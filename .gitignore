@@ -59,3 +59,8 @@ out/
 CMakeSettings.json
 ## Staging area for cmake install (default install prefix)
 SIMH-install
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
