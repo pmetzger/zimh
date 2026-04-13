@@ -34,7 +34,7 @@ jobs:
         
       - name: Installing build dependencies
         run: |
-           sh -ex .travis/deps.sh linux
+           sh -ex tools/ci/deps/deps.sh linux
            sudo apt --assume-yes install -ym ninja-build
         if: steps.determine-repo.outputs.repo == 'open-simh/simh'
 

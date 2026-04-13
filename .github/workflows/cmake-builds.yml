@@ -22,7 +22,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Install dependencies
       run: |
-        sh -ex .travis/deps.sh linux
+        sh -ex tools/ci/deps/deps.sh linux
         sudo apt install -ym ninja-build
     - name: cmake-builder.sh
       run: |
@@ -78,7 +78,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        sh -ex .travis/deps.sh osx
+        sh -ex tools/ci/deps/deps.sh osx
 
     - name: cmake-builder.sh
       run: |

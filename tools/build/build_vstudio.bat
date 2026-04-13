@@ -1,4 +1,6 @@
 @echo off
+set _SIMH_ROOT=%~dp0\..\..
+pushd "%_SIMH_ROOT%"
 :: Rebuild all of SIMH simulators using Visual Studio
 ::
 :: If this procedure is not invoked from a Developer command prompt
@@ -27,7 +29,7 @@
 set _BUILD_CONFIG=Release
 set _BUILD_PROJECTS=
 set _REBUILD_PROJECTS=
-set _BUILD_PROJECT_DIR=%~dp0\Visual Studio Projects\
+set _BUILD_PROJECT_DIR=%_SIMH_ROOT%\tools\legacy\visual-studio-projects\
 :_CheckArg
 if "%1" == "" goto _DoneArgs
 if /i "%1" == "Debug" set _BUILD_CONFIG=Debug& shift & goto _CheckArg

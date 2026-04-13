@@ -42,7 +42,7 @@ ipch/
 # Visual Studio, Visual Code directories:
 .vscode/
 .vs/
-build/
+/build/
 cmake-build-check/
 # We only care about specific files in the Visual Studio Projects 
 # folder.  Things which are there on the fly to support debugging 

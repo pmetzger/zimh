@@ -1,4 +1,6 @@
 @echo off
+set _SIMH_ROOT=%~dp0\..\..
+pushd "%_SIMH_ROOT%"
 rem Compile all of SIMH using MINGW make and gcc environment
 rem
 rem The Makefile will determine if the needed WinPcap build
@@ -17,3 +19,6 @@ if not exist BIN mkdir BIN
 gcc -v 1>NUL 2>NUL
 if ERRORLEVEL 1 echo "MinGW Environment Unavailable"
 mingw32-make -f Makefile %*
+set _BUILD_STATUS=%ERRORLEVEL%
+popd
+exit /b %_BUILD_STATUS%

@@ -180,7 +180,11 @@ def normalize_variables(varstr):
 
 
 def test_rule_rx():
-    result = _rule_rx.match('${BIN}frontpaneltest${EXE} : frontpanel/FrontPanelTest.c sim_sock.c sim_frontpanel.c')
+    result = _rule_rx.match(
+        '${BIN}frontpaneltest${EXE} : '
+        'src/components/frontpanel/FrontPanelTest.c '
+        'src/runtime/sim_sock.c src/runtime/sim_frontpanel.c'
+    )
     print('{0}: {1}'.format('${BIN}frontpaneltest${EXE}...', result))
     print(result.groups())
 

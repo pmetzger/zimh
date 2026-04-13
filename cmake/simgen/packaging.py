@@ -66,7 +66,7 @@ cpack_add_component(runtime_support
 )
 
 ## Basic documentation for SIMH
-install(FILES doc/simh.doc TYPE DOC COMPONENT runtime_support)
+install(FILES docs/legacy-word/doc/simh.doc TYPE DOC COMPONENT runtime_support)
 
 """)
 

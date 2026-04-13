@@ -200,16 +200,20 @@ class CMakeBuildSystem:
         """Add indirectly referenced macros and variables, adding them to the defines dictionary.
 
         Indirectly referenced macros and variables are macros and variables embedded in existing
-        variables, source macros and include lists. For example, SIMHD is an indirect reference
-        in "KA10D = ${SIMHD}/ka10" because KA10D might never have been expanded by 'extract()'.
+        variables, source macros and include lists. For example, SIMROOT is an indirect reference
+        in "KA10D = ${SIMROOT}/PDP10" because KA10D might never have been expanded by 'extract()'.
         """
 
         def scan_var(varset, var):
             tmp = var
             return varset.union(set(SPM.extract_variables(tmp)))
 
-        def replace_simhd(l, v):
-            l.append(v.replace('SIMHD', 'CMAKE_SOURCE_DIR'))
+        def replace_make_roots(l, v):
+            v = v.replace('SIMROOT', 'SIMH_SIMULATOR_ROOT')
+            v = v.replace('COREHD', 'SIMH_CORE_ROOT')
+            v = v.replace('RUNTIMEHD', 'SIMH_RUNTIME_ROOT')
+            v = v.replace('COMPONENTHD', 'SIMH_COMPONENTS_ROOT')
+            l.append(v)
             return l
 
         simvars = set()
@@ -233,12 +237,15 @@ class CMakeBuildSystem:
                 else:
                     print('{0}: variable not defined.'.format(var))
 
-        ## Replace SIMHD with CMAKE_SOURCE_DIR
+        ## Replace Makefile path roots with the corresponding CMake roots.
         for k, v in self.vars.items():
             if isinstance(v, list):
-                v = functools.reduce(replace_simhd, v, [])
+                v = functools.reduce(replace_make_roots, v, [])
             else:
-                v = v.replace('SIMHD', 'CMAKE_SOURCE_DIR')
+                v = v.replace('SIMROOT', 'SIMH_SIMULATOR_ROOT')
+                v = v.replace('COREHD', 'SIMH_CORE_ROOT')
+                v = v.replace('RUNTIMEHD', 'SIMH_RUNTIME_ROOT')
+                v = v.replace('COMPONENTHD', 'SIMH_COMPONENTS_ROOT')
             self.vars[k] = v
 
     def collect_source_macros(self, comp, defs, varname, simcoll, sim, debug=0, depth=''):
@@ -300,9 +307,10 @@ class CMakeBuildSystem:
                     alldeps.add(mvar)
 
         nodeps = self.vars.copy()
-        ## SIMHD will never be used.
-        if 'SIMHD' in nodeps:
-            del nodeps['SIMHD']
+        ## Path-root helper variables will never be emitted directly.
+        for helper in ('SIMROOT', 'COREHD', 'RUNTIMEHD', 'COMPONENTHD'):
+            if helper in nodeps:
+                del nodeps[helper]
         for dep in alldeps:
             del nodeps[dep]
 

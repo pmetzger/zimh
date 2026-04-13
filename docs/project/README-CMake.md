@@ -67,8 +67,8 @@ Before you begin building the simulators, you need the following:
     builds on Windows.
 
   - _Microsoft Visual C/C++_: Visual Studio 2022, 2019, 2017 and 2015 are
-    supported. The [appveyor CI/CD][appveyor] pipeline builds using these four
-    Microsoft toolchains in _Release_ and _Debug_ configurations.
+    supported. The project CI exercises these Microsoft toolchains in
+    _Release_ and _Debug_ configurations.
 
     - _VS 2022_: The Community Edition can be downloaded from the
       [Microsoft Visual Studio Community][vs_community] page.
@@ -267,28 +267,28 @@ package on Linux and macOS.
 
 #### Linux, macOS and MinGW-w64
 
-[Github Actions][open_simh_actions] and [appveyor][appveyor] CI/CD pipelines
-execute the `.travis/deps.sh` script to install these feature libraries on Linux
-and macOS. `.travis/deps.sh` can also install the requisite toolchains and
-feature libraries for and MinGW-64 Win64 native and Universal C Runtime (UCRT)
+[Github Actions][open_simh_actions] executes the
+`tools/ci/deps/deps.sh` script to install these feature libraries on Linux and
+macOS. `tools/ci/deps/deps.sh` can also install the requisite toolchains and
+feature libraries for MinGW-64 Win64 native and Universal C Runtime (UCRT)
 binaries.
 
   - Linux apt-based distributions (e.g., Debian, Ubuntu):
 
     ```bash
-    $ sudo sh .travis/deps.sh linux
+    $ sudo sh tools/ci/deps/deps.sh linux
     ```
 
   - macOS Homebrew:
 
     ```bash
-    $ sudo sh .travis/deps.sh osx
+    $ sudo sh tools/ci/deps/deps.sh osx
     ```
 
   - macOS MacPorts:
 
     ```bash
-    $ sudo sh .travis/deps.sh macports
+    $ sudo sh tools/ci/deps/deps.sh macports
     ```
 
   - MinGW-w64 Win64 console:
@@ -296,7 +296,7 @@ binaries.
     ```bash
     $ echo $MSYSTEM
     MINGW64
-    $ .travis/deps.sh mingw64
+    $ tools/ci/deps/deps.sh mingw64
     ```
 
   - MinGW-w64 UCRT console:
@@ -304,7 +304,7 @@ binaries.
     ```bash
     $ echo $MSYSTEM
     UCRT64
-    $ .travis/deps.sh ucrt64
+    $ tools/ci/deps/deps.sh ucrt64
     ```
 
 #### Windows: "Legacy" superbuild or `vcpkg`
@@ -458,8 +458,8 @@ entirely from within the VS IDE.
 
 Building the simulator suite via the build scripts is simply a matter of
 following the appropriate script below. If you are a build-from-source SIMH
-user, this is all you need to do. The [Github Actions][open_simh_actions] and
-the [appveyor] CI/CD pipelines execute these scripts.
+user, this is all you need to do. The [Github Actions][open_simh_actions]
+workflow executes these scripts.
 
 - Linux/Unix-lib/macOS/MinGW-w64:
 
@@ -470,7 +470,7 @@ the [appveyor] CI/CD pipelines execute these scripts.
 
     # Install feature dependency libraries (use "osx", for HomeBrew or "macports" for MacPorts)
     # on macOS with HomeBrew.)
-    $ sh .travis/deps.sh linux
+    $ sh tools/ci/deps/deps.sh linux
 
     # Configure cmake to generate Unix Makefiles, compile the simulators
     # using the 'Release' configuration inside the cmake/build-unix build
@@ -904,9 +904,9 @@ Setting `RELEASE_LTO` to `True` does two things:
 The net effect of turning on `-O3`, `-flto` and `-Werror` is additional static
 code checking and any LTO-emitted warnings are fatal compilation errors.
 
-`RELEASE_LTO` is the default optimization for the appveyor and Github Actions
- CI/CD builds. Any warnings will cause these CI/CD builds to fail and must be
- corrected before the code is accepted in the SIMH main branch.
+`RELEASE_LTO` is the default optimization for the Github Actions CI builds.
+Any warnings will cause these CI builds to fail and must be corrected before
+the code is accepted in the SIMH main branch.
 
 
 ### `cppcheck` static code checks
@@ -1545,7 +1545,6 @@ generate.py: Expecting to emit 78 simulators.
 ```
 
 
-[appveyor]: https://www.appveyor.com/
 [bison]: https://www.gnu.org/software/bison/
 [chocolatey]: https://chocolatey.org/
 [cmake_build_type]: https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html

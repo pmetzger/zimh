@@ -51,8 +51,8 @@ if (NOT DEFINED VCPKG_TARGET_TRIPLET)
                 "(b) If VCPKG is not usable on this system, unset the VCPKG_ROOT environment variable.")
         endif ()
 
-        ## Set the default triplet in the environment; older vcpkg installs on
-        ## appveyor don't necessarily support the "--triplet" command line argument.
+        ## Set the default triplet in the environment; older vcpkg installs do
+        ## not necessarily support the "--triplet" command line argument.
         set(use_triplet "${SIMH_VCPKG_ARCH}-${SIMH_VCPKG_PLATFORM}")
         if (SIMH_VCPKG_RUNTIME)
             string(APPEND use_triplet "-${SIMH_VCPKG_RUNTIME}")

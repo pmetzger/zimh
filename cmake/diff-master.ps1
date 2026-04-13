@@ -3,12 +3,11 @@
 $excludes = @(
     "/*CMakeLists.txt",
     "/.gitignore",
-    "/Visual Studio Projects/",
     "/build_*.bat",
     "/cmake/",
     "/PDP8/tests/diags/*.pal",
     "/PDP8/tests/diags/*.txt",
-    "/appveyor.yml"
+    "/tools/legacy/visual-studio-projects/"
 ) | % { "`":!" + $_ + "`"" }
 
 git diff --ignore-space-at-eol simh/master HEAD -- ${excludes}

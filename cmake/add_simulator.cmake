@@ -23,24 +23,24 @@ add_custom_target(update_sim_commit ALL
 
 ## Simulator sources and library:
 set(SIM_SOURCES
-    ${CMAKE_SOURCE_DIR}/scp.c
-    ${CMAKE_SOURCE_DIR}/sim_card.c
-    ${CMAKE_SOURCE_DIR}/sim_console.c
-    ${CMAKE_SOURCE_DIR}/sim_disk.c
-    ${CMAKE_SOURCE_DIR}/sim_ether.c
-    ${CMAKE_SOURCE_DIR}/sim_fio.c
-    ${CMAKE_SOURCE_DIR}/sim_imd.c
-    ${CMAKE_SOURCE_DIR}/sim_scsi.c
-    ${CMAKE_SOURCE_DIR}/sim_serial.c
-    ${CMAKE_SOURCE_DIR}/sim_sock.c
-    ${CMAKE_SOURCE_DIR}/sim_tape.c
-    ${CMAKE_SOURCE_DIR}/sim_timer.c
-    ${CMAKE_SOURCE_DIR}/sim_tmxr.c
-    ${CMAKE_SOURCE_DIR}/sim_video.c)
+    ${SIMH_CORE_ROOT}/scp.c
+    ${SIMH_RUNTIME_ROOT}/sim_card.c
+    ${SIMH_RUNTIME_ROOT}/sim_console.c
+    ${SIMH_RUNTIME_ROOT}/sim_disk.c
+    ${SIMH_RUNTIME_ROOT}/sim_ether.c
+    ${SIMH_RUNTIME_ROOT}/sim_fio.c
+    ${SIMH_RUNTIME_ROOT}/sim_imd.c
+    ${SIMH_RUNTIME_ROOT}/sim_scsi.c
+    ${SIMH_RUNTIME_ROOT}/sim_serial.c
+    ${SIMH_RUNTIME_ROOT}/sim_sock.c
+    ${SIMH_RUNTIME_ROOT}/sim_tape.c
+    ${SIMH_RUNTIME_ROOT}/sim_timer.c
+    ${SIMH_RUNTIME_ROOT}/sim_tmxr.c
+    ${SIMH_RUNTIME_ROOT}/sim_video.c)
 
 set(SIM_VIDEO_SOURCES
-    ${CMAKE_SOURCE_DIR}/display/display.c
-    ${CMAKE_SOURCE_DIR}/display/sim_ws.c)
+    ${SIMH_COMPONENTS_ROOT}/display/display.c
+    ${SIMH_COMPONENTS_ROOT}/display/sim_ws.c)
 
 ## Build a simulator core library, with and without AIO support. The AIO variant
 ## has "_aio" appended to its name, e.g., "simhz64_aio" or "simhz64_video_aio".
@@ -64,8 +64,11 @@ function(build_simcore _targ)
         target_compile_options(${lib} PRIVATE ${EXTRA_TARGET_CFLAGS})
         target_link_options(${lib} PRIVATE ${EXTRA_TARGET_LFLAGS})
 
-        # Make sure that the top-level directory is part of the libary's include path:
-        target_include_directories("${lib}" PUBLIC "${CMAKE_SOURCE_DIR}")
+        # Make sure the shared source roots are part of the library include path.
+        target_include_directories("${lib}" PUBLIC
+            "${SIMH_CORE_ROOT}"
+            "${SIMH_RUNTIME_ROOT}"
+            "${SIMH_COMPONENTS_ROOT}")
 
         if (SIMH_INT64)
             target_compile_definitions(${lib} PUBLIC USE_INT64)
@@ -389,45 +392,47 @@ build_simcore(simhz64_video  VIDEO INT64 ADDR64)
 build_simcore(simhi64_besm6  VIDEO INT64 BESM6_SDL_HACK)
 
 if (NOT DONT_USE_ROMS)
-    add_executable(BuildROMs sim_BuildROMs.c)
-    target_include_directories(BuildROMs PUBLIC "${CMAKE_SOURCE_DIR}")
+    add_executable(BuildROMs ${SIMH_RUNTIME_ROOT}/sim_BuildROMs.c)
+    target_include_directories(BuildROMs PUBLIC
+        "${SIMH_CORE_ROOT}"
+        "${SIMH_RUNTIME_ROOT}")
     target_link_libraries(BuildROMs os_features)
     add_custom_command(
         OUTPUT
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka655x_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka620_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka630_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka610_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka410_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka411_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka412_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka41a_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka41d_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka42a_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka42b_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka43a_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka46a_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka47a_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka48a_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_is1000_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka410_xs_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka420_rdrz_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka420_rzrz_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka4xx_4pln_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka4xx_8pln_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka4xx_dz_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka4xx_spx_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka750_bin_new.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_ka750_bin_old.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_vcb02_bin.h
-            ${CMAKE_SOURCE_DIR}/VAX/vax_vmb_exe.h
-            ${CMAKE_SOURCE_DIR}/PDP11/pdp11_vt_lunar_rom.h
-            ${CMAKE_SOURCE_DIR}/PDP11/pdp11_dazzle_dart_rom.h
-            ${CMAKE_SOURCE_DIR}/PDP11/pdp11_11logo_rom.h
-            ${CMAKE_SOURCE_DIR}/swtp6800/swtp6800/swtp_swtbugv10_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka655x_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka620_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka630_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka610_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka410_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka411_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka412_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka41a_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka41d_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka42a_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka42b_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka43a_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka46a_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka47a_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka48a_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_is1000_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka410_xs_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka420_rdrz_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka420_rzrz_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka4xx_4pln_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka4xx_8pln_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka4xx_dz_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka4xx_spx_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka750_bin_new.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka750_bin_old.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_vcb02_bin.h
+            ${SIMH_SIMULATOR_ROOT}/VAX/vax_vmb_exe.h
+            ${SIMH_SIMULATOR_ROOT}/PDP11/pdp11_vt_lunar_rom.h
+            ${SIMH_SIMULATOR_ROOT}/PDP11/pdp11_dazzle_dart_rom.h
+            ${SIMH_SIMULATOR_ROOT}/PDP11/pdp11_11logo_rom.h
+            ${SIMH_SIMULATOR_ROOT}/swtp6800/swtp6800/swtp_swtbugv10_bin.h
         MAIN_DEPENDENCY BuildROMs
         COMMAND BuildROMS
-        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
 endif ()
 
@@ -437,11 +442,14 @@ endif ()
 ##
 ## Needs curses...
 add_executable(frontpaneltest
-    ${CMAKE_SOURCE_DIR}/frontpanel/FrontPanelTest.c
-    ${CMAKE_SOURCE_DIR}/sim_sock.c
-    ${CMAKE_SOURCE_DIR}/sim_frontpanel.c)
+    ${SIMH_COMPONENTS_ROOT}/frontpanel/FrontPanelTest.c
+    ${SIMH_RUNTIME_ROOT}/sim_sock.c
+    ${SIMH_RUNTIME_ROOT}/sim_frontpanel.c)
 
-target_include_directories(frontpaneltest PUBLIC "${CMAKE_SOURCE_DIR}")
+target_include_directories(frontpaneltest PUBLIC
+    "${SIMH_CORE_ROOT}"
+    "${SIMH_RUNTIME_ROOT}"
+    "${SIMH_COMPONENTS_ROOT}")
 target_link_libraries(frontpaneltest PUBLIC os_features thread_lib)
 
 if (WIN32)

@@ -234,7 +234,7 @@ The top-level `CMakeLists.txt` drives CMake's configure/generate phase, which ha
 
 - If the `NO_DEP_BUILD` option is `True` (which is usually the case) and there are missing dependency
   libraries, print a fatal error message with the missing libraries, suggest to the user how they might
-  fix this (`.travis/deps.sh`) and exit.
+  fix this (`tools/ci/deps/deps.sh`) and exit.
 
 - Initiate a "superbuild" if missing dependency libraries need to be built and `NO_DEP_BUILD` is `False`.
   - A superbuild is CMake's terminology for building external software and libraries (see *CMake's*
@@ -262,7 +262,8 @@ The top-level `CMakeLists.txt` drives CMake's configure/generate phase, which ha
 
 *add_simulator* is the centerpiece around which the rest of the CMake-based infrastructure revolves. The
 basic principle is to make simulator compiles very straightforward with a simple *CMake* function. The
-function's full documentation for usage and options are in [README-CMake.md][cmake_readme].
+function's full documentation for usage and options are in
+[docs/project/README-CMake.md][cmake_readme].
 
 `add_simulator.cmake` decomposes into eight (8) sections:
 
@@ -502,13 +503,13 @@ your source tree.
   per-subdirectory `SimCollection` simulator groups.
 
 - `SimCollection` (`sim_collection.py`): A group of simulators, e.g., all of the VAX or PDP-11 simulators,
-  or the PDP-8 simulator. It also maps simulator source macro names to source lists that become *CMake* 
+  or the PDP-8 simulator. It also maps simulator source macro names to source lists that become *CMake*
   variables to make the emitted `CMakeLists.txt` files more readable. The `SimCollection.write_simulators`
   method emits the simulator subdirectory `CMakeLists.txt` file.
 
 - `SIMHBasicSimulator` (`basic_simulator.py`): An individual SIMH simulator stored inside a `SimCollection`.
-  This class tracks of the simulator's sources, simulator-specific defines and include paths, as well as 
-  detects when the simulator requires 64-bit address and 64-bit data, when the simulator requires video 
+  This class tracks of the simulator's sources, simulator-specific defines and include paths, as well as
+  detects when the simulator requires 64-bit address and 64-bit data, when the simulator requires video
   support. The `SIMHBasicSimulator.write_section` method emits the individual simulator's `add_simulator`
   function call to the `CMakeLists.txt` file stream passed by the parent `SimCollection`.
 
@@ -548,7 +549,7 @@ class SIMHPackaging:
 
     def was_processed(self) -> bool:
         return self.processed == True
-    
+
     def encountered(self) -> None:
         self.processed = True
 
@@ -601,7 +602,7 @@ cpack_add_component(runtime_support
 )
 
 ## Basic documentation for SIMH
-install(FILES doc/simh.doc TYPE DOC COMPONENT runtime_support)
+install(FILES docs/legacy-word/doc/simh.doc TYPE DOC COMPONENT runtime_support)
 
 """)
 
@@ -685,7 +686,7 @@ unnecessary for SIMH.
 <!-- Reference links -->
 [cmake]: https://cmake.org
 [cmake_modules]: https://gitlab.kitware.com/cmake/cmake/-/tree/master/Modules
-[cmake_readme]: ../README-CMake.md
+[cmake_readme]: ../docs/project/README-CMake.md
 [cpack]: https://cmake.org/cmake/help/latest/module/CPack.html
 [cpack_generators]: https://cmake.org/cmake/help/latest/manual/cpack-generators.7.html#manual:cpack-generators(7)
 [external_project]: https://cmake.org/cmake/help/latest/module/ExternalProject.html

@@ -35,6 +35,14 @@ set(SIMH_VERSION_PATCH 0)
 set(SIMH_VERSION "${SIMH_VERSION_MAJOR}.${SIMH_VERSION_MINOR}.${SIMH_VERSION_PATCH}"
     CACHE PATH "Open-Simh version string.")
 
+set(SIMH_CORE_ROOT ${CMAKE_SOURCE_DIR}/src/core)
+set(SIMH_RUNTIME_ROOT ${CMAKE_SOURCE_DIR}/src/runtime)
+set(SIMH_COMPONENTS_ROOT ${CMAKE_SOURCE_DIR}/src/components)
+set(SIMH_SIMULATOR_ROOT ${CMAKE_SOURCE_DIR}/simulators)
+set(SIMH_THIRD_PARTY_ROOT ${CMAKE_SOURCE_DIR}/third_party)
+set(SIMH_TOOLS_ROOT ${CMAKE_SOURCE_DIR}/tools)
+set(SIMH_DOCS_ROOT ${CMAKE_SOURCE_DIR}/docs)
+
 # Places to look for CMake modules/includes
 set(SIMH_INCLUDE_PATH_LIST
     ${CMAKE_SOURCE_DIR}/cmake
@@ -424,7 +432,7 @@ if (NO_DEP_BUILD AND SIMH_BUILD_DEPS)
     message("Please install the above dependencies via your platform package management or")
     message("software installation system and reconfigure.")
     message("")
-    message("Also see the .travis/deps.h file for Brew and apt packages installed during")
+    message("Also see tools/ci/deps/deps.sh for Brew and apt packages installed during")
     message("github.com workflow actions.")
     message(FATAL_ERROR "Missing dependencies, cannot continue.")
 
@@ -449,7 +457,7 @@ endif ()
 if (NOT DO_DEPENDENCY_BUILD)
     include (add_simulator)
     if (WITH_SLIRP)
-      add_subdirectory(slirp)
+      add_subdirectory(third_party/slirp)
     endif (WITH_SLIRP)
 
 ## Don't delete yet ##    set(Python_ADDITIONAL_VERSIONS 3)

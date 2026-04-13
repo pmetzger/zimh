@@ -69,7 +69,7 @@ param (
     ## The build environment's "flavor" that determines which CMake generator is used
     ## to create all of the build machinery to compile the SIMH simulator suite
     ## and the target compiler.
-    ## 
+    ##
     ## Supported flavors:
     ## ------------------
     ## vs2022          Visual Studio 2022 (default)
@@ -288,7 +288,7 @@ if (!$testonly)
     that your PATH environment variables references the directory in which it was
     installed.
 
-    See the .travis/deps.sh functions mingw64() and ucrt64() for the pacman packages
+    See the tools/ci/deps/deps.sh functions mingw64() and ucrt64() for the pacman packages
     that should be installed.
 "@
             exit 1
@@ -406,7 +406,7 @@ if (($scriptPhases -contains "generate") -or ($scriptPhases -contains "build"))
     ## Unconditionally remove the CMake cache.
     Remove-Item          -Force -Path ${buildDir}/CMakeCache.txt -ErrorAction SilentlyContinue | Out-Null
     Remove-Item -Recurse -Force -Path ${buildDir}/CMakeFiles     -ErrorAction SilentlyContinue | Out-Null
-   
+
     ## Where we do the heaving lifting:
     $generateArgs = @("-G", $genInfo.Generator)
     if ($genInfo.SingleConfig) {
@@ -469,7 +469,7 @@ if (($scriptPhases -contains "generate") -or ($scriptPhases -contains "build"))
           $buildArgs += @("--target", "$targ")
         }
     }
-    
+
     $buildSpecificArgs = @()
     if ($flavor -eq "mingw" -and $parallel)
     {
@@ -527,7 +527,7 @@ foreach ($phase in $scriptPhases) {
                 $tests = "simh-(" + ($target -join "|") + ")`$"
                 $testArgs += @("-R", $tests)
             }
-         
+
             $phaseCommand = ${ctestCmd}
             $argList = $testArgs
 
