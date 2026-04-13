@@ -48,6 +48,9 @@ cmake-build-check/
 # legacy Word documents against their Markdown conversions.
 tmp/word-text/
 tmp/word-text-stage.*/
+# Temporary working tree containing existing Markdown conversions and
+# exported assets while the Word-document replacement effort is ongoing.
+simh-docs/
 # We only care about specific files in the Visual Studio Projects 
 # folder.  Things which are there on the fly to support debugging 
 # or other things we don't want git to manage.
