@@ -7003,7 +7003,9 @@ sim_printf ("\n*** Containers with meta data tests\n");
 if (tarfiles == NULL)
     tarfiles = sim_get_filelist ("./Test-Disks/*.tar.gz");
 if (tarfiles == NULL)
-    tarfiles = sim_get_filelist ("./tools/legacy/visual-studio-projects/Test-Disks/*.tar.gz");
+    tarfiles = sim_get_filelist ("../tests/data/disk-meta/*.tar.gz");
+if (tarfiles == NULL)
+    tarfiles = sim_get_filelist ("./tests/data/disk-meta/*.tar.gz");
 sim_printf ("Tar File containing test disk images: ");
 sim_print_filelist (tarfiles);
 if (tarfiles) {
