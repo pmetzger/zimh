@@ -17,7 +17,7 @@ X11-style open source license; the precise terms are available at:
 
 [2 Compiling A Simulator](#compiling-a-simulator)
 
-[2.1 Compiling Under UNIX/Linux/Mac OS-X](#compiling-under-unixlinuxmac-os-x)
+[2.1 Compiling Under Unix/Linux/macOS](#compiling-under-unixlinuxmacos)
 
 [2.2 Compiling Under Windows](#compiling-under-windows)
 
@@ -26,8 +26,6 @@ X11-style open source license; the precise terms are available at:
 [2.2.2 Compiling Under Visual C++](#compiling-under-visual-c)
 
 [2.2.3 Compiling Under MinGW](#compiling-under-mingw)
-
-[2.3 Compiling Under OpenVMS](#compiling-under-openvms)
 
 [3 Simulator Conventions](#simulator-conventions)
 
@@ -161,9 +159,7 @@ simulator are documented in separate, machine-specific memoranda.
 
 # Running A Simulator
 
-To start the simulator, simply type its name. (On VMS the simulators
-must then be defined as foreign commands in order to be started by
-name.)
+To start the simulator, simply type its name.
 
 The simulator recognizes three command line switches: `-q`, `-v`, and
 `-e`. If `-q` is specified, certain informational messages are
@@ -195,12 +191,11 @@ sim>
 
 # Compiling A Simulator
 
-The simulators have been tested on VAX VMS, Alpha VMS, IA64 VMS, Alpha
-UNIX, NetBSD, FreeBSD, OpenBSD, Linux, Solaris, Windows
-9x/NT/2000/XP/Win7/Win8, MacOS X, and OS/2. Porting to other
-environments will require changes to the operating system dependent
-code in the SIMH libraries (`sim_fio.c`, `sim_timer.c`, `sim_console.c`,
-`sim_ether.c`, `sim_sock.c`, `sim_disk.c`, `sim_serial.c`).
+The simulators have been tested on NetBSD, FreeBSD, OpenBSD, Linux,
+Windows, and macOS. Porting to other environments will require
+changes to the operating system dependent code in the SIMH libraries
+(`sim_fio.c`, `sim_timer.c`, `sim_console.c`, `sim_ether.c`,
+`sim_sock.c`, `sim_disk.c`, `sim_serial.c`).
 
 The simulator sources are provided in a zip archive and are organized
 hierarchically:
@@ -224,9 +219,9 @@ The simulators recognize or require a few compile-time `#define`s:
 - The PDP-10 and IBM 7094 simulators use 64b integer variables,
   requiring that `USE_INT64` be defined as part of the compilation
   command line. Since 64b integer declarations vary, `sim_defs.h` has
-  conditional declarations for Windows (`_int64`) and Digital UNIX
-  (`long`). The default is GNU C (`long long`). If your compiler uses a
-  different convention, you will have to modify `sim_defs.h`.
+  conditional declarations for Windows (`_int64`). The default is GNU C
+  (`long long`). If your compiler uses a different convention, you will
+  have to modify `sim_defs.h`.
 
 - The PDP-10, PDP-11, and VAX simulators share common peripherals. To
   distinguish the target system, one of three variables must be
@@ -235,9 +230,9 @@ The simulators recognize or require a few compile-time `#define`s:
 
 - The PDP-11, and VAX simulators optionally support Ethernet. At
   present, Ethernet support has been tested only on Windows, Linux,
-  OSX, NetBSD, OpenBSD, FreeBSD, Solaris, Alpha and IA64 VMS, but it
-  should work in any host environment that supports the Pcap library
-  (see the Ethernet readme file).
+  macOS, NetBSD, OpenBSD, and FreeBSD, but it should work in any host
+  environment that supports the Pcap library (see the Ethernet readme
+  file).
 
 - The PDP-11 and VAX simulators support disks and sequential tape
   files greater than 2GB when the host OS is capable of manipulating
@@ -251,7 +246,7 @@ The simulators recognize or require a few compile-time `#define`s:
   `XADD`) will be disabled; the remainder of the FFP instructions will
   work normally. There may be some compilation warnings.
 
-## Compiling Under Unix/Linux/Mac OS-X
+## Compiling Under Unix/Linux/macOS
 
 The sources originate on a Windows system and have CR-LF line
 endings. For use on other systems, the sources may need to be
@@ -277,9 +272,9 @@ gmake {target|ALL|clean}
 Notes for hand compilation:
 
 - The default Unix terminal handling model is the POSIX TERMIOS
-  interface, which is supported by Linux, Mac OS/X, and Alpha UNIX. If
-  your Unix only supports the BSD terminal interface, `BSDTTY` must be
-  defined as part of the compilation command line.
+  interface, which is supported by Linux and macOS. If your Unix only
+  supports the BSD terminal interface, `BSDTTY` must be defined as part
+  of the compilation command line.
 
 - The PDP-8, PDP-11, 18b PDP, PDP-10, and Nova simulators use the math
   library. If your Unix does not link the math library automatically,
@@ -410,20 +405,6 @@ all the simulators from source. By default, the PDP-11 and VAX family
 simulators are built with Ethernet support if the necessary Winpcap
 components are available at build time. The compiled executables will
 be produced in the `BIN` directory which will be created if needed.
-
-## Compiling Under OpenVMS
-
-Compiling on OpenVMS requires DEC C. The simulators that require 64b
-(PDP-10, VAX and others) will not compile on OpenVMS/VAX. The SIMH
-distribution includes an MMS command file descrip.mms that will build
-all the simulators from source. An example of hand compilation:
-
-- PDP-8 under VMS:
-
-```
-$ cc scp.c,sim_*.c,[.pdp8]pdp8*.c
-$ link/exec=pdp8 scp.obj,sim_*.obj,[.pdp8]pdp8*.obj
-```
 
 # Simulator Conventions
 
