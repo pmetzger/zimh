@@ -1,15 +1,18 @@
-# RustyIron Historical Computer Simulator
+# ZeeRust Historical Computer Simulator
 
-RustyIron is a software emulator for important classic computer
+ZeeRust is a software emulator for important classic computer
 systems and peripherals. It provides simulators, device models, and
 the supporting infrastructure needed to run historical software and
 operating systems with high fidelity on modern machines.
 
-RustyIron is a hard fork of SIMH, the simulator created by Bob Supnik
+ZeeRust is a hard fork of SIMH, the simulator created by Bob Supnik
 and extended over many years by the SIMH team and broader contributor
 community. We are grateful to Bob and the SIMH contributors for all of
 their work over the years. Without their effort, none of this would be
 possible.
+
+If you are curious about where the name comes from,
+see: [TV Tropes: Zeerust](https://tvtropes.org/pmwiki/pmwiki.php/Main/Zeerust).
 
 The goals of this fork are substantially different from those of the
 original project. In particular, this project is intended to pursue:
