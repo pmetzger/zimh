@@ -63,7 +63,7 @@ Notes:
 | `simh_magtape.doc` | `docs/manual/magtape_format.md` | yes, proofread | `replaced` | verified against Word and adopted without substantive text changes |
 | `simh_swre.doc` | `docs/manual/sample_software.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical document; fixed command dash corruption, spelling/typo defects, and minor heading/text cleanup before adoption |
 | `simh_vmio.doc` | `docs/developers/adding_io_devices.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical document; fixed heading spacing, prose defects, I/O notation consistency, and a real `IVCL` code-example typo before adoption |
-| `simulators_acm_queue_2004.doc` | `docs/articles/simulators_acm_queue_2004.md` | yes, proofread | `not started` | article rather than manual |
+| `simulators_acm_queue_2004.doc` | `docs/articles/simulators_acm_queue_2004.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical article; removed a stray heading artifact and fixed minor capitalization/unit/style defects while preserving the established hand-converted structure |
 | `ssem_doc.doc` | `docs/simulators/SSEM/ssem_doc.md` | yes, proofread | `not started` | verify against Word before adopting |
 | `swtp6800_doc.doc` | `docs/simulators/swtp6800/swtp6800_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `tx0_doc.doc` | `docs/simulators/TX-0/tx0_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
