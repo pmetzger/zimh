@@ -77,6 +77,29 @@ This work should proceed in these stages:
    - begin from the existing `simh-docs` Pandoc output
    - hand-clean the draft heavily, following the structure and style of
      the already-believed-correct `simh-docs` conversions
+   - when a document is still visibly raw Pandoc output, do a dedicated
+     structure-cleanup pass before thinking about adoption:
+     - replace fake page-number TOCs with real section-link TOCs
+     - convert command lists, file lists, register lists, mode lists,
+       and similar aligned text into real Markdown tables
+     - replace broken paragraph splits, malformed list structure, and
+       other obvious conversion damage
+     - normalize the copyright/front-matter block to the current
+       cleaned-doc standard
+   - align the document's Markdown presentation with the cleaned
+     manuals such as `pdp11.md`:
+     - use fenced code blocks for standalone syntax forms and usage
+       examples rather than leaving them as inline-code paragraphs
+     - backquote uppercase literals in prose when they denote commands,
+       registers, device mnemonics, mode names, constants, state
+       keywords, or similar machine-readable terms
+     - keep ordinary prose as prose; do not over-quote words that are
+       not acting as literals
+     - reflow ordinary prose to fit repository width conventions when
+       that improves readability without damaging tables or link lines
+     - prefer 80-column wrapping for ordinary prose in converted
+       documents, but do not force awkward wrapping of tables, code
+       blocks, or long Markdown link lines
    - proofread the result against the original Word file
    - update the tracker with problems found and resolved
 
