@@ -57,7 +57,7 @@ Notes:
 | `sel32_doc.doc` | `docs/simulators/SEL32/sel32_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `sigma_doc.doc` | `docs/simulators/sigma/sigma_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `simh.doc` | `docs/project/writing_a_simulator.md` | yes, proofread | `replaced` | verified against Word; fixed malformed VM hardware table, stray table rule, and obvious source typos before adoption |
-| `simh_breakpoints.doc` | `docs/project/simh_breakpoints.md` | yes, proofread | `not started` | project-level documentation |
+| `simh_breakpoints.doc` | `docs/project/simh_breakpoints.md` | yes, proofread | `replaced` | verified against Word; fixed command dashes, code quote corruption, code formatting defects, and obvious source typos before adoption |
 | `simh_doc.doc` | `docs/project/simh_doc.md` | yes, proofread | `not started` | SIMH user's guide |
 | `simh_faq.doc` | `docs/project/simh_faq.md` | yes, proofread | `not started` | project-level documentation |
 | `simh_magtape.doc` | `docs/project/simh_magtape.md` | yes, proofread | `not started` | project-level documentation |
