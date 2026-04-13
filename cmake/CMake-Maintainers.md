@@ -130,8 +130,8 @@ open-simh                            This is CMAKE_SOURCE_DIR
 |   +-- fpintrin.cmake               Unused. Detects SSE, SSE2 and SSE3.
 |   +-- generate.py                  Python script that generates the simulator
 |   |                                CMakeLists.txt from the Makefile
-|   +-- git-commit-id.cmake          CMake script to update .git-commit-id and
-|   |                                .git-commit-id.h
+|   +-- git-commit-id.cmake          CMake script to update git-commit-id.txt and
+|   |                                git-commit-id.h
 |   +-- github_v141_xp.ps1           Visual Studio "XP toolkit" installer PowerShell
 |   |                                script
 |   +-- installer-customizations     Installer-specific customization files
@@ -267,9 +267,10 @@ function's full documentation for usage and options are in
 
 `add_simulator.cmake` decomposes into eight (8) sections:
 
-- Update `${CMAKE_SOURCE_DIR}/.git-commit-id` and `${CMAKE_SOURCE_DIR}/.git-commit-id.h` with the current
-  Git hash identifier, if it has changed. These files are only rewritten if the hash identifier has
-  changed, i.e., there has been a new commit.
+- Update `${CMAKE_BINARY_DIR}/generated/git-commit-id.txt` and
+  `${CMAKE_BINARY_DIR}/generated/git-commit-id.h` with the current Git hash
+  identifier, if it has changed. These files are only rewritten if the hash
+  identifier has changed, i.e., there has been a new commit.
 
 - `build_simcore` function: This is the workhorse function that compiles the six (6) simulator core
   libraries: `simhcore`, `simhi64`, `simhz64` and their `_video` counterparts. Network support is always

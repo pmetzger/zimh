@@ -7,16 +7,18 @@ find_program(GIT_COMMAND git)
 if (GIT_COMMAND)
     message(STATUS "Git command is ${GIT_COMMAND}")
 else ()
-    message(STATUS "Git not found -- will not update or include .git-commit-id.h")
+    message(STATUS "Git not found -- will not update or include git-commit-id.h")
 endif ()
+
+set(SIMH_GENERATED_INCLUDE_DIR "${CMAKE_BINARY_DIR}/generated")
 
 add_custom_target(update_sim_commit ALL
     COMMAND ${CMAKE_COMMAND}
-        -D GIT_COMMIT_DEST=${CMAKE_SOURCE_DIR}
+        -D GIT_COMMIT_DEST=${SIMH_GENERATED_INCLUDE_DIR}
         -P ${CMAKE_SOURCE_DIR}/cmake/git-commit-id.cmake
     BYPRODUCTS
-        ${CMAKE_SOURCE_DIR}/.git-commit-id
-        ${CMAKE_SOURCE_DIR}/.git-commit-id.h
+        ${SIMH_GENERATED_INCLUDE_DIR}/git-commit-id.txt
+        ${SIMH_GENERATED_INCLUDE_DIR}/git-commit-id.h
     WORKING_DIRECTORY
         ${CMAKE_SOURCE_DIR}
 )
@@ -68,7 +70,8 @@ function(build_simcore _targ)
         target_include_directories("${lib}" PUBLIC
             "${SIMH_CORE_ROOT}"
             "${SIMH_RUNTIME_ROOT}"
-            "${SIMH_COMPONENTS_ROOT}")
+            "${SIMH_COMPONENTS_ROOT}"
+            "${SIMH_GENERATED_INCLUDE_DIR}")
 
         if (SIMH_INT64)
             target_compile_definitions(${lib} PUBLIC USE_INT64)
@@ -107,7 +110,7 @@ function(build_simcore _targ)
             thread_lib
         )
 
-        # Ensure that sim_rev.h picks up .git-commit-id.h if the git command is
+        # Ensure that sim_rev.h picks up git-commit-id.h if the git command is
         # available.
         if (GIT_COMMAND)
             target_compile_definitions("${lib}" PRIVATE SIM_NEED_GIT_COMMIT_ID)

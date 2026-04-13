@@ -1,10 +1,12 @@
 ## git-commit-id.cmake
 ##
 ## Get the current Git commit hash code and commit time, update
-## .git-commit-id and .git-commit-id.h
+## git-commit-id.txt and git-commit-id.h
 
-set(GIT_COMMIT_ID ${GIT_COMMIT_DEST}/.git-commit-id)
-set(GIT_COMMIT_ID_H ${GIT_COMMIT_DEST}/.git-commit-id.h)
+set(GIT_COMMIT_ID ${GIT_COMMIT_DEST}/git-commit-id.txt)
+set(GIT_COMMIT_ID_H ${GIT_COMMIT_DEST}/git-commit-id.h)
+
+file(MAKE_DIRECTORY ${GIT_COMMIT_DEST})
 
 find_program(GIT_COMMAND git)
 if (GIT_COMMAND)

@@ -345,17 +345,19 @@ ifeq (${WIN32},)  #*nix Environments (&& cygwin)
       OS_CCDEFS += -Wno-deprecated
     endif
   endif
+  GIT_COMMIT_DIR = BIN/buildtools
+  GIT_COMMIT_FILE = ${GIT_COMMIT_DIR}/git-commit-id.txt
   ifeq (git-repo,$(shell if ${TEST} -e ./.git; then echo git-repo; fi))
     GIT_PATH=$(strip $(shell which git))
     ifeq (,$(GIT_PATH))
       $(error building using a git repository, but git is not available)
     endif
-    ifeq (commit-id-exists,$(shell if ${TEST} -e .git-commit-id; then echo commit-id-exists; fi))
-      CURRENT_GIT_COMMIT_ID=$(strip $(shell grep 'SIM_GIT_COMMIT_ID' .git-commit-id | awk '{ print $$2 }'))
+    ifeq (commit-id-exists,$(shell if ${TEST} -e ${GIT_COMMIT_FILE}; then echo commit-id-exists; fi))
+      CURRENT_GIT_COMMIT_ID=$(strip $(shell grep 'SIM_GIT_COMMIT_ID' ${GIT_COMMIT_FILE} | awk '{ print $$2 }'))
       ACTUAL_GIT_COMMIT_ID=$(strip $(shell git log -1 --pretty="%H"))
       ifneq ($(CURRENT_GIT_COMMIT_ID),$(ACTUAL_GIT_COMMIT_ID))
         NEED_COMMIT_ID = need-commit-id
-        # make sure that the invalidly formatted .git-commit-id file wasn't generated
+        # make sure that the invalidly formatted git-commit-id file wasn't generated
         # by legacy git hooks which need to be removed.
         $(shell rm -f .git/hooks/post-checkout .git/hooks/post-commit .git/hooks/post-merge)
       endif
@@ -367,7 +369,8 @@ ifeq (${WIN32},)  #*nix Environments (&& cygwin)
     endif
     ifneq (,$(or $(NEED_COMMIT_ID),$(GIT_EXTRA_FILES)))
       isodate=$(shell git log -1 --pretty="%ai"|sed -e 's/ /T/'|sed -e 's/ //')
-      $(shell git log -1 --pretty="SIM_GIT_COMMIT_ID %H$(GIT_EXTRA_FILES)%nSIM_GIT_COMMIT_TIME $(isodate)" >.git-commit-id)
+      $(shell mkdir -p ${GIT_COMMIT_DIR})
+      $(shell git log -1 --pretty="SIM_GIT_COMMIT_ID %H$(GIT_EXTRA_FILES)%nSIM_GIT_COMMIT_TIME $(isodate)" >${GIT_COMMIT_FILE})
     endif
   endif
   LTO_EXCLUDE_VERSIONS =
@@ -1087,9 +1090,9 @@ ifeq (${WIN32},)  #*nix Environments (&& cygwin)
   ifneq (binexists,$(shell if ${TEST} -e BIN/buildtools; then echo binexists; fi))
     MKDIRBIN = @mkdir -p BIN/buildtools
   endif
-  ifeq (commit-id-exists,$(shell if ${TEST} -e .git-commit-id; then echo commit-id-exists; fi))
-    GIT_COMMIT_ID=$(shell grep 'SIM_GIT_COMMIT_ID' .git-commit-id | awk '{ print $$2 }')
-    GIT_COMMIT_TIME=$(shell grep 'SIM_GIT_COMMIT_TIME' .git-commit-id | awk '{ print $$2 }')
+  ifeq (commit-id-exists,$(shell if ${TEST} -e ${GIT_COMMIT_FILE}; then echo commit-id-exists; fi))
+    GIT_COMMIT_ID=$(shell grep 'SIM_GIT_COMMIT_ID' ${GIT_COMMIT_FILE} | awk '{ print $$2 }')
+    GIT_COMMIT_TIME=$(shell grep 'SIM_GIT_COMMIT_TIME' ${GIT_COMMIT_FILE} | awk '{ print $$2 }')
   else
     ifeq (,$(shell grep 'define SIM_GIT_COMMIT_ID' src/core/sim_rev.h | grep 'Format:'))
       GIT_COMMIT_ID=$(shell grep 'define SIM_GIT_COMMIT_ID' src/core/sim_rev.h | awk '{ print $$3 }')
@@ -1204,6 +1207,8 @@ else
       MKDIRBIN=
     endif
   endif
+  GIT_COMMIT_DIR = BIN\buildtools
+  GIT_COMMIT_FILE = $(GIT_COMMIT_DIR)\git-commit-id.txt
   ifneq ($(USE_NETWORK),)
     NETWORK_OPT += -DUSE_SHARED
   endif
@@ -1212,15 +1217,15 @@ else
     ifeq (,$(GIT_PATH))
       $(error building using a git repository, but git is not available)
     endif
-    ifeq (commit-id-exists,$(shell if exist .git-commit-id echo commit-id-exists))
-      CURRENT_GIT_COMMIT_ID=$(shell for /F "tokens=2" %%i in ("$(shell findstr /C:"SIM_GIT_COMMIT_ID" .git-commit-id)") do echo %%i)
+    ifeq (commit-id-exists,$(shell if exist $(GIT_COMMIT_FILE) echo commit-id-exists))
+      CURRENT_GIT_COMMIT_ID=$(shell for /F "tokens=2" %%i in ("$(shell findstr /C:"SIM_GIT_COMMIT_ID" $(GIT_COMMIT_FILE))") do echo %%i)
       ifneq (, $(shell git update-index --refresh --))
         ACTUAL_GIT_COMMIT_EXTRAS=+uncommitted-changes
       endif
       ACTUAL_GIT_COMMIT_ID=$(strip $(shell git log -1 --pretty=%H))$(ACTUAL_GIT_COMMIT_EXTRAS)
       ifneq ($(CURRENT_GIT_COMMIT_ID),$(ACTUAL_GIT_COMMIT_ID))
         NEED_COMMIT_ID = need-commit-id
-        # make sure that the invalidly formatted .git-commit-id file wasn't generated
+        # make sure that the invalidly formatted git-commit-id file wasn't generated
         # by legacy git hooks which need to be removed.
         $(shell if exist .git\hooks\post-checkout del .git\hooks\post-checkout)
         $(shell if exist .git\hooks\post-commit   del .git\hooks\post-commit)
@@ -1236,13 +1241,14 @@ else
       ACTUAL_GIT_COMMIT_ID=$(strip $(shell git log -1 --pretty=%H))$(ACTUAL_GIT_COMMIT_EXTRAS)
       isodate=$(shell git log -1 --pretty=%ai)
       commit_time=$(word 1,$(isodate))T$(word 2,$(isodate))$(word 3,$(isodate))
-      $(shell echo SIM_GIT_COMMIT_ID $(ACTUAL_GIT_COMMIT_ID)>.git-commit-id)
-      $(shell echo SIM_GIT_COMMIT_TIME $(commit_time)>>.git-commit-id)
+      $(shell if not exist $(GIT_COMMIT_DIR) mkdir $(GIT_COMMIT_DIR))
+      $(shell echo SIM_GIT_COMMIT_ID $(ACTUAL_GIT_COMMIT_ID)>$(GIT_COMMIT_FILE))
+      $(shell echo SIM_GIT_COMMIT_TIME $(commit_time)>>$(GIT_COMMIT_FILE))
     endif
   endif
-  ifneq (,$(shell if exist .git-commit-id echo git-commit-id))
-    GIT_COMMIT_ID=$(shell for /F "tokens=2" %%i in ("$(shell findstr /C:"SIM_GIT_COMMIT_ID" .git-commit-id)") do echo %%i)
-    GIT_COMMIT_TIME=$(shell for /F "tokens=2" %%i in ("$(shell findstr /C:"SIM_GIT_COMMIT_TIME" .git-commit-id)") do echo %%i)
+  ifneq (,$(shell if exist $(GIT_COMMIT_FILE) echo git-commit-id))
+    GIT_COMMIT_ID=$(shell for /F "tokens=2" %%i in ("$(shell findstr /C:"SIM_GIT_COMMIT_ID" $(GIT_COMMIT_FILE))") do echo %%i)
+    GIT_COMMIT_TIME=$(shell for /F "tokens=2" %%i in ("$(shell findstr /C:"SIM_GIT_COMMIT_TIME" $(GIT_COMMIT_FILE))") do echo %%i)
   else
     ifeq (,$(shell findstr /C:"define SIM_GIT_COMMIT_ID" src/core/sim_rev.h | findstr Format))
       GIT_COMMIT_ID=$(shell for /F "tokens=3" %%i in ("$(shell findstr /C:"define SIM_GIT_COMMIT_ID" src/core/sim_rev.h)") do echo %%i)
@@ -1426,7 +1432,7 @@ ifneq ($(DONT_USE_READER_THREAD),)
 endif
 
 CC_OUTSPEC = -o $@
-CC := ${GCC} ${CC_STD} -U__STRICT_ANSI__ ${CFLAGS_G} ${CFLAGS_O} ${CFLAGS_GIT} ${CFLAGS_I} -DSIM_COMPILER="${COMPILER_NAME}" -DSIM_BUILD_TOOL=simh-makefile -I . -I src/core -I src/runtime -I src/components ${OS_CCDEFS} ${ROMS_OPT}
+CC := ${GCC} ${CC_STD} -U__STRICT_ANSI__ ${CFLAGS_G} ${CFLAGS_O} ${CFLAGS_GIT} ${CFLAGS_I} -DSIM_COMPILER="${COMPILER_NAME}" -DSIM_BUILD_TOOL=simh-makefile -I . -I src/core -I src/runtime -I src/components -I BIN/buildtools ${OS_CCDEFS} ${ROMS_OPT}
 ifneq (,${SIM_VERSION_MODE})
   CC += -DSIM_VERSION_MODE="${SIM_VERSION_MODE}"
 endif
@@ -3045,4 +3051,3 @@ ${BIN}frontpaneltest${EXE} : src/components/frontpanel/FrontPanelTest.c src/runt
 	#cmake:ignore-target
 	${MKDIRBIN}
 	${CC} src/components/frontpanel/FrontPanelTest.c src/runtime/sim_sock.c src/runtime/sim_frontpanel.c ${CC_OUTSPEC} ${LDFLAGS} ${OS_CURSES_DEFS}
-
