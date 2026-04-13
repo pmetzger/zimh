@@ -35,6 +35,26 @@ for the specific wording.
 A detailed listing of features in the inherited code base as of 12 May
 2022 may be found in [SIMH-V4-status](docs/project/SIMH-V4-status.md).
 
+## Repository Layout
+
+The repository contains:
+
+- `src/`: shared core, runtime, and reusable in-tree components
+- `simulators/`: source trees for specific machine simulators
+- `docs/`: project-level, historical, and legacy-format documentation
+- `third_party/`: vendored or externally-derived code
+- `tools/`: build helpers, CI support, and developer utilities
+- `tests/`: shared test infrastructure and test data
+
+Build entrypoints visible at the top level:
+
+- `CMakeLists.txt`
+- `Makefile`
+- `cmake/`
+- `vcpkg.json`
+
+More detail is in [docs/project/layout.md](docs/project/layout.md).
+
 ## PLEASE NOTE
 
 **Do not** contribute material taken from `github.com/simh/simh`
