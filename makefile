@@ -1328,17 +1328,24 @@ ifneq (,$(UNSUPPORTED_BUILD))
   CFLAGS_GIT += -DSIM_BUILD=Unsupported=$(UNSUPPORTED_BUILD)
 endif
 OPTIMIZE ?= -O2 -DNDEBUG=1
+CFLAGS_UB =
+ifneq (,$(findstring GCC Version:,$(COMPILER_NAME))$(findstring clang,$(COMPILER_NAME))$(findstring LLVM,$(COMPILER_NAME)))
+  # Temporarily require wraparound overflow semantics while the code base
+  # still contains signed-overflow UB that must not be exploited by the
+  # optimizer.
+  CFLAGS_UB = -fwrapv -fno-strict-overflow
+endif
 ifneq ($(DEBUG),)
   CFLAGS_G = -g -ggdb -g3 -D_DEBUG=1
-  CFLAGS_O = -O0
+  CFLAGS_O = -O0 ${CFLAGS_UB}
   BUILD_FEATURES = - debugging support
   LTO =
 else
   ifneq (,$(findstring clang,$(COMPILER_NAME))$(findstring LLVM,$(COMPILER_NAME)))
-    CFLAGS_O = $(OPTIMIZE) -fno-strict-overflow
+    CFLAGS_O = $(OPTIMIZE) ${CFLAGS_UB}
     GCC_OPTIMIZERS_CMD = ${GCC} --help 2>&1
   else
-    CFLAGS_O := $(OPTIMIZE)
+    CFLAGS_O := $(OPTIMIZE) ${CFLAGS_UB}
   endif
   LDFLAGS_O =
   GCC_MAJOR_VERSION = $(firstword $(subst  ., ,$(GCC_VERSION)))
@@ -1368,9 +1375,6 @@ else
   endif
   ifneq (,$(findstring -funsafe-loop-optimizations,$(GCC_OPTIMIZERS)))
     CFLAGS_O += -fno-unsafe-loop-optimizations
-  endif
-  ifneq (,$(findstring -fstrict-overflow,$(GCC_OPTIMIZERS)))
-    CFLAGS_O += -fno-strict-overflow
   endif
   ifneq (,$(findstring $(GCC_VERSION),$(LTO_EXCLUDE_VERSIONS)))
     override LTO =
