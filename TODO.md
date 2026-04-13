@@ -53,6 +53,8 @@ This work should proceed in these stages:
      - retaining intentional hand-edited readability improvements even
        when they are not literal reproductions of the Word source, so
        long as meaning is preserved
+     - correcting obvious source-document typos when doing so improves
+       clarity without changing meaning
    - mark the tracker only after that proofreading pass is complete
 
 3. Replace the Word documents only after the Markdown replacement is
