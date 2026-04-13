@@ -44,6 +44,10 @@ ipch/
 .vs/
 /build/
 cmake-build-check/
+# Temporary plain-text extractions and staging used when proofreading
+# legacy Word documents against their Markdown conversions.
+tmp/word-text/
+tmp/word-text-stage.*/
 # We only care about specific files in the Visual Studio Projects 
 # folder.  Things which are there on the fly to support debugging 
 # or other things we don't want git to manage.
