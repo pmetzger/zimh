@@ -61,7 +61,7 @@ Notes:
 | `simh_doc.doc` | `docs/project/simh_users_guide.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical document; fixed malformed command syntax, missing words, grammar/typo defects, and other conversion damage while preserving prior human editorial updates |
 | `simh_faq.doc` | `docs/project/simh_faq.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical document; fixed quote corruption, malformed examples, missing punctuation/spacing, and obvious grammar/typo defects while preserving prior human editorial updates |
 | `simh_magtape.doc` | `docs/project/magtape_format.md` | yes, proofread | `replaced` | verified against Word and adopted without substantive text changes |
-| `simh_swre.doc` | `docs/project/simh_swre.md` | yes, proofread | `not started` | sample software documentation |
+| `simh_swre.doc` | `docs/project/sample_software.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical document; fixed command dash corruption, spelling/typo defects, and minor heading/text cleanup before adoption |
 | `simh_vmio.doc` | `docs/project/simh_vmio.md` | yes, proofread | `not started` | project-level documentation |
 | `simulators_acm_queue_2004.doc` | `docs/articles/simulators_acm_queue_2004.md` | yes, proofread | `not started` | article rather than manual |
 | `ssem_doc.doc` | `docs/simulators/SSEM/ssem_doc.md` | yes, proofread | `not started` | verify against Word before adopting |
