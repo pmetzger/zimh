@@ -1,8 +1,11 @@
 # SIMH v4.0 - 19-01 Current
 
+This document is retained as a historical status snapshot inherited from
+SIMH. References below to Travis CI, AppVeyor, OpenVMS/VMS, and
+`descrip.mms` are historical and do not describe the current RustyIron
+build or CI configuration.
+
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/11982/badge.svg)](https://scan.coverity.com/projects/simh)
-[![Build Status](https://travis-ci.org/simh/simh.svg)](https://travis-ci.org/simh/simh)
-[![AppVeyor](https://ci.appveyor.com/api/projects/status/github/simh/simh)](https://ci.appveyor.com/project/simh/simh/history)
 
 ## Table of Contents:
 [WHAT'S NEW since simh v3.9](#whats-new-since-simh-v39)

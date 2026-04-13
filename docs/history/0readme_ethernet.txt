@@ -1,5 +1,10 @@
 This file contains information about the SIMH Ethernet package.
 
+Editorial note: this is a historical document inherited from SIMH.
+References below to the old "Visual Studio Projects" directory and
+`descrip.mms` describe removed legacy infrastructure and are preserved
+for historical context only.
+
 -------------------------------------------------------------------------------
 
 The XQ emulator is a host-independent software emulation of Digital's

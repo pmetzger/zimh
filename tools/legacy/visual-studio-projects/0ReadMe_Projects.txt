@@ -1,26 +1,28 @@
-This dirctory contains a set of Visual Studio 2008 build projects for the 
-current simh code base.  When used (with Visual Studio Express 2008 or 
-or a later Visual Studio version) it populates a directory tree under the 
-BIN directory of the Simh distribution for temporary build files and 
-produces resulting executables in the BIN/NT/Win32-Debug or 
-BIN/NT/Win32-Release directories (depending on whether you target a Debug 
-or Release build).
+This directory contains a legacy set of Visual Studio 2008 build projects
+for the inherited SIMH code base. It is retained primarily for historical
+reference, and may be removed in a future cleanup. The supported Windows
+build path for this repository is the CMake-based workflow.
+
+When used experimentally (with Visual Studio Express 2008 or a later
+Visual Studio version) it populates a directory tree under the BIN
+directory of the distribution for temporary build files and produces
+resulting executables in the BIN/NT/Win32-Debug or BIN/NT/Win32-Release
+directories (depending on whether you target a Debug or Release build).
 
 These projects, when used with Visual Studio 2008, will produce Release 
 build binaries that will run on Windows versions from XP onward.  Building
 with later versions of Visual Studio will have different Windows version
 compatibility.
 
-The Visual Studio Projects expect that various dependent packages that
-the simh code depends on are available in a directory parallel to the 
-simh directory.  
+These project files expect that various dependent packages are available
+in a directory parallel to the source tree.
 
 For Example, the directory structure should look like:
 
-    .../simh/sim-master/VAX/vax_cpu.c
-    .../simh/sim-master/scp.c
-    .../simh/sim-master/Visual Studio Projects/simh.sln
-    .../simh/sim-master/Visual Studio Projects/VAX.vcproj
+    .../simh/sim-master/simulators/VAX/vax_cpu.c
+    .../simh/sim-master/src/core/scp.c
+    .../simh/sim-master/tools/legacy/visual-studio-projects/Simh.sln
+    .../simh/sim-master/tools/legacy/visual-studio-projects/VAX.vcproj
     .../simh/sim-master/BIN/Nt/Win32-Release/vax.exe
     .../simh/windows-build/pthreads/pthread.h
     .../simh/windows-build/winpcap/WpdPack/Include/pcap.h
@@ -78,6 +80,6 @@ your later version of Visual Studio will automatically convert the Visual
 Studio 2008 project files.  You should ignore any warnings produced by the 
 conversion process.
 
-If you have a version of Visual Studio installed and want to build all the
-simulators from a command prompt, the file build_vstudio.bat in the root
-of the simh source tree will do that without any furthur interaction.
+If you want to experiment with these project files, open the Simh.sln file
+in this directory directly from Visual Studio. The old command-line helper
+script is no longer maintained as a supported build path.

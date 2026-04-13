@@ -93,7 +93,9 @@ echo **** ERROR **** Can't locate the Windows SDK include and library files
 exit /B 1
 :VSOK
 
-rem  This procedure must be located in the "Visual Studio Projects\Win32-Development-Binaries" directory.
+rem  This procedure is legacy infrastructure retained for historical reference.
+rem  It must be located in the
+rem  "tools\legacy\visual-studio-projects\Win32-Development-Binaries" directory.
 rem  The git repository directory (.git) is located relative to that directory.
 cd %~p0
 SET GIT_COMMIT_ID=
