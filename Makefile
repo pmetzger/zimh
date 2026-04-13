@@ -349,28 +349,30 @@ ifeq (${WIN32},)  #*nix Environments (&& cygwin)
   GIT_COMMIT_FILE = ${GIT_COMMIT_DIR}/git-commit-id.txt
   ifeq (git-repo,$(shell if ${TEST} -e ./.git; then echo git-repo; fi))
     GIT_PATH=$(strip $(shell which git))
-    ifeq (,$(GIT_PATH))
-      $(error building using a git repository, but git is not available)
-    endif
-    ifeq (commit-id-exists,$(shell if ${TEST} -e ${GIT_COMMIT_FILE}; then echo commit-id-exists; fi))
-      CURRENT_GIT_COMMIT_ID=$(strip $(shell grep 'SIM_GIT_COMMIT_ID' ${GIT_COMMIT_FILE} | awk '{ print $$2 }'))
-      ACTUAL_GIT_COMMIT_ID=$(strip $(shell git log -1 --pretty="%H"))
-      ifneq ($(CURRENT_GIT_COMMIT_ID),$(ACTUAL_GIT_COMMIT_ID))
+    ifneq (,$(GIT_PATH))
+      ifeq (commit-id-exists,$(shell if ${TEST} -e ${GIT_COMMIT_FILE}; then echo commit-id-exists; fi))
+        CURRENT_GIT_COMMIT_ID=$(strip $(shell grep 'SIM_GIT_COMMIT_ID' ${GIT_COMMIT_FILE} | awk '{ print $$2 }'))
+        ACTUAL_GIT_COMMIT_ID=$(strip $(shell git log -1 --pretty="%H"))
+        ifneq ($(CURRENT_GIT_COMMIT_ID),$(ACTUAL_GIT_COMMIT_ID))
+          NEED_COMMIT_ID = need-commit-id
+          # make sure that the invalidly formatted git-commit-id file wasn't generated
+          # by legacy git hooks which need to be removed.
+          $(shell rm -f .git/hooks/post-checkout .git/hooks/post-commit .git/hooks/post-merge)
+        endif
+      else
         NEED_COMMIT_ID = need-commit-id
-        # make sure that the invalidly formatted git-commit-id file wasn't generated
-        # by legacy git hooks which need to be removed.
-        $(shell rm -f .git/hooks/post-checkout .git/hooks/post-commit .git/hooks/post-merge)
+      endif
+      ifneq (,$(shell git update-index --refresh --))
+        GIT_EXTRA_FILES=+uncommitted-changes
+      endif
+      ifneq (,$(or $(NEED_COMMIT_ID),$(GIT_EXTRA_FILES)))
+        isodate=$(shell git log -1 --pretty="%ai"|sed -e 's/ /T/'|sed -e 's/ //')
+        $(shell mkdir -p ${GIT_COMMIT_DIR})
+        $(shell git log -1 --pretty="SIM_GIT_COMMIT_ID %H$(GIT_EXTRA_FILES)%nSIM_GIT_COMMIT_TIME $(isodate)" >${GIT_COMMIT_FILE})
       endif
     else
-      NEED_COMMIT_ID = need-commit-id
-    endif
-    ifneq (,$(shell git update-index --refresh --))
-      GIT_EXTRA_FILES=+uncommitted-changes
-    endif
-    ifneq (,$(or $(NEED_COMMIT_ID),$(GIT_EXTRA_FILES)))
-      isodate=$(shell git log -1 --pretty="%ai"|sed -e 's/ /T/'|sed -e 's/ //')
-      $(shell mkdir -p ${GIT_COMMIT_DIR})
-      $(shell git log -1 --pretty="SIM_GIT_COMMIT_ID %H$(GIT_EXTRA_FILES)%nSIM_GIT_COMMIT_TIME $(isodate)" >${GIT_COMMIT_FILE})
+      GIT_METADATA_FALLBACK = 1
+      $(info git is not available; using fallback build metadata)
     endif
   endif
   LTO_EXCLUDE_VERSIONS =
@@ -1090,9 +1092,21 @@ ifeq (${WIN32},)  #*nix Environments (&& cygwin)
   ifneq (binexists,$(shell if ${TEST} -e BIN/buildtools; then echo binexists; fi))
     MKDIRBIN = @mkdir -p BIN/buildtools
   endif
-  ifeq (commit-id-exists,$(shell if ${TEST} -e ${GIT_COMMIT_FILE}; then echo commit-id-exists; fi))
-    GIT_COMMIT_ID=$(shell grep 'SIM_GIT_COMMIT_ID' ${GIT_COMMIT_FILE} | awk '{ print $$2 }')
-    GIT_COMMIT_TIME=$(shell grep 'SIM_GIT_COMMIT_TIME' ${GIT_COMMIT_FILE} | awk '{ print $$2 }')
+  ifneq ($(GIT_METADATA_FALLBACK),1)
+    ifeq (commit-id-exists,$(shell if ${TEST} -e ${GIT_COMMIT_FILE}; then echo commit-id-exists; fi))
+      GIT_COMMIT_ID=$(shell grep 'SIM_GIT_COMMIT_ID' ${GIT_COMMIT_FILE} | awk '{ print $$2 }')
+      GIT_COMMIT_TIME=$(shell grep 'SIM_GIT_COMMIT_TIME' ${GIT_COMMIT_FILE} | awk '{ print $$2 }')
+    else
+      ifeq (,$(shell grep 'define SIM_GIT_COMMIT_ID' src/core/sim_rev.h | grep 'Format:'))
+        GIT_COMMIT_ID=$(shell grep 'define SIM_GIT_COMMIT_ID' src/core/sim_rev.h | awk '{ print $$3 }')
+        GIT_COMMIT_TIME=$(shell grep 'define SIM_GIT_COMMIT_TIME' src/core/sim_rev.h | awk '{ print $$3 }')
+      else
+        ifeq (git-submodule,$(if $(shell cd .. ; git rev-parse --git-dir 2>/dev/null),git-submodule))
+          GIT_COMMIT_ID=$(shell cd .. ; git submodule status | grep " $(notdir $(realpath .)) " | awk '{ print $$1 }')
+          GIT_COMMIT_TIME=$(shell cd .. ; git show -s --pretty=%cI $(GIT_COMMIT_ID))
+        endif
+      endif
+    endif
   else
     ifeq (,$(shell grep 'define SIM_GIT_COMMIT_ID' src/core/sim_rev.h | grep 'Format:'))
       GIT_COMMIT_ID=$(shell grep 'define SIM_GIT_COMMIT_ID' src/core/sim_rev.h | awk '{ print $$3 }')
@@ -1214,41 +1228,50 @@ else
   endif
   ifeq (git-repo,$(shell if exist .git echo git-repo))
     GIT_PATH := $(shell where git)
-    ifeq (,$(GIT_PATH))
-      $(error building using a git repository, but git is not available)
-    endif
-    ifeq (commit-id-exists,$(shell if exist $(GIT_COMMIT_FILE) echo commit-id-exists))
-      CURRENT_GIT_COMMIT_ID=$(shell for /F "tokens=2" %%i in ("$(shell findstr /C:"SIM_GIT_COMMIT_ID" $(GIT_COMMIT_FILE))") do echo %%i)
-      ifneq (, $(shell git update-index --refresh --))
-        ACTUAL_GIT_COMMIT_EXTRAS=+uncommitted-changes
-      endif
-      ACTUAL_GIT_COMMIT_ID=$(strip $(shell git log -1 --pretty=%H))$(ACTUAL_GIT_COMMIT_EXTRAS)
-      ifneq ($(CURRENT_GIT_COMMIT_ID),$(ACTUAL_GIT_COMMIT_ID))
+    ifneq (,$(GIT_PATH))
+      ifeq (commit-id-exists,$(shell if exist $(GIT_COMMIT_FILE) echo commit-id-exists))
+        CURRENT_GIT_COMMIT_ID=$(shell for /F "tokens=2" %%i in ("$(shell findstr /C:"SIM_GIT_COMMIT_ID" $(GIT_COMMIT_FILE))") do echo %%i)
+        ifneq (, $(shell git update-index --refresh --))
+          ACTUAL_GIT_COMMIT_EXTRAS=+uncommitted-changes
+        endif
+        ACTUAL_GIT_COMMIT_ID=$(strip $(shell git log -1 --pretty=%H))$(ACTUAL_GIT_COMMIT_EXTRAS)
+        ifneq ($(CURRENT_GIT_COMMIT_ID),$(ACTUAL_GIT_COMMIT_ID))
+          NEED_COMMIT_ID = need-commit-id
+          # make sure that the invalidly formatted git-commit-id file wasn't generated
+          # by legacy git hooks which need to be removed.
+          $(shell if exist .git\hooks\post-checkout del .git\hooks\post-checkout)
+          $(shell if exist .git\hooks\post-commit   del .git\hooks\post-commit)
+          $(shell if exist .git\hooks\post-merge    del .git\hooks\post-merge)
+        endif
+      else
         NEED_COMMIT_ID = need-commit-id
-        # make sure that the invalidly formatted git-commit-id file wasn't generated
-        # by legacy git hooks which need to be removed.
-        $(shell if exist .git\hooks\post-checkout del .git\hooks\post-checkout)
-        $(shell if exist .git\hooks\post-commit   del .git\hooks\post-commit)
-        $(shell if exist .git\hooks\post-merge    del .git\hooks\post-merge)
+      endif
+      ifeq (need-commit-id,$(NEED_COMMIT_ID))
+        ifneq (, $(shell git update-index --refresh --))
+          ACTUAL_GIT_COMMIT_EXTRAS=+uncommitted-changes
+        endif
+        ACTUAL_GIT_COMMIT_ID=$(strip $(shell git log -1 --pretty=%H))$(ACTUAL_GIT_COMMIT_EXTRAS)
+        isodate=$(shell git log -1 --pretty=%ai)
+        commit_time=$(word 1,$(isodate))T$(word 2,$(isodate))$(word 3,$(isodate))
+        $(shell if not exist $(GIT_COMMIT_DIR) mkdir $(GIT_COMMIT_DIR))
+        $(shell echo SIM_GIT_COMMIT_ID $(ACTUAL_GIT_COMMIT_ID)>$(GIT_COMMIT_FILE))
+        $(shell echo SIM_GIT_COMMIT_TIME $(commit_time)>>$(GIT_COMMIT_FILE))
       endif
     else
-      NEED_COMMIT_ID = need-commit-id
-    endif
-    ifeq (need-commit-id,$(NEED_COMMIT_ID))
-      ifneq (, $(shell git update-index --refresh --))
-        ACTUAL_GIT_COMMIT_EXTRAS=+uncommitted-changes
-      endif
-      ACTUAL_GIT_COMMIT_ID=$(strip $(shell git log -1 --pretty=%H))$(ACTUAL_GIT_COMMIT_EXTRAS)
-      isodate=$(shell git log -1 --pretty=%ai)
-      commit_time=$(word 1,$(isodate))T$(word 2,$(isodate))$(word 3,$(isodate))
-      $(shell if not exist $(GIT_COMMIT_DIR) mkdir $(GIT_COMMIT_DIR))
-      $(shell echo SIM_GIT_COMMIT_ID $(ACTUAL_GIT_COMMIT_ID)>$(GIT_COMMIT_FILE))
-      $(shell echo SIM_GIT_COMMIT_TIME $(commit_time)>>$(GIT_COMMIT_FILE))
+      GIT_METADATA_FALLBACK = 1
+      $(info git is not available; using fallback build metadata)
     endif
   endif
-  ifneq (,$(shell if exist $(GIT_COMMIT_FILE) echo git-commit-id))
-    GIT_COMMIT_ID=$(shell for /F "tokens=2" %%i in ("$(shell findstr /C:"SIM_GIT_COMMIT_ID" $(GIT_COMMIT_FILE))") do echo %%i)
-    GIT_COMMIT_TIME=$(shell for /F "tokens=2" %%i in ("$(shell findstr /C:"SIM_GIT_COMMIT_TIME" $(GIT_COMMIT_FILE))") do echo %%i)
+  ifneq ($(GIT_METADATA_FALLBACK),1)
+    ifneq (,$(shell if exist $(GIT_COMMIT_FILE) echo git-commit-id))
+      GIT_COMMIT_ID=$(shell for /F "tokens=2" %%i in ("$(shell findstr /C:"SIM_GIT_COMMIT_ID" $(GIT_COMMIT_FILE))") do echo %%i)
+      GIT_COMMIT_TIME=$(shell for /F "tokens=2" %%i in ("$(shell findstr /C:"SIM_GIT_COMMIT_TIME" $(GIT_COMMIT_FILE))") do echo %%i)
+    else
+      ifeq (,$(shell findstr /C:"define SIM_GIT_COMMIT_ID" src/core/sim_rev.h | findstr Format))
+        GIT_COMMIT_ID=$(shell for /F "tokens=3" %%i in ("$(shell findstr /C:"define SIM_GIT_COMMIT_ID" src/core/sim_rev.h)") do echo %%i)
+        GIT_COMMIT_TIME=$(shell for /F "tokens=3" %%i in ("$(shell findstr /C:"define SIM_GIT_COMMIT_TIME" src/core/sim_rev.h)") do echo %%i)
+      endif
+    endif
   else
     ifeq (,$(shell findstr /C:"define SIM_GIT_COMMIT_ID" src/core/sim_rev.h | findstr Format))
       GIT_COMMIT_ID=$(shell for /F "tokens=3" %%i in ("$(shell findstr /C:"define SIM_GIT_COMMIT_ID" src/core/sim_rev.h)") do echo %%i)
