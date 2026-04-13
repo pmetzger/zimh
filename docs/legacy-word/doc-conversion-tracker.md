@@ -50,7 +50,7 @@ Notes:
 | `pdp10_doc.doc` | `docs/simulators/PDP10/pdp10_doc.md` | yes, proofread | `not started` | verify relationship to KA10/KI10/KS10 docs |
 | `pdp11_doc.doc` | `docs/simulators/PDP11/pdp11.md` | yes, proofread | `replaced` | proofread against Word; TM11 table/prose bug fixed before adoption |
 | `pdp18b_doc.doc` | `docs/simulators/PDP18B/pdp18b_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
-| `pdp1_doc.doc` | `docs/simulators/PDP1/pdp1_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
+| `pdp1_doc.doc` | `docs/simulators/PDP1/pdp1.md` | yes, raw pandoc | `replaced` | verified against Word and heavily cleaned before adoption; replaced fake page-number TOC entries, normalized front matter, converted command/register/mode listings into real Markdown tables, converted standalone syntax forms into fenced code blocks, aligned literal formatting with cleaned manuals, clarified PDP-1 glyph names with Unicode where unambiguous, and fixed real content defects including clock command names, a `WRE` register-name typo, dash corruption, and prose issues |
 | `pdp6_doc.doc` | `docs/simulators/PDP10/pdp6_doc.md` | yes, proofread | `not started` | tentative placement under PDP10 family |
 | `pdp8_doc.doc` | `docs/simulators/PDP8/pdp8_doc.md` | yes, proofread | `not started` | verify against Word before adopting |
 | `sds_doc.doc` | `docs/simulators/SDS/sds_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
