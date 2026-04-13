@@ -14,7 +14,7 @@ import simgen.parse_makefile as SPM
 import simgen.sim_collection as SC
 import simgen.utils as SU
 
-## Corresponding special variable uses in the makefile:
+## Corresponding special variable uses in the Makefile:
 _special_sources = frozenset(['${DISPLAYL}', '$(DISPLAYL)'])
 
 ## Banner header for individual CMakeLists.txt files:
@@ -23,7 +23,7 @@ _individual_header = [
     '## This is an automagically generated file. Do NOT EDIT.',
     '## Any changes you make will be overwritten!!',
     '##',
-    '## Make changes to the SIMH top-level makefile and then run the',
+    '## Make changes to the SIMH top-level Makefile and then run the',
     '## "cmake/generate.py" script to regenerate these files.',
     '##',
     '##     cd cmake; python -m generate --help',
@@ -89,7 +89,7 @@ class CMakeBuildSystem:
 
     def extract(self, compile_action, test_name, sim_dir, sim_name, defs, buildrom, debug=0, depth=''):
         """Extract sources, defines, includes and flags from the simulator's
-        compile action in the makefile.
+        compile action in the Makefile.
         """
         sim_dir_path = SPM.expand_vars(sim_dir, defs).replace('./', '')
         simcoll = self.dirs.get(sim_dir_path)

@@ -85,7 +85,7 @@ function(build_simcore _targ)
                 ## (a) The BESM6 SDL hack is temporary. If SDL_MAIN_AVAILABLE needs
                 ##     to be defined, it belongs in the simh_video interface library.
                 ## (b) BESM6 doesn't use SIMH's video capabilities correctly and
-                ##     the makefile filters out SDL_MAIN_AVAILABLE on macOS.
+                ##     the Makefile filters out SDL_MAIN_AVAILABLE on macOS.
                 ## (c) This shouldn't be just an Apple platform quirk; SDL_main should
                 ##     be used by all platforms. <sigh!>
                 target_compile_definitions("${lib}" PUBLIC SDL_MAIN_AVAILABLE)
@@ -144,7 +144,7 @@ endfunction(build_simcore _targ)
 ##
 ## BESM6_SDL_HACK: A TEMPORARY feature to work around issues with BESM6 and
 ##   SDL and SIMH video. Because it's a day ending in "y", there's going to
-##   be another makefile quirk.
+##   be another Makefile quirk.
 list(APPEND ADD_SIMULATOR_OPTIONS
     "FEATURE_INT64"
     "FEATURE_FULL64"
@@ -433,7 +433,7 @@ endif ()
 
 ## Front panel test.
 ##
-## From all evidence in makefile, sim_frontpanel isn't used yet by any targets.
+## From all evidence in Makefile, sim_frontpanel isn't used yet by any targets.
 ##
 ## Needs curses...
 add_executable(frontpaneltest

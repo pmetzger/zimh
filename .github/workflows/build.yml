@@ -16,11 +16,11 @@ jobs:
   cmake-builds:
     uses: ./.github/workflows/cmake-builds.yml
 
-  makefile:
+  makefile-builds:
     runs-on: ${{ matrix.os }}
     strategy:
       #-
-      # The makefile builds DO NOT produce artifacts (*). Using the "-latest"
+      # The Makefile builds DO NOT produce artifacts (*). Using the "-latest"
       # runner images is sufficient.
       #
       # (*) "artefact" for the rest of the Anglosphere
@@ -30,7 +30,7 @@ jobs:
         os: [macos-latest, ubuntu-latest]
 
         simulators:
-          # These are supposed to match ALL in makefile.
+          # These are supposed to match ALL in Makefile.
           # Each job builds ~15 simulators.
           - pdp1 pdp4 pdp6 pdp7 pdp8 pdp9 pdp10 pdp10-ka pdp10-ki pdp10-kl pdp10-ks pdp11 pdp15 vax 
           - microvax2 vax730 vax750 vax780 vax8200 vax8600 microvax2000 infoserver100 infoserver150vxt microvax3100 microvax3100e vaxstation3100m30 vaxstation3100m38 
@@ -59,7 +59,7 @@ jobs:
       - name: Install dependencies (Linux)
         if: ${{runner.os == 'Linux'}}
         run: sh -ex .travis/deps.sh linux
-      - name: makefile build
+      - name: Makefile build
         env:
           SIM: ${{matrix.simulators}}
         run: make LTO=1 OPTIMIZE=-O3 $SIM

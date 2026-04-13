@@ -95,7 +95,7 @@
             make install
         Note:  The "make install" step generally will have to be done as root.
         This will install libpcap in /usr/local/lib and /usr/local/include
-        The current simh makefile will do the right thing to locate and
+        The current simh Makefile will do the right thing to locate and
         reference the OS provided libpcap or the one just installed.
 
 

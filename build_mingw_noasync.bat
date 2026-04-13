@@ -11,4 +11,4 @@ if ERRORLEVEL 1 path C:\MinGW\bin;%path%
 if not exist BIN mkdir BIN
 gcc -v 1>NUL 2>NUL
 if ERRORLEVEL 1 echo "MinGW Environment Unavailable"
-mingw32-make NOASYNCH=1 -f makefile %*
+mingw32-make NOASYNCH=1 -f Makefile %*

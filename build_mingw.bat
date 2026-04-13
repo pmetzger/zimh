@@ -1,7 +1,7 @@
 @echo off
 rem Compile all of SIMH using MINGW make and gcc environment
 rem
-rem The makefile will determine if the needed WinPcap build 
+rem The Makefile will determine if the needed WinPcap build
 rem components are available and the resulting simulators will
 rem run with networking support when the WinPcap environment 
 rem is installed on the running system.
@@ -16,4 +16,4 @@ if ERRORLEVEL 1 path C:\MinGW\bin;%path%
 if not exist BIN mkdir BIN
 gcc -v 1>NUL 2>NUL
 if ERRORLEVEL 1 echo "MinGW Environment Unavailable"
-mingw32-make -f makefile %*
+mingw32-make -f Makefile %*

@@ -31,7 +31,7 @@
     - [Simulator "core" libraries](#simulator-core-libraries)
   - [`add_simulator` Reference](#add_simulator-reference)
     - [Adding a new simulator](#adding-a-new-simulator)
-    - [Regenerating `CMakeLists.txt` from the `makefile`](#regenerating-cmakeliststxt-from-the-makefile)
+    - [Regenerating `CMakeLists.txt` from the `Makefile`](#regenerating-cmakeliststxt-from-the-makefile)
 
 
 ## Why CMake?
@@ -816,7 +816,7 @@ $ cmake -G Ninja CMAKE_C_COMPILER=clang CMAKE_CXX_COMPILER=clang ...
 
 You can enable or disable SIMH simulator suite options on the `cmake`
 configuration command line by specifying `-DOPTION=VALUE`. The configuration
-options generally mirror those in the original `simh` `makefile`.
+options generally mirror those in the original `simh` `Makefile`.
 
 _NOTE:_ `CMake` __aggressively__ caches option values. If you change an option,
 you should also remove the `CMakeCache.txt` file and recursively remove the
@@ -1383,15 +1383,15 @@ endif()
 
 6. Build and develop.
 
-### Regenerating `CMakeLists.txt` from the `makefile`
+### Regenerating `CMakeLists.txt` from the `Makefile`
 
-An alternate development path for new simulators is updating the SIMH `makefile`
+An alternate development path for new simulators is updating the SIMH `Makefile`
 in the top-level source directory, then regenerating the simulator suite's
 `CMakeLists.txt` via the `cmake/generate.py` Python3 script. This works on both
 Linux and Windows.
 
 _Note:_ The `cmake/generate.py` script is not automatically run by `cmake` when
-the `makefile` is newer than the top-level `CMakeLists.txt`. If you have done a
+the `Makefile` is newer than the top-level `CMakeLists.txt`. If you have done a
 `git pull` and you get undefined symbols when a simulator is linked, the
 solution is `cmake/generate.py` to update the affected simulator
 `CMakeLists.txt` file.
@@ -1407,14 +1407,14 @@ SIMH simulator CMakeLists.txt generator.
 options:
   -h, --help       show this help message and exit
   --debug [DEBUG]  Debug level (0-3, 0 == off)
-  --srcdir SRCDIR  makefile source directory.
+  --srcdir SRCDIR  Makefile source directory.
   --orphans        Check for packaging orphans
 
 # [simh_source] is the absolute path to your top-level SIMH source directory
 $ python -m generate --orphans
-generate.py: Looking for makefile, starting in [simh-source]/open-simh/cmake
-generate.py: Looking for makefile, trying [simh-source]/open-simh
-generate.py: Processing [simh-source]/open-simh/makefile
+generate.py: Looking for Makefile, starting in [simh-source]/open-simh/cmake
+generate.py: Looking for Makefile, trying [simh-source]/open-simh
+generate.py: Processing [simh-source]/open-simh/Makefile
 generate.py: all target pdp1
 generate.py: all target pdp4
 generate.py: all target pdp7

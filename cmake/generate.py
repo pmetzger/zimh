@@ -1,9 +1,9 @@
 ## generate.py
 ##
-## Generate the simulator CMakeLists.txt from the top-level makefile.
+## Generate the simulator CMakeLists.txt from the top-level Makefile.
 ##
 ## This is the top-level driver: process options, search for the
-## makefile, parse the makefile and walk its dependencies, and,
+## Makefile, parse the Makefile and walk its dependencies, and,
 ## finally, output the CMakeLists.txt(s) and simh-simulators.cmake.
 ##
 ## Author: B. Scott Michel
@@ -24,8 +24,11 @@ import simgen.parse_makefile as SPM
 import simgen.packaging as SPKG
 
 
+TOP_LEVEL_MAKEFILE = "Makefile"
+
+
 def process_makefile(makefile_dir, debug=0):
-    the_makefile = os.path.join(makefile_dir, "makefile")
+    the_makefile = os.path.join(makefile_dir, TOP_LEVEL_MAKEFILE)
     print('{0}: Processing {1}'.format(GEN_SCRIPT_NAME, the_makefile))
 
     (defs, rules, actions) = SPM.parse_makefile(the_makefile)
@@ -133,7 +136,7 @@ if __name__ == '__main__':
     args.add_argument('--debug', nargs='?', const=1, default=0, type=int,
                       help='Debug level (0-3, 0 == off)')
     args.add_argument('--srcdir', default=None,
-                      help='makefile source directory.')
+                      help='Makefile source directory.')
     args.add_argument('--skip-orphans', action='store_true',
                       help='Skip the check for packaging orphans')
 
@@ -144,28 +147,28 @@ if __name__ == '__main__':
 
     found_makefile = True
     if makefile_dir is None:
-        ## Find the makefile, which should be one directory up from this Python
+        ## Find the Makefile, which should be one directory up from this Python
         ## module
         makefile_dir = GEN_SCRIPT_DIR
-        print('{0}: Looking for makefile, starting in {1}'.format(GEN_SCRIPT_NAME, makefile_dir))
+        print('{0}: Looking for Makefile, starting in {1}'.format(GEN_SCRIPT_NAME, makefile_dir))
         the_makefile = ''
         while makefile_dir:
-            the_makefile = os.path.join(makefile_dir, "makefile")
+            the_makefile = os.path.join(makefile_dir, TOP_LEVEL_MAKEFILE)
             if os.path.exists(the_makefile):
                 break
             else:
                 makefile_dir = os.path.dirname(makefile_dir)
-                print('{0}: Looking for makefile, trying {1}'.format(GEN_SCRIPT_NAME, makefile_dir))
+                print('{0}: Looking for Makefile, trying {1}'.format(GEN_SCRIPT_NAME, makefile_dir))
 
         if not the_makefile:
             found_makefile = False
     else:
-        the_makefile = os.path.join(makefile_dir, "makefile")
+        the_makefile = os.path.join(makefile_dir, TOP_LEVEL_MAKEFILE)
         if not os.path.exists(the_makefile):
             found_makefile = False
 
     if not found_makefile:
-        print('{0}: SIMH top-level makefile not found, relative to {1}'.format(GEN_SCRIPT_NAME, GEN_SCRIPT_DIR))
+        print('{0}: SIMH top-level Makefile not found, relative to {1}'.format(GEN_SCRIPT_NAME, GEN_SCRIPT_DIR))
         sys.exit(1)
 
     sims = process_makefile(makefile_dir, debug=debug_level)
@@ -183,7 +186,7 @@ if __name__ == '__main__':
 
         orphans = [ sim for sim, pkg_info in SPKG.package_info.items() if not pkg_info.was_processed() ]
         if len(orphans) > 0:
-            print('{0}: Simulators not extracted from makefile:'.format(GEN_SCRIPT_NAME))
+            print('{0}: Simulators not extracted from Makefile:'.format(GEN_SCRIPT_NAME))
             for orphan in orphans:
                 print('{0}{1}'.format(' ' * 4, orphan))
             sys.exit(1)

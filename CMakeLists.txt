@@ -457,14 +457,14 @@ if (NOT DO_DEPENDENCY_BUILD)
 ## Don't delete yet ##    if (PYTHONINTERP_FOUND AND PYTHON_VERSION_MAJOR GREATER_EQUAL 3)
 ## Don't delete yet ##        add_custom_command(OUTPUT ${CMAKE_SOURCE_DIR}/cmake/simh-simulators.cmake
 ## Don't delete yet ##          COMMAND ${PYTHON_EXECUTABLE} "-m" generate "--srcdir" "${CMAKE_SOURCE_DIR}"
-## Don't delete yet ##            MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/makefile
+## Don't delete yet ##            MAIN_DEPENDENCY ${CMAKE_SOURCE_DIR}/Makefile
 ## Don't delete yet ##            COMMENT "Updating cmake/simh-simulators.cmake"
 ## Don't delete yet ##            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/cmake
 ## Don't delete yet ##            COMMAND_EXPAND_LISTS)
-## Don't delete yet ##        message(STATUS "Added makefile update rule.")
+## Don't delete yet ##        message(STATUS "Added Makefile update rule.")
 ## Don't delete yet ##    endif (PYTHONINTERP_FOUND AND PYTHON_VERSION_MAJOR GREATER_EQUAL 3)
 ## Don't delete yet ##
-## Don't delete yet ##    if (${CMAKE_SOURCE_DIR}/makefile IS_NEWER_THAN ${CMAKE_SOURCE_DIR}/cmake/simh-simulators.cmake)
+## Don't delete yet ##    if (${CMAKE_SOURCE_DIR}/Makefile IS_NEWER_THAN ${CMAKE_SOURCE_DIR}/cmake/simh-simulators.cmake)
 ## Don't delete yet ##        if (NOT PYTHONINTERP_FOUND OR PYTHON_VERSION_MAJOR LESS 3)
 ## Don't delete yet ##            if (NOT PYTHONINTERP_FOUND)
 ## Don't delete yet ##                message("!! Python not found")
