@@ -50,6 +50,9 @@ This work should proceed in these stages:
        lists
      - promoting titles and section headings into normal Markdown
        heading structure instead of preserving Word visual formatting
+     - retaining intentional hand-edited readability improvements even
+       when they are not literal reproductions of the Word source, so
+       long as meaning is preserved
    - mark the tracker only after that proofreading pass is complete
 
 3. Replace the Word documents only after the Markdown replacement is
