@@ -67,5 +67,5 @@ Notes:
 | `ssem_doc.doc` | `docs/simulators/SSEM/ssem_doc.md` | yes, proofread | `not started` | verify against Word before adopting |
 | `swtp6800_doc.doc` | `docs/simulators/swtp6800/swtp6800_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `tx0_doc.doc` | `docs/simulators/TX-0/tx0_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
-| `vax780_doc.doc` | `docs/simulators/VAX/vax780_doc.md` | yes, proofread | `not started` | verify against Word before adopting |
+| `vax780_doc.doc` | `docs/simulators/VAX/vax780.md` | yes, proofread | `replaced` | verified against Word; corrected lingering XU/XQ and MCTL1 typos and removed stray placeholder comments before adoption |
 | `vax_doc.doc` | `docs/simulators/VAX/vax.md` | yes, proofread | `replaced` | verified against Word; fixed stray `:smile:` conversion in XQ section before adoption |
