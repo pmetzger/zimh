@@ -48,7 +48,7 @@ Notes:
 | `lgp_doc.doc` | `docs/simulators/LGP/lgp_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `nova_doc.doc` | `docs/simulators/NOVA/nova_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `pdp10_doc.doc` | `docs/simulators/PDP10/pdp10_doc.md` | yes, proofread | `not started` | verify relationship to KA10/KI10/KS10 docs |
-| `pdp11_doc.doc` | `docs/simulators/PDP11/pdp11_doc.md` | yes, proofread | `not started` | verify against Word before adopting |
+| `pdp11_doc.doc` | `docs/simulators/PDP11/pdp11.md` | yes, proofread | `replaced` | proofread against Word; TM11 table/prose bug fixed before adoption |
 | `pdp18b_doc.doc` | `docs/simulators/PDP18B/pdp18b_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `pdp1_doc.doc` | `docs/simulators/PDP1/pdp1_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `pdp6_doc.doc` | `docs/simulators/PDP10/pdp6_doc.md` | yes, proofread | `not started` | tentative placement under PDP10 family |
