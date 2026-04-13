@@ -9,15 +9,14 @@ proofread Markdown in the main repository.
 This work should use the existing `simh-docs/` repository as the
 starting point. That repository already contains:
 
-- Pandoc-generated Markdown drafts for most of the Word documents
+- Pandoc-generated Markdown drafts for the Word documents
 - a set of documents believed to have already been hand-fixed into
   reasonable shape
 - exported image/asset directories for documents that needed them
 
 The general rule should be:
 
-- adopt and proofread the existing `simh-docs/` material rather than
-  regenerating work unnecessarily
+- proofread and adopt the `simh-docs/` material
 - for documents that are still rough, continue from the existing
   Pandoc output rather than starting over unless there is a specific
   reason to do so
@@ -48,8 +47,8 @@ This work should proceed in these stages:
    copied into this repository without a careful proofread against the
    original Word source.
 
-4. Proofread existing conversions in a disciplined way.
-   For each document that already has a Markdown counterpart:
+4. Proofread the Pandoc conversions in a disciplined way.
+   For each document that has a Markdown counterpart:
    - compare document structure, headings, tables, lists, footnotes,
      code blocks, and emphasized text against the Word original
    - repair Pandoc damage, formatting loss, bad wrapping, broken lists,
@@ -59,6 +58,15 @@ This work should proceed in these stages:
    - normalize the result to repository conventions such as line width,
      headings, links, file placement, and the style already established
      by the believed-correct `simh-docs` conversions
+   - Editorial improvements in the believed-correct existing `simh-docs`
+     conversions should be performed on the uncorrected Pandoc
+     conversions, including but not limited to:
+     - replacing duplicated inline license text with a stable license
+       reference where that cleanup was already done correctly
+     - converting Word file lists into readable Markdown tables or
+       lists
+     - promoting titles and section headings into normal Markdown
+       heading structure instead of preserving Word visual formatting
    - mark the tracker only after that proofreading pass is complete
 
 5. Replace the Word documents only after the Markdown replacement is
