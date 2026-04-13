@@ -263,7 +263,7 @@ The top-level `CMakeLists.txt` drives CMake's configure/generate phase, which ha
 *add_simulator* is the centerpiece around which the rest of the CMake-based infrastructure revolves. The
 basic principle is to make simulator compiles very straightforward with a simple *CMake* function. The
 function's full documentation for usage and options are in
-[docs/project/README-CMake.md][cmake_readme].
+[README-CMake.md][cmake_readme].
 
 `add_simulator.cmake` decomposes into eight (8) sections:
 
@@ -687,7 +687,7 @@ unnecessary for SIMH.
 <!-- Reference links -->
 [cmake]: https://cmake.org
 [cmake_modules]: https://gitlab.kitware.com/cmake/cmake/-/tree/master/Modules
-[cmake_readme]: ../docs/project/README-CMake.md
+[cmake_readme]: ../README-CMake.md
 [cpack]: https://cmake.org/cmake/help/latest/module/CPack.html
 [cpack_generators]: https://cmake.org/cmake/help/latest/manual/cpack-generators.7.html#manual:cpack-generators(7)
 [external_project]: https://cmake.org/cmake/help/latest/module/ExternalProject.html

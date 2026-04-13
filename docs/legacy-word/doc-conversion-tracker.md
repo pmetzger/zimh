@@ -56,13 +56,13 @@ Notes:
 | `sds_doc.doc` | `docs/simulators/SDS/sds_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `sel32_doc.doc` | `docs/simulators/SEL32/sel32_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `sigma_doc.doc` | `docs/simulators/sigma/sigma_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
-| `simh.doc` | `docs/project/writing_a_simulator.md` | yes, proofread | `replaced` | verified against Word; fixed malformed VM hardware table, stray table rule, and obvious source typos before adoption |
-| `simh_breakpoints.doc` | `docs/project/breakpoints.md` | yes, proofread | `replaced` | verified against Word; fixed command dashes, code quote corruption, code formatting defects, and obvious source typos before adoption |
-| `simh_doc.doc` | `docs/project/users_guide.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical document; fixed malformed command syntax, missing words, grammar/typo defects, and other conversion damage while preserving prior human editorial updates |
-| `simh_faq.doc` | `docs/project/faq.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical document; fixed quote corruption, malformed examples, missing punctuation/spacing, and obvious grammar/typo defects while preserving prior human editorial updates |
-| `simh_magtape.doc` | `docs/project/magtape_format.md` | yes, proofread | `replaced` | verified against Word and adopted without substantive text changes |
-| `simh_swre.doc` | `docs/project/sample_software.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical document; fixed command dash corruption, spelling/typo defects, and minor heading/text cleanup before adoption |
-| `simh_vmio.doc` | `docs/project/adding_io_devices.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical document; fixed heading spacing, prose defects, I/O notation consistency, and a real `IVCL` code-example typo before adoption |
+| `simh.doc` | `docs/developers/writing_a_simulator.md` | yes, proofread | `replaced` | verified against Word; fixed malformed VM hardware table, stray table rule, and obvious source typos before adoption |
+| `simh_breakpoints.doc` | `docs/developers/breakpoints.md` | yes, proofread | `replaced` | verified against Word; fixed command dashes, code quote corruption, code formatting defects, and obvious source typos before adoption |
+| `simh_doc.doc` | `docs/manual/users_guide.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical document; fixed malformed command syntax, missing words, grammar/typo defects, and other conversion damage while preserving prior human editorial updates |
+| `simh_faq.doc` | `docs/manual/faq.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical document; fixed quote corruption, malformed examples, missing punctuation/spacing, and obvious grammar/typo defects while preserving prior human editorial updates |
+| `simh_magtape.doc` | `docs/manual/magtape_format.md` | yes, proofread | `replaced` | verified against Word and adopted without substantive text changes |
+| `simh_swre.doc` | `docs/manual/sample_software.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical document; fixed command dash corruption, spelling/typo defects, and minor heading/text cleanup before adoption |
+| `simh_vmio.doc` | `docs/developers/adding_io_devices.md` | yes, proofread | `replaced` | verified against Word as a cleaned historical document; fixed heading spacing, prose defects, I/O notation consistency, and a real `IVCL` code-example typo before adoption |
 | `simulators_acm_queue_2004.doc` | `docs/articles/simulators_acm_queue_2004.md` | yes, proofread | `not started` | article rather than manual |
 | `ssem_doc.doc` | `docs/simulators/SSEM/ssem_doc.md` | yes, proofread | `not started` | verify against Word before adopting |
 | `swtp6800_doc.doc` | `docs/simulators/swtp6800/swtp6800_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |

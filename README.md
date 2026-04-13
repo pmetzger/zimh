@@ -43,7 +43,7 @@ This project is made available under the MIT license; see
 [LICENSE.txt](LICENSE.txt) for details.
 
 A detailed listing of features in the inherited code base as of 12 May
-2022 may be found in [SIMH-V4-status](docs/project/SIMH-V4-status.md);
+2022 may be found in [SIMH-V4-status](docs/history/SIMH-V4-status.md);
 however, it is likely that the code will not resemble SIMH much in the
 near future.
 
