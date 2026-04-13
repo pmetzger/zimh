@@ -23,7 +23,7 @@ Notes:
 | Source Word file | Destination | `simh-docs` | Status | Notes |
 | --- | --- | --- | --- | --- |
 | `Summary of IMP IO Device Codes.doc` | `docs/simulators/H316/h316_imp_IO_Device_Codes.md` | yes, raw pandoc | `not started` | special filename; map carefully |
-| `altairz80_doc.docx` | `docs/simulators/AltairZ80/altairz80_doc.md` | no | `not started` | no existing Markdown counterpart |
+| `altairz80_doc.docx` | `docs/simulators/AltairZ80/altairz80_doc.md` | yes, raw pandoc | `not started` | newly generated Pandoc draft in `simh-docs` |
 | `b5500_doc.doc` | `docs/simulators/B5500/b5500_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `gri_doc.doc` | `docs/simulators/GRI/gri_doc.md` | yes, proofread | `not started` | verify against Word before adopting |
 | `h316_doc.doc` | `docs/simulators/H316/h316_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |

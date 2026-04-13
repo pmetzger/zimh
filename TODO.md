@@ -2,9 +2,27 @@
 
 ## Documentation Conversion Methodology
 
-The next major documentation task should be to replace the legacy
+The next major documentation task is to replace the legacy
 Microsoft Word material under `docs/legacy-word/doc/` with carefully
 proofread Markdown in the main repository.
+
+This work should use the existing `simh-docs/` repository as the
+starting point. That repository already contains:
+
+- Pandoc-generated Markdown drafts for most of the Word documents
+- a set of documents believed to have already been hand-fixed into
+  reasonable shape
+- exported image/asset directories for documents that needed them
+
+The general rule should be:
+
+- adopt and proofread the existing `simh-docs/` material rather than
+  regenerating work unnecessarily
+- for documents that are still rough, continue from the existing
+  Pandoc output rather than starting over unless there is a specific
+  reason to do so
+- use the already-believed-correct `simh-docs` conversions as the
+  pattern for how future cleaned-up conversions should look
 
 This work should proceed in these stages:
 
@@ -26,9 +44,9 @@ This work should proceed in these stages:
    `simulators/`.
 
 3. Audit every existing conversion from `simh-docs` before adopting it.
-   No Markdown file from `simh-docs` should be copied into this
-   repository without a careful proofread against the original Word
-   source.
+   No Markdown file or asset directory from `simh-docs` should be
+   copied into this repository without a careful proofread against the
+   original Word source.
 
 4. Proofread existing conversions in a disciplined way.
    For each document that already has a Markdown counterpart:
@@ -36,8 +54,11 @@ This work should proceed in these stages:
      code blocks, and emphasized text against the Word original
    - repair Pandoc damage, formatting loss, bad wrapping, broken lists,
      and malformed tables
+   - preserve and adopt any needed exported image assets from
+     `simh-docs`
    - normalize the result to repository conventions such as line width,
-     headings, links, and file placement
+     headings, links, file placement, and the style already established
+     by the believed-correct `simh-docs` conversions
    - mark the tracker only after that proofreading pass is complete
 
 5. Replace the Word documents only after the Markdown replacement is
@@ -50,16 +71,16 @@ This work should proceed in these stages:
    - only then remove or retire the Word file from active use
 
    As a default placement policy:
-   - simulator manuals should go under `docs/simulators/<family>/`
+   - simulator manuals should go under `docs/simulators/`
    - SIMH-wide manuals should go under `docs/project/`
-   - articles or historical standalone pieces should go under an
-     appropriate `docs/` subdirectory rather than inside a simulator
-     tree
+   - standalone articles should go under `docs/articles/`
+   - historical standalone pieces if any should go under `docs/history/`
 
 6. Convert the remaining Word files one at a time.
-   For documents that only exist as raw Word sources:
-   - generate an initial Markdown draft with the chosen conversion tool
-   - hand-clean the draft heavily
+   For documents that are still only raw Pandoc conversions:
+   - begin from the existing `simh-docs` Pandoc output
+   - hand-clean the draft heavily, following the structure and style of
+     the already-believed-correct `simh-docs` conversions
    - proofread the result against the original Word file
    - update the tracker with problems found and resolved
 
@@ -71,32 +92,13 @@ This work should proceed in these stages:
 
 8. Treat images, diagrams, and tables as first-class conversion work.
    Where Word documents contain embedded figures or tables, the tracker
-   should note whether extraction, recreation, or manual cleanup is
-   needed before the document can be considered finished.
+   should note whether the existing `simh-docs` assets are sufficient or
+   whether extraction, recreation, or manual cleanup is still needed
+   before the document can be considered finished.
 
 9. Do not begin mass conversion until the methodology and toolchain are
    explicitly approved.
 
-## Proposed Tooling For Approval
-
-The currently visible local tooling is not sufficient for the full
-conversion effort. Before starting the actual document work, it would
-be reasonable to install:
-
-- `pandoc`
-  Used to produce initial Markdown drafts from `.doc` and `.docx`
-  material.
-- `libreoffice`
-  Needed to open and visually inspect the original Word documents,
-  especially old `.doc` files and formatting-sensitive manuals.
-- `antiword` or an equivalent legacy `.doc` extraction tool
-  Useful as a secondary textual check for older Word files when Pandoc
-  or LibreOffice import quality is questionable.
-
-Optional but likely helpful:
-
-- a spell-checking tool such as `aspell` or `hunspell`
-- a diff-friendly Markdown formatter if we later decide we want one
 
 ## Other Pending Items
 
@@ -111,8 +113,9 @@ Optional but likely helpful:
 ## Notes
 
 - The `simh-docs` repository reports a mix of proofread conversions and
-  near-raw Pandoc output. It should be treated as source material for
-  adoption, not as already-finished documentation.
+  near-raw Pandoc output. It should be treated as the working base for
+  adoption, with the proofread files serving as the style model for the
+  remaining cleanup work.
 - The current top-level build-output directories such as `BIN/` and
   local out-of-tree build directories remain expected generated
   artifacts rather than pending layout work.
