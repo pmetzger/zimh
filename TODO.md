@@ -3,7 +3,7 @@
 ## Documentation Conversion Methodology
 
 The next major documentation task is to replace the legacy
-Microsoft Word material under `docs/legacy-word/doc/` with carefully
+Microsoft Word material under `docs/legacy-word/` with carefully
 proofread Markdown in the main repository.
 
 This work should use the existing `simh-docs/` repository as the
