@@ -6,6 +6,9 @@ The next major documentation task is to replace the legacy
 Microsoft Word material under `docs/legacy-word/` with carefully
 proofread Markdown in the main repository.
 
+(Pre-converted versions of the word document into text using soffice
+are located in `tmp/word-text/altairz80_doc.txt`.)
+
 This work should use the existing `simh-docs/` repository as the
 starting point. That repository already contains:
 
