@@ -41,10 +41,10 @@ Notes:
 | `i7094_doc.doc` | `docs/simulators/I7094/i7094_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `ibm1130.doc` | `docs/simulators/Ibm1130/ibm1130.md` | yes, raw pandoc | `not started` | basename differs from Word file |
 | `id_doc.doc` | `docs/simulators/Interdata/id_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
-| `ka10_doc.doc` | `docs/simulators/PDP10/ka10_doc.md` | yes, proofread | `not started` | verify against Word before adopting |
-| `ki10_doc.doc` | `docs/simulators/PDP10/ki10_doc.md` | yes, proofread | `not started` | verify against Word before adopting |
+| `ka10_doc.doc` | `docs/simulators/PDP10/ka10.md` | yes, proofread | `replaced` | verified against Word and cleaned before adoption; normalized front matter, repaired shared PDP-10-family prose and table formatting, corrected verified simulator-file and PDP-6 device references, and kept historically intentional wording where appropriate |
+| `ki10_doc.doc` | `docs/simulators/PDP10/ki10.md` | yes, proofread | `replaced` | verified against Word and cleaned before adoption; corrected title/front matter, normalized command and feature tables, repaired formatting damage in device sections and TOC entries, and aligned the introduction wording with the cleaned PDP-10-family manuals |
 | `kl10_doc.doc` | `docs/simulators/PDP10/kl10_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
-| `ks10_doc.doc` | `docs/simulators/PDP10/ks10_doc.md` | yes, proofread | `not started` | verify against Word before adopting |
+| `ks10_doc.doc` | `docs/simulators/PDP10/ks10.md` | yes, proofread | `replaced` | verified against Word and cleaned before adoption; corrected front matter and TOC artifacts, fixed verified KS10 device naming (`DZ11`, `CH11`) and related prose, and normalized tables and shared introduction wording to match the cleaned PDP-10-family manuals |
 | `lgp_doc.doc` | `docs/simulators/LGP/lgp_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `nova_doc.doc` | `docs/simulators/NOVA/nova_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `pdp10_doc.doc` | `docs/simulators/PDP10/pdp10.md` | yes, proofread | `replaced` | verified against Word and cleaned before adoption; split the malformed `IND_MAX`/`XCT_MAX` register rows, repaired broken `DZ`, `RP`, `TU`, `LP20`, `RY`, `CD20`, and symbolic-display formatting, corrected real prose and conversion defects, and preserved historical/shared PDP-10-family wording where it appeared intentional |
