@@ -22,7 +22,7 @@ Notes:
 
 | Source Word file | Destination | `simh-docs` | Status | Notes |
 | --- | --- | --- | --- | --- |
-| `Summary of IMP IO Device Codes.doc` | `docs/simulators/H316/h316_imp_IO_Device_Codes.md` | yes, raw pandoc | `not started` | special filename; map carefully |
+| `Summary of IMP IO Device Codes.doc` | `docs/simulators/H316/h316_imp_IO_Device_Codes.md` | yes, cleaned and proofread | `replaced` | adopted from `simh-docs/docs/h316_imp_IO_Device_Codes.md`; compared carefully against the Word text export and the H316 IMP listing, corrected verified host-interface opcode and DMC pointer-name errors, converted malformed HTML/Markdown tables to normal Markdown tables, normalized heading structure, and converted extracted figures to working Markdown image references |
 | `altairz80_doc.docx` | `docs/simulators/AltairZ80/altairz80.md` | yes, cleaned and proofread | `replaced` | adopted from `simh-docs/docs/altairz80_doc.md`; real linked TOC retained, simulator-files table cleaned, remaining section-by-section mechanical fixes applied, and revision-history ordering corrected before replacement |
 | `b5500_doc.doc` | `docs/simulators/B5500/b5500_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `gri_doc.doc` | `docs/simulators/GRI/gri_doc.md` | yes, proofread | `replaced` | verified against Word; fixed raw TOC/page-number artifacts, repaired CPU option and HSP device-description errors from the draft, and cleaned prose and symbolic-syntax formatting before adoption |
