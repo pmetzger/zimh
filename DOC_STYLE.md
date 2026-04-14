@@ -44,6 +44,14 @@ cleanup in `simh-docs/docs/`.
   paragraph text; use three backquote fencing instead.
 - Use inline code when a command or token is part of a sentence. Don't
   use ordinary quote marks for commands or tokens.
+- Use inline code not only for commands, but also for literal device
+  names, register names, flags, switches, file names, placeholder
+  values, and other technical identifiers when they are being referred
+  to literally.
+- Treat grammar fragments and symbolic syntax forms as literal notation.
+  Short forms such as `opcode ac, operand`, `ttss`, `-R`, `-w`, or
+  `SET CPU NORMAL` should stay visibly code-like even when they are not
+  full command examples.
 - When several command lines are presented as a list of examples, prefer
   a fenced code block unless the source is clearly better represented as
   a command/action table.
@@ -68,6 +76,10 @@ cleanup in `simh-docs/docs/`.
   headers, malformed separator rows, or stray footnote fragments.
 - Keep meaningful multi-row groupings if they help preserve the original
   structure.
+- Prefer compact reference tables for stable mappings such as
+  command/action, switch/effect, name/meaning, device/simulation, or
+  character-code equivalences when the source material is reference
+  oriented.
 - Footnote like material can be moved to distinct tables or turned
   into GFM footnotes.
 
@@ -98,6 +110,15 @@ cleanup in `simh-docs/docs/`.
 - Keep symbol meaning explicit, especially for characters such as
   `` `#` ``, `` `|` ``, `` `[` ``, `` `]` ``, `` `<` ``, `` `>` ``, and
   backslash.
+
+## Quote Marks
+
+- Prefer curly quote marks in English text where it makes sense, e.g.,
+  "A record can “grow” when..." is sensible. "don’t" is sensible.
+
+## Miscellaneous
+
+- “command line” is preferred to “command-line”.
 
 ## Human Review Boundary
 
