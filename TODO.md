@@ -144,7 +144,9 @@ finished.
 
 For documents still under section-by-section review, keep a companion
 tracker that records non-mechanical proposed changes requiring human
-judgment.
+judgment. Store these temporary human-readable tracker files under
+`tmp/doc-review-trackers/`, with one tracker file per document under
+review.
 
 That tracker should:
 
