@@ -9,6 +9,9 @@ proofread Markdown in the main repository.
 (Pre-converted versions of the word document into text using soffice
 are located in `tmp/word-text/altairz80_doc.txt`.)
 
+The conversion tracker is in:
+`docs/legacy-word/doc-conversion-tracker.md`
+
 This work should use the existing `simh-docs/` repository as the
 starting point. That repository already contains:
 
