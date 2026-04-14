@@ -25,7 +25,7 @@ Notes:
 | `Summary of IMP IO Device Codes.doc` | `docs/simulators/H316/h316_imp_IO_Device_Codes.md` | yes, raw pandoc | `not started` | special filename; map carefully |
 | `altairz80_doc.docx` | `docs/simulators/AltairZ80/altairz80_doc.md` | yes, raw pandoc | `not started` | newly generated Pandoc draft in `simh-docs` |
 | `b5500_doc.doc` | `docs/simulators/B5500/b5500_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
-| `gri_doc.doc` | `docs/simulators/GRI/gri_doc.md` | yes, proofread | `not started` | verify against Word before adopting |
+| `gri_doc.doc` | `docs/simulators/GRI/gri_doc.md` | yes, proofread | `replaced` | verified against Word; fixed raw TOC/page-number artifacts, repaired CPU option and HSP device-description errors from the draft, and cleaned prose and symbolic-syntax formatting before adoption |
 | `h316_doc.doc` | `docs/simulators/H316/h316_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `h316_imp.doc` | `docs/simulators/H316/h316_imp.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
 | `hp2100_doc.doc` | `docs/simulators/HP2100/hp2100_doc.md` | yes, raw pandoc | `not started` | simulator manual under `docs/` |
