@@ -2,149 +2,171 @@
 
 ## Documentation Conversion Methodology
 
-The next major documentation task is to replace the legacy
-Microsoft Word material under `docs/legacy-word/` with carefully
-proofread Markdown in the main repository.
+The next major documentation task is to replace the legacy Microsoft
+Word material under `docs/legacy-word/` with carefully proofread
+Markdown in the main repository.
 
-(Pre-converted versions of the word document into text using soffice
-are located in `tmp/word-text/altairz80_doc.txt`.)
-
-The conversion tracker is in:
+The conversion tracker is:
 `docs/legacy-word/doc-conversion-tracker.md`
 
-This work should use the existing `simh-docs/` repository as the
-starting point. That repository already contains:
+Supporting plain-text exports of Word documents are under
+`tmp/word-text/`.
+
+The working base for this effort is the existing `simh-docs/`
+repository. It already contains:
 
 - Pandoc-generated Markdown drafts for the Word documents
-- a set of documents believed to have already been hand-fixed into
-  reasonable shape
-- exported image/asset directories for documents that needed them
+    - Some of the documents have already been hand or machine corrected
+- exported image and asset directories for documents that need them
 
-The general rule should be:
+The default rule is to proofread and adopt the `simh-docs/` material
+rather than reconvert from scratch. If a document is still rough,
+continue from the existing Pandoc output unless there is a specific
+reason to start over. Use the already proofread `simh-docs`
+conversions as the style model for future cleaned-up conversions.
 
-- proofread and adopt the `simh-docs/` material
-- for documents that are still rough, continue from the existing
-  Pandoc output rather than starting over unless there is a specific
-  reason to do so
-- use the already-believed-correct `simh-docs` conversions as the
-  pattern for how future cleaned-up conversions should look
+### Per-Document Workflow
 
-This work should proceed in these stages:
+The remaining `simh-docs` drafts should be treated as having already
+received the initial normalization pass for their leading structure.
+Do not spend time redoing that pass unless a specific document shows a
+clear problem.
 
-1. Start each document with an initial normalization pass in
-   `simh-docs`.
-   - clean up the front matter to the current standard
-   - replace fake page-number TOCs with real linked TOCs
-   - reflow ordinary prose toward the 80-column preference where that
-     improves readability
-   - make only those broad presentational fixes first
-   - then let a human review that diff and, if desired, make an interim
-     `simh-docs` commit before more detailed cleanup
+Each remaining unadopted document should be reviewed section by
+section, not only as a whole-file cleanup pass.
 
-2. After that initial pass, decide how rough the document still is.
+For each document:
+
+1. Read and compare the document one section at a time.
+   - use the `simh-docs` draft as the working copy
+   - compare each section against the Word source or supporting text
+     export before moving on
+   - apply clearly mechanical or obvious fixes immediately
+   - do not defer straightforward repairs such as formatting damage,
+     broken tables, corrupted punctuation, obvious command-formatting
+     problems, or clearly wrong technical identifiers once verified
+
+2. Maintain a per-document review tracker for judgment calls.
+   - when a proposed change goes beyond the mechanical or obvious,
+     record it in a tracker file for human review rather than applying
+     it immediately
+   - the tracker should record these as clear yes-or-no items in the
+     style used for the Altair review
+   - each item should be short, concrete, and tied to a specific
+     section or local issue
+   - once reviewed by a human, apply approved items and remove or mark
+     resolved entries so the tracker remains usable
+
+3. Distinguish mechanical fixes from judgment calls consistently.
+   - mechanical or obvious fixes should be applied directly
+   - judgment-call edits should go into the tracker first
+   - if there is any real risk of changing technical meaning, treat
+     the change as a judgment call
+
+4. While reviewing, watch for repeated issue patterns that may affect
+   multiple remaining documents.
+   - examples include command names left in quotation marks instead of
+     backquotes, spurious backslashes inside backquoted text, repeated
+     table-conversion defects, or recurring syntax-formatting damage
+   - once a pattern has been verified as a real cleanup category,
+     treat it as a tracked cross-document review item for the
+     remaining unadopted documents
+
+5. Create beads issues for verified cross-document cleanup patterns.
+   - once a recurring issue pattern has been verified as real, create
+     a beads issue for each remaining document and each section that
+     should be checked for that pattern
+   - each such issue should cover both checking whether the pattern is
+     present in that document section and fixing it if it is present
+   - issue descriptions should identify the pattern, the document, and
+     the affected section or section range
+   - use these issues to ensure repeated cleanup work is tracked
+     explicitly rather than being rediscovered ad hoc
+
+6. Decide whether the document is structurally ready for adoption after
+   the section-by-section pass.
    - if it is still visibly raw Pandoc output, do a dedicated
-     structure-cleanup pass
-   - if it is already close, proceed directly to detailed proofreading
-   - a document is not ready for adoption if any of these remain:
+     structure-cleanup pass first
+   - if it is already close, proceed directly to detailed
+     proofreading
+   - do not adopt a document that still contains:
      - fake page-number TOC entries
      - malformed tables or lists
      - broken code or syntax formatting
      - obvious conversion corruption
      - unverified technical names, commands, registers, device types,
        or model numbers
+     - unresolved judgment-call items that still need human review
      - unexplained substantive differences from the Word original
 
-3. Do a careful source-comparison pass against the Word original.
-   - compare headings, structure, tables, lists, syntax blocks,
-     examples, and emphasized text
-   - preserve and adopt any needed exported image assets from
-     `simh-docs`
-   - repair Pandoc damage, formatting loss, bad wrapping, broken lists,
-     and malformed tables
-   - verify technical-looking identifiers against source code where
-     practical:
-     - commands
-     - option names
-     - register names
-     - device names
-     - model numbers
-     - controller names
-   - if the Word document is wrong, correct the Markdown and note that
-     in the tracker or adoption summary
+7. Reread the cleaned Markdown as Markdown before adoption.
+   - do not rely only on the diff
+   - check the front matter, TOC, tables, and example blocks
+   - confirm the tracker entry accurately describes what changed
+   - confirm any verified cross-document issue patterns have either
+     been addressed in this document or have explicit beads coverage
 
-4. Then do restrained editorial cleanup.
-   - preserve wording when it is historically intentional or
-     technically specific
-   - improve wording when it is clearly:
-     - a typo
-     - conversion damage
-     - broken grammar
-     - misleading due to obsolete formatting
-   - do not smooth language if doing so risks changing technical
-     meaning
-   - Editorial improvements in the believed-correct existing
-     `simh-docs` conversions should be performed on the uncorrected
-     Pandoc conversions, including but not limited to:
-     - replacing duplicated inline license text with a stable license
-       reference where that cleanup was already done correctly
-     - converting Word file lists into readable Markdown tables or
-       lists
-     - promoting titles and section headings into normal Markdown
-       heading structure instead of preserving Word visual formatting
-     - retaining intentional hand-edited readability improvements even
-       when they are not literal reproductions of the Word source, so
-       long as meaning is preserved
-     - correcting obvious source-document typos when doing so improves
-       clarity without changing meaning
-
-5. For tables:
-   - convert aligned text to real Markdown tables when that improves
-     rendering
-   - keep intentional blank separator rows inside tables when they
-     preserve grouping from the original
-   - remove stray leading or trailing blank rows that do not serve a
-     purpose
-   - do not over-normalize minimalist tables when the simpler form
-     still reads well
-
-6. Replace the Word documents only after the Markdown replacement is
-   good enough to stand on its own.
-   The practical sequence for each document should be:
+8. Adopt the document into the main repository only after the
+   Markdown version can stand on its own as the maintained copy.
    - finish the cleaned `simh-docs` version first
    - place it in its final location in this repository
    - update references and indexes as needed
    - update the tracker destination and notes
+   - keep the working `simh-docs` copy in sync with the adopted
+     version unless there is a specific reason not to
    - only then remove or retire the Word file from active use
 
-   As a default placement policy:
-   - simulator manuals should go under `docs/simulators/`
-   - SIMH-wide manuals should go under `docs/project/`
-   - standalone articles should go under `docs/articles/`
-   - historical standalone pieces if any should go under `docs/history/`
+### Adoption Policy
 
-   Adopted filenames should usually drop `_doc` unless that suffix is
-   actually useful. Prefer short descriptive names and update the
-   tracker when the final adopted name differs from the Word filename
-   or the `simh-docs` draft name.
+A document is considered adopted once the cleaned Markdown has been
+placed in its final repository location and the conversion tracker
+points to that maintained copy.
 
-7. Keep commits narrow and reviewable.
-   A sensible commit pattern is:
-   - one commit for tracker or process updates
-   - one commit per document or small related document set
-   - no large bulk-import commit of dozens of partially proofread files
+Default placement policy:
 
-8. Treat images, diagrams, and tables as first-class conversion work.
-   Where Word documents contain embedded figures or tables, the tracker
-   should note whether the existing `simh-docs` assets are sufficient or
-   whether extraction, recreation, or manual cleanup is still needed
-   before the document can be considered finished.
+- simulator manuals should go under `docs/simulators/`
+- SIMH-wide manuals should go under `docs/project/`
+- standalone articles should go under `docs/articles/`
+- historical standalone pieces, if any, should go under
+  `docs/history/`
 
-9. Before committing an adopted document:
-   - reread the cleaned Markdown as Markdown, not just as a diff
-   - check the front matter, TOC, tables, and example blocks
-   - confirm the tracker entry accurately describes what changed
-   - keep the working `simh-docs` copy in sync with the adopted version
-     unless there is a specific reason not to
+Adopted filenames should usually drop `_doc` unless that suffix is
+actually useful. Prefer short descriptive names and update the tracker
+when the final adopted name differs from the Word filename or the
+`simh-docs` draft name.
+
+The tracker should also note whether the existing `simh-docs` image
+and asset exports were sufficient or whether extraction, recreation,
+or manual cleanup was needed before the document could be considered
+finished.
+
+### Review-Tracker Policy
+
+For documents still under section-by-section review, keep a companion
+tracker that records non-mechanical proposed changes requiring human
+judgment.
+
+That tracker should:
+
+- be organized by document and section
+- use short yes-or-no review items
+- separate unapplied judgment calls from already resolved items
+- make it easy to apply approved edits without re-reading the entire
+  document to rediscover them
+
+When a reviewed issue turns out to represent a broader recurring
+defect across the remaining unadopted documents, create the
+corresponding beads issues at that point. Those issues should cover
+checking for the pattern in the assigned document section and fixing
+it where present.
+
+### Commit and Review Guidance
+
+Keep commits narrow and reviewable.
+
+- one commit for tracker or process updates
+- one commit per document or small related document set
+- no large bulk-import commit of dozens of partially proofread files
 
 
 ## Other Pending Items
