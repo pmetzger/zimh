@@ -43,7 +43,7 @@ ipch/
 .vscode/
 .vs/
 /build/
-cmake-build-check/
+cmake-build*/
 # Temporary plain-text extractions and staging used when proofreading
 # legacy Word documents against their Markdown conversions.
 tmp/word-text/
