@@ -138,9 +138,16 @@ Useful tooling candidates:
 
 - `llvm-cov` / `llvm-profdata` with Clang
 - `gcov` / `lcov` / `genhtml` with GCC
+- `Mull` for later mutation-testing work once the basic host-side unit
+  test and coverage infrastructure is mature
 
 The exact tool should follow the installed toolchain, but coverage
 reporting must become a regular part of the workflow.
+
+Mutation testing is planned future work, not a first-wave requirement.
+Once the host-side unit-test harness and basic coverage reporting are in
+regular use, adopt `Mull` to measure how effectively the tests detect
+behavior-changing edits in common-source code.
 
 ## Directory layout
 

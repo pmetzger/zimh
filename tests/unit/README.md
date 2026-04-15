@@ -15,6 +15,11 @@ The top-level CMake build enables host-side unit tests with the
 `unittest` interface target, adds `tests/unit/`, and registers unit test
 executables with `ctest`.
 
+Mutation testing with `Mull` is intended future work. It is not part of
+the first host-side unit-test rollout, but the long-term plan is to use
+it once the unit-test harness and basic coverage workflow are
+established.
+
 ## Layout
 
 - `tests/unit/CMakeLists.txt`
