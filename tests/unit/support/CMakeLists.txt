@@ -1,0 +1,16 @@
+add_library(simh_unit_support STATIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_support.c
+)
+
+set_target_properties(simh_unit_support PROPERTIES
+    C_STANDARD 99
+)
+
+target_include_directories(simh_unit_support PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+target_compile_definitions(simh_unit_support PRIVATE
+    SIMH_TEST_SOURCE_ROOT="${CMAKE_SOURCE_DIR}"
+    SIMH_TEST_BINARY_ROOT="${CMAKE_BINARY_DIR}"
+)

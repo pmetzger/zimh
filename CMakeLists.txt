@@ -210,6 +210,9 @@ option(WITH_TAP
 option(WITH_VIDEO
        "Enable (=1)/disable (=0) simulator display and graphics support (def: enabled)"
        TRUE)
+option(WITH_UNIT_TESTS
+       "Enable (=1)/disable (=0) host-side unit tests using cmocka. (def: enabled)"
+       TRUE)
 option(DONT_USE_ROMS
        "Enable (=1)/disable (=0) building support ROMs. (def: disabled)"
        FALSE)
@@ -388,6 +391,11 @@ string(APPEND _feature_text "\n    * zlib ............................. ${ZLIB_P
 string(APPEND _feature_text "\n    * Perl-Compatible RegExps........... ${PCRE_PKG_STATUS}")
 string(APPEND _feature_text "\n    * PNG, Freetype, SDL2, SDL2_ttf .... ${VIDEO_PKG_STATUS}")
 string(APPEND _feature_text "\n    * Network support .................. ${NETWORK_PKG_STATUS}")
+if (WITH_UNIT_TESTS)
+    string(APPEND _feature_text "\n    * Host-side unit tests ............. requested")
+else ()
+    string(APPEND _feature_text "\n    * Host-side unit tests ............. disabled")
+endif ()
 
 get_target_property(OS_FEATURE_DEFS os_features INTERFACE_COMPILE_DEFINITIONS)
 list(LENGTH OS_FEATURE_DEFS len_os_features)
@@ -494,6 +502,22 @@ if (NOT DO_DEPENDENCY_BUILD)
 
     message(STATUS "Adding simulators")
     include(simh-simulators)
+
+    if (WITH_UNIT_TESTS)
+        pkg_check_modules(CMOCKA IMPORTED_TARGET cmocka)
+
+        if (CMOCKA_FOUND)
+            add_library(unittest INTERFACE)
+            add_subdirectory(tests/unit)
+            target_link_libraries(unittest INTERFACE
+                PkgConfig::CMOCKA
+                simh_unit_support
+            )
+            message(STATUS "Host-side cmocka unit tests enabled")
+        else ()
+            message(STATUS "Host-side unit tests requested but cmocka was not found")
+        endif ()
+    endif ()
 
     include(cpack-setup)
     include(simh-packaging)
