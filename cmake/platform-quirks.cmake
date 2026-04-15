@@ -30,7 +30,7 @@
 
 
 set(EXTRA_TARGET_CFLAGS)
-set(EXTRA_TARGET_CFLAGS)
+set(EXTRA_TARGET_LFLAGS)
 
 # For 64-bit builds (and this is especially true for MSVC), set the library
 # architecture.
@@ -92,7 +92,7 @@ if (WIN32)
             set(use_rtdll "")
         endif ()
 
-        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>${use_rtll}")
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>${use_rtdll}")
 
         ## Disable automagic add for _MBCS:
         add_definitions(-D_SBCS)
@@ -180,7 +180,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES ".*Clang")
             string(REGEX REPLACE "-O3" "-O2" CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL}")
         endif ()
 
-        if (WARNINGS_FATAL` OR RELEASE_LTO)
+        if (WARNINGS_FATAL OR RELEASE_LTO)
             check_c_compiler_flag("-Werror" GCC_W_ERROR_FLAG)
             if (GCC_W_ERROR_FLAG)
                 if (WARNINGS_FATAL)

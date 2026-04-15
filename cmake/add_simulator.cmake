@@ -335,7 +335,7 @@ function (add_simulator _targ)
     set_property(TEST "simh-${_targ}" PROPERTY ENVIRONMENT "${test_add_env}")
 
     if (DONT_USE_ROMS)
-        target_compile_definitions(DONT_USE_INTERNAL_ROM)
+        target_compile_definitions(${_targ} PRIVATE DONT_USE_INTERNAL_ROM)
     elseif (SIMH_BUILDROMS)
         add_dependencies(${_targ} BuildROMs)
     endif ()
