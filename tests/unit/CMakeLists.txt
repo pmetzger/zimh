@@ -7,3 +7,11 @@ add_unit_test(unit-smoke
     INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/support
 )
+
+add_unit_test(unit-support
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_unit_support.c
+    INCLUDES
+        ${CMAKE_CURRENT_SOURCE_DIR}/support
+)
