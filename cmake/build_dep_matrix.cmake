@@ -16,8 +16,7 @@ function(BuildDepMatrix dep pretty)
 
     set(cmake_cfg_args
             "-G${CMAKE_GENERATOR}"
-            "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}"
-            "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
+            "-DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}")
 
     if (CMAKE_GENERATOR_PLATFORM)
         list(APPEND cmake_cfg_args "-A" "${CMAKE_GENERATOR_PLATFORM}")
@@ -82,4 +81,3 @@ function(BuildDepMatrix dep pretty)
     set(CMAKE_MODULE_PATH ${_saved_cmake_module_path})
     unset(_saved_cmake_module_path)
 endfunction ()
-

@@ -88,7 +88,7 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.15)
     cmake_policy(SET CMP0091 NEW)
 endif()
 
-project(simh VERSION "${SIMH_VERSION}" LANGUAGES C CXX)
+project(simh VERSION "${SIMH_VERSION}" LANGUAGES C)
 
 include(vcpkg-setup)
 include(GNUInstallDirs)
@@ -515,7 +515,6 @@ else ()
             -DDO_DEPENDENCY_BUILD:BOOL=OFF
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-            -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
         INSTALL_COMMAND ""
         BINARY_DIR
             ${CMAKE_BINARY_DIR}
