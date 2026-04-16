@@ -15,6 +15,7 @@ At minimum:
 - `ninja`
 - `git`
 - `pkg-config`
+- `bison`
 
 For the full feature build, install the libraries used by optional
 features:
@@ -51,6 +52,8 @@ Notes:
 
 - The source tree assumes a compiler with at least C11 support. A modern
   C17-capable compiler is preferred.
+- `bison` is required when regenerating parser sources from the checked-in
+  `.y` grammars, including the SAGE and AltairZ80 Motorola 68000 parsers.
 - `cmocka` is for host-side unit tests rather than the historical
   simulator binaries themselves.
 - `SDL2_ttf` is the usual missing piece when a video-enabled build does
@@ -193,6 +196,7 @@ pkg-config --modversion freetype2
 pkg-config --modversion libpng
 pkg-config --modversion zlib
 pkg-config --modversion libedit
+bison --version
 ```
 
 If `SDL2_ttf` is missing, a full video-enabled build is not ready yet.
