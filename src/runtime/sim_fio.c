@@ -756,18 +756,28 @@ FILE *fIn = NULL, *fOut = NULL;
 t_stat st = SCPE_OK;
 char *buf = NULL;
 size_t bytes;
+#if defined(SIMH_NO_FOPEN_X)
 struct stat statb;
+#endif
 
 fIn = sim_fopen (source_file, "rb");
 if (!fIn) {
     st = sim_messagef (SCPE_ARG, "Can't open '%s' for input: %s\n", source_file, strerror (errno));
     goto Cleanup_Return;
     }
+#if !defined(SIMH_NO_FOPEN_X)
+fOut = sim_fopen (dest_file, overwrite_existing ? "wb" : "xb");
+#else
+    // TODO: Replace this fallback with an atomic no-overwrite open on
+    // platforms where CMake did not confirm fopen exclusive-create
+    // mode. In theory this sim_stat/open sequence can race with
+    // another creator.
 if (!overwrite_existing && (sim_stat (dest_file, &statb) == 0)) {
     st = sim_messagef (SCPE_ARG, "Can't open '%s' for output: %s\n", dest_file, strerror (EEXIST));
     goto Cleanup_Return;
     }
 fOut = sim_fopen (dest_file, "wb");
+#endif
 if (!fOut) {
     st = sim_messagef (SCPE_ARG, "Can't open '%s' for output: %s\n", dest_file, strerror (errno));
     goto Cleanup_Return;

@@ -4,6 +4,7 @@
 ## "scooter me fecit"
 
 include(CheckSymbolExists)
+include(CheckCSourceRuns)
 include(CMakePushCheckState)
 
 include(pthreads-dep)
@@ -110,6 +111,36 @@ else ()
         target_compile_definitions(os_features INTERFACE HAVE_FNMATCH)
     endif (have_fnmatch_h)
 endif (have_glob_h)
+
+## fopen(..."x") exclusive-create mode
+check_c_source_runs("
+#include <stdio.h>
+
+int main(void)
+{
+    FILE *f;
+
+    remove(\"cmake_fopen_x_test.tmp\");
+
+    f = fopen(\"cmake_fopen_x_test.tmp\", \"wbx\");
+    if (f == NULL)
+        return 1;
+    fclose(f);
+
+    f = fopen(\"cmake_fopen_x_test.tmp\", \"wbx\");
+    if (f != NULL) {
+        fclose(f);
+        remove(\"cmake_fopen_x_test.tmp\");
+        return 2;
+    }
+
+    remove(\"cmake_fopen_x_test.tmp\");
+    return 0;
+}
+" have_working_fopen_x_mode)
+if (NOT have_working_fopen_x_mode)
+    target_compile_definitions(os_features INTERFACE SIMH_NO_FOPEN_X)
+endif ()
 
 ## <sys/mman.h> and shm_open
 check_include_file(sys/mman.h have_sys_mman_h)
