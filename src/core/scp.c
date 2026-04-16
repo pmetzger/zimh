@@ -2732,7 +2732,7 @@ t_stat process_stdin_commands (t_stat stat, char *argv[], t_bool do_called);
 
 /* Main command loop */
 
-int main (int argc, char *argv[])
+int scp_main (int argc, char *argv[])
 {
 char cbuf[4*CBUFSIZE], *cptr, *cptr2;
 char nbuf[PATH_MAX + 7];

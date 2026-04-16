@@ -237,6 +237,9 @@ function (simh_executable_template _targ)
         if (SIMH_FEATURE_DISPLAY)
             target_compile_definitions(${_targ} PUBLIC USE_DISPLAY)
         endif ()
+        if (CMAKE_HOST_APPLE AND (SIMH_FEATURE_VIDEO OR SIMH_FEATURE_DISPLAY))
+            target_compile_definitions(${_targ} PUBLIC SDL_MAIN_AVAILABLE)
+        endif ()
     endif ()
 
     set(SIMH_SIMLIB simhcore)
@@ -266,6 +269,8 @@ endfunction ()
 function (add_simulator _targ)
     simh_executable_template(${_targ} "${ARGN}")
     cmake_parse_arguments(SIMH "${ADD_SIMULATOR_OPTIONS}" "${ADD_SIMULATOR_1ARG}" "${ADD_SIMULATOR_NARG}" ${ARGN})
+
+    target_sources(${_targ} PRIVATE ${SIMH_CORE_ROOT}/main.c)
 
     set(pkg_family "default_family")
     if (SIMH_PKG_FAMILY)

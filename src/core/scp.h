@@ -247,6 +247,7 @@ const char *sim_error_text (t_stat stat);
 t_stat sim_string_to_stat (const char *cptr, t_stat *cond);
 t_stat sim_sched_step (void);
 t_stat sim_cancel_step (void);
+int scp_main (int argc, char *argv[]);
 const char *sim_get_tool_path (const char *tool);
 void sim_printf (const char *fmt, ...) GCC_FMT_ATTR(1, 2);
 void sim_perror (const char *msg);
