@@ -23,3 +23,11 @@ add_unit_test(unit-sim-card
     INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/support
 )
+
+add_unit_test(unit-sim-imd
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_unit_sim_imd.c
+    INCLUDES
+        ${CMAKE_CURRENT_SOURCE_DIR}/support
+)
