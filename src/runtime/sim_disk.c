@@ -112,11 +112,7 @@ struct simh_disk_footer {
 
 /* OS Independent Disk Virtual Disk (VHD) I/O support */
 
-#if (defined (VMS) && !(defined (__ALPHA) || defined (__ia64)))
-#define DONT_DO_VHD_SUPPORT  /* VAX/VMS compilers don't have 64 bit integers */
-#endif
-
-#if defined(_WIN32) || defined (__ALPHA) || defined (__ia64) || defined (VMS)
+#if defined(_WIN32)
 #ifndef __BYTE_ORDER__
 #define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
 #endif
@@ -4303,7 +4299,7 @@ _set_errno_from_status (GetLastError ());
 return SCPE_IOERR;
 }
 
-#elif defined (__linux) || defined (__linux__) || defined (__APPLE__)|| defined (__sun) || defined (__sun__) || defined (__hpux) || defined (_AIX)
+#elif defined (__linux) || defined (__linux__) || defined (__APPLE__)
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -4597,86 +4593,6 @@ return SCPE_NOFNC;
 #endif
 
 /* OS Independent Disk Virtual Disk (VHD) I/O support */
-
-#if (defined (VMS) && !(defined (__ALPHA) || defined (__ia64)))
-#define DONT_DO_VHD_SUPPORT  /* VAX/VMS compilers don't have 64 bit integers */
-#endif
-
-#if defined (DONT_DO_VHD_SUPPORT)
-
-/*============================================================================*/
-/*                        Non-implemented version                             */
-/*   This is only for hody systems which don't have 64 bit integer types      */
-/*============================================================================*/
-
-static t_stat sim_vhd_disk_implemented (void)
-{
-return SCPE_NOFNC;
-}
-
-static FILE *sim_vhd_disk_open (const char *vhdfilename, const char *openmode)
-{
-return NULL;
-}
-
-static FILE *sim_vhd_disk_merge (const char *szVHDPath, char **ParentVHD)
-{
-return NULL;
-}
-
-static FILE *sim_vhd_disk_create (const char *szVHDPath, t_offset desiredsize)
-{
-return NULL;
-}
-
-static FILE *sim_vhd_disk_create_diff (const char *szVHDPath, const char *szParentVHDPath)
-{
-return NULL;
-}
-
-static int sim_vhd_disk_close (FILE *f)
-{
-return -1;
-}
-
-static void sim_vhd_disk_flush (FILE *f)
-{
-}
-
-static t_offset sim_vhd_disk_size (FILE *f)
-{
-return (t_offset)-1;
-}
-
-static t_stat sim_vhd_disk_rdsect (UNIT *uptr, t_lba lba, uint8 *buf, t_seccnt *sectsread, t_seccnt sects)
-{
-*sectsread = 0;
-return SCPE_IOERR;
-}
-
-static t_stat sim_vhd_disk_clearerr (UNIT *uptr)
-{
-return SCPE_IOERR;
-}
-
-static t_stat sim_vhd_disk_wrsect (UNIT *uptr, t_lba lba, uint8 *buf, t_seccnt *sectswritten, t_seccnt sects)
-{
-*sectswritten = 0;
-return SCPE_IOERR;
-}
-
-static t_stat sim_vhd_disk_set_dtype (FILE *f, const char *dtype)
-{
-return SCPE_NOFNC;
-}
-
-static const char *sim_vhd_disk_get_dtype (FILE *f, uint32 *SectorSize, uint32 *xfer_element_size, char sim_name[64], time_t *creation_time)
-{
-*SectorSize = *xfer_element_size = 0;
-return NULL;
-}
-
-#else
 
 /*++
     This code follows the details specified in the "Virtual Hard Disk Image
@@ -5032,7 +4948,7 @@ while (size--)
 return ~sum;
 }
 
-#if defined(_WIN32) || defined (__ALPHA) || defined (__ia64) || defined (VMS)
+#if defined(_WIN32)
 #ifndef __BYTE_ORDER__
 #define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
 #endif
@@ -5845,7 +5761,7 @@ errno = Status;
 return hVHD;
 }
 
-#if defined(__CYGWIN__) || defined(VMS) || defined(__APPLE__) || defined(__linux) || defined(__linux__) || defined(__unix__)
+#if defined(__APPLE__) || defined(__linux) || defined(__linux__) || defined(__unix__)
 #include <unistd.h>
 #endif
 static void
@@ -5923,23 +5839,8 @@ char *d = szHostPath;
 
 memmove (szHostPath, szVhdPath, HostPathSize);
 szHostPath[HostPathSize-1] = '\0';
-#if defined(VMS)
-c = strchr (szHostPath, ':');
-if (*(c+1) != '\\')
-    return NULL;
-*(c+1) = '[';
-d = strrchr (c+2, '\\');
-if (d) {
-    *d = ']';
-    while ((d = strrchr (c+2, '\\')))
-        *d = '.';
-    }
-else
-    return NULL;
-#else
 while ((c = strchr (d, '\\')))
     *c = '/';
-#endif
 memset (szHostPath + strlen (szHostPath), 0, HostPathSize - strlen (szHostPath));
 return szHostPath;
 }
@@ -6476,7 +6377,6 @@ struct disk_context *ctx = (struct disk_context *)uptr->disk_ctx;
 
 return WriteVirtualDiskSectors(hVHD, buf, sects, sectswritten, ctx->sector_size, lba);
 }
-#endif
 
 t_stat sim_disk_init (void)
 {

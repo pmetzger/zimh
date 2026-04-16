@@ -489,10 +489,7 @@ char namebuf[PATH_MAX + 1];
 
 if (NULL == _sim_expand_homedir (file, namebuf, sizeof (namebuf)))
     return NULL;
-#if defined (VMS)
-f = fopen (namebuf, mode, "ALQ=32", "DEQ=4096",
-                          "MBF=6", "MBC=127", "FOP=cbt,tef", "ROP=rah,wbh", "CTX=stm");
-#elif (defined (__linux) || defined (__linux__) || defined (__hpux) || defined (_AIX)) && !defined (DONT_DO_LARGEFILE)
+#if (defined (__linux) || defined (__linux__)) && !defined (DONT_DO_LARGEFILE)
 f = fopen64 (namebuf, mode);
 #else
 f = fopen (namebuf, mode);
@@ -501,39 +498,6 @@ return f;
 }
 
 #if !defined (DONT_DO_LARGEFILE)
-/* 64b VMS */
-
-#if ((defined (__ALPHA) || defined (__ia64)) && defined (VMS) && (__DECC_VER >= 60590001)) || \
-    ((defined(__sun) || defined(__sun__)) && defined(_LARGEFILE_SOURCE))
-#define S_SIM_IO_FSEEK_EXT_ 1
-int sim_fseeko (FILE *st, t_offset offset, int whence)
-{
-return fseeko (st, (off_t)offset, whence);
-}
-
-t_offset sim_ftell (FILE *st)
-{
-return (t_offset)(ftello (st));
-}
-
-#endif
-
-/* Alpha UNIX - natively 64b */
-
-#if defined (__ALPHA) && defined (__unix__)             /* Alpha UNIX */
-#define S_SIM_IO_FSEEK_EXT_ 1
-int sim_fseeko (FILE *st, t_offset offset, int whence)
-{
-return fseek (st, offset, whence);
-}
-
-t_offset sim_ftell (FILE *st)
-{
-return (t_offset)(ftell (st));
-}
-
-#endif
-
 /* Windows */
 
 #if defined (_WIN32)
@@ -554,7 +518,7 @@ return (t_offset)_ftelli64 (st);
 
 /* Linux */
 
-#if defined (__linux) || defined (__linux__) || defined (__hpux) || defined (_AIX)
+#if defined (__linux) || defined (__linux__)
 #define S_SIM_IO_FSEEK_EXT_ 1
 int sim_fseeko (FILE *st, t_offset xpos, int origin)
 {
@@ -570,7 +534,7 @@ return (t_offset)(ftello64 (st));
 
 /* Apple OS/X */
 
-#if defined (__APPLE__) || defined (__FreeBSD__) || defined(__NetBSD__) || defined (__OpenBSD__) || defined (__CYGWIN__)
+#if defined (__APPLE__) || defined (__FreeBSD__) || defined(__NetBSD__) || defined (__OpenBSD__)
 #define S_SIM_IO_FSEEK_EXT_ 1
 int sim_fseeko (FILE *st, t_offset xpos, int origin)
 {
@@ -862,7 +826,7 @@ if ((stbuf.st_mode & S_IFIFO)) {
 return -1;
 }
 
-#if defined (__linux__) || defined (__APPLE__) || defined (__CYGWIN__) || defined (__FreeBSD__) || defined(__NetBSD__) || defined (__OpenBSD__)
+#if defined (__linux__) || defined (__APPLE__) || defined (__FreeBSD__) || defined(__NetBSD__) || defined (__OpenBSD__)
 
 #if defined (HAVE_SHM_OPEN)
 #include <sys/mman.h>
@@ -1002,28 +966,9 @@ return FALSE;
 #endif /* defined (__linux__) || defined (__APPLE__) */
 #endif /* defined (_WIN32) */
 
-#if defined(__VAX)
-/*
- * We provide a 'basic' snprintf, which 'might' overrun a buffer, but
- * the actual use cases don't on other platforms and none of the callers
- * care about the function return value.
- */
-int sim_vax_snprintf(char *buf, size_t buf_size, const char *fmt, ...)
-{
-va_list arglist;
-
-va_start (arglist, fmt);
-vsprintf (buf, fmt, arglist);
-va_end (arglist);
-return 0;
-}
-#endif
-
 char *sim_getcwd (char *buf, size_t buf_size)
 {
-#if defined (VMS)
-return getcwd (buf, buf_size, 0);
-#elif defined(__MINGW64__) ||defined(_MSC_VER) || defined(__MINGW32__)
+#if defined(__MINGW64__) ||defined(_MSC_VER) || defined(__MINGW32__)
 return _getcwd (buf, (int) buf_size);
 #else
 return getcwd (buf, buf_size);

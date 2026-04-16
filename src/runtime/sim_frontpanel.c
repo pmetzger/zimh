@@ -88,8 +88,8 @@ return 0;
 #define HAVE_STRUCT_TIMESPEC 1   /* OSX defined the structure but doesn't tell us */
 #endif
 
-/* on HP-UX, CLOCK_REALTIME is enum, not preprocessor define */
-#if !defined(CLOCK_REALTIME) && !defined(__hpux)
+/* Provide a fallback CLOCK_REALTIME if the host headers omit it. */
+#if !defined(CLOCK_REALTIME)
 #define CLOCK_REALTIME 1
 #define NEED_CLOCK_GETTIME 1
 #if !defined(HAVE_STRUCT_TIMESPEC)
@@ -114,7 +114,7 @@ tp->tv_nsec = cur.tv_usec*1000;
 return 0;
 }
 #endif /* defined(NEED_CLOCK_GETTIME) */
-#endif /* !defined(CLOCK_REALTIME) && !defined(__hpux) */
+#endif /* !defined(CLOCK_REALTIME) */
 
 #endif /* NOT _WIN32 */
 

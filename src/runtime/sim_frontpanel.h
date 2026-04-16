@@ -54,8 +54,6 @@ extern "C" {
 
 #include <stdlib.h>
 
-#if !defined(__VAX)         /* Unsupported platform */
-
 #define SIM_FRONTPANEL_VERSION   12
 
 /**
@@ -602,8 +600,6 @@ sim_panel_debug (PANEL *panel, const char *fmt, ...);
 
 void
 sim_panel_flush_debug (PANEL *panel);
-
-#endif /* !defined(__VAX) */
 
 #ifdef  __cplusplus
 }
