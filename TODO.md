@@ -84,6 +84,19 @@
 - Decide the long-term status of the top-level `Makefile`:
   continue supporting it as a first-class build path, or eventually
   retire it in favor of CMake.
+- Unify the Git build/archive provenance mechanism. Right now commit ID
+  and commit time can come from two overlapping paths:
+  - `src/core/sim_rev.h` with Git `export-subst` archive placeholders
+  - CMake- or Makefile-generated live-build metadata
+    (`generated/git-commit-id.h` for CMake and compiler `-D` defines for
+    the legacy Makefile)
+  Decide whether archive builds still need separate `export-subst`
+  support. Then simplify to one clear policy for:
+  - live Git checkouts
+  - exported source archives
+  - builds with local uncommitted changes
+  Make the chosen fallback order explicit in both build systems and keep
+  only the minimum necessary mechanisms.
 - Normalize repository naming and casing policies more broadly once the
   new directory hierarchy is stable.
 - Purge obsolete host operating system support references and code
