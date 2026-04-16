@@ -16,7 +16,7 @@ int simh_test_join_path(char *buffer, size_t buffer_size, const char *base,
     int written;
 
     written = snprintf(buffer, buffer_size, "%s/%s", base, relative_path);
-    if (written < 0 || (size_t) written >= buffer_size) {
+    if (written < 0 || (size_t)written >= buffer_size) {
         errno = ENAMETOOLONG;
         return -1;
     }
@@ -43,7 +43,7 @@ static int remove_directory_contents(const char *path)
         }
 
         if (snprintf(child, sizeof(child), "%s/%s", path, entry->d_name) >=
-            (int) sizeof(child)) {
+            (int)sizeof(child)) {
             closedir(dir);
             errno = ENAMETOOLONG;
             return -1;
@@ -74,10 +74,9 @@ const char *simh_test_binary_root(void)
 
 /* Initialize a minimal one-unit device for host-side common-code tests. */
 void simh_test_init_device_unit(DEVICE *device, UNIT *unit,
-                                const char *dev_name,
-                                const char *unit_name, uint32 dev_flags,
-                                uint32 unit_flags, uint32 dwidth,
-                                uint32 aincr)
+                                const char *dev_name, const char *unit_name,
+                                uint32 dev_flags, uint32 unit_flags,
+                                uint32 dwidth, uint32 aincr)
 {
     memset(device, 0, sizeof(*device));
     memset(unit, 0, sizeof(*unit));
@@ -114,7 +113,7 @@ int simh_test_make_temp_dir(char *buffer, size_t buffer_size,
 
     written = snprintf(buffer, buffer_size, "%s/%s-XXXXXX",
                        simh_test_binary_root(), prefix);
-    if (written < 0 || (size_t) written >= buffer_size) {
+    if (written < 0 || (size_t)written >= buffer_size) {
         errno = ENAMETOOLONG;
         return -1;
     }
@@ -150,22 +149,22 @@ int simh_test_read_file(const char *path, void **data_out, size_t *size_out)
         return -1;
     }
 
-    data = malloc((size_t) size + 1);
+    data = malloc((size_t)size + 1);
     if (data == NULL) {
         fclose(file);
         errno = ENOMEM;
         return -1;
     }
 
-    bytes_read = fread(data, 1, (size_t) size, file);
-    if (bytes_read != (size_t) size) {
+    bytes_read = fread(data, 1, (size_t)size, file);
+    if (bytes_read != (size_t)size) {
         free(data);
         fclose(file);
         errno = EIO;
         return -1;
     }
 
-    ((char *) data)[size] = '\0';
+    ((char *)data)[size] = '\0';
 
     if (fclose(file) != 0) {
         free(data);
@@ -173,7 +172,7 @@ int simh_test_read_file(const char *path, void **data_out, size_t *size_out)
     }
 
     *data_out = data;
-    *size_out = (size_t) size;
+    *size_out = (size_t)size;
 
     return 0;
 }
@@ -234,14 +233,14 @@ int simh_test_read_stream(FILE *stream, char **text_out, size_t *size_out)
         return -1;
     }
 
-    data = malloc((size_t) size + 1);
+    data = malloc((size_t)size + 1);
     if (data == NULL) {
         errno = ENOMEM;
         return -1;
     }
 
-    bytes_read = fread(data, 1, (size_t) size, stream);
-    if (bytes_read != (size_t) size) {
+    bytes_read = fread(data, 1, (size_t)size, stream);
+    if (bytes_read != (size_t)size) {
         free(data);
         errno = EIO;
         return -1;
@@ -249,7 +248,7 @@ int simh_test_read_stream(FILE *stream, char **text_out, size_t *size_out)
 
     data[size] = '\0';
     *text_out = data;
-    *size_out = (size_t) size;
+    *size_out = (size_t)size;
     return 0;
 }
 

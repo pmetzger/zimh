@@ -47,9 +47,8 @@ static int setup_sim_card_fixture(void **state)
     simh_test_init_device_unit(&fixture->reader_dev, &fixture->reader_unit,
                                "RDR", "RDR", DEV_CARD,
                                UNIT_ATTABLE | UNIT_RO | MODE_TEXT, 0, 0);
-    simh_test_init_device_unit(&fixture->punch_dev, &fixture->punch_unit,
-                               "PUN", "PUN", DEV_CARD,
-                               UNIT_ATTABLE | MODE_TEXT, 0, 0);
+    simh_test_init_device_unit(&fixture->punch_dev, &fixture->punch_unit, "PUN",
+                               "PUN", DEV_CARD, UNIT_ATTABLE | MODE_TEXT, 0, 0);
 
     simh_test_reset_simulator_state();
     assert_int_equal(simh_test_set_sim_name("simbase-unit-sim-card"), 0);

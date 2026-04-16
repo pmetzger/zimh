@@ -164,10 +164,9 @@ static void test_sim_exp_check_populates_regex_capture_groups(void **state)
 {
     struct scp_expect_fixture *fixture = *state;
 
-    assert_int_equal(
-        sim_exp_set(&fixture->exp, "/ab([0-9][0-9])/", 0, 0, EXP_TYP_REGEX,
-                    NULL),
-        SCPE_OK);
+    assert_int_equal(sim_exp_set(&fixture->exp, "/ab([0-9][0-9])/", 0, 0,
+                                 EXP_TYP_REGEX, NULL),
+                     SCPE_OK);
 
     assert_int_equal(sim_exp_check(&fixture->exp, 'a'), SCPE_OK);
     assert_int_equal(sim_exp_check(&fixture->exp, 'b'), SCPE_OK);

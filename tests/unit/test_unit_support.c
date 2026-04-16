@@ -22,8 +22,8 @@ static void test_support_reads_fixture(void **state)
 
     (void)state;
 
-    assert_int_equal(
-        simh_test_fixture_path(path, sizeof(path), "sample.txt"), 0);
+    assert_int_equal(simh_test_fixture_path(path, sizeof(path), "sample.txt"),
+                     0);
     assert_true(strstr(path, "tests/unit/fixtures/sample.txt") != NULL);
 
     assert_int_equal(simh_test_read_fixture("sample.txt", &data, &size), 0);

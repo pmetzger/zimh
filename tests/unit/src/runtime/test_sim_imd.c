@@ -151,8 +151,8 @@ static void test_disk_open_reads_minimal_single_sector_image(void **state)
 }
 
 /* Verify compressed sectors expand on read and reject writes when locked. */
-static void test_disk_open_reads_compressed_sector_and_write_protects(
-    void **state)
+static void
+test_disk_open_reads_compressed_sector_and_write_protects(void **state)
 {
     uint8_t image_bytes[18];
     uint8_t expected_buffer[128];
@@ -242,10 +242,9 @@ static void test_sect_write_persists_deleted_address_mark(void **state)
 
     flags = IMD_DISK_IO_DELETED_ADDR_MARK;
     readlen = 0;
-    assert_int_equal(
-        sectWrite(disk, 0, 0, 1, write_buffer, sizeof(write_buffer), &flags,
-                  &readlen),
-        SCPE_OK);
+    assert_int_equal(sectWrite(disk, 0, 0, 1, write_buffer,
+                               sizeof(write_buffer), &flags, &readlen),
+                     SCPE_OK);
     assert_int_equal(readlen, sizeof(write_buffer));
 
     memset(read_buffer, 0, sizeof(read_buffer));
