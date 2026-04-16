@@ -1,6 +1,7 @@
 #include <setjmp.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +28,10 @@ struct sim_fio_fixture {
 struct filelist_context {
     char **entries;
     size_t count;
+};
+
+struct stdout_capture_context {
+    char **filelist;
 };
 
 static int setup_sim_fio_fixture(void **state)
@@ -134,6 +139,16 @@ static int filelist_contains(char **filelist, const char *path)
     }
     return 0;
 }
+
+static void write_printed_filelist(void *context)
+{
+    struct stdout_capture_context *capture = context;
+
+    sim_print_filelist(capture->filelist);
+}
+
+/* TODO: Add shared-memory coverage once the test environment has a
+   stable policy for shm_open()-based tests. */
 
 /* Verify trailing whitespace is removed in place and the input pointer
    is preserved. */
@@ -409,6 +424,41 @@ static void test_sim_file_size_helpers_report_sizes_consistently(void **state)
     fclose(file);
 }
 
+/* Verify sim_finit recalculates the exported host-endian and large-file
+   capability flags from the current build. */
+static void test_sim_finit_sets_endian_and_large_file_flags(void **state)
+{
+    int32 result;
+
+    (void)state;
+
+    result = sim_finit();
+    assert_int_equal(result, sim_end);
+    assert_int_equal(sim_toffset_64, sizeof(t_offset) > sizeof(int32));
+    assert_int_equal(sim_taddr_64,
+                     sim_toffset_64 && (sizeof(t_addr) > sizeof(int32)));
+}
+
+/* Verify the t_addr wrapper seek helper delegates to the extended seek
+   path and updates the current position correctly. */
+static void test_sim_fseek_moves_to_requested_offsets(void **state)
+{
+    struct sim_fio_fixture *fixture = *state;
+    FILE *file;
+
+    file = sim_fopen(fixture->file_path, "rb");
+    assert_non_null(file);
+
+    assert_int_equal(sim_fseek(file, 2, SEEK_SET), 0);
+    assert_int_equal(sim_ftell(file), 2);
+    assert_int_equal(sim_fseek(file, 1, SEEK_CUR), 0);
+    assert_int_equal(sim_ftell(file), 3);
+    assert_int_equal(sim_fseek(file, 0, SEEK_END), 0);
+    assert_int_equal(sim_ftell(file), 5);
+
+    fclose(file);
+}
+
 /* Verify sim_fopen and sim_set_fsize can create and resize a file
    addressed through home-directory expansion. */
 static void test_sim_fopen_and_sim_set_fsize_handle_home_expansion(void **state)
@@ -455,6 +505,58 @@ static void test_sim_set_file_times_updates_stat_times(void **state)
     assert_int_equal(sim_stat(fixture->file_path, &statb), 0);
     assert_int_equal(statb.st_atime, access_time);
     assert_int_equal(statb.st_mtime, write_time);
+}
+
+/* Verify missing files produce a stable strerror-backed description on
+   the POSIX path. */
+static void test_sim_get_os_error_text_reports_missing_file(void **state)
+{
+    (void)state;
+
+    assert_string_equal(sim_get_os_error_text(ENOENT), strerror(ENOENT));
+}
+
+/* Verify copy and timestamp helpers reject missing inputs rather than
+   silently succeeding. */
+static void test_sim_file_helpers_report_missing_path_failures(void **state)
+{
+    struct sim_fio_fixture *fixture = *state;
+    char missing_path[1024];
+    char bad_dest[1024];
+    t_stat status;
+
+    assert_int_equal(simh_test_join_path(missing_path, sizeof(missing_path),
+                                         fixture->temp_dir, "missing.bin"),
+                     0);
+    assert_int_equal(simh_test_join_path(bad_dest, sizeof(bad_dest),
+                                         fixture->temp_dir, "absent/out.bin"),
+                     0);
+
+    status = sim_copyfile(missing_path, fixture->copy_path, TRUE);
+    assert_true((status & SCPE_NOMESSAGE) != 0);
+    assert_int_equal(status & ~(SCPE_NOMESSAGE | SCPE_KFLAG | SCPE_BREAK),
+                     SCPE_ARG);
+
+    status = sim_copyfile(fixture->file_path, bad_dest, TRUE);
+    assert_true((status & SCPE_NOMESSAGE) != 0);
+    assert_int_equal(status & ~(SCPE_NOMESSAGE | SCPE_KFLAG | SCPE_BREAK),
+                     SCPE_ARG);
+    assert_int_equal(sim_set_file_times(missing_path, 1, 2), SCPE_IOERR);
+}
+
+/* Verify failing open and non-seekable argument validation return
+   obvious failure indicators. */
+static void test_sim_fopen_and_fifo_helpers_reject_bad_inputs(void **state)
+{
+    struct sim_fio_fixture *fixture = *state;
+    char bad_path[1024];
+
+    assert_int_equal(simh_test_join_path(bad_path, sizeof(bad_path),
+                                         fixture->temp_dir, "missing/out.bin"),
+                     0);
+
+    assert_null(sim_fopen(bad_path, "wb"));
+    assert_int_equal(sim_set_fifo_nonblock(NULL), -1);
 }
 
 /* Verify sim_set_fifo_nonblock distinguishes FIFOs from regular files
@@ -529,6 +631,38 @@ test_sim_dir_scan_get_filelist_and_copyfile_work_together(void **state)
     sim_free_filelist(&filelist);
     assert_null(filelist);
     free_filelist_context(&context);
+}
+
+/* Verify sim_print_filelist writes each entry on its own line through
+   the normal stdout-based SIMH output path. */
+static void test_sim_print_filelist_formats_one_entry_per_line(void **state)
+{
+    struct sim_fio_fixture *fixture = *state;
+    struct stdout_capture_context capture;
+    char **filelist;
+    char *text;
+    size_t size;
+
+    filelist = calloc(3, sizeof(*filelist));
+    assert_non_null(filelist);
+    filelist[0] = strdup(fixture->file_path);
+    filelist[1] = strdup(fixture->copy_path);
+    assert_non_null(filelist[0]);
+    assert_non_null(filelist[1]);
+    capture.filelist = filelist;
+
+    assert_int_equal(simh_test_capture_stdout(write_printed_filelist, &capture,
+                                              &text, &size),
+                     0);
+    assert_true(size > 0);
+    assert_non_null(strstr(text, fixture->file_path));
+    assert_non_null(strstr(text, fixture->copy_path));
+    assert_non_null(strstr(text, "\n"));
+
+    free(text);
+    free(filelist[0]);
+    free(filelist[1]);
+    free(filelist);
 }
 
 /* Verify sim_dir_scan reports an argument-style failure when a pattern
@@ -639,17 +773,31 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_sim_file_size_helpers_report_sizes_consistently,
             setup_sim_fio_fixture, teardown_sim_fio_fixture),
+        cmocka_unit_test(test_sim_finit_sets_endian_and_large_file_flags),
+        cmocka_unit_test_setup_teardown(
+            test_sim_fseek_moves_to_requested_offsets, setup_sim_fio_fixture,
+            teardown_sim_fio_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_fopen_and_sim_set_fsize_handle_home_expansion,
             setup_sim_fio_fixture, teardown_sim_fio_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_set_file_times_updates_stat_times, setup_sim_fio_fixture,
             teardown_sim_fio_fixture),
+        cmocka_unit_test(test_sim_get_os_error_text_reports_missing_file),
+        cmocka_unit_test_setup_teardown(
+            test_sim_file_helpers_report_missing_path_failures,
+            setup_sim_fio_fixture, teardown_sim_fio_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_fopen_and_fifo_helpers_reject_bad_inputs,
+            setup_sim_fio_fixture, teardown_sim_fio_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_set_fifo_nonblock_marks_fifo_streams,
             setup_sim_fio_fixture, teardown_sim_fio_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_dir_scan_get_filelist_and_copyfile_work_together,
+            setup_sim_fio_fixture, teardown_sim_fio_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_print_filelist_formats_one_entry_per_line,
             setup_sim_fio_fixture, teardown_sim_fio_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_dir_scan_reports_missing_matches, setup_sim_fio_fixture,

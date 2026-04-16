@@ -252,6 +252,59 @@ int simh_test_read_stream(FILE *stream, char **text_out, size_t *size_out)
     return 0;
 }
 
+/* Capture text written to stdout by a callback into a heap buffer. */
+int simh_test_capture_stdout(simh_test_stream_writer writer, void *context,
+                             char **text_out, size_t *size_out)
+{
+    const int stdout_fd = fileno(stdout);
+    int saved_stdout;
+    FILE *capture;
+    int status;
+
+    if (fflush(stdout) != 0) {
+        return -1;
+    }
+
+    saved_stdout = dup(stdout_fd);
+    if (saved_stdout < 0) {
+        return -1;
+    }
+
+    capture = tmpfile();
+    if (capture == NULL) {
+        close(saved_stdout);
+        return -1;
+    }
+
+    if (dup2(fileno(capture), stdout_fd) < 0) {
+        fclose(capture);
+        close(saved_stdout);
+        return -1;
+    }
+
+    writer(context);
+
+    status = 0;
+    if (fflush(stdout) != 0) {
+        status = -1;
+    }
+    if (dup2(saved_stdout, stdout_fd) < 0) {
+        status = -1;
+    }
+    close(saved_stdout);
+
+    if (status == 0 &&
+        simh_test_read_stream(capture, text_out, size_out) != 0) {
+        status = -1;
+    }
+
+    if (fclose(capture) != 0) {
+        status = -1;
+    }
+
+    return status;
+}
+
 int simh_test_files_equal(const char *left_path, const char *right_path)
 {
     void *left_data;
