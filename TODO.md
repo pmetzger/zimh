@@ -71,7 +71,10 @@
   standard fixed-width C types. Migrate the codebase away from
   compatibility aliases such as `t_int64` and `t_uint64` where those are
   acting only as historical wrappers, and rely on `<stdint.h>` types
-  throughout unless a type is carrying real simulator-specific meaning.
+  throughout unless a type is carrying real simulator-specific
+  meaning.
+- Also look for other types (like `t_bool`) that could be validly
+  replaced with standard types.
 - Raise the project language baseline to C14 and clean out
   compatibility code that exists only for pre-C14 compilers or obsolete
   host platforms. Once that decision is made, update the build system,
