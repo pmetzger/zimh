@@ -49,6 +49,20 @@ static void test_get_glyph_quoted_keeps_quoted_token_intact(void **state)
     assert_string_equal(rest, "tail");
 }
 
+/* Verify quoted glyph parsing preserves escaped quote content. */
+static void test_get_glyph_quoted_preserves_escaped_quotes(void **state)
+{
+    char token[CBUFSIZE];
+    const char *rest;
+
+    (void)state;
+
+    rest = get_glyph_quoted("\"say \\\"hi\\\"\", next", token, ',');
+
+    assert_string_equal(token, "\"say \\\"hi\\\"\"");
+    assert_string_equal(rest, "next");
+}
+
 /* Verify command glyph parsing breaks out a leading shell bang. */
 static void test_get_glyph_cmd_handles_bang_prefix(void **state)
 {
@@ -61,6 +75,20 @@ static void test_get_glyph_cmd_handles_bang_prefix(void **state)
 
     assert_string_equal(token, "!");
     assert_string_equal(rest, "echo test");
+}
+
+/* Verify a shell bang followed by space is parsed as a normal token. */
+static void test_get_glyph_cmd_treats_spaced_bang_as_normal_token(void **state)
+{
+    char token[CBUFSIZE];
+    const char *rest;
+
+    (void)state;
+
+    rest = get_glyph_cmd("! echo", token);
+
+    assert_string_equal(token, "!");
+    assert_string_equal(rest, "echo");
 }
 
 /* Verify switch parsing handles both bitmask and numeric switch forms. */
@@ -121,17 +149,39 @@ static void test_get_sim_sw_returns_null_on_invalid_switches(void **state)
     assert_int_equal(sim_switch_number, 0);
 }
 
+/* Verify multiple switch groups accumulate until the command body begins. */
+static void test_get_sim_sw_accumulates_multiple_switch_groups(void **state)
+{
+    const char *rest;
+
+    (void)state;
+
+    sim_switches = 0;
+    sim_switch_number = 0;
+
+    rest = get_sim_sw("-qr -16 -ab command tail");
+
+    assert_non_null(rest);
+    assert_int_equal(sim_switches,
+                     SWMASK('Q') | SWMASK('R') | SWMASK('A') | SWMASK('B'));
+    assert_int_equal(sim_switch_number, 16);
+    assert_string_equal(rest, "command tail");
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_get_glyph_uppercases_and_skips_spaces),
         cmocka_unit_test(test_get_glyph_nc_preserves_case),
         cmocka_unit_test(test_get_glyph_quoted_keeps_quoted_token_intact),
+        cmocka_unit_test(test_get_glyph_quoted_preserves_escaped_quotes),
         cmocka_unit_test(test_get_glyph_cmd_handles_bang_prefix),
+        cmocka_unit_test(test_get_glyph_cmd_treats_spaced_bang_as_normal_token),
         cmocka_unit_test(test_get_switches_parses_bitmask_and_number),
         cmocka_unit_test(test_get_switches_rejects_invalid_switches),
         cmocka_unit_test(test_get_sim_sw_consumes_switch_tokens),
         cmocka_unit_test(test_get_sim_sw_returns_null_on_invalid_switches),
+        cmocka_unit_test(test_get_sim_sw_accumulates_multiple_switch_groups),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

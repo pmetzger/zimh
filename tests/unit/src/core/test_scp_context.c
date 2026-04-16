@@ -6,6 +6,7 @@
 #include <cmocka.h>
 
 #include "scp.h"
+#include "test_scp_fixture.h"
 #include "test_simh_personality.h"
 #include "test_support.h"
 
@@ -20,31 +21,6 @@ struct scp_context_fixture {
     UNIT internal_unit;
 };
 
-static void init_multiunit_device(DEVICE *device, UNIT *units, uint32 numunits,
-                                  const char *name, const char *lname,
-                                  uint32 flags)
-{
-    uint32 i;
-
-    memset(device, 0, sizeof(*device));
-    memset(units, 0, numunits * sizeof(*units));
-
-    device->name = name;
-    device->lname = (char *)lname;
-    device->units = units;
-    device->numunits = numunits;
-    device->flags = flags;
-
-    for (i = 0; i < numunits; ++i)
-        units[i].dptr = device;
-}
-
-static void free_unit_name(UNIT *unit)
-{
-    free(unit->uname);
-    unit->uname = NULL;
-}
-
 static int setup_scp_context_fixture(void **state)
 {
     struct scp_context_fixture *fixture;
@@ -53,8 +29,8 @@ static int setup_scp_context_fixture(void **state)
     fixture = calloc(1, sizeof(*fixture));
     assert_non_null(fixture);
 
-    init_multiunit_device(&fixture->disk, fixture->disk_units, 2, "DQ",
-                          "SYSDISK", 0);
+    simh_test_init_multiunit_device(&fixture->disk, fixture->disk_units, 2,
+                                    "DQ", "SYSDISK", 0);
     simh_test_init_device_unit(&fixture->reader, &fixture->reader_unit, "PTR",
                                NULL, 0, 0, 8, 1);
     fixture->reader.lname = "READER";
@@ -69,13 +45,13 @@ static int setup_scp_context_fixture(void **state)
     fixture->internal.lname = "CLOCK";
     fixture->internal_unit.uname = NULL;
 
-    simh_test_reset_simulator_state();
-    assert_int_equal(simh_test_set_sim_name("simbase-unit-scp-context"), 0);
     devices[0] = &fixture->disk;
     devices[1] = &fixture->reader;
     devices[2] = &fixture->disabled;
     devices[3] = NULL;
-    assert_int_equal(simh_test_set_devices(devices), 0);
+    assert_int_equal(simh_test_install_devices("simbase-unit-scp-context",
+                                               devices),
+                     0);
 
     *state = fixture;
     return 0;
@@ -85,11 +61,10 @@ static int teardown_scp_context_fixture(void **state)
 {
     struct scp_context_fixture *fixture = *state;
 
-    free_unit_name(&fixture->disk_units[0]);
-    free_unit_name(&fixture->disk_units[1]);
-    free_unit_name(&fixture->reader_unit);
-    free_unit_name(&fixture->disabled_unit);
-    free_unit_name(&fixture->internal_unit);
+    simh_test_free_unit_names(fixture->disk_units, 2);
+    simh_test_free_unit_names(&fixture->reader_unit, 1);
+    simh_test_free_unit_names(&fixture->disabled_unit, 1);
+    simh_test_free_unit_names(&fixture->internal_unit, 1);
     simh_test_reset_simulator_state();
     free(fixture);
     *state = NULL;
@@ -185,6 +160,24 @@ test_find_unit_matches_device_names_and_cached_unit_names(void **state)
     assert_ptr_equal(uptr, &fixture->disk_units[1]);
 }
 
+/* Verify invalid numeric suffixes leave the unit unresolved. */
+static void test_find_unit_rejects_invalid_unit_numbers(void **state)
+{
+    struct scp_context_fixture *fixture = *state;
+    UNIT *uptr;
+    DEVICE *dptr;
+
+    uptr = (UNIT *)1;
+    dptr = find_unit("DQ99", &uptr);
+    assert_ptr_equal(dptr, &fixture->disk);
+    assert_null(uptr);
+
+    uptr = (UNIT *)1;
+    dptr = find_unit("SYSDISK2", &uptr);
+    assert_ptr_equal(dptr, &fixture->disk);
+    assert_null(uptr);
+}
+
 /* Verify disabled devices are rejected by lookup and flagged as disabled. */
 static void test_find_unit_rejects_disabled_devices(void **state)
 {
@@ -197,6 +190,21 @@ static void test_find_unit_rejects_disabled_devices(void **state)
 
     assert_true(qdisable(&fixture->disabled));
     assert_false(qdisable(&fixture->disk));
+}
+
+/* Verify internal devices remain available by name but not unit lookup. */
+static void test_internal_devices_do_not_participate_in_find_unit(void **state)
+{
+    struct scp_context_fixture *fixture = *state;
+    UNIT *uptr;
+
+    fixture->internal.flags = DEV_DIS;
+    assert_int_equal(sim_register_internal_device(&fixture->internal), SCPE_OK);
+    assert_ptr_equal(find_dev("CLK"), &fixture->internal);
+
+    uptr = (UNIT *)1;
+    assert_null(find_unit("CLK", &uptr));
+    assert_null(uptr);
 }
 
 /* Verify internal-device registration ignores duplicates and main devices. */
@@ -236,9 +244,15 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_find_unit_matches_device_names_and_cached_unit_names,
             setup_scp_context_fixture, teardown_scp_context_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_find_unit_rejects_invalid_unit_numbers,
+            setup_scp_context_fixture, teardown_scp_context_fixture),
         cmocka_unit_test_setup_teardown(test_find_unit_rejects_disabled_devices,
                                         setup_scp_context_fixture,
                                         teardown_scp_context_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_internal_devices_do_not_participate_in_find_unit,
+            setup_scp_context_fixture, teardown_scp_context_fixture),
         cmocka_unit_test_setup_teardown(
             test_register_internal_device_ignores_duplicates,
             setup_scp_context_fixture, teardown_scp_context_fixture),

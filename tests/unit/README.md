@@ -73,6 +73,7 @@ is declared in:
 
 - `tests/unit/support/test_support.h`
 - `tests/unit/support/test_simh_personality.h`
+- `tests/unit/support/test_scp_fixture.h`
 
 Current helpers:
 
@@ -107,6 +108,13 @@ Current helpers:
 - `simh_test_set_devices`
   Install a null-terminated device list for tests that need shared SCP
   code to see a simulator device table.
+- `simh_test_init_multiunit_device`
+  Initialize a multi-unit device for SCP lookup and naming tests.
+- `simh_test_install_devices`
+  Reset the shared simulator state and install a device table in one
+  step for SCP-facing tests.
+- `simh_test_free_unit_names`
+  Release cached unit names allocated during SCP naming tests.
 
 These helpers are intentionally simple. Add to them as new unit tests
 need stable infrastructure.

@@ -7,6 +7,7 @@
 #include <cmocka.h>
 
 #include "scp.h"
+#include "test_scp_fixture.h"
 #include "test_simh_personality.h"
 #include "test_support.h"
 
@@ -37,14 +38,11 @@ static int setup_scp_unit_fixture(void **state)
     simh_test_init_device_unit(&fixture->device, &fixture->unit, "DSK", "DSK0",
                                0, UNIT_ATTABLE, 8, 1);
 
-    simh_test_reset_simulator_state();
-    assert_int_equal(simh_test_set_sim_name("simbase-unit-scp-unit"), 0);
     devices[0] = &fixture->device;
     devices[1] = NULL;
-    assert_int_equal(simh_test_set_devices(devices), 0);
-
-    sim_switches = 0;
-    sim_switch_number = 0;
+    assert_int_equal(simh_test_install_devices("simbase-unit-scp-unit",
+                                               devices),
+                     0);
 
     *state = fixture;
     return 0;
@@ -119,6 +117,53 @@ static void test_attach_unit_honors_read_only_mode(void **state)
     assert_true((fixture->unit.flags & UNIT_RO) == 0);
 }
 
+/* Verify attach rejects units that are not marked attachable. */
+static void test_attach_unit_rejects_non_attachable_units(void **state)
+{
+    struct scp_unit_fixture *fixture = *state;
+
+    fixture->unit.flags = 0;
+
+    assert_int_equal(attach_unit(&fixture->unit, fixture->file_path),
+                     SCPE_NOATT);
+    assert_null(fixture->unit.filename);
+    assert_null(fixture->unit.fileref);
+}
+
+/* Verify -E turns a missing input file into an open error. */
+static void test_attach_unit_honors_existing_file_requirement(void **state)
+{
+    struct scp_unit_fixture *fixture = *state;
+
+    sim_switches = SWMASK('E');
+
+    assert_int_equal(
+        SCPE_BARE_STATUS(attach_unit(&fixture->unit, fixture->file_path)),
+        SCPE_OPENERR);
+    assert_null(fixture->unit.filename);
+    assert_null(fixture->unit.fileref);
+}
+
+/* Verify forced read-only attach is rejected for non-ROABLE units. */
+static void test_attach_unit_rejects_read_only_without_roable(void **state)
+{
+    static const uint8_t initial_data[] = {0x10, 0x20};
+    struct scp_unit_fixture *fixture = *state;
+
+    fixture->unit.flags = UNIT_ATTABLE;
+    assert_int_equal(simh_test_write_file(fixture->file_path, initial_data,
+                                          sizeof(initial_data)),
+                     0);
+
+    sim_switches = SWMASK('R');
+
+    assert_int_equal(
+        SCPE_BARE_STATUS(attach_unit(&fixture->unit, fixture->file_path)),
+        SCPE_NORO);
+    assert_null(fixture->unit.filename);
+    assert_null(fixture->unit.fileref);
+}
+
 /* Verify detach writes buffered changes back to the attached file. */
 static void test_detach_unit_flushes_buffered_changes(void **state)
 {
@@ -154,6 +199,21 @@ static void test_detach_unit_flushes_buffered_changes(void **state)
     free(file_data);
 }
 
+/* Verify detach reports null and unattached units consistently. */
+static void test_detach_unit_rejects_null_and_unattached_units(void **state)
+{
+    struct scp_unit_fixture *fixture = *state;
+
+    (void)fixture;
+
+    assert_int_equal(detach_unit(NULL), SCPE_IERR);
+    assert_int_equal(detach_unit(&fixture->unit), SCPE_UNATT);
+
+    fixture->unit.flags = UNIT_ATTABLE;
+    sim_switches = SIM_SW_REST;
+    assert_int_equal(detach_unit(&fixture->unit), SCPE_OK);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -167,8 +227,20 @@ int main(void)
                                         setup_scp_unit_fixture,
                                         teardown_scp_unit_fixture),
         cmocka_unit_test_setup_teardown(
+            test_attach_unit_rejects_non_attachable_units,
+            setup_scp_unit_fixture, teardown_scp_unit_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_attach_unit_honors_existing_file_requirement,
+            setup_scp_unit_fixture, teardown_scp_unit_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_attach_unit_rejects_read_only_without_roable,
+            setup_scp_unit_fixture, teardown_scp_unit_fixture),
+        cmocka_unit_test_setup_teardown(
             test_detach_unit_flushes_buffered_changes, setup_scp_unit_fixture,
             teardown_scp_unit_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_detach_unit_rejects_null_and_unattached_units,
+            setup_scp_unit_fixture, teardown_scp_unit_fixture),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

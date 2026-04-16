@@ -8,7 +8,9 @@
 
 #include <cmocka.h>
 
+#include "test_scp_fixture.h"
 #include "test_support.h"
+#include "test_simh_personality.h"
 
 /* Verify that fixture lookup and fixture reads use the expected tree. */
 static void test_support_reads_fixture(void **state)
@@ -102,6 +104,34 @@ static void test_support_initializes_device_and_unit(void **state)
     assert_ptr_equal(unit.dptr, &device);
 }
 
+/* Verify SCP fixture helpers install devices and free cached unit names. */
+static void test_scp_fixture_helpers_install_devices(void **state)
+{
+    DEVICE device;
+    UNIT units[2];
+    DEVICE *devices[2];
+
+    (void)state;
+
+    simh_test_init_multiunit_device(&device, units, 2, "DSK", "SYSDISK", 0);
+    devices[0] = &device;
+    devices[1] = NULL;
+
+    assert_int_equal(
+        simh_test_install_devices("simbase-unit-test-support", devices), 0);
+    assert_ptr_equal(sim_devices[0], &device);
+    assert_string_equal(sim_name, "simbase-unit-test-support");
+
+    assert_string_equal(sim_set_uname(&units[0], "SYSDISK0"), "SYSDISK0");
+    assert_string_equal(sim_set_uname(&units[1], "SYSDISK1"), "SYSDISK1");
+
+    simh_test_free_unit_names(units, 2);
+    assert_null(units[0].uname);
+    assert_null(units[1].uname);
+
+    simh_test_reset_simulator_state();
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -109,6 +139,7 @@ int main(void)
         cmocka_unit_test(test_support_joins_paths),
         cmocka_unit_test(test_support_temp_dir_round_trip),
         cmocka_unit_test(test_support_initializes_device_and_unit),
+        cmocka_unit_test(test_scp_fixture_helpers_install_devices),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

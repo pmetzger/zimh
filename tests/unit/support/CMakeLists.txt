@@ -1,4 +1,5 @@
 add_library(simh_unit_support STATIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_scp_fixture.c
     ${CMAKE_CURRENT_SOURCE_DIR}/test_support.c
     ${CMAKE_CURRENT_SOURCE_DIR}/test_simh_personality.c
 )
