@@ -1125,19 +1125,21 @@ extern int32 sim_asynch_check;
 extern int32 sim_asynch_latency;
 extern int32 sim_asynch_inst_latency;
 
-/* Thread local storage */
-#if defined(thread_local)
+/* Thread-local storage for asynchronous I/O diagnostics.
+
+   The project baseline assumes a compiler with at least C11 support, so
+   `_Thread_local` is the normal C spelling here.  MSVC is the remaining
+   exception: its C11/C17 mode still documents `_Thread_local` as recognized
+   but unsupported, so keep using `__declspec(thread)` there for now.
+
+   This branch should be removable once our supported Windows C toolchain has
+   portable `_Thread_local` support in C mode. */
+#ifdef __cplusplus
 #define AIO_TLS thread_local
-#elif (__STDC_VERSION__ >= 201112) && !(defined(__STDC_NO_THREADS__))
-#define AIO_TLS _Thread_local
-#elif defined(__GNUC__) && !defined(__APPLE__) && !defined(__OpenBSD__)
-#define AIO_TLS __thread
 #elif defined(_MSC_VER)
 #define AIO_TLS __declspec(thread)
 #else
-/* Other compiler environment, then don't worry about thread local storage. */
-/* It is primarily used only used in debugging messages */
-#define AIO_TLS
+#define AIO_TLS _Thread_local
 #endif
 #define AIO_QUEUE_CHECK(que, lock)                              \
     do {                                                        \
