@@ -3910,11 +3910,7 @@ return SCPE_OK;
 
 #else
 
-#if !defined (__ANDROID_API__) || (__ANDROID_API__ < 26)
-#define TCSETATTR_ACTION TCSAFLUSH
-#else
 #define TCSETATTR_ACTION TCSANOW
-#endif
 
 #include <termios.h>
 #include <unistd.h>
