@@ -10,7 +10,7 @@ configure directly in the repository root.
 
 At minimum:
 
-- a C compiler toolchain
+- a C compiler toolchain with at least C11 support
 - `cmake`
 - `ninja`
 - `git`
@@ -49,6 +49,8 @@ For networking, you will need:
 
 Notes:
 
+- The source tree assumes a compiler with at least C11 support. A modern
+  C17-capable compiler is preferred.
 - `cmocka` is for host-side unit tests rather than the historical
   simulator binaries themselves.
 - `SDL2_ttf` is the usual missing piece when a video-enabled build does
