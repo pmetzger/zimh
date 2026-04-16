@@ -10,6 +10,8 @@
 #include "sim_defs.h"
 #include "scp.h"
 
+/* Current/default simulator context and the list of registered internal
+   devices that participate in SCP lookup. */
 DEVICE *sim_dfdev = NULL;
 UNIT *sim_dfunit = NULL;
 DEVICE **sim_internal_devices = NULL;

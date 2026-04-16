@@ -13,17 +13,28 @@
 
 #include "sim_defs.h"
 
+/* Default device selected for SCP commands that operate on a device. */
 extern DEVICE *sim_dfdev;
+/* Default unit selected for SCP commands that operate on a unit. */
 extern UNIT *sim_dfunit;
+/* Extra devices registered for SCP lookup outside the main simulator set. */
 extern DEVICE **sim_internal_devices;
+/* Number of devices currently registered in sim_internal_devices. */
 extern uint32 sim_internal_device_count;
 
+/* Return the display name for a device, preferring any assigned alias. */
 const char *sim_dname(DEVICE *dptr);
+/* Return a cached display name for a unit, generating it if needed. */
 const char *sim_uname(UNIT *uptr);
+/* Replace the cached display name stored on a unit. */
 const char *sim_set_uname(UNIT *uptr, const char *uname);
+/* Find a device by physical or logical name. */
 DEVICE *find_dev(const char *cptr);
+/* Find a device and unit by SCP-style device or unit name. */
 DEVICE *find_unit(const char *cptr, UNIT **uptr);
+/* Register an internal helper device so SCP lookup can see it. */
 t_stat sim_register_internal_device(DEVICE *dptr);
+/* Return whether a device is currently disabled. */
 t_bool qdisable(DEVICE *dptr);
 
 #endif
