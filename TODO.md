@@ -91,7 +91,9 @@
     (`generated/git-commit-id.h` for CMake and compiler `-D` defines for
     the legacy Makefile)
   Decide whether archive builds still need separate `export-subst`
-  support. Then simplify to one clear policy for:
+  support. The build should not assume it can run Git commands or write
+  to the Git index while compiling. Then simplify to one clear policy
+  for:
   - live Git checkouts
   - exported source archives
   - builds with local uncommitted changes
