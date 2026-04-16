@@ -103,11 +103,7 @@
 
 #include "sim_timer.h"
 
-#if (SIM_MAJOR >= 4)
-  #include "sim_fio.h"
-#else
-  #include "sim_shmem.h"
-#endif
+#include "sim_fio.h"
 
 
 

@@ -146,35 +146,33 @@ endif
 BUILD_SINGLE := ${MAKECMDGOALS} $(BLANK_SUFFIX)
 BUILD_MULTIPLE_VERB = is
 # building the pdp1, pdp11, tx-0, or any microvax simulator could use video support
-ifneq (3,${SIM_MAJOR})
-  ifneq (,$(or $(findstring XXpdp1XX,$(addsuffix XX,$(addprefix XX,${MAKECMDGOALS}))),$(findstring pdp11,${MAKECMDGOALS}),$(findstring tx-0,${MAKECMDGOALS}),$(findstring microvax1,${MAKECMDGOALS}),$(findstring microvax2,${MAKECMDGOALS}),$(findstring microvax3900,${MAKECMDGOALS}),$(findstring microvax2000,${MAKECMDGOALS}),$(findstring vaxstation3100,${MAKECMDGOALS}),$(findstring XXvaxXX,$(addsuffix XX,$(addprefix XX,${MAKECMDGOALS})))))
-    VIDEO_USEFUL = true
-  endif
-  # building the besm6 needs both video support and fontfile support
-  ifneq (,$(findstring besm6,${MAKECMDGOALS}))
-    VIDEO_USEFUL = true
-    BESM6_BUILD = true
-  endif
-  # building the Imlac needs video support
-  ifneq (,$(findstring imlac,${MAKECMDGOALS}))
-    VIDEO_USEFUL = true
-  endif
-  # building the LINC needs video support
-  ifneq (,$(findstring linc,${MAKECMDGOALS}))
-    VIDEO_USEFUL = true
-  endif
-  # building the TT2500 needs video support
-  ifneq (,$(findstring tt2500,${MAKECMDGOALS}))
-    VIDEO_USEFUL = true
-  endif
-  # building the PDP6, KA10 or KI10 needs video support
-  ifneq (,$(or $(findstring pdp6,${MAKECMDGOALS}),$(findstring pdp10-ka,${MAKECMDGOALS}),$(findstring pdp10-ki,${MAKECMDGOALS})))
-    VIDEO_USEFUL = true
-  endif
-  # building the AltairZ80 could use video support
-  ifneq (,$(findstring altairz80,${MAKECMDGOALS}))
-    VIDEO_USEFUL = true
-  endif
+ifneq (,$(or $(findstring XXpdp1XX,$(addsuffix XX,$(addprefix XX,${MAKECMDGOALS}))),$(findstring pdp11,${MAKECMDGOALS}),$(findstring tx-0,${MAKECMDGOALS}),$(findstring microvax1,${MAKECMDGOALS}),$(findstring microvax2,${MAKECMDGOALS}),$(findstring microvax3900,${MAKECMDGOALS}),$(findstring microvax2000,${MAKECMDGOALS}),$(findstring vaxstation3100,${MAKECMDGOALS}),$(findstring XXvaxXX,$(addsuffix XX,$(addprefix XX,${MAKECMDGOALS})))))
+  VIDEO_USEFUL = true
+endif
+# building the besm6 needs both video support and fontfile support
+ifneq (,$(findstring besm6,${MAKECMDGOALS}))
+  VIDEO_USEFUL = true
+  BESM6_BUILD = true
+endif
+# building the Imlac needs video support
+ifneq (,$(findstring imlac,${MAKECMDGOALS}))
+  VIDEO_USEFUL = true
+endif
+# building the LINC needs video support
+ifneq (,$(findstring linc,${MAKECMDGOALS}))
+  VIDEO_USEFUL = true
+endif
+# building the TT2500 needs video support
+ifneq (,$(findstring tt2500,${MAKECMDGOALS}))
+  VIDEO_USEFUL = true
+endif
+# building the PDP6, KA10 or KI10 needs video support
+ifneq (,$(or $(findstring pdp6,${MAKECMDGOALS}),$(findstring pdp10-ka,${MAKECMDGOALS}),$(findstring pdp10-ki,${MAKECMDGOALS})))
+  VIDEO_USEFUL = true
+endif
+# building the AltairZ80 could use video support
+ifneq (,$(findstring altairz80,${MAKECMDGOALS}))
+  VIDEO_USEFUL = true
 endif
 # building the SEL32 networking can be used
 ifneq (,$(findstring sel32,${MAKECMDGOALS}))
@@ -235,25 +233,18 @@ ifneq ($(findstring Windows,${OS}),)
     endif
   endif
 endif
-ifeq (3,${SIM_MAJOR})
-  # simh v3 DOES not have any video support
-  VIDEO_USEFUL =
-endif
-
 find_exe = $(abspath $(strip $(firstword $(foreach dir,$(strip $(subst :, ,${PATH})),$(wildcard $(dir)/$(1))))))
 find_lib = $(firstword $(abspath $(strip $(firstword $(foreach dir,$(strip ${LIBPATH}),$(foreach ext,$(strip ${LIBEXT}),$(wildcard $(dir)/lib$(1).$(ext))))))))
 find_include = $(abspath $(strip $(firstword $(foreach dir,$(strip ${INCPATH}),$(wildcard $(dir)/$(1).h)))))
-ifneq (3,${SIM_MAJOR})
-  ifneq (0,$(TESTS))
-    find_test = RegisterSanityCheck $(abspath $(wildcard $(1)/tests/$(2)_test.ini)) </dev/null
-    ifneq (,${TEST_ARG})
-      TESTING_FEATURES = - Per simulator tests will be run with argument: ${TEST_ARG}
-    else
-      TESTING_FEATURES = - Per simulator tests will be run
-    endif
+ifneq (0,$(TESTS))
+  find_test = RegisterSanityCheck $(abspath $(wildcard $(1)/tests/$(2)_test.ini)) </dev/null
+  ifneq (,${TEST_ARG})
+    TESTING_FEATURES = - Per simulator tests will be run with argument: ${TEST_ARG}
   else
-    TESTING_FEATURES = - Per simulator tests will be skipped
+    TESTING_FEATURES = - Per simulator tests will be run
   endif
+else
+  TESTING_FEATURES = - Per simulator tests will be skipped
 endif
 ifeq (${WIN32},)  #*nix Environments (&& cygwin)
   ifeq (${GCC},)
@@ -1263,20 +1254,18 @@ else
       $(info Cloning the windows-build dependencies into $(abspath ..)/windows-build)
       $(shell git clone https://github.com/simh/windows-build ../windows-build)
     else
-      ifneq (3,${SIM_MAJOR})
-        $(info ***********************************************************************)
-        $(info ***********************************************************************)
-        $(info **  This build is operating without the required windows-build       **)
-        $(info **  components and therefore will produce less than optimal          **)
-        $(info **  simulator operation and features.                                **)
-        $(info **  Download the file:                                               **)
-        $(info **  https://github.com/simh/windows-build/archive/windows-build.zip  **)
-        $(info **  Extract the windows-build-windows-build folder it contains to    **)
-        $(info **  $(abspath ..\)                                                   **)
-        $(info ***********************************************************************)
-        $(info ***********************************************************************)
-        $(info .)
-      endif
+      $(info ***********************************************************************)
+      $(info ***********************************************************************)
+      $(info **  This build is operating without the required windows-build       **)
+      $(info **  components and therefore will produce less than optimal          **)
+      $(info **  simulator operation and features.                                **)
+      $(info **  Download the file:                                               **)
+      $(info **  https://github.com/simh/windows-build/archive/windows-build.zip  **)
+      $(info **  Extract the windows-build-windows-build folder it contains to    **)
+      $(info **  $(abspath ..\)                                                   **)
+      $(info ***********************************************************************)
+      $(info ***********************************************************************)
+      $(info .)
     endif
   else
     # Version check on windows-build

@@ -185,12 +185,9 @@
     2. The macro names are UNDEFed to avoid potential name clashes with
        sim_def.h macros.
 
-    3. The REG structure for version 4.0 contains several fields that are not
-       present in 3.x versions.  The 4.x REGDATA macro maps to the REG strcture
-       in a field-order- and preprocessor-independent manner.  There is no
-       corresponding macro in 3.x, so we must handle standard vs. non-standard
-       preprocessor differences by creating our own REGMAP macro to handle the
-       mapping.
+    3. The REGDATA macro maps to the REG structure in a field-order-
+       and preprocessor-independent manner.  We create our own REGMAP
+       wrapper to keep the call sites readable.
 */
 
 #undef FBDATA
@@ -198,19 +195,8 @@
 #undef YRDATA
 #undef REGMAP
 
-#if (SIM_MAJOR >= 4)
-  #define REGMAP(nm,loc,rdx,wd,off,dep,fl,siz) \
-    REGDATA (nm, loc, rdx, wd, off, dep, NULL, NULL, fl, 0, siz)
-
-#elif defined (__STDC__) || defined (_WIN32)
-  #define REGMAP(nm,loc,rdx,wd,off,dep,fl,siz) \
-    #nm, &(loc), (rdx), (wd), (off), (dep), (fl), 0
-
-#else
-  #define REGMAP(nm,loc,rdx,wd,off,dep,fl,siz) \
-    "nm", &(loc), (rdx), (wd), (off), (dep), (fl), 0
-
-#endif
+#define REGMAP(nm,loc,rdx,wd,off,dep,fl,siz) \
+  REGDATA (nm, loc, rdx, wd, off, dep, NULL, NULL, fl, 0, siz)
 
 /*              Macro                      name   loc    radix  width  offset    depth     flags     size       */
 /*      -------------------------          ----  ------  -----  -----  ------  ----------  ----- -------------- */

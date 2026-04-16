@@ -944,12 +944,10 @@
 
 /* Lost time workaround */
 
-#if (SIM_MAJOR >= 4)
-  #define sim_idle(timer,decrement) \
-            if (sim_idle (timer, decrement) == TRUE     /* [workaround] idle the simulator; if idling occurred */ \
-              && sim_interval < 0)                      /* [workaround]   and the time interval is negative */ \
-                sim_interval = 0                        /* [workaround]     then reset it to zero */
-#endif
+#define sim_idle(timer,decrement) \
+          if (sim_idle (timer, decrement) == TRUE     /* [workaround] idle the simulator; if idling occurred */ \
+            && sim_interval < 0)                      /* [workaround]   and the time interval is negative */ \
+              sim_interval = 0                        /* [workaround]     then reset it to zero */
 
 
 

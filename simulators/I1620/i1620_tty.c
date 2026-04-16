@@ -98,13 +98,8 @@ REG tty_reg[] = {
     { FLDATAD (UNLOCK, tti_unlock, 0, "keyboard unlocked flag") },
     { FLDATAD (FLAG, tti_flag, 0, "set flag on next input digit"), REG_HRO },
     { DRDATAD (COL, tto_col, 7, "current column") },
-#if (SIM_MAJOR >= 4)
     { DRDATAD (CPS, tty_unit[UTTO].DEFIO_CPS, 24, "Character Output Rate"), PV_LEFT },
     { DRDATAD (ICPS, tty_unit[UTTI].DEFIO_CPS, 24, "Character Input Rate"), PV_LEFT },
-#else
-    { DRDATAD (KTIME, tty_unit[UTTI].wait, 24, "keyboard polling interval"), REG_NZ + PV_LEFT },
-    { DRDATAD (TTIME, tty_unit[UTTO].wait, 24, "typewriter character delay"), REG_NZ + PV_LEFT },
-#endif
     { NULL }
     };
 

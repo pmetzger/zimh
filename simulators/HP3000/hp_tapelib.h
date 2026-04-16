@@ -41,16 +41,13 @@
 
 
 
-#include "sim_rev.h"                        /* For SIM_MAJOR */
 #include "sim_tape.h"
 
 
 
-/* Remap tape attach in 4.x to avoid unwanted debug output */
+/* Remap tape attach to avoid unwanted debug output. */
 
-#if (SIM_MAJOR >= 4)
-  #define sim_tape_attach(a,b) sim_tape_attach_ex (a, b, 0, 0)
-#endif
+#define sim_tape_attach(a,b) sim_tape_attach_ex (a, b, 0, 0)
 
 
 

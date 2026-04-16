@@ -1639,13 +1639,6 @@ static int pcap_mac_if_win32(const char *AdapterName, unsigned char MACAddress[6
 
 #endif  /* defined(_WIN32) */
 
-#if SIM_MAJOR != 4
-static const char *sim_get_tool_path (const char *tool)
-{
-return tool;
-}
-#endif
-
 static void eth_get_nic_hw_addr(ETH_DEV* dev, const char *devname, int set_on)
 {
   memset(&dev->host_nic_phy_hw_addr, 0, sizeof(dev->host_nic_phy_hw_addr));

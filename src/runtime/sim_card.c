@@ -1484,7 +1484,7 @@ return SCPE_OK;
 t_stat sim_card_test (DEVICE *dptr, const char *cptr)
 {
 t_stat stat = SCPE_OK;
-#if defined(USE_SIM_CARD) && defined(SIM_CARD_API) && (SIM_MAJOR > 3)
+#if defined(USE_SIM_CARD) && defined(SIM_CARD_API)
 char cmd[CBUFSIZE];
 char saved_filename[4*CBUFSIZE];
 uint16 card_image[80];
