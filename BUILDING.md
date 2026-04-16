@@ -20,28 +20,43 @@ For the full feature build, install the libraries used by optional
 features:
 
 - `SDL2`
+  Provides the windowing, input, and rendering layer used by the
+  project’s video/graphics support.
 - `SDL2_ttf`
+  Adds text rendering for SDL-based displays and is required for the
+  normal video-enabled build.
 - `freetype`
+  Supplies font loading and glyph rasterization used by the SDL display
+  stack.
 - `libpng`
+  Adds PNG image support used by graphics and image-loading paths.
 - `zlib`
+  Provides compression support used by image and related file-handling
+  code.
 - `libedit`
+  Enables SCP command-line editing and history support
 
 For testing, you will need:
 
 - `cmocka`
+  Provides the host-side C unit-test framework used under `tests/unit/`.
 
 For networking, you will need:
 
 - `libpcap`
+  Enables direct host-interface packet capture and injection for the
+  optional network backends.
 
 Notes:
 
-- `cmocka` is for host-side unit tests. It may not be required by the
-  historical simulator build today, but it should be installed for the
-  testing work planned for the common sources.
-- `SDL2_ttf` is required for video-enabled builds.
-- Some networking features may also use system libraries such as
-  `libpcap`, depending on the platform and enabled options.
+- `cmocka` is for host-side unit tests rather than the historical
+  simulator binaries themselves.
+- `SDL2_ttf` is the usual missing piece when a video-enabled build does
+  not configure successfully.
+- `libedit` is optional, but without it SCP falls back to plainer
+  console input without interactive line-editing support.
+- Some networking features may also use additional system libraries,
+  such as `libpcap`, depending on the platform and enabled options.
 
 ## Installing dependencies
 
