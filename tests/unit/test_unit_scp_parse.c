@@ -4,7 +4,6 @@
 
 #include <cmocka.h>
 
-#include "sim_defs.h"
 #include "scp.h"
 #include "scp_parse.h"
 

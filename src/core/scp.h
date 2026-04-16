@@ -37,6 +37,8 @@
 #ifndef SIM_SCP_H_
 #define SIM_SCP_H_     0
 
+#include "sim_defs.h"
+
 #include "sim_fio.h"
 #include "scp_parse.h"
 #include "scp_size.h"

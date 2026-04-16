@@ -6,7 +6,6 @@
 
 #include <cmocka.h>
 
-#include "sim_defs.h"
 #include "scp.h"
 #include "test_simh_personality.h"
 #include "test_support.h"

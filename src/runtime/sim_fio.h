@@ -33,11 +33,15 @@
 #ifndef SIM_FIO_H_
 #define SIM_FIO_H_     0
 
+#include "sim_defs.h"
+
+#include <stdio.h>
+#include <sys/stat.h>
+#include <time.h>
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
-
-#include <sys/stat.h>
 
 #define FLIP_SIZE       (1 << 16)                       /* flip buf size */
 #define fxread(a,b,c,d)         sim_fread (a, b, c, d)
@@ -80,7 +84,6 @@ int sim_rmdir(const char *path);
 t_stat sim_copyfile (const char *source_file, const char *dest_file, t_bool overwrite_existing);
 char *sim_filepath_parts (const char *pathname, const char *parts);
 char *sim_getcwd (char *buf, size_t buf_size);
-#include <sys/stat.h>
 typedef void (*DIR_ENTRY_CALLBACK)(const char *directory, 
                                    const char *filename,
                                    t_offset FileSize,
