@@ -26,6 +26,8 @@ add_custom_target(update_sim_commit ALL
 ## Simulator sources and library:
 set(SIM_SOURCES
     ${SIMH_CORE_ROOT}/scp.c
+    ${SIMH_CORE_ROOT}/scp_parse.c
+    ${SIMH_CORE_ROOT}/scp_unit.c
     ${SIMH_RUNTIME_ROOT}/sim_card.c
     ${SIMH_RUNTIME_ROOT}/sim_console.c
     ${SIMH_RUNTIME_ROOT}/sim_disk.c

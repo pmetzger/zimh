@@ -38,6 +38,9 @@
 #define SIM_SCP_H_     0
 
 #include "sim_fio.h"
+#include "scp_parse.h"
+#include "scp_size.h"
+#include "scp_unit.h"
 #include <sys/stat.h>
 
 #ifdef  __cplusplus
@@ -152,8 +155,6 @@ t_stat sim_run_boot_prep (int32 flag);
 double sim_gtime (void);
 uint32 sim_grtime (void);
 int32 sim_qcount (void);
-t_stat attach_unit (UNIT *uptr, CONST char *cptr);
-t_stat detach_unit (UNIT *uptr);
 t_stat assign_device (DEVICE *dptr, const char *cptr);
 t_stat deassign_device (DEVICE *dptr);
 t_stat reset_all (uint32 start_device);
@@ -173,12 +174,7 @@ int sim_rand (void);
 #define rand sim_rand
 #define srand(seed) sim_srand(seed)
 CONST char *get_sim_opt (int32 opt, CONST char *cptr, t_stat *st);
-CONST char *get_sim_sw (CONST char *cptr);
 const char *put_switches (char *buf, size_t bufsize, uint32 sw);
-CONST char *get_glyph (const char *iptr, char *optr, char mchar);
-CONST char *get_glyph_nc (const char *iptr, char *optr, char mchar);
-CONST char *get_glyph_quoted (const char *iptr, char *optr, char mchar);
-CONST char *get_glyph_cmd (const char *iptr, char *optr);
 t_value get_uint (const char *cptr, uint32 radix, t_value max, t_stat *status);
 CONST char *get_range (DEVICE *dptr, CONST char *cptr, t_addr *lo, t_addr *hi,
     uint32 rdx, t_addr max, char term);
@@ -209,7 +205,6 @@ void fprint_show_help (FILE *st, DEVICE *dptr);
 CTAB *find_cmd (const char *gbuf);
 DEVICE *find_dev (const char *ptr);
 DEVICE *find_unit (const char *ptr, UNIT **uptr);
-DEVICE *find_dev_from_unit (UNIT *uptr);
 t_stat sim_register_internal_device (DEVICE *dptr);
 void sim_sub_args (char *in_str, size_t in_str_size, char *do_arg[]);
 REG *find_reg (CONST char *ptr, CONST char **optr, DEVICE *dptr);

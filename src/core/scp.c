@@ -300,9 +300,6 @@
     else                                                        \
         (void)0
 
-#define SZ_D(dp) (size_map[((dp)->dwidth + CHAR_BIT - 1) / CHAR_BIT])
-#define SZ_R(rp) \
-    (size_map[((rp)->width + (rp)->offset + CHAR_BIT - 1) / CHAR_BIT])
 #if defined (USE_INT64)
 #define SZ_LOAD(sz,v,mb,j) \
     if (sz == sizeof (uint8)) v = *(((uint8 *) mb) + ((uint32) j)); \
@@ -530,13 +527,6 @@ FILE *stdnul;
 SCHTAB *get_rsearch (CONST char *cptr, int32 radix, SCHTAB *schptr);
 SCHTAB *get_asearch (CONST char *cptr, int32 radix, SCHTAB *schptr);
 int32 test_search (t_value *val, SCHTAB *schptr);
-static const char *get_glyph_gen (const char *iptr, char *optr, char mchar, t_bool uc, t_bool quote, char escape_char);
-typedef enum {
-    SW_ERROR,           /* Parse Error */
-    SW_BITMASK,         /* Bitmask Value or Not a switch */
-    SW_NUMBER           /* Numeric Value */
-    } SWITCH_PARSE;
-SWITCH_PARSE get_switches (const char *cptr, int32 *sw_val, int32 *sw_number);
 void put_rval_pcchk (REG *rptr, uint32 idx, t_value val, t_bool pc_chk);
 void put_rval (REG *rptr, uint32 idx, t_value val);
 void fprint_help (FILE *st);
@@ -552,7 +542,6 @@ const char *sim_eval_expression (const char *cptr, t_svalue *value, t_bool paren
 t_stat scp_attach_unit (DEVICE *dptr, UNIT *uptr, const char *cptr);
 t_stat scp_detach_unit (DEVICE *dptr, UNIT *uptr);
 t_bool qdisable (DEVICE *dptr);
-t_stat attach_err (UNIT *uptr, t_stat stat);
 t_stat detach_all (int32 start_device, t_bool shutdown);
 t_stat assign_device (DEVICE *dptr, const char *cptr);
 t_stat deassign_device (DEVICE *dptr);
@@ -837,13 +826,6 @@ const struct scp_error {
          {"RUNTIME",   "Run time limit exhausted"},
          {"INCOMPDSK", "Incompatible Disk Container"},
     };
-
-const size_t size_map[] = { sizeof (int8),
-    sizeof (int8), sizeof (int16), sizeof (int32), sizeof (int32)
-#if defined (USE_INT64)
-    , sizeof (t_int64), sizeof (t_int64), sizeof (t_int64), sizeof (t_int64)
-#endif
-};
 
 const t_value width_mask[] = { 0,
     0x1, 0x3, 0x7, 0xF,
@@ -8215,116 +8197,6 @@ if (dptr->attach != NULL)                               /* device routine? */
 return attach_unit (uptr, (CONST char *)cptr);          /* no, std routine */
 }
 
-/* Attach unit to file */
-
-t_stat attach_unit (UNIT *uptr, CONST char *cptr)
-{
-DEVICE *dptr;
-t_bool open_rw = FALSE;
-
-if (!(uptr->flags & UNIT_ATTABLE))                      /* not attachable? */
-    return SCPE_NOATT;
-if ((dptr = find_dev_from_unit (uptr)) == NULL)
-    return SCPE_NOATT;
-uptr->filename = (char *) calloc (CBUFSIZE, sizeof (char)); /* alloc name buf */
-if (uptr->filename == NULL)
-    return SCPE_MEM;
-strlcpy (uptr->filename, cptr, CBUFSIZE);               /* save name */
-if ((sim_switches & SWMASK ('R')) ||                    /* read only? */
-    ((uptr->flags & UNIT_RO) != 0)) {
-    if (((uptr->flags & UNIT_ROABLE) == 0) &&           /* allowed? */
-        ((uptr->flags & UNIT_RO) == 0))
-        return sim_messagef (attach_err (uptr, SCPE_NORO), "%s: Read Only operation not allowed\n", /* no, error */
-                                                        sim_uname (uptr));
-    uptr->fileref = sim_fopen (cptr, "rb");             /* open rd only */
-    if (uptr->fileref == NULL)                          /* open fail? */
-        return sim_messagef (attach_err (uptr, SCPE_OPENERR), "%s: Can't open '%s': %s\n", /* yes, error */
-                                            sim_uname (uptr), cptr, strerror (errno));
-    if (!(uptr->flags & UNIT_RO))
-        sim_messagef (SCPE_OK, "%s: unit is read only\n", sim_uname (uptr));
-    uptr->flags = uptr->flags | UNIT_RO;                /* set rd only */
-    }
-else {
-    if (sim_switches & SWMASK ('N')) {                  /* new file only? */
-        uptr->fileref = sim_fopen (cptr, "wb+");        /* open new file */
-        if (uptr->fileref == NULL)                      /* open fail? */
-            return sim_messagef (attach_err (uptr, SCPE_OPENERR), "%s: Can't open '%s': %s\n", /* yes, error */
-                                                sim_uname (uptr), cptr, strerror (errno));
-        sim_messagef (SCPE_OK, "%s: creating new file: %s\n", sim_uname (uptr), cptr);
-        }
-    else {                                              /* normal */
-        uptr->fileref = sim_fopen (cptr, "rb+");        /* open r/w */
-        if (uptr->fileref == NULL) {                    /* open fail? */
-#if defined(EPERM)
-            if ((errno == EROFS) || (errno == EACCES) || (errno == EPERM)) {/* read only? */
-#else
-            if ((errno == EROFS) || (errno == EACCES)) {/* read only? */
-#endif
-                if ((uptr->flags & UNIT_ROABLE) == 0)   /* allowed? */
-                    return sim_messagef (attach_err (uptr, SCPE_NORO), "%s: Read Only operation not allowed\n", /* no, error */
-                                                                    sim_uname (uptr));
-                uptr->fileref = sim_fopen (cptr, "rb"); /* open rd only */
-                if (uptr->fileref == NULL)              /* open fail? */
-                    return sim_messagef (attach_err (uptr, SCPE_OPENERR), "%s: Can't open '%s': %s\n", /* yes, error */
-                                                        sim_uname (uptr), cptr, strerror (errno));
-                uptr->flags = uptr->flags | UNIT_RO;    /* set rd only */
-                sim_messagef (SCPE_OK, "%s: unit is read only\n", sim_uname (uptr));
-                }
-            else {                                      /* doesn't exist */
-                if (sim_switches & SWMASK ('E'))        /* must exist? */
-                    return sim_messagef (attach_err (uptr, SCPE_OPENERR), "%s: Can't open '%s': %s\n", /* yes, error */
-                                                        sim_uname (uptr), cptr, strerror (errno));
-                uptr->fileref = sim_fopen (cptr, "wb+");/* open new file */
-                if (uptr->fileref == NULL)              /* open fail? */
-                    return sim_messagef (attach_err (uptr, SCPE_OPENERR), "%s: Can't open '%s': %s\n", /* yes, error */
-                                                        sim_uname (uptr), cptr, strerror (errno));
-                sim_messagef (SCPE_OK, "%s: creating new file\n", sim_uname (uptr));
-                }
-            }                                           /* end if null */
-        else
-            open_rw = TRUE;
-        }                                               /* end else */
-    }
-if (uptr->flags & UNIT_BUFABLE) {                       /* buffer? */
-    uint32 cap = ((uint32) uptr->capac) / dptr->aincr;  /* effective size */
-
-    uptr->filebuf2 = calloc (cap, SZ_D (dptr));         /* allocate copy */
-    if (uptr->filebuf2 == NULL)
-        return attach_err (uptr, SCPE_MEM);             /* error */
-    if (uptr->flags & UNIT_MUSTBUF) {                   /* dyn alloc? */
-        uptr->filebuf = calloc (cap, SZ_D (dptr));      /* allocate */
-        if (uptr->filebuf == NULL) {
-            free (uptr->filebuf);
-            uptr->filebuf = NULL;
-            free (uptr->filebuf2);
-            uptr->filebuf2 = NULL;
-            return attach_err (uptr, SCPE_MEM);         /* error */
-            }
-        }
-    sim_messagef (SCPE_OK, "%s: buffering file in memory\n", sim_uname (uptr));
-    uptr->hwmark = (uint32)sim_fread (uptr->filebuf,    /* read file */
-        SZ_D (dptr), cap, uptr->fileref);
-    memcpy (uptr->filebuf2, uptr->filebuf, cap * SZ_D (dptr));/* save initial contents */
-    uptr->flags = uptr->flags | UNIT_BUF;               /* set buffered */
-    }
-uptr->flags = uptr->flags | UNIT_ATT;
-uptr->pos = 0;
-if (open_rw &&                                      /* open for write in append mode? */
-    (sim_switches & SWMASK ('A')) &&
-    (uptr->flags & UNIT_SEQ) &&
-    (!(uptr->flags & UNIT_MUSTBUF)) &&
-    (0 == sim_fseek (uptr->fileref, 0, SEEK_END)))
-    uptr->pos = (t_addr)sim_ftell (uptr->fileref);  /* Position at end of file */
-return SCPE_OK;
-}
-
-t_stat attach_err (UNIT *uptr, t_stat stat)
-{
-free (uptr->filename);
-uptr->filename = NULL;
-return stat;
-}
-
 /* Detach command
 
    det[ach] all         detach all units
@@ -8401,55 +8273,6 @@ t_stat scp_detach_unit (DEVICE *dptr, UNIT *uptr)
 if (dptr->detach != NULL)                               /* device routine? */
     return dptr->detach (uptr);
 return detach_unit (uptr);                              /* no, standard */
-}
-
-/* Detach unit from file */
-
-t_stat detach_unit (UNIT *uptr)
-{
-DEVICE *dptr;
-
-if (uptr == NULL)
-    return SCPE_IERR;
-if (!(uptr->flags & UNIT_ATTABLE))                      /* attachable? */
-    return SCPE_NOATT;
-if (!(uptr->flags & UNIT_ATT)) {                        /* not attached? */
-    if (sim_switches & SIM_SW_REST)                     /* restoring? */
-        return SCPE_OK;                                 /* allow detach */
-    else
-        return SCPE_UNATT;                              /* complain */
-    }
-if ((dptr = find_dev_from_unit (uptr)) == NULL)
-    return SCPE_OK;
-if ((uptr->flags & UNIT_BUF) && (uptr->filebuf)) {
-    uint32 cap = (uptr->hwmark + dptr->aincr - 1) / dptr->aincr;
-    if (((uptr->flags & UNIT_RO) == 0) &&
-        (memcmp (uptr->filebuf, uptr->filebuf2, (size_t)(SZ_D (dptr) * (uptr->capac / dptr->aincr))) != 0)) {
-        sim_messagef (SCPE_OK, "%s: writing buffer to file: %s\n", sim_uname (uptr), uptr->filename);
-        rewind (uptr->fileref);
-        sim_fwrite (uptr->filebuf, SZ_D (dptr), cap, uptr->fileref);
-        if (ferror (uptr->fileref))
-            sim_printf ("%s: I/O error - %s", sim_uname (uptr), strerror (errno));
-        }
-    if (uptr->flags & UNIT_MUSTBUF) {                   /* dyn alloc? */
-        free (uptr->filebuf);                           /* free buffers */
-        uptr->filebuf = NULL;
-        free (uptr->filebuf2);
-        uptr->filebuf2 = NULL;
-        }
-    uptr->flags = uptr->flags & ~UNIT_BUF;
-    }
-uptr->flags = uptr->flags & ~(UNIT_ATT | ((uptr->flags & UNIT_ROABLE) ? UNIT_RO : 0));
-free (uptr->filename);
-uptr->filename = NULL;
-if (uptr->fileref) {                        /* Only close open file */
-    if (fclose (uptr->fileref) == EOF) {
-        uptr->fileref = NULL;
-        return SCPE_IOERR;
-        }
-    uptr->fileref = NULL;
-    }
-return SCPE_OK;
 }
 
 /* Assign command
@@ -8656,7 +8479,8 @@ for (i = 0; i < (device_count + sim_internal_device_count); i++) {/* loop thru d
                 ((uptr->flags & UNIT_RO) == 0)) {       /* written on save */
                 uint32 cap = (uptr->hwmark + dptr->aincr - 1) / dptr->aincr;
                 rewind (uptr->fileref);
-                sim_fwrite (uptr->filebuf, SZ_D (dptr), cap, uptr->fileref);
+                sim_fwrite (uptr->filebuf, scp_device_data_size_bytes (dptr),
+                            cap, uptr->fileref);
                 fclose (uptr->fileref);                 /* flush data and state */
                 uptr->fileref = sim_fopen (uptr->filename, "rb+");/* reopen r/w */
                 }
@@ -8666,7 +8490,7 @@ for (i = 0; i < (device_count + sim_internal_device_count); i++) {/* loop thru d
              (dptr->examine != NULL) &&
              ((high = uptr->capac) != 0)) {             /* memory-like unit? */
             WRITE_I (high);                             /* [V2.5] write size */
-            sz = SZ_D (dptr);
+            sz = scp_device_data_size_bytes (dptr);
             if ((mbuf = calloc (SRBSIZ, sz)) == NULL) {
                 fclose (sfile);
                 return SCPE_MEM;
@@ -8978,7 +8802,7 @@ for ( ;; ) {                                            /* device loop */
                     fprint_capac (sim_log, dptr, uptr);
                 sim_printf ("\n");
                 }
-            sz = SZ_D (dptr);                           /* allocate buffer */
+            sz = scp_device_data_size_bytes (dptr);    /* allocate buffer */
             if ((mbuf = realloc (mbuf, SRBSIZ * sz)) == NULL) {
                 r = SCPE_MEM;
                 goto Cleanup_Return;
@@ -10130,7 +9954,7 @@ for (i = 0, j = addr; i < sim_emax; i++, j = j + dptr->aincr) {
             reason = SCPE_NXM;
             break;
             }
-        sz = SZ_D (dptr);
+        sz = scp_device_data_size_bytes (dptr);
         loc = j / dptr->aincr;
         if (uptr->flags & UNIT_BUF) {
             SZ_LOAD (sz, sim_eval[i], uptr->filebuf, loc);
@@ -10226,7 +10050,7 @@ for (i = 0, j = addr; i < count; i++, j = j + dptr->aincr) {
             return SCPE_NOFNC;
         if ((uptr->flags & UNIT_FIX) && (j >= uptr->capac))
             return SCPE_NXM;
-        sz = SZ_D (dptr);
+        sz = scp_device_data_size_bytes (dptr);
         loc = j / dptr->aincr;
         if (uptr->flags & UNIT_BUF) {
             SZ_STORE (sz, sim_eval[i], uptr->filebuf, loc);
@@ -10366,92 +10190,6 @@ if (prompt && *cptr)                   /* Save non blank lines in history */
     add_history (cptr);
 #endif
 return cptr;
-}
-
-/* get_glyph            get next glyph (force upper case)
-   get_glyph_nc         get next glyph (no conversion)
-   get_glyph_quoted     get next glyph (potentially enclosed in quotes, no conversion)
-   get_glyph_cmd        get command glyph (force upper case, extract leading !)
-   get_glyph_gen        get next glyph (general case)
-
-   Inputs:
-        iptr        =   pointer to input string
-        optr        =   pointer to output string
-        mchar       =   optional end of glyph character
-        uc          =   TRUE for convert to upper case (_gen only)
-        quote       =   TRUE to allow quote enclosing values (_gen only)
-        escape_char =   optional escape character within quoted strings (_gen only)
-
-   Outputs
-        result      =   pointer to next character in input string
-*/
-
-static const char *get_glyph_gen (const char *iptr, char *optr, char mchar, t_bool uc, t_bool quote, char escape_char)
-{
-t_bool quoting = FALSE;
-t_bool escaping = FALSE;
-t_bool got_quoted = FALSE;
-char quote_char = 0;
-
-while ((*iptr != 0) && (!got_quoted) &&
-       ((quote && quoting) || ((sim_isspace (*iptr) == 0) && (*iptr != mchar)))) {
-    if (quote) {
-        if (quoting) {
-            if (!escaping) {
-                if (*iptr == escape_char)
-                    escaping = TRUE;
-                else
-                    if (*iptr == quote_char) {
-                        quoting = FALSE;
-                        got_quoted = TRUE;
-                        }
-                }
-            else
-                escaping = FALSE;
-            }
-        else {
-            if ((*iptr == '"') || (*iptr == '\'')) {
-                quoting = TRUE;
-                quote_char = *iptr;
-                }
-            }
-        }
-    if (sim_islower (*iptr) && uc)
-        *optr = (char)sim_toupper (*iptr);
-    else *optr = *iptr;
-    iptr++; optr++;
-    }
-if (mchar && (*iptr == mchar))              /* skip input terminator */
-    iptr++;
-*optr = 0;                                  /* terminate result string */
-while (sim_isspace (*iptr))                 /* absorb additional input spaces */
-    iptr++;
-return iptr;
-}
-
-CONST char *get_glyph (const char *iptr, char *optr, char mchar)
-{
-return (CONST char *)get_glyph_gen (iptr, optr, mchar, TRUE, FALSE, 0);
-}
-
-CONST char *get_glyph_nc (const char *iptr, char *optr, char mchar)
-{
-return (CONST char *)get_glyph_gen (iptr, optr, mchar, FALSE, FALSE, 0);
-}
-
-CONST char *get_glyph_quoted (const char *iptr, char *optr, char mchar)
-{
-return (CONST char *)get_glyph_gen (iptr, optr, mchar, FALSE, TRUE, '\\');
-}
-
-CONST char *get_glyph_cmd (const char *iptr, char *optr)
-{
-/* Tolerate "!subprocess" vs. requiring "! subprocess" */
-if ((iptr[0] == '!') && (!sim_isspace(iptr[1]))) {
-    strcpy (optr, "!");                     /* return ! as command glyph */
-    return (CONST char *)(iptr + 1);        /* and skip over the leading ! */
-    }
-return (CONST char *)get_glyph_gen (iptr, optr, 0, TRUE, FALSE, 0);
 }
 
 /* get_yn               yes/no question
@@ -10943,35 +10681,6 @@ return SCPE_OK;
         result  =       pointer to device
 */
 
-DEVICE *find_dev_from_unit (UNIT *uptr)
-{
-DEVICE *dptr;
-uint32 i, j;
-
-if (uptr == NULL)
-    return NULL;
-if (uptr->dptr)
-    return uptr->dptr;
-for (i = 0; (dptr = sim_devices[i]) != NULL; i++) {
-    for (j = 0; j < dptr->numunits; j++) {
-        if (uptr == (dptr->units + j)) {
-            uptr->dptr = dptr;
-            return dptr;
-            }
-        }
-    }
-for (i = 0; i<sim_internal_device_count; i++) {
-    dptr = sim_internal_devices[i];
-    for (j = 0; j < dptr->numunits; j++) {
-        if (uptr == (dptr->units + j)) {
-            uptr->dptr = dptr;
-            return dptr;
-            }
-        }
-    }
-return NULL;
-}
-
 /* Test for disabled device */
 
 t_bool qdisable (DEVICE *dptr)
@@ -11084,59 +10793,6 @@ return NULL;
                         SW_NUMBER    if numeric
 */
 
-SWITCH_PARSE get_switches (const char *cptr, int32 *sw, int32 *number)
-{
-*sw = 0;
-if (*cptr != '-')
-    return SW_BITMASK;
-if (number)
-    *number = 0;
-if (sim_isdigit(cptr[1])) {
-    char *end;
-    long val = strtol (1+cptr, &end, 10);
-
-    if ((*end != 0) || (number == NULL))
-        return SW_ERROR;
-    *number = (int32)val;
-    return SW_NUMBER;
-    }
-for (cptr++; (sim_isspace (*cptr) == 0) && (*cptr != 0); cptr++) {
-    if (sim_isalpha (*cptr) == 0)
-        return SW_ERROR;
-    *sw = *sw | SWMASK (sim_toupper (*cptr));
-    }
-return SW_BITMASK;
-}
-
-/* get_sim_sw           accumulate sim_switches
-
-   Inputs:
-        cptr    =       pointer to input string
-   Outputs:
-        ptr     =       pointer to first non-string glyph
-                        NULL if error
-*/
-
-CONST char *get_sim_sw (CONST char *cptr)
-{
-int32 lsw, lnum;
-char gbuf[CBUFSIZE];
-
-while (*cptr == '-') {                                  /* while switches */
-    cptr = get_glyph (cptr, gbuf, 0);                   /* get switch glyph */
-    switch (get_switches (gbuf, &lsw, &lnum)) {         /* parse */
-        case SW_ERROR:
-            return NULL;
-        case SW_BITMASK:
-            sim_switches = sim_switches | lsw;          /* accumulate */
-            break;
-        case SW_NUMBER:
-            sim_switch_number = lnum;                   /* set number */
-            break;
-        }
-    }
-return cptr;
-}
 
 /* get_sim_opt          get simulator command options
 
@@ -16124,17 +15780,15 @@ for (i = 0; (dptr = devices[i]) != NULL; i++) {
     REG *rptr;
 
     for (rptr = dptr->registers; (rptr != NULL) && (rptr->name != NULL); rptr++) {
-        size_t rsz = SZ_R(rptr);
+        size_t rsz = scp_register_data_size_bytes(rptr);
         size_t memsize = ((rptr->flags & REG_FIT) || (rptr->depth > 1)) ? rptr->depth * rsz : 4;
         t_bool Bad;
 
-        if (((rptr->width + rptr->offset + CHAR_BIT - 1) / CHAR_BIT) >= sizeof(size_map) / sizeof(size_map[0])) {
+        if (rsz == 0) {
             Bad = TRUE;
-            rsz = 0;
             }
         else {
             Bad = FALSE;
-            rsz = SZ_R(rptr);
             }
 
         if (sim_switches & SWMASK ('R'))            /* Debug output */
