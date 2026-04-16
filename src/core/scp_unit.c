@@ -8,8 +8,13 @@
 #include "sim_defs.h"
 #include "scp.h"
 
-/* Free attach-time filename state before returning an error. */
-static t_stat attach_err(UNIT *uptr, t_stat stat);
+/* Roll back partially initialized attach state on failure. */
+static t_stat attach_err(UNIT *uptr, t_stat stat)
+{
+    free(uptr->filename);
+    uptr->filename = NULL;
+    return stat;
+}
 
 /* Open a host file and attach it to a unit using SCP's generic rules. */
 t_stat attach_unit(UNIT *uptr, CONST char *cptr)
@@ -121,14 +126,6 @@ t_stat attach_unit(UNIT *uptr, CONST char *cptr)
         (0 == sim_fseek(uptr->fileref, 0, SEEK_END)))
         uptr->pos = (t_addr)sim_ftell(uptr->fileref);
     return SCPE_OK;
-}
-
-/* Roll back partially initialized attach state on failure. */
-static t_stat attach_err(UNIT *uptr, t_stat stat)
-{
-    free(uptr->filename);
-    uptr->filename = NULL;
-    return stat;
 }
 
 /* Flush and detach a unit using SCP's generic buffered-file rules. */
