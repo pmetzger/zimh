@@ -666,13 +666,15 @@ static void test_sim_copyfile_honors_overwrite_flag(void **state)
     static const uint8_t replacement_bytes[] = {0x99, 0x88, 0x77};
     void *copied_bytes;
     size_t copied_size;
+    t_stat status;
 
     assert_int_equal(simh_test_write_file(fixture->copy_path, replacement_bytes,
                                           sizeof(replacement_bytes)),
                      0);
 
-    assert_int_equal(
-        sim_copyfile(fixture->file_path, fixture->copy_path, FALSE), SCPE_OK);
+    status = sim_copyfile(fixture->file_path, fixture->copy_path, FALSE);
+    assert_int_equal(status & ~(SCPE_NOMESSAGE | SCPE_KFLAG | SCPE_BREAK),
+                     SCPE_ARG);
     assert_int_equal(
         simh_test_read_file(fixture->copy_path, &copied_bytes, &copied_size),
         0);
