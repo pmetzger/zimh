@@ -23,7 +23,12 @@ established.
 ## Layout
 
 - `tests/unit/CMakeLists.txt`
-  Registers host-side unit-test executables with `add_unit_test`.
+  Registers harness-level tests and adds the mirrored unit-test
+  subtrees.
+- `tests/unit/src/`
+  Host-side unit tests that mirror the `src/` tree.
+- `tests/unit/simulators/`
+  Host-side unit tests that will mirror the `simulators/` tree.
 - `tests/unit/support/`
   Shared support code linked into every unit-test executable.
 - `tests/unit/fixtures/`
@@ -35,8 +40,16 @@ established.
 
 ## Adding A Unit Test
 
-1. Add a new test source file under `tests/unit/`.
-2. Register it in `tests/unit/CMakeLists.txt` with `add_unit_test`.
+1. Mirror the source tree under `tests/unit/`.
+   Examples:
+   - `src/core/scp_parse.c` ->
+     `tests/unit/src/core/test_scp_parse.c`
+   - `src/runtime/sim_card.c` ->
+     `tests/unit/src/runtime/test_sim_card.c`
+   - `simulators/PDP11/pdp11_cpu.c` ->
+     `tests/unit/simulators/PDP11/test_pdp11_cpu.c`
+2. Register the new test in the nearest `CMakeLists.txt` under that
+   mirrored subtree.
 3. Put reusable helpers in `tests/unit/support/` instead of duplicating
    them across tests.
 4. Put checked-in fixture files in `tests/unit/fixtures/`.
@@ -44,12 +57,12 @@ established.
 Current examples:
 
 ```cmake
-add_unit_test(unit-support
+add_unit_test(unit-scp-parse
     LABEL unit
     SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/test_unit_support.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_scp_parse.c
     INCLUDES
-        ${CMAKE_CURRENT_SOURCE_DIR}/support
+        ${PROJECT_SOURCE_DIR}/tests/unit/support
 )
 ```
 
