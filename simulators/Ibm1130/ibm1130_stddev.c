@@ -509,10 +509,6 @@ static t_stat tto_reset (DEVICE *dptr)
 #  pragma warning(disable:4245)         /* disable int->char demotion warning caused by characters with high-bit set */
 #endif
 
-#ifdef __SUNPRO_C
-#  pragma error_messages (off, E_INIT_DOES_NOT_FIT)     /* disable int->char demotion warning caused by characters with high-bit set */
-#endif
-
 static struct {                         /* default input mapping for APL */
     unsigned char in;
     unsigned char out;
@@ -670,10 +666,6 @@ static OS_MAP default_os_map[] =            /* overstrike mapping for APLPLUS fo
     {'\xf0',    2,  "\xb0\xa8"},
     {'\xfe',    2,  "\x3a\xa8"},
 };
-
-#ifdef __SUNPRO_C
-#  pragma error_messages (default, E_INIT_DOES_NOT_FIT)     /* enable int->char demotion warning caused by characters with high-bit set */
-#endif
 
 #ifdef _MSC_VER
 #  pragma warning(default:4245)                     /* enable int->char demotion warning */

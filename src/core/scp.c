@@ -5802,8 +5802,6 @@ if (flag) {
 #else
     build = " (Release Build)";
 #endif
-#elif defined (__DECC_VER)
-    fprintf (st, "\n        Compiler: DEC C %c%d.%d-%03d", ("T SV")[((__DECC_VER/10000)%10)-6], __DECC_VER/10000000, (__DECC_VER/100000)%100, __DECC_VER%10000);
 #elif defined (SIM_COMPILER)
     fprintf (st, "\n        Compiler: %s", S_xstr(SIM_COMPILER));
 #endif
