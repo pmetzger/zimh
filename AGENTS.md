@@ -3,6 +3,16 @@
 When adding new source code to this repository, prefer keeping lines
 under 80 columns.
 
+When creating a new source file, run `clang-format` on that new file
+before finishing the change. Do not run `clang-format` across existing
+legacy files just to normalize formatting.
+
+When adding new functions or other new code to an existing file, write
+the new code so that it roughly follows the style in `.clang-format`
+without reformatting unrelated older code around it. The goal is for new
+code to move toward the project style while avoiding large formatting
+churn in legacy files.
+
 Before starting a long block of work, check that the tools needed for
 that work are present in the environment.
 
