@@ -291,6 +291,31 @@ test_sim_filepath_parts_handles_home_expansion_and_time_fields(void **state)
     }
 }
 
+/* Verify missing files still produce defined placeholder time and size
+   text instead of crashing. */
+static void test_sim_filepath_parts_handles_missing_file_metadata(void **state)
+{
+    struct sim_fio_fixture *fixture = *state;
+    char missing_path[1024];
+    char *time_text;
+    char *size_text;
+
+    assert_int_equal(simh_test_join_path(missing_path, sizeof(missing_path),
+                                         fixture->temp_dir, "missing.bin"),
+                     0);
+
+    time_text = sim_filepath_parts(missing_path, "t");
+    size_text = sim_filepath_parts(missing_path, "z");
+
+    assert_non_null(time_text);
+    assert_non_null(size_text);
+    assert_non_null(strstr(time_text, "/"));
+    assert_string_equal(size_text, "0 ");
+
+    free(time_text);
+    free(size_text);
+}
+
 /* Verify byte-swap helpers reverse multi-byte objects when the host is
    treated as big-endian. */
 static void test_sim_byte_swap_helpers_reverse_multibyte_elements(void **state)
@@ -633,6 +658,34 @@ test_sim_dir_scan_get_filelist_and_copyfile_work_together(void **state)
     free_filelist_context(&context);
 }
 
+/* Verify copyfile honors the overwrite flag when the destination file
+   already exists. */
+static void test_sim_copyfile_honors_overwrite_flag(void **state)
+{
+    struct sim_fio_fixture *fixture = *state;
+    static const uint8_t replacement_bytes[] = {0x99, 0x88, 0x77};
+    void *copied_bytes;
+    size_t copied_size;
+
+    assert_int_equal(simh_test_write_file(fixture->copy_path, replacement_bytes,
+                                          sizeof(replacement_bytes)),
+                     0);
+
+    assert_int_equal(
+        sim_copyfile(fixture->file_path, fixture->copy_path, FALSE), SCPE_OK);
+    assert_int_equal(
+        simh_test_read_file(fixture->copy_path, &copied_bytes, &copied_size),
+        0);
+    assert_int_equal(copied_size, sizeof(replacement_bytes));
+    assert_memory_equal(copied_bytes, replacement_bytes, copied_size);
+    free(copied_bytes);
+
+    assert_int_equal(sim_copyfile(fixture->file_path, fixture->copy_path, TRUE),
+                     SCPE_OK);
+    assert_int_equal(
+        simh_test_files_equal(fixture->file_path, fixture->copy_path), 1);
+}
+
 /* Verify sim_print_filelist writes each entry on its own line through
    the normal stdout-based SIMH output path. */
 static void test_sim_print_filelist_formats_one_entry_per_line(void **state)
@@ -663,6 +716,22 @@ static void test_sim_print_filelist_formats_one_entry_per_line(void **state)
     free(filelist[0]);
     free(filelist[1]);
     free(filelist);
+}
+
+/* Verify sim_print_filelist quietly ignores a NULL list. */
+static void test_sim_print_filelist_ignores_null_list(void **state)
+{
+    char *text;
+    size_t size;
+
+    (void)state;
+
+    assert_int_equal(simh_test_capture_stdout(
+                         write_printed_filelist,
+                         &(struct stdout_capture_context){NULL}, &text, &size),
+                     0);
+    assert_int_equal(size, 0);
+    free(text);
 }
 
 /* Verify sim_dir_scan reports an argument-style failure when a pattern
@@ -763,6 +832,9 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_sim_filepath_parts_handles_home_expansion_and_time_fields,
             setup_sim_fio_fixture, teardown_sim_fio_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_filepath_parts_handles_missing_file_metadata,
+            setup_sim_fio_fixture, teardown_sim_fio_fixture),
         cmocka_unit_test(test_sim_byte_swap_helpers_reverse_multibyte_elements),
         cmocka_unit_test_setup_teardown(
             test_sim_fread_and_fwrite_round_trip_in_big_endian_mode,
@@ -796,9 +868,13 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_sim_dir_scan_get_filelist_and_copyfile_work_together,
             setup_sim_fio_fixture, teardown_sim_fio_fixture),
+        cmocka_unit_test_setup_teardown(test_sim_copyfile_honors_overwrite_flag,
+                                        setup_sim_fio_fixture,
+                                        teardown_sim_fio_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_print_filelist_formats_one_entry_per_line,
             setup_sim_fio_fixture, teardown_sim_fio_fixture),
+        cmocka_unit_test(test_sim_print_filelist_ignores_null_list),
         cmocka_unit_test_setup_teardown(
             test_sim_dir_scan_reports_missing_matches, setup_sim_fio_fixture,
             teardown_sim_fio_fixture),
