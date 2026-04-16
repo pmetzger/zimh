@@ -541,7 +541,6 @@ const char *sim_eval_expression (const char *cptr, t_svalue *value, t_bool paren
 
 t_stat scp_attach_unit (DEVICE *dptr, UNIT *uptr, const char *cptr);
 t_stat scp_detach_unit (DEVICE *dptr, UNIT *uptr);
-t_bool qdisable (DEVICE *dptr);
 t_stat detach_all (int32 start_device, t_bool shutdown);
 t_stat assign_device (DEVICE *dptr, const char *cptr);
 t_stat deassign_device (DEVICE *dptr);
@@ -592,10 +591,6 @@ TMLN *sim_oline = NULL;
 MEMFILE *sim_mfile = NULL;
 SCHTAB *sim_schrptr = FALSE;
 SCHTAB *sim_schaptr = FALSE;
-DEVICE *sim_dfdev = NULL;
-UNIT *sim_dfunit = NULL;
-DEVICE **sim_internal_devices = NULL;
-uint32 sim_internal_device_count = 0;
 int32 sim_opt_out = 0;
 volatile t_bool sim_is_running = FALSE;
 t_bool sim_processing_event = FALSE;
@@ -8342,41 +8337,6 @@ dptr->lname = NULL;
 return SCPE_OK;
 }
 
-/* Get device display name */
-
-const char *sim_dname (DEVICE *dptr)
-{
-return (dptr ? (dptr->lname? dptr->lname: dptr->name) : "");
-}
-
-/* Get unit display name */
-
-const char *sim_uname (UNIT *uptr)
-{
-DEVICE *d;
-char uname[CBUFSIZE];
-
-if (!uptr)
-    return "";
-if (uptr->uname)
-    return uptr->uname;
-d = find_dev_from_unit(uptr);
-if (!d)
-    return "";
-if (d->numunits == 1)
-    sprintf (uname, "%s", sim_dname (d));
-else
-    sprintf (uname, "%s%d", sim_dname (d), (int)(uptr-d->units));
-return sim_set_uname (uptr, uname);
-}
-
-const char *sim_set_uname (UNIT *uptr, const char *uname)
-{
-free (uptr->uname);
-return uptr->uname = strcpy ((char *)malloc (1 + strlen (uname)), uname);
-}
-
-
 /* Save command
 
    sa[ve] filename              save state to specified file
@@ -10560,133 +10520,6 @@ fprintf (st, "%s", string);
 free (string);
 }
 
-
-/* Find_device          find device matching input string
-
-   Inputs:
-        cptr    =       pointer to input string
-   Outputs:
-        result  =       pointer to device
-*/
-
-DEVICE *find_dev (const char *cptr)
-{
-int32 i;
-DEVICE *dptr;
-
-if (cptr == NULL)
-    return NULL;
-for (i = 0; (dptr = sim_devices[i]) != NULL; i++) {
-    if ((strcmp (cptr, dptr->name) == 0) ||
-        (dptr->lname &&
-        (strcmp (cptr, dptr->lname) == 0)))
-        return dptr;
-    }
-for (i = 0; sim_internal_device_count && (dptr = sim_internal_devices[i]); ++i) {
-    if ((strcmp (cptr, dptr->name) == 0) ||
-        (dptr->lname &&
-        (strcmp (cptr, dptr->lname) == 0)))
-        return dptr;
-    }
-return NULL;
-}
-
-/* Find_unit            find unit matching input string
-
-   Inputs:
-        cptr    =       pointer to input string
-        uptr    =       pointer to unit pointer
-   Outputs:
-        result  =       pointer to device (null if no dev)
-        *iptr   =       pointer to unit (null if nx unit)
-
-*/
-
-DEVICE *find_unit (const char *cptr, UNIT **uptr)
-{
-uint32 i, u;
-const char *nptr;
-const char *tptr;
-t_stat r;
-DEVICE *dptr;
-
-if (uptr == NULL)                                       /* arg error? */
-    return NULL;
-*uptr = NULL;
-if ((dptr = find_dev (cptr))) {                         /* exact match? */
-    if (qdisable (dptr))                                /* disabled? */
-        return NULL;
-    *uptr = dptr->units;                                /* unit 0 */
-    return dptr;
-    }
-
-for (i = 0; (dptr = sim_devices[i]) != NULL; i++) {     /* base + unit#? */
-    if (qdisable (dptr))                                /* device disabled? */
-        continue;
-    if (dptr->numunits &&                               /* any units? */
-        (((nptr = dptr->name) &&
-          (strncmp (cptr, nptr, strlen (nptr)) == 0)) ||
-         ((nptr = dptr->lname) &&
-          (strncmp (cptr, nptr, strlen (nptr)) == 0)))) {
-        tptr = cptr + strlen (nptr);
-        if (sim_isdigit (*tptr)) {
-            if (qdisable (dptr))                        /* disabled? */
-                return NULL;
-            u = (uint32) get_uint (tptr, 10, dptr->numunits - 1, &r);
-            if (r != SCPE_OK)                           /* error? */
-                *uptr = NULL;
-            else
-                *uptr = dptr->units + u;
-            return dptr;
-            }
-        }
-    for (u = 0; u < dptr->numunits; u++) {
-        if (0 == strcmp (cptr, sim_uname (&dptr->units[u]))) {
-            *uptr = &dptr->units[u];
-            return dptr;
-            }
-        }
-    }
-return NULL;
-}
-
-/* sim_register_internal_device   Add device to internal device list
-
-   Inputs:
-        dptr    =       pointer to device
-*/
-
-t_stat sim_register_internal_device (DEVICE *dptr)
-{
-uint32 i;
-
-for (i = 0; i < sim_internal_device_count; i++)
-    if (sim_internal_devices[i] == dptr)
-        return SCPE_OK;
-for (i = 0; (sim_devices[i] != NULL); i++)
-    if (sim_devices[i] == dptr)
-        return SCPE_OK;
-++sim_internal_device_count;
-sim_internal_devices = (DEVICE **)realloc(sim_internal_devices, (sim_internal_device_count+1)*sizeof(*sim_internal_devices));
-sim_internal_devices[sim_internal_device_count-1] = dptr;
-sim_internal_devices[sim_internal_device_count] = NULL;
-return SCPE_OK;
-}
-
-/* Find_dev_from_unit   find device for unit
-
-   Inputs:
-        uptr    =       pointer to unit
-   Outputs:
-        result  =       pointer to device
-*/
-
-/* Test for disabled device */
-
-t_bool qdisable (DEVICE *dptr)
-{
-return (dptr->flags & DEV_DIS? TRUE: FALSE);
-}
 
 /* find_reg_glob        find globally unique register
 

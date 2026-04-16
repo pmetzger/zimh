@@ -40,6 +40,7 @@
 #include "sim_defs.h"
 
 #include "sim_fio.h"
+#include "scp_context.h"
 #include "scp_parse.h"
 #include "scp_size.h"
 #include "scp_unit.h"
@@ -163,9 +164,6 @@ t_stat reset_all (uint32 start_device);
 t_stat reset_all_p (uint32 start_device);
 t_stat set_writelock (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
 t_stat show_writelock (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-const char *sim_dname (DEVICE *dptr);
-const char *sim_uname (UNIT *dptr);
-const char *sim_set_uname (UNIT *uptr, const char *uname);
 t_bool get_yn (const char *ques, t_bool deflt);
 void sim_srand (unsigned int seed);
 int sim_rand (void);
@@ -205,9 +203,6 @@ void fprint_reg_help (FILE *st, DEVICE *dptr);
 void fprint_set_help (FILE *st, DEVICE *dptr);
 void fprint_show_help (FILE *st, DEVICE *dptr);
 CTAB *find_cmd (const char *gbuf);
-DEVICE *find_dev (const char *ptr);
-DEVICE *find_unit (const char *ptr, UNIT **uptr);
-t_stat sim_register_internal_device (DEVICE *dptr);
 void sim_sub_args (char *in_str, size_t in_str_size, char *do_arg[]);
 REG *find_reg (CONST char *ptr, CONST char **optr, DEVICE *dptr);
 CTAB *find_ctab (CTAB *tab, const char *gbuf);
@@ -288,8 +283,6 @@ t_stat scp_vhelpFromFile (FILE *st, DEVICE *dptr,
 /* Global data */
 
 extern DEVICE *sim_dflt_dev;
-extern DEVICE *sim_dfdev;
-extern UNIT *sim_dfunit;
 extern int32 sim_interval;
 extern int32 sim_switches;
 extern int32 sim_switch_number;
@@ -315,8 +308,6 @@ extern char *sim_deb_buffer;                            /* debug memory buffer *
 extern size_t sim_debug_buffer_offset;                  /* debug memory buffer insertion offset */
 extern size_t sim_debug_buffer_inuse;                   /* debug memory buffer inuse count */
 extern struct timespec sim_deb_basetime;                /* debug base time for relative time output */
-extern DEVICE **sim_internal_devices;
-extern uint32 sim_internal_device_count;
 extern UNIT *sim_clock_queue;
 extern volatile t_bool sim_is_running;
 extern t_bool sim_processing_event;                     /* Called from sim_process_event */
