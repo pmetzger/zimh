@@ -1469,7 +1469,7 @@ SIMROOT = simulators
 COREHD = src/core
 RUNTIMEHD = src/runtime
 COMPONENTHD = src/components
-SIM = ${COREHD}/scp.c ${COREHD}/scp_context.c ${COREHD}/scp_parse.c ${COREHD}/scp_unit.c ${COREHD}/main.c ${RUNTIMEHD}/sim_console.c ${RUNTIMEHD}/sim_fio.c \
+SIM = ${COREHD}/scp.c ${COREHD}/scp_context.c ${COREHD}/scp_expr.c ${COREHD}/scp_parse.c ${COREHD}/scp_unit.c ${COREHD}/main.c ${RUNTIMEHD}/sim_console.c ${RUNTIMEHD}/sim_fio.c \
 	${RUNTIMEHD}/sim_timer.c ${RUNTIMEHD}/sim_sock.c ${RUNTIMEHD}/sim_tmxr.c \
 	${RUNTIMEHD}/sim_ether.c ${RUNTIMEHD}/sim_tape.c ${RUNTIMEHD}/sim_disk.c \
 	${RUNTIMEHD}/sim_serial.c ${RUNTIMEHD}/sim_video.c ${RUNTIMEHD}/sim_imd.c \

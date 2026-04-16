@@ -29,6 +29,12 @@ These files own simulator-context and lookup support extracted from
 `scp.c`: device and unit naming, name lookup, internal-device
 registration, and default-context bookkeeping.
 
+## `scp_expr.c` and `scp_expr.h`
+
+These files own SCP's shared expression parser and evaluator, including
+the infix-to-postfix conversion and the expression-specific temporary
+state needed while commands are being interpreted.
+
 ## `scp_help.h`
 
 This header defines the structured help-text format used by SCP and by

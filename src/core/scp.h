@@ -41,6 +41,7 @@
 
 #include "sim_fio.h"
 #include "scp_context.h"
+#include "scp_expr.h"
 #include "scp_parse.h"
 #include "scp_size.h"
 #include "scp_unit.h"
@@ -77,6 +78,19 @@ extern "C" {
 #define CMD_OPT_OF      002                             /* output file */
 #define CMD_OPT_SCH     004                             /* search */
 #define CMD_OPT_DFT     010                             /* defaults */
+
+/* SCP internal debug bit assignments used by extracted helper modules. */
+#define SIM_DBG_EVENT_NEG   0x80000000
+#define SIM_DBG_EVENT       0x40000000
+#define SIM_DBG_ACTIVATE    0x20000000
+#define SIM_DBG_AIO_QUEUE   0x10000000
+#define SIM_DBG_EXP_STACK   0x08000000
+#define SIM_DBG_EXP_EVAL    0x04000000
+#define SIM_DBG_BRK_ACTION  0x02000000
+#define SIM_DBG_DO          0x01000000
+#define SIM_DBG_SAVE        0x00800000
+#define SIM_DBG_RESTORE     0x00400000
+#define SCP_LOG_TESTING     0x00200000
 
 /* Command processors */
 
@@ -204,6 +218,8 @@ void fprint_set_help (FILE *st, DEVICE *dptr);
 void fprint_show_help (FILE *st, DEVICE *dptr);
 CTAB *find_cmd (const char *gbuf);
 void sim_sub_args (char *in_str, size_t in_str_size, char *do_arg[]);
+const char *_sim_get_env_special(const char *gbuf, char *rbuf,
+    size_t rbuf_size);
 REG *find_reg (CONST char *ptr, CONST char **optr, DEVICE *dptr);
 CTAB *find_ctab (CTAB *tab, const char *gbuf);
 C1TAB *find_c1tab (C1TAB *tab, const char *gbuf);
@@ -283,6 +299,7 @@ t_stat scp_vhelpFromFile (FILE *st, DEVICE *dptr,
 /* Global data */
 
 extern DEVICE *sim_dflt_dev;
+extern DEVICE sim_scp_dev;
 extern int32 sim_interval;
 extern int32 sim_switches;
 extern int32 sim_switch_number;
