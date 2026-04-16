@@ -84,18 +84,21 @@ extern "C" {
 
 /* Shared SCP limits and debug-bit assignments used by helper modules. */
 #define MAX_DO_NEST_LVL    20
+
+/* Max width of a value expressed as a formatted string. */
 #define MAX_WIDTH ((CHAR_BIT * sizeof (t_value) * 4 + 3) / 3)
-#define SIM_DBG_EVENT_NEG   0x80000000
-#define SIM_DBG_EVENT       0x40000000
-#define SIM_DBG_ACTIVATE    0x20000000
-#define SIM_DBG_AIO_QUEUE   0x10000000
-#define SIM_DBG_EXP_STACK   0x08000000
-#define SIM_DBG_EXP_EVAL    0x04000000
-#define SIM_DBG_BRK_ACTION  0x02000000
-#define SIM_DBG_DO          0x01000000
-#define SIM_DBG_SAVE        0x00800000
-#define SIM_DBG_RESTORE     0x00400000
-#define SCP_LOG_TESTING     0x00200000
+
+#define SIM_DBG_EVENT_NEG   0x80000000      /* negative event dispatch */
+#define SIM_DBG_EVENT       0x40000000      /* event dispatch */
+#define SIM_DBG_ACTIVATE    0x20000000      /* queue insertion */
+#define SIM_DBG_AIO_QUEUE   0x10000000      /* async event queue */
+#define SIM_DBG_EXP_STACK   0x08000000      /* expression stack */
+#define SIM_DBG_EXP_EVAL    0x04000000      /* expression evaluation */
+#define SIM_DBG_BRK_ACTION  0x02000000      /* action processing */
+#define SIM_DBG_DO          0x01000000      /* DO command handling */
+#define SIM_DBG_SAVE        0x00800000      /* save processing */
+#define SIM_DBG_RESTORE     0x00400000      /* restore processing */
+#define SCP_LOG_TESTING     0x00200000      /* debug-log self-test */
 
 /* Command processors */
 

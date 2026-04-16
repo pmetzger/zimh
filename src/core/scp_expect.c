@@ -38,6 +38,7 @@ static uint32 get_default_env_parameter(const char *dev_name,
             val = default_value;
     }
 
+    /* This narrows from unsigned long to uint32 by design. */
     return (uint32)val;
 }
 
