@@ -1,5 +1,3 @@
-#include <ctype.h>
-#include <stdarg.h>
 #include <stddef.h>
 #include <setjmp.h>
 #include <stdint.h>
@@ -14,166 +12,12 @@
 #include "sim_card.h"
 #include "test_support.h"
 
-#undef isspace
-#undef tolower
-#undef toupper
-
+/* Minimal simulator personality required by scp.c/sim_card.c. */
 DEVICE *sim_devices[] = {NULL};
 REG *sim_PC = NULL;
 char sim_name[64] = "simbase-unit";
 const char *sim_stop_messages[SCPE_BASE] = {0};
 int32 sim_emax = 0;
-int32 sim_switches = 0;
-FILE *sim_deb = NULL;
-
-int Fprintf(FILE *file, const char *fmt, ...)
-{
-    int result;
-    va_list args;
-
-    va_start(args, fmt);
-    result = vfprintf(file, fmt, args);
-    va_end(args);
-
-    return result;
-}
-
-void _sim_debug_device(uint32 dbits, DEVICE *dptr, const char *fmt, ...)
-{
-    (void)dbits;
-    (void)dptr;
-    (void)fmt;
-}
-
-int sim_isspace(int chr)
-{
-    return isspace(chr);
-}
-
-int sim_tolower(int chr)
-{
-    return tolower(chr);
-}
-
-int sim_toupper(int chr)
-{
-    return toupper(chr);
-}
-
-const char *sim_uname(UNIT *uptr)
-{
-    return uptr->uname ? uptr->uname : "UNIT";
-}
-
-t_stat attach_unit(UNIT *uptr, CONST char *cptr)
-{
-    FILE *file;
-    const char *mode;
-
-    mode = (uptr->flags & UNIT_RO) ? "rb" : "ab+";
-    file = fopen(cptr, mode);
-    if (file == NULL && ((uptr->flags & UNIT_RO) == 0)) {
-        file = fopen(cptr, "wb+");
-    }
-    if (file == NULL) {
-        return SCPE_OPENERR;
-    }
-
-    uptr->fileref = file;
-    uptr->filename = strdup(cptr);
-    uptr->flags |= UNIT_ATT;
-    uptr->pos = 0;
-
-    return SCPE_OK;
-}
-
-t_stat detach_unit(UNIT *uptr)
-{
-    if (uptr->fileref != NULL) {
-        fclose(uptr->fileref);
-        uptr->fileref = NULL;
-    }
-    free(uptr->filename);
-    uptr->filename = NULL;
-    uptr->flags &= ~UNIT_ATT;
-    uptr->pos = 0;
-    return SCPE_OK;
-}
-
-DEVICE *find_dev_from_unit(UNIT *uptr)
-{
-    return uptr->dptr;
-}
-
-CONST char *get_sim_sw(CONST char *cptr)
-{
-    return cptr;
-}
-
-CONST char *get_glyph(CONST char *iptr, char *optr, char mchar)
-{
-    const char *ptr = iptr;
-    size_t offset = 0;
-
-    while (*ptr != '\0' && isspace((unsigned char)*ptr)) {
-        ++ptr;
-    }
-    while (*ptr != '\0' && *ptr != mchar && !isspace((unsigned char)*ptr)) {
-        optr[offset++] = *ptr++;
-    }
-    optr[offset] = '\0';
-    while (*ptr != '\0' && isspace((unsigned char)*ptr)) {
-        ++ptr;
-    }
-    return ptr;
-}
-
-const char *sim_error_text(t_stat stat)
-{
-    (void)stat;
-    return "error";
-}
-
-void sim_printf(const char *fmt, ...)
-{
-    va_list args;
-
-    va_start(args, fmt);
-    vfprintf(stderr, fmt, args);
-    va_end(args);
-}
-
-t_stat sim_messagef(t_stat stat, const char *fmt, ...)
-{
-    va_list args;
-
-    va_start(args, fmt);
-    vfprintf(stderr, fmt, args);
-    va_end(args);
-
-    return stat;
-}
-
-t_stat attach_cmd(int32 flag, CONST char *cptr)
-{
-    (void)flag;
-    (void)cptr;
-    return SCPE_OK;
-}
-
-t_stat detach_cmd(int32 flag, CONST char *cptr)
-{
-    (void)flag;
-    (void)cptr;
-    return SCPE_OK;
-}
-
-t_stat show_cmd(int32 flag, CONST char *cptr)
-{
-    (void)flag;
-    (void)cptr;
-    return SCPE_OK;
-}
 
 t_stat sim_instr(void)
 {
@@ -199,16 +43,6 @@ t_stat fprint_sym(FILE *ofile, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
     (void)sw;
 
     return SCPE_OK;
-}
-
-size_t sim_fread(void *bptr, size_t size, size_t count, FILE *fptr)
-{
-    return fread(bptr, size, count, fptr);
-}
-
-size_t sim_fwrite(const void *bptr, size_t size, size_t count, FILE *fptr)
-{
-    return fwrite(bptr, size, count, fptr);
 }
 
 t_stat parse_sym(CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val,
