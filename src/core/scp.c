@@ -2615,7 +2615,7 @@ static SHTAB show_unit_tab[] = {
     };
 
 
-#if defined(_WIN32) || defined(__hpux)
+#if defined(_WIN32)
 static
 int setenv(const char *envname, const char *envval, int overwrite)
 {
@@ -2713,8 +2713,6 @@ if (*argv[0]) {                                         /* sim name arg? */
     np = strrchr (nbuf, '/');                           /* strip path and try again in cwd */
     if (np == NULL)
         np = strrchr (nbuf, '\\');                      /* windows path separator */
-    if (np == NULL)
-        np = strrchr (nbuf, ']');                       /* VMS path separator */
     if (np != NULL)
         setenv ("SIM_BIN_NAME", np+1, 1);               /* Publish simulator binary name */
     setenv ("SIM_BIN_PATH", argv[0], 1);
@@ -2875,8 +2873,6 @@ if (docmdp) {
                 np = strrchr (nbuf, '/');                  /* strip path and try again in cwd */
                 if (np == NULL)
                     np = strrchr (nbuf, '\\');             /* windows path separator */
-                if (np == NULL)
-                    np = strrchr (nbuf, ']');              /* VMS path separator */
                 if (np != NULL) {
                     *np = '"';
                     stat = docmdp->action (-1, np) & ~SCPE_NOMESSAGE;/* proc default cmd file */
@@ -3246,10 +3242,6 @@ if ((cptr == NULL) || (strlen (cptr) == 0))
     cptr = getenv("SHELL");
 if ((cptr == NULL) || (strlen (cptr) == 0))
     cptr = getenv("ComSpec");
-#if defined (VMS)
-if ((cptr == NULL) || (strlen (cptr) == 0))
-    cptr = "SPAWN/INPUT=SYS$COMMAND:";
-#endif
 fflush(stdout);                                         /* flush stdout */
 if (sim_log)                                            /* flush log if enabled */
     fflush (sim_log);
@@ -3259,9 +3251,6 @@ if (sim_deb)                                            /* flush debug if enable
 for (i = 0; i < sim_external_env_count; i++)
     setenv (sim_external_env[i].name, sim_external_env[i].value, 1);
 status = system (cptr);
-#if defined (VMS)
-printf ("\n");
-#endif
 /* Remove the externally defined (command alias conflicting) environment variables again */
 for (i = 0; i < sim_external_env_count; i++)
     unsetenv (sim_external_env[i].name);
@@ -5833,8 +5822,6 @@ if (flag) {
     arch = " arch: ARM64";
 #elif defined(_M_ARM) || defined(__arm__)
     arch = " arch: ARM";
-#elif defined(__ia64__) || defined(_M_IA64) || defined(__itanium__)
-    arch = " arch: IA-64";
 #endif
 #if defined (__DATE__) && defined (__TIME__)
 #ifdef  __cplusplus
@@ -5866,21 +5853,7 @@ if (flag) {
     fprintf (st, "\n        Time taken by msleep(1): %dms", os_ms_sleep_1);
     if (eth_version ())
         fprintf (st, "\n        Ethernet packet info: %s", eth_version());
-#if defined(__VMS)
-    if (1) {
-        char *arch =
-#if defined(__ia64)
-            "I64";
-#elif defined(__ALPHA)
-            "Alpha";
-#else
-            "VAX";
-#endif
-        strlcpy (os_type, "OpenVMS ", sizeof (os_type));
-        strlcat (os_type, arch, sizeof (os_type));
-        fprintf (st, "\n        OS: OpenVMS %s %s", arch, __VMS_VERSION);
-        }
-#elif defined(_WIN32)
+#if defined(_WIN32)
     if (1) {
         char *proc_id = getenv ("PROCESSOR_IDENTIFIER");
         char *arch = getenv ("PROCESSOR_ARCHITECTURE");
@@ -8333,9 +8306,6 @@ return r | ((sim_switches & SWMASK ('Q')) ? SCPE_NOMESSAGE : 0);
 void
 run_cmd_message (const char *unechoed_cmdline, t_stat r)
 {
-#if defined (VMS)
-printf ("\n");
-#endif
 if (unechoed_cmdline && (r >= SCPE_BASE) && (r != SCPE_STEP) && (r != SCPE_STOP) && (r != SCPE_EXPECT))
     sim_printf("%s> %s\n", do_position(), unechoed_cmdline);
 fprint_stopped (stdout, r);                         /* print msg */
@@ -9879,11 +9849,7 @@ if ((fnam == NULL) || (ext == NULL))                    /* bad arguments? */
 pptr = strrchr (fnam, '.');                             /* find last . */
 if (pptr) {                                             /* any? */
     for (fptr = pptr + 1, eptr = ext;                   /* match characters */
-#if defined (VMS)                                       /* VMS: stop at ; or null */
-    (*fptr != 0) && (*fptr != ';');
-#else
-    *fptr != 0;                                         /* others: stop at null */
-#endif
+    *fptr != 0;                                         /* stop at null */
     fptr++, eptr++) {
         if (sim_toupper (*fptr) != sim_toupper (*eptr))
             return NULL;

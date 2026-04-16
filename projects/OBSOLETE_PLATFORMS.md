@@ -42,6 +42,8 @@ obsolete-host markers:
 - `__OS2__`
 - `__EMX__`
 - `__ZAURUS__`
+- `__HAIKU__`
+- `macintosh`
 
 ## Coupled qualifier macros
 
@@ -69,6 +71,8 @@ platforms, including:
 - VAX-host-specific compatibility cases
 - OS/2 / EMX
 - Sharp Zaurus host-specific compatibility cases
+- Haiku host-specific compatibility cases
+- Classic Macintosh compiler compatibility cases
 
 ## Important notes
 

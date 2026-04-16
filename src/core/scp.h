@@ -259,21 +259,11 @@ void sim_debug_bits_hdr (uint32 dbits, DEVICE* dptr, const char *header,
     BITFIELD* bitdefs, uint32 before, uint32 after, int terminate);
 void sim_debug_bits (uint32 dbits, DEVICE* dptr, BITFIELD* bitdefs,
     uint32 before, uint32 after, int terminate);
-#if defined (__DECC) && defined (__VMS) && (defined (__VAX) || (__DECC_VER < 60590001))
-#define CANT_USE_MACRO_VA_ARGS 1
-#endif
 void _sim_vdebug (uint32 dbits, DEVICE* dptr, UNIT *uptr, const char* fmt, va_list arglist);
-#ifdef CANT_USE_MACRO_VA_ARGS
-#define _sim_debug_device sim_debug
-void sim_debug (uint32 dbits, DEVICE* dptr, const char *fmt, ...) GCC_FMT_ATTR(3, 4);
-#define _sim_debug_unit sim_debug_unit
-void sim_debug_unit (uint32 dbits, UNIT* uptr, const char *fmt, ...) GCC_FMT_ATTR(3, 4);
-#else
 void _sim_debug_unit (uint32 dbits, UNIT *uptr, const char* fmt, ...) GCC_FMT_ATTR(3, 4);
 void _sim_debug_device (uint32 dbits, DEVICE* dptr, const char* fmt, ...) GCC_FMT_ATTR(3, 4);
 #define sim_debug(dbits, dptr, ...) do { if ((sim_deb != NULL) && ((dptr) != NULL) && ((dptr)->dctrl & (dbits))) _sim_debug_device (dbits, dptr, __VA_ARGS__);} while (0)
 #define sim_debug_unit(dbits, uptr, ...) do { if ((sim_deb != NULL) && ((uptr) != NULL) && (uptr->dptr != NULL) && (((uptr)->dctrl | (uptr)->dptr->dctrl) & (dbits))) _sim_debug_unit (dbits, uptr, __VA_ARGS__);} while (0)
-#endif
 void sim_flush_buffered_files (void);
 
 void fprint_stopped_gen (FILE *st, t_stat v, REG *pc, DEVICE *dptr);

@@ -57,15 +57,6 @@
 #  define T_INT64_FMT    "ll"
 #  define POINTER_FMT    "p"
 
-#elif defined(__VAX)
-
-/* No 64 bit ints on VAX, nothing special about size_t */
-#  define LL_FMT         "l"
-#  define SIZE_T_FMT     ""
-#  define T_UINT64_FMT   ""
-#  define T_INT64_FMT    ""
-#  define POINTER_FMT    ""
-
 #else
 /* Defaults. */
 #  define LL_FMT         "ll"

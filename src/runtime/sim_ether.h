@@ -78,25 +78,16 @@ extern "C" {
 #if defined(__NetBSD__) || defined (__OpenBSD__) || defined (__FreeBSD__)
 #define xBSD 1
 #endif
-#if !defined(__FreeBSD__) && !defined(_WIN32) && !defined(VMS) && !defined(__CYGWIN__) && !defined(__APPLE__)
+#if !defined(__FreeBSD__) && !defined(_WIN32) && !defined(__APPLE__)
 #define USE_SETNONBLOCK 1
 #endif
 
-/* cygwin doesn't have the right features to use the threaded network I/O */
-#if defined(__CYGWIN__) || defined(__ZAURUS__) // psco added check for Zaurus platform
-#define DONT_USE_READER_THREAD
-#endif
-
-#if ((((defined(__sun) || defined(__sun__)) && defined(__i386__)) || defined(__linux)) && !defined(DONT_USE_READER_THREAD))
+#if defined(__linux)
 #define USE_READER_THREAD 1
 #endif
 
-#if defined(DONT_USE_READER_THREAD)
-#undef USE_READER_THREAD
-#endif
-
 /* make common winpcap code a bit easier to read in this file */
-#if defined(_WIN32) || defined(VMS) || defined(__CYGWIN__)
+#if defined(_WIN32)
 #define PCAP_READ_TIMEOUT -1
 #else
 #define PCAP_READ_TIMEOUT  1
@@ -115,7 +106,7 @@ extern "C" {
 #endif /* USE_SETNONBLOCK */
 #undef PCAP_READ_TIMEOUT
 #define PCAP_READ_TIMEOUT 15
-#if (!defined (xBSD) && !defined(_WIN32) && !defined(VMS) && !defined(__CYGWIN__)) || defined (HAVE_TAP_NETWORK) || defined (HAVE_VDE_NETWORK)
+#if (!defined (xBSD) && !defined(_WIN32)) || defined (HAVE_TAP_NETWORK) || defined (HAVE_VDE_NETWORK)
 #define MUST_DO_SELECT 1
 #endif
 #endif /* USE_READER_THREAD */

@@ -3721,7 +3721,7 @@ static int tmxr_open_device_count = 0;
 
 #if defined(SIM_ASYNCH_MUX)
 pthread_t           sim_tmxr_poll_thread;          /* Polling Thread Id */
-#if defined(_WIN32) || defined(VMS)
+#if defined(_WIN32)
 pthread_t           sim_tmxr_serial_poll_thread;   /* Serial Polling Thread Id */
 pthread_cond_t      sim_tmxr_serial_startup_cond;
 #endif
@@ -3803,7 +3803,7 @@ while (sim_asynch_enabled) {
                     max_socket_fd = mp->ldsc[j].sock;
                 ++socket_count;
                 }
-#if !defined(_WIN32) && !defined(VMS)
+#if !defined(_WIN32)
             if (mp->ldsc[j].serport) {
                 units[socket_count] = mp->ldsc[j].uptr;
                 if (units[socket_count] == NULL)
@@ -4057,165 +4057,6 @@ sim_debug (TMXR_DBG_ASY, dptr, "_tmxr_serial_poll() - exiting\n");
 return NULL;
 }
 #endif /* _WIN32 */
-
-#if defined(VMS)
-
-#include <descrip.h>
-#include <ttdef.h>
-#include <tt2def.h>
-#include <iodef.h>
-#include <ssdef.h>
-#include <starlet.h>
-#include <unistd.h>
-
-typedef struct {
-    unsigned short status;
-    unsigned short count;
-    unsigned int dev_status; } IOSB;
-
-#define MAXIMUM_WAIT_OBJECTS 64             /* Number of possible concurrently opened serial ports */
-
-pthread_cond_t      sim_serial_line_startup_cond;
-
-
-static void *
-_tmxr_serial_line_poll(void *arg)
-{
-TMLN *lp = (TMLN *)arg;
-DEVICE *dptr = tmxr_open_devices[0]->dptr;
-UNIT *uptr = (lp->uptr ? lp->uptr : lp->mp->uptr);
-DEVICE *d = find_dev_from_unit(uptr);
-int wait_count = 0;
-
-/* Boost Priority for this I/O thread vs the CPU instruction execution
-   thread which, in general, won't be readily yielding the processor when
-   this thread needs to run */
-sim_os_set_thread_priority (PRIORITY_ABOVE_NORMAL);
-
-sim_debug (TMXR_DBG_ASY, dptr, "_tmxr_serial_line_poll() - starting\n");
-
-pthread_mutex_lock (&sim_tmxr_poll_lock);
-pthread_cond_signal (&sim_serial_line_startup_cond);   /* Signal we're ready to go */
-while (sim_asynch_enabled) {
-    int i, j;
-    int serport_count;
-    TMXR *mp = lp->mp;
-    unsigned int status, term[2];
-    unsigned char buf[4];
-    IOSB iosb;
-
-    if ((tmxr_open_device_count == 0) || (!sim_is_running)) {
-        if (wait_count) {
-            sim_debug (TMXR_DBG_ASY, d, "_tmxr_serial_line_poll() - Removing interest in %s. Other interest: %d\n", sim_uname(uptr), uptr->a_poll_waiter_count);
-            --uptr->a_poll_waiter_count;
-            --sim_tmxr_poll_count;
-            }
-        break;
-        }
-    /* If we started something we should wait for, let it finish before polling again */
-    if (wait_count) {
-        sim_debug (TMXR_DBG_ASY, dptr, "_tmxr_serial_line_poll() - waiting for %d units\n", wait_count);
-        pthread_cond_wait (&sim_tmxr_poll_cond, &sim_tmxr_poll_lock);
-        sim_debug (TMXR_DBG_ASY, dptr, "_tmxr_serial_line_poll() - continuing with timeout of 1 sec\n");
-        }
-    lp->a_active = TRUE;
-    pthread_mutex_unlock (&sim_tmxr_poll_lock);
-    term[0] = term[1] = 0;
-    status = sys$qiow (0, lp->serport,
-                       IO$_READLBLK | IO$M_NOECHO | IO$M_NOFILTR | IO$M_TIMED | IO$M_TRMNOECHO,
-                       &iosb, 0, 0, buf, 1, 1, term, 0, 0);
-    if (status != SS$_NORMAL) {
-        sim_printf ("_tmxr_serial_line_poll() - QIO Failed, Status=%d\r\n", status);
-        abort();
-        }
-    wait_count = 0;
-    sys$synch (0, &iosb);
-    pthread_mutex_lock (&sim_tmxr_poll_lock);
-    lp->a_active = FALSE;
-    if (iosb.count == 1) {
-        lp->a_buffered_character = buf[0] | SCPE_KFLAG;
-        wait_count = 1;
-        if (!uptr->a_polling_now) {
-            uptr->a_polling_now = TRUE;
-            uptr->a_poll_waiter_count = 1;
-            sim_debug (TMXR_DBG_ASY, d, "_tmxr_serial_line_poll() - Activating for data %s\n", sim_uname(uptr));
-            pthread_mutex_unlock (&sim_tmxr_poll_lock);
-            _sim_activate (uptr, 0);
-            pthread_mutex_lock (&sim_tmxr_poll_lock);
-            }
-        else {
-            sim_debug (TMXR_DBG_ASY, d, "_tmxr_serial_line_poll() - Already Activated %s%d %d times\n", sim_uname(uptr), uptr->a_poll_waiter_count);
-            ++uptr->a_poll_waiter_count;
-            }
-        }
-    sim_tmxr_poll_count += wait_count;
-    }
-pthread_mutex_unlock (&sim_tmxr_poll_lock);
-
-sim_debug (TMXR_DBG_ASY, dptr, "_tmxr_serial_line_poll() - exiting\n");
-
-return NULL;
-}
-
-static void *
-_tmxr_serial_poll(void *arg)
-{
-int timeout_usec;
-DEVICE *dptr = tmxr_open_devices[0]->dptr;
-TMLN **lines = NULL;
-pthread_t *threads = NULL;
-
-/* Boost Priority for this I/O thread vs the CPU instruction execution
-   thread which, in general, won't be readily yielding the processor when
-   this thread needs to run */
-
-sim_debug (TMXR_DBG_ASY, dptr, "_tmxr_serial_poll() - starting\n");
-
-lines = (TMLN **)calloc(MAXIMUM_WAIT_OBJECTS, sizeof(*lines));
-threads = (pthread_t *)calloc(MAXIMUM_WAIT_OBJECTS, sizeof(*threads));
-pthread_mutex_lock (&sim_tmxr_poll_lock);
-pthread_cond_signal (&sim_tmxr_serial_startup_cond);   /* Signal we're ready to go */
-pthread_cond_init (&sim_serial_line_startup_cond, NULL);
-while (sim_asynch_enabled) {
-    pthread_attr_t attr;
-    int i, j;
-    int serport_count;
-    TMXR *mp;
-    DEVICE *d;
-
-    if ((tmxr_open_device_count == 0) || (!sim_is_running))
-        break;
-    pthread_attr_init (&attr);
-    pthread_attr_setscope (&attr, PTHREAD_SCOPE_SYSTEM);
-    for (i=serport_count=0; i<tmxr_open_device_count; ++i) {
-        mp = tmxr_open_devices[i];
-        for (j=0; j<mp->lines; ++j) {
-            if (mp->ldsc[j].serport) {
-                lines[serport_count] = &mp->ldsc[j];
-                pthread_create (&threads[serport_count], &attr, _tmxr_serial_line_poll, (void *)&mp->ldsc[j]);
-                pthread_cond_wait (&sim_serial_line_startup_cond, &sim_tmxr_poll_lock); /* Wait for thread to stabilize */
-                ++serport_count;
-                }
-            }
-        }
-    pthread_attr_destroy( &attr);
-    if (serport_count == 0)                                 /* No open serial ports? */
-        break;                                              /* We're done */
-    pthread_mutex_unlock (&sim_tmxr_poll_lock);
-    for (i=0; i<serport_count; i++)
-        pthread_join (threads[i], NULL);
-    pthread_mutex_lock (&sim_tmxr_poll_lock);
-    }
-pthread_mutex_unlock (&sim_tmxr_poll_lock);
-pthread_cond_destroy (&sim_serial_line_startup_cond);
-free(lines);
-free(threads);
-
-sim_debug (TMXR_DBG_ASY, dptr, "_tmxr_serial_poll() - exiting\n");
-
-return NULL;
-}
-#endif /* VMS */
 
 #endif /* defined(SIM_ASYNCH_MUX) */
 
@@ -6361,4 +6202,3 @@ ret = eth_write (line->framer->eth, &framer_tx, NULL);
 /* Always report the whole thing was written */
 return length;
 }
-

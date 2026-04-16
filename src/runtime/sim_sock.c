@@ -83,51 +83,7 @@ extern "C" {
    sim_setnonblock      set socket non-blocking
 */
 
-/* First, all the non-implemented versions */
-
-#if defined (__OS2__) && !defined (__EMX__)
-
-void sim_init_sock (void)
-{
-}
-
-void sim_cleanup_sock (void)
-{
-}
-
-SOCKET sim_master_sock_ex (const char *hostport, int *parse_status, int opt_flags)
-{
-return INVALID_SOCKET;
-}
-
-SOCKET sim_connect_sock_ex (const char *sourcehostport, const char *hostport, const char *default_host, const char *default_port, int opt_flags)
-{
-return INVALID_SOCKET;
-}
-
-SOCKET sim_accept_conn (SOCKET master, char **connectaddr);
-{
-return INVALID_SOCKET;
-}
-
-int sim_read_sock (SOCKET sock, char *buf, int nbytes)
-{
-return -1;
-}
-
-int sim_write_sock (SOCKET sock, char *msg, int nbytes)
-{
-return 0;
-}
-
-void sim_close_sock (SOCKET sock)
-{
-return;
-}
-
-#else                                                   /* endif unimpl */
-
-/* UNIX, Win32, Macintosh, VMS, OS2 (Berkeley socket) routines */
+/* Win32 and POSIX socket routines */
 
 static struct sock_errors {
     int value;
@@ -190,17 +146,8 @@ typedef int     (WSAAPI *getaddrinfo_func) (const char *hostname,
                                  struct addrinfo **res);
 static getaddrinfo_func p_getaddrinfo;
 
-#if defined(VMS)
-typedef size_t socklen_t;
 #if !defined(EAI_OVERFLOW)
 #define EAI_OVERFLOW EAI_FAIL
-#endif
-#endif
-
-#if defined(__hpux)
-#if !defined(EAI_OVERFLOW)
-#define EAI_OVERFLOW EAI_FAIL
-#endif
 #endif
 
 typedef int (WSAAPI *getnameinfo_func) (const struct sockaddr *sa, socklen_t salen, char *host, size_t hostlen, char *serv, size_t servlen, int flags);
@@ -427,7 +374,7 @@ if ((host) && (hostlen > 0)) {
 return 0;
 }
 
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if defined(_WIN32)
 
 #if !defined(IPV6_V6ONLY)           /* Older XP environments may not define IPV6_V6ONLY */
 #define IPV6_V6ONLY           27    /* Treat wildcard bind as AF_INET6-only. */
@@ -924,15 +871,7 @@ unsigned long non_block = 1;
 return ioctlsocket (sock, FIONBIO, &non_block);         /* set nonblocking */
 }
 
-#elif defined (VMS)                                     /* VMS */
-static int sim_setnonblock (SOCKET sock)
-{
-int non_block = 1;
-
-return ioctl (sock, FIONBIO, &non_block);               /* set nonblocking */
-}
-
-#else                                                   /* Mac, Unix, OS/2 */
+#else                                                   /* POSIX */
 static int sim_setnonblock (SOCKET sock)
 {
 int fl, sta;
@@ -943,16 +882,13 @@ if (fl == -1)
 sta = fcntl (sock, F_SETFL, fl | O_NONBLOCK);           /* set nonblock */
 if (sta == -1)
     return SOCKET_ERROR;
-#if !defined (macintosh) && !defined (__EMX__) && \
-    !defined (__HAIKU__)                                /* Unix only */
 sta = fcntl (sock, F_SETOWN, getpid());                 /* set ownership */
 if (sta == -1)
     return SOCKET_ERROR;
-#endif
 return 0;
 }
 
-#endif                                                  /* endif !Win32 && !VMS */
+#endif                                                  /* endif !Win32 */
 
 static int sim_setnodelay (SOCKET sock)
 {
@@ -1203,18 +1139,10 @@ SOCKET sim_accept_conn_ex (SOCKET master, char **connectaddr, int opt_flags)
 {
 int sta = 0, err;
 int keepalive = 1;
-#if defined (macintosh) || defined (__linux) || defined (__linux__) || \
-    defined (__APPLE__) || defined (__OpenBSD__) || \
-    defined(__NetBSD__) || defined(__FreeBSD__) || \
-    (defined(__hpux) && defined(_XOPEN_SOURCE_EXTENDED)) || \
-    defined (__HAIKU__) || defined(__CYGWIN__)
-socklen_t size;
-#elif defined (_WIN32) || defined (__EMX__) || \
-     (defined (__ALPHA) && defined (__unix__)) || \
-     defined (__hpux)
+#if defined (_WIN32)
 int size;
-#else 
-size_t size; 
+#else
+socklen_t size;
 #endif
 SOCKET newsock;
 struct sockaddr_storage clientname;
@@ -1265,18 +1193,10 @@ fd_set *rw_p = &rw_set;
 fd_set *er_p = &er_set;
 struct timeval zero;
 struct sockaddr_storage peername;
-#if defined (macintosh) || defined (__linux) || defined (__linux__) || \
-    defined (__APPLE__) || defined (__OpenBSD__) || \
-    defined(__NetBSD__) || defined(__FreeBSD__) || \
-    (defined(__hpux) && defined(_XOPEN_SOURCE_EXTENDED)) || \
-    defined (__HAIKU__) || defined(__CYGWIN__)
-socklen_t peernamesize = (socklen_t)sizeof(peername);
-#elif defined (_WIN32) || defined (__EMX__) || \
-     (defined (__ALPHA) && defined (__unix__)) || \
-     defined (__hpux)
+#if defined (_WIN32)
 int peernamesize = (int)sizeof(peername);
-#else 
-size_t peernamesize = sizeof(peername); 
+#else
+socklen_t peernamesize = (socklen_t)sizeof(peername);
 #endif
 
 memset (&zero, 0, sizeof(zero));
@@ -1301,18 +1221,10 @@ return 0;
 
 static int _sim_getaddrname (struct sockaddr *addr, size_t addrsize, char *hostnamebuf, char *portnamebuf)
 {
-#if defined (macintosh) || defined (__linux) || defined (__linux__) || \
-    defined (__APPLE__) || defined (__OpenBSD__) || \
-    defined(__NetBSD__) || defined(__FreeBSD__) || \
-    (defined(__hpux) && defined(_XOPEN_SOURCE_EXTENDED)) || \
-    defined (__HAIKU__) || defined(__CYGWIN__)
-socklen_t size = (socklen_t)addrsize;
-#elif defined (_WIN32) || defined (__EMX__) || \
-     (defined (__ALPHA) && defined (__unix__)) || \
-     defined (__hpux)
+#if defined (_WIN32)
 int size = (int)addrsize;
-#else 
-size_t size = addrsize; 
+#else
+socklen_t size = (socklen_t)addrsize;
 #endif
 int ret = 0;
 
@@ -1330,21 +1242,12 @@ return ret;
 int sim_getnames_sock (SOCKET sock, char **socknamebuf, char **peernamebuf)
 {
 struct sockaddr_storage sockname, peername;
-#if defined (macintosh) || defined (__linux) || defined (__linux__) || \
-    defined (__APPLE__) || defined (__OpenBSD__) || \
-    defined(__NetBSD__) || defined(__FreeBSD__) || \
-    (defined(__hpux) && defined(_XOPEN_SOURCE_EXTENDED)) || \
-    defined (__HAIKU__) || defined(__CYGWIN__)
-socklen_t socknamesize = (socklen_t)sizeof(sockname);
-socklen_t peernamesize = (socklen_t)sizeof(peername);
-#elif defined (_WIN32) || defined (__EMX__) || \
-     (defined (__ALPHA) && defined (__unix__)) || \
-     defined (__hpux)
+#if defined (_WIN32)
 int socknamesize = (int)sizeof(sockname);
 int peernamesize = (int)sizeof(peername);
-#else 
-size_t socknamesize = sizeof(sockname); 
-size_t peernamesize = sizeof(peername); 
+#else
+socklen_t socknamesize = (socklen_t)sizeof(sockname);
+socklen_t peernamesize = (socklen_t)sizeof(peername);
 #endif
 char hostbuf[NI_MAXHOST+1];
 char portbuf[NI_MAXSERV+1];
@@ -1415,8 +1318,6 @@ void sim_close_sock (SOCKET sock)
 shutdown(sock, SD_BOTH);
 closesocket (sock);
 }
-
-#endif                                                  /* end else !implemented */
 
 #ifdef  __cplusplus
 }

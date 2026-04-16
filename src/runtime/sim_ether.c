@@ -60,20 +60,12 @@
   Linux                     libpcap at least 0.9
   OpenBSD,FreeBSD,NetBSD    libpcap at least 0.9
   MAC OS/X                  libpcap at least 0.9
-  Solaris Sparc             libpcap at least 0.9
-  Solaris Intel             libpcap at least 0.9
-  AIX                       ??
-  HP/UX                     ??
-  Compaq Tru64 Unix         ??
-  VMS                       Alpha/Itanium VMS only, needs VMS libpcap
 
   WinPcap is no longer developed or supported by was available from:
                         http://winpcap.polito.it/
   Npcap is a complete replacement for systems running Windows7 and later
   and is available from:
                         https://nmap.org/npcap
-  libpcap for VMS is available from:
-                        http://simh.trailing-edge.com/sources/vms-pcap.zip
   libpcap for other Unix platforms is available at:
         NOTE: As of the release of this version of sim_ether.c ALL current
               *nix platforms ship with a sufficiently new version of
@@ -1024,8 +1016,7 @@ const char *eth_capabilities(void)
 
 #if defined (HAVE_PCAP_NETWORK)
 /*============================================================================*/
-/*      WIN32, Linux, and xBSD routines use WinPcap and libpcap packages      */
-/*        OpenVMS Alpha uses a WinPcap port and an associated execlet         */
+/*      WIN32, Linux, macOS, and xBSD routines use WinPcap and libpcap        */
 /*============================================================================*/
 
 #include <pcap.h>
@@ -1268,7 +1259,7 @@ static int lib_loaded = 0;                  /* 0=not loaded, 1=loaded, 2=library
 #define __STR_QUOTE(tok) #tok
 #define __STR(tok) __STR_QUOTE(tok)
 static const char* lib_name =
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if defined(_WIN32)
                           "wpcap.dll";
 #elif defined(__APPLE__)
                           "/usr/lib/libpcap.A.dylib";
@@ -1277,7 +1268,7 @@ static const char* lib_name =
 #endif
 
 static char no_pcap[PCAP_ERRBUF_SIZE] =
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if defined(_WIN32)
     "wpcap.dll failed to load, install Npcap or WinPcap 4.1.3 to use pcap networking";
 #elif defined(__APPLE__)
     "/usr/lib/libpcap.A.dylib failed to load, install libpcap to use pcap networking";
@@ -1556,7 +1547,7 @@ int pcap_setnonblock(pcap_t* a, int nonblock, char *errbuf) {
 #endif /* defined(USE_SHARED) && (defined(_WIN32) || defined(SIM_HAVE_DLOPEN)) */
 
 /* Some platforms have always had pcap_sendpacket */
-#if defined(_WIN32) || defined(__VMS)
+#if defined(_WIN32)
 #define HAS_PCAP_SENDPACKET 1
 #else
 /* The latest libpcap and WinPcap all have pcap_sendpacket */
@@ -1579,7 +1570,7 @@ int pcap_sendpacket(pcap_t* handle, const u_char* msg, int len)
 }
 #endif /* !HAS_PCAP_SENDPACKET */
 
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if defined(_WIN32)
 /* extracted from WinPcap's Packet32.h */
 struct _PACKET_OID_DATA {
     uint32 Oid;                 ///< OID code. See the Microsoft DDK documentation or the file ntddndis.h
@@ -1598,38 +1589,22 @@ static int pcap_mac_if_win32(const char *AdapterName, unsigned char MACAddress[6
   PPACKET_OID_DATA  OidData;
   int               Status;
   int               ReturnValue;
-#ifdef _WIN32
   HMODULE           hDll;         /* handle to DLL */
-#else
-  static void       *hDll = NULL; /* handle to Library */
-  typedef int BOOLEAN;
-#endif
   LPADAPTER (*p_PacketOpenAdapter)(const char *AdapterName);
   void (*p_PacketCloseAdapter)(LPADAPTER lpAdapter);
   int (*p_PacketRequest)(LPADAPTER  AdapterObject,BOOLEAN Set,PPACKET_OID_DATA  OidData);
 
-#ifdef _WIN32
   hDll = LoadLibraryA("packet.dll");
   p_PacketOpenAdapter = (LPADAPTER (*)(const char *AdapterName))GetProcAddress(hDll, "PacketOpenAdapter");
   p_PacketCloseAdapter = (void (*)(LPADAPTER lpAdapter))GetProcAddress(hDll, "PacketCloseAdapter");
   p_PacketRequest = (int (*)(LPADAPTER  AdapterObject,BOOLEAN Set,PPACKET_OID_DATA  OidData))GetProcAddress(hDll, "PacketRequest");
-#else
-  hDll = dlopen("packet.dll", RTLD_NOW);
-  p_PacketOpenAdapter = (LPADAPTER (*)(const char *AdapterName))dlsym(hDll, "PacketOpenAdapter");
-  p_PacketCloseAdapter = (void (*)(LPADAPTER lpAdapter))dlsym(hDll, "PacketCloseAdapter");
-  p_PacketRequest = (int (*)(LPADAPTER  AdapterObject,BOOLEAN Set,PPACKET_OID_DATA  OidData))dlsym(hDll, "PacketRequest");
-#endif
 
   /* Open the selected adapter */
 
   lpAdapter =   p_PacketOpenAdapter(AdapterName);
 
   if (!lpAdapter || (*lpAdapter == (void *)-1)) {
-#ifdef _WIN32
       FreeLibrary(hDll);
-#else
-      dlclose(hDll);
-#endif
     return -1;
   }
 
@@ -1638,11 +1613,7 @@ static int pcap_mac_if_win32(const char *AdapterName, unsigned char MACAddress[6
   OidData = (PACKET_OID_DATA *)malloc(6 + sizeof(PACKET_OID_DATA));
   if (OidData == NULL) {
     p_PacketCloseAdapter(lpAdapter);
-#ifdef _WIN32
     FreeLibrary(hDll);
-#else
-    dlclose(hDll);
-#endif
     return -1;
   }
 
@@ -1662,103 +1633,11 @@ static int pcap_mac_if_win32(const char *AdapterName, unsigned char MACAddress[6
 
   free(OidData);
   p_PacketCloseAdapter(lpAdapter);
-#ifdef _WIN32
   FreeLibrary(hDll);
-#else
-  dlclose(hDll);
-#endif
   return ReturnValue;
 }
 
-#endif  /* defined(_WIN32) || defined(__CYGWIN__) */
-
-#if defined (__VMS) && !defined(__VAX)
-#include <descrip.h>
-#include <iodef.h>
-#include <ssdef.h>
-#include <starlet.h>
-#include <stdio.h>
-#include <stsdef.h>
-#include <nmadef.h>
-
-static int pcap_mac_if_vms(const char *AdapterName, unsigned char MACAddress[6])
-{
-  char VMS_Device[16];
-  $DESCRIPTOR(Device, VMS_Device);
-  unsigned short iosb[4];
-  unsigned short *w;
-  unsigned char *pha = NULL;
-  unsigned char *hwa = NULL;
-  int tmpval;
-  int status;
-  unsigned short characteristics[512];
-  long chardesc[] = {sizeof(characteristics), (long)&characteristics};
-  unsigned short chan;
-#pragma member_alignment save
-#pragma nomember_alignment
-  static struct {
-    short fmt;
-    long val_fmt;
-    short pty;
-    long val_pty;
-    short pad;
-    long val_pad;
-    } setup  = {
-        NMA$C_PCLI_FMT, NMA$C_LINFM_ETH,
-        NMA$C_PCLI_PTY, 0x0090,
-        NMA$C_PCLI_PAD, NMA$C_STATE_OFF,
-    };
-#pragma member_alignment restore
-    long setupdesc[] = {sizeof(setup), (long)&setup};
-
-  /* Convert Interface Name to VMS Device Name */
-  /* This is a name shuffle */
-  /*   WE0 becomes EWA0:    */
-  /*   SE1 becomes ESB0:    */
-  /*   XE0 becomes EXA0:    */
-  tmpval = (int)(AdapterName[2]-'0');
-  if ((tmpval < 0) || (tmpval > 25))
-    return -1;
-  VMS_Device[0] = toupper(AdapterName[1]);
-  VMS_Device[1] = toupper(AdapterName[0]);
-  VMS_Device[2] = 'A' + tmpval;
-  VMS_Device[3] = '0';
-  VMS_Device[4] = '\0';
-  VMS_Device[5] = '\0';
-  Device.dsc$w_length = strlen(VMS_Device);
-  if (!$VMS_STATUS_SUCCESS( sys$assign (&Device, &chan, 0, 0, 0) ))
-    return -1;
-  status = sys$qiow (0, chan, IO$_SETMODE|IO$M_CTRL|IO$M_STARTUP, &iosb, 0, 0,
-                     0, &setupdesc, 0, 0, 0, 0);
-  if ((!$VMS_STATUS_SUCCESS(status)) || (!$VMS_STATUS_SUCCESS(iosb[0]))) {
-    sys$dassgn(chan);
-    return -1;
-    }
-  status = sys$qiow (0, chan, IO$_SENSEMODE|IO$M_CTRL, &iosb, 0, 0,
-                     0, &chardesc, 0, 0, 0, 0);
-  sys$dassgn(chan);
-  if ((!$VMS_STATUS_SUCCESS(status)) || (!$VMS_STATUS_SUCCESS(iosb[0])))
-    return -1;
-  for (w=characteristics; w < &characteristics[iosb[1]]; ) {
-    if ((((*w)&0xFFF) == NMA$C_PCLI_HWA) && (6 == *(w+1)))
-      hwa = (unsigned char *)(w + 2);
-    if ((((*w)&0xFFF) == NMA$C_PCLI_PHA) && (6 == *(w+1)))
-      pha = (unsigned char *)(w + 2);
-    if (((*w)&0x1000) == 0)
-      w += 3;                       /* Skip over Longword Parameter */
-    else
-      w += (2 + ((1 + *(w+1))/2));  /* Skip over String Parameter */
-    }
-  if (pha != NULL)                  /* Prefer Physical Address */
-    memcpy(MACAddress, pha, 6);
-  else
-    if (hwa != NULL)                /* Fallback to Hardware Address */
-      memcpy(MACAddress, hwa, 6);
-    else
-      return -1;
-  return 0;
-}
-#endif /* defined (__VMS) && !defined(__VAX) */
+#endif  /* defined(_WIN32) */
 
 #if SIM_MAJOR != 4
 static const char *sim_get_tool_path (const char *tool)
@@ -1773,13 +1652,10 @@ static void eth_get_nic_hw_addr(ETH_DEV* dev, const char *devname, int set_on)
   dev->have_host_nic_phy_addr = 0;
   if (dev->eth_api != ETH_API_PCAP)
     return;
-#if defined(_WIN32) || defined(__CYGWIN__)
+#if defined(_WIN32)
   if (!pcap_mac_if_win32(devname, dev->host_nic_phy_hw_addr))
     dev->have_host_nic_phy_addr = 1;
-#elif defined (__VMS) && !defined(__VAX)
-  if (!pcap_mac_if_vms(devname, dev->host_nic_phy_hw_addr))
-    dev->have_host_nic_phy_addr = 1;
-#elif !defined(__CYGWIN__) && !defined(__VMS)
+#else
   if (1) {
     char command[1024];
     FILE *f;
@@ -2429,7 +2305,7 @@ else { /* !tap: */
       else { /* not udp:, so attempt to open the parameter as if it were an explicit device name */
 #if defined(HAVE_PCAP_NETWORK)
         *handle = (void*) pcap_open_live(savname, bufsz, ETH_PROMISC, PCAP_READ_TIMEOUT, errbuf);
-#if !defined(__CYGWIN__) && !defined(__VMS) && !defined(_WIN32)
+#if !defined(_WIN32)
         if (!*handle) { /* can't open device */
           if (strstr (errbuf, "That device is not up")) {
             char command[1024];
@@ -2608,16 +2484,6 @@ if (1) {
   pthread_cond_init (&dev->writer_cond, NULL);
   pthread_attr_init(&attr);
   pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
-#if defined(__hpux)
-  {
-    /* libpcap needs sizeof(long) * 8192 bytes on the stack */
-    size_t stack_size;
-    const size_t min_stack_size = sizeof(long) * 8192 * 3 / 2;
-    if (!pthread_attr_getstacksize(&attr, &stack_size) && stack_size < min_stack_size) {
-      pthread_attr_setstacksize(&attr, min_stack_size);
-    }
-  }
-#endif /* defined(__hpux) */
   pthread_create (&dev->reader_thread, &attr, _eth_reader, (void *)dev);
   pthread_create (&dev->writer_thread, &attr, _eth_writer, (void *)dev);
   pthread_attr_destroy(&attr);
@@ -4016,23 +3882,12 @@ if ((addr_count > 0) && (reflections > 0)) {
   }
 if (strlen(buf) > 0)
   sprintf(&buf[strlen(buf)], ")");
-/* When changing the Physical Address on a LAN interface, VMS sends out a
-   loopback packet with the source and destination addresses set to the same
-   value as the Physical Address which is being setup.  This packet is
-   designed to find and help diagnose MAC address conflicts (which also
-   include DECnet address conflicts). Normally, this packet would not be
-   seen by the sender, only by the other machine that has the same Physical
-   Address (or possibly DECnet address). If the ethernet subsystem is
-   reflecting packets, the network startup will fail to start if it sees the
-   reflected packet, since it thinks another system is using this Physical
-   Address (or DECnet address). We have to let these packets through, so
-   that if another machine has the same Physical Address (or DECnet address)
-   that we can detect it. Both eth_write() and _eth_callback() help by
-   checking the reflection count - eth_write() adds the reflection count to
-   dev->loopback_self_sent, and _eth_callback() check the value - if the
-   dev->loopback_self_sent count is zero, then the packet has come from
-   another machine with the same address, and needs to be passed on to the
-   simulated machine. */
+/* Preserve packets whose source and destination match the interface's
+   physical address so that address-conflict probes are still visible to the
+   simulator even when the host reflects locally transmitted traffic. Both
+   eth_write() and _eth_callback() cooperate using loopback_self_sent to
+   distinguish reflected self-traffic from packets sent by another host with
+   the same address. */
 /* check for physical address in filters */
 if ((!promiscuous) && (addr_count) && (reflections > 0)) {
   eth_mac_fmt(physical_addr, mac);

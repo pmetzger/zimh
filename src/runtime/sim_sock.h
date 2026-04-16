@@ -54,7 +54,7 @@ extern "C" {
 #include <winsock2.h>
 #include <winerror.h>
 
-#elif !defined (__OS2__) || defined (__EMX__)           /* VMS, Mac, Unix, OS/2 EMX */
+#else                                                   /* POSIX sockets */
 #include <sys/types.h>                                  /* for fcntl, getpid */
 #include <sys/socket.h>                                 /* for sockets */
 #include <string.h>
@@ -71,11 +71,7 @@ extern "C" {
 #define WSASetLastError(err) errno = err
 #define closesocket     close
 #define SOCKET          int
-#if defined(__hpux)
-#define WSAEWOULDBLOCK  EAGAIN
-#else
 #define WSAEWOULDBLOCK  EWOULDBLOCK
-#endif
 #define WSAENAMETOOLONG ENAMETOOLONG
 #define WSAEINPROGRESS  EINPROGRESS
 #define WSAETIMEDOUT    ETIMEDOUT
@@ -93,16 +89,6 @@ extern "C" {
 #define INVALID_SOCKET  ((SOCKET)-1)
 #if !defined(SOCKET_ERROR)
 #define SOCKET_ERROR    (-1)
-#endif
-#endif
-
-#if defined (VMS)                                       /* VMS unique */
-#include <ioctl.h>                                      /* for ioctl */
-#if !defined (AI_NUMERICHOST)
-#define AI_NUMERICHOST 0
-#endif
-#if defined (__VAX)
-#define sockaddr_storage sockaddr
 #endif
 #endif
 

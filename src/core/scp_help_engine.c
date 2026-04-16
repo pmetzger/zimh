@@ -1455,13 +1455,6 @@ t_stat scp_vhelpFromFile(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                 if ((p = strrchr(fbuf, '/'))) {
                     p[1] = '\0';
                     d = "%s/";
-#ifdef VMS
-                } else {
-                    if ((p = strrchr(fbuf, ']'))) {
-                        p[1] = '\0';
-                        d = "[%s]";
-                    }
-#endif
                 }
             }
             if (p && (strlen(fbuf) + strlen(helpfile) + 1) <= sizeof(fbuf)) {

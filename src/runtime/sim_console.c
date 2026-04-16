@@ -150,10 +150,6 @@
 #include <ctype.h>
 #include <math.h>
 
-#ifdef __HAIKU__
-#define nice(n) ({})
-#endif
-
 #ifndef MIN
 #define MIN(a,b)  (((a) <= (b)) ? (a) : (b))
 #endif
@@ -199,7 +195,7 @@ int32 sim_del_char = '\b';                              /* delete character */
 int32 sim_del_char = 0177;
 #endif
 t_bool sim_signaled_int_char                            /* WRU character detected by signal while running */
-#if defined (_WIN32) || defined (_VMS) || defined (__CYGWIN__) || (defined(USE_SIM_VIDEO) && defined(HAVE_LIBSDL))
+#if defined (_WIN32) || (defined(USE_SIM_VIDEO) && defined(HAVE_LIBSDL))
                              = FALSE;
 #else
                              = TRUE;
@@ -3302,183 +3298,9 @@ return sim_os_fd_isatty (fd);
 
 /* Platform specific routine definitions */
 
-/* VMS routines, from Ben Thomas, with fixes from Robert Alan Byer */
-
-#if defined (VMS)
-
-#if defined(__VAX)
-#define sys$assign SYS$ASSIGN
-#define sys$qiow SYS$QIOW
-#define sys$dassgn SYS$DASSGN
-#endif
-
-#include <descrip.h>
-#include <ttdef.h>
-#include <tt2def.h>
-#include <iodef.h>
-#include <ssdef.h>
-#include <starlet.h>
-#include <unistd.h>
-
-#define EFN 0
-uint32 tty_chan = 0;
-int buffered_character = 0;
-
-typedef struct {
-    unsigned short sense_count;
-    unsigned char sense_first_char;
-    unsigned char sense_reserved;
-    unsigned int stat;
-    unsigned int stat2; } SENSE_BUF;
-
-typedef struct {
-    unsigned short status;
-    unsigned short count;
-    unsigned int dev_status; } IOSB;
-
-SENSE_BUF cmd_mode = { 0 };
-SENSE_BUF run_mode = { 0 };
-
-static t_stat sim_os_ttinit (void)
-{
-unsigned int status;
-IOSB iosb;
-$DESCRIPTOR (terminal_device, "tt");
-
-sim_debug (DBG_TRC, &sim_con_telnet, "sim_os_ttinit()\n");
-
-status = sys$assign (&terminal_device, &tty_chan, 0, 0);
-if (status != SS$_NORMAL)
-    return SCPE_TTIERR;
-status = sys$qiow (EFN, tty_chan, IO$_SENSEMODE, &iosb, 0, 0,
-    &cmd_mode, sizeof (cmd_mode), 0, 0, 0, 0);
-if ((status != SS$_NORMAL) || (iosb.status != SS$_NORMAL))
-    return SCPE_TTIERR;
-run_mode = cmd_mode;
-run_mode.stat = cmd_mode.stat | TT$M_NOECHO & ~(TT$M_HOSTSYNC | TT$M_TTSYNC);
-run_mode.stat2 = cmd_mode.stat2 | TT2$M_PASTHRU;
-return SCPE_OK;
-}
-
-static t_stat sim_os_ttrun (void)
-{
-unsigned int status;
-IOSB iosb;
-
-sim_debug (DBG_TRC, &sim_con_telnet, "sim_os_ttrun()\n");
-
-status = sys$qiow (EFN, tty_chan, IO$_SETMODE, &iosb, 0, 0,
-    &run_mode, sizeof (run_mode), 0, 0, 0, 0);
-if ((status != SS$_NORMAL) || (iosb.status != SS$_NORMAL))
-    return SCPE_TTIERR;
-return SCPE_OK;
-}
-
-static t_stat sim_os_ttcmd (void)
-{
-unsigned int status;
-IOSB iosb;
-
-sim_debug (DBG_TRC, &sim_con_telnet, "sim_os_ttcmd() - BSDTTY\n");
-
-status = sys$qiow (EFN, tty_chan, IO$_SETMODE, &iosb, 0, 0,
-    &cmd_mode, sizeof (cmd_mode), 0, 0, 0, 0);
-if ((status != SS$_NORMAL) || (iosb.status != SS$_NORMAL))
-    return SCPE_TTIERR;
-return SCPE_OK;
-}
-
-static t_stat sim_os_ttclose (void)
-{
-sim_ttcmd ();
-sys$dassgn (tty_chan);
-return SCPE_OK;
-}
-
-static t_bool sim_os_fd_isatty (int fd)
-{
-return isatty (fd);
-}
-
-static t_stat sim_os_poll_kbd_data (void)
-{
-unsigned int status, term[2];
-unsigned char buf[4];
-IOSB iosb;
-SENSE_BUF sense;
-
-term[0] = 0; term[1] = 0;
-status = sys$qiow (EFN, tty_chan, IO$_SENSEMODE | IO$M_TYPEAHDCNT, &iosb,
-    0, 0, &sense, 8, 0, term, 0, 0);
-if ((status != SS$_NORMAL) || (iosb.status != SS$_NORMAL))
-    return SCPE_TTIERR;
-if (sense.sense_count == 0) return SCPE_OK;
-term[0] = 0; term[1] = 0;
-status = sys$qiow (EFN, tty_chan,
-    IO$_READLBLK | IO$M_NOECHO | IO$M_NOFILTR | IO$M_TIMED | IO$M_TRMNOECHO,
-    &iosb, 0, 0, buf, 1, 0, term, 0, 0);
-if ((status != SS$_NORMAL) || (iosb.status != SS$_NORMAL))
-    return SCPE_OK;
-if (buf[0] == sim_int_char)
-    return SCPE_STOP;
-if (sim_brk_char && (buf[0] == sim_brk_char))
-    return SCPE_BREAK;
-return (buf[0] | SCPE_KFLAG);
-}
-
-static t_stat sim_os_poll_kbd (void)
-{
-t_stat response;
-
-sim_debug (DBG_TRC, &sim_con_telnet, "sim_os_poll_kbd()\n");
-
-if (response = buffered_character) {
-    buffered_character = 0;
-    return response;
-    }
-return sim_os_poll_kbd_data ();
-}
-
-static t_bool sim_os_poll_kbd_ready (int ms_timeout)
-{
-unsigned int status, term[2];
-unsigned char buf[4];
-IOSB iosb;
-
-term[0] = 0; term[1] = 0;
-status = sys$qiow (EFN, tty_chan,
-    IO$_READLBLK | IO$M_NOECHO | IO$M_NOFILTR | IO$M_TIMED | IO$M_TRMNOECHO,
-    &iosb, 0, 0, buf, 1, (ms_timeout+999)/1000, term, 0, 0);
-if ((status != SS$_NORMAL) || (iosb.status != SS$_NORMAL))
-    return FALSE;
-if (buf[0] == sim_int_char)
-    buffered_character = SCPE_STOP;
-else
-    if (sim_brk_char && (buf[0] == sim_brk_char))
-        buffered_character = SCPE_BREAK;
-    else
-        buffered_character = (buf[0] | SCPE_KFLAG);
-return TRUE;
-}
-
-
-static t_stat sim_os_putchar (int32 out)
-{
-unsigned int status;
-char c;
-IOSB iosb;
-
-c = out;
-status = sys$qiow (EFN, tty_chan, IO$_WRITELBLK | IO$M_NOFORMAT,
-    &iosb, 0, 0, &c, 1, 0, 0, 0, 0);
-if ((status != SS$_NORMAL) || (iosb.status != SS$_NORMAL))
-    return SCPE_TTOERR;
-return SCPE_OK;
-}
-
 /* Win32 routines */
 
-#elif defined (_WIN32)
+#if defined (_WIN32)
 
 #include <fcntl.h>
 #include <io.h>

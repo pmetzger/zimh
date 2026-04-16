@@ -125,13 +125,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
-#if defined(_MSC_VER) && (_MSC_VER < 1900)
-#define snprintf _snprintf      /* poor man's snprintf which will work most of the time but has different return value */
-#endif
-#if defined(__VAX)
-extern int sim_vax_snprintf(char *buf, size_t buf_size, const char *fmt, ...);
-#define snprintf sim_vax_snprintf
-#endif
 #include <stdarg.h>
 #include <string.h>
 #include <errno.h>
@@ -139,6 +132,7 @@ extern int sim_vax_snprintf(char *buf, size_t buf_size, const char *fmt, ...);
 #include <ctype.h>
 #include <math.h>
 #include <setjmp.h>
+#include <stdint.h>
 
 
 #ifndef EXIT_FAILURE
@@ -212,27 +206,13 @@ extern "C" {
 
 /* Length specific integer declarations */
 
-/* Handle the special/unusual cases first with everything else leveraging stdint.h */
-#if defined (VMS)
-#include <ints.h>
-#elif defined(_MSC_VER) && (_MSC_VER < 1600)
-typedef __int8           int8;
-typedef __int16          int16;
-typedef __int32          int32;
-typedef unsigned __int8  uint8;
-typedef unsigned __int16 uint16;
-typedef unsigned __int32 uint32;
-#else
-/* All modern/standard compiler environments */
-/* any other environment needs a special case above */
-#include <stdint.h>
+/* All supported toolchains provide stdint.h. */
 typedef int8_t          int8;
 typedef int16_t         int16;
 typedef int32_t         int32;
 typedef uint8_t         uint8;
 typedef uint16_t        uint16;
 typedef uint32_t        uint32;
-#endif                                                  /* end standard integers */
 
 typedef int             t_stat;                         /* status */
 typedef int             t_bool;                         /* boolean */
@@ -245,12 +225,6 @@ typedef unsigned long long      t_uint64;
 #elif defined (_WIN32)                                  /* Windows */
 typedef signed __int64          t_int64;
 typedef unsigned __int64        t_uint64;
-#elif (defined (__ALPHA) || defined (__ia64)) && defined (VMS) /* 64b VMS */
-typedef signed __int64          t_int64;
-typedef unsigned __int64        t_uint64;
-#elif defined (__ALPHA) && defined (__unix__)           /* Alpha UNIX */
-typedef signed long             t_int64;
-typedef unsigned long           t_uint64;
 #else                                                   /* default */
 #define t_int64                 signed long long
 #define t_uint64                unsigned long long
@@ -282,37 +256,20 @@ typedef uint32          t_addr;
 #if defined (_WIN32)
 #define vsnprintf _vsnprintf
 #endif
-#if defined (__DECC) && defined (__VMS) && (defined (__VAX) || (__CRTL_VER <= 70311000))
-#define NO_vsnprintf
-#endif
-#if defined( NO_vsnprintf)
-#define STACKBUFSIZE 16384
-#else
 #define STACKBUFSIZE 2048
-#endif
 
 #if defined (_WIN32) /* Actually, a GCC issue */
 #define LL_TYPE long long
 #else
-#if defined (__VAX) /* No 64 bit ints on VAX */
-#define LL_TYPE long
-#else
 #define LL_TYPE long long
 #endif
-#endif
 
-#if defined (VMS) && (defined (__ia64) || defined (__ALPHA))
-#define HAVE_GLOB
-#endif
-
-#if defined (__linux) || defined (VMS) || defined (__APPLE__)
+#if defined (__linux) || defined (__APPLE__)
 #define HAVE_C99_STRFTIME 1
 #endif
 
 #if defined (_WIN32)
 #define NULL_DEVICE "NUL:"
-#elif defined (_VMS)
-#define NULL_DEVICE "NL:"
 #else
 #define NULL_DEVICE "/dev/null"
 #endif
@@ -1177,7 +1134,7 @@ extern int32 sim_asynch_inst_latency;
 #define AIO_TLS thread_local
 #elif (__STDC_VERSION__ >= 201112) && !(defined(__STDC_NO_THREADS__))
 #define AIO_TLS _Thread_local
-#elif defined(__GNUC__) && !defined(__APPLE__) && !defined(__hpux) && !defined(__OpenBSD__) && !defined(_AIX)
+#elif defined(__GNUC__) && !defined(__APPLE__) && !defined(__OpenBSD__)
 #define AIO_TLS __thread
 #elif defined(_MSC_VER)
 #define AIO_TLS __declspec(thread)

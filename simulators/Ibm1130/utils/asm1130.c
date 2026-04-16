@@ -157,10 +157,6 @@
  * Comment out this define to make @ and ' different in symbol names, keep to make equivalent
  */
 
-#if defined(VMS)
-    #  include <unistd.h>                   /* to pick up 'unlink' */
-#endif
-
 #define BETWEEN(v,a,b) (((v) >= (a)) && ((v) <= (b)))
 #define MIN(a,b)       (((a) <= (b)) ? (a) : (b))
 #define MAX(a,b)       (((a) >= (b)) ? (a) : (b))
@@ -4698,4 +4694,3 @@ int strcmpi (char *a, char *b)
 }
 
 #endif
-
