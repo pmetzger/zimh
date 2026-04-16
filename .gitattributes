@@ -22,4 +22,3 @@
 *.vhd binary
 *.vcproj binary
 *.zip binary
-sim_rev.h export-subst

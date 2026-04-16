@@ -1,0 +1,3 @@
+# sim_rev.h uses export-subst to splice the git commit ID and time
+# into the include file, so that they can be present in the binary.
+sim_rev.h export-subst
