@@ -2,6 +2,7 @@
 #define TEST_SUPPORT_H
 
 #include <stddef.h>
+#include <stdio.h>
 
 #include "sim_defs.h"
 
@@ -22,6 +23,7 @@ int simh_test_read_file(const char *path, void **data_out, size_t *size_out);
 int simh_test_read_fixture(const char *relative_path, void **data_out,
                            size_t *size_out);
 int simh_test_write_file(const char *path, const void *data, size_t size);
+int simh_test_read_stream(FILE *stream, char **text_out, size_t *size_out);
 int simh_test_files_equal(const char *left_path, const char *right_path);
 int simh_test_remove_path(const char *path);
 

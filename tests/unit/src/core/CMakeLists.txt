@@ -29,3 +29,35 @@ add_unit_test(unit-scp-context
     INCLUDES
         ${PROJECT_SOURCE_DIR}/tests/unit/support
 )
+
+add_unit_test(unit-scp-expr
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_scp_expr.c
+    INCLUDES
+        ${PROJECT_SOURCE_DIR}/tests/unit/support
+)
+
+add_unit_test(unit-scp-expect
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_scp_expect.c
+    INCLUDES
+        ${PROJECT_SOURCE_DIR}/tests/unit/support
+)
+
+add_unit_test(unit-scp-breakpoint
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_scp_breakpoint.c
+    INCLUDES
+        ${PROJECT_SOURCE_DIR}/tests/unit/support
+)
+
+add_unit_test(unit-scp-help-engine
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_scp_help_engine.c
+    INCLUDES
+        ${PROJECT_SOURCE_DIR}/tests/unit/support
+)

@@ -210,6 +210,49 @@ int simh_test_write_file(const char *path, const void *data, size_t size)
     return fclose(file) == 0 ? 0 : -1;
 }
 
+/* Read the full contents of a seekable stream into a NUL-terminated buffer. */
+int simh_test_read_stream(FILE *stream, char **text_out, size_t *size_out)
+{
+    long size;
+    char *data;
+    size_t bytes_read;
+
+    if (fflush(stream) != 0) {
+        return -1;
+    }
+
+    if (fseek(stream, 0, SEEK_END) != 0) {
+        return -1;
+    }
+
+    size = ftell(stream);
+    if (size < 0) {
+        return -1;
+    }
+
+    if (fseek(stream, 0, SEEK_SET) != 0) {
+        return -1;
+    }
+
+    data = malloc((size_t) size + 1);
+    if (data == NULL) {
+        errno = ENOMEM;
+        return -1;
+    }
+
+    bytes_read = fread(data, 1, (size_t) size, stream);
+    if (bytes_read != (size_t) size) {
+        free(data);
+        errno = EIO;
+        return -1;
+    }
+
+    data[size] = '\0';
+    *text_out = data;
+    *size_out = (size_t) size;
+    return 0;
+}
+
 int simh_test_files_equal(const char *left_path, const char *right_path)
 {
     void *left_data;
