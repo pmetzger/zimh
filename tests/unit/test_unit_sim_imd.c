@@ -16,19 +16,6 @@ struct sim_imd_fixture {
     char image_path[1024];
 };
 
-static int make_path(char *buffer, size_t buffer_size, const char *dir_path,
-                     const char *leaf_name)
-{
-    int length;
-
-    length = snprintf(buffer, buffer_size, "%s/%s", dir_path, leaf_name);
-    if (length < 0 || (size_t)length >= buffer_size) {
-        return -1;
-    }
-
-    return 0;
-}
-
 static int setup_sim_imd_fixture(void **state)
 {
     struct sim_imd_fixture *fixture;
@@ -40,8 +27,9 @@ static int setup_sim_imd_fixture(void **state)
                                              sizeof(fixture->temp_dir),
                                              "sim-imd"),
                      0);
-    assert_int_equal(make_path(fixture->image_path, sizeof(fixture->image_path),
-                               fixture->temp_dir, "image.imd"),
+    assert_int_equal(simh_test_join_path(fixture->image_path,
+                                         sizeof(fixture->image_path),
+                                         fixture->temp_dir, "image.imd"),
                      0);
 
     *state = fixture;
@@ -159,6 +147,117 @@ static void test_disk_open_reads_minimal_single_sector_image(void **state)
     fclose(image);
 }
 
+static void test_disk_open_reads_compressed_sector_and_write_protects(
+    void **state)
+{
+    uint8_t image_bytes[18];
+    uint8_t expected_buffer[128];
+    uint8_t read_buffer[128];
+    struct sim_imd_fixture *fixture = *state;
+    uint32 flags;
+    uint32 readlen;
+    FILE *image;
+    DISK_INFO *disk;
+
+    memcpy(image_bytes, "IMD test\n\x1A", 10);
+    image_bytes[10] = IMD_MODE_500K_FM;
+    image_bytes[11] = 0x00;
+    image_bytes[12] = 0x00;
+    image_bytes[13] = 0x01;
+    image_bytes[14] = 0x00;
+    image_bytes[15] = 0x01;
+    image_bytes[16] = SECT_RECORD_NORM_COMP;
+    image_bytes[17] = 0xA5;
+
+    assert_int_equal(simh_test_write_file(fixture->image_path, image_bytes,
+                                          sizeof(image_bytes)),
+                     0);
+
+    image = fopen(fixture->image_path, "rb+");
+    assert_non_null(image);
+
+    disk = diskOpen(image, 0);
+    assert_non_null(disk);
+    assert_int_equal(imdIsWriteLocked(disk), 1);
+
+    memset(expected_buffer, 0xA5, sizeof(expected_buffer));
+    memset(read_buffer, 0, sizeof(read_buffer));
+    assert_int_equal(sectRead(disk, 0, 0, 1, read_buffer, sizeof(read_buffer),
+                              &flags, &readlen),
+                     SCPE_OK);
+    assert_int_equal(readlen, sizeof(read_buffer));
+    assert_true((flags & IMD_DISK_IO_COMPRESSED) != 0);
+    assert_memory_equal(read_buffer, expected_buffer, sizeof(read_buffer));
+
+    flags = 0;
+    readlen = 0;
+    assert_int_equal(sectWrite(disk, 0, 0, 1, read_buffer, sizeof(read_buffer),
+                               &flags, &readlen),
+                     SCPE_IOERR);
+    assert_true((flags & IMD_DISK_IO_ERROR_WPROT) != 0);
+    assert_int_equal(readlen, 0);
+
+    assert_int_equal(diskClose(&disk), SCPE_OK);
+    assert_null(disk);
+    fclose(image);
+}
+
+static void test_sect_write_persists_deleted_address_mark(void **state)
+{
+    uint8_t image_bytes[145];
+    uint8_t write_buffer[128];
+    uint8_t read_buffer[128];
+    struct sim_imd_fixture *fixture = *state;
+    uint32 flags;
+    uint32 readlen;
+    FILE *image;
+    DISK_INFO *disk;
+
+    memset(write_buffer, 0x5A, sizeof(write_buffer));
+
+    memcpy(image_bytes, "IMD test\n\x1A", 10);
+    image_bytes[10] = IMD_MODE_500K_FM;
+    image_bytes[11] = 0x00;
+    image_bytes[12] = 0x00;
+    image_bytes[13] = 0x01;
+    image_bytes[14] = 0x00;
+    image_bytes[15] = 0x01;
+    image_bytes[16] = SECT_RECORD_NORM;
+    memset(&image_bytes[17], 0xE5, 128);
+
+    assert_int_equal(simh_test_write_file(fixture->image_path, image_bytes,
+                                          sizeof(image_bytes)),
+                     0);
+
+    image = fopen(fixture->image_path, "rb+");
+    assert_non_null(image);
+
+    disk = diskOpen(image, 0);
+    assert_non_null(disk);
+
+    flags = IMD_DISK_IO_DELETED_ADDR_MARK;
+    readlen = 0;
+    assert_int_equal(
+        sectWrite(disk, 0, 0, 1, write_buffer, sizeof(write_buffer), &flags,
+                  &readlen),
+        SCPE_OK);
+    assert_int_equal(readlen, sizeof(write_buffer));
+
+    memset(read_buffer, 0, sizeof(read_buffer));
+    flags = 0;
+    readlen = 0;
+    assert_int_equal(sectRead(disk, 0, 0, 1, read_buffer, sizeof(read_buffer),
+                              &flags, &readlen),
+                     SCPE_OK);
+    assert_int_equal(readlen, sizeof(read_buffer));
+    assert_true((flags & IMD_DISK_IO_DELETED_ADDR_MARK) != 0);
+    assert_memory_equal(read_buffer, write_buffer, sizeof(read_buffer));
+
+    assert_int_equal(diskClose(&disk), SCPE_OK);
+    assert_null(disk);
+    fclose(image);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -170,6 +269,12 @@ int main(void)
                                         teardown_sim_imd_fixture),
         cmocka_unit_test_setup_teardown(
             test_disk_open_reads_minimal_single_sector_image,
+            setup_sim_imd_fixture, teardown_sim_imd_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_disk_open_reads_compressed_sector_and_write_protects,
+            setup_sim_imd_fixture, teardown_sim_imd_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sect_write_persists_deleted_address_mark,
             setup_sim_imd_fixture, teardown_sim_imd_fixture),
     };
 

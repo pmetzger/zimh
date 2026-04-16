@@ -30,6 +30,17 @@ static void test_support_reads_fixture(void **state)
     free(data);
 }
 
+static void test_support_joins_paths(void **state)
+{
+    char path[1024];
+
+    (void)state;
+
+    assert_int_equal(
+        simh_test_join_path(path, sizeof(path), "/tmp", "file.txt"), 0);
+    assert_string_equal(path, "/tmp/file.txt");
+}
+
 static void test_support_temp_dir_round_trip(void **state)
 {
     char dir_path[1024];
@@ -47,10 +58,9 @@ static void test_support_temp_dir_round_trip(void **state)
     assert_int_equal(stat(dir_path, &st), 0);
     assert_true(S_ISDIR(st.st_mode));
 
-    assert_int_equal(
-        simh_test_fixture_path(fixture_path, sizeof(fixture_path),
-                               "sample.txt"),
-        0);
+    assert_int_equal(simh_test_fixture_path(fixture_path, sizeof(fixture_path),
+                                            "sample.txt"),
+                     0);
     assert_int_equal(simh_test_read_fixture("sample.txt", &data, &size), 0);
 
     length = snprintf(output_path, sizeof(output_path), "%s/%s", dir_path,
@@ -66,11 +76,35 @@ static void test_support_temp_dir_round_trip(void **state)
     assert_int_not_equal(stat(dir_path, &st), 0);
 }
 
+static void test_support_initializes_device_and_unit(void **state)
+{
+    DEVICE device;
+    UNIT unit;
+
+    (void)state;
+
+    simh_test_init_device_unit(&device, &unit, "DEV", "DEV0", DEV_CARD,
+                               UNIT_ATTABLE | UNIT_ROABLE, 16, 2);
+
+    assert_string_equal(device.name, "DEV");
+    assert_ptr_equal(device.units, &unit);
+    assert_int_equal(device.numunits, 1);
+    assert_int_equal(device.flags, DEV_CARD);
+    assert_int_equal(device.dwidth, 16);
+    assert_int_equal(device.aincr, 2);
+    assert_true((unit.flags & UNIT_ATTABLE) != 0);
+    assert_true((unit.flags & UNIT_ROABLE) != 0);
+    assert_string_equal(unit.uname, "DEV0");
+    assert_ptr_equal(unit.dptr, &device);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_support_reads_fixture),
+        cmocka_unit_test(test_support_joins_paths),
         cmocka_unit_test(test_support_temp_dir_round_trip),
+        cmocka_unit_test(test_support_initializes_device_and_unit),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

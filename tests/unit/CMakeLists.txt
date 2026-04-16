@@ -39,3 +39,19 @@ add_unit_test(unit-scp-size
     INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/support
 )
+
+add_unit_test(unit-scp-parse
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_unit_scp_parse.c
+    INCLUDES
+        ${CMAKE_CURRENT_SOURCE_DIR}/support
+)
+
+add_unit_test(unit-scp-unit
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_unit_scp_unit.c
+    INCLUDES
+        ${CMAKE_CURRENT_SOURCE_DIR}/support
+)

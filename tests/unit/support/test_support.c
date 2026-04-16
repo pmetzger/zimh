@@ -9,8 +9,9 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-static int join_path(char *buffer, size_t buffer_size, const char *base,
-                     const char *relative_path)
+/* Build one filesystem path from a base directory and relative leaf. */
+int simh_test_join_path(char *buffer, size_t buffer_size, const char *base,
+                        const char *relative_path)
 {
     int written;
 
@@ -71,17 +72,39 @@ const char *simh_test_binary_root(void)
     return SIMH_TEST_BINARY_ROOT;
 }
 
+/* Initialize a minimal one-unit device for host-side common-code tests. */
+void simh_test_init_device_unit(DEVICE *device, UNIT *unit,
+                                const char *dev_name,
+                                const char *unit_name, uint32 dev_flags,
+                                uint32 unit_flags, uint32 dwidth,
+                                uint32 aincr)
+{
+    memset(device, 0, sizeof(*device));
+    memset(unit, 0, sizeof(*unit));
+
+    unit->flags = unit_flags;
+    unit->uname = (char *)unit_name;
+    unit->dptr = device;
+
+    device->name = dev_name;
+    device->units = unit;
+    device->numunits = 1;
+    device->flags = dev_flags;
+    device->dwidth = dwidth;
+    device->aincr = aincr;
+}
+
 int simh_test_fixture_path(char *buffer, size_t buffer_size,
                            const char *relative_path)
 {
     char base[PATH_MAX];
 
-    if (join_path(base, sizeof(base), simh_test_source_root(),
-                  "tests/unit/fixtures") != 0) {
+    if (simh_test_join_path(base, sizeof(base), simh_test_source_root(),
+                            "tests/unit/fixtures") != 0) {
         return -1;
     }
 
-    return join_path(buffer, buffer_size, base, relative_path);
+    return simh_test_join_path(buffer, buffer_size, base, relative_path);
 }
 
 int simh_test_make_temp_dir(char *buffer, size_t buffer_size,

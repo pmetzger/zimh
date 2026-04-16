@@ -67,6 +67,11 @@ Current helpers:
   Return the repository source root used for the current test build.
 - `simh_test_binary_root`
   Return the CMake build directory for the current test build.
+- `simh_test_init_device_unit`
+  Initialize a minimal one-unit `DEVICE`/`UNIT` pair for common-source
+  tests.
+- `simh_test_join_path`
+  Build one filesystem path from a base directory and relative leaf.
 - `simh_test_fixture_path`
   Build a full path to a file under `tests/unit/fixtures/`.
 - `simh_test_make_temp_dir`

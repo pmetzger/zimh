@@ -23,35 +23,6 @@ struct sim_card_fixture {
     DEVICE punch_dev;
 };
 
-static void init_card_device(DEVICE *device, UNIT *unit, const char *dev_name,
-                             const char *unit_name, uint32 flags)
-{
-    memset(device, 0, sizeof(*device));
-    memset(unit, 0, sizeof(*unit));
-
-    unit->flags = UNIT_ATTABLE | flags;
-    unit->uname = (char *)unit_name;
-    unit->dptr = device;
-
-    device->name = dev_name;
-    device->units = unit;
-    device->numunits = 1;
-    device->flags = DEV_CARD;
-}
-
-static int make_path(char *buffer, size_t buffer_size, const char *dir_path,
-                     const char *leaf_name)
-{
-    int length;
-
-    length = snprintf(buffer, buffer_size, "%s/%s", dir_path, leaf_name);
-    if (length < 0 || (size_t)length >= buffer_size) {
-        return -1;
-    }
-
-    return 0;
-}
-
 static int setup_sim_card_fixture(void **state)
 {
     struct sim_card_fixture *fixture;
@@ -64,18 +35,21 @@ static int setup_sim_card_fixture(void **state)
                                              sizeof(fixture->temp_dir),
                                              "sim-card"),
                      0);
-    assert_int_equal(make_path(fixture->input_path, sizeof(fixture->input_path),
-                               fixture->temp_dir, "input.deck"),
+    assert_int_equal(simh_test_join_path(fixture->input_path,
+                                         sizeof(fixture->input_path),
+                                         fixture->temp_dir, "input.deck"),
                      0);
-    assert_int_equal(make_path(fixture->output_path,
-                               sizeof(fixture->output_path), fixture->temp_dir,
-                               "output.deck"),
+    assert_int_equal(simh_test_join_path(fixture->output_path,
+                                         sizeof(fixture->output_path),
+                                         fixture->temp_dir, "output.deck"),
                      0);
 
-    init_card_device(&fixture->reader_dev, &fixture->reader_unit, "RDR", "RDR",
-                     UNIT_RO | MODE_TEXT);
-    init_card_device(&fixture->punch_dev, &fixture->punch_unit, "PUN", "PUN",
-                     MODE_TEXT);
+    simh_test_init_device_unit(&fixture->reader_dev, &fixture->reader_unit,
+                               "RDR", "RDR", DEV_CARD,
+                               UNIT_ATTABLE | UNIT_RO | MODE_TEXT, 0, 0);
+    simh_test_init_device_unit(&fixture->punch_dev, &fixture->punch_unit,
+                               "PUN", "PUN", DEV_CARD,
+                               UNIT_ATTABLE | MODE_TEXT, 0, 0);
 
     simh_test_reset_simulator_state();
     assert_int_equal(simh_test_set_sim_name("simbase-unit-sim-card"), 0);
