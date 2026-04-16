@@ -55,3 +55,11 @@ add_unit_test(unit-scp-unit
     INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}/support
 )
+
+add_unit_test(unit-scp-context
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_unit_scp_context.c
+    INCLUDES
+        ${CMAKE_CURRENT_SOURCE_DIR}/support
+)

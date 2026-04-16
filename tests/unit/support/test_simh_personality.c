@@ -22,6 +22,11 @@ void simh_test_reset_simulator_state(void)
     memcpy(sim_name, "simbase-unit", sizeof("simbase-unit"));
     memset(sim_stop_messages, 0, sizeof(sim_stop_messages));
     sim_emax = 0;
+    sim_dfdev = NULL;
+    sim_dfunit = NULL;
+    free(sim_internal_devices);
+    sim_internal_devices = NULL;
+    sim_internal_device_count = 0;
 }
 
 int simh_test_set_sim_name(const char *name)
