@@ -1,12 +1,19 @@
+# C style with BSD/KNF influence, but spaces instead of tabs.
 BasedOnStyle: LLVM
 Language: C
 IndentWidth: 4
 UseTab: Never
 ColumnLimit: 80
-BreakBeforeBraces: Attach
+
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterFunction: true
+  AfterControlStatement: Never
+
 SpaceBeforeParens: ControlStatements
 PointerAlignment: Right
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 AllowShortFunctionsOnASingleLine: Empty
 SortIncludes: false
+IndentCaseLabels: false
