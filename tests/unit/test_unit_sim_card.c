@@ -10,52 +10,8 @@
 #include "sim_defs.h"
 #include "scp.h"
 #include "sim_card.h"
+#include "test_simh_personality.h"
 #include "test_support.h"
-
-/* Minimal simulator personality required by scp.c/sim_card.c. */
-DEVICE *sim_devices[] = {NULL};
-REG *sim_PC = NULL;
-char sim_name[64] = "simbase-unit";
-const char *sim_stop_messages[SCPE_BASE] = {0};
-int32 sim_emax = 0;
-
-t_stat sim_instr(void)
-{
-    return SCPE_OK;
-}
-
-t_stat sim_load(FILE *ptr, CONST char *cptr, CONST char *fnam, int flag)
-{
-    (void)ptr;
-    (void)cptr;
-    (void)fnam;
-    (void)flag;
-
-    return SCPE_OK;
-}
-
-t_stat fprint_sym(FILE *ofile, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
-{
-    (void)ofile;
-    (void)addr;
-    (void)val;
-    (void)uptr;
-    (void)sw;
-
-    return SCPE_OK;
-}
-
-t_stat parse_sym(CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val,
-                 int32 sw)
-{
-    (void)cptr;
-    (void)addr;
-    (void)uptr;
-    (void)val;
-    (void)sw;
-
-    return SCPE_OK;
-}
 
 struct sim_card_fixture {
     char temp_dir[1024];
@@ -99,6 +55,7 @@ static int make_path(char *buffer, size_t buffer_size, const char *dir_path,
 static int setup_sim_card_fixture(void **state)
 {
     struct sim_card_fixture *fixture;
+    DEVICE *devices[3];
 
     fixture = calloc(1, sizeof(*fixture));
     assert_non_null(fixture);
@@ -119,6 +76,14 @@ static int setup_sim_card_fixture(void **state)
                      UNIT_RO | MODE_TEXT);
     init_card_device(&fixture->punch_dev, &fixture->punch_unit, "PUN", "PUN",
                      MODE_TEXT);
+
+    simh_test_reset_simulator_state();
+    assert_int_equal(simh_test_set_sim_name("simbase-unit-sim-card"), 0);
+
+    devices[0] = &fixture->reader_dev;
+    devices[1] = &fixture->punch_dev;
+    devices[2] = NULL;
+    assert_int_equal(simh_test_set_devices(devices), 0);
 
     *state = fixture;
     return 0;

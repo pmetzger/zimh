@@ -56,7 +56,10 @@ add_unit_test(unit-support
 ## Support Library
 
 The shared support library is `simh_unit_support`. Its public interface
-is declared in `tests/unit/support/test_support.h`.
+is declared in:
+
+- `tests/unit/support/test_support.h`
+- `tests/unit/support/test_simh_personality.h`
 
 Current helpers:
 
@@ -78,6 +81,14 @@ Current helpers:
   Compare two files byte-for-byte.
 - `simh_test_remove_path`
   Remove a file or recursively remove a directory tree.
+- `simh_test_reset_simulator_state`
+  Reset the minimal shared simulator personality used by common-source
+  tests.
+- `simh_test_set_sim_name`
+  Set the shared simulator name used by the test personality.
+- `simh_test_set_devices`
+  Install a null-terminated device list for tests that need shared SCP
+  code to see a simulator device table.
 
 These helpers are intentionally simple. Add to them as new unit tests
 need stable infrastructure.

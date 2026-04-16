@@ -1,5 +1,6 @@
 add_library(simh_unit_support STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/test_support.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_simh_personality.c
 )
 
 set_target_properties(simh_unit_support PROPERTIES
@@ -8,6 +9,8 @@ set_target_properties(simh_unit_support PROPERTIES
 
 target_include_directories(simh_unit_support PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${SIMH_CORE_ROOT}
+    ${SIMH_RUNTIME_ROOT}
 )
 
 target_compile_definitions(simh_unit_support PRIVATE
