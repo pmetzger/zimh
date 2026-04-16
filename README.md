@@ -1,27 +1,28 @@
-# Zeerust Historical Computer Simulator
+# ZIMH Historical Computer Simulator
 
-Zeerust is a software emulator for important classic computer
-systems and peripherals. It provides a mechanism by which modern users
-can run and experience what it was like to run historical software on
-old computers that have not been made in many decades.
+ZIMH, the Zeerust Infrastructure for Machine History, is a software
+emulator for important classic computer systems and peripherals. It
+provides a mechanism by which modern users can run and experience what
+it was like to run historical software on old computers that have not
+been made in many decades.
 
-Zeerust is a hard fork of SIMH, a simulator created by Bob Supnik and
+ZIMH is a hard fork of SIMH, a simulator created by Bob Supnik and
 extended over many years by the SIMH team. We are grateful to Bob and
 the SIMH contributors for all of their work over the years. Without
 their efforts, none of this would be possible.
 
-(If you are curious about where the name Zeerust comes from, it's a
-neologism for something that seemed futuristic in the past, but it
-also invokes the Rust programming language a bit. See the
-[zeerust page](https://tvtropes.org/pmwiki/pmwiki.php/Main/Zeerust)
-on the TV Tropes Wiki for more. Thanks to Eric Raymond for suggesting
+(The project name "ZIMH" stands for "Zeerust Infrastructure for
+Machine History". "Zeerust" is a neologism for something that seemed
+futuristic in the past, but it also invokes the Rust programming
+language a bit. See the
+[zeerust page](https://tvtropes.org/pmwiki/pmwiki.php/Main/Zeerust) on
+the TV Tropes Wiki for more. Thanks to Eric Raymond for suggesting
 it.)
 
-Although Zeerust is also intended to provide simulators to allow
-people to experience and run historical software from computing's
-past, the development track of Zeerust is substantially different from
-those of the original SIMH project. In particular, this project is
-pursuing:
+Although ZIMH is also intended to provide simulators to allow people
+to experience and run historical software from computing's past, the
+development track of ZIMH is substantially different from that of the
+original SIMH project. In particular, this project is pursuing:
 
 - A much higher velocity of development
 - An extensive, automated, in-tree test suite sufficient to allow for
@@ -37,7 +38,7 @@ pursuing:
 Conversations with the upstream team indicated that they would almost
 certainly not be interested in adopting the kinds of changes planned
 here. Accordingly, this fork is being developed independently and we
-have changed the name of the project.
+have changed the name of the project to ZIMH.
 
 This project is made available under the MIT license; see
 [LICENSE.txt](LICENSE.txt) for details.
