@@ -19,8 +19,22 @@ struct sim_tape_fixture {
     UNIT unit;
     DEVICE *devices[2];
     char temp_dir[1024];
+    char original_cwd[1024];
     char tape_path[1024];
 };
+
+struct sim_tape_capture {
+    struct sim_tape_fixture *fixture;
+    t_stat status;
+};
+
+struct sim_tape_callback_state {
+    UNIT *unit;
+    t_stat status;
+    unsigned calls;
+};
+
+static struct sim_tape_callback_state *active_tape_callback_state;
 
 static int setup_sim_tape_fixture(void **state)
 {
@@ -39,6 +53,8 @@ static int setup_sim_tape_fixture(void **state)
                                              sizeof(fixture->temp_dir),
                                              "sim-tape"),
                      0);
+    assert_non_null(
+        getcwd(fixture->original_cwd, sizeof(fixture->original_cwd)));
     assert_int_equal(simh_test_join_path(fixture->tape_path,
                                          sizeof(fixture->tape_path),
                                          fixture->temp_dir, "sample.tap"),
@@ -58,6 +74,7 @@ static int teardown_sim_tape_fixture(void **state)
 
     if (fixture->unit.flags & UNIT_ATT)
         assert_int_equal(sim_tape_detach(&fixture->unit), SCPE_OK);
+    assert_int_equal(chdir(fixture->original_cwd), 0);
     assert_int_equal(simh_test_remove_path(fixture->temp_dir), 0);
     simh_test_reset_simulator_state();
     free(fixture);
@@ -90,6 +107,42 @@ static void assert_tape_record_equals(const uint8 *actual, t_mtrlnt actual_len,
 {
     assert_int_equal(actual_len, expected_len);
     assert_memory_equal(actual, expected, expected_len);
+}
+
+static void assert_string_contains(const char *haystack, const char *needle)
+{
+    assert_non_null(strstr(haystack, needle));
+}
+
+static void record_tape_callback(UNIT *unit, t_stat status)
+{
+    assert_non_null(active_tape_callback_state);
+    active_tape_callback_state->unit = unit;
+    active_tape_callback_state->status = status;
+    active_tape_callback_state->calls += 1;
+}
+
+static void reset_tape_callback_state(struct sim_tape_callback_state *state)
+{
+    memset(state, 0, sizeof(*state));
+}
+
+static void assert_tape_callback(struct sim_tape_callback_state *state,
+                                 UNIT *unit, t_stat status)
+{
+    assert_int_equal(state->calls, 1);
+    assert_ptr_equal(state->unit, unit);
+    assert_int_equal(state->status, status);
+    reset_tape_callback_state(state);
+}
+
+static void write_sim_tape_self_test_output(void *context)
+{
+    struct sim_tape_capture *capture = context;
+
+    assert_int_equal(chdir(capture->fixture->temp_dir), 0);
+    capture->status = sim_tape_test(&capture->fixture->device, NULL);
+    assert_int_equal(chdir(capture->fixture->original_cwd), 0);
 }
 
 /* Verify the BOT/EOT/write-protect predicates track format, position,
@@ -226,6 +279,169 @@ test_sim_tape_error_text_covers_named_and_generic_errors(void **state)
     assert_string_equal(sim_tape_error_text(MTSE_WRP), "write protected");
     assert_string_equal(sim_tape_error_text(MTSE_RUNAWAY), "tape runaway");
     assert_string_equal(sim_tape_error_text(MTSE_MAX_ERR + 5), "Error 16");
+}
+
+/* Verify attach-help text mentions the major switches, ANSI formats,
+   and example commands. */
+static void test_sim_tape_attach_help_describes_supported_usage(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+    FILE *stream;
+    char *text;
+    size_t size;
+
+    stream = tmpfile();
+    assert_non_null(stream);
+
+    assert_int_equal(
+        sim_tape_attach_help(stream, &fixture->device, &fixture->unit, 0, NULL),
+        SCPE_OK);
+    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    assert_string_contains(text, "TAPE Tape Attach Help");
+    assert_string_contains(text, "-F          Open the indicated tape");
+    assert_string_contains(text, "ANSI-VMS, ANSI-RT11");
+    assert_string_contains(text, "sim> ATTACH TAPE -F DOS11");
+
+    free(text);
+    fclose(stream);
+}
+
+/* Verify the built-in sim_tape self-test succeeds in a temporary
+   workspace and reports the API test run. */
+static void test_sim_tape_self_test_succeeds(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+    struct sim_tape_capture capture = {fixture, SCPE_IERR};
+    char *text;
+    size_t size;
+    char generated_path[1024];
+
+    assert_int_equal(simh_test_capture_stdout(write_sim_tape_self_test_output,
+                                              &capture, &text, &size),
+                     0);
+    assert_int_equal(capture.status, SCPE_OK);
+    assert_int_equal(simh_test_join_path(generated_path, sizeof(generated_path),
+                                         fixture->temp_dir, "TapeTestFile1"),
+                     0);
+    assert_true(access(generated_path, F_OK) != 0);
+    free(text);
+}
+
+/* Verify the built-in sim_tape self-test rejects attached units rather
+   than mutating live tape state. */
+static void test_sim_tape_self_test_rejects_attached_units(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+
+    assert_int_equal(sim_tape_attach(&fixture->unit, fixture->tape_path),
+                     SCPE_OK);
+    assert_int_equal(SCPE_BARE_STATUS(sim_tape_test(&fixture->device, NULL)),
+                     SCPE_ALATT);
+}
+
+/* Verify the synchronous callback wrappers return the same status as the
+   base APIs and report it via the supplied callback. */
+static void test_sim_tape_callback_wrappers_report_sync_status(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+    struct sim_tape_callback_state callback_state;
+    uint8 first_record[] = {0x61, 0x62, 0x63};
+    uint8 second_record[] = {0x71, 0x72};
+    uint8 read_buffer[16] = {0};
+    t_mtrlnt record_length;
+    uint32 files_skipped;
+    uint32 records_skipped;
+    uint32 objects_skipped;
+
+    active_tape_callback_state = &callback_state;
+    reset_tape_callback_state(&callback_state);
+
+    assert_int_equal(sim_tape_attach(&fixture->unit, fixture->tape_path),
+                     SCPE_OK);
+    assert_int_equal(
+        sim_tape_set_dens(&fixture->unit, MT_DENS_1600, NULL, NULL), SCPE_OK);
+
+    assert_int_equal(sim_tape_wrgap_a(&fixture->unit, 0, record_tape_callback),
+                     MTSE_OK);
+    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
+
+    assert_int_equal(sim_tape_wrrecf_a(&fixture->unit, first_record,
+                                       sizeof(first_record),
+                                       record_tape_callback),
+                     MTSE_OK);
+    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
+
+    assert_int_equal(sim_tape_wrtmk_a(&fixture->unit, record_tape_callback),
+                     MTSE_OK);
+    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
+
+    assert_int_equal(sim_tape_wrrecf_a(&fixture->unit, second_record,
+                                       sizeof(second_record),
+                                       record_tape_callback),
+                     MTSE_OK);
+    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
+
+    assert_int_equal(sim_tape_rewind_a(&fixture->unit, record_tape_callback),
+                     MTSE_OK);
+    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
+
+    assert_int_equal(sim_tape_rdrecf_a(&fixture->unit, read_buffer,
+                                       &record_length, sizeof(read_buffer),
+                                       record_tape_callback),
+                     MTSE_OK);
+    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
+    assert_tape_record_equals(read_buffer, record_length, first_record,
+                              sizeof(first_record));
+
+    assert_int_equal(sim_tape_spfilebyrecf_a(&fixture->unit, 1, &files_skipped,
+                                             &records_skipped, FALSE,
+                                             record_tape_callback),
+                     MTSE_OK);
+    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
+    assert_int_equal(files_skipped, 1);
+    assert_int_equal(records_skipped, 0);
+
+    memset(read_buffer, 0, sizeof(read_buffer));
+    assert_int_equal(sim_tape_rdrecf_a(&fixture->unit, read_buffer,
+                                       &record_length, sizeof(read_buffer),
+                                       record_tape_callback),
+                     MTSE_TMK);
+    assert_tape_callback(&callback_state, &fixture->unit, MTSE_TMK);
+    assert_int_equal(record_length, 0);
+
+    memset(read_buffer, 0, sizeof(read_buffer));
+    assert_int_equal(sim_tape_rdrecf_a(&fixture->unit, read_buffer,
+                                       &record_length, sizeof(read_buffer),
+                                       record_tape_callback),
+                     MTSE_OK);
+    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
+    assert_tape_record_equals(read_buffer, record_length, second_record,
+                              sizeof(second_record));
+
+    assert_int_equal(sim_tape_spfilebyrecr_a(&fixture->unit, 1, &files_skipped,
+                                             &records_skipped,
+                                             record_tape_callback),
+                     MTSE_OK);
+    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
+    assert_int_equal(files_skipped, 1);
+    assert_int_equal(records_skipped, 1);
+
+    assert_int_equal(
+        sim_tape_position_a(&fixture->unit, MTPOS_M_REW | MTPOS_M_OBJ, 3,
+                            &records_skipped, 0, &files_skipped,
+                            &objects_skipped, record_tape_callback),
+        MTSE_OK);
+    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
+    assert_int_equal(records_skipped, 0);
+    assert_int_equal(files_skipped, 0);
+    assert_int_equal(objects_skipped, 3);
+
+    assert_int_equal(sim_tape_wreomrw_a(&fixture->unit, record_tape_callback),
+                     MTSE_OK);
+    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
+    assert_true(sim_tape_bot(&fixture->unit));
+
+    active_tape_callback_state = NULL;
 }
 
 /* Verify a standard tape image can be attached, written, rewound, and
@@ -423,6 +639,82 @@ static void test_sim_tape_position_tracks_objects_and_files(void **state)
     assert_int_equal(record_length, 0);
 }
 
+/* Verify direct file-spacing reports both file and record counts and
+   detects logical end of tape on a double tape mark. */
+static void test_sim_tape_spfilebyrecf_reports_counts_and_leot(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+    uint8 first_record[] = {0x0A, 0x0B};
+    uint8 read_buffer[16] = {0};
+    t_mtrlnt record_length;
+    uint32 files_skipped;
+    uint32 records_skipped;
+
+    assert_int_equal(sim_tape_attach(&fixture->unit, fixture->tape_path),
+                     SCPE_OK);
+    assert_int_equal(
+        sim_tape_wrrecf(&fixture->unit, first_record, sizeof(first_record)),
+        MTSE_OK);
+    assert_int_equal(sim_tape_wrtmk(&fixture->unit), MTSE_OK);
+    assert_int_equal(sim_tape_wrtmk(&fixture->unit), MTSE_OK);
+    assert_int_equal(sim_tape_rewind(&fixture->unit), MTSE_OK);
+
+    assert_int_equal(sim_tape_spfilebyrecf(&fixture->unit, 1, &files_skipped,
+                                           &records_skipped, FALSE),
+                     MTSE_OK);
+    assert_int_equal(files_skipped, 1);
+    assert_int_equal(records_skipped, 1);
+
+    memset(read_buffer, 0, sizeof(read_buffer));
+    assert_int_equal(sim_tape_rdrecf(&fixture->unit, read_buffer,
+                                     &record_length, sizeof(read_buffer)),
+                     MTSE_TMK);
+    assert_int_equal(record_length, 0);
+
+    assert_int_equal(sim_tape_rewind(&fixture->unit), MTSE_OK);
+    assert_int_equal(sim_tape_spfilebyrecf(&fixture->unit, 2, &files_skipped,
+                                           &records_skipped, TRUE),
+                     MTSE_LEOT);
+    assert_int_equal(files_skipped, 1);
+    assert_int_equal(records_skipped, 1);
+}
+
+/* Verify reverse file-spacing reports both file and record counts and
+   leaves the unit positioned at the preceding file boundary. */
+static void test_sim_tape_spfilebyrecr_reports_counts(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+    uint8 first_record[] = {0x31, 0x32};
+    uint8 second_record[] = {0x41, 0x42, 0x43};
+    uint8 read_buffer[16] = {0};
+    t_mtrlnt record_length;
+    uint32 files_skipped;
+    uint32 records_skipped;
+
+    assert_int_equal(sim_tape_attach(&fixture->unit, fixture->tape_path),
+                     SCPE_OK);
+    assert_int_equal(
+        sim_tape_wrrecf(&fixture->unit, first_record, sizeof(first_record)),
+        MTSE_OK);
+    assert_int_equal(sim_tape_wrtmk(&fixture->unit), MTSE_OK);
+    assert_int_equal(
+        sim_tape_wrrecf(&fixture->unit, second_record, sizeof(second_record)),
+        MTSE_OK);
+
+    assert_int_equal(sim_tape_spfilebyrecr(&fixture->unit, 1, &files_skipped,
+                                           &records_skipped),
+                     MTSE_OK);
+    assert_int_equal(files_skipped, 1);
+    assert_int_equal(records_skipped, 1);
+
+    memset(read_buffer, 0, sizeof(read_buffer));
+    assert_int_equal(sim_tape_rdrecr(&fixture->unit, read_buffer,
+                                     &record_length, sizeof(read_buffer)),
+                     MTSE_OK);
+    assert_tape_record_equals(read_buffer, record_length, first_record,
+                              sizeof(first_record));
+}
+
 /* Verify write-EOM-and-rewind leaves the unit rewound and makes the
    newly written EOM visible after the existing data. */
 static void test_sim_tape_wreomrw_writes_eom_and_rewinds(void **state)
@@ -476,6 +768,48 @@ static void test_sim_tape_reset_clears_pnu_without_detaching(void **state)
     assert_int_equal(fixture->unit.pos, saved_pos);
 }
 
+/* Verify erase-gap and erase-record operations modify standard tapes in
+   the expected direction-sensitive ways. */
+static void test_sim_tape_gap_and_erase_operations_modify_records(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+    uint8 first_record[] = {0x21, 0x22, 0x23};
+    uint8 second_record[] = {0x51, 0x52};
+    uint8 read_buffer[16] = {0};
+    t_mtrlnt record_length;
+
+    assert_int_equal(sim_tape_attach(&fixture->unit, fixture->tape_path),
+                     SCPE_OK);
+    assert_int_equal(sim_tape_wrgap(&fixture->unit, 1), MTSE_IOERR);
+    assert_int_equal(
+        sim_tape_set_dens(&fixture->unit, MT_DENS_1600, NULL, NULL), SCPE_OK);
+    assert_int_equal(sim_tape_wrgap(&fixture->unit, 0), MTSE_OK);
+
+    assert_int_equal(
+        sim_tape_wrrecf(&fixture->unit, first_record, sizeof(first_record)),
+        MTSE_OK);
+    assert_int_equal(
+        sim_tape_wrrecf(&fixture->unit, second_record, sizeof(second_record)),
+        MTSE_OK);
+    assert_int_equal(sim_tape_rewind(&fixture->unit), MTSE_OK);
+
+    assert_int_equal(sim_tape_errecf(&fixture->unit, sizeof(first_record)),
+                     MTSE_OK);
+    assert_int_equal(sim_tape_rdrecf(&fixture->unit, read_buffer,
+                                     &record_length, sizeof(read_buffer)),
+                     MTSE_OK);
+    assert_tape_record_equals(read_buffer, record_length, second_record,
+                              sizeof(second_record));
+
+    assert_int_equal(sim_tape_errecr(&fixture->unit, sizeof(second_record)),
+                     MTSE_OK);
+    assert_int_equal(sim_tape_rewind(&fixture->unit), MTSE_OK);
+    assert_int_equal(sim_tape_rdrecf(&fixture->unit, read_buffer,
+                                     &record_length, sizeof(read_buffer)),
+                     MTSE_RUNAWAY);
+    assert_int_equal(record_length, 0);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -494,12 +828,30 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_sim_tape_density_helpers_validate_and_render,
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_attach_help_describes_supported_usage,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(test_sim_tape_self_test_succeeds,
+                                        setup_sim_tape_fixture,
+                                        teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_self_test_rejects_attached_units,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_callback_wrappers_report_sync_status,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(test_sim_tape_standard_image_round_trip,
                                         setup_sim_tape_fixture,
                                         teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_tape_spacing_and_reverse_reads_work,
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_spfilebyrecf_reports_counts_and_leot,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_spfilebyrecr_reports_counts, setup_sim_tape_fixture,
+            teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_tape_position_tracks_objects_and_files,
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
@@ -508,6 +860,9 @@ int main(void)
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_tape_reset_clears_pnu_without_detaching,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_gap_and_erase_operations_modify_records,
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(test_sim_tape_operational_error_paths,
                                         setup_sim_tape_fixture,
