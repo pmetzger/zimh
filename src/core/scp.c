@@ -2730,7 +2730,11 @@ return 0;
 
 t_stat process_stdin_commands (t_stat stat, char *argv[], t_bool do_called);
 
-/* Main command loop */
+/* Main command loop.
+
+   The process entrypoint lives in main.c so that scp.c can be linked
+   into host-side unit tests without dragging in a conflicting main().
+*/
 
 int scp_main (int argc, char *argv[])
 {
