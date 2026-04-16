@@ -255,4 +255,27 @@
 #define T(level, text) #level " " #text "\n"
 #define L(text) " " #text "\n"
 
+/* Generic SCP and device-help output helpers. */
+void fprint_help (FILE *st);
+void fprint_reg_help (FILE *st, DEVICE *dptr);
+void fprint_reg_help_ex (FILE *st, DEVICE *dptr, t_bool silent);
+void fprint_attach_help_ex (FILE *st, DEVICE *dptr, t_bool silent);
+void fprint_set_help (FILE *st, DEVICE *dptr);
+void fprint_set_help_ex (FILE *st, DEVICE *dptr, t_bool silent);
+void fprint_show_help (FILE *st, DEVICE *dptr);
+void fprint_show_help_ex (FILE *st, DEVICE *dptr, t_bool silent);
+void fprint_brk_help_ex (FILE *st, DEVICE *dptr, t_bool silent);
+t_stat help_dev_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
+    const char *cptr);
+
+/* Structured help entry points. */
+t_stat scp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
+    const char *help, const char *cptr, ...);
+t_stat scp_vhelp (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
+    const char *help, const char *cptr, va_list ap);
+t_stat scp_helpFromFile (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
+    const char *helpfile, const char *cptr, ...);
+t_stat scp_vhelpFromFile (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
+    const char *helpfile, const char *cptr, va_list ap);
+
 #endif

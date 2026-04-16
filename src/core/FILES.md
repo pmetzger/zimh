@@ -23,11 +23,23 @@ This is the umbrella public header for the simulator control program. It
 collects the shared SCP-facing interface and includes the narrower SCP
 helper headers.
 
+## `scp_breakpoint.c` and `scp_breakpoint.h`
+
+These files own SCP's breakpoint subsystem: breakpoint-table management,
+pending breakpoint actions, and the shared breakpoint status consumed by
+simulators and the command layer.
+
 ## `scp_context.c` and `scp_context.h`
 
 These files own simulator-context and lookup support extracted from
 `scp.c`: device and unit naming, name lookup, internal-device
 registration, and default-context bookkeeping.
+
+## `scp_expect.c` and `scp_expect.h`
+
+These files own the SCP expect/send subsystem: SEND and EXPECT command
+handling, queued injected input, expect-rule matching, and the internal
+device used to stop simulation when an expect rule fires.
 
 ## `scp_expr.c` and `scp_expr.h`
 
@@ -35,10 +47,11 @@ These files own SCP's shared expression parser and evaluator, including
 the infix-to-postfix conversion and the expression-specific temporary
 state needed while commands are being interpreted.
 
-## `scp_help.h`
+## `scp_help.c` and `scp_help.h`
 
-This header defines the structured help-text format used by SCP and by
-devices that participate in the hierarchical help system.
+These files own SCP's shared help runtime: the generic `HELP` output,
+device-help rendering, and the structured hierarchical help parser used
+by SCP and by devices that participate in that help system.
 
 ## `scp_parse.c` and `scp_parse.h`
 

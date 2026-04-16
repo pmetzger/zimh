@@ -1,0 +1,66 @@
+/* scp_expect.h: SCP expect/send subsystem interfaces
+
+   This header collects the public command and helper interfaces for the
+   SCP expect/send subsystem.  The implementation manages queued console
+   input, expect-match rules, and the internal device used to stop the
+   simulator when an expect rule fires.
+*/
+
+#ifndef SCP_EXPECT_H_
+#define SCP_EXPECT_H_
+
+/* Internal device used to stop simulation when an expect rule matches. */
+extern DEVICE sim_expect_dev;
+
+/* Identify the internal expect trigger unit in generic SCP code. */
+t_bool sim_expect_is_unit(const UNIT *uptr);
+
+/* SCP command entry points for SEND/NOSEND and EXPECT/NOEXPECT. */
+t_stat send_cmd(int32 flag, CONST char *ptr);
+t_stat expect_cmd(int32 flag, CONST char *ptr);
+
+/* SHOW command helpers for queued SEND and EXPECT state. */
+t_stat sim_show_send(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
+                     CONST char *cptr);
+t_stat sim_show_expect(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
+                       CONST char *cptr);
+
+/* Queue data for SEND processing on a console or multiplexer line. */
+t_stat sim_send_input(SEND *snd, uint8 *data, size_t size, uint32 after,
+                      uint32 delay);
+
+/* Display queued SEND state for a console or multiplexer line. */
+t_stat sim_show_send_input(FILE *st, const SEND *snd);
+
+/* Poll queued SEND state and return one pending character when available. */
+t_bool sim_send_poll_data(SEND *snd, t_stat *stat);
+
+/* Clear queued SEND data for a console or multiplexer line. */
+t_stat sim_send_clear(SEND *snd);
+
+/* Parse an EXPECT command and install a rule in the target context. */
+t_stat sim_set_expect(EXPECT *exp, CONST char *cptr);
+
+/* Parse a NOEXPECT command and remove rules from the target context. */
+t_stat sim_set_noexpect(EXPECT *exp, const char *cptr);
+
+/* Add one expect rule to a target context. */
+t_stat sim_exp_set(EXPECT *exp, const char *match, int32 cnt, uint32 after,
+                   int32 switches, const char *act);
+
+/* Remove expect rules matching one display-format pattern. */
+t_stat sim_exp_clr(EXPECT *exp, const char *match);
+
+/* Remove all expect rules and buffered match state. */
+t_stat sim_exp_clrall(EXPECT *exp);
+
+/* Show expect state for one display-format pattern or all rules. */
+t_stat sim_exp_show(FILE *st, CONST EXPECT *exp, const char *match);
+
+/* Show all expect rules for one context. */
+t_stat sim_exp_showall(FILE *st, const EXPECT *exp);
+
+/* Feed one byte of output to the expect matcher. */
+t_stat sim_exp_check(EXPECT *exp, uint8 data);
+
+#endif

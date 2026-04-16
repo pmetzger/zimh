@@ -40,8 +40,11 @@
 #include "sim_defs.h"
 
 #include "sim_fio.h"
+#include "scp_breakpoint.h"
 #include "scp_context.h"
+#include "scp_expect.h"
 #include "scp_expr.h"
+#include "scp_help.h"
 #include "scp_parse.h"
 #include "scp_size.h"
 #include "scp_unit.h"
@@ -79,7 +82,9 @@ extern "C" {
 #define CMD_OPT_SCH     004                             /* search */
 #define CMD_OPT_DFT     010                             /* defaults */
 
-/* SCP internal debug bit assignments used by extracted helper modules. */
+/* Shared SCP limits and debug-bit assignments used by helper modules. */
+#define MAX_DO_NEST_LVL    20
+#define MAX_WIDTH ((CHAR_BIT * sizeof (t_value) * 4 + 3) / 3)
 #define SIM_DBG_EVENT_NEG   0x80000000
 #define SIM_DBG_EVENT       0x40000000
 #define SIM_DBG_ACTIVATE    0x20000000
@@ -127,8 +132,6 @@ t_stat call_cmd (int32 flag, CONST char *ptr);
 t_stat on_cmd (int32 flag, CONST char *ptr);
 t_stat noop_cmd (int32 flag, CONST char *ptr);
 t_stat assert_cmd (int32 flag, CONST char *ptr);
-t_stat send_cmd (int32 flag, CONST char *ptr);
-t_stat expect_cmd (int32 flag, CONST char *ptr);
 t_stat sleep_cmd (int32 flag, CONST char *ptr);
 t_stat help_cmd (int32 flag, CONST char *ptr);
 t_stat screenshot_cmd (int32 flag, CONST char *ptr);
@@ -211,40 +214,26 @@ t_stat sim_print_val (t_value val, uint32 radix, uint32 width, uint32 format);
 const char *sim_fmt_secs (double seconds);
 const char *sim_fmt_numeric (double number);
 const char *sprint_capac (DEVICE *dptr, UNIT *uptr);
+REG *find_reg_glob (CONST char *ptr, CONST char **optr, DEVICE **gdptr);
 char *read_line (char *cptr, int32 size, FILE *stream);
 char *read_line_p (const char *prompt, char *ptr, int32 size, FILE *stream);
-void fprint_reg_help (FILE *st, DEVICE *dptr);
-void fprint_set_help (FILE *st, DEVICE *dptr);
-void fprint_show_help (FILE *st, DEVICE *dptr);
 CTAB *find_cmd (const char *gbuf);
+CTAB *scp_cmd_table (void);
+const char *scp_argv0 (void);
+t_bool scp_has_oline (void);
 void sim_sub_args (char *in_str, size_t in_str_size, char *do_arg[]);
 const char *_sim_get_env_special(const char *gbuf, char *rbuf,
     size_t rbuf_size);
+const char *sim_unsub_args(const char *cptr);
+t_bool scp_do_echo_enabled(void);
+int32 scp_do_depth(void);
+const char *_get_dbg_verb(uint32 dbits, DEVICE *dptr, UNIT *uptr);
 REG *find_reg (CONST char *ptr, CONST char **optr, DEVICE *dptr);
 CTAB *find_ctab (CTAB *tab, const char *gbuf);
 C1TAB *find_c1tab (C1TAB *tab, const char *gbuf);
 SHTAB *find_shtab (SHTAB *tab, const char *gbuf);
 t_stat get_aval (t_addr addr, DEVICE *dptr, UNIT *uptr);
 t_value get_rval (REG *rptr, uint32 idx);
-BRKTAB *sim_brk_fnd (t_addr loc);
-uint32 sim_brk_test (t_addr bloc, uint32 btyp);
-void sim_brk_clrspc (uint32 spc, uint32 btyp);
-void sim_brk_npc (uint32 cnt);
-void sim_brk_setact (const char *action);
-char *sim_brk_replace_act (char *new_action);
-const char *sim_brk_message(void);
-t_stat sim_send_input (SEND *snd, uint8 *data, size_t size, uint32 after, uint32 delay);
-t_stat sim_show_send_input (FILE *st, const SEND *snd);
-t_bool sim_send_poll_data (SEND *snd, t_stat *stat);
-t_stat sim_send_clear (SEND *snd);
-t_stat sim_set_expect (EXPECT *exp, CONST char *cptr);
-t_stat sim_set_noexpect (EXPECT *exp, const char *cptr);
-t_stat sim_exp_set (EXPECT *exp, const char *match, int32 cnt, uint32 after, int32 switches, const char *act);
-t_stat sim_exp_clr (EXPECT *exp, const char *match);
-t_stat sim_exp_clrall (EXPECT *exp);
-t_stat sim_exp_show (FILE *st, CONST EXPECT *exp, const char *match);
-t_stat sim_exp_showall (FILE *st, const EXPECT *exp);
-t_stat sim_exp_check (EXPECT *exp, uint8 data);
 CONST char *match_ext (CONST char *fnam, const char *ext);
 int sim_cmp_string (const char *s1, const char *s2);
 t_stat show_version (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
@@ -287,14 +276,6 @@ void fprint_stopped_gen (FILE *st, t_stat v, REG *pc, DEVICE *dptr);
 #define SCP_HELP_FLAT   (1u << 31)       /* Force flat help when prompting is not possible */
 #define SCP_HELP_ONECMD (1u << 30)       /* Display one topic, do not prompt */
 #define SCP_HELP_ATTACH (1u << 29)       /* Top level topic is ATTACH help */
-t_stat scp_help (FILE *st, DEVICE *dptr,
-                 UNIT *uptr, int32 flag, const char *help, const char *cptr, ...);
-t_stat scp_vhelp (FILE *st, DEVICE *dptr,
-                  UNIT *uptr, int32 flag, const char *help, const char *cptr, va_list ap);
-t_stat scp_helpFromFile (FILE *st, DEVICE *dptr,
-                         UNIT *uptr, int32 flag, const char *help, const char *cptr, ...);
-t_stat scp_vhelpFromFile (FILE *st, DEVICE *dptr,
-                          UNIT *uptr, int32 flag, const char *help, const char *cptr, va_list ap);
 
 /* Global data */
 
@@ -332,12 +313,6 @@ extern char *sim_prompt;                                /* prompt string */
 extern const char *sim_savename;                        /* Simulator Name used in Save/Restore files */
 extern t_value *sim_eval;
 extern volatile t_bool stop_cpu;
-extern uint32 sim_brk_types;                            /* breakpoint info */
-extern uint32 sim_brk_dflt;
-extern uint32 sim_brk_summ;
-extern uint32 sim_brk_match_type;
-extern t_addr sim_brk_match_addr;
-extern BRKTYPTAB *sim_brk_type_desc;                    /* type descriptions */
 extern const char *sim_prog_name;                       /* executable program name */
 extern FILE *stdnul;
 extern t_bool sim_asynch_enabled;
