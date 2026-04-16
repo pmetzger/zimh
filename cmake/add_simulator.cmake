@@ -30,7 +30,7 @@ set(SIM_SOURCES
     ${SIMH_CORE_ROOT}/scp_context.c
     ${SIMH_CORE_ROOT}/scp_expect.c
     ${SIMH_CORE_ROOT}/scp_expr.c
-    ${SIMH_CORE_ROOT}/scp_help.c
+    ${SIMH_CORE_ROOT}/scp_help_engine.c
     ${SIMH_CORE_ROOT}/scp_parse.c
     ${SIMH_CORE_ROOT}/scp_unit.c
     ${SIMH_RUNTIME_ROOT}/sim_card.c

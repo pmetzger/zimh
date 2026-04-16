@@ -1,4 +1,4 @@
-/* scp_help.c: SCP help runtime and device-help support
+/* scp_help_engine.c: SCP help runtime and device-help support
 
    This file contains the structured help runtime extracted from scp.c.
    It owns generic HELP output, device-help rendering, and the VMS-style

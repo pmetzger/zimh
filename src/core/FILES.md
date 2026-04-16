@@ -47,9 +47,14 @@ These files own SCP's shared expression parser and evaluator, including
 the infix-to-postfix conversion and the expression-specific temporary
 state needed while commands are being interpreted.
 
-## `scp_help.c` and `scp_help.h`
+## `scp_help.h`
 
-These files own SCP's shared help runtime: the generic `HELP` output,
+This header owns the public structured-help format and entry points used
+by device help text.
+
+## `scp_help_engine.c` and `scp_help_engine.h`
+
+These files own SCP's broader help runtime: generic `HELP` output,
 device-help rendering, and the structured hierarchical help parser used
 by SCP and by devices that participate in that help system.
 

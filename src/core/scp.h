@@ -44,6 +44,7 @@
 #include "scp_context.h"
 #include "scp_expect.h"
 #include "scp_expr.h"
+#include "scp_help_engine.h"
 #include "scp_help.h"
 #include "scp_parse.h"
 #include "scp_size.h"
