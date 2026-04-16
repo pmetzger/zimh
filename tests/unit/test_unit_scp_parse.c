@@ -7,6 +7,7 @@
 #include "scp.h"
 #include "scp_parse.h"
 
+/* Verify plain glyph parsing uppercases tokens and skips leading space. */
 static void test_get_glyph_uppercases_and_skips_spaces(void **state)
 {
     char token[CBUFSIZE];
@@ -20,6 +21,7 @@ static void test_get_glyph_uppercases_and_skips_spaces(void **state)
     assert_string_equal(rest, "beta");
 }
 
+/* Verify the no-conversion glyph helper preserves original letter case. */
 static void test_get_glyph_nc_preserves_case(void **state)
 {
     char token[CBUFSIZE];
@@ -33,6 +35,7 @@ static void test_get_glyph_nc_preserves_case(void **state)
     assert_string_equal(rest, "next");
 }
 
+/* Verify quoted glyph parsing keeps a quoted token together. */
 static void test_get_glyph_quoted_keeps_quoted_token_intact(void **state)
 {
     char token[CBUFSIZE];
@@ -46,6 +49,7 @@ static void test_get_glyph_quoted_keeps_quoted_token_intact(void **state)
     assert_string_equal(rest, "tail");
 }
 
+/* Verify command glyph parsing breaks out a leading shell bang. */
 static void test_get_glyph_cmd_handles_bang_prefix(void **state)
 {
     char token[CBUFSIZE];
@@ -59,6 +63,7 @@ static void test_get_glyph_cmd_handles_bang_prefix(void **state)
     assert_string_equal(rest, "echo test");
 }
 
+/* Verify switch parsing handles both bitmask and numeric switch forms. */
 static void test_get_switches_parses_bitmask_and_number(void **state)
 {
     int32 sw;
@@ -73,6 +78,7 @@ static void test_get_switches_parses_bitmask_and_number(void **state)
     assert_int_equal(number, 16);
 }
 
+/* Verify switch parsing rejects mixed or otherwise invalid syntax. */
 static void test_get_switches_rejects_invalid_switches(void **state)
 {
     int32 sw;
@@ -84,6 +90,7 @@ static void test_get_switches_rejects_invalid_switches(void **state)
     assert_int_equal(get_switches("-?", &sw, &number), SW_ERROR);
 }
 
+/* Verify leading simulator switches are consumed and stored globally. */
 static void test_get_sim_sw_consumes_switch_tokens(void **state)
 {
     const char *rest;
@@ -101,6 +108,7 @@ static void test_get_sim_sw_consumes_switch_tokens(void **state)
     assert_string_equal(rest, "command tail");
 }
 
+/* Verify invalid simulator switches abort parsing without side effects. */
 static void test_get_sim_sw_returns_null_on_invalid_switches(void **state)
 {
     (void)state;

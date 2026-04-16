@@ -10,6 +10,7 @@
 
 #include "test_support.h"
 
+/* Verify that fixture lookup and fixture reads use the expected tree. */
 static void test_support_reads_fixture(void **state)
 {
     static const char fixture_text[] = "sample fixture for unit tests\n";
@@ -30,6 +31,7 @@ static void test_support_reads_fixture(void **state)
     free(data);
 }
 
+/* Verify that path joining produces the expected simple path. */
 static void test_support_joins_paths(void **state)
 {
     char path[1024];
@@ -41,6 +43,7 @@ static void test_support_joins_paths(void **state)
     assert_string_equal(path, "/tmp/file.txt");
 }
 
+/* Verify temp-directory, write, compare, and recursive cleanup helpers. */
 static void test_support_temp_dir_round_trip(void **state)
 {
     char dir_path[1024];
@@ -76,6 +79,7 @@ static void test_support_temp_dir_round_trip(void **state)
     assert_int_not_equal(stat(dir_path, &st), 0);
 }
 
+/* Verify minimal one-unit device initialization for later common tests. */
 static void test_support_initializes_device_and_unit(void **state)
 {
     DEVICE device;

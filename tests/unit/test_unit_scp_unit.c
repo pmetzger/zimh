@@ -63,6 +63,7 @@ static int teardown_scp_unit_fixture(void **state)
     return 0;
 }
 
+/* Verify unit-to-device lookup finds and caches the owning device. */
 static void test_find_dev_from_unit_locates_simulator_device(void **state)
 {
     struct scp_unit_fixture *fixture = *state;
@@ -73,6 +74,7 @@ static void test_find_dev_from_unit_locates_simulator_device(void **state)
     assert_ptr_equal(fixture->unit.dptr, &fixture->device);
 }
 
+/* Verify attach creates a new empty file and detach clears state cleanly. */
 static void test_attach_unit_creates_new_file_and_detaches_cleanly(void **state)
 {
     struct scp_unit_fixture *fixture = *state;
@@ -97,6 +99,7 @@ static void test_attach_unit_creates_new_file_and_detaches_cleanly(void **state)
     free(file_data);
 }
 
+/* Verify read-only attach mode sets and clears UNIT_RO as expected. */
 static void test_attach_unit_honors_read_only_mode(void **state)
 {
     static const uint8_t initial_data[] = {0x11, 0x22, 0x33, 0x44};
@@ -116,6 +119,7 @@ static void test_attach_unit_honors_read_only_mode(void **state)
     assert_true((fixture->unit.flags & UNIT_RO) == 0);
 }
 
+/* Verify detach writes buffered changes back to the attached file. */
 static void test_detach_unit_flushes_buffered_changes(void **state)
 {
     static const uint8_t initial_data[] = {'A', 'B', 'C', 'D'};

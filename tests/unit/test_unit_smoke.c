@@ -8,6 +8,7 @@
 
 #include "test_support.h"
 
+/* Verify that the injected source and binary roots are usable paths. */
 static void test_support_roots_exist(void **state)
 {
     const char *source_root = simh_test_source_root();

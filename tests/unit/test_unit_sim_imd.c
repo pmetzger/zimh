@@ -46,6 +46,7 @@ static int teardown_sim_imd_fixture(void **state)
     return 0;
 }
 
+/* Verify a zero-content IMD file is rejected as invalid media. */
 static void test_disk_open_rejects_blank_image(void **state)
 {
     struct sim_imd_fixture *fixture = *state;
@@ -59,6 +60,7 @@ static void test_disk_open_rejects_blank_image(void **state)
     fclose(image);
 }
 
+/* Verify obviously malformed track metadata is rejected on open. */
 static void test_disk_open_rejects_corrupt_header(void **state)
 {
     static const uint8_t corrupt_image[] = {'I',
@@ -94,6 +96,7 @@ static void test_disk_open_rejects_corrupt_header(void **state)
     fclose(image);
 }
 
+/* Verify a minimal valid image opens and reads its lone sector. */
 static void test_disk_open_reads_minimal_single_sector_image(void **state)
 {
     struct sim_imd_fixture *fixture = *state;
@@ -147,6 +150,7 @@ static void test_disk_open_reads_minimal_single_sector_image(void **state)
     fclose(image);
 }
 
+/* Verify compressed sectors expand on read and reject writes when locked. */
 static void test_disk_open_reads_compressed_sector_and_write_protects(
     void **state)
 {
@@ -202,6 +206,7 @@ static void test_disk_open_reads_compressed_sector_and_write_protects(
     fclose(image);
 }
 
+/* Verify deleted-address-mark state survives a write/read round trip. */
 static void test_sect_write_persists_deleted_address_mark(void **state)
 {
     uint8_t image_bytes[145];

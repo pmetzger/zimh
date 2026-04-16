@@ -6,6 +6,7 @@
 
 #include "scp_size.h"
 
+/* Verify raw byte widths map into the expected SCP storage buckets. */
 static void test_storage_size_buckets(void **state)
 {
     (void)state;
@@ -24,6 +25,7 @@ static void test_storage_size_buckets(void **state)
 #endif
 }
 
+/* Verify device data widths map to the right storage size. */
 static void test_device_width_maps_to_storage_size(void **state)
 {
     DEVICE dptr;
@@ -45,6 +47,7 @@ static void test_device_width_maps_to_storage_size(void **state)
     assert_int_equal(scp_device_data_size_bytes(&dptr), sizeof(int32));
 }
 
+/* Verify register width plus offset maps to the right storage size. */
 static void test_register_width_and_offset_map_to_storage_size(void **state)
 {
     REG rptr;

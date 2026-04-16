@@ -80,6 +80,7 @@ static int teardown_sim_card_fixture(void **state)
     return 0;
 }
 
+/* Verify text decks handle CRLF, tab expansion, and EOF cards correctly. */
 static void test_sim_card_text_deck_handles_crlf_and_tabs(void **state)
 {
     static const char deck_text[] = "A\tB\r\nWORLD\n~\n";
@@ -121,6 +122,7 @@ static void test_sim_card_text_deck_handles_crlf_and_tabs(void **state)
     free(output_data);
 }
 
+/* Verify bad text-card bytes are reported as conversion errors. */
 static void test_sim_card_reports_text_conversion_errors(void **state)
 {
     static const unsigned char deck_bytes[] = {'A', 0x01, 'B', '\n', '~', '\n'};

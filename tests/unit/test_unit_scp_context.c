@@ -96,6 +96,7 @@ static int teardown_scp_context_fixture(void **state)
     return 0;
 }
 
+/* Verify device display names prefer logical aliases over physical names. */
 static void test_sim_dname_prefers_logical_name(void **state)
 {
     struct scp_context_fixture *fixture = *state;
@@ -106,6 +107,7 @@ static void test_sim_dname_prefers_logical_name(void **state)
     assert_string_equal(sim_dname(NULL), "");
 }
 
+/* Verify unit display names are formatted once and then cached. */
 static void test_sim_uname_formats_and_caches_names(void **state)
 {
     struct scp_context_fixture *fixture = *state;
@@ -122,6 +124,7 @@ static void test_sim_uname_formats_and_caches_names(void **state)
     assert_string_equal(sim_uname(NULL), "");
 }
 
+/* Verify replacing a cached unit name frees and stores the new value. */
 static void test_sim_set_uname_replaces_cached_name(void **state)
 {
     struct scp_context_fixture *fixture = *state;
@@ -136,6 +139,7 @@ static void test_sim_set_uname_replaces_cached_name(void **state)
     assert_string_equal(fixture->disk_units[0].uname, "RENAMED0");
 }
 
+/* Verify device lookup sees primary, logical, and internal device names. */
 static void
 test_find_dev_matches_primary_logical_and_internal_names(void **state)
 {
@@ -150,6 +154,7 @@ test_find_dev_matches_primary_logical_and_internal_names(void **state)
     assert_ptr_equal(find_dev("CLOCK"), &fixture->internal);
 }
 
+/* Verify unit lookup matches bare, qualified, and cached unit names. */
 static void
 test_find_unit_matches_device_names_and_cached_unit_names(void **state)
 {
@@ -180,6 +185,7 @@ test_find_unit_matches_device_names_and_cached_unit_names(void **state)
     assert_ptr_equal(uptr, &fixture->disk_units[1]);
 }
 
+/* Verify disabled devices are rejected by lookup and flagged as disabled. */
 static void test_find_unit_rejects_disabled_devices(void **state)
 {
     struct scp_context_fixture *fixture = *state;
@@ -193,6 +199,7 @@ static void test_find_unit_rejects_disabled_devices(void **state)
     assert_false(qdisable(&fixture->disk));
 }
 
+/* Verify internal-device registration ignores duplicates and main devices. */
 static void test_register_internal_device_ignores_duplicates(void **state)
 {
     struct scp_context_fixture *fixture = *state;
