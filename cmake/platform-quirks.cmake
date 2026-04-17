@@ -143,9 +143,15 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES ".*Clang")
         "-U__STRICT_ANSI__"
         "-fwrapv"
         "-fno-strict-overflow"
-        "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WALL}>:-Wall>>"
-        ## Only add if WARNINGS_FATAL set; has undesirable consequences with LTO.
+        "$<$<CONFIG:Debug>:$<$<OR:$<BOOL:${DEBUG_WALL}>,$<BOOL:${DEBUG_WARNINGS}>>:-Wall>>"
         "$<$<CONFIG:Release>:-Wall>"
+        "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wextra>>"
+        "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wformat=2>>"
+        "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wundef>>"
+        "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wimplicit-fallthrough>>"
+        "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wstrict-prototypes>>"
+        "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wmissing-prototypes>>"
+        "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wold-style-definition>>"
     )
 
     # 07 NOV 2022: Apparently, -O3 is kosher now.

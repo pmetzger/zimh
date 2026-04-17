@@ -231,6 +231,9 @@ option(RELEASE_LTO
 option(DEBUG_WALL
        "Turn on maximal compiler warnings in Debug builds (e.g., \"-Wall\" or \"/W4\")"
        FALSE)
+option(DEBUG_WARNINGS
+       "Turn on additional strict compiler warnings in Debug builds."
+       FALSE)
 option(SIMH_PACKAGE_SUFFIX
        "The packaging suffix for CPack artifacts, e.g. simh-SIMH_VERSION-SIMH_PACKAGE_SUFFIX."
        "")
