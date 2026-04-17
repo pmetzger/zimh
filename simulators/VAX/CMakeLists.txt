@@ -1,20 +1,12 @@
 ## VAX simulators
 ##
-## This is an automagically generated file. Do NOT EDIT.
-## Any changes you make will be overwritten!!
+## Update this file as the simulators' sources and local build metadata
+## change. Keep shared target-construction logic in the common CMake helpers.
 ##
-## Make changes to the SIMH top-level Makefile and then run the
-## "cmake/generate.py" script to regenerate these files.
-##
-##     cd cmake; python -m generate --help
-##
-## ------------------------------------------------------------
+## Not yet: if these simulators later get a local unit-test subtree, declare
+## it explicitly here with add_subdirectory(unit-tests).
 
-if (HAVE_UNITY_FRAMEWORK AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/unit-tests/CMakeLists.txt")
-  add_subdirectory(unit-tests)
-endif ()
-
-
+## Common VAX-family source bundles reused by multiple targets.
 set(VAX
     ${VAXD}/vax_cpu.c
     ${VAXD}/vax_cpu1.c
@@ -382,6 +374,7 @@ if (CMAKE_CONFIGURATION_TYPES)
     string(APPEND vax_binary_dir "/$<CONFIG>")
 endif (CMAKE_CONFIGURATION_TYPES)
 
+## Preserve the historical microvax3900 alias for the vax target in the build tree.
 add_custom_command(TARGET vax POST_BUILD
     COMMAND "${CMAKE_COMMAND}"
         -DSRCFILE=vax${CMAKE_EXECUTABLE_SUFFIX}
@@ -391,6 +384,7 @@ add_custom_command(TARGET vax POST_BUILD
     COMMENT "Symlink vax${CMAKE_EXECUTABLE_SUFFIX} to microvax3900${CMAKE_EXECUTABLE_SUFFIX}"
     WORKING_DIRECTORY ${vax_binary_dir})
 
+## Mirror the vax-target microvax3900 alias in the install tree.
 install(
     CODE "
         execute_process(
