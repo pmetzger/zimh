@@ -288,46 +288,24 @@ Preferred direction:
 - avoid per-simulator CMake boilerplate when a data-driven declaration is
   cleaner
 - use the hybrid model as the final architecture
+- use small hand-maintained per-simulator `CMakeLists.txt` files as the local
+  declaration point
 
 Candidate approaches:
 
-#### Option A: Central Manifest
+Chosen model:
 
-Maintain one or a few CMake data files that declare each simulator's:
-- sources
-- include directories
-- compile definitions
-- feature requirements
-- test metadata
+- each simulator directory keeps a small hand-maintained `CMakeLists.txt`
+- that file acts as the local declaration point for simulator-specific build
+  facts
+- shared logic lives centrally in helper code such as
+  `cmake/add_simulator.cmake`
 
-Then feed those declarations into `add_simulator(...)`.
+This means:
 
-Pros:
-- one authoritative place for the inventory
-- easier consistency checking
-- easy to review systemic edits
-
-Cons:
-- very large central file if not organized carefully
-
-#### Option B: Per-Simulator Native CMake
-
-Each simulator directory owns a real hand-maintained `CMakeLists.txt`.
-
-Pros:
-- strong locality
-- easy for simulator maintainers to reason about
-
-Cons:
-- repetitive unless carefully templated
-- more opportunities for drift in style and behavior
-
-#### Option C: Hybrid
-
-Keep per-simulator `CMakeLists.txt`, but make them tiny wrappers around a
-central declarative helper.
-
-This is the chosen option.
+- no giant central manifest as the main source of truth
+- no separate per-simulator manifest format
+- no generator-owned simulator `CMakeLists.txt`
 
 Why this is the best fit here:
 
@@ -339,6 +317,10 @@ Why this is the best fit here:
   - small local `CMakeLists.txt`
   - shared helper functions/macros
   - clear target ownership
+
+The local `CMakeLists.txt` files should be small, declarative, and boring.
+They should mostly declare local data and pass it to shared helpers. They
+should not grow large custom frameworks of their own.
 
 Success criteria:
 - we choose one authoritative metadata model
@@ -657,7 +639,7 @@ with CMake, for example:
 
 These choices affect the design and should be settled early.
 
-1. Use the hybrid metadata model:
+1. Use the chosen local-declaration model:
    - each simulator directory keeps a small, hand-maintained
      `CMakeLists.txt`
    - shared target construction logic lives in central CMake helpers
