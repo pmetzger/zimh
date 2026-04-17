@@ -1,18 +1,10 @@
 ## S3 simulator
 ##
-## This is an automagically generated file. Do NOT EDIT.
-## Any changes you make will be overwritten!!
+## Update this file as the local simulator sources and build metadata
+## change. Keep shared target-construction logic in the common CMake helpers.
 ##
-## Make changes to the SIMH top-level Makefile and then run the
-## "cmake/generate.py" script to regenerate these files.
-##
-##     cd cmake; python -m generate --help
-##
-## ------------------------------------------------------------
-
-if (HAVE_UNITY_FRAMEWORK AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/unit-tests/CMakeLists.txt")
-  add_subdirectory(unit-tests)
-endif ()
+## Not yet: if this directory later gets a local unit-test subtree, declare
+## it explicitly here with add_subdirectory(unit-tests).
 
 add_simulator(s3
     SOURCES
