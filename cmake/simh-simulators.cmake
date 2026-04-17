@@ -1,13 +1,10 @@
 ##
-## This is an automagically generated file. Do NOT EDIT.
-## Any changes you make will be overwritten!!
-##
-## Make changes to the SIMH top-level Makefile and then run the
-## "cmake/generate.py" script to regenerate these files.
-##
-##     cd cmake; python -m generate --help
-##
-## ------------------------------------------------------------
+## Update this file as simulator directories are added, removed, or reorganized.
+## Keep the top-level simulator inventory and shared simulator path variables
+## here. Keep shared target-construction logic in the common CMake helpers.
+
+## Shared simulator and source-root variables consumed by simulator-local
+## CMakeLists.txt files.
 set(ALPHAD     "${SIMH_SIMULATOR_ROOT}/alpha")
 set(ALTAIRD    "${SIMH_SIMULATOR_ROOT}/ALTAIR")
 set(ALTAIRZ80D "${SIMH_SIMULATOR_ROOT}/AltairZ80")
@@ -69,8 +66,7 @@ set(INTEL_MDSD "${INTELSYSD}/Intel-MDS")
 set(SCELBIC    "${INTELSYSD}/common")
 set(SCELBID    "${INTELSYSD}/scelbi")
 
-## ----------------------------------------
-
+## Display sources used by simulator-local CMake metadata.
 if (NOT WITH_VIDEO)
     ### Hack: Unset these variables so that they don't expand if
     ### not building with video:
@@ -80,8 +76,7 @@ if (NOT WITH_VIDEO)
     set(DISPLAYVT  "")
 endif ()
 
-## ----------------------------------------
-
+## Top-level simulator directory inventory.
 add_subdirectory(simulators/3B2)
 add_subdirectory(simulators/ALTAIR)
 add_subdirectory(simulators/AltairZ80)
