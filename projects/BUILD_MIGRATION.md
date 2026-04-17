@@ -27,6 +27,160 @@ The most important current dependency is:
 So the real problem is not "CMake cannot build the tree." The problem is
 "CMake is not yet the authoritative description of the tree."
 
+## Phase 1 Inventory Baseline
+
+This section records the concrete first-pass inventory of where the current
+build still depends on the top-level `Makefile`.
+
+### Primary Dependency Chain
+
+The current dependency chain is:
+
+- the top-level `Makefile` defines simulator source lists, compile flags,
+  simulator groupings, and related metadata
+- [cmake/generate.py](/Users/perry/proj/simh/cmake/generate.py:1) parses that
+  `Makefile`
+- the generator emits:
+  - per-simulator `CMakeLists.txt`
+  - `cmake/simh-simulators.cmake`
+  - `cmake/simh-packaging.cmake`
+
+This means the old `Makefile` is still an upstream metadata source for CMake,
+even though CMake is the build engine for most actual development work.
+
+### Generated Artifacts Still Tied to Makefile
+
+The following generated CMake artifacts are still logically downstream of the
+top-level `Makefile`:
+
+- `cmake/simh-simulators.cmake`
+- `cmake/simh-packaging.cmake`
+- most simulator `CMakeLists.txt` files under `simulators/`
+- some generated unit-test `CMakeLists.txt` files beneath simulator
+  directories
+
+Evidence:
+
+- `cmake/generate.py` explicitly states that it generates simulator
+  `CMakeLists.txt` files from the top-level `Makefile`
+- `cmake/simgen/cmake_container.py` contains the generated-file banner used in
+  simulator `CMakeLists.txt`
+- many simulator `CMakeLists.txt` files still include the "edit the top-level
+  Makefile, then run cmake/generate.py" warning banner
+
+### Metadata Currently Extracted from Makefile
+
+Based on `cmake/generate.py`, `cmake/simgen/cmake_container.py`, and the
+generated outputs, the generator currently derives at least the following from
+the top-level `Makefile`:
+
+- simulator source-file lists
+- simulator-local include directories
+- simulator compile definitions
+- simulator compile-time feature flags
+- source macros that expand into source-file groups
+- simulator names and simulator directories
+- `all` and `experimental` simulator group membership
+- test names associated with simulators
+- whether a simulator depends on ROM-building support
+- packaging family membership and install metadata
+
+Important detail:
+
+- the generator does not just copy flat source lists
+- it walks Makefile target dependencies and compile actions
+- it expands Make variables/macros and infers the simulator build shape from
+  those actions
+
+This is why the migration must start by moving the metadata authority, not by
+simply deleting generated files.
+
+### CMake Logic Already Owning Shared Build Behavior
+
+CMake already owns a substantial amount of shared build logic. In particular:
+
+- top-level feature options in `CMakeLists.txt`, such as:
+  - `WITH_NETWORK`
+  - `WITH_VIDEO`
+  - `WITH_UNIT_TESTS`
+  - `RELEASE_LTO`
+  - `DEBUG_WALL`
+- shared simulator construction helpers in:
+  - `cmake/add_simulator.cmake`
+- dependency discovery and optional third-party handling in:
+  - `cmake/dep-locate.cmake`
+  - `cmake/os-features.cmake`
+  - related CMake support modules
+
+So the migration problem is not that CMake lacks any build framework. The
+remaining dependency is mostly about simulator inventory and simulator-specific
+metadata.
+
+### Makefile-Owned Behaviors Still Needing CMake-Native Ownership
+
+The following categories still need to be fully owned by CMake rather than by
+the top-level `Makefile`:
+
+- simulator inventory
+  - what simulators exist
+  - where their source directories are
+- per-simulator source composition
+- per-simulator compile defines and include paths
+- simulator grouping
+  - especially `all` and `experimental`
+- simulator test association metadata
+- simulator packaging family metadata
+- remaining developer entry-point conveniences now expressed only in the
+  top-level `Makefile`
+
+### Remaining Top-Level Makefile Convenience/Policy Surface
+
+The top-level `Makefile` still exposes legacy user/developer controls such as:
+
+- `NONETWORK`
+- `NOVIDEO`
+- `DEBUG`
+- `LTO`
+- `TESTS`
+
+Some of these already have clean CMake equivalents. The migration should not
+try to preserve the old names, but it does need to ensure that the useful
+underlying capabilities are present and documented on the CMake side.
+
+### Packaging Dependency
+
+Packaging is also still downstream of generator-era data:
+
+- `cmake/simgen/packaging.py` owns simulator-to-family packaging metadata
+- `generate.py` emits `cmake/simh-packaging.cmake`
+
+So packaging is not an independent cleanup. It is part of the same metadata
+migration, and it belongs in the final phase once build/test ownership is
+cleanly in CMake.
+
+### First Incremental Migration Targets
+
+The safest first migration slices appear to be:
+
+1. stop treating simulator `CMakeLists.txt` files as generated artifacts
+2. move `cmake/simh-simulators.cmake` to hand-maintained or manifest-driven
+   CMake
+3. migrate simulator metadata ownership out of `Makefile` and into the chosen
+   hybrid CMake layout
+4. only after that, replace the top-level `Makefile` with a thin compatibility
+   wrapper
+
+### Inventory Conclusion
+
+The central fact established by this inventory is:
+
+- the real blocker is not missing CMake functionality
+- the real blocker is that simulator metadata authority still sits in the
+  top-level `Makefile`, with CMake artifacts generated downstream of it
+
+Therefore the first implementation phase after planning should be a metadata
+authority migration, not a superficial wrapper or documentation change.
+
 ## What "Authoritative CMake Metadata" Means
 
 This phrase just means:
