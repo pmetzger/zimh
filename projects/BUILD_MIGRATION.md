@@ -499,6 +499,70 @@ Recommended implementation order:
    with configuration-time feature detection where it improves portability and
    clarity.
 
+## Pilot Conversion Candidates
+
+The first implementation work should use low-risk pilot simulator directories
+to prove the hand-maintained CMake pattern before touching complex directories.
+
+### Selected Pilot Order
+
+Recommended order:
+
+1. `simulators/SSEM`
+2. `simulators/LGP` or `simulators/GRI`
+3. `simulators/NOVA` or `simulators/PDP8`
+
+### Why These Are Good Pilots
+
+`SSEM` is the best first pilot:
+
+- one simulator target
+- two source files
+- no obvious ROM dependency
+- no video/display complexity
+- no unusual shared source macros
+- minimal migration risk
+
+`LGP` and `GRI` are strong second pilots:
+
+- one simulator target each
+- three source files each
+- very small local metadata surface
+- enough substance to validate the pattern on a slightly less trivial target
+
+`NOVA` and `PDP8` are good second-wave pilots:
+
+- still reasonably straightforward
+- more representative than the tiny first pilots
+- `NOVA` is especially useful because it has two simulator targets in one
+  directory
+- `PDP8` is a modest single-target classic simulator with a more realistic
+  source list
+
+### Deferred Higher-Complexity Targets
+
+`PDP11` is important, but it should not be the first pilot:
+
+- multiple targets in one directory (`pdp11`, `uc15`)
+- video/display hooks
+- ROM build dependency
+- shared display source macros
+- large source list
+
+`VAX` is not suitable as an early pilot:
+
+- many simulator targets in one directory
+- shared source-set variables and cross-directory source reuse
+- ROM dependencies
+- video/display variants
+- shared test label handling
+
+So the migration sequence should treat:
+
+- `PDP11` as an important medium-complexity proving ground after the basic
+  pattern is established
+- `VAX` as a later conversion once the process is already routine
+
 This order avoids a "flag day" rewrite.
 
 ## Quality Bar
