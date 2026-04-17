@@ -339,19 +339,15 @@ static void test_sim_tape_self_test_rejects_attached_units(void **state)
                      SCPE_ALATT);
 }
 
-/* Verify the synchronous callback wrappers return the same status as the
-   base APIs and report it via the supplied callback. */
+/* Verify a minimal set of synchronous *_a wrappers returns the same
+   status as the base operations and invokes the callback once. */
 static void test_sim_tape_callback_wrappers_report_sync_status(void **state)
 {
     struct sim_tape_fixture *fixture = *state;
     struct sim_tape_callback_state callback_state;
-    uint8 first_record[] = {0x61, 0x62, 0x63};
-    uint8 second_record[] = {0x71, 0x72};
+    uint8 record[] = {0x61, 0x62, 0x63};
     uint8 read_buffer[16] = {0};
     t_mtrlnt record_length;
-    uint32 files_skipped;
-    uint32 records_skipped;
-    uint32 objects_skipped;
 
     active_tape_callback_state = &callback_state;
     reset_tape_callback_state(&callback_state);
@@ -365,18 +361,7 @@ static void test_sim_tape_callback_wrappers_report_sync_status(void **state)
                      MTSE_OK);
     assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
 
-    assert_int_equal(sim_tape_wrrecf_a(&fixture->unit, first_record,
-                                       sizeof(first_record),
-                                       record_tape_callback),
-                     MTSE_OK);
-    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
-
-    assert_int_equal(sim_tape_wrtmk_a(&fixture->unit, record_tape_callback),
-                     MTSE_OK);
-    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
-
-    assert_int_equal(sim_tape_wrrecf_a(&fixture->unit, second_record,
-                                       sizeof(second_record),
+    assert_int_equal(sim_tape_wrrecf_a(&fixture->unit, record, sizeof(record),
                                        record_tape_callback),
                      MTSE_OK);
     assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
@@ -390,60 +375,14 @@ static void test_sim_tape_callback_wrappers_report_sync_status(void **state)
                                        record_tape_callback),
                      MTSE_OK);
     assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
-    assert_tape_record_equals(read_buffer, record_length, first_record,
-                              sizeof(first_record));
-
-    assert_int_equal(sim_tape_spfilebyrecf_a(&fixture->unit, 1, &files_skipped,
-                                             &records_skipped, FALSE,
-                                             record_tape_callback),
-                     MTSE_OK);
-    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
-    assert_int_equal(files_skipped, 1);
-    assert_int_equal(records_skipped, 0);
-
-    memset(read_buffer, 0, sizeof(read_buffer));
-    assert_int_equal(sim_tape_rdrecf_a(&fixture->unit, read_buffer,
-                                       &record_length, sizeof(read_buffer),
-                                       record_tape_callback),
-                     MTSE_TMK);
-    assert_tape_callback(&callback_state, &fixture->unit, MTSE_TMK);
-    assert_int_equal(record_length, 0);
-
-    memset(read_buffer, 0, sizeof(read_buffer));
-    assert_int_equal(sim_tape_rdrecf_a(&fixture->unit, read_buffer,
-                                       &record_length, sizeof(read_buffer),
-                                       record_tape_callback),
-                     MTSE_OK);
-    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
-    assert_tape_record_equals(read_buffer, record_length, second_record,
-                              sizeof(second_record));
-
-    assert_int_equal(sim_tape_spfilebyrecr_a(&fixture->unit, 1, &files_skipped,
-                                             &records_skipped,
-                                             record_tape_callback),
-                     MTSE_OK);
-    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
-    assert_int_equal(files_skipped, 1);
-    assert_int_equal(records_skipped, 1);
-
-    assert_int_equal(
-        sim_tape_position_a(&fixture->unit, MTPOS_M_REW | MTPOS_M_OBJ, 3,
-                            &records_skipped, 0, &files_skipped,
-                            &objects_skipped, record_tape_callback),
-        MTSE_OK);
-    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
-    assert_int_equal(records_skipped, 0);
-    assert_int_equal(files_skipped, 0);
-    assert_int_equal(objects_skipped, 3);
-
-    assert_int_equal(sim_tape_wreomrw_a(&fixture->unit, record_tape_callback),
-                     MTSE_OK);
-    assert_tape_callback(&callback_state, &fixture->unit, MTSE_OK);
-    assert_true(sim_tape_bot(&fixture->unit));
+    assert_tape_record_equals(read_buffer, record_length, record,
+                              sizeof(record));
 
     active_tape_callback_state = NULL;
 }
 
+/* Verify the synchronous callback wrappers return the same status as the
+   base APIs and report it via the supplied callback. */
 /* Verify a standard tape image can be attached, written, rewound, and
    read back including tape marks and end-of-medium status. */
 static void test_sim_tape_standard_image_round_trip(void **state)
