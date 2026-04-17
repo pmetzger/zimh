@@ -305,6 +305,49 @@ Success criteria:
 - there is exactly one real build system: CMake
 - `make` is a wrapper, not a second implementation
 
+### Phase 8: Replace OS-Name Conditionals with Feature Detection
+
+Purpose:
+- reduce reliance on hard-coded host OS names in the source tree
+- prefer capability checks discovered at configuration time
+- make the code more portable to new or less common platforms
+
+Rationale:
+- `#if defined(__linux__)`, `#if defined(__APPLE__)`, and similar guards are
+  often only proxies for the real question, such as:
+  - does the platform support a specific header
+  - does a function exist
+  - does a library call behave correctly
+  - does a file-open mode or socket option work
+- replacing those with feature checks usually makes the code clearer and more
+  portable
+
+Policy:
+- prefer feature-based conditionals over OS-name conditionals where practical
+- use configuration-time probes for capabilities and semantics
+- only keep OS-name conditionals where the behavior is truly tied to a named
+  platform family and cannot be expressed cleanly as a feature test
+
+Examples of the desired direction:
+- use a configured define like `SIMH_NO_FOPEN_X` rather than checking host OS
+  names in `sim_fio.c`
+- probe for headers, functions, types, constants, and behavioral semantics in
+  CMake instead of assuming them from the host name
+
+Important caveat:
+- the goal is not to replace OS `#if`s with arbitrary CMake-generated
+  booleans everywhere
+- the goal is to express real capability checks
+- if a condition is truly about "this is Windows-specific behavior" or "this
+  is POSIX API structure", then a platform-family split may still be the
+  cleanest representation
+
+Success criteria:
+- major portability decisions are feature-driven instead of host-name-driven
+- adding support for a new platform usually means satisfying capability
+  probes, not sprinkling new OS-name checks through the code
+- the remaining OS-name conditionals are rare, justified, and easy to explain
+
 ## Incremental Execution Plan
 
 Recommended implementation order:
@@ -316,6 +359,9 @@ Recommended implementation order:
 5. Convert the rest of the simulator directories.
 6. Replace `Makefile` metadata logic with compatibility wrappers.
 7. Remove the generator and dead legacy build logic.
+8. After the build migration stabilizes, begin replacing OS-name conditionals
+   with configuration-time feature detection where it improves portability and
+   clarity.
 
 This order avoids a "flag day" rewrite.
 
