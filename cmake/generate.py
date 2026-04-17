@@ -25,6 +25,7 @@ import simgen.packaging as SPKG
 
 
 TOP_LEVEL_MAKEFILE = "Makefile"
+LEGACY_GENERATION_ACK = "--allow-legacy-overwrite"
 
 
 def process_makefile(makefile_dir, debug=0):
@@ -139,8 +140,27 @@ if __name__ == '__main__':
                       help='Makefile source directory.')
     args.add_argument('--skip-orphans', action='store_true',
                       help='Skip the check for packaging orphans')
+    args.add_argument(LEGACY_GENERATION_ACK, dest='allow_legacy_overwrite',
+                      action='store_true',
+                      help='Acknowledge that this legacy tool may overwrite '
+                           'hand-maintained CMake files during the build '
+                           'migration')
 
     flags = vars(args.parse_args())
+
+    if not flags.get('allow_legacy_overwrite'):
+        print(
+            "{0}: Refusing to run without {1}.".format(
+                GEN_SCRIPT_NAME, LEGACY_GENERATION_ACK))
+        print(
+            "{0}: This legacy generator can overwrite hand-maintained "
+            "CMake files during the build migration.".format(
+                GEN_SCRIPT_NAME))
+        print(
+            "{0}: Use {1} only when you explicitly intend to regenerate "
+            "the legacy generated CMake artifacts.".format(
+                GEN_SCRIPT_NAME, LEGACY_GENERATION_ACK))
+        sys.exit(2)
 
     debug_level = flags.get('debug')
     makefile_dir = flags.get('srcdir')
