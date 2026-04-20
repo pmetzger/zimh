@@ -23,6 +23,7 @@ struct scp_expect_fixture {
     SEND snd;
 };
 
+/* Reset the SEND and EXPECT default variables used by current SCP code. */
 static void clear_send_expect_default_env(void)
 {
     unsetenv("SIM_SEND_DELAY_CONSOLE");
@@ -33,6 +34,7 @@ static void clear_send_expect_default_env(void)
     unsetenv("SIM_EXPECT_HALTAFTER_TTY_1");
 }
 
+/* Return one SEND context to a clean empty state between tests. */
 static void reset_send_context(SEND *snd)
 {
     sim_send_clear(snd);
@@ -44,6 +46,7 @@ static void reset_send_context(SEND *snd)
     snd->next_time = 0.0;
 }
 
+/* Clear the published EXPECT match variables from the current process. */
 static void clear_expect_match_env(void)
 {
     size_t i;
@@ -56,6 +59,84 @@ static void clear_expect_match_env(void)
     }
 }
 
+/* Feed one byte sequence through sim_exp_check() and require success. */
+static void assert_expect_bytes(EXPECT *exp, const uint8 *data, size_t size)
+{
+    size_t i;
+
+    for (i = 0; i < size; ++i)
+        assert_int_equal(sim_exp_check(exp, data[i]), SCPE_OK);
+}
+
+/* Convenience wrapper for feeding ordinary C strings to EXPECT. */
+static void assert_expect_string(EXPECT *exp, const char *text)
+{
+    assert_expect_bytes(exp, (const uint8 *)text, strlen(text));
+}
+
+/* Poll one queued SEND byte and require the expected character. */
+static void assert_send_polls_byte(SEND *snd, uint8 value)
+{
+    t_stat stat;
+
+    assert_true(sim_send_poll_data(snd, &stat));
+    assert_int_equal(stat, value | SCPE_KFLAG);
+}
+
+/* Read one temporary output stream into a heap string. */
+static char *read_stream_text(FILE *stream)
+{
+    char *text;
+    size_t size;
+
+    assert_non_null(stream);
+    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    fclose(stream);
+    return text;
+}
+
+/* Capture sim_show_send_input() output into a heap string. */
+static char *capture_show_send_input_text(const SEND *snd)
+{
+    FILE *stream = tmpfile();
+
+    assert_non_null(stream);
+    assert_int_equal(sim_show_send_input(stream, snd), SCPE_OK);
+    return read_stream_text(stream);
+}
+
+/* Capture sim_exp_show() output for one filter and expected status. */
+static char *capture_show_expect_text(const EXPECT *exp, const char *match,
+                                      t_stat expected)
+{
+    FILE *stream = tmpfile();
+
+    assert_non_null(stream);
+    assert_int_equal(sim_exp_show(stream, exp, match), expected);
+    return read_stream_text(stream);
+}
+
+/* Capture sim_show_send() output for one wrapper invocation. */
+static char *capture_show_send_wrapper_text(const char *cptr, t_stat expected)
+{
+    FILE *stream = tmpfile();
+
+    assert_non_null(stream);
+    assert_int_equal(sim_show_send(stream, NULL, NULL, 0, cptr), expected);
+    return read_stream_text(stream);
+}
+
+/* Capture sim_show_expect() output for one wrapper invocation. */
+static char *capture_show_expect_wrapper_text(const char *cptr, t_stat expected)
+{
+    FILE *stream = tmpfile();
+
+    assert_non_null(stream);
+    assert_int_equal(sim_show_expect(stream, NULL, NULL, 0, cptr), expected);
+    return read_stream_text(stream);
+}
+
+/* Build a fresh SCP/TMXR fixture and reset global SEND/EXPECT state. */
 static int setup_scp_expect_fixture(void **state)
 {
     struct scp_expect_fixture *fixture;
@@ -103,6 +184,7 @@ static int setup_scp_expect_fixture(void **state)
     return 0;
 }
 
+/* Tear down the SCP/TMXR fixture and clear any published test state. */
 static int teardown_scp_expect_fixture(void **state)
 {
     struct scp_expect_fixture *fixture = *state;
@@ -139,12 +221,9 @@ static void test_sim_send_input_queues_and_polls_bytes(void **state)
         sim_send_input(&fixture->snd, payload, sizeof(payload), 0, 0), SCPE_OK);
     assert_int_equal(fixture->snd.insoff, sizeof(payload));
 
-    assert_true(sim_send_poll_data(&fixture->snd, &stat));
-    assert_int_equal(stat, 'A' | SCPE_KFLAG);
-    assert_true(sim_send_poll_data(&fixture->snd, &stat));
-    assert_int_equal(stat, 'B' | SCPE_KFLAG);
-    assert_true(sim_send_poll_data(&fixture->snd, &stat));
-    assert_int_equal(stat, 'C' | SCPE_KFLAG);
+    assert_send_polls_byte(&fixture->snd, 'A');
+    assert_send_polls_byte(&fixture->snd, 'B');
+    assert_send_polls_byte(&fixture->snd, 'C');
     assert_false(sim_send_poll_data(&fixture->snd, &stat));
 }
 
@@ -173,11 +252,11 @@ static void test_sim_exp_check_triggers_action_and_consumes_rule(void **state)
         sim_exp_set(&fixture->exp, "\"OK\"", 0, 0, 0, "echo matched"), SCPE_OK);
     assert_int_equal(fixture->exp.size, 1);
 
-    assert_int_equal(sim_exp_check(&fixture->exp, 'O'), SCPE_OK);
+    assert_expect_string(&fixture->exp, "O");
     assert_int_equal(fixture->exp.size, 1);
     assert_null(sim_brk_getact(action, sizeof(action)));
 
-    assert_int_equal(sim_exp_check(&fixture->exp, 'K'), SCPE_OK);
+    assert_expect_string(&fixture->exp, "K");
     assert_int_equal(fixture->exp.size, 0);
     assert_string_equal(sim_brk_getact(action, sizeof(action)), "echo matched");
 }
@@ -211,7 +290,7 @@ static void test_sim_exp_clear_paths_remove_rules_and_buffers(void **state)
     assert_int_equal(sim_exp_clr(&fixture->exp, "\"A\""), SCPE_OK);
     assert_int_equal(fixture->exp.size, 1);
 
-    assert_int_equal(sim_exp_check(&fixture->exp, 'X'), SCPE_OK);
+    assert_expect_string(&fixture->exp, "X");
     assert_true(fixture->exp.buf_ins > 0);
 
     assert_int_equal(sim_exp_clrall(&fixture->exp), SCPE_OK);
@@ -231,6 +310,8 @@ static void test_sim_exp_clr_handles_empty_context_without_rules(void **state)
     assert_int_equal(sim_exp_clr(&fixture->exp, "\"A\""), SCPE_OK);
 }
 
+/* Regex-specific matching behavior. */
+
 /* Verify regex expect rules capture groups into the documented environment. */
 static void test_sim_exp_check_populates_regex_capture_groups(void **state)
 {
@@ -240,10 +321,7 @@ static void test_sim_exp_check_populates_regex_capture_groups(void **state)
                                  EXP_TYP_REGEX, NULL),
                      SCPE_OK);
 
-    assert_int_equal(sim_exp_check(&fixture->exp, 'a'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'b'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, '4'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, '2'), SCPE_OK);
+    assert_expect_string(&fixture->exp, "ab42");
 
     assert_string_equal(getenv("_EXPECT_MATCH_PATTERN"), "/ab([0-9][0-9])/");
     assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "ab42");
@@ -259,9 +337,7 @@ static void test_sim_exp_check_honors_case_independent_regex(void **state)
                                  EXP_TYP_REGEX | EXP_TYP_REGEX_I, NULL),
                      SCPE_OK);
 
-    assert_int_equal(sim_exp_check(&fixture->exp, 'A'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'B'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, '5'), SCPE_OK);
+    assert_expect_string(&fixture->exp, "AB5");
 
     assert_string_equal(getenv("_EXPECT_MATCH_PATTERN"), "/ab([0-9])/");
     assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "AB5");
@@ -288,10 +364,7 @@ static void test_sim_exp_check_clears_stale_regex_capture_groups(void **state)
     assert_int_equal(sim_exp_set(&fixture->exp, "/ab([0-9])([0-9])/", 0, 0,
                                  EXP_TYP_REGEX, NULL),
                      SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'a'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'b'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, '4'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, '2'), SCPE_OK);
+    assert_expect_string(&fixture->exp, "ab42");
 
     assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "ab42");
     assert_string_equal(getenv("_EXPECT_MATCH_GROUP_1"), "4");
@@ -300,9 +373,7 @@ static void test_sim_exp_check_clears_stale_regex_capture_groups(void **state)
     assert_int_equal(sim_exp_set(&fixture->exp, "/cd([0-9])/", 0, 0,
                                  EXP_TYP_REGEX, NULL),
                      SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'c'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'd'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, '7'), SCPE_OK);
+    assert_expect_string(&fixture->exp, "cd7");
 
     assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "cd7");
     assert_string_equal(getenv("_EXPECT_MATCH_GROUP_1"), "7");
@@ -314,9 +385,7 @@ static void test_show_helpers_render_pending_state(void **state)
 {
     struct scp_expect_fixture *fixture = *state;
     static uint8 payload[] = {'Z'};
-    FILE *stream;
     char *text;
-    size_t size;
 
     assert_int_equal(
         sim_exp_set(&fixture->exp, "\"Z\"", 0, 0, EXP_TYP_PERSIST, NULL),
@@ -324,21 +393,13 @@ static void test_show_helpers_render_pending_state(void **state)
     assert_int_equal(
         sim_send_input(&fixture->snd, payload, sizeof(payload), 0, 0), SCPE_OK);
 
-    stream = tmpfile();
-    assert_non_null(stream);
-    assert_int_equal(sim_show_send_input(stream, &fixture->snd), SCPE_OK);
-    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    text = capture_show_send_input_text(&fixture->snd);
     assert_non_null(strstr(text, "pending input Data"));
     free(text);
-    fclose(stream);
 
-    stream = tmpfile();
-    assert_non_null(stream);
-    assert_int_equal(sim_exp_show(stream, &fixture->exp, ""), SCPE_OK);
-    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    text = capture_show_expect_text(&fixture->exp, "", SCPE_OK);
     assert_non_null(strstr(text, "\"Z\""));
     free(text);
-    fclose(stream);
 }
 
 /* Verify SEND command parsing updates console defaults and queue timing. */
@@ -530,43 +591,32 @@ static void test_expect_rule_restrictions_and_clearall_match_behavior(
     assert_int_equal(fixture->exp.size, 0);
 }
 
+/* SHOW and reporting behavior. */
+
 /* Verify SHOW reports filtered no-match errors for expect rules. */
 static void test_sim_exp_show_reports_when_no_rules_match_filter(void **state)
 {
     struct scp_expect_fixture *fixture = *state;
-    FILE *stream;
     char *text;
-    size_t size;
 
     assert_int_equal(
         sim_exp_set(&fixture->exp, "\"A\"", 0, 0, EXP_TYP_PERSIST, NULL),
         SCPE_OK);
 
-    stream = tmpfile();
-    assert_non_null(stream);
-    assert_int_equal(sim_exp_show(stream, &fixture->exp, "\"NOPE\""),
-                     SCPE_ARG);
-    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    text = capture_show_expect_text(&fixture->exp, "\"NOPE\"", SCPE_ARG);
     assert_non_null(strstr(text, "No Rules match '\"NOPE\"'"));
     free(text);
-    fclose(stream);
 }
 
 /* Verify SHOW EXPECT reports no-match on an empty expect context too. */
 static void test_sim_exp_show_reports_no_match_for_empty_context(void **state)
 {
     struct scp_expect_fixture *fixture = *state;
-    FILE *stream;
     char *text;
-    size_t size;
 
-    stream = tmpfile();
-    assert_non_null(stream);
-    assert_int_equal(sim_exp_show(stream, &fixture->exp, "\"A\""), SCPE_ARG);
-    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    text = capture_show_expect_text(&fixture->exp, "\"A\"", SCPE_ARG);
     assert_non_null(strstr(text, "No Rules match '\"A\"'"));
     free(text);
-    fclose(stream);
 }
 
 /* Verify exact-string matching works when the buffer wraps mid-pattern. */
@@ -578,14 +628,9 @@ static void test_sim_exp_check_matches_across_buffer_wrap(void **state)
         sim_exp_set(&fixture->exp, "\"ABCDE\"", 0, 0, EXP_TYP_PERSIST, NULL),
         SCPE_OK);
 
-    assert_int_equal(sim_exp_check(&fixture->exp, 'x'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'x'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'A'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'B'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'C'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'D'), SCPE_OK);
+    assert_expect_string(&fixture->exp, "xxABCD");
     assert_int_equal(fixture->exp.buf_ins, 0);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'E'), SCPE_OK);
+    assert_expect_string(&fixture->exp, "E");
 
     assert_string_equal(getenv("_EXPECT_MATCH_PATTERN"), "\"ABCDE\"");
 }
@@ -618,8 +663,7 @@ static void test_expect_matches_schedule_internal_expect_unit(void **state)
     assert_true(sim_expect_is_unit(&sim_expect_dev.units[0]));
     assert_int_equal(
         sim_exp_set(&fixture->exp, "\"HI\"", 0, 0, 0, NULL), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'H'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'I'), SCPE_OK);
+    assert_expect_string(&fixture->exp, "HI");
     assert_int_equal(SCPE_BARE_STATUS(sim_process_event()), SCPE_EXPECT);
 }
 
@@ -637,8 +681,7 @@ static void test_expect_time_rules_schedule_microsecond_based_stop(
     assert_int_equal(sim_exp_set(&fixture->exp, "\"GO\"", 0, 5000,
                                  EXP_TYP_TIME, NULL),
                      SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'G'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'O'), SCPE_OK);
+    assert_expect_string(&fixture->exp, "GO");
     assert_true(sim_is_active(&sim_expect_dev.units[0]));
     scheduled_delay = sim_activate_time(&sim_expect_dev.units[0]);
     assert_true(scheduled_delay >= expected_delay);
@@ -665,33 +708,26 @@ static void test_expect_helpers_handle_empty_contexts(void **state)
 static void test_sim_exp_show_renders_debug_guidance(void **state)
 {
     struct scp_expect_fixture *fixture = *state;
-    FILE *stream;
     char *text;
-    size_t size;
 
     fixture->exp.dbit = 1;
     fixture->device.dctrl = 1;
 
-    stream = tmpfile();
-    assert_non_null(stream);
-    assert_int_equal(sim_exp_show(stream, &fixture->exp, ""), SCPE_OK);
-    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    text = capture_show_expect_text(&fixture->exp, "", SCPE_OK);
     assert_non_null(strstr(text, "Expect Debugging via: SET TTY DEBUG"));
     free(text);
-    fclose(stream);
 }
 
 /* Verify the SHOW SEND wrapper accepts the console path and rejects extras. */
 static void test_sim_show_send_wrapper_handles_console_arguments(void **state)
 {
     FILE *stream;
+    char *text;
 
     (void)state;
 
-    stream = tmpfile();
-    assert_non_null(stream);
-    assert_int_equal(sim_show_send(stream, NULL, NULL, 0, ""), SCPE_OK);
-    fclose(stream);
+    text = capture_show_send_wrapper_text("", SCPE_OK);
+    free(text);
 
     stream = tmpfile();
     assert_non_null(stream);
@@ -705,6 +741,7 @@ static void test_sim_show_expect_wrapper_handles_console_arguments(void **state)
 {
     EXPECT *exp;
     FILE *stream;
+    char *text;
 
     (void)state;
 
@@ -712,11 +749,8 @@ static void test_sim_show_expect_wrapper_handles_console_arguments(void **state)
     assert_int_equal(sim_exp_set(exp, "\"A\"", 0, 0, EXP_TYP_PERSIST, NULL),
                      SCPE_OK);
 
-    stream = tmpfile();
-    assert_non_null(stream);
-    assert_int_equal(sim_show_expect(stream, NULL, NULL, 0, "\"A\""),
-                     SCPE_OK);
-    fclose(stream);
+    text = capture_show_expect_wrapper_text("\"A\"", SCPE_OK);
+    free(text);
 
     stream = tmpfile();
     assert_non_null(stream);
@@ -750,31 +784,20 @@ static void test_sim_show_expect_wrapper_rejects_invalid_filters(void **state)
 /* Verify SHOW wrappers resolve TMXR lines and reject unknown line names. */
 static void test_show_wrappers_handle_named_tmxr_lines(void **state)
 {
-    FILE *stream;
     char *text;
-    size_t size;
 
     (void)state;
 
     assert_int_equal(send_cmd(1, "TTY:1 DELAY=4 AFTER=6 \"Q\""), SCPE_OK);
     assert_int_equal(expect_cmd(1, "TTY:1 \"GO\" echo hit"), SCPE_OK);
 
-    stream = tmpfile();
-    assert_non_null(stream);
-    assert_int_equal(sim_show_send(stream, NULL, NULL, 0, "TTY:1"), SCPE_OK);
-    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    text = capture_show_send_wrapper_text("TTY:1", SCPE_OK);
     assert_non_null(strstr(text, "TTY:1"));
     free(text);
-    fclose(stream);
 
-    stream = tmpfile();
-    assert_non_null(stream);
-    assert_int_equal(sim_show_expect(stream, NULL, NULL, 0, "TTY:1"),
-                     SCPE_OK);
-    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    text = capture_show_expect_wrapper_text("TTY:1", SCPE_OK);
     assert_non_null(strstr(text, "\"GO\""));
     free(text);
-    fclose(stream);
 }
 
 /* Verify line-qualified SEND and EXPECT reject unknown TMXR lines. */
@@ -872,15 +895,15 @@ static void test_send_state_compacts_pending_bytes_and_honors_timing(
     assert_memory_equal(fixture->snd.buffer, "BCABC", fixture->snd.insoff);
 }
 
+/* Additional SEND/EXPECT edge cases. */
+
 /* Verify SHOW SEND renders pending timing and invalid env vars fallback. */
 static void test_sim_show_send_input_renders_timing_and_env_fallback(
     void **state)
 {
     SEND *snd;
     static uint8 payload[] = {'A'};
-    FILE *stream;
     char *text;
-    size_t size;
 
     (void)state;
 
@@ -890,10 +913,7 @@ static void test_sim_show_send_input_renders_timing_and_env_fallback(
     assert_int_equal(
         sim_send_input(snd, payload, sizeof(payload), 5000, 2000000), SCPE_OK);
 
-    stream = tmpfile();
-    assert_non_null(stream);
-    assert_int_equal(sim_show_send_input(stream, snd), SCPE_OK);
-    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    text = capture_show_send_input_text(snd);
     assert_non_null(strstr(text, "pending input Data"));
     assert_non_null(strstr(text, "first character"));
     assert_non_null(strstr(text, "between characters"));
@@ -902,7 +922,6 @@ static void test_sim_show_send_input_renders_timing_and_env_fallback(
     assert_non_null(
         strstr(text, "Default delay between character input is 1000"));
     free(text);
-    fclose(stream);
 }
 
 /* Verify SHOW SEND reports distinct default after and delay values. */
@@ -910,9 +929,7 @@ static void test_sim_show_send_input_reports_distinct_default_values(
     void **state)
 {
     SEND *snd;
-    FILE *stream;
     char *text;
-    size_t size;
 
     (void)state;
 
@@ -920,16 +937,12 @@ static void test_sim_show_send_input_reports_distinct_default_values(
     setenv("SIM_SEND_DELAY_CONSOLE", "7", 1);
     setenv("SIM_SEND_AFTER_CONSOLE", "11", 1);
 
-    stream = tmpfile();
-    assert_non_null(stream);
-    assert_int_equal(sim_show_send_input(stream, snd), SCPE_OK);
-    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    text = capture_show_send_input_text(snd);
     assert_non_null(
         strstr(text, "Default delay before first character input is 11"));
     assert_non_null(
         strstr(text, "Default delay between character input is 7"));
     free(text);
-    fclose(stream);
 }
 
 /* Verify SHOW SEND renders microsecond detail and debug guidance. */
@@ -938,9 +951,7 @@ static void test_sim_show_send_input_renders_microsecond_and_debug_detail(
 {
     struct scp_expect_fixture *fixture = *state;
     SEND *snd;
-    FILE *stream;
     char *text;
-    size_t size;
     uint32 threshold;
 
     snd = &fixture->lines[1].send;
@@ -952,12 +963,8 @@ static void test_sim_show_send_input_renders_microsecond_and_debug_detail(
     snd->dbit = 1;
     fixture->device.dctrl = 1;
 
-    stream = tmpfile();
-    assert_non_null(stream);
-    assert_int_equal(sim_show_send_input(stream, snd), SCPE_OK);
-    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    text = capture_show_send_input_text(snd);
     free(text);
-    fclose(stream);
 }
 
 /* Verify regex export clears optional capture groups that did not match. */
@@ -970,8 +977,7 @@ static void test_regex_optional_group_unsets_unmatched_capture_group(
     assert_int_equal(sim_exp_set(&fixture->exp, "/ab(c)?/", 0, 0,
                                  EXP_TYP_REGEX, NULL),
                      SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'a'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'b'), SCPE_OK);
+    assert_expect_string(&fixture->exp, "ab");
 
     assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "ab");
     group1 = getenv("_EXPECT_MATCH_GROUP_1");
@@ -1002,9 +1008,11 @@ static void test_regex_matching_flattens_embedded_nul_buffer_segments(
                                  EXP_TYP_REGEX | EXP_TYP_PERSIST, NULL),
                      SCPE_OK);
 
-    assert_int_equal(sim_exp_check(&fixture->exp, 'A'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, '\0'), SCPE_OK);
-    assert_int_equal(sim_exp_check(&fixture->exp, 'B'), SCPE_OK);
+    {
+        static const uint8 wrapped_data[] = {'A', '\0', 'B'};
+
+        assert_expect_bytes(&fixture->exp, wrapped_data, sizeof(wrapped_data));
+    }
 
     assert_string_equal(getenv("_EXPECT_MATCH_PATTERN"), "/AB/");
     assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "AB");
@@ -1014,9 +1022,7 @@ static void test_regex_matching_flattens_embedded_nul_buffer_segments(
 static void test_sim_exp_show_renders_decorated_rule_details(void **state)
 {
     EXPECT *exp;
-    FILE *stream;
     char *text;
-    size_t size;
 
     (void)state;
 
@@ -1028,16 +1034,12 @@ static void test_sim_exp_show_renders_decorated_rule_details(void **state)
                                  "echo done"),
                      SCPE_OK);
 
-    stream = tmpfile();
-    assert_non_null(stream);
-    assert_int_equal(sim_exp_show(stream, exp, "/A(B)?/"), SCPE_OK);
-    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    text = capture_show_expect_text(exp, "/A(B)?/", SCPE_OK);
     assert_non_null(strstr(text, "EXPECT -p -c -r -i"));
     assert_non_null(strstr(text, "HALTAFTER=9"));
     assert_non_null(strstr(text, "[2]"));
     assert_non_null(strstr(text, "echo done"));
     free(text);
-    fclose(stream);
 }
 
 int main(void)
