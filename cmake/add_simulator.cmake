@@ -326,9 +326,11 @@ function (add_simulator _targ)
 
     add_test(NAME "simh-${_targ}" COMMAND ${test_cmd})
 
+    set(TEST_LABELS "simh;integration")
     if (SIMH_LABEL)
-        set_tests_properties("simh-${_targ}" PROPERTIES LABELS "simh-${SIMH_LABEL}")
+        list(APPEND TEST_LABELS "simh-${SIMH_LABEL}")
     endif ()
+    set_tests_properties("simh-${_targ}" PROPERTIES LABELS "${TEST_LABELS}")
 
     if (BUILD_SHARED_DEPS)
         ## Make sure that the tests can find the DLLs/shared objects:
@@ -382,8 +384,8 @@ endfunction ()
 
 
 function(add_unit_test _targ)
-    set(UNIT_TARGET "simbase-${_targ}")
-    set(UNIT_TEST "simbase-${_targ}")
+    set(UNIT_TARGET "simh-${_targ}")
+    set(UNIT_TEST "simh-${_targ}")
 
     simh_executable_template(${UNIT_TARGET} "${ARGN}")
     cmake_parse_arguments(SIMH "FEATURE_INT64;FEATURE_FULL64;BUILDROMS;FEATURE_VIDEO,FEATURE_DISPLAY"
@@ -394,9 +396,9 @@ function(add_unit_test _targ)
     target_link_libraries(${UNIT_TARGET} PUBLIC unittest)
     add_test(NAME ${UNIT_TEST} COMMAND ${UNIT_TARGET})
 
-    set(TEST_LABEL "simbase;unit")
+    set(TEST_LABEL "simh;unit")
     if (SIMH_LABEL)
-      list(APPEND TEST_LABEL "simbase-${SIMH_LABEL}")
+      list(APPEND TEST_LABEL "simh-${SIMH_LABEL}")
     endif ()
     set_tests_properties(${UNIT_TEST} PROPERTIES LABELS "${TEST_LABEL}")
 

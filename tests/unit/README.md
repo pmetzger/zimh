@@ -124,27 +124,27 @@ need stable infrastructure.
 Configure a build with unit tests enabled:
 
 ```sh
-cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -S . -B cmake-build-unitharness
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -S . -B build/release
 ```
 
 Build specific unit-test executables:
 
 ```sh
-ninja -C cmake-build-unitharness simbase-unit-smoke simbase-unit-support
+ninja -C build/release simh-unit-smoke simh-unit-support
 ```
 
 Run just the host-side unit tests:
 
 ```sh
-ctest --test-dir cmake-build-unitharness \
-  -R 'simbase-unit-(smoke|support)' \
+ctest --test-dir build/release \
+  -R 'simh-unit-(smoke|support)' \
   --output-on-failure
 ```
 
 List all tests currently known to `ctest`:
 
 ```sh
-ctest --test-dir cmake-build-unitharness -N
+ctest --test-dir build/release -N
 ```
 
 ## Conventions

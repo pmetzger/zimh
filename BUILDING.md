@@ -157,7 +157,7 @@ cmake --build build/release --target unit-tests
 cmake --build build/release --target integration-tests
 ```
 
-`unit-tests` builds and runs the host-side `simbase-unit-*` suite.
+`unit-tests` builds and runs the host-side `simh-unit-*` suite.
 `integration-tests` builds and runs the simulator `simh-*` suite.
 
 ## Common options

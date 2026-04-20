@@ -250,7 +250,7 @@ Common maintainer workflows:
   - `ctest --test-dir build/release -R simh-pdp11 --output-on-failure`
 
 - run host-side unit tests:
-  - `ctest --test-dir build/release -R 'simbase-unit-' --output-on-failure`
+  - `ctest --test-dir build/release -R 'simh-unit-' --output-on-failure`
 
 ## When To Edit Which File
 

@@ -45,7 +45,7 @@ static int setup_scp_help_engine_fixture(void **state)
     devices[0] = &fixture->device;
     devices[1] = NULL;
     assert_int_equal(
-        simh_test_install_devices("simbase-unit-scp-help-engine", devices), 0);
+        simh_test_install_devices("simh-unit-scp-help-engine", devices), 0);
 
     *state = fixture;
     return 0;

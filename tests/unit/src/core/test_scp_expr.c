@@ -35,7 +35,7 @@ static int setup_scp_expr_fixture(void **state)
     devices[0] = &fixture->device;
     devices[1] = NULL;
     assert_int_equal(
-        simh_test_install_devices("simbase-unit-scp-expr", devices), 0);
+        simh_test_install_devices("simh-unit-scp-expr", devices), 0);
 
     sim_dfdev = &fixture->device;
     scp_set_exp_argv(NULL);

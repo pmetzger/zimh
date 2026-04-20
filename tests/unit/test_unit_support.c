@@ -118,9 +118,9 @@ static void test_scp_fixture_helpers_install_devices(void **state)
     devices[1] = NULL;
 
     assert_int_equal(
-        simh_test_install_devices("simbase-unit-test-support", devices), 0);
+        simh_test_install_devices("simh-unit-test-support", devices), 0);
     assert_ptr_equal(sim_devices[0], &device);
-    assert_string_equal(sim_name, "simbase-unit-test-support");
+    assert_string_equal(sim_name, "simh-unit-test-support");
 
     assert_string_equal(sim_set_uname(&units[0], "SYSDISK0"), "SYSDISK0");
     assert_string_equal(sim_set_uname(&units[1], "SYSDISK1"), "SYSDISK1");

@@ -10,7 +10,7 @@
 
 DEVICE *sim_devices[SIMH_TEST_MAX_DEVICES];
 REG *sim_PC = NULL;
-char sim_name[64] = "simbase-unit";
+char sim_name[64] = "simh-unit";
 const char *sim_stop_messages[SCPE_BASE];
 int32 sim_emax = 0;
 
@@ -19,7 +19,7 @@ void simh_test_reset_simulator_state(void)
     memset(sim_devices, 0, sizeof(sim_devices));
     sim_PC = NULL;
     memset(sim_name, 0, sizeof(sim_name));
-    memcpy(sim_name, "simbase-unit", sizeof("simbase-unit"));
+    memcpy(sim_name, "simh-unit", sizeof("simh-unit"));
     memset(sim_stop_messages, 0, sizeof(sim_stop_messages));
     sim_emax = 0;
     sim_dfdev = NULL;

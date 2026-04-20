@@ -50,7 +50,7 @@ static int setup_scp_context_fixture(void **state)
     devices[2] = &fixture->disabled;
     devices[3] = NULL;
     assert_int_equal(
-        simh_test_install_devices("simbase-unit-scp-context", devices), 0);
+        simh_test_install_devices("simh-unit-scp-context", devices), 0);
 
     *state = fixture;
     return 0;

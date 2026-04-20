@@ -32,7 +32,7 @@ static int setup_scp_expect_fixture(void **state)
     devices[0] = &fixture->device;
     devices[1] = NULL;
     assert_int_equal(
-        simh_test_install_devices("simbase-unit-scp-expect", devices), 0);
+        simh_test_install_devices("simh-unit-scp-expect", devices), 0);
 
     fixture->exp.dptr = &fixture->device;
     fixture->snd.dptr = &fixture->device;
