@@ -17,5 +17,5 @@ add_simulator(pdq3
     INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}
     LABEL PDQ-3
-    PKG_FAMILY experimental
+    PKG_FAMILY experimental_family
     TEST pdq3)

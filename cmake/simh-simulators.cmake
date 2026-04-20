@@ -118,3 +118,12 @@ add_subdirectory(simulators/imlac)
 add_subdirectory(simulators/sigma)
 add_subdirectory(simulators/swtp6800/swtp6800)
 add_subdirectory(simulators/tt2500)
+
+## Top-level simulator groups that replace the old Makefile grouping targets.
+## Use a simulator-specific target name here to avoid collisions with
+## packaging metadata that also uses "experimental".
+add_custom_target(experimental-simulators
+    DEPENDS
+        alpha
+        pdq3
+        sage)

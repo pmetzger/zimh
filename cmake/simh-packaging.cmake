@@ -37,7 +37,7 @@ cpack_add_component(dgnova_family
     DISPLAY_NAME "DG Nova and Eclipse"
     DESCRIPTION "Data General NOVA and Eclipse system simulators. Simulators: eclipse, nova"
 )
-cpack_add_component(experimental
+cpack_add_component(experimental_family
     DISPLAY_NAME "Experimental (work-in-progress) simulators"
     DESCRIPTION "Experimental or work-in-progress simulators not in the SIMH mainline simulator suite. Simulators: alpha, pdq3, sage"
 )
