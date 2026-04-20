@@ -3,6 +3,12 @@
 When adding new source code to this repository, prefer keeping lines
 under 80 columns.
 
+When doing source code commits, create a commit message in tmp/ in the
+repository and make sure it is propery formatted, including keeping
+lines under 80 columns, and then use that with git's `-F` flag. Give
+it a temporary unique name to avoid collisions with other commit
+workflows.
+
 When creating a new source file, run `clang-format` on that new file
 before finishing the change. Do not run `clang-format` across existing
 legacy files just to normalize formatting.
@@ -18,6 +24,15 @@ that work are present in the environment.
 
 If a required tool is missing, stop and ask for it to be installed
 instead of trying to work around the missing dependency.
+
+On macOS, prefer the Clang/LLVM toolchain consistently:
+
+- use `clang` rather than GCC
+- use `llvm-cov` and `llvm-profdata` for code coverage
+- use `lldb` rather than `gdb`
+
+Do not switch to GCC or GNU coverage tools on macOS unless the user
+explicitly asks for that.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:ca08a54f -->
 ## Beads Issue Tracker
