@@ -168,31 +168,25 @@ ELSE ()
 ENDIF()
 
 if (WITH_REGEX)
-    ## TEMP: Use PCRE until patches for PCRE2 are avaiable.
-    ##
-    ## 1. Prefer PCRE2 over PCRE (unless PREFER_PCRE is set)
-    ## 2. Prefer interface libraries before using detected find_package
-    ##    variables.
-    IF (TARGET PkgConfig::PCRE)
+    ## TEMP: Use PCRE until the runtime code has a complete PCRE2 port.
+    ## The tree still has a full PCRE path and only partial PCRE2
+    ## plumbing.  Prefer interface libraries before falling back to the
+    ## variables from find_package.
+    IF (TARGET PkgConfig::PCRE2)
+        target_link_libraries(simh_regexp INTERFACE PkgConfig::PCRE2)
+        target_compile_definitions(simh_regexp INTERFACE HAVE_PCRE2_H)
+        set(PCRE_PKG_STATUS "pkg-config pcre2")
+    ELSEIF (TARGET PkgConfig::PCRE)
         target_link_libraries(simh_regexp INTERFACE PkgConfig::PCRE)
-        if (PREFER_PCRE)
-            target_compile_definitions(simh_regexp INTERFACE HAVE_PCRE_H)
-            set(PCRE_PKG_STATUS "pkg-config pcre")
-        else ()
-            target_compile_definitions(simh_regexp INTERFACE HAVE_PCRE2_H)
-            if (WIN32)
-                ## Use static linkage (vice DLL) on Windows:
-                target_compile_definitions(simh_regexp INTERFACE PCRE2_STATIC)
-            endif ()
-            set(PCRE_PKG_STATUS "pkg-config pcre2")
-        endif ()
+        target_compile_definitions(simh_regexp INTERFACE HAVE_PCRE_H)
+        set(PCRE_PKG_STATUS "pkg-config pcre")
     ELSEIF (TARGET unofficial::pcre::pcre)
         ## vcpkg:
         target_link_libraries(simh_regexp INTERFACE unofficial::pcre::pcre)
         target_compile_definitions(simh_regexp INTERFACE HAVE_PCRE_H)
         target_compile_definitions(simh_regexp INTERFACE PCRE_STATIC)
         set(PCRE_PKG_STATUS "vcpkg pcre")
-    ELSEIF (NOT PREFER_PCRE AND PCRE2_FOUND)
+    ELSEIF (WITH_PCRE2 AND PCRE2_FOUND)
         target_compile_definitions(simh_regexp INTERFACE HAVE_PCRE2_H)
         target_include_directories(simh_regexp INTERFACE ${PCRE2_INCLUDE_DIRS})
         if (NOT WIN32)

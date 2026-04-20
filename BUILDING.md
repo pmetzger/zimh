@@ -24,6 +24,9 @@ At minimum:
 For the full feature build, install the libraries used by optional
 features:
 
+- `libpcre`
+  Provides the currently working regular expression backend used by SCP
+  EXPECT commands when regex support is enabled.
 - `SDL2`
   Provides the windowing, input, and rendering layer used by the
   project’s video/graphics support.
@@ -226,6 +229,13 @@ Some useful CMake options:
   Disable SDL-based graphics support. Default: `On`.
 - `-DWITH_NETWORK=Off`
   Disable optional networking features. Default: `On`.
+- `-DWITH_REGEX=Off`
+  Disable regular expression support for SCP EXPECT commands. Default:
+  `On`.
+- `-DWITH_PCRE2=On`
+  Prefer the experimental PCRE2 regex backend. The current working regex
+  implementation still depends on `libpcre`, so this option is mainly
+  useful for conversion work. Default: `Off`.
 - `-DWARNINGS_FATAL=On`
   Treat warnings as errors. Default: `Off`.
 - `-DRELEASE_LTO=On`

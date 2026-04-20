@@ -829,7 +829,8 @@ following the table.
 | `ENABLE_DEP_BUILD`   | platform-specific  | Allow supported missing dependencies to be fetched and built locally. Enabled by default on Windows, disabled by default on Linux/macOS and MinGW-w64. |
 | `BUILD_SHARED_DEPS`  | platform-specific  | Build dependencies as shared libraries/DLLs on Windows. Does nothing on Linux/macOS. Disabled by default on Windows to ensure that the simulators link against static libraries. |
 | `WITH_ASYNC`         | enabled            | Asynchronous I/O and threading support. |
-| `WITH_REGEX`         | enabled            | PCRE regular expression support. |
+| `WITH_REGEX`         | enabled            | PCRE-based regular expression support. |
+| `WITH_PCRE2`         | disabled           | Prefer the experimental PCRE2 backend for regular expression support. |
 | `WITH_NETWORK`       | enabled            | Simulator networking support. `WITH_PCAP`, `WITH_SLIRP`, `WITH_VDE` and `WITH_TAP` only have meaning if `WITH_NETWORK` is enabled. |
 | `WITH_PCAP`          | enabled            | libpcap (packet capture) support. |
 | `WITH_SLIRP`         | enabled            | SLIRP UDP network support. |

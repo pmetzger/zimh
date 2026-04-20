@@ -11,15 +11,15 @@
 ##-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 
 if (WITH_REGEX)
-    if (PREFER_PCRE)
+    if (WITH_PCRE2)
+        find_package(PCRE2)
+    else ()
         if (USING_VCPKG)
             find_package(unofficial-pcre CONFIG)
         else ()
             ## LEGACY strategy:
             find_package(PCRE)
         endif ()
-    else ()
-        find_package(PCRE2)
     endif ()
 endif ()
 
@@ -58,10 +58,10 @@ if (NOT WIN32 OR MINGW)
     find_package(PkgConfig)
     if (PKG_CONFIG_FOUND)
         if (WITH_REGEX)
-            if (PREFER_PCRE AND NOT PCRE_FOUND)
+            if (WITH_PCRE2 AND NOT PCRE2_FOUND)
+                pkg_check_modules(PCRE2 IMPORTED_TARGET libpcre2-8)
+            elseif (NOT WITH_PCRE2 AND NOT PCRE_FOUND)
                 pkg_check_modules(PCRE IMPORTED_TARGET libpcre)
-            elseif (NOT PREFER_PCRE AND NOT PCRE2_FOUND)
-                pkg_check_modules(PCRE IMPORTED_TARGET libpcre2-8)
             endif ()
         endif (WITH_REGEX)
 
@@ -175,7 +175,7 @@ IF (WITH_REGEX AND NOT (PCRE_FOUND OR PCRE2_FOUND OR TARGET unofficial::pcre::pc
     ENDIF (TARGET zlib-dep)
 
     set(PCRE_CMAKE_ARGS -DBUILD_SHARED_LIBS:Bool=${BUILD_SHARED_DEPS})
-    if (NOT PREFER_PCRE)
+    if (WITH_PCRE2)
         set(PCRE_URL ${PCRE2_SOURCE_URL})
         list(APPEND PCRE_CMAKE_ARGS 
             -DPCRE2_BUILD_PCREGREP:Bool=Off

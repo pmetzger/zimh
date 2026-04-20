@@ -143,6 +143,10 @@ Policy:
 - do not introduce `WITHOUT_*`
 
 Likely cleanup targets:
+- `WINAPI_DEPRECATION`
+  - this is vague for a warning-control option
+  - a name that explicitly says it controls WinAPI deprecation warnings
+    would be clearer
 
 Migration approach:
 - add positive replacement names first
@@ -208,4 +212,5 @@ The end state should be boring in a good way.
 
 The next concrete work item is:
 
-- normalize the remaining project-defined CMake option names
+- evaluate whether `WINAPI_DEPRECATION` should be renamed to make its
+  warning-control purpose clearer
