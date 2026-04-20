@@ -505,6 +505,7 @@ if (NOT DO_DEPENDENCY_BUILD)
 
     message(STATUS "Adding simulators")
     include(simh-simulators)
+    include(simh-extra-tools)
 
     if (WITH_UNIT_TESTS)
         pkg_check_modules(CMOCKA IMPORTED_TARGET cmocka)

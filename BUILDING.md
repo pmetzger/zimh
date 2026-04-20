@@ -142,6 +142,43 @@ There is also an explicit target for the experimental simulator set:
 cmake --build build/release --target experimental-simulators
 ```
 
+## Common build targets
+
+Build an individual simulator by naming its target directly:
+
+```sh
+cmake --build build/release --target pdp11
+cmake --build build/release --target vax
+```
+
+Common top-level targets include:
+
+- default build
+  `cmake --build build/release`
+  Builds the normal default simulator set for the configured tree.
+- `experimental-simulators`
+  `cmake --build build/release --target experimental-simulators`
+  Builds the experimental simulator set.
+- `unit-tests`
+  `cmake --build build/release --target unit-tests`
+  Builds and runs the host-side `simh-unit-*` suite.
+- `integration-tests`
+  `cmake --build build/release --target integration-tests`
+  Builds and runs the simulator `simh-*` suite.
+- `stub`
+  `cmake --build build/release --target stub`
+  Builds the stub simulator skeleton under `src/components/stub/`.
+  This is a developer/sample target for people working on new simulator
+  integrations, not part of the normal simulator set or automated test
+  suite.
+- `frontpaneltest`
+  `cmake --build build/release --target frontpaneltest`
+  Builds the front panel sample and manual diagnostic program.
+- `extra-tools`
+  `cmake --build build/release --target extra-tools`
+  Builds the developer/sample utility targets, currently `stub` and
+  `frontpaneltest`.
+
 ## Running just the tests
 
 If the build tree is already configured and built:
@@ -156,9 +193,6 @@ There are also explicit build targets for the two main test groups:
 cmake --build build/release --target unit-tests
 cmake --build build/release --target integration-tests
 ```
-
-`unit-tests` builds and runs the host-side `simh-unit-*` suite.
-`integration-tests` builds and runs the simulator `simh-*` suite.
 
 ## Common options
 

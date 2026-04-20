@@ -467,29 +467,3 @@ if (NOT DONT_USE_ROMS)
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
     )
 endif ()
-
-## Front panel test.
-##
-## From all evidence in Makefile, sim_frontpanel isn't used yet by any targets.
-##
-## Needs curses...
-add_executable(frontpaneltest
-    ${SIMH_COMPONENTS_ROOT}/frontpanel/FrontPanelTest.c
-    ${SIMH_RUNTIME_ROOT}/sim_sock.c
-    ${SIMH_RUNTIME_ROOT}/sim_frontpanel.c)
-
-target_include_directories(frontpaneltest PUBLIC
-    "${SIMH_CORE_ROOT}"
-    "${SIMH_RUNTIME_ROOT}"
-    "${SIMH_COMPONENTS_ROOT}")
-target_link_libraries(frontpaneltest PUBLIC os_features thread_lib)
-
-if (WIN32)
-    target_link_libraries(frontpaneltest PUBLIC simh_network)
-
-    if (MSVC)
-            target_link_options(frontpaneltest PUBLIC "/SUBSYSTEM:CONSOLE")
-    elseif (MINGW)
-            target_link_options(frontpaneltest PUBLIC "-mconsole")
-    endif ()
-endif (WIN32)
