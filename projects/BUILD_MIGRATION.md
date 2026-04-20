@@ -143,7 +143,6 @@ Policy:
 - do not introduce `WITHOUT_*`
 
 Likely cleanup targets:
-- `DONT_USE_ROMS`
 
 Migration approach:
 - add positive replacement names first
@@ -186,9 +185,8 @@ CMake.
   - `-DCMAKE_BUILD_TYPE=Debug`
 - `LTO=1`
   - `-DRELEASE_LTO=On`
-- `DONT_USE_ROMS=1`
-  - currently `-DDONT_USE_ROMS=On`
-  - should eventually become a positive-name option
+- `WITH_ROMS=Off`
+  - disables internal ROM generation and embedding
 
 Items that still need policy decisions:
 
@@ -210,5 +208,4 @@ The end state should be boring in a good way.
 
 The next concrete work item is:
 
-- normalize the remaining project-defined CMake option names, starting
-  with negative names such as `DONT_USE_ROMS`
+- normalize the remaining project-defined CMake option names

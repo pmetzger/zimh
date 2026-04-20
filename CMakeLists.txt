@@ -212,9 +212,9 @@ option(WITH_VIDEO
 option(WITH_UNIT_TESTS
        "Enable (=1)/disable (=0) host-side unit tests using cmocka. (def: enabled)"
        TRUE)
-option(DONT_USE_ROMS
-       "Enable (=1)/disable (=0) building support ROMs. (def: disabled)"
-       FALSE)
+option(WITH_ROMS
+       "Enable (=1)/disable (=0) internal support ROM generation and embedding."
+       TRUE)
 option(ENABLE_CPPCHECK
        "Enable (=1)/disable (=0) 'cppcheck' static code analysis. (def: disabled.)"
        FALSE)
@@ -391,10 +391,10 @@ set(_feature_text "Libraries and features:\n")
 string(APPEND _feature_text "\n    * Build with video/graphics support. ${BUILD_WITH_VIDEO}")
 string(APPEND _feature_text "\n    * Build with networking support .... ${BUILD_WITH_NETWORK}")
 string(APPEND _feature_text "\n    * Build internal ROMS .............. ")
-if (DONT_SET_ROMS)
-    string(APPEND _feature_text "No")
-else ()
+if (WITH_ROMS)
     string(APPEND _feature_text "Yes")
+else ()
+    string(APPEND _feature_text "No")
 endif ()
 string(APPEND _feature_text "\n    * Thread support ................... ${THREADING_PKG_STATUS}")
 string(APPEND _feature_text "\n    * zlib ............................. ${ZLIB_PKG_STATUS}")

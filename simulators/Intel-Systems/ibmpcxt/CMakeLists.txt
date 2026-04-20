@@ -23,7 +23,7 @@ simh_executable_template(ibmpcxt
 
 target_sources(ibmpcxt PRIVATE ${SIMH_CORE_ROOT}/main.c)
 
-if (DONT_USE_ROMS)
+if (NOT WITH_ROMS)
     target_compile_definitions(ibmpcxt PRIVATE DONT_USE_INTERNAL_ROM)
 else ()
     add_dependencies(ibmpcxt BuildROMs)

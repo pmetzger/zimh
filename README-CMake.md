@@ -837,7 +837,7 @@ following the table.
 | `WITH_TAP`           | enabled            | TAP/TUN device network support. |
 | `WITH_VIDEO`         | enabled            | Simulator display and graphics support |
 | `PANDA_LIGHTS`       | disabled           | KA-10/KI-11 simulator's Panda display. |
-| `DONT_USE_ROMS`      | disabled           | Do not build support ROM header files (i.e., embed the simulator's boot ROMs in the simulator executable.) |
+| `WITH_ROMS`          | enabled            | Build and embed internal support ROM header files when supported by the simulator. |
 | `ENABLE_CPPCHECK`    | disabled           | `cppcheck` static code analysis support. |
 | `WINAPI_DEPRECATION` | disabled           | Show (enable) or mute (disable) WinAPI deprecation warnings. |
 | `WARNINGS_FATAL`     | disabled           | Compiler warnings are fatal errors, e.g. set "-Werror" on `gcc`, "/WX" for MSVC |

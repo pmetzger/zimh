@@ -232,6 +232,8 @@ Some useful CMake options:
   Enable link-time optimization in release builds. Default: `Off`.
 - `-DDEBUG_WALL=On`
   Turn on stronger warning settings for debug builds. Default: `Off`.
+- `-DWITH_ROMS=Off`
+  Disable internal ROM generation and embedding. Default: `On`.
 - `-DENABLE_DEP_BUILD=On`
   Allow CMake to fetch and build supported missing dependencies into the
   local dependency prefix. This is a fallback convenience for awkward

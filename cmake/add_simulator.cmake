@@ -359,7 +359,7 @@ function (add_simulator _targ)
 
     set_property(TEST "simh-${_targ}" PROPERTY ENVIRONMENT "${test_add_env}")
 
-    if (DONT_USE_ROMS)
+    if (NOT WITH_ROMS)
         target_compile_definitions(${_targ} PRIVATE DONT_USE_INTERNAL_ROM)
     elseif (SIMH_BUILDROMS)
         add_dependencies(${_targ} BuildROMs)
@@ -423,7 +423,7 @@ build_simcore(simhz64_video  VIDEO INT64 ADDR64)
 ## Temporary hack for BESM6's breakage.
 build_simcore(simhi64_besm6  VIDEO INT64 BESM6_SDL_HACK)
 
-if (NOT DONT_USE_ROMS)
+if (WITH_ROMS)
     add_executable(BuildROMs ${SIMH_RUNTIME_ROOT}/sim_BuildROMs.c)
     target_include_directories(BuildROMs PUBLIC
         "${SIMH_CORE_ROOT}"
