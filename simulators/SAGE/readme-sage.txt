@@ -26,7 +26,7 @@ Holger Veit, March 2011
 
 
 
-$ BIN/sage
+$ build/release/bin/sage
 
 Sage-II/IV 68k simulator V3.8-2
 sim> show dev
@@ -48,7 +48,7 @@ Debug output disabled
 $ cp SAGE/FILES/68k.sim .
 $ cp SAGE/FILES/cpm68k12.imd .
 $ cp SAGE/sage-ii.hex .
-$ BIN/sage 68k.sim
+$ build/release/bin/sage 68k.sim
 
 Sage-II/IV 68k simulator V3.8-2
 Debug output to "debug.log"
@@ -88,4 +88,3 @@ Simulation stopped, PC: 0007C8C4 (stop #2000)
 sim>quit
 Goodbye
 Debug output disabled
-

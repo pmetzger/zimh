@@ -404,7 +404,8 @@ distribution includes a batch file (`build_mingw.bat`) that will build
 all the simulators from source. By default, the PDP-11 and VAX family
 simulators are built with Ethernet support if the necessary Winpcap
 components are available at build time. The compiled executables will
-be produced in the `BIN` directory which will be created if needed.
+be produced in the configured build tree's `bin/` subdirectory, such as
+`build/release/bin`.
 
 # Simulator Conventions
 

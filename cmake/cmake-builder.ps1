@@ -48,16 +48,15 @@ PS> cmake-builder.ps1 vs2019 Debug -notest -noinstall
 
 Generate/configure and build the SIMH simulator suite with the Visual Studio
 2019 toolchain in the Debug compile configuration. Does not execute tests and
-does not install the simulators under the BIN subdirectory in the top of the
-source tree.
+does not run the install phase.
 
 .EXAMPLE
 
 PS> cmake-builder.ps1 -flavor vs2019 -config Release -installonly
 
-Install the simulators under the BIN subdirectory in the top of the source
-tree. Does not generate/configure, but will build to ensure that compile
-targets (simulator executables) are up-to-date.
+Run the install phase using the configured CMake install prefix. Does not
+generate/configure, but will build to ensure that compile targets (simulator
+executables) are up-to-date.
 #>
 
 param (
@@ -131,8 +130,7 @@ param (
     [Parameter(Mandatory=$false)]
     [switch] $notest         = $false,
 
-    ## Do not install the simulator suite in the source directory's BIN
-    ## subdirectory.
+    ## Do not run the install phase.
     [Parameter(Mandatory=$false)]
     [switch] $noinstall      = $false,
 
@@ -148,8 +146,7 @@ param (
     [Parameter(Mandatory=$false)]
     [switch] $testonly       = $false,
 
-    ## Only install the SIMH simulator suite in the source directory's BIN
-    ## subdirectory.
+    ## Only run the install phase.
     [Parameter(Mandatory=$false)]
     [switch] $installOnly    = $false,
 
