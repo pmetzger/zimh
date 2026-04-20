@@ -82,10 +82,10 @@ the normal compiler and `pkg-config` search paths.
 
 ## Recommended build layout
 
-Create a dedicated build directory under `cmake/`, for example:
+Create a dedicated build directory under `build/`, for example:
 
 ```sh
-mkdir -p cmake-build
+mkdir -p build/release
 ```
 
 You may choose a different build directory name, but keep it separate
@@ -97,9 +97,9 @@ Use this when all optional dependencies, including `SDL2_ttf`, are
 installed:
 
 ```sh
-cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -S . -B cmake-build
-ninja -C cmake-build
-ctest --test-dir cmake-build --output-on-failure --timeout 300
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -S . -B build/release
+ninja -C build/release
+ctest --test-dir build/release --output-on-failure --timeout 300
 ```
 
 This enables the normal default feature set, including video support.
@@ -110,9 +110,9 @@ If the SDL stack is incomplete, especially if `SDL2_ttf` is missing, use
 this configuration instead:
 
 ```sh
-cmake -G Ninja -DWITH_VIDEO=Off -DCMAKE_BUILD_TYPE=Release -S . -B cmake-build
-ninja -C cmake-build -j 8
-ctest --test-dir cmake-build -j 8 --output-on-failure --timeout 300
+cmake -G Ninja -DWITH_VIDEO=Off -DCMAKE_BUILD_TYPE=Release -S . -B build/release
+ninja -C build/release -j 8
+ctest --test-dir build/release -j 8 --output-on-failure --timeout 300
 ```
 
 This is the safest fallback build when the graphics dependencies are not
@@ -123,7 +123,23 @@ fully installed.
 If you have already configured successfully and only want to rebuild:
 
 ```sh
-ninja -C cmake-build
+ninja -C build/release
+```
+
+The plain default build in a configured tree builds the normal default
+simulator set. For example, if you use a build directory such as
+`build/release`, then:
+
+```sh
+cmake --build build/release
+```
+
+builds the normal default simulator set for that configured tree.
+
+There is also an explicit target for the experimental simulator set:
+
+```sh
+cmake --build build/release --target experimental-simulators
 ```
 
 ## Running just the tests
@@ -131,7 +147,7 @@ ninja -C cmake-build
 If the build tree is already configured and built:
 
 ```sh
-ctest --test-dir cmake-build -j 8 --output-on-failure --timeout 300
+ctest --test-dir build/release -j 8 --output-on-failure --timeout 300
 ```
 
 ## Common options
@@ -153,7 +169,7 @@ Example:
 
 ```sh
 cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug -DWITH_VIDEO=Off \
-  -DDEBUG_WALL=On -S . -B cmake-build-debug
+  -DDEBUG_WALL=On -S . -B build/debug
 ```
 
 ## Reconfiguring safely
@@ -165,8 +181,8 @@ old build directory and configure again.
 Example:
 
 ```sh
-rm -rf cmake-build
-cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -S . -B cmake-build
+rm -rf build/release
+cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -S . -B build/release
 ```
 
 Or use a new build directory name instead.
