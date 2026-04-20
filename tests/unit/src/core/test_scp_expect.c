@@ -707,7 +707,36 @@ static void test_sim_show_send_input_renders_timing_and_env_fallback(
     assert_non_null(strstr(text, "first character"));
     assert_non_null(strstr(text, "between characters"));
     assert_non_null(
+        strstr(text, "Default delay before first character input is 1000"));
+    assert_non_null(
         strstr(text, "Default delay between character input is 1000"));
+    free(text);
+    fclose(stream);
+}
+
+/* Verify SHOW SEND reports distinct default after and delay values. */
+static void test_sim_show_send_input_reports_distinct_default_values(
+    void **state)
+{
+    SEND *snd;
+    FILE *stream;
+    char *text;
+    size_t size;
+
+    (void)state;
+
+    snd = sim_cons_get_send();
+    setenv("SIM_SEND_DELAY_CONSOLE", "7", 1);
+    setenv("SIM_SEND_AFTER_CONSOLE", "11", 1);
+
+    stream = tmpfile();
+    assert_non_null(stream);
+    assert_int_equal(sim_show_send_input(stream, snd), SCPE_OK);
+    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    assert_non_null(
+        strstr(text, "Default delay before first character input is 11"));
+    assert_non_null(
+        strstr(text, "Default delay between character input is 7"));
     free(text);
     fclose(stream);
 }
@@ -867,6 +896,9 @@ int main(void)
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_show_send_input_renders_timing_and_env_fallback,
+            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_show_send_input_reports_distinct_default_values,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_regex_optional_group_unsets_unmatched_capture_group,

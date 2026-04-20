@@ -962,7 +962,7 @@ t_stat sim_show_send_input(FILE *st, const SEND *snd)
         fprintf(st, "  Default delay before first character input is %u %s\n",
                 after, sim_vm_interval_units);
     if (delay)
-        fprintf(st, "  Default delay between character input is %u %s\n", after,
+        fprintf(st, "  Default delay between character input is %u %s\n", delay,
                 sim_vm_interval_units);
     if (snd->dptr && (snd->dbit & snd->dptr->dctrl))
         fprintf(st, "  Send Debugging via: SET %s DEBUG%s%s\n",
