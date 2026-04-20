@@ -150,6 +150,16 @@ If the build tree is already configured and built:
 ctest --test-dir build/release -j 8 --output-on-failure --timeout 300
 ```
 
+There are also explicit build targets for the two main test groups:
+
+```sh
+cmake --build build/release --target unit-tests
+cmake --build build/release --target integration-tests
+```
+
+`unit-tests` builds and runs the host-side `simbase-unit-*` suite.
+`integration-tests` builds and runs the simulator `simh-*` suite.
+
 ## Common options
 
 Some useful CMake options:

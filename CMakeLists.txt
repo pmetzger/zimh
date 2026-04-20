@@ -522,6 +522,31 @@ if (NOT DO_DEPENDENCY_BUILD)
         endif ()
     endif ()
 
+    get_property(SIMH_UNIT_TEST_TARGETS GLOBAL PROPERTY SIMH_UNIT_TEST_TARGETS)
+    if (SIMH_UNIT_TEST_TARGETS)
+        list(REMOVE_DUPLICATES SIMH_UNIT_TEST_TARGETS)
+        add_custom_target(unit-tests
+            COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+                    -R "^simbase-unit-"
+            DEPENDS ${SIMH_UNIT_TEST_TARGETS}
+            USES_TERMINAL
+            COMMENT "Building and running host-side unit tests"
+        )
+    endif ()
+
+    get_property(SIMH_INTEGRATION_TARGETS GLOBAL PROPERTY
+                 SIMH_INTEGRATION_TARGETS)
+    if (SIMH_INTEGRATION_TARGETS)
+        list(REMOVE_DUPLICATES SIMH_INTEGRATION_TARGETS)
+        add_custom_target(integration-tests
+            COMMAND ${CMAKE_CTEST_COMMAND} --output-on-failure
+                    -R "^simh-"
+            DEPENDS ${SIMH_INTEGRATION_TARGETS}
+            USES_TERMINAL
+            COMMENT "Building and running simulator integration tests"
+        )
+    endif ()
+
     include(cpack-setup)
     include(simh-packaging)
 else ()

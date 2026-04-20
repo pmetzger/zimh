@@ -376,6 +376,8 @@ function (add_simulator _targ)
 
         add_dependencies(cppcheck "${_targ}_cppcheck")
     endif (ENABLE_CPPCHECK AND cppcheck_cmd)
+
+    set_property(GLOBAL APPEND PROPERTY SIMH_INTEGRATION_TARGETS ${_targ})
 endfunction ()
 
 
@@ -397,6 +399,8 @@ function(add_unit_test _targ)
       list(APPEND TEST_LABEL "simbase-${SIMH_LABEL}")
     endif ()
     set_tests_properties(${UNIT_TEST} PROPERTIES LABELS "${TEST_LABEL}")
+
+    set_property(GLOBAL APPEND PROPERTY SIMH_UNIT_TEST_TARGETS ${UNIT_TARGET})
 endfunction ()
 
 ##~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=
