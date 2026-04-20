@@ -21,12 +21,16 @@ At minimum:
 - `pkg-config`
 - `bison`
 
-For the full feature build, install the libraries used by optional
-features:
+For the normal default build, install these additional libraries:
 
 - `libpcre`
   Provides the currently working regular expression backend used by SCP
-  EXPECT commands when regex support is enabled.
+  EXPECT commands when regex support is enabled. Disable
+  `-DWITH_REGEX=Off` if you do not want to install it.
+
+For the full feature build, install the libraries used by optional
+features:
+
 - `SDL2`
   Provides the windowing, input, and rendering layer used by the
   project’s video/graphics support.
