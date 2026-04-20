@@ -9,6 +9,7 @@
 #include "scp.h"
 #include "scp_expect.h"
 #include "sim_console.h"
+#include "sim_tmxr.h"
 #include "test_scp_fixture.h"
 #include "test_simh_personality.h"
 #include "test_support.h"
@@ -16,6 +17,8 @@
 struct scp_expect_fixture {
     DEVICE device;
     UNIT unit;
+    TMXR mux;
+    TMLN lines[2];
     EXPECT exp;
     SEND snd;
 };
@@ -25,6 +28,9 @@ static void clear_send_expect_default_env(void)
     unsetenv("SIM_SEND_DELAY_CONSOLE");
     unsetenv("SIM_SEND_AFTER_CONSOLE");
     unsetenv("SIM_EXPECT_HALTAFTER_CONSOLE");
+    unsetenv("SIM_SEND_DELAY_TTY_1");
+    unsetenv("SIM_SEND_AFTER_TTY_1");
+    unsetenv("SIM_EXPECT_HALTAFTER_TTY_1");
 }
 
 static void reset_send_context(SEND *snd)
@@ -54,6 +60,7 @@ static int setup_scp_expect_fixture(void **state)
 {
     struct scp_expect_fixture *fixture;
     DEVICE *devices[2];
+    size_t i;
 
     fixture = calloc(1, sizeof(*fixture));
     assert_non_null(fixture);
@@ -68,6 +75,22 @@ static int setup_scp_expect_fixture(void **state)
 
     fixture->exp.dptr = &fixture->device;
     fixture->snd.dptr = &fixture->device;
+    fixture->mux.dptr = &fixture->device;
+    fixture->mux.uptr = &fixture->unit;
+    fixture->mux.ldsc = fixture->lines;
+    fixture->mux.lines = 2;
+    for (i = 0; i < 2; ++i) {
+        fixture->lines[i].mp = &fixture->mux;
+        fixture->lines[i].dptr = &fixture->device;
+        fixture->lines[i].uptr = &fixture->unit;
+        fixture->lines[i].o_uptr = &fixture->unit;
+        fixture->lines[i].rxbsz = 16;
+        fixture->lines[i].txbsz = 16;
+    }
+    assert_int_equal(
+        tmxr_attach_ex(&fixture->mux, &fixture->unit,
+                       "LINE=0,LOOPBACK,LINE=1,LOOPBACK", FALSE),
+        SCPE_OK);
     assert_int_equal(sim_brk_init(), SCPE_OK);
     sim_switches = 0;
     sim_switch_number = 0;
@@ -83,11 +106,17 @@ static int setup_scp_expect_fixture(void **state)
 static int teardown_scp_expect_fixture(void **state)
 {
     struct scp_expect_fixture *fixture = *state;
+    size_t i;
 
     sim_exp_clrall(&fixture->exp);
     sim_send_clear(&fixture->snd);
     free(fixture->snd.buffer);
     fixture->snd.buffer = NULL;
+    for (i = 0; i < 2; ++i) {
+        sim_exp_clrall(&fixture->lines[i].expect);
+        reset_send_context(&fixture->lines[i].send);
+    }
+    assert_int_equal(tmxr_detach(&fixture->mux, &fixture->unit), SCPE_OK);
     assert_int_equal(sim_exp_clrall(sim_cons_get_expect()), SCPE_OK);
     reset_send_context(sim_cons_get_send());
     sim_brk_clract();
@@ -190,6 +219,16 @@ static void test_sim_exp_clear_paths_remove_rules_and_buffers(void **state)
     assert_null(fixture->exp.rules);
     assert_null(fixture->exp.buf);
     assert_int_equal(fixture->exp.buf_ins, 0);
+}
+
+/* Verify clearing a missing rule in an empty context is a harmless no-op. */
+static void test_sim_exp_clr_handles_empty_context_without_rules(void **state)
+{
+    struct scp_expect_fixture *fixture = *state;
+
+    assert_int_equal(fixture->exp.size, 0);
+    assert_null(fixture->exp.rules);
+    assert_int_equal(sim_exp_clr(&fixture->exp, "\"A\""), SCPE_OK);
 }
 
 /* Verify regex expect rules capture groups into the documented environment. */
@@ -357,6 +396,23 @@ static void test_send_cmd_time_switch_converts_usec_to_instructions(void **state
     assert_int_equal(snd->after, expected_after);
 }
 
+/* Verify SEND line targeting updates the requested TMXR line and defaults. */
+static void test_send_cmd_targets_named_tmxr_line(void **state)
+{
+    struct scp_expect_fixture *fixture = *state;
+    SEND *snd = &fixture->lines[1].send;
+
+    assert_int_equal(send_cmd(1, "TTY:1 DELAY=5 AFTER=9"), SCPE_OK);
+    assert_string_equal(getenv("SIM_SEND_DELAY_TTY_1"), "5");
+    assert_string_equal(getenv("SIM_SEND_AFTER_TTY_1"), "9");
+
+    assert_int_equal(send_cmd(1, "TTY:1 \"AZ\""), SCPE_OK);
+    assert_int_equal(snd->delay, 5);
+    assert_int_equal(snd->after, 9);
+    assert_int_equal(snd->insoff, 2);
+    assert_int_equal(sim_cons_get_send()->insoff, 0);
+}
+
 /* Verify EXPECT parses repeat counts, HALTAFTER, and trailing actions. */
 static void test_sim_set_expect_parses_repeat_haltafter_and_action(void **state)
 {
@@ -385,6 +441,26 @@ static void test_sim_set_expect_parses_repeat_haltafter_and_action(void **state)
     assert_int_equal(sim_exp_check(exp, 'G'), SCPE_OK);
     assert_int_equal(sim_exp_check(exp, 'O'), SCPE_OK);
     assert_string_equal(sim_brk_getact(action, sizeof(action)), "echo hit");
+}
+
+/* Verify EXPECT line targeting updates the requested TMXR line only. */
+static void test_expect_cmd_targets_named_tmxr_line(void **state)
+{
+    struct scp_expect_fixture *fixture = *state;
+    EXPECT *exp = &fixture->lines[1].expect;
+    EXPTAB *rule;
+
+    assert_int_equal(expect_cmd(1, "TTY:1 HALTAFTER=7"), SCPE_OK);
+    assert_string_equal(getenv("SIM_EXPECT_HALTAFTER_TTY_1"), "7");
+
+    assert_int_equal(expect_cmd(1, "TTY:1 \"GO\" echo hit"), SCPE_OK);
+    assert_int_equal(exp->size, 1);
+    assert_int_equal(sim_cons_get_expect()->size, 0);
+
+    rule = &exp->rules[0];
+    assert_string_equal(rule->match_pattern, "\"GO\"");
+    assert_int_equal(rule->after, 7);
+    assert_string_equal(rule->act, "echo hit");
 }
 
 /* Verify EXPECT parser errors and -t switch handling on the console rule. */
@@ -472,6 +548,23 @@ static void test_sim_exp_show_reports_when_no_rules_match_filter(void **state)
                      SCPE_ARG);
     assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
     assert_non_null(strstr(text, "No Rules match '\"NOPE\"'"));
+    free(text);
+    fclose(stream);
+}
+
+/* Verify SHOW EXPECT reports no-match on an empty expect context too. */
+static void test_sim_exp_show_reports_no_match_for_empty_context(void **state)
+{
+    struct scp_expect_fixture *fixture = *state;
+    FILE *stream;
+    char *text;
+    size_t size;
+
+    stream = tmpfile();
+    assert_non_null(stream);
+    assert_int_equal(sim_exp_show(stream, &fixture->exp, "\"A\""), SCPE_ARG);
+    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    assert_non_null(strstr(text, "No Rules match '\"A\"'"));
     free(text);
     fclose(stream);
 }
@@ -568,6 +661,26 @@ static void test_expect_helpers_handle_empty_contexts(void **state)
     fclose(stream);
 }
 
+/* Verify SHOW EXPECT includes debug guidance when enabled for the context. */
+static void test_sim_exp_show_renders_debug_guidance(void **state)
+{
+    struct scp_expect_fixture *fixture = *state;
+    FILE *stream;
+    char *text;
+    size_t size;
+
+    fixture->exp.dbit = 1;
+    fixture->device.dctrl = 1;
+
+    stream = tmpfile();
+    assert_non_null(stream);
+    assert_int_equal(sim_exp_show(stream, &fixture->exp, ""), SCPE_OK);
+    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    assert_non_null(strstr(text, "Expect Debugging via: SET TTY DEBUG"));
+    free(text);
+    fclose(stream);
+}
+
 /* Verify the SHOW SEND wrapper accepts the console path and rejects extras. */
 static void test_sim_show_send_wrapper_handles_console_arguments(void **state)
 {
@@ -609,6 +722,84 @@ static void test_sim_show_expect_wrapper_handles_console_arguments(void **state)
     assert_non_null(stream);
     assert_int_equal(sim_show_expect(stream, NULL, NULL, 0, "\"A\" extra"),
                      SCPE_2MARG);
+    fclose(stream);
+}
+
+/* Verify SHOW EXPECT rejects unquoted and unterminated filters. */
+static void test_sim_show_expect_wrapper_rejects_invalid_filters(void **state)
+{
+    FILE *stream;
+
+    (void)state;
+
+    stream = tmpfile();
+    assert_non_null(stream);
+    assert_int_equal(SCPE_BARE_STATUS(sim_show_expect(stream, NULL, NULL, 0,
+                                                      "plain")),
+                     SCPE_ARG);
+    fclose(stream);
+
+    stream = tmpfile();
+    assert_non_null(stream);
+    assert_int_equal(SCPE_BARE_STATUS(sim_show_expect(stream, NULL, NULL, 0,
+                                                      "\"A")),
+                     SCPE_ARG);
+    fclose(stream);
+}
+
+/* Verify SHOW wrappers resolve TMXR lines and reject unknown line names. */
+static void test_show_wrappers_handle_named_tmxr_lines(void **state)
+{
+    FILE *stream;
+    char *text;
+    size_t size;
+
+    (void)state;
+
+    assert_int_equal(send_cmd(1, "TTY:1 DELAY=4 AFTER=6 \"Q\""), SCPE_OK);
+    assert_int_equal(expect_cmd(1, "TTY:1 \"GO\" echo hit"), SCPE_OK);
+
+    stream = tmpfile();
+    assert_non_null(stream);
+    assert_int_equal(sim_show_send(stream, NULL, NULL, 0, "TTY:1"), SCPE_OK);
+    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    assert_non_null(strstr(text, "TTY:1"));
+    free(text);
+    fclose(stream);
+
+    stream = tmpfile();
+    assert_non_null(stream);
+    assert_int_equal(sim_show_expect(stream, NULL, NULL, 0, "TTY:1"),
+                     SCPE_OK);
+    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    assert_non_null(strstr(text, "\"GO\""));
+    free(text);
+    fclose(stream);
+}
+
+/* Verify line-qualified SEND and EXPECT reject unknown TMXR lines. */
+static void test_line_qualified_commands_reject_unknown_tmxr_lines(
+    void **state)
+{
+    FILE *stream;
+
+    (void)state;
+
+    assert_int_equal(SCPE_BARE_STATUS(send_cmd(1, "TTY:9 \"A\"")), SCPE_ARG);
+    assert_int_equal(SCPE_BARE_STATUS(expect_cmd(1, "TTY:9 \"A\"")), SCPE_ARG);
+
+    stream = tmpfile();
+    assert_non_null(stream);
+    assert_int_equal(SCPE_BARE_STATUS(sim_show_send(stream, NULL, NULL, 0,
+                                                    "TTY:9")),
+                     SCPE_ARG);
+    fclose(stream);
+
+    stream = tmpfile();
+    assert_non_null(stream);
+    assert_int_equal(SCPE_BARE_STATUS(sim_show_expect(stream, NULL, NULL, 0,
+                                                      "TTY:9")),
+                     SCPE_ARG);
     fclose(stream);
 }
 
@@ -741,6 +932,34 @@ static void test_sim_show_send_input_reports_distinct_default_values(
     fclose(stream);
 }
 
+/* Verify SHOW SEND renders microsecond detail and debug guidance. */
+static void test_sim_show_send_input_renders_microsecond_and_debug_detail(
+    void **state)
+{
+    struct scp_expect_fixture *fixture = *state;
+    SEND *snd;
+    FILE *stream;
+    char *text;
+    size_t size;
+    uint32 threshold;
+
+    snd = &fixture->lines[1].send;
+    threshold = (uint32)(sim_timer_inst_per_sec() / 1000000.0);
+    snd->delay = threshold + 5;
+    snd->after = threshold + 7;
+    snd->next_time = sim_gtime() + snd->after;
+    snd->dptr = &fixture->device;
+    snd->dbit = 1;
+    fixture->device.dctrl = 1;
+
+    stream = tmpfile();
+    assert_non_null(stream);
+    assert_int_equal(sim_show_send_input(stream, snd), SCPE_OK);
+    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    free(text);
+    fclose(stream);
+}
+
 /* Verify regex export clears optional capture groups that did not match. */
 static void test_regex_optional_group_unsets_unmatched_capture_group(
     void **state)
@@ -757,6 +976,17 @@ static void test_regex_optional_group_unsets_unmatched_capture_group(
     assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "ab");
     group1 = getenv("_EXPECT_MATCH_GROUP_1");
     assert_true((NULL == group1) || (group1[0] == '\0'));
+}
+
+/* Verify actions are trimmed before storing them on a new rule. */
+static void test_sim_exp_set_trims_leading_action_whitespace(void **state)
+{
+    struct scp_expect_fixture *fixture = *state;
+
+    assert_int_equal(sim_exp_set(&fixture->exp, "\"GO\"", 0, 0, 0,
+                                 "   echo hit"),
+                     SCPE_OK);
+    assert_string_equal(fixture->exp.rules[0].act, "echo hit");
 }
 
 /* Verify regex checks flatten wrapped buffers with embedded NUL bytes. */
@@ -829,6 +1059,9 @@ int main(void)
             test_sim_exp_clear_paths_remove_rules_and_buffers,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_exp_clr_handles_empty_context_without_rules,
+            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_exp_check_populates_regex_capture_groups,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
@@ -852,8 +1085,14 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_send_cmd_time_switch_converts_usec_to_instructions,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(test_send_cmd_targets_named_tmxr_line,
+                                        setup_scp_expect_fixture,
+                                        teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_set_expect_parses_repeat_haltafter_and_action,
+            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_expect_cmd_targets_named_tmxr_line,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_expect_cmd_parses_switches_and_rejects_bad_input,
@@ -866,6 +1105,9 @@ int main(void)
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_show_reports_when_no_rules_match_filter,
+            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_exp_show_reports_no_match_for_empty_context,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_check_matches_across_buffer_wrap,
@@ -881,6 +1123,15 @@ int main(void)
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_show_expect_wrapper_handles_console_arguments,
+            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_show_expect_wrapper_rejects_invalid_filters,
+            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_show_wrappers_handle_named_tmxr_lines,
+            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_line_qualified_commands_reject_unknown_tmxr_lines,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_set_noexpect_rejects_invalid_argument_forms,
@@ -901,7 +1152,13 @@ int main(void)
             test_sim_show_send_input_reports_distinct_default_values,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_show_send_input_renders_microsecond_and_debug_detail,
+            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(
             test_regex_optional_group_unsets_unmatched_capture_group,
+            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_exp_set_trims_leading_action_whitespace,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_regex_matching_flattens_embedded_nul_buffer_segments,
@@ -914,6 +1171,9 @@ int main(void)
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_expect_helpers_handle_empty_contexts,
+            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_exp_show_renders_debug_guidance,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
     };
 
