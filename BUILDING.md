@@ -6,6 +6,10 @@ checkout.
 The project uses CMake and supports out-of-tree builds. Do not try to
 configure directly in the repository root.
 
+The top-level `Makefile` is a thin compatibility wrapper over the
+`build/release` CMake build. The native interface is still CMake and
+CTest; the `make` entry points simply forward into that configured tree.
+
 ## What you need installed
 
 At minimum:
@@ -120,6 +124,14 @@ fully installed.
 
 ## Running just the build
 
+The compatibility `Makefile` preserves a small set of convenience entry
+points. These two commands are equivalent for the default build:
+
+```sh
+make all
+cmake --build build/release
+```
+
 If you have already configured successfully and only want to rebuild:
 
 ```sh
@@ -180,6 +192,18 @@ Common top-level targets include:
   `frontpaneltest`.
 
 ## Running just the tests
+
+The compatibility `Makefile` also preserves these convenience entry
+points:
+
+```sh
+make unit-tests
+make integration-tests
+make test
+```
+
+They forward to the corresponding CMake/CTest workflows in
+`build/release`.
 
 If the build tree is already configured and built:
 

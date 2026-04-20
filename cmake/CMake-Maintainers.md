@@ -21,6 +21,8 @@ In practical terms:
   `cmake/simh-simulators.cmake`
 - packaging component declarations live in `cmake/simh-packaging.cmake`
 - shared target construction logic lives in `cmake/add_simulator.cmake`
+- the top-level `Makefile` is only a thin compatibility wrapper over
+  `build/release`
 
 ## Core Layout
 
@@ -86,6 +88,8 @@ The project assumes out-of-tree builds. The preferred layout is:
 
 - `build/release`
 - `build/debug`
+
+The compatibility `Makefile` auto-configures and uses `build/release`.
 
 ### Standard CMake Variables
 
@@ -299,10 +303,10 @@ Edit a simulator-local `CMakeLists.txt` when you are changing:
 
 Some cleanup themes still matter for maintainers:
 
-- simplify the top-level maintainer and workflow surface
 - continue normalizing CMake option naming
 - prefer explicit CMake and CTest workflow targets
-- remove unused generator code
+- prefer feature checks over OS-name checks when that better expresses
+  the real dependency
 
 When in doubt, prefer the solution that makes the tree look more like a
 normal hand-maintained CMake project:

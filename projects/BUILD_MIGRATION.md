@@ -23,8 +23,6 @@ The major metadata migration is complete.
 
 The remaining work is about:
 
-- replacing the real logic in the top-level `Makefile`
-- finishing workflow parity for common developer entry points
 - cleaning up the project-defined CMake option surface
 - continuing the move from OS-name conditionals to configuration-time
   feature checks where that improves portability and clarity
@@ -66,7 +64,7 @@ Purpose:
   equivalents
 
 Status:
-- partly complete
+- complete
 
 Already covered:
 - building the default simulator set:
@@ -75,14 +73,12 @@ Already covered:
   - `cmake --build build/release --target pdp11`
 - building the experimental simulator set:
   - `cmake --build build/release --target experimental-simulators`
-
-Still to do:
-- define the supported test-oriented workflows that the compatibility
-  `Makefile` will expose
-- decide whether we want a dedicated convenience target for host-side unit
-  tests, or whether documented `ctest` entry points are sufficient
-- decide whether we want a convenience target for broader regression runs, or
-  whether documented `ctest` usage is enough
+- build and run unit tests:
+  - `cmake --build build/release --target unit-tests`
+- build and run integration tests:
+  - `cmake --build build/release --target integration-tests`
+- run the full test suite:
+  - `ctest --test-dir build/release --output-on-failure`
 
 Success criteria:
 - every preserved user-facing `make` target has a clean CMake/CTest-side
@@ -92,6 +88,9 @@ Success criteria:
 
 Purpose:
 - reduce the top-level `Makefile` to thin compatibility glue
+
+Status:
+- complete
 
 Design:
 - keep a small hand-written `Makefile`
@@ -107,13 +106,19 @@ Design:
 
 Compatibility scope:
 - preserve only common and useful entry points
-- planned preserved set:
+- preserved set:
   - `make all`
   - `make <simulator>`
-  - `make test`
-- possible additional target:
+  - `make experimental`
   - `make unit-tests`
-  only if it remains genuinely useful after the workflow cleanup
+  - `make integration-tests`
+  - `make test`
+- additional preserved build names:
+  - `make microvax3900`
+  - `make 3b2-400`
+  - `make stub`
+  - `make frontpaneltest`
+  - `make extra-tools`
 
 Option policy:
 - the wrapper should not translate old Makefile option names
@@ -206,10 +211,5 @@ The end state should be boring in a good way.
 
 The next concrete work item is:
 
-- define and implement the CMake/CTest-side workflows that will back the
-  preserved test-oriented `make` targets
-
-That means deciding what `make test` and any optional `make unit-tests`
-compatibility target should actually do, implementing the underlying
-CMake/CTest workflow cleanly, and only then replacing the top-level
-`Makefile` logic.
+- normalize the remaining project-defined CMake option names, starting
+  with negative names such as `DONT_USE_ROMS` and `NO_DEP_BUILD`
