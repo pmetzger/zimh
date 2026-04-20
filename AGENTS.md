@@ -38,6 +38,11 @@ cleaner, then do that.
 
 Comment what all non-obvious functions do.
 
+Use `cmake --build` with Ninja and no -j to make sure we get optimal
+parallelism.
+
+Use `ctest --parallel` to make sure tests are run in parallel.
+
 On macOS, prefer the Clang/LLVM toolchain consistently:
 
 - use `clang` rather than GCC
