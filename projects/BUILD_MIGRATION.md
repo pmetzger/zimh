@@ -373,6 +373,112 @@ Work:
 Success criteria:
 - no meaningful build mode still requires the top-level `Makefile`
 
+### Phase 4 Audit Baseline
+
+This section records the first concrete audit of the remaining useful
+top-level `Makefile` controls after the simulator-local CMake conversion.
+
+#### Generator-Era CMake Still In Active Use
+
+The simulator inventory side is now hand-maintained in CMake, but one
+generator-era CMake file is still actively included by the top-level build:
+
+- `cmake/simh-packaging.cmake`
+
+This means:
+
+- simulator build metadata is now mostly CMake-owned
+- packaging metadata is not yet fully migrated
+- packaging remains a later migration step and should not be confused with
+  the build/test parity work in this phase
+
+#### Makefile Controls Already Mapped Cleanly To CMake
+
+These useful legacy controls already have clear CMake equivalents:
+
+- `NONETWORK=1`
+  - CMake equivalent: `-DWITH_NETWORK=Off`
+- `NOVIDEO=1`
+  - CMake equivalent: `-DWITH_VIDEO=Off`
+- `DEBUG=1`
+  - CMake equivalent: `-DCMAKE_BUILD_TYPE=Debug`
+- `LTO=1`
+  - CMake equivalent: `-DRELEASE_LTO=On`
+- `DONT_USE_ROMS=1`
+  - CMake equivalent: `-DDONT_USE_ROMS=On`
+
+These do not appear to be blocking the migration any longer.
+
+#### Makefile Controls That Need Policy Or Workflow Decisions
+
+These legacy controls do not map one-to-one to the current CMake workflow:
+
+- `TESTS=0`
+  - the old `Makefile` ran per-simulator regression tests as part of a build
+  - the CMake workflow separates build and test, using `ctest`
+  - likely outcome:
+    - do not preserve `TESTS=0` as a build option
+    - instead define explicit wrapper workflows for:
+      - build only
+      - build and test
+
+- `TEST_ARG=-v`
+  - this is really a test-runner verbosity control
+  - likely CMake/CTest equivalent:
+    - `ctest --verbose` or `ctest -V`
+
+- `WARNINGS=ALLOWED`
+  - legacy `Makefile` behavior defaulted to warnings-as-errors and allowed an
+    override
+  - current CMake uses `WARNINGS_FATAL`, but the default policy is not the
+    same as the old `Makefile`
+  - this needs an explicit decision:
+    - preserve the stricter default
+    - or standardize on the current CMake default and document it
+
+- `OPTIMIZE=-O3`
+  - there is no direct high-level CMake equivalent today
+  - this may be intentionally dropped rather than preserved
+  - if retained at all, it should likely become a documented advanced cache
+    variable, not a compatibility-level public knob
+
+#### Makefile Group Targets Still Needing CMake-Native Equivalents
+
+The top-level `Makefile` still defines two important simulator groups:
+
+- `all`
+- `experimental`
+
+These are important because they describe user-facing build intent, not just
+low-level compiler settings.
+
+Current state:
+
+- building an individual simulator with CMake is already clean:
+  - `cmake --build build/release --target pdp11`
+- but there is not yet a CMake-native top-level replacement for:
+  - `make all`
+  - `make experimental`
+
+This means the next implementation step in this phase should focus on:
+
+- defining explicit CMake targets or workflows for simulator groups
+- deciding which groups remain worth preserving in the compatibility wrapper
+
+#### Current Phase 4 Conclusion
+
+The remaining feature-parity work is now mostly about workflow parity, not
+feature toggles.
+
+In practical terms, the next concrete tasks should be:
+
+1. decide and implement the CMake-native replacements for:
+   - `all`
+   - `experimental`
+2. define the supported test-running workflows in CMake/CTest terms
+3. decide whether `WARNINGS=ALLOWED` and `OPTIMIZE=...` deserve compatibility
+   handling or should be retired
+
 ### Phase 5: Move Legacy Convenience Workflows onto CMake
 
 Purpose:
