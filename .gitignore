@@ -1,19 +1,14 @@
-.git-commit-id
-.git-commit-id.h
-#ignore thumbnails created by windows
+# Ignore common OS-generated files.
 Thumbs.db
-#ignore Desktop Services Store created by OSX
 .DS_Store
-#Ignore files built by Visual Studio
+
+# Ignore generated build artifacts.
 *.obj
 *.exe
-# VAX/vmb.exe is not a generated file and should be in the repository
 !simulators/VAX/vmb.exe
 *.pdb
 *.user
 *.pch
-*_i.c
-*_p.c
 *.suo
 *.tlb
 *.tlh
@@ -21,42 +16,29 @@ Thumbs.db
 *.cache
 *.ilk
 *.log
-[Dd]ebug*/
 *.lib
-*.save
-obj/
-[Rr]elease*/
-_ReSharper*/
-[Tt]est[Rr]esult*
 *.o
 *~
 *#
-ipch/
-# Visual Studio, Visual Code directories:
+
+# Ignore local editor state.
 .vscode/
 .vs/
+**/*.code-workspace
+**/.vscode/
+
+# Ignore local build and install trees.
 /build/
+SIMH-install
+
 # Temporary plain-text extractions and staging used when proofreading
 # legacy Word documents against their Markdown conversions.
 tmp/word-text/
 tmp/word-text-stage.*/
+
 # Temporary working tree containing existing Markdown conversions and
 # exported assets while the Word-document replacement effort is ongoing.
 simh-docs/
-# We only care about specific files in the Visual Studio Projects 
-# folder.  Things which are there on the fly to support debugging 
-# or other things we don't want git to manage.
-Visual Studio Projects/*
-!Visual Studio Projects/*.vcproj
-!Visual Studio Projects/*.vcxproj*
-!Visual Studio Projects/*.sln
-Visual Studio Projects/~AutoRecover.*
-!Visual Studio Projects/0ReadMe_Projects.txt
-**/*.code-workspace
-**/.vscode/
-CMakeSettings.json
-## Staging area for cmake install (default install prefix)
-SIMH-install
 
 # Beads / Dolt files (added by bd init)
 .dolt/
