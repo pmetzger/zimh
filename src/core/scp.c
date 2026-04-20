@@ -239,10 +239,6 @@
 #include <ctype.h>
 #include <time.h>
 #include <math.h>
-#if defined(HAVE_PCRE2_H)
-#define PCRE2_CODE_UNIT_WIDTH 8
-#include <pcre2.h>
-#endif
 #if defined(_WIN32)
 #include <io.h>
 #include <fcntl.h>
@@ -2113,7 +2109,13 @@ static const char simh_help2[] =
       " as a regular expression applied to the output data stream.  This regular\n"
       " expression may contain parentheses delimited sub-groups.\n\n"
        /***************** 80 character line width template *************************/
-#if defined (HAVE_PCRE_H)
+#if defined (HAVE_PCRE2_H)
+      " The syntax of the regular expressions available are those supported by\n"
+      " the Perl Compatible Regular Expression package (aka PCRE2).  As the\n"
+      " name implies, the syntax is generally the same as Perl regular\n"
+      " expressions.  See http://perldoc.perl.org/perlre.html for more\n"
+      " details\n"
+#elif defined (HAVE_PCRE_H)
       " The syntax of the regular expressions available are those supported by\n"
       " the Perl Compatible Regular Expression package (aka PCRE).  As the name\n"
       " implies, the syntax is generally the same as Perl regular expressions.\n"
@@ -2121,8 +2123,8 @@ static const char simh_help2[] =
 #else
       " Regular expression support is not currently available on your environment.\n"
       " This simulator could use regular expression support provided by the\n"
-      " Perl Compatible Regular Expression (PCRE) package if it was available\n"
-      " when you simulator was compiled.\n"
+      " Perl Compatible Regular Expression package if it was available when\n"
+      " your simulator was compiled.\n"
 #endif
       "5-i\n"
       " If a regular expression expect rule is defined with the -i switch,\n"

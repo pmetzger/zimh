@@ -156,7 +156,11 @@
 #ifdef USE_REGEX
 #undef USE_REGEX
 #endif
-#if defined(HAVE_PCRE_H)
+#if defined(HAVE_PCRE2_H)
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
+#define USE_REGEX 1
+#elif defined(HAVE_PCRE_H)
 #include <pcre.h>
 #define USE_REGEX 1
 #endif
@@ -795,7 +799,11 @@ struct EXPTAB {
 #define EXP_TYP_REGEX_I         (SWMASK ('I'))      /* regular expression pattern matching should be case independent */
 #define EXP_TYP_TIME            (SWMASK ('T'))      /* halt delay is in microseconds instead of instructions */
 #if defined(USE_REGEX)
+#if defined(HAVE_PCRE2_H)
+    pcre2_code          *regex;                         /* compiled regular expression */
+#else
     pcre                *regex;                         /* compiled regular expression */
+#endif
     int                 re_nsub;                        /* regular expression sub expression count */
 #endif
     char                *act;                           /* action string */
