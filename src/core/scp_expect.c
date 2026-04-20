@@ -11,6 +11,21 @@
 #include "scp_pcre2.h"
 #include "sim_tmxr.h"
 
+/* Build one SEND/EXPECT environment-variable name from a target name. */
+static void format_default_env_parameter_name(char *varname, size_t varname_size,
+                                              const char *dev_name,
+                                              const char *param_name)
+{
+    const char *colon = strchr(dev_name, ':');
+
+    if (colon)
+        snprintf(varname, varname_size, "%s_%*.*s_%s", param_name,
+                 (int)(colon - dev_name), (int)(colon - dev_name), dev_name,
+                 colon + 1);
+    else
+        snprintf(varname, varname_size, "%s_%s", param_name, dev_name);
+}
+
 /* Return the default SEND/EXPECT parameter value for one line or console. */
 static uint32 get_default_env_parameter(const char *dev_name,
                                         const char *param_name,
@@ -19,15 +34,10 @@ static uint32 get_default_env_parameter(const char *dev_name,
     char varname[CBUFSIZE];
     unsigned long val;
     char *endptr;
-    const char *colon = strchr(dev_name, ':');
     char *env_val;
 
-    if (colon)
-        snprintf(varname, sizeof(varname), "%s_%*.*s_%s", param_name,
-                 (int)(colon - dev_name), (int)(colon - dev_name), dev_name,
-                 colon + 1);
-    else
-        snprintf(varname, sizeof(varname), "%s_%s", param_name, dev_name);
+    format_default_env_parameter_name(varname, sizeof(varname), dev_name,
+                                      param_name);
 
     env_val = getenv(varname);
 
@@ -49,15 +59,9 @@ static void set_default_env_parameter(const char *dev_name,
 {
     char varname[CBUFSIZE];
     char valbuf[CBUFSIZE];
-    const char *colon = strchr(dev_name, ':');
 
-    if (colon)
-        snprintf(varname, sizeof(varname), "%s_%*.*s_%s", param_name,
-                 (int)(colon - dev_name), (int)(colon - dev_name), dev_name,
-                 colon + 1);
-    else
-        snprintf(varname, sizeof(varname), "%s_%s", param_name, dev_name);
-
+    format_default_env_parameter_name(varname, sizeof(varname), dev_name,
+                                      param_name);
     snprintf(valbuf, sizeof(valbuf), "%u", value);
     setenv(varname, valbuf, 1);
 }
@@ -330,10 +334,65 @@ static t_stat sim_exp_show_tab(FILE *st, const EXPECT *exp, const EXPTAB *ep)
     return SCPE_OK;
 }
 
-t_stat send_cmd(int32 flag, CONST char *cptr)
+static void sim_exp_show_context_state(FILE *st, const EXPECT *exp,
+                                       uint32 default_haltafter);
+
+/* Return whether one command token looks like a TMXR dev:line target. */
+static t_bool sim_exp_has_line_target(const char *token)
+{
+    return sim_isalpha(token[0]) && (strchr(token, ':') != NULL);
+}
+
+/* Resolve an optional SEND dev:line prefix and advance past it. */
+static t_stat sim_exp_resolve_send_target(const char **cptr, SEND **snd,
+                                          const char **next)
 {
     char gbuf[CBUFSIZE];
+    const char *tptr;
+    t_stat r;
+
+    tptr = get_glyph(*cptr, gbuf, ',');
+    if (!sim_exp_has_line_target(gbuf)) {
+        *snd = sim_cons_get_send();
+        *next = tptr;
+        return SCPE_OK;
+    }
+
+    r = tmxr_locate_line_send(gbuf, snd);
+    if (r != SCPE_OK)
+        return r;
+    *cptr = tptr;
+    *next = get_glyph(*cptr, gbuf, ',');
+    return SCPE_OK;
+}
+
+/* Resolve an optional EXPECT dev:line prefix and advance past it. */
+static t_stat sim_exp_resolve_expect_target(const char **cptr, EXPECT **exp,
+                                            t_bool show_error)
+{
+    char gbuf[CBUFSIZE];
+    const char *tptr;
+    t_stat r;
+
+    tptr = get_glyph(*cptr, gbuf, ',');
+    if (!sim_exp_has_line_target(gbuf)) {
+        *exp = sim_cons_get_expect();
+        return SCPE_OK;
+    }
+
+    r = tmxr_locate_line_expect(gbuf, exp);
+    if ((r != SCPE_OK) && show_error)
+        return sim_messagef(r, "No such active line: %s\n", gbuf);
+    if (r != SCPE_OK)
+        return r;
+    *cptr = tptr;
+    return SCPE_OK;
+}
+
+t_stat send_cmd(int32 flag, CONST char *cptr)
+{
     CONST char *tptr;
+    char gbuf[CBUFSIZE];
     uint8 dbuf[CBUFSIZE];
     uint32 dsize = 0;
     const char *dev_name;
@@ -345,15 +404,9 @@ t_stat send_cmd(int32 flag, CONST char *cptr)
     SEND *snd;
 
     GET_SWITCHES(cptr);
-    tptr = get_glyph(cptr, gbuf, ',');
-    if (sim_isalpha(gbuf[0]) && (strchr(gbuf, ':'))) {
-        r = tmxr_locate_line_send(gbuf, &snd);
-        if (r != SCPE_OK)
-            return r;
-        cptr = tptr;
-        tptr = get_glyph(tptr, gbuf, ',');
-    } else
-        snd = sim_cons_get_send();
+    r = sim_exp_resolve_send_target(&cptr, &snd, &tptr);
+    if (r != SCPE_OK)
+        return r;
     dev_name = tmxr_send_line_name(snd);
     if (!flag)
         return sim_send_clear(snd);
@@ -408,23 +461,17 @@ t_stat send_cmd(int32 flag, CONST char *cptr)
 t_stat sim_show_send(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                      CONST char *cptr)
 {
-    char gbuf[CBUFSIZE];
-    CONST char *tptr;
     t_stat r;
     SEND *snd;
+    const char *tptr;
 
     (void)dptr;
     (void)uptr;
     (void)flag;
 
-    tptr = get_glyph(cptr, gbuf, ',');
-    if (sim_isalpha(gbuf[0]) && (strchr(gbuf, ':'))) {
-        r = tmxr_locate_line_send(gbuf, &snd);
-        if (r != SCPE_OK)
-            return r;
-        cptr = tptr;
-    } else
-        snd = sim_cons_get_send();
+    r = sim_exp_resolve_send_target(&cptr, &snd, &tptr);
+    if (r != SCPE_OK)
+        return r;
     if (*cptr)
         return SCPE_2MARG;
     return sim_show_send_input(st, snd);
@@ -432,20 +479,13 @@ t_stat sim_show_send(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
 
 t_stat expect_cmd(int32 flag, CONST char *cptr)
 {
-    char gbuf[CBUFSIZE];
-    CONST char *tptr;
     t_stat r;
     EXPECT *exp;
 
     GET_SWITCHES(cptr);
-    tptr = get_glyph(cptr, gbuf, ',');
-    if (sim_isalpha(gbuf[0]) && (strchr(gbuf, ':'))) {
-        r = tmxr_locate_line_expect(gbuf, &exp);
-        if (r != SCPE_OK)
-            return sim_messagef(r, "No such active line: %s\n", gbuf);
-        cptr = tptr;
-    } else
-        exp = sim_cons_get_expect();
+    r = sim_exp_resolve_expect_target(&cptr, &exp, TRUE);
+    if (r != SCPE_OK)
+        return r;
     if (flag)
         return sim_set_expect(exp, cptr);
     return sim_set_noexpect(exp, cptr);
@@ -455,22 +495,17 @@ t_stat sim_show_expect(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                        CONST char *cptr)
 {
     char gbuf[CBUFSIZE];
-    CONST char *tptr;
     t_stat r;
     EXPECT *exp;
+    const char *tptr;
 
     (void)dptr;
     (void)uptr;
     (void)flag;
 
-    tptr = get_glyph(cptr, gbuf, ',');
-    if (sim_isalpha(gbuf[0]) && (strchr(gbuf, ':'))) {
-        r = tmxr_locate_line_expect(gbuf, &exp);
-        if (r != SCPE_OK)
-            return r;
-        cptr = tptr;
-    } else
-        exp = sim_cons_get_expect();
+    r = sim_exp_resolve_expect_target(&cptr, &exp, FALSE);
+    if (r != SCPE_OK)
+        return r;
     if (*cptr && (*cptr != '"') && (*cptr != '\''))
         return SCPE_ARG;
     tptr = get_glyph_quoted(cptr, gbuf, 0);
@@ -694,23 +729,7 @@ t_stat sim_exp_show(FILE *st, CONST EXPECT *exp, const char *match)
     uint32 default_haltafter =
         get_default_env_parameter(dev_name, "SIM_EXPECT_HALTAFTER", 0);
 
-    if (exp->buf_size) {
-        char *bstr = sim_encode_quoted_string(exp->buf, exp->buf_ins);
-
-        fprintf(st, "  Match Buffer Size: %" SIZE_T_FMT "d\n", exp->buf_size);
-        fprintf(st, "  Buffer Insert Offset: %" SIZE_T_FMT "d\n", exp->buf_ins);
-        fprintf(st, "  Buffer Contents: %s\n", bstr);
-        if (default_haltafter)
-            fprintf(st, "  Default HaltAfter: %u %s\n",
-                    (unsigned)default_haltafter, sim_vm_interval_units);
-        free(bstr);
-    }
-    if (exp->dptr && (exp->dbit & exp->dptr->dctrl))
-        fprintf(st, "  Expect Debugging via: SET %s DEBUG%s%s\n",
-                sim_dname(exp->dptr), exp->dptr->debflags ? "=" : "",
-                exp->dptr->debflags ? _get_dbg_verb(exp->dbit, exp->dptr, NULL)
-                                    : "");
-    fprintf(st, "  Match Rules:\n");
+    sim_exp_show_context_state(st, exp, default_haltafter);
     if (!*match)
         return sim_exp_showall(st, exp);
     if (!ep) {
@@ -731,6 +750,141 @@ t_stat sim_exp_showall(FILE *st, const EXPECT *exp)
     for (i = 0; i < exp->size; i++)
         sim_exp_show_tab(st, exp, &exp->rules[i]);
     return SCPE_OK;
+}
+
+/* Render SHOW EXPECT state from already-gathered values. */
+static void sim_exp_show_context_state(FILE *st, const EXPECT *exp,
+                                       uint32 default_haltafter)
+{
+    if (exp->buf_size) {
+        char *bstr = sim_encode_quoted_string(exp->buf, exp->buf_ins);
+
+        fprintf(st, "  Match Buffer Size: %" SIZE_T_FMT "d\n", exp->buf_size);
+        fprintf(st, "  Buffer Insert Offset: %" SIZE_T_FMT "d\n", exp->buf_ins);
+        fprintf(st, "  Buffer Contents: %s\n", bstr);
+        if (default_haltafter)
+            fprintf(st, "  Default HaltAfter: %u %s\n",
+                    (unsigned)default_haltafter, sim_vm_interval_units);
+        free(bstr);
+    }
+    if (exp->dptr && (exp->dbit & exp->dptr->dctrl))
+        fprintf(st, "  Expect Debugging via: SET %s DEBUG%s%s\n",
+                sim_dname(exp->dptr), exp->dptr->debflags ? "=" : "",
+                exp->dptr->debflags ? _get_dbg_verb(exp->dbit, exp->dptr, NULL)
+                                    : "");
+    fprintf(st, "  Match Rules:\n");
+}
+
+/* Render pending SEND input data from already-gathered state. */
+static void sim_show_send_pending_data(FILE *st, const SEND *snd)
+{
+    if (snd->extoff < snd->insoff) {
+        fprintf(st, "  %" SIZE_T_FMT "d bytes of pending input Data:\n    ",
+                snd->insoff - snd->extoff);
+        fprint_buffer_string(st, snd->buffer + snd->extoff,
+                             snd->insoff - snd->extoff);
+        fprintf(st, "\n");
+    } else
+        fprintf(st, "  No Pending Input Data\n");
+}
+
+/* Render SEND timing and default state from explicit values. */
+static void sim_show_send_timing(FILE *st, const SEND *snd, uint32 delay,
+                                 uint32 after)
+{
+    if ((snd->next_time - sim_gtime()) > 0) {
+        if (((snd->next_time - sim_gtime()) >
+             (sim_timer_inst_per_sec() / 1000000.0)) &&
+            ((sim_timer_inst_per_sec() / 1000000.0) > 0.0))
+            fprintf(st,
+                    "  Minimum of %d %s (%d microseconds) before sending "
+                    "first character\n",
+                    (int)(snd->next_time - sim_gtime()), sim_vm_interval_units,
+                    (int)((snd->next_time - sim_gtime()) /
+                          (sim_timer_inst_per_sec() / 1000000.0)));
+        else
+            fprintf(st, "  Minimum of %d %s before sending first character\n",
+                    (int)(snd->next_time - sim_gtime()), sim_vm_interval_units);
+    }
+    if ((snd->delay > (sim_timer_inst_per_sec() / 1000000.0)) &&
+        ((sim_timer_inst_per_sec() / 1000000.0) > 0.0))
+        fprintf(st, "  Minimum of %d %s (%d microseconds) between characters\n",
+                (int)snd->delay, sim_vm_interval_units,
+                (int)(snd->delay / (sim_timer_inst_per_sec() / 1000000.0)));
+    else
+        fprintf(st, "  Minimum of %d %s between characters\n", (int)snd->delay,
+                sim_vm_interval_units);
+    if (after)
+        fprintf(st, "  Default delay before first character input is %u %s\n",
+                after, sim_vm_interval_units);
+    if (delay)
+        fprintf(st, "  Default delay between character input is %u %s\n", delay,
+                sim_vm_interval_units);
+    if (snd->dptr && (snd->dbit & snd->dptr->dctrl))
+        fprintf(st, "  Send Debugging via: SET %s DEBUG%s%s\n",
+                sim_dname(snd->dptr), snd->dptr->debflags ? "=" : "",
+                snd->dptr->debflags ? _get_dbg_verb(snd->dbit, snd->dptr, NULL)
+                                    : "");
+}
+
+/* Check one exact-match rule against the current expect buffer. */
+static t_bool sim_exp_check_exact_rule(EXPECT *exp, EXPTAB *ep)
+{
+    if (exp->buf_data < ep->size)
+        return FALSE;
+    if (exp->buf_ins < ep->size) {
+        if (exp->buf_ins > 0) {
+            if (sim_deb && exp->dptr && (exp->dptr->dctrl & exp->dbit)) {
+                char *estr =
+                    sim_encode_quoted_string(exp->buf, exp->buf_ins);
+                char *mstr = sim_encode_quoted_string(
+                    &ep->match[ep->size - exp->buf_ins], exp->buf_ins);
+
+                sim_debug(exp->dbit, exp->dptr,
+                          "Checking String[0:%" SIZE_T_FMT "d]: %s\n",
+                          exp->buf_ins, estr);
+                sim_debug(exp->dbit, exp->dptr, "Against Match Data: %s\n",
+                          mstr);
+                free(estr);
+                free(mstr);
+            }
+            if (memcmp(exp->buf, &ep->match[ep->size - exp->buf_ins],
+                       exp->buf_ins))
+                return FALSE;
+        }
+        if (sim_deb && exp->dptr && (exp->dptr->dctrl & exp->dbit)) {
+            char *estr = sim_encode_quoted_string(
+                &exp->buf[exp->buf_size - (ep->size - exp->buf_ins)],
+                ep->size - exp->buf_ins);
+            char *mstr = sim_encode_quoted_string(ep->match,
+                                                  ep->size - exp->buf_ins);
+
+            sim_debug(exp->dbit, exp->dptr,
+                      "Checking String[%" SIZE_T_FMT "d:%" SIZE_T_FMT
+                      "d]: %s\n",
+                      exp->buf_size - ep->size - exp->buf_ins,
+                      ep->size - exp->buf_ins, estr);
+            sim_debug(exp->dbit, exp->dptr, "Against Match Data: %s\n", mstr);
+            free(estr);
+            free(mstr);
+        }
+        return memcmp(&exp->buf[exp->buf_size - (ep->size - exp->buf_ins)],
+                      ep->match, ep->size - exp->buf_ins) == 0;
+    }
+    if (sim_deb && exp->dptr && (exp->dptr->dctrl & exp->dbit)) {
+        char *estr = sim_encode_quoted_string(&exp->buf[exp->buf_ins - ep->size],
+                                              ep->size);
+        char *mstr = sim_encode_quoted_string(ep->match, ep->size);
+
+        sim_debug(exp->dbit, exp->dptr,
+                  "Checking String[%" SIZE_T_FMT "u:%" SIZE_T_FMT "u]: %s\n",
+                  exp->buf_ins - ep->size, ep->size, estr);
+        sim_debug(exp->dbit, exp->dptr, "Against Match Data: %s\n", mstr);
+        free(estr);
+        free(mstr);
+    }
+    return memcmp(&exp->buf[exp->buf_ins - ep->size], ep->match, ep->size) ==
+           0;
 }
 
 t_stat sim_exp_check(EXPECT *exp, uint8 data)
@@ -758,71 +912,8 @@ t_stat sim_exp_check(EXPECT *exp, uint8 data)
                                          &sim_exp_match_sub_count))
                 break;
         } else {
-            if (exp->buf_data < ep->size)
-                continue;
-            if (exp->buf_ins < ep->size) {
-                if (exp->buf_ins > 0) {
-                    if (sim_deb && exp->dptr &&
-                        (exp->dptr->dctrl & exp->dbit)) {
-                        char *estr =
-                            sim_encode_quoted_string(exp->buf, exp->buf_ins);
-                        char *mstr = sim_encode_quoted_string(
-                            &ep->match[ep->size - exp->buf_ins], exp->buf_ins);
-
-                        sim_debug(exp->dbit, exp->dptr,
-                                  "Checking String[0:%" SIZE_T_FMT "d]: "
-                                  "%s\n",
-                                  exp->buf_ins, estr);
-                        sim_debug(exp->dbit, exp->dptr,
-                                  "Against Match Data: %s\n", mstr);
-                        free(estr);
-                        free(mstr);
-                    }
-                    if (memcmp(exp->buf, &ep->match[ep->size - exp->buf_ins],
-                               exp->buf_ins))
-                        continue;
-                }
-                if (sim_deb && exp->dptr && (exp->dptr->dctrl & exp->dbit)) {
-                    char *estr = sim_encode_quoted_string(
-                        &exp->buf[exp->buf_size - (ep->size - exp->buf_ins)],
-                        ep->size - exp->buf_ins);
-                    char *mstr = sim_encode_quoted_string(
-                        ep->match, ep->size - exp->buf_ins);
-
-                    sim_debug(exp->dbit, exp->dptr,
-                              "Checking String[%" SIZE_T_FMT "d:%" SIZE_T_FMT
-                              "d]: %s\n",
-                              exp->buf_size - ep->size - exp->buf_ins,
-                              ep->size - exp->buf_ins, estr);
-                    sim_debug(exp->dbit, exp->dptr, "Against Match Data: %s\n",
-                              mstr);
-                    free(estr);
-                    free(mstr);
-                }
-                if (memcmp(&exp->buf[exp->buf_size - (ep->size - exp->buf_ins)],
-                           ep->match, ep->size - exp->buf_ins))
-                    continue;
+            if (sim_exp_check_exact_rule(exp, ep))
                 break;
-            } else {
-                if (sim_deb && exp->dptr && (exp->dptr->dctrl & exp->dbit)) {
-                    char *estr = sim_encode_quoted_string(
-                        &exp->buf[exp->buf_ins - ep->size], ep->size);
-                    char *mstr = sim_encode_quoted_string(ep->match, ep->size);
-
-                    sim_debug(exp->dbit, exp->dptr,
-                              "Checking String[%" SIZE_T_FMT "u:%" SIZE_T_FMT
-                              "u]: %s\n",
-                              exp->buf_ins - ep->size, ep->size, estr);
-                    sim_debug(exp->dbit, exp->dptr, "Against Match Data: %s\n",
-                              mstr);
-                    free(estr);
-                    free(mstr);
-                }
-                if (memcmp(&exp->buf[exp->buf_ins - ep->size], ep->match,
-                           ep->size))
-                    continue;
-                break;
-            }
         }
     }
     if (exp->buf_ins == exp->buf_size) {
@@ -928,47 +1019,8 @@ t_stat sim_show_send_input(FILE *st, const SEND *snd)
     uint32 after = get_default_env_parameter(dev_name, "SIM_SEND_AFTER", delay);
 
     fprintf(st, "%s\n", tmxr_send_line_name(snd));
-    if (snd->extoff < snd->insoff) {
-        fprintf(st, "  %" SIZE_T_FMT "d bytes of pending input Data:\n    ",
-                snd->insoff - snd->extoff);
-        fprint_buffer_string(st, snd->buffer + snd->extoff,
-                             snd->insoff - snd->extoff);
-        fprintf(st, "\n");
-    } else
-        fprintf(st, "  No Pending Input Data\n");
-    if ((snd->next_time - sim_gtime()) > 0) {
-        if (((snd->next_time - sim_gtime()) >
-             (sim_timer_inst_per_sec() / 1000000.0)) &&
-            ((sim_timer_inst_per_sec() / 1000000.0) > 0.0))
-            fprintf(st,
-                    "  Minimum of %d %s (%d microseconds) before sending "
-                    "first character\n",
-                    (int)(snd->next_time - sim_gtime()), sim_vm_interval_units,
-                    (int)((snd->next_time - sim_gtime()) /
-                          (sim_timer_inst_per_sec() / 1000000.0)));
-        else
-            fprintf(st, "  Minimum of %d %s before sending first character\n",
-                    (int)(snd->next_time - sim_gtime()), sim_vm_interval_units);
-    }
-    if ((snd->delay > (sim_timer_inst_per_sec() / 1000000.0)) &&
-        ((sim_timer_inst_per_sec() / 1000000.0) > 0.0))
-        fprintf(st, "  Minimum of %d %s (%d microseconds) between characters\n",
-                (int)snd->delay, sim_vm_interval_units,
-                (int)(snd->delay / (sim_timer_inst_per_sec() / 1000000.0)));
-    else
-        fprintf(st, "  Minimum of %d %s between characters\n", (int)snd->delay,
-                sim_vm_interval_units);
-    if (after)
-        fprintf(st, "  Default delay before first character input is %u %s\n",
-                after, sim_vm_interval_units);
-    if (delay)
-        fprintf(st, "  Default delay between character input is %u %s\n", delay,
-                sim_vm_interval_units);
-    if (snd->dptr && (snd->dbit & snd->dptr->dctrl))
-        fprintf(st, "  Send Debugging via: SET %s DEBUG%s%s\n",
-                sim_dname(snd->dptr), snd->dptr->debflags ? "=" : "",
-                snd->dptr->debflags ? _get_dbg_verb(snd->dbit, snd->dptr, NULL)
-                                    : "");
+    sim_show_send_pending_data(st, snd);
+    sim_show_send_timing(st, snd, delay, after);
     return SCPE_OK;
 }
 
