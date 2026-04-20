@@ -1,0 +1,121 @@
+#include "test_scp_expect_fixture.h"
+
+#include <stdlib.h>
+#include <string.h>
+
+#include <cmocka.h>
+
+#include "scp.h"
+#include "sim_console.h"
+#include "test_scp_fixture.h"
+#include "test_simh_personality.h"
+#include "test_support.h"
+
+/* Reset the SEND and EXPECT default variables used by current SCP code. */
+static void clear_send_expect_default_env(void)
+{
+    unsetenv("SIM_SEND_DELAY_CONSOLE");
+    unsetenv("SIM_SEND_AFTER_CONSOLE");
+    unsetenv("SIM_EXPECT_HALTAFTER_CONSOLE");
+    unsetenv("SIM_SEND_DELAY_TTY_1");
+    unsetenv("SIM_SEND_AFTER_TTY_1");
+    unsetenv("SIM_EXPECT_HALTAFTER_TTY_1");
+}
+
+/* Return one SEND context to a clean empty state between tests. */
+static void reset_send_context(SEND *snd)
+{
+    sim_send_clear(snd);
+    free(snd->buffer);
+    snd->buffer = NULL;
+    snd->bufsize = 0;
+    snd->delay = 0;
+    snd->after = 0;
+    snd->next_time = 0.0;
+}
+
+/* Clear the published EXPECT match variables from the current process. */
+static void clear_expect_match_env(void)
+{
+    size_t i;
+    char name[32];
+
+    unsetenv("_EXPECT_MATCH_PATTERN");
+    for (i = 0; i < 8; ++i) {
+        snprintf(name, sizeof(name), "_EXPECT_MATCH_GROUP_%zu", i);
+        unsetenv(name);
+    }
+}
+
+/* Build a fresh SCP/TMXR fixture and reset global SEND/EXPECT state. */
+int simh_test_setup_scp_expect_fixture(void **state)
+{
+    struct scp_expect_fixture *fixture;
+    DEVICE *devices[2];
+    size_t i;
+
+    fixture = calloc(1, sizeof(*fixture));
+    assert_non_null(fixture);
+
+    simh_test_init_device_unit(&fixture->device, &fixture->unit, "TTY", "TTY0",
+                               0, 0, 8, 1);
+
+    devices[0] = &fixture->device;
+    devices[1] = NULL;
+    assert_int_equal(simh_test_install_devices("simh-unit-scp-expect", devices),
+                     0);
+
+    fixture->exp.dptr = &fixture->device;
+    fixture->snd.dptr = &fixture->device;
+    fixture->mux.dptr = &fixture->device;
+    fixture->mux.uptr = &fixture->unit;
+    fixture->mux.ldsc = fixture->lines;
+    fixture->mux.lines = 2;
+    for (i = 0; i < 2; ++i) {
+        fixture->lines[i].mp = &fixture->mux;
+        fixture->lines[i].dptr = &fixture->device;
+        fixture->lines[i].uptr = &fixture->unit;
+        fixture->lines[i].o_uptr = &fixture->unit;
+        fixture->lines[i].rxbsz = 16;
+        fixture->lines[i].txbsz = 16;
+    }
+    assert_int_equal(tmxr_attach_ex(&fixture->mux, &fixture->unit,
+                                    "LINE=0,LOOPBACK,LINE=1,LOOPBACK", FALSE),
+                     SCPE_OK);
+    assert_int_equal(sim_brk_init(), SCPE_OK);
+    sim_switches = 0;
+    sim_switch_number = 0;
+    clear_expect_match_env();
+    clear_send_expect_default_env();
+    assert_int_equal(sim_exp_clrall(sim_cons_get_expect()), SCPE_OK);
+    reset_send_context(sim_cons_get_send());
+
+    *state = fixture;
+    return 0;
+}
+
+/* Tear down the SCP/TMXR fixture and clear any published test state. */
+int simh_test_teardown_scp_expect_fixture(void **state)
+{
+    struct scp_expect_fixture *fixture = *state;
+    size_t i;
+
+    sim_exp_clrall(&fixture->exp);
+    sim_send_clear(&fixture->snd);
+    free(fixture->snd.buffer);
+    fixture->snd.buffer = NULL;
+    for (i = 0; i < 2; ++i) {
+        sim_exp_clrall(&fixture->lines[i].expect);
+        reset_send_context(&fixture->lines[i].send);
+    }
+    assert_int_equal(tmxr_detach(&fixture->mux, &fixture->unit), SCPE_OK);
+    assert_int_equal(sim_exp_clrall(sim_cons_get_expect()), SCPE_OK);
+    reset_send_context(sim_cons_get_send());
+    sim_brk_clract();
+    clear_expect_match_env();
+    clear_send_expect_default_env();
+    simh_test_reset_simulator_state();
+    free(fixture);
+    *state = NULL;
+    return 0;
+}

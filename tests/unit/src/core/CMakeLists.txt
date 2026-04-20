@@ -42,6 +42,7 @@ add_unit_test(unit-scp-expect
     LABEL unit
     SOURCES
         ${CMAKE_CURRENT_SOURCE_DIR}/test_scp_expect.c
+        ${PROJECT_SOURCE_DIR}/tests/unit/support/test_scp_expect_fixture.c
     INCLUDES
         ${PROJECT_SOURCE_DIR}/tests/unit/support
 )

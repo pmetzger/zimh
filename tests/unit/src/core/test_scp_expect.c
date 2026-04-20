@@ -8,56 +8,8 @@
 
 #include "scp.h"
 #include "scp_expect.h"
-#include "sim_console.h"
-#include "sim_tmxr.h"
-#include "test_scp_fixture.h"
-#include "test_simh_personality.h"
+#include "test_scp_expect_fixture.h"
 #include "test_support.h"
-
-struct scp_expect_fixture {
-    DEVICE device;
-    UNIT unit;
-    TMXR mux;
-    TMLN lines[2];
-    EXPECT exp;
-    SEND snd;
-};
-
-/* Reset the SEND and EXPECT default variables used by current SCP code. */
-static void clear_send_expect_default_env(void)
-{
-    unsetenv("SIM_SEND_DELAY_CONSOLE");
-    unsetenv("SIM_SEND_AFTER_CONSOLE");
-    unsetenv("SIM_EXPECT_HALTAFTER_CONSOLE");
-    unsetenv("SIM_SEND_DELAY_TTY_1");
-    unsetenv("SIM_SEND_AFTER_TTY_1");
-    unsetenv("SIM_EXPECT_HALTAFTER_TTY_1");
-}
-
-/* Return one SEND context to a clean empty state between tests. */
-static void reset_send_context(SEND *snd)
-{
-    sim_send_clear(snd);
-    free(snd->buffer);
-    snd->buffer = NULL;
-    snd->bufsize = 0;
-    snd->delay = 0;
-    snd->after = 0;
-    snd->next_time = 0.0;
-}
-
-/* Clear the published EXPECT match variables from the current process. */
-static void clear_expect_match_env(void)
-{
-    size_t i;
-    char name[32];
-
-    unsetenv("_EXPECT_MATCH_PATTERN");
-    for (i = 0; i < 8; ++i) {
-        snprintf(name, sizeof(name), "_EXPECT_MATCH_GROUP_%zu", i);
-        unsetenv(name);
-    }
-}
 
 /* Feed one byte sequence through sim_exp_check() and require success. */
 static void assert_expect_bytes(EXPECT *exp, const uint8 *data, size_t size)
@@ -136,79 +88,6 @@ static char *capture_show_expect_wrapper_text(const char *cptr, t_stat expected)
     return read_stream_text(stream);
 }
 
-/* Build a fresh SCP/TMXR fixture and reset global SEND/EXPECT state. */
-static int setup_scp_expect_fixture(void **state)
-{
-    struct scp_expect_fixture *fixture;
-    DEVICE *devices[2];
-    size_t i;
-
-    fixture = calloc(1, sizeof(*fixture));
-    assert_non_null(fixture);
-
-    simh_test_init_device_unit(&fixture->device, &fixture->unit, "TTY", "TTY0",
-                               0, 0, 8, 1);
-
-    devices[0] = &fixture->device;
-    devices[1] = NULL;
-    assert_int_equal(
-        simh_test_install_devices("simh-unit-scp-expect", devices), 0);
-
-    fixture->exp.dptr = &fixture->device;
-    fixture->snd.dptr = &fixture->device;
-    fixture->mux.dptr = &fixture->device;
-    fixture->mux.uptr = &fixture->unit;
-    fixture->mux.ldsc = fixture->lines;
-    fixture->mux.lines = 2;
-    for (i = 0; i < 2; ++i) {
-        fixture->lines[i].mp = &fixture->mux;
-        fixture->lines[i].dptr = &fixture->device;
-        fixture->lines[i].uptr = &fixture->unit;
-        fixture->lines[i].o_uptr = &fixture->unit;
-        fixture->lines[i].rxbsz = 16;
-        fixture->lines[i].txbsz = 16;
-    }
-    assert_int_equal(
-        tmxr_attach_ex(&fixture->mux, &fixture->unit,
-                       "LINE=0,LOOPBACK,LINE=1,LOOPBACK", FALSE),
-        SCPE_OK);
-    assert_int_equal(sim_brk_init(), SCPE_OK);
-    sim_switches = 0;
-    sim_switch_number = 0;
-    clear_expect_match_env();
-    clear_send_expect_default_env();
-    assert_int_equal(sim_exp_clrall(sim_cons_get_expect()), SCPE_OK);
-    reset_send_context(sim_cons_get_send());
-
-    *state = fixture;
-    return 0;
-}
-
-/* Tear down the SCP/TMXR fixture and clear any published test state. */
-static int teardown_scp_expect_fixture(void **state)
-{
-    struct scp_expect_fixture *fixture = *state;
-    size_t i;
-
-    sim_exp_clrall(&fixture->exp);
-    sim_send_clear(&fixture->snd);
-    free(fixture->snd.buffer);
-    fixture->snd.buffer = NULL;
-    for (i = 0; i < 2; ++i) {
-        sim_exp_clrall(&fixture->lines[i].expect);
-        reset_send_context(&fixture->lines[i].send);
-    }
-    assert_int_equal(tmxr_detach(&fixture->mux, &fixture->unit), SCPE_OK);
-    assert_int_equal(sim_exp_clrall(sim_cons_get_expect()), SCPE_OK);
-    reset_send_context(sim_cons_get_send());
-    sim_brk_clract();
-    clear_expect_match_env();
-    clear_send_expect_default_env();
-    simh_test_reset_simulator_state();
-    free(fixture);
-    *state = NULL;
-    return 0;
-}
 
 /* Verify SEND queues bytes and polls them back in order immediately. */
 static void test_sim_send_input_queues_and_polls_bytes(void **state)
@@ -1047,136 +926,178 @@ int main(void)
     const struct CMUnitTest tests[] = {
         cmocka_unit_test_setup_teardown(
             test_sim_send_input_queues_and_polls_bytes,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_send_clear_discards_pending_bytes,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_check_triggers_action_and_consumes_rule,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_set_rejects_duplicate_persistent_rules,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_clear_paths_remove_rules_and_buffers,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_clr_handles_empty_context_without_rules,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_check_populates_regex_capture_groups,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_check_honors_case_independent_regex,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_set_rejects_invalid_regex_syntax,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_check_clears_stale_regex_capture_groups,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(test_show_helpers_render_pending_state,
-                                        setup_scp_expect_fixture,
-                                        teardown_scp_expect_fixture),
+                                        simh_test_setup_scp_expect_fixture,
+                                        simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_send_cmd_sets_console_defaults_and_queue_timing,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_send_cmd_rejects_invalid_argument_forms,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_send_cmd_time_switch_converts_usec_to_instructions,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(test_send_cmd_targets_named_tmxr_line,
-                                        setup_scp_expect_fixture,
-                                        teardown_scp_expect_fixture),
+                                        simh_test_setup_scp_expect_fixture,
+                                        simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_set_expect_parses_repeat_haltafter_and_action,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_expect_cmd_targets_named_tmxr_line,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_expect_cmd_parses_switches_and_rejects_bad_input,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_set_noexpect_removes_specific_rules_and_all,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_expect_rule_restrictions_and_clearall_match_behavior,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_show_reports_when_no_rules_match_filter,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_show_reports_no_match_for_empty_context,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_check_matches_across_buffer_wrap,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_check_slides_regex_buffers_when_full,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_expect_matches_schedule_internal_expect_unit,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_show_send_wrapper_handles_console_arguments,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_show_expect_wrapper_handles_console_arguments,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_show_expect_wrapper_rejects_invalid_filters,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_show_wrappers_handle_named_tmxr_lines,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_line_qualified_commands_reject_unknown_tmxr_lines,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_set_noexpect_rejects_invalid_argument_forms,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_expect_parsers_reject_missing_input_and_bad_switches,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_set_rejects_invalid_quoted_match_string,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_send_state_compacts_pending_bytes_and_honors_timing,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_show_send_input_renders_timing_and_env_fallback,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_show_send_input_reports_distinct_default_values,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_show_send_input_renders_microsecond_and_debug_detail,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_regex_optional_group_unsets_unmatched_capture_group,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_set_trims_leading_action_whitespace,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_regex_matching_flattens_embedded_nul_buffer_segments,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_show_renders_decorated_rule_details,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_expect_time_rules_schedule_microsecond_based_stop,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_expect_helpers_handle_empty_contexts,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_exp_show_renders_debug_guidance,
-            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+            simh_test_setup_scp_expect_fixture,
+            simh_test_teardown_scp_expect_fixture),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);
