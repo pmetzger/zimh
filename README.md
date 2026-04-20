@@ -48,6 +48,9 @@ A detailed listing of features in the inherited code base as of 12 May
 however, it is likely that the code will not resemble SIMH much in the
 near future.
 
+For a current catalog of the simulator targets in this tree, see
+[docs/manual/simulators.md](docs/manual/simulators.md).
+
 ## Repository Layout
 
 The repository contains:
