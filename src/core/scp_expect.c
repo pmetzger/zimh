@@ -246,6 +246,47 @@ static void sim_exp_export_regex_groups(EXPECT *exp, const char *cbuf,
     free(buf);
 }
 
+/* Return whether SCP expect debug logging is active for one context. */
+static t_bool sim_exp_debug_enabled(const EXPECT *exp)
+{
+    return sim_deb && exp->dptr && (exp->dptr->dctrl & exp->dbit);
+}
+
+/* Log one regex check using already-flattened buffer contents. */
+static void sim_exp_log_regex_check(const EXPECT *exp, const char *cbuf,
+                                    const EXPTAB *ep)
+{
+    char *estr;
+
+    if (!sim_exp_debug_enabled(exp))
+        return;
+    estr = sim_encode_quoted_string((const uint8 *)cbuf, exp->buf_ins);
+    sim_debug(exp->dbit, exp->dptr, "Checking String: %s\n", estr);
+    sim_debug(exp->dbit, exp->dptr, "Against RegEx Match Rule: %s\n",
+              ep->match_pattern);
+    free(estr);
+}
+
+/* Log one exact-match buffer comparison. */
+static void sim_exp_log_exact_check(const EXPECT *exp, const uint8 *data,
+                                    size_t data_size, const uint8 *match,
+                                    size_t match_size, size_t start_offs)
+{
+    char *estr;
+    char *mstr;
+
+    if (!sim_exp_debug_enabled(exp))
+        return;
+    estr = sim_encode_quoted_string(data, data_size);
+    mstr = sim_encode_quoted_string(match, match_size);
+    sim_debug(exp->dbit, exp->dptr, "Checking String[%" SIZE_T_FMT "d:%"
+                                    SIZE_T_FMT "d]: %s\n",
+              start_offs, data_size, estr);
+    sim_debug(exp->dbit, exp->dptr, "Against Match Data: %s\n", mstr);
+    free(estr);
+    free(mstr);
+}
+
 /* Run one regex rule against the current expect buffer. */
 static t_bool sim_exp_check_regex_rule(EXPECT *exp, EXPTAB *ep, char **tstr,
                                        size_t *sim_exp_match_sub_count)
@@ -253,14 +294,7 @@ static t_bool sim_exp_check_regex_rule(EXPECT *exp, EXPTAB *ep, char **tstr,
     char *cbuf;
 
     cbuf = sim_exp_build_regex_buffer(exp, tstr);
-    if (sim_deb && exp->dptr && (exp->dptr->dctrl & exp->dbit)) {
-        char *estr = sim_encode_quoted_string(exp->buf, exp->buf_ins);
-
-        sim_debug(exp->dbit, exp->dptr, "Checking String: %s\n", estr);
-        sim_debug(exp->dbit, exp->dptr, "Against RegEx Match Rule: %s\n",
-                  ep->match_pattern);
-        free(estr);
-    }
+    sim_exp_log_regex_check(exp, cbuf, ep);
     {
         pcre2_match_data *match_data;
         int rc;
@@ -834,55 +868,22 @@ static t_bool sim_exp_check_exact_rule(EXPECT *exp, EXPTAB *ep)
         return FALSE;
     if (exp->buf_ins < ep->size) {
         if (exp->buf_ins > 0) {
-            if (sim_deb && exp->dptr && (exp->dptr->dctrl & exp->dbit)) {
-                char *estr =
-                    sim_encode_quoted_string(exp->buf, exp->buf_ins);
-                char *mstr = sim_encode_quoted_string(
-                    &ep->match[ep->size - exp->buf_ins], exp->buf_ins);
-
-                sim_debug(exp->dbit, exp->dptr,
-                          "Checking String[0:%" SIZE_T_FMT "d]: %s\n",
-                          exp->buf_ins, estr);
-                sim_debug(exp->dbit, exp->dptr, "Against Match Data: %s\n",
-                          mstr);
-                free(estr);
-                free(mstr);
-            }
+            sim_exp_log_exact_check(exp, exp->buf, exp->buf_ins,
+                                    &ep->match[ep->size - exp->buf_ins],
+                                    exp->buf_ins, 0);
             if (memcmp(exp->buf, &ep->match[ep->size - exp->buf_ins],
                        exp->buf_ins))
                 return FALSE;
         }
-        if (sim_deb && exp->dptr && (exp->dptr->dctrl & exp->dbit)) {
-            char *estr = sim_encode_quoted_string(
-                &exp->buf[exp->buf_size - (ep->size - exp->buf_ins)],
-                ep->size - exp->buf_ins);
-            char *mstr = sim_encode_quoted_string(ep->match,
-                                                  ep->size - exp->buf_ins);
-
-            sim_debug(exp->dbit, exp->dptr,
-                      "Checking String[%" SIZE_T_FMT "d:%" SIZE_T_FMT
-                      "d]: %s\n",
-                      exp->buf_size - ep->size - exp->buf_ins,
-                      ep->size - exp->buf_ins, estr);
-            sim_debug(exp->dbit, exp->dptr, "Against Match Data: %s\n", mstr);
-            free(estr);
-            free(mstr);
-        }
+        sim_exp_log_exact_check(
+            exp, &exp->buf[exp->buf_size - (ep->size - exp->buf_ins)],
+            ep->size - exp->buf_ins, ep->match, ep->size - exp->buf_ins,
+            exp->buf_size - ep->size - exp->buf_ins);
         return memcmp(&exp->buf[exp->buf_size - (ep->size - exp->buf_ins)],
                       ep->match, ep->size - exp->buf_ins) == 0;
     }
-    if (sim_deb && exp->dptr && (exp->dptr->dctrl & exp->dbit)) {
-        char *estr = sim_encode_quoted_string(&exp->buf[exp->buf_ins - ep->size],
-                                              ep->size);
-        char *mstr = sim_encode_quoted_string(ep->match, ep->size);
-
-        sim_debug(exp->dbit, exp->dptr,
-                  "Checking String[%" SIZE_T_FMT "u:%" SIZE_T_FMT "u]: %s\n",
-                  exp->buf_ins - ep->size, ep->size, estr);
-        sim_debug(exp->dbit, exp->dptr, "Against Match Data: %s\n", mstr);
-        free(estr);
-        free(mstr);
-    }
+    sim_exp_log_exact_check(exp, &exp->buf[exp->buf_ins - ep->size], ep->size,
+                            ep->match, ep->size, exp->buf_ins - ep->size);
     return memcmp(&exp->buf[exp->buf_ins - ep->size], ep->match, ep->size) ==
            0;
 }
