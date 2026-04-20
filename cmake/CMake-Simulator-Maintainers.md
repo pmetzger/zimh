@@ -14,8 +14,7 @@ The short version is:
 
 When changing how a simulator is built, update the simulator's local
 `CMakeLists.txt` and the top-level simulator inventory in
-`cmake/simh-simulators.cmake`
-as needed.
+`cmake/simh-simulators.cmake` as needed.
 
 Do not use:
 
@@ -28,8 +27,7 @@ accidental use because it can overwrite maintained CMake files.
 
 ### Top-Level Inventory
 
-`cmake/simh-simulators.cmake`
-owns:
+`cmake/simh-simulators.cmake` owns:
 
 - the top-level `add_subdirectory(...)` list for simulator directories
 - shared simulator/source-root variables such as `PDP11D`, `VAXD`, `DISPLAYNG`
@@ -62,8 +60,7 @@ Examples:
 
 ### Shared Build Logic
 
-`cmake/add_simulator.cmake`
-owns the common target-construction logic.
+`cmake/add_simulator.cmake` owns the common target-construction logic.
 
 Keep shared logic there. Do not duplicate it in simulator-local files.
 
