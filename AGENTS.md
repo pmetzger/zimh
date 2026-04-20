@@ -30,6 +30,14 @@ architectural problem that requires repair, do not keep it to
 yourself. Inform the user, and create a project file in projects/ to
 document the needed refactorings to fix later.
 
+Don't pathologically minimize the scope of changes if doing so creates
+ugly problems later.
+
+If moving code from one part of a file to another makes things
+cleaner, then do that.
+
+Comment what all non-obvious functions do.
+
 On macOS, prefer the Clang/LLVM toolchain consistently:
 
 - use `clang` rather than GCC
