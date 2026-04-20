@@ -23,10 +23,10 @@ At minimum:
 
 For the normal default build, install these additional libraries:
 
-- `libpcre`
-  Provides the currently working regular expression backend used by SCP
-  EXPECT commands when regex support is enabled. Disable
-  `-DWITH_REGEX=Off` if you do not want to install it.
+- `libpcre2`
+  Provides the regular expression backend used by SCP EXPECT commands
+  when regex support is enabled. Disable `-DWITH_REGEX=Off` if you do
+  not want to install it.
 
 For the full feature build, install the libraries used by optional
 features:
@@ -250,10 +250,6 @@ Some useful CMake options:
 - `-DWITH_REGEX=Off`
   Disable regular expression support for SCP EXPECT commands. Default:
   `On`.
-- `-DWITH_PCRE2=On`
-  Prefer the experimental PCRE2 regex backend. The current working regex
-  implementation still depends on `libpcre`, so this option is mainly
-  useful for conversion work. Default: `Off`.
 - `-DWARNINGS_FATAL=On`
   Treat warnings as errors. Default: `Off`.
 - `-DRELEASE_LTO=On`

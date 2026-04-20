@@ -11,16 +11,9 @@
 ##-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 
 if (WITH_REGEX)
-    if (WITH_PCRE2)
-        find_package(PCRE2)
-    else ()
-        if (USING_VCPKG)
-            find_package(unofficial-pcre CONFIG)
-        else ()
-            ## LEGACY strategy:
-            find_package(PCRE)
-        endif ()
-    endif ()
+    find_package(PCRE2)
+else ()
+    set(PCRE_PKG_STATUS "regular expressions disabled")
 endif ()
 
 if (WITH_REGEX OR WITH_VIDEO)
@@ -58,10 +51,8 @@ if (NOT WIN32 OR MINGW)
     find_package(PkgConfig)
     if (PKG_CONFIG_FOUND)
         if (WITH_REGEX)
-            if (WITH_PCRE2 AND NOT PCRE2_FOUND)
+            if (NOT PCRE2_FOUND)
                 pkg_check_modules(PCRE2 IMPORTED_TARGET libpcre2-8)
-            elseif (NOT WITH_PCRE2 AND NOT PCRE_FOUND)
-                pkg_check_modules(PCRE IMPORTED_TARGET libpcre)
             endif ()
         endif (WITH_REGEX)
 
@@ -112,16 +103,6 @@ include (ExternalProject)
 # Source URLs (to make it easy to update versions):
 set(ZLIB_SOURCE_URL     "https://github.com/madler/zlib/archive/v1.2.13.zip")
 set(PCRE2_SOURCE_URL    "https://github.com/PCRE2Project/pcre2/releases/download/pcre2-10.40/pcre2-10.40.zip")
-## PCRE needs multiple URLs to chase a working SF mirror:
-list(APPEND PCRE_SOURCE_URL
-    "https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.zip/download?use_mirror=cytranet"
-    "https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.zip/download?use_mirror=phoenixnap"
-    "https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.zip/download?use_mirror=versaweb"
-    "https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.zip/download?use_mirror=netactuate"
-    "https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.zip/download?use_mirror=cfhcable"
-    "https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.zip/download?use_mirror=freefr"
-    "https://sourceforge.net/projects/pcre/files/pcre/8.45/pcre-8.45.zip/download?use_mirror=master"
-)
 set(PNG_SOURCE_URL      "https://github.com/glennrp/libpng/archive/refs/tags/v1.6.40.tar.gz")
 ## Freetype also needs multiple URLs to chase a working mirror:
 list(APPEND FREETYPE_SOURCE_URL
@@ -168,44 +149,26 @@ if ((WITH_REGEX OR WITH_VIDEO) AND NOT ZLIB_FOUND)
     set(ZLIB_PKG_STATUS "ZLIB source build")
 endif ()
 
-IF (WITH_REGEX AND NOT (PCRE_FOUND OR PCRE2_FOUND OR TARGET unofficial::pcre::pcre))
+IF (WITH_REGEX AND NOT PCRE2_FOUND)
     set(PCRE_DEPS)
     IF (TARGET zlib-dep)
         list(APPEND PCRE_DEPS zlib-dep)
     ENDIF (TARGET zlib-dep)
 
     set(PCRE_CMAKE_ARGS -DBUILD_SHARED_LIBS:Bool=${BUILD_SHARED_DEPS})
-    if (WITH_PCRE2)
-        set(PCRE_URL ${PCRE2_SOURCE_URL})
-        list(APPEND PCRE_CMAKE_ARGS 
-            -DPCRE2_BUILD_PCREGREP:Bool=Off
-            -DPCRE2_SUPPORT_LIBEDIT:Bool=Off
-            -DPCRE2_SUPPORT_LIBREADLINE:Bool=Off
-        )
+    set(PCRE_URL ${PCRE2_SOURCE_URL})
+    list(APPEND PCRE_CMAKE_ARGS
+        -DPCRE2_BUILD_PCREGREP:Bool=Off
+        -DPCRE2_SUPPORT_LIBEDIT:Bool=Off
+        -DPCRE2_SUPPORT_LIBREADLINE:Bool=Off
+    )
 
-        # IF(MSVC)
-        #   list(APPEND PCRE_CMAKE_ARGS -DINSTALL_MSVC_PDB=On)
-        # ENDIF(MSVC)
+    # IF(MSVC)
+    #   list(APPEND PCRE_CMAKE_ARGS -DINSTALL_MSVC_PDB=On)
+    # ENDIF(MSVC)
 
-        message(STATUS "Building PCRE2 from ${PCRE_URL}")
-        set(PCRE_PKG_STATUS "pcre2 source build")
-    ELSE ()
-        set(PCRE_URL ${PCRE_SOURCE_URL})
-        list(APPEND PCRE_CMAKE_ARGS
-            -DPCRE_BUILD_PCREGREP:Bool=Off
-            -DPCRE_SUPPORT_LIBEDIT:Bool=Off
-            -DPCRE_SUPPORT_LIBREADLINE:Bool=Off
-        )
-        if (WIN32)
-            list(APPEND PCRE_CMAKE_ARGS
-                -DBUILD_SHARED_LIBS:Bool=Off
-                -DPCRE_STATIC_RUNTIME:Bool=On
-            )
-        endif ()
-
-        message(STATUS "Building PCRE from ${PCRE_URL}")
-        set(PCRE_PKG_STATUS "pcre source build")
-    ENDIF ()
+    message(STATUS "Building PCRE2 from ${PCRE_URL}")
+    set(PCRE_PKG_STATUS "pcre2 source build")
 
     ExternalProject_Add(pcre-ext
         URL

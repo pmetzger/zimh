@@ -160,9 +160,6 @@
 #define PCRE2_CODE_UNIT_WIDTH 8
 #include <pcre2.h>
 #define USE_REGEX 1
-#elif defined(HAVE_PCRE_H)
-#include <pcre.h>
-#define USE_REGEX 1
 #endif
 
 #ifdef  __cplusplus

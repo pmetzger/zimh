@@ -130,11 +130,7 @@ static CONST EXPTAB *sim_exp_fnd(CONST EXPECT *exp, const char *match,
 static void sim_exp_free_regex_rule(EXPTAB *ep)
 {
     if ((NULL != ep) && (ep->switches & EXP_TYP_REGEX) && (NULL != ep->regex))
-#if defined(HAVE_PCRE2_H)
         pcre2_code_free(ep->regex);
-#else
-        pcre_free(ep->regex);
-#endif
     if (NULL != ep) {
         ep->regex = NULL;
         ep->re_nsub = 0;
@@ -152,7 +148,6 @@ static void sim_exp_extract_regex_pattern(const char *match, uint8 *match_buf)
 static t_stat sim_exp_compile_regex_pattern(EXPECT *exp, const uint8 *match_buf,
                                             int32 switches, EXPTAB *ep)
 {
-#if defined(HAVE_PCRE2_H)
     int error_code;
     PCRE2_SIZE error_offset;
     PCRE2_UCHAR errmsg[256];
@@ -172,20 +167,6 @@ static t_stat sim_exp_compile_regex_pattern(EXPECT *exp, const uint8 *match_buf,
     }
     (void)pcre2_pattern_info(ep->regex, PCRE2_INFO_CAPTURECOUNT, &re_nsub);
     ep->re_nsub = (int)re_nsub;
-#else
-    const char *errmsg;
-    int erroffset;
-
-    ep->regex = pcre_compile((const char *)match_buf,
-                             (switches & EXP_TYP_REGEX_I) ? PCRE_CASELESS : 0,
-                             &errmsg, &erroffset, NULL);
-    if (NULL == ep->regex) {
-        sim_messagef(SCPE_ARG, "Regular Expression Error: %s\n", errmsg);
-        return SCPE_ARG | SCPE_NOMESSAGE;
-    }
-    (void)pcre_fullinfo(ep->regex, NULL, PCRE_INFO_CAPTURECOUNT,
-                        &ep->re_nsub);
-#endif
     sim_debug(exp->dbit, exp->dptr,
               "Expect Regular Expression: \"%s\" has %d sub expressions\n",
               match_buf, ep->re_nsub);
@@ -221,7 +202,7 @@ static char *sim_exp_build_regex_buffer(EXPECT *exp, char **tstr)
 
 /* Export regex match groups into the documented environment variables. */
 static void sim_exp_export_regex_groups(EXPECT *exp, const char *cbuf,
-                                        const void *ovector, int rc,
+                                        const PCRE2_SIZE *ovector, int rc,
                                         size_t *sim_exp_match_sub_count,
                                         int re_nsub)
 {
@@ -234,22 +215,11 @@ static void sim_exp_export_regex_groups(EXPECT *exp, const char *cbuf,
         size_t end_offs;
         t_bool have_range;
 
-#if defined(HAVE_PCRE2_H)
-        const PCRE2_SIZE *match_ovector = (const PCRE2_SIZE *)ovector;
-
-        start_offs = (size_t)match_ovector[2 * j];
-        end_offs = (size_t)match_ovector[2 * j + 1];
-        have_range = (match_ovector[2 * j] != PCRE2_UNSET) &&
-                     (match_ovector[2 * j + 1] != PCRE2_UNSET) &&
+        start_offs = (size_t)ovector[2 * j];
+        end_offs = (size_t)ovector[2 * j + 1];
+        have_range = (ovector[2 * j] != PCRE2_UNSET) &&
+                     (ovector[2 * j + 1] != PCRE2_UNSET) &&
                      (end_offs >= start_offs);
-#else
-        const int *match_ovector = (const int *)ovector;
-
-        start_offs = (size_t)match_ovector[2 * j];
-        end_offs = (size_t)match_ovector[2 * j + 1];
-        have_range = (match_ovector[2 * j] >= 0) &&
-                     (match_ovector[2 * j + 1] >= match_ovector[2 * j]);
-#endif
 
         sprintf(env_name, "_EXPECT_MATCH_GROUP_%d", (int)j);
         if (have_range) {
@@ -287,7 +257,6 @@ static t_bool sim_exp_check_regex_rule(EXPECT *exp, EXPTAB *ep, char **tstr,
                   ep->match_pattern);
         free(estr);
     }
-#if defined(HAVE_PCRE2_H)
     {
         pcre2_match_data *match_data;
         int rc;
@@ -307,25 +276,6 @@ static t_bool sim_exp_check_regex_rule(EXPECT *exp, EXPTAB *ep, char **tstr,
         }
         pcre2_match_data_free(match_data);
     }
-#else
-    {
-        int *ovector;
-        int ovector_elts;
-        int rc;
-
-        ovector_elts = 3 * (ep->re_nsub + 1);
-        ovector = (int *)calloc((size_t)ovector_elts, sizeof(*ovector));
-        rc = pcre_exec(ep->regex, NULL, cbuf, (int)exp->buf_ins, 0,
-                       PCRE_NOTBOL, ovector, ovector_elts);
-        if (rc >= 0) {
-            sim_exp_export_regex_groups(exp, cbuf, ovector, rc,
-                                        sim_exp_match_sub_count, ep->re_nsub);
-            free(ovector);
-            return TRUE;
-        }
-        free(ovector);
-    }
-#endif
     return FALSE;
 }
 #endif

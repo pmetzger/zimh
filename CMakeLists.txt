@@ -186,11 +186,8 @@ option(WITH_ASYNC
        "Enable (=1)/disable (=0) Asynchronous I/O and threading."
        TRUE)
 option(WITH_REGEX
-       "Enable (=1)/disable (=0) PCRE/PCRE2 regular expression support (def: enabled)"
+       "Enable (=1)/disable (=0) PCRE2 regular expression support (def: enabled)"
        TRUE)
-option(WITH_PCRE2
-       "Use the experimental PCRE2 backend for regular expressions (def: disabled)"
-       FALSE)
 option(WITH_NETWORK
        "Enable (=1)/disable (=0) simulator networking support. (def: enabled)"
        TRUE)

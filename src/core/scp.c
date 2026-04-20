@@ -2115,11 +2115,6 @@ static const char simh_help2[] =
       " name implies, the syntax is generally the same as Perl regular\n"
       " expressions.  See http://perldoc.perl.org/perlre.html for more\n"
       " details\n"
-#elif defined (HAVE_PCRE_H)
-      " The syntax of the regular expressions available are those supported by\n"
-      " the Perl Compatible Regular Expression package (aka PCRE).  As the name\n"
-      " implies, the syntax is generally the same as Perl regular expressions.\n"
-      " See http://perldoc.perl.org/perlre.html for more details\n"
 #else
       " Regular expression support is not currently available on your environment.\n"
       " This simulator could use regular expression support provided by the\n"
@@ -5729,8 +5724,6 @@ const char *sim_regex_backend_name (void)
 {
 #if defined(HAVE_PCRE2_H)
     return "PCRE2";
-#elif defined(HAVE_PCRE_H)
-    return "PCRE";
 #else
     return NULL;
 #endif
@@ -5745,8 +5738,6 @@ const char *sim_regex_backend_version (void)
         if (0 != pcre2_config (PCRE2_CONFIG_VERSION, version))
             strcpy (version, "unknown");
     return version;
-#elif defined(HAVE_PCRE_H)
-    return pcre_version ();
 #else
     return NULL;
 #endif

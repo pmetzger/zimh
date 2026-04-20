@@ -41,10 +41,6 @@ static void test_sim_regex_backend_helpers_match_build_configuration(void **stat
     assert_string_equal(backend, "PCRE2");
     assert_non_null(version);
     assert_true(version[0] != '\0');
-#elif defined(HAVE_PCRE_H)
-    assert_string_equal(backend, "PCRE");
-    assert_non_null(version);
-    assert_true(version[0] != '\0');
 #else
     assert_null(backend);
     assert_null(version);
