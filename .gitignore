@@ -8,15 +8,12 @@ Thumbs.db
 *.obj
 *.exe
 # VAX/vmb.exe is not a generated file and should be in the repository
-!VAX/vmb.exe
+!simulators/VAX/vmb.exe
 *.pdb
 *.user
-*.aps
 *.pch
-*.vspscc
 *_i.c
 *_p.c
-*.ncb
 *.suo
 *.tlb
 *.tlh
@@ -24,11 +21,8 @@ Thumbs.db
 *.cache
 *.ilk
 *.log
-[Bb]in
 [Dd]ebug*/
 *.lib
-*.sbr
-*.bak
 *.save
 obj/
 [Rr]elease*/
@@ -37,13 +31,11 @@ _ReSharper*/
 *.o
 *~
 *#
-BIN/
 ipch/
 # Visual Studio, Visual Code directories:
 .vscode/
 .vs/
 /build/
-cmake-build*/
 # Temporary plain-text extractions and staging used when proofreading
 # legacy Word documents against their Markdown conversions.
 tmp/word-text/
@@ -62,8 +54,6 @@ Visual Studio Projects/~AutoRecover.*
 !Visual Studio Projects/0ReadMe_Projects.txt
 **/*.code-workspace
 **/.vscode/
-# Visual Studio artifacts in CMake mode
-out/
 CMakeSettings.json
 ## Staging area for cmake install (default install prefix)
 SIMH-install

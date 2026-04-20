@@ -1,6 +1,3 @@
-# Ignore captured compiler/build outputs (txt and out files)
-*.txt
-*.out
 __pycache__/
 build-*/
 dependencies/
