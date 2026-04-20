@@ -167,7 +167,6 @@ static void test_sim_exp_clear_paths_remove_rules_and_buffers(void **state)
     assert_int_equal(fixture->exp.buf_ins, 0);
 }
 
-#if defined(USE_REGEX)
 /* Verify regex expect rules capture groups into the documented environment. */
 static void test_sim_exp_check_populates_regex_capture_groups(void **state)
 {
@@ -245,7 +244,6 @@ static void test_sim_exp_check_clears_stale_regex_capture_groups(void **state)
     assert_string_equal(getenv("_EXPECT_MATCH_GROUP_1"), "7");
     assert_string_equal(getenv("_EXPECT_MATCH_GROUP_2"), "");
 }
-#endif
 
 /* Verify the SHOW helpers describe pending SEND and EXPECT state. */
 static void test_show_helpers_render_pending_state(void **state)
@@ -297,7 +295,6 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_sim_exp_clear_paths_remove_rules_and_buffers,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
-#if defined(USE_REGEX)
         cmocka_unit_test_setup_teardown(
             test_sim_exp_check_populates_regex_capture_groups,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
@@ -310,7 +307,6 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_sim_exp_check_clears_stale_regex_capture_groups,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
-#endif
         cmocka_unit_test_setup_teardown(test_show_helpers_render_pending_state,
                                         setup_scp_expect_fixture,
                                         teardown_scp_expect_fixture),

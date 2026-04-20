@@ -24,9 +24,7 @@ At minimum:
 For the normal default build, install these additional libraries:
 
 - `libpcre2`
-  Provides the regular expression backend used by SCP EXPECT commands
-  when regex support is enabled. Disable `-DWITH_REGEX=Off` if you do
-  not want to install it.
+  Provides the regular expression backend used by SCP EXPECT commands.
 
 For the full feature build, install the libraries used by optional
 features:
@@ -247,9 +245,6 @@ Some useful CMake options:
   Disable SDL-based graphics support. Default: `On`.
 - `-DWITH_NETWORK=Off`
   Disable optional networking features. Default: `On`.
-- `-DWITH_REGEX=Off`
-  Disable regular expression support for SCP EXPECT commands. Default:
-  `On`.
 - `-DWARNINGS_FATAL=On`
   Treat warnings as errors. Default: `Off`.
 - `-DRELEASE_LTO=On`

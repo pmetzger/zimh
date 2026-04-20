@@ -10,13 +10,9 @@
 ## Find packages:
 ##-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 
-if (WITH_REGEX)
-    find_package(PCRE2)
-else ()
-    set(PCRE_PKG_STATUS "regular expressions disabled")
-endif ()
+find_package(PCRE2)
 
-if (WITH_REGEX OR WITH_VIDEO)
+if (NOT ZLIB_FOUND)
     set(ZLIB_USE_STATIC_LIBS ON)
     find_package(ZLIB)
 endif ()
@@ -50,16 +46,12 @@ endif (WITH_NETWORK)
 if (NOT WIN32 OR MINGW)
     find_package(PkgConfig)
     if (PKG_CONFIG_FOUND)
-        if (WITH_REGEX)
-            if (NOT PCRE2_FOUND)
-                pkg_check_modules(PCRE2 IMPORTED_TARGET libpcre2-8)
-            endif ()
-        endif (WITH_REGEX)
+        if (NOT PCRE2_FOUND)
+            pkg_check_modules(PCRE2 IMPORTED_TARGET libpcre2-8)
+        endif ()
 
-        if (WITH_REGEX OR WITH_VIDEO)
-            if (NOT ZLIB_FOUND)
-                pkg_check_modules(ZLIB IMPORTED_TARGET zlib)
-            endif ()
+        if (NOT ZLIB_FOUND)
+            pkg_check_modules(ZLIB IMPORTED_TARGET zlib)
         endif ()
 
         if (WITH_VIDEO)
@@ -120,8 +112,8 @@ list(APPEND FREETYPE_SOURCE_URL
 set(SDL2_SOURCE_URL     "https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.28.1.zip")
 set(SDL2_TTF_SOURCE_URL "https://github.com/libsdl-org/SDL_ttf/archive/refs/tags/release-2.20.2.zip")
 
-## Need to build ZLIB for both PCRE and libpng16:
-if ((WITH_REGEX OR WITH_VIDEO) AND NOT ZLIB_FOUND)
+## Need to build ZLIB for both PCRE2 and libpng16:
+if (NOT ZLIB_FOUND)
     ExternalProject_Add(zlib-dep
         URL ${ZLIB_SOURCE_URL}
         CONFIGURE_COMMAND ""
@@ -149,7 +141,7 @@ if ((WITH_REGEX OR WITH_VIDEO) AND NOT ZLIB_FOUND)
     set(ZLIB_PKG_STATUS "ZLIB source build")
 endif ()
 
-IF (WITH_REGEX AND NOT PCRE2_FOUND)
+IF (NOT PCRE2_FOUND)
     set(PCRE_DEPS)
     IF (TARGET zlib-dep)
         list(APPEND PCRE_DEPS zlib-dep)
@@ -184,8 +176,6 @@ IF (WITH_REGEX AND NOT PCRE2_FOUND)
 
     list(APPEND SIMH_BUILD_DEPS pcre)
     list(APPEND SIMH_DEP_TARGETS pcre-ext)
-ELSE ()
-  set(PCRE_PKG_STATUS "regular expressions disabled")
 ENDIF ()
 
 set(BUILD_WITH_VIDEO FALSE)

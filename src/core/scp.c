@@ -226,6 +226,7 @@
 #define IN_SCP_C 1          /* Include from scp.c */
 
 #include "sim_defs.h"
+#include "scp_pcre2.h"
 #include "sim_rev.h"
 #include "sim_disk.h"
 #include "sim_tape.h"
@@ -2109,18 +2110,11 @@ static const char simh_help2[] =
       " as a regular expression applied to the output data stream.  This regular\n"
       " expression may contain parentheses delimited sub-groups.\n\n"
        /***************** 80 character line width template *************************/
-#if defined (HAVE_PCRE2_H)
       " The syntax of the regular expressions available are those supported by\n"
       " the Perl Compatible Regular Expression package (aka PCRE2).  As the\n"
       " name implies, the syntax is generally the same as Perl regular\n"
       " expressions.  See http://perldoc.perl.org/perlre.html for more\n"
       " details\n"
-#else
-      " Regular expression support is not currently available on your environment.\n"
-      " This simulator could use regular expression support provided by the\n"
-      " Perl Compatible Regular Expression package if it was available when\n"
-      " your simulator was compiled.\n"
-#endif
       "5-i\n"
       " If a regular expression expect rule is defined with the -i switch,\n"
       " character matching for that expression will be case independent.\n"
@@ -5722,55 +5716,37 @@ return toolversion;
 
 const char *sim_regex_backend_name (void)
 {
-#if defined(HAVE_PCRE2_H)
     return "PCRE2";
-#else
-    return NULL;
-#endif
 }
 
 const char *sim_regex_backend_version (void)
 {
-#if defined(HAVE_PCRE2_H)
     static char version[64];
 
     if (version[0] == '\0')
         if (0 != pcre2_config (PCRE2_CONFIG_VERSION, version))
             strcpy (version, "unknown");
     return version;
-#else
-    return NULL;
-#endif
 }
 
 void sim_publish_regex_environment (void)
 {
-    const char *backend = sim_regex_backend_name ();
-
-    if (backend)
-        setenv ("SIM_REGEX_TYPE", backend, 1);
-    else
-        unsetenv ("SIM_REGEX_TYPE");
+    setenv ("SIM_REGEX_TYPE", sim_regex_backend_name (), 1);
 }
 
 void sim_fprint_regex_support (FILE *st)
 {
     const char *backend = sim_regex_backend_name ();
+    const char *version = sim_regex_backend_version ();
 
-    if (backend) {
-        const char *version = sim_regex_backend_version ();
-
-        if (version && *version)
-            fprintf (st,
-                     "\n        %s RegEx (Version %s) support for EXPECT "
-                     "commands",
-                     backend, version);
-        else
-            fprintf (st,
-                     "\n        %s RegEx support for EXPECT commands",
-                     backend);
-    } else
-        fprintf (st, "\n        No RegEx support for EXPECT commands");
+    if (version && *version)
+        fprintf (st,
+                 "\n        %s RegEx (Version %s) support for EXPECT commands",
+                 backend, version);
+    else
+        fprintf (st,
+                 "\n        %s RegEx support for EXPECT commands",
+                 backend);
 }
 
 /* Show <global name> processors  */

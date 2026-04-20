@@ -185,9 +185,6 @@ option(BUILD_SHARED_DEPS
 option(WITH_ASYNC
        "Enable (=1)/disable (=0) Asynchronous I/O and threading."
        TRUE)
-option(WITH_REGEX
-       "Enable (=1)/disable (=0) PCRE2 regular expression support (def: enabled)"
-       TRUE)
 option(WITH_NETWORK
        "Enable (=1)/disable (=0) simulator networking support. (def: enabled)"
        TRUE)

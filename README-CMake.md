@@ -106,9 +106,6 @@ The most commonly used options are:
 - `WITH_NETWORK`
   Default: `On`.
   Enable simulator networking support.
-- `WITH_REGEX`
-  Default: `On`.
-  Enable PCRE2-based SCP regular expression support.
 - `WITH_ROMS`
   Default: `On`.
   Build and embed internal ROM support where applicable.

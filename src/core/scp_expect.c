@@ -8,6 +8,7 @@
 
 #include "sim_defs.h"
 #include "scp.h"
+#include "scp_pcre2.h"
 #include "sim_tmxr.h"
 
 /* Return the default SEND/EXPECT parameter value for one line or console. */
@@ -125,7 +126,6 @@ static CONST EXPTAB *sim_exp_fnd(CONST EXPECT *exp, const char *match,
     return NULL;
 }
 
-#if defined(USE_REGEX)
 /* Release one compiled regex rule and reset its metadata. */
 static void sim_exp_free_regex_rule(EXPTAB *ep)
 {
@@ -278,7 +278,6 @@ static t_bool sim_exp_check_regex_rule(EXPECT *exp, EXPTAB *ep, char **tstr,
     }
     return FALSE;
 }
-#endif
 
 /* Remove one expect rule from a context and compact the table. */
 static t_stat sim_exp_clr_tab(EXPECT *exp, EXPTAB *ep)
@@ -291,9 +290,7 @@ static t_stat sim_exp_clr_tab(EXPECT *exp, EXPTAB *ep)
     free(ep->match);
     free(ep->match_pattern);
     free(ep->act);
-#if defined(USE_REGEX)
     sim_exp_free_regex_rule(ep);
-#endif
     exp->size -= 1;
     for (i = ep - exp->rules; i < exp->size; i++)
         exp->rules[i] = exp->rules[i + 1];
@@ -564,9 +561,7 @@ t_stat sim_exp_clrall(EXPECT *exp)
         free(exp->rules[i].match);
         free(exp->rules[i].match_pattern);
         free(exp->rules[i].act);
-#if defined(USE_REGEX)
         sim_exp_free_regex_rule(&exp->rules[i]);
-#endif
     }
     free(exp->rules);
     exp->rules = NULL;
@@ -590,10 +585,6 @@ t_stat sim_exp_set(EXPECT *exp, const char *match, int32 cnt, uint32 after,
     if (!match_buf)
         return SCPE_MEM;
     if (switches & EXP_TYP_REGEX) {
-#if !defined(USE_REGEX)
-        free(match_buf);
-        return sim_messagef(SCPE_ARG, "RegEx support not available\n");
-#else
         EXPTAB temp_ep;
 
         memset(&temp_ep, 0, sizeof(temp_ep));
@@ -605,7 +596,6 @@ t_stat sim_exp_set(EXPECT *exp, const char *match, int32 cnt, uint32 after,
             return SCPE_ARG | SCPE_NOMESSAGE;
         }
         sim_exp_free_regex_rule(&temp_ep);
-#endif
     } else {
         if (switches & EXP_TYP_REGEX_I) {
             free(match_buf);
@@ -651,14 +641,12 @@ t_stat sim_exp_set(EXPECT *exp, const char *match, int32 cnt, uint32 after,
         return SCPE_MEM;
     }
     if (switches & EXP_TYP_REGEX) {
-#if defined(USE_REGEX)
         sim_exp_extract_regex_pattern(match, match_buf);
         if (SCPE_OK != sim_exp_install_regex_rule(exp, ep, match_buf, switches)) {
             free(match_buf);
             sim_exp_clr_tab(exp, ep);
             return SCPE_ARG | SCPE_NOMESSAGE;
         }
-#endif
         free(match_buf);
         match_buf = NULL;
     } else {
@@ -763,14 +751,12 @@ t_stat sim_exp_check(EXPECT *exp, uint8 data)
     for (i = 0; i < exp->size; i++) {
         ep = &exp->rules[i];
         if (ep->switches & EXP_TYP_REGEX) {
-#if defined(USE_REGEX)
             static size_t sim_exp_match_sub_count = 0;
 
             ++regex_checks;
             if (sim_exp_check_regex_rule(exp, ep, &tstr,
                                          &sim_exp_match_sub_count))
                 break;
-#endif
         } else {
             if (exp->buf_data < ep->size)
                 continue;
