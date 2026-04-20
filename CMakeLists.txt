@@ -218,8 +218,8 @@ option(WITH_ROMS
 option(ENABLE_CPPCHECK
        "Enable (=1)/disable (=0) 'cppcheck' static code analysis. (def: disabled.)"
        FALSE)
-option(WINAPI_DEPRECATION
-       "Show (=1)/mute (=0) Various WinAPI deprecation warning (def: mute.)"
+option(ENABLE_WINAPI_DEPRECATION_WARNINGS
+       "Enable (=1)/disable (=0) WinAPI deprecation warnings (def: disabled)"
        FALSE)
 option(WARNINGS_FATAL
        "Compile-time warnings are errors (e.g., \"-Werror\" on GCC)"

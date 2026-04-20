@@ -242,6 +242,8 @@ Some useful CMake options:
   Enable link-time optimization in release builds. Default: `Off`.
 - `-DDEBUG_WALL=On`
   Turn on stronger warning settings for debug builds. Default: `Off`.
+- `-DENABLE_WINAPI_DEPRECATION_WARNINGS=On`
+  Enable WinAPI deprecation warnings. Default: `Off`.
 - `-DWITH_ROMS=Off`
   Disable internal ROM generation and embedding. Default: `On`.
 - `-DENABLE_DEP_BUILD=On`

@@ -142,12 +142,6 @@ Policy:
 - avoid negative option names such as `NO_*` and `DONT_*`
 - do not introduce `WITHOUT_*`
 
-Likely cleanup targets:
-- `WINAPI_DEPRECATION`
-  - this is vague for a warning-control option
-  - a name that explicitly says it controls WinAPI deprecation warnings
-    would be clearer
-
 Migration approach:
 - add positive replacement names first
 - update docs to teach only the new names
@@ -212,5 +206,5 @@ The end state should be boring in a good way.
 
 The next concrete work item is:
 
-- evaluate whether `WINAPI_DEPRECATION` should be renamed to make its
-  warning-control purpose clearer
+- review whether any remaining project-defined options still need
+  normalization beyond the current `WITH_*` / `ENABLE_*` cleanup

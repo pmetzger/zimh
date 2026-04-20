@@ -840,7 +840,7 @@ following the table.
 | `PANDA_LIGHTS`       | disabled           | KA-10/KI-11 simulator's Panda display. |
 | `WITH_ROMS`          | enabled            | Build and embed internal support ROM header files when supported by the simulator. |
 | `ENABLE_CPPCHECK`    | disabled           | `cppcheck` static code analysis support. |
-| `WINAPI_DEPRECATION` | disabled           | Show (enable) or mute (disable) WinAPI deprecation warnings. |
+| `ENABLE_WINAPI_DEPRECATION_WARNINGS` | disabled | Enable WinAPI deprecation warnings. |
 | `WARNINGS_FATAL`     | disabled           | Compiler warnings are fatal errors, e.g. set "-Werror" on `gcc`, "/WX" for MSVC |
 | `RELEASE_LTO`        | disabled           | Use Link-Time Optimization in Release builds, where supported. Normally disabled; the CI/CD builds turn this on to catch additional warnings emitted with higher optimization and LTO. |
 | `DEBUG_WALL`         | disabled           | Turn on maximal warnings for Debug builds, e.g., `-Wall` for GCC/Clang and `/W4` for MSVC. |
@@ -874,7 +874,7 @@ The following table summarizes "enabled" and "disabled" option values on the com
     PS> remove-item -recurse -force CMakeCache.txt CMakeFiles/
 
     # Then (re)configure:
-    PS> cmake -G "Visual Studio 17 2022" -A Win32 -DWITH_NETWORK=Off -DWINAPI_DEPRECATION=True -S ../..
+    PS> cmake -G "Visual Studio 17 2022" -A Win32 -DWITH_NETWORK=Off -DENABLE_WINAPI_DEPRECATION_WARNINGS=True -S ../..
     ```
 
 

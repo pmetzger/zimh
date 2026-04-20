@@ -462,7 +462,7 @@ if (($scriptPhases -contains "generate") -or ($scriptPhases -contains "build"))
     }
     if ($windeprecation)
     {
-        $buildArgs += "-DWINAPI_DEPRECATION:Bool=TRUE"
+        $buildArgs += "-DENABLE_WINAPI_DEPRECATION_WARNINGS:Bool=TRUE"
     }
     if (![String]::IsNullOrEmpty($target)) {
         foreach ($targ in $target) {

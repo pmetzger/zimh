@@ -215,11 +215,12 @@ endif (WITH_NETWORK)
 
 ## Windows: winmm (for ms timer functions), socket functions (even when networking is
 ## disabled. Also squelch the deprecation warnings (these warnings can be enabled
-## via the -DWINAPI_DEPRECATION:Bool=On flag at configure time.)
+## via the -DENABLE_WINAPI_DEPRECATION_WARNINGS:Bool=On flag at configure
+## time.)
 if (WIN32)
     target_link_libraries(os_features INTERFACE ws2_32 wsock32 winmm)
     target_compile_definitions(os_features INTERFACE HAVE_WINMM)
-    if (NOT WINAPI_DEPRECATION)
+    if (NOT ENABLE_WINAPI_DEPRECATION_WARNINGS)
         target_compile_definitions(os_features INTERFACE
             _WINSOCK_DEPRECATED_NO_WARNINGS
             _CRT_NONSTDC_NO_WARNINGS
