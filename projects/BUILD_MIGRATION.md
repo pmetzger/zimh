@@ -590,6 +590,56 @@ Success criteria:
   probes, not sprinkling new OS-name checks through the code
 - the remaining OS-name conditionals are rare, justified, and easy to explain
 
+### Phase 9: Normalize Project CMake Option Naming
+
+Purpose:
+- make the project-defined CMake option surface more consistent
+- make the option names look more like a normal well-maintained CMake project
+- remove confusing negative-name options over time
+
+Rationale:
+- CMake already has established conventions for its own built-in variables,
+  and those should be left alone
+- project-defined options in this tree currently mix styles such as:
+  - `WITH_*`
+  - `ENABLE_*`
+  - `NO_*`
+  - `DONT_*`
+  - configuration-specific names like `DEBUG_*` and `RELEASE_*`
+- this is not fatal, but it is untidy and harder to explain than it should be
+
+Important rule:
+- do not rename standard CMake variables
+- for example, `CMAKE_BUILD_TYPE` should remain `CMAKE_BUILD_TYPE`
+- the cleanup only applies to project-defined option names
+
+Preferred naming policy:
+- use `WITH_*` for optional product/runtime features
+- use `ENABLE_*` for developer tooling or analysis features
+- avoid negative names such as `NO_*` and `DONT_*`
+- do not introduce `WITHOUT_*`; in CMake, the normal way to express
+  "without" is to set the positive option to `Off`
+
+Examples of likely cleanup targets:
+- `DONT_USE_ROMS`
+  - candidate replacement: `WITH_ROMS`
+- `NO_DEP_BUILD`
+  - should be renamed to a positive option once its exact intended semantics
+    are restated clearly
+- `ENABLE_CPPCHECK`
+  - likely fine as-is, because it is tooling rather than a product feature
+
+Migration approach:
+- add the positive replacement option first
+- translate the old name temporarily if compatibility is needed
+- update docs to teach only the new name
+- remove the old negative-name option after the transition
+
+Success criteria:
+- project-defined options use a small, coherent naming vocabulary
+- users can infer what an option means from its name
+- the option surface looks conventional to experienced CMake users
+
 ## Incremental Execution Plan
 
 Recommended implementation order:
