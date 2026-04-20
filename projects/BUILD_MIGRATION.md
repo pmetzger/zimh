@@ -43,7 +43,7 @@ The current dependency chain is:
 - the generator emits:
   - per-simulator `CMakeLists.txt`
   - `cmake/simh-simulators.cmake`
-  - `cmake/simh-packaging.cmake`
+  - historically, `cmake/simh-packaging.cmake`
 
 This means the old `Makefile` is still an upstream metadata source for CMake,
 even though CMake is the build engine for most actual development work.
@@ -53,11 +53,12 @@ even though CMake is the build engine for most actual development work.
 The following generated CMake artifacts are still logically downstream of the
 top-level `Makefile`:
 
-- `cmake/simh-simulators.cmake`
-- `cmake/simh-packaging.cmake`
-- most simulator `CMakeLists.txt` files under `simulators/`
-- some generated unit-test `CMakeLists.txt` files beneath simulator
-  directories
+- historically:
+  - `cmake/simh-simulators.cmake`
+  - `cmake/simh-packaging.cmake`
+  - most simulator `CMakeLists.txt` files under `simulators/`
+  - some generated unit-test `CMakeLists.txt` files beneath simulator
+    directories
 
 Evidence:
 
@@ -149,14 +150,18 @@ underlying capabilities are present and documented on the CMake side.
 
 ### Packaging Dependency
 
-Packaging is also still downstream of generator-era data:
+Historically, packaging was also downstream of generator-era data:
 
 - `cmake/simgen/packaging.py` owns simulator-to-family packaging metadata
-- `generate.py` emits `cmake/simh-packaging.cmake`
+- `generate.py` emitted `cmake/simh-packaging.cmake`
 
-So packaging is not an independent cleanup. It is part of the same metadata
-migration, and it belongs in the final phase once build/test ownership is
-cleanly in CMake.
+That is no longer true for the active build:
+
+- `cmake/simh-packaging.cmake` is now hand-maintained
+- the legacy generator no longer writes it
+
+The remaining packaging migration work is now about cleanup and eventual
+removal of unused legacy generator support, not about active build ownership.
 
 ### First Incremental Migration Targets
 
@@ -380,17 +385,15 @@ top-level `Makefile` controls after the simulator-local CMake conversion.
 
 #### Generator-Era CMake Still In Active Use
 
-The simulator inventory side is now hand-maintained in CMake, but one
-generator-era CMake file is still actively included by the top-level build:
-
-- `cmake/simh-packaging.cmake`
+The simulator inventory side and the packaging metadata are now both
+hand-maintained in CMake.
 
 This means:
 
-- simulator build metadata is now mostly CMake-owned
-- packaging metadata is not yet fully migrated
-- packaging remains a later migration step and should not be confused with
-  the build/test parity work in this phase
+- simulator build metadata is now CMake-owned
+- packaging metadata is also CMake-owned
+- the remaining migration work is about workflow parity and eventual legacy
+  wrapper replacement, not generated build metadata
 
 #### Makefile Controls Already Mapped Cleanly To CMake
 

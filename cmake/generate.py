@@ -21,9 +21,6 @@ import pprint
 
 import simgen.cmake_container as SCC
 import simgen.parse_makefile as SPM
-import simgen.packaging as SPKG
-
-
 TOP_LEVEL_MAKEFILE = "Makefile"
 LEGACY_GENERATION_ACK = "--allow-legacy-overwrite"
 
@@ -138,8 +135,6 @@ if __name__ == '__main__':
                       help='Debug level (0-3, 0 == off)')
     args.add_argument('--srcdir', default=None,
                       help='Makefile source directory.')
-    args.add_argument('--skip-orphans', action='store_true',
-                      help='Skip the check for packaging orphans')
     args.add_argument(LEGACY_GENERATION_ACK, dest='allow_legacy_overwrite',
                       action='store_true',
                       help='Acknowledge that this legacy tool may overwrite '
@@ -193,31 +188,9 @@ if __name__ == '__main__':
 
     sims = process_makefile(makefile_dir, debug=debug_level)
 
-    ## Sanity check: Make sure that all of the simulators in SPKG.package_info have
-    ## been encountered
-    for simdir in sims.dirs.keys():
-        if debug_level >= 2:
-            print('{}: simdir {}'.format(GEN_SCRIPT_NAME, simdir))
-        for sim in sims.dirs[simdir].simulators.keys():
-            SPKG.package_info[sim].encountered()
-
-    if not flags.get('skip_orphans'):
-        print('{0}: Expecting to emit {1} simulators.'.format(GEN_SCRIPT_NAME, len(SPKG.package_info.keys())))
-
-        orphans = [ sim for sim, pkg_info in SPKG.package_info.items() if not pkg_info.was_processed() ]
-        if len(orphans) > 0:
-            print('{0}: Simulators not extracted from Makefile:'.format(GEN_SCRIPT_NAME))
-            for orphan in orphans:
-                print('{0}{1}'.format(' ' * 4, orphan))
-            sys.exit(1)
-        else:
-            print('{0}: All simulators present and accounted for!'.format(GEN_SCRIPT_NAME))
-
     if debug_level >= 1:
         pp = pprint.PrettyPrinter()
         pp.pprint(sims)
 
     ## Emit all of the individual CMakeLists.txt
     sims.write_simulators(makefile_dir, debug=debug_level)
-    ## Emit the packaging data
-    SPKG.write_packaging(makefile_dir)

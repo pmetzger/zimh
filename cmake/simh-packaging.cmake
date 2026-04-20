@@ -1,3 +1,8 @@
+##
+## Update this file as simulator package-family metadata changes.
+## Keep CPack component declarations and other packaging-specific metadata
+## here. Do not regenerate this file from the legacy generator.
+
 ## The default runtime support component/family:
 cpack_add_component(runtime_support
     DISPLAY_NAME "Runtime support"
