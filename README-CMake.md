@@ -826,7 +826,7 @@ following the table.
 | Option               | Default            | Description |
 | -------------------- | ------------------ | ----------- |
 | `CMAKE_BUILD_TYPE`   |                    | [`CMake`-defined variable][cmake_build_type] that controls the build's configuration, typical values are _"Release"_ and _"Debug"_. This only needs to be set for single configuration tools, such as `make` and `ninja`. It does not have to be set for multi-configuration tools such as `msbuild` |
-| `NO_DEP_BUILD`       | platform-specific  | Build dependency libraries on Windows (def: enabled), disabled on Linux/macOS, MinGW-w64. |
+| `ENABLE_DEP_BUILD`   | platform-specific  | Allow supported missing dependencies to be fetched and built locally. Enabled by default on Windows, disabled by default on Linux/macOS and MinGW-w64. |
 | `BUILD_SHARED_DEPS`  | platform-specific  | Build dependencies as shared libraries/DLLs on Windows. Does nothing on Linux/macOS. Disabled by default on Windows to ensure that the simulators link against static libraries. |
 | `WITH_ASYNC`         | enabled            | Asynchronous I/O and threading support. |
 | `WITH_REGEX`         | enabled            | PCRE regular expression support. |
@@ -996,7 +996,7 @@ within the IDE. The walkthrough provides directions for VS 2022 and VS 2019.
        1> [CMake] -- Detecting CXX compile features - done
        1> [CMake] -- CMAKE_BUILD_TYPE is Debug
        1> [CMake] -- CMAKE_MODULE_PATH: C:/.../open-simh-github/cmake
-       1> [CMake] -- Setting NO_DEP_BUILD to FALSE, will BUILD missing dependencies
+       1> [CMake] -- Setting ENABLE_DEP_BUILD to TRUE, will BUILD missing dependencies
        1> [CMake] -- Creating dependency library directory hierarchy
 
        [... snipped for brevity ...]

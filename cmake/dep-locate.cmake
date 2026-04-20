@@ -102,7 +102,7 @@ endif ()
 ## Add rules for the superbuild if dependencies need to be built:
 ##-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 
-if (NO_DEP_BUILD)
+if (NOT ENABLE_DEP_BUILD)
     ## Not going to build dependencies...
     return ()
 endif ()

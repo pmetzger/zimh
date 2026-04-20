@@ -144,7 +144,6 @@ Policy:
 
 Likely cleanup targets:
 - `DONT_USE_ROMS`
-- `NO_DEP_BUILD`
 
 Migration approach:
 - add positive replacement names first
@@ -212,4 +211,4 @@ The end state should be boring in a good way.
 The next concrete work item is:
 
 - normalize the remaining project-defined CMake option names, starting
-  with negative names such as `DONT_USE_ROMS` and `NO_DEP_BUILD`
+  with negative names such as `DONT_USE_ROMS`

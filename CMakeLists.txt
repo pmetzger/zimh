@@ -133,7 +133,7 @@ endif ()
 # SIMH_DEP_TOPDIR: This is the top-level directory where dependencies live. It's cached so that
 # scripts (e.g., cmake-builder.ps1) can update PATH to find shared objects and DLLs.
 #
-# Only add to search paths if NO_DEP_BUILD is False
+# Only add to search paths if local dependency builds are enabled.
 set(SIMH_DEP_TOPDIR
     ${CMAKE_SOURCE_DIR}/cmake/dependencies/${SIMH_SYSTEM_ID}
     CACHE PATH "Top-level directory for SIMH library dependencies")
@@ -144,22 +144,21 @@ set(SIMH_DEP_PATCHES ${CMAKE_SOURCE_DIR}/cmake/patches
         CACHE PATH "Top-level directory for external dependency patches")
 
 ##-- Options --##
-set(NO_DEP_BUILD_OPTVAL FALSE)
-if (NOT DEFINED NO_DEP_BUILD)
-    ## For Windows, always build dependencies
-    if (WIN32 AND NOT DEFINED ENV{MSYSTEM} AND NOT USING_VCPKG)
-        message(STATUS "Setting NO_DEP_BUILD to FALSE, will BUILD missing dependencies")
-        set(NO_DEP_BUILD_OPTVAL FALSE)
-    else ()
-        message(STATUS "Setting NO_DEP_BUILD to TRUE, will NOT BUILD missing dependencies")
-        set(NO_DEP_BUILD_OPTVAL TRUE)
-    endif ()
+set(ENABLE_DEP_BUILD_OPTVAL FALSE)
+if (DEFINED ENABLE_DEP_BUILD)
+    set(ENABLE_DEP_BUILD_OPTVAL ${ENABLE_DEP_BUILD})
 else ()
-    set(NO_DEP_BUILD_OPTVAL ${NO_DEP_BUILD})
-    if (NO_DEP_BUILD_OPTVAL)
-        message(STATUS "Missing dependencies WILL NOT BE BUILT.")
+    ## For Windows, always build dependencies by default.
+    if (WIN32 AND NOT DEFINED ENV{MSYSTEM} AND NOT USING_VCPKG)
+        message(STATUS
+            "Setting ENABLE_DEP_BUILD to TRUE, will BUILD missing "
+            "dependencies")
+        set(ENABLE_DEP_BUILD_OPTVAL TRUE)
     else ()
-        message(STATUS "Missing dependencies WILL BE BUILT.")
+        message(STATUS
+            "Setting ENABLE_DEP_BUILD to FALSE, will NOT BUILD missing "
+            "dependencies")
+        set(ENABLE_DEP_BUILD_OPTVAL FALSE)
     endif ()
 endif ()
 
@@ -177,9 +176,9 @@ else ()
     endif ()
 endif ()
 
-option(NO_DEP_BUILD
-       "Enable (=1)/disable (=0) Dependency library builds (def: enabled)"
-       ${NO_DEP_BUILD_OPTVAL})
+option(ENABLE_DEP_BUILD
+       "Enable (=1)/disable (=0) building supported missing dependencies into the local dependency prefix."
+       ${ENABLE_DEP_BUILD_OPTVAL})
 option(BUILD_SHARED_DEPS
        "Enable (=1)/disable (=0) building dependencies as shared libraries/DLLs (def: disabled)"
        FALSE)
@@ -241,9 +240,17 @@ option(MAC_UNIVERSAL
        "macOS universal binary flag: TRUE -> build universal binaries, FALSE -> don't."
        ${MAC_UNIVERSAL_OPTVAL})
 
+unset(NO_DEP_BUILD CACHE)
+
+if (ENABLE_DEP_BUILD)
+    message(STATUS "Missing dependencies WILL BE BUILT.")
+else ()
+    message(STATUS "Missing dependencies WILL NOT BE BUILT.")
+endif ()
+
 # Places where CMake should look for dependent package configuration fragments and artifacts:
 set(SIMH_PREFIX_PATH_LIST)
-if (NOT (USING_VCPKG OR NO_DEP_BUILD))
+if (NOT (USING_VCPKG OR NOT ENABLE_DEP_BUILD))
     list(APPEND CMAKE_INCLUDE_PATH ${SIMH_DEP_TOPDIR})
     list(APPEND SIMH_PREFIX_PATH_LIST ${SIMH_DEP_TOPDIR})
     list(APPEND CMAKE_PREFIX_PATH ${SIMH_PREFIX_PATH_LIST})
@@ -258,7 +265,7 @@ list(APPEND CMAKE_INCLUDE_PATH "${CMAKE_BINARY_DIR}/include")
 set(DEP_CMAKE_ARGS "-Wno-dev" "--no-warn-unused-cli")
 
 ## build-stage directory hierarchy for dependency installs:
-if (NOT (USING_VCPKG OR NO_DEP_BUILD) AND NOT EXISTS ${SIMH_DEP_TOPDIR})
+if (ENABLE_DEP_BUILD AND NOT USING_VCPKG AND NOT EXISTS ${SIMH_DEP_TOPDIR})
     message(STATUS "Creating dependency library directory hierarchy")
     execute_process(
         COMMAND ${CMAKE_COMMAND} -E make_directory ${SIMH_DEP_TOPDIR} ${SIMH_DEP_TOPDIR}/include ${SIMH_DEP_TOPDIR}/lib
@@ -282,7 +289,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SIMH_LEGACY_INSTALL})
 ## Source directory is always on the global include path.
 include_directories(${CMAKE_SOURCE_DIR})
 
-if (NOT USING_VCPKG AND NOT NO_DEP_BUILD)
+if (NOT USING_VCPKG AND ENABLE_DEP_BUILD)
     # Make sure we can include and link from the dependency directory
     list(APPEND CMAKE_LIBRARY_PATH ${SIMH_DEP_TOPDIR}/lib)
     link_directories(${SIMH_DEP_TOPDIR}/lib)
@@ -432,7 +439,7 @@ unset(_feature_text)
 
 unset(ROM_STATUS)
 
-if (NO_DEP_BUILD AND SIMH_BUILD_DEPS)
+if (NOT ENABLE_DEP_BUILD AND SIMH_BUILD_DEPS)
     ## Don't build dependencies. Just wail about them.
     message("")
     message("Missing SIMH dependencies:")

@@ -223,15 +223,20 @@ cmake --build build/release --target integration-tests
 Some useful CMake options:
 
 - `-DWITH_VIDEO=Off`
-  Disable SDL-based graphics support.
+  Disable SDL-based graphics support. Default: `On`.
 - `-DWITH_NETWORK=Off`
-  Disable optional networking features.
+  Disable optional networking features. Default: `On`.
 - `-DWARNINGS_FATAL=On`
-  Treat warnings as errors.
+  Treat warnings as errors. Default: `Off`.
 - `-DRELEASE_LTO=On`
-  Enable link-time optimization in release builds.
+  Enable link-time optimization in release builds. Default: `Off`.
 - `-DDEBUG_WALL=On`
-  Turn on stronger warning settings for debug builds.
+  Turn on stronger warning settings for debug builds. Default: `Off`.
+- `-DENABLE_DEP_BUILD=On`
+  Allow CMake to fetch and build supported missing dependencies into the
+  local dependency prefix. This is a fallback convenience for awkward
+  environments, not the preferred normal workflow. Default: `On` on
+  Windows non-vcpkg builds, `Off` elsewhere.
 
 Example:
 
