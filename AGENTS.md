@@ -25,6 +25,11 @@ that work are present in the environment.
 If a required tool is missing, stop and ask for it to be installed
 instead of trying to work around the missing dependency.
 
+If you discover an ugly design issue or major or even minor
+architectural problem that requires repair, do not keep it to
+yourself. Inform the user, and create a project file in projects/ to
+document the needed refactorings to fix later.
+
 On macOS, prefer the Clang/LLVM toolchain consistently:
 
 - use `clang` rather than GCC
