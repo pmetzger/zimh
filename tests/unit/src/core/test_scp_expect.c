@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <setjmp.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,6 +18,18 @@ struct scp_expect_fixture {
     EXPECT exp;
     SEND snd;
 };
+
+static void clear_expect_match_env(void)
+{
+    size_t i;
+    char name[32];
+
+    unsetenv("_EXPECT_MATCH_PATTERN");
+    for (i = 0; i < 8; ++i) {
+        snprintf(name, sizeof(name), "_EXPECT_MATCH_GROUP_%zu", i);
+        unsetenv(name);
+    }
+}
 
 static int setup_scp_expect_fixture(void **state)
 {
@@ -39,9 +52,7 @@ static int setup_scp_expect_fixture(void **state)
     assert_int_equal(sim_brk_init(), SCPE_OK);
     sim_switches = 0;
     sim_switch_number = 0;
-    unsetenv("_EXPECT_MATCH_PATTERN");
-    unsetenv("_EXPECT_MATCH_GROUP_0");
-    unsetenv("_EXPECT_MATCH_GROUP_1");
+    clear_expect_match_env();
 
     *state = fixture;
     return 0;
@@ -56,9 +67,7 @@ static int teardown_scp_expect_fixture(void **state)
     free(fixture->snd.buffer);
     fixture->snd.buffer = NULL;
     sim_brk_clract();
-    unsetenv("_EXPECT_MATCH_PATTERN");
-    unsetenv("_EXPECT_MATCH_GROUP_0");
-    unsetenv("_EXPECT_MATCH_GROUP_1");
+    clear_expect_match_env();
     simh_test_reset_simulator_state();
     free(fixture);
     *state = NULL;
@@ -177,6 +186,65 @@ static void test_sim_exp_check_populates_regex_capture_groups(void **state)
     assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "ab42");
     assert_string_equal(getenv("_EXPECT_MATCH_GROUP_1"), "42");
 }
+
+/* Verify regex rules honor case-independent matching when requested. */
+static void test_sim_exp_check_honors_case_independent_regex(void **state)
+{
+    struct scp_expect_fixture *fixture = *state;
+
+    assert_int_equal(sim_exp_set(&fixture->exp, "/ab([0-9])/", 0, 0,
+                                 EXP_TYP_REGEX | EXP_TYP_REGEX_I, NULL),
+                     SCPE_OK);
+
+    assert_int_equal(sim_exp_check(&fixture->exp, 'A'), SCPE_OK);
+    assert_int_equal(sim_exp_check(&fixture->exp, 'B'), SCPE_OK);
+    assert_int_equal(sim_exp_check(&fixture->exp, '5'), SCPE_OK);
+
+    assert_string_equal(getenv("_EXPECT_MATCH_PATTERN"), "/ab([0-9])/");
+    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "AB5");
+    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_1"), "5");
+}
+
+/* Verify invalid regex syntax is rejected without installing a rule. */
+static void test_sim_exp_set_rejects_invalid_regex_syntax(void **state)
+{
+    struct scp_expect_fixture *fixture = *state;
+
+    assert_int_equal(SCPE_BARE_STATUS(sim_exp_set(&fixture->exp, "/(/", 0, 0,
+                                                  EXP_TYP_REGEX, NULL)),
+                     SCPE_ARG);
+    assert_int_equal(fixture->exp.size, 0);
+    assert_null(fixture->exp.rules);
+}
+
+/* Verify later regex matches clear stale capture groups from prior rules. */
+static void test_sim_exp_check_clears_stale_regex_capture_groups(void **state)
+{
+    struct scp_expect_fixture *fixture = *state;
+
+    assert_int_equal(sim_exp_set(&fixture->exp, "/ab([0-9])([0-9])/", 0, 0,
+                                 EXP_TYP_REGEX, NULL),
+                     SCPE_OK);
+    assert_int_equal(sim_exp_check(&fixture->exp, 'a'), SCPE_OK);
+    assert_int_equal(sim_exp_check(&fixture->exp, 'b'), SCPE_OK);
+    assert_int_equal(sim_exp_check(&fixture->exp, '4'), SCPE_OK);
+    assert_int_equal(sim_exp_check(&fixture->exp, '2'), SCPE_OK);
+
+    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "ab42");
+    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_1"), "4");
+    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_2"), "2");
+
+    assert_int_equal(sim_exp_set(&fixture->exp, "/cd([0-9])/", 0, 0,
+                                 EXP_TYP_REGEX, NULL),
+                     SCPE_OK);
+    assert_int_equal(sim_exp_check(&fixture->exp, 'c'), SCPE_OK);
+    assert_int_equal(sim_exp_check(&fixture->exp, 'd'), SCPE_OK);
+    assert_int_equal(sim_exp_check(&fixture->exp, '7'), SCPE_OK);
+
+    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "cd7");
+    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_1"), "7");
+    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_2"), "");
+}
 #endif
 
 /* Verify the SHOW helpers describe pending SEND and EXPECT state. */
@@ -232,6 +300,15 @@ int main(void)
 #if defined(USE_REGEX)
         cmocka_unit_test_setup_teardown(
             test_sim_exp_check_populates_regex_capture_groups,
+            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_exp_check_honors_case_independent_regex,
+            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_exp_set_rejects_invalid_regex_syntax,
+            setup_scp_expect_fixture, teardown_scp_expect_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_exp_check_clears_stale_regex_capture_groups,
             setup_scp_expect_fixture, teardown_scp_expect_fixture),
 #endif
         cmocka_unit_test_setup_teardown(test_show_helpers_render_pending_state,
