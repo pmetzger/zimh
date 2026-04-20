@@ -13,19 +13,15 @@ CMake-first build system that is:
 
 ## Current State
 
-The repository already has a substantial CMake build, but the top-level
-`Makefile` is still the source of truth for important simulator metadata.
+The repository already has a substantial CMake build, and CMake now owns the
+simulator metadata directly.
 
-The most important current dependency is:
+The remaining migration work is no longer about generated CMake files. It is
+about:
 
-- `cmake/generate.py` reads the top-level `Makefile`
-- it generates simulator `CMakeLists.txt` files and
-  `cmake/simh-simulators.cmake`
-- many simulator `CMakeLists.txt` files still explicitly say that changes
-  must be made in the top-level `Makefile` and then regenerated
-
-So the real problem is not "CMake cannot build the tree." The problem is
-"CMake is not yet the authoritative description of the tree."
+- workflow parity for the eventual compatibility `Makefile`
+- option-surface cleanup
+- final retirement of obsolete build logic in the top-level `Makefile`
 
 ## Phase 1 Inventory Baseline
 
@@ -352,6 +348,13 @@ Success criteria:
 - deleting or ignoring the top-level `Makefile` does not change what CMake
   can discover/build
 - `cmake/generate.py` is no longer part of the normal build/update path
+
+Status:
+- completed
+- simulator-local `CMakeLists.txt` files are maintained directly
+- `cmake/simh-simulators.cmake` is maintained directly
+- `cmake/simh-packaging.cmake` is maintained directly
+- the legacy generator code has been removed
 
 ### Phase 4: Achieve Feature Parity for Build Controls
 

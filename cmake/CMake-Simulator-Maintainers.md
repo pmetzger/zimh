@@ -6,8 +6,6 @@ build.
 The short version is:
 
 - simulator build metadata is maintained directly in CMake
-- do not regenerate simulator `CMakeLists.txt` files from the top-level
-  `Makefile`
 - do not treat simulator-local `CMakeLists.txt` files as generated artifacts
 
 ## Core Rule
@@ -15,13 +13,6 @@ The short version is:
 When changing how a simulator is built, update the simulator's local
 `CMakeLists.txt` and the top-level simulator inventory in
 `cmake/simh-simulators.cmake` as needed.
-
-Do not use:
-
-- `cmake/generate.py`
-
-That tool is legacy migration-era infrastructure and is guarded against
-accidental use because it can overwrite maintained CMake files.
 
 ## Where Build Metadata Lives
 
@@ -311,7 +302,6 @@ migration, use that directory consistently for the verification pass.
 ## Do Not Do These Things
 
 - do not edit the top-level `Makefile` to change simulator source lists
-- do not run `cmake/generate.py` as part of normal simulator maintenance
 - do not treat simulator `CMakeLists.txt` files as generated output
 - do not add dead framework hooks such as `HAVE_UNITY_FRAMEWORK`
 - do not move generic build logic into individual simulator directories
