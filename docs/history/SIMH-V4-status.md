@@ -1,9 +1,9 @@
 # SIMH v4.0 - 19-01 Current
 
-This document is retained as a historical status snapshot inherited from
-SIMH. References below to Travis CI, AppVeyor, OpenVMS/VMS, and
-`descrip.mms` are historical and do not describe the current RustyIron
-build or CI configuration.
+This document is retained as a historical status snapshot inherited from SIMH.
+References below to Travis CI, AppVeyor, OpenVMS/VMS, and `descrip.mms` are
+historical and do not describe the current RustyIron build or CI
+configuration.
 
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/11982/badge.svg)](https://scan.coverity.com/projects/simh)
 
@@ -112,35 +112,54 @@ build or CI configuration.
 
 ### Simulator Front Panel API
 
-The sim_frontpanel API provides a programmatic interface to start and control any simulator without any special additions to the simulator code.
+The sim_frontpanel API provides a programmatic interface to start and control
+any simulator without any special additions to the simulator code.
 
 ### New Functionality
 
 #### DDCMP Synchronous host physical device support - framer
-Paul Koning has implemented a USB hardware device which can interface transport DDCMP packets across a synchronous line
-to physical host systems with native synchronous devices or other simulators using framer devices.
+Paul Koning has implemented a USB hardware device which can interface
+transport DDCMP packets across a synchronous line to physical host systems
+with native synchronous devices or other simulators using framer devices.
 
 #### Remote Console Facility
-A new capability has been added which allows a TELNET Connection to a user designated port so that some out of band commands can be entered to manipulate and/or adjust a running simulator.  The commands which enable and control this capability are SET REMOTE TELNET=port, SET REMOTE CONNECTIONS=n, SET REMOTE TIMEOUT=seconds, and SHOW REMOTE.
+A new capability has been added which allows a TELNET Connection to a user
+designated port so that some out of band commands can be entered to manipulate
+and/or adjust a running simulator. The commands which enable and control this
+capability are SET REMOTE TELNET=port, SET REMOTE CONNECTIONS=n, SET REMOTE
+TIMEOUT=seconds, and SHOW REMOTE.
 
-The remote console facility has two modes of operation: 1) single command mode. and 2) multiple command mode.
-In single command mode you enter one command at a time and aren't concerned about what the simulated system is doing while you enter that command.  The command is executed once you've hit return.
-In multiple command mode you initiate your activities by entering the WRU character (usually ^E).  This will suspend the current simulator execution.  You then enter commands as needed and when you are done you enter a CONTINUE command.  While entering Multiple Command commands, if you fail to enter a complete command before the timeout (specified by "SET REMOTE TIMEOUT=seconds"), a CONTINUE command is automatically processed and simulation proceeds.
+The remote console facility has two modes of operation: 1) single command
+mode. and 2) multiple command mode. In single command mode you enter one
+command at a time and aren't concerned about what the simulated system is
+doing while you enter that command. The command is executed once you've hit
+return. In multiple command mode you initiate your activities by entering the
+WRU character (usually ^E). This will suspend the current simulator execution.
+You then enter commands as needed and when you are done you enter a CONTINUE
+command. While entering Multiple Command commands, if you fail to enter a
+complete command before the timeout (specified by "SET REMOTE
+TIMEOUT=seconds"), a CONTINUE command is automatically processed and
+simulation proceeds.
 
-A subset of normal simh commands are available for use in remote console sessions.
-The Single Command Mode commands are: ATTACH, DETACH, PWD, SHOW, DIR, LS, ECHO, HELP
-The Multiple Command Mode commands are: EXAMINE, IEXAMINE, DEPOSIT, EVALUATE, ATTACH, DETACH, ASSIGN, DEASSIGN, STEP, CONTINUE, PWD, SAVE, SET, SHOW, DIR, LS, ECHO, HELP
+A subset of normal simh commands are available for use in remote console
+sessions. The Single Command Mode commands are: ATTACH, DETACH, PWD, SHOW,
+DIR, LS, ECHO, HELP The Multiple Command Mode commands are: EXAMINE, IEXAMINE,
+DEPOSIT, EVALUATE, ATTACH, DETACH, ASSIGN, DEASSIGN, STEP, CONTINUE, PWD,
+SAVE, SET, SHOW, DIR, LS, ECHO, HELP
 
-A remote console session will close when an EOF character is entered (i.e. ^D or ^Z).
+A remote console session will close when an EOF character is entered (i.e. ^D
+or ^Z).
 
 #### VAX/PDP11 Enhancements
     RQ has new disk types: RC25, RCF25, RA80
     RQ device has a settable controller type (RQDX3, UDA50, KLESI, RUX50)
     RQ disks default to Autosize without regard to disk type
     RQ disks on PDP11 can have RAUSER size beyond 2GB
-    DMC11/DMR11 DDCMP DECnet device simulation.  Up to 8 DMC devices are supported.  Packet transport is via TCP or UDP connections.
+    DMC11/DMR11 DDCMP DECnet device simulation. Up to 8 DMC devices are
+        supported. Packet transport is via TCP or UDP connections.
     KDP11 on PDP11 for DECnet
-    DUP11 on PDP11 for DECnet connectivity to talk to DMC, KDP or other DUP devices
+    DUP11 on PDP11 for DECnet connectivity to talk to DMC, KDP or other DUP
+        devices
     CH11 on PDP11 and VAX780 for Chaosnet (from Lars Brinkhoff)
     DZ on Unibus systems can have up to 256 ports (default of 32), on
         Qbus systems 128 port limit (default of 16).
@@ -149,17 +168,21 @@ A remote console session will close when an EOF character is entered (i.e. ^D or
     TU58 device support for all PDP11 and VAX systems.
     DHU11 (device VH) on Unibus systems now has 16 ports per multiplexer.
     XQ devices (DEQNA, DELQA and DELQA-T) are bootable on Qbus PDP11 simulators
-    XQ and XU devices (DEQNA, DELQA, DELQA-T, DEUNA and DELQA) devices can now
-        directly communicate to a remote device via UDP (i.e. a built-in HECnet bridge).
-    XQ and XU devices (DEQNA, DELQA, DELQA-T, DEUNA and DELQA) devices can now
-        optionally throttle outgoing packets which is useful when communicating with
-        legacy systems (real hardware) on a local LAN which can easily get over run
-        when packets arrive too fast.
+    XQ and XU devices (DEQNA, DELQA, DELQA-T, DEUNA and DELQA) devices can
+        now directly communicate to a remote device via UDP (i.e. a built-in
+        HECnet bridge).
+    XQ and XU devices (DEQNA, DELQA, DELQA-T, DEUNA and DELQA) devices can
+        now optionally throttle outgoing packets which is useful when
+        communicating with legacy systems (real hardware) on a local LAN
+        which can easily get over run when packets arrive too fast.
     MicroVAX 3900 has QVSS (VCB01) board available.
     MicroVAX 3900 and MicroVAX II have SET CPU AUTOBOOT option
-    MicroVAX 3900 has a SET CPU MODEL=(MicroVAX|VAXserver|VAXstation) command to change between system types
-    MicroVAX I has a SET CPU MODEL=(MicroVAX|VAXSTATION) command to change between system types
-    MicroVAX II has a SET CPU MODEL=(MicroVAX|VAXSTATION) command to change between system types
+    MicroVAX 3900 has a SET CPU MODEL=(MicroVAX|VAXserver|VAXstation)
+        command to change between system types
+    MicroVAX I has a SET CPU MODEL=(MicroVAX|VAXSTATION) command to change
+        between system types
+    MicroVAX II has a SET CPU MODEL=(MicroVAX|VAXSTATION) command to change
+        between system types
 
 #### PDP11 Specific Enhancements
     ROM (from Lars Brinkhoff) I/O page ROM support
@@ -167,14 +190,18 @@ A remote console session will close when an EOF character is entered (i.e. ^D or
     DAZ (from Lars Brinkhoff) Dazzle Dart Input device
 
 #### PDP10 Enhancements
-    KDP11 (from Timothe Litt) for DECnet connectivity to simulators with DMC, DUP or KDP devices
-    DMR11 for DECnet connectivity to simulators with DMC, DUP or KDP devices on TOPS10.
+    KDP11 (from Timothe Litt) for DECnet connectivity to simulators with
+        DMC, DUP or KDP devices
+    DMR11 for DECnet connectivity to simulators with DMC, DUP or KDP
+        devices on TOPS10.
     CH11 (from Lars Brinkhoff) Chaosnet interface.
 
 #### SDS 940 Enhancements
-    Support for SDS internal ASCII character encoding during display and data entry.
+    Support for SDS internal ASCII character encoding during display and data
+        entry.
     Allow breakpoints to be qualified by normal, monitor or user mode.
-    Fix CPU, RAD, MUX and I/O bugs that prevented SDS Time Share System Monitor and Executive from executing properly.
+    Fix CPU, RAD, MUX and I/O bugs that prevented SDS Time Share System
+        Monitor and Executive from executing properly.
 
 #### Terminal Multiplexer additions
     Added support for TCP connections using IPv4 and/or IPv6.
@@ -190,13 +217,16 @@ A remote console session will close when an EOF character is entered (i.e. ^D or
     Serial Console Support
     Separate TCP listening ports per line
     Outgoing connections per line (virtual Null Modem cable).
-    Packet sending and reception semantics for simulated network device support using either TCP or UDP transport.
-    Input character rates reflect the natural character arrival time based on the line speed.
+    Packet sending and reception semantics for simulated network device
+        support using either TCP or UDP transport.
+    Input character rates reflect the natural character arrival time based
+        on the line speed.
 
 #### Video Display Capabilities
-Added support for monochrome and color displays with optional keyboards and mice.
-The VAXstation QVSS device (VCB01) and QDSS device (VCB02) simulations use these capabilities.
-Host platforms which have libSDL2 available can leverage this functionality.
+Added support for monochrome and color displays with optional keyboards and
+mice. The VAXstation QVSS device (VCB01) and QDSS device (VCB02) simulations
+use these capabilities. Host platforms which have libSDL2 available can
+leverage this functionality.
 
 #### Asynchronous I/O
     * Disk and Tape I/O can be asynchronous.  Asynchronous support exists
@@ -241,7 +271,8 @@ Host platforms which have libSDL2 available can leverage this functionality.
     RAW Disk Access (including CDROM)
     Virtual Disk Container files, including differencing disks
     File System type detection to accurately autosize disks.
-    Recognized file systems are: DEC ODS1, DEC ODS2, DEC RT11, DEC RSTS, DEC RSX11, Ultrix Partitions, ISO 9660
+    Recognized file systems are: DEC ODS1, DEC ODS2, DEC RT11, DEC RSTS,
+        DEC RSX11, Ultrix Partitions, ISO 9660
 
 #### Tape Extensions
     AWS format tape support
@@ -265,7 +296,8 @@ Host platforms which have libSDL2 available can leverage this functionality.
 
 #### Control Flow
 
-The following extensions to the SCP command language without affecting prior behavior:
+The following extensions to the SCP command language without affecting prior
+behavior:
 
     GOTO <Label>                 Command is now available.  Labels are lines
                                  in which the first non whitespace character
@@ -306,8 +338,10 @@ The following extensions to the SCP command language without affecting prior beh
                                  the operator enters CTRL+C while a command
                                  procedure is running.  The default action is
                                  to exit the current and any nested command
-                                 procedures and return to the sim> input prompt.
-    ON <statusvalue>             Clears the action(s) to take when condition occurs
+                                 procedures and return to the sim> input
+                                 prompt.
+    ON <statusvalue>             Clears the action(s) to take when condition
+                                 occurs
     ON ERROR                     Clears the default actions to take when any
                                  otherwise unspecified error status is
                                  returned by a command in the currently
@@ -317,12 +351,19 @@ The following extensions to the SCP command language without affecting prior beh
                                  currently running command procedure.
 
     DO <stdin>
-                                 Invokes a nested DO command with input from the
+                                 Invokes a nested DO command with input from
+                                 the
                                  running console.
 
-Error traps can be taken for any command which returns a status other than SCPE_STEP, SCPE_OK, and SCPE_EXIT.
+Error traps can be taken for any command which returns a status other than
+SCPE_STEP, SCPE_OK, and SCPE_EXIT.
 
-ON Traps can specify any status value from the following list: NXM, UNATT, IOERR, CSUM, FMT, NOATT, OPENERR, MEM, ARG, STEP, UNK, RO, INCOMP, STOP, TTIERR, TTOERR, EOF, REL, NOPARAM, ALATT, TIMER, SIGERR, TTYERR, SUB, NOFNC, UDIS, NORO, INVSW, MISVAL, 2FARG, 2MARG, NXDEV, NXUN, NXREG, NXPAR, NEST, IERR, MTRLNT, LOST, TTMO, STALL, AFAIL, NOTATT, AMBREG.  These values can be indicated by name or by their internal numeric value (not recommended).
+ON Traps can specify any status value from the following list: NXM, UNATT,
+IOERR, CSUM, FMT, NOATT, OPENERR, MEM, ARG, STEP, UNK, RO, INCOMP, STOP,
+TTIERR, TTOERR, EOF, REL, NOPARAM, ALATT, TIMER, SIGERR, TTYERR, SUB, NOFNC,
+UDIS, NORO, INVSW, MISVAL, 2FARG, 2MARG, NXDEV, NXUN, NXREG, NXPAR, NEST,
+IERR, MTRLNT, LOST, TTMO, STALL, AFAIL, NOTATT, AMBREG. These values can be
+indicated by name or by their internal numeric value (not recommended).
 
 Interactions with ASSERT command and "DO -e":
 
@@ -337,25 +378,31 @@ Interactions with ASSERT command and "DO -e":
          defined, then an AFAIL causes exit from the current do
          command file.
 
-Other related changes/extensions:
-The "!" command (execute a command on the local OS), now returns the command's exit status as the status from the "!" command.  This allows ON conditions to handle error status responses from OS commands and act as desired.
+Other related changes/extensions: The "!" command (execute a command on the
+local OS), now returns the command's exit status as the status from the "!"
+command. This allows ON conditions to handle error status responses from OS
+commands and act as desired.
 
 #### Scriptable interactions with running simulators
 
-The EXPECT command now exists to provide a means of reacting to simulator output and the SEND command exists to inject data into programs running within a simulator.
+The EXPECT command now exists to provide a means of reacting to simulator
+output and the SEND command exists to inject data into programs running within
+a simulator.
 
     EXPECT {HALTAFTER=n,}"\r\nPassword: "
     SEND {AFTER=n,}{DELAY=m,}"mypassword\r"
 
     or
 
-    EXPECT {HALTAFTER=n,}"\r\nPassword: " SEND {AFTER=n,}{DELAY=m,}"mypassword\r"; GO
+    EXPECT {HALTAFTER=n,}"\r\nPassword: "
+    SEND {AFTER=n,}{DELAY=m,}"mypassword\r"
+    GO
 
 
 #### Help
 
-The built-in help system provides a hierarchical oriented help command interface.
-In addition, there is explicit support for per device help:
+The built-in help system provides a hierarchical oriented help command
+interface. In addition, there is explicit support for per device help:
 
     HELP dev
     HELP dev ATTACH
@@ -365,61 +412,94 @@ In addition, there is explicit support for per device help:
 
 #### Generic SCP support Clock Coscheduling as opposed to per simulator implementations
 
-Device simulator authors can easily schedule their device polling activities to allow for efficient simulator execution when polling for device activity while still being well behaved when their simulated system is actually idle.
+Device simulator authors can easily schedule their device polling activities
+to allow for efficient simulator execution when polling for device activity
+while still being well behaved when their simulated system is actually idle.
 
 #### New SCP Commands:
 
     SCREENSHOT filename.bmp          Save video window to the specified file
     SET ENV Name=Value               Set Environment variable
-    SET ENV -p "Prompt" Name=Default Gather User input into an Environment Variable
-    SET ENV -a Name=Expression       Evaluate an expression and store result in an Environment Variable
+    SET ENV -p "Prompt" Name=Default Gather User input into an Environment
+                                   Variable
+    SET ENV -a Name=Expression       Evaluate an expression and store result
+                                   in an Environment Variable
     SET ASYNCH                       Enable Asynchronous I/O
     SET NOASYNCH                     Disable Asynchronous I/O
-    SET VERIFY                       Enable command display while processing DO command files
-    SET NOVERIFY                     Enable command display while processing DO command files
-    SET MESSAGE                      Enable error message output when commands complete (default)
-    SET NOMESSAGE                    Disable error message output when commands complete
-    SET QUIET                        Set minimal output mode for command execution
-    SET NOQUIET                      Set normal output mode for command execution
-    SET PROMPT                       Change the prompt used by the simulator (default sim>)
+    SET VERIFY                       Enable command display while processing
+                                   DO command files
+    SET NOVERIFY                     Enable command display while processing
+                                   DO command files
+    SET MESSAGE                      Enable error message output when
+                                   commands complete (default)
+    SET NOMESSAGE                    Disable error message output when
+                                   commands complete
+    SET QUIET                        Set minimal output mode for command
+                                   execution
+    SET NOQUIET                      Set normal output mode for command
+                                   execution
+    SET PROMPT                       Change the prompt used by the simulator
+                                   (default sim>)
     SET THROTTLE x/t                 Throttle t ms every x cycles
     SET REMOTE TELNET=port           Specify remote console telnet port
     SET REMOTE NOTELNET              Disables remote console
-    SET REMOTE CONNECTIONS=n         Specify the number of concurrent remote console sessions
-    SHOW FEATURES                    Displays the devices descriptions and features
-    SHOW ASYNCH                      Display the current Asynchronous I/O status
-    SHOW SERIAL                      Display the available and/or open serial ports
-    SHOW ETHERNET                    Display the available and/or open ethernet connections
-    SHOW MULTIPLEXER                 Display the details about open multiplexer devices
-    SHOW CLOCKS                      Display the details about calibrated timers
+    SET REMOTE CONNECTIONS=n         Specify the number of concurrent remote
+                                   console sessions
+    SHOW FEATURES                    Displays the devices descriptions and
+                                   features
+    SHOW ASYNCH                      Display the current Asynchronous I/O
+                                   status
+    SHOW SERIAL                      Display the available and/or open serial
+                                   ports
+    SHOW ETHERNET                    Display the available and/or open
+                                   ethernet connections
+    SHOW MULTIPLEXER                 Display the details about open
+                                   multiplexer devices
+    SHOW CLOCKS                      Display the details about calibrated
+                                   timers
     SHOW REMOTE                      Display the remote console configuration
     SHOW ON                          Display ON condition dispatch actions
     SET ON                           Enable ON condition error dispatching
     SET NOON                         Disable ON condition error dispatching
-    GOTO                             Transfer to label in the current DO command file
+    GOTO                             Transfer to label in the current DO
+                                   command file
     CALL                             Call subroutine at indicated label
     RETURN                           Return from subroutine call
-    SHIFT                            Slide argument parameters %1 thru %9 left 1
+    SHIFT                            Slide argument parameters %1 thru %9
+                                   left 1
     NOOP                             A no-op command
-    ON                               Establish or cancel an ON condition dispatch
-    IF                               Test some simulator state and conditionally execute commands
-    IF (C-style-expression)          Test some simulator state and conditionally execute commands
-    ELSE                             commands to execute when the previous IF wasn't true
+    ON                               Establish or cancel an ON condition
+                                   dispatch
+    IF                               Test some simulator state and
+                                   conditionally execute commands
+    IF (C-style-expression)          Test some simulator state and
+                                   conditionally execute commands
+    ELSE                             commands to execute when the previous IF
+                                   wasn't true
     CD                               Change working directory
     SET DEFAULT                      Change working directory
     PWD                              Show working directory
     SHOW DEFAULT                     Show working directory
     DIR {path|file}                  Display file listing
     LS {path|file}                   Display file listing
-    NEXT                             Step across a subroutine call or step a single instruction.
-    EXPECT                           React to output produced by a simulated system
-    SEND                             Inject input to a simulated system's console
+    NEXT                             Step across a subroutine call or step a
+                                   single instruction.
+    EXPECT                           React to output produced by a simulated
+                                   system
+    SEND                             Inject input to a simulated system's
+                                   console
     SLEEP time                       Pause command execution for specified time
     SCREENSHOT                       Snapshot the current video display window
-    RUN UNTIL breakpoint             Establish the breakpoint specified and run until it is encountered
-    RUN UNTIL "output-string" ...    Establish the specified "output-string" as an EXPECT and run until it is encountered.
-    GO UNTIL breakpoint              Establish the breakpoint specified and go until it is encountered
-    GO UNTIL "output-string" ...     Establish the specified "output-string" as an EXPECT and go until it is encountered.
+    RUN UNTIL breakpoint             Establish the breakpoint specified and
+                                   run until it is encountered
+    RUN UNTIL "output-string" ...    Establish the specified
+                                   "output-string" as an EXPECT and run until
+                                   it is encountered.
+    GO UNTIL breakpoint              Establish the breakpoint specified and
+                                   go until it is encountered
+    GO UNTIL "output-string" ...     Establish the specified
+                                   "output-string" as an EXPECT and go until
+                                   it is encountered.
     RUNLIMIT						 Bound simulator execution time
     TAR                              Manipulate file archives
     CURL                             Access URLs from the web
@@ -427,20 +507,23 @@ Device simulator authors can easily schedule their device polling activities to 
 #### Command Processing Enhancements
 
 ##### Environment variable insertion
-Built In variables %DATE%, %TIME%, %DATETIME%, %LDATE%, %LTIME%, %CTIME%, %DATE_YYYY%, %DATE_YY%, %DATE_YC%, %DATE_MM%, %DATE_MMM%, %DATE_MONTH%, %DATE_DD%, %DATE_D%, %DATE_WYYYY%, %DATE_WW%, %TIME_HH%, %TIME_MM%, %TIME_SS%, %STATUS%, %TSTATUS%, %SIM_VERIFY%, %SIM_QUIET%, %SIM_MESSAGE%
+Built In variables %DATE%, %TIME%, %DATETIME%, %LDATE%, %LTIME%, %CTIME%,
+%DATE_YYYY%, %DATE_YY%, %DATE_YC%, %DATE_MM%, %DATE_MMM%, %DATE_MONTH%,
+%DATE_DD%, %DATE_D%, %DATE_WYYYY%, %DATE_WW%, %TIME_HH%, %TIME_MM%, %TIME_SS%,
+%STATUS%, %TSTATUS%, %SIM_VERIFY%, %SIM_QUIET%, %SIM_MESSAGE%
 
-   Token "%0" expands to the command file name.
-   Token %n (n being a single digit) expands to the n'th argument
-   Token %* expands to the whole set of arguments (%1 ... %9)
+Token "%0" expands to the command file name. Token %n (n being a single digit)
+expands to the n'th argument Token %* expands to the whole set of arguments
+(%1 ... %9)
 
-   The input sequence "%%" represents a literal "%".  All other
-   character combinations are rendered literally.
+The input sequence "%%" represents a literal "%". All other character
+combinations are rendered literally.
 
-   Omitted parameters result in null-string substitutions.
+Omitted parameters result in null-string substitutions.
 
-   Tokens preceded and followed by % characters are expanded as environment
-   variables, and if an environment variable isn't found then it can be one of
-   several special variables:
+Tokens preceded and followed by % characters are expanded as environment
+variables, and if an environment variable isn't found then it can be one of
+several special variables:
 
           %DATE%              yyyy-mm-dd
           %TIME%              hh:mm:ss
@@ -468,24 +551,26 @@ Built In variables %DATE%, %TIME%, %DATETIME%, %LDATE%, %LTIME%, %CTIME%, %DATE_
           %TIME_SS%           ss          (00-59)
           %STATUS%            Status value from the last command executed
           %TSTATUS%           The text form of the last status value
-          %SIM_VERIFY%        The Verify/Verbose mode of the current Do command file
-          %SIM_VERBOSE%       The Verify/Verbose mode of the current Do command file
+          %SIM_VERIFY%        The Verify/Verbose mode of the current
+                              Do command file
+          %SIM_VERBOSE%       The Verify/Verbose mode of the current
+                              Do command file
           %SIM_QUIET%         The Quiet mode of the current Do command file
-          %SIM_MESSAGE%       The message display status of the current Do command file
+          %SIM_MESSAGE%       The message display status of the current
+                              Do command file
 
-   Environment variable lookups are done first with the precise name between
-   the % characters and if that fails, then the name between the % characters
-   is upcased and a lookup of that values is attempted.
+Environment variable lookups are done first with the precise name between the
+% characters and if that fails, then the name between the % characters is
+upcased and a lookup of that values is attempted.
 
-   The first Space delimited token on the line is extracted in uppercase and
-   then looked up as an environment variable.  If found it the value is
-   substituted for the original string before expanding everything else.  If
-   it is not found, then the original beginning token on the line is left
-   untouched.
+The first Space delimited token on the line is extracted in uppercase and then
+looked up as an environment variable. If found it the value is substituted for
+the original string before expanding everything else. If it is not found, then
+the original beginning token on the line is left untouched.
 
 ##### Command aliases
 
-Commands can be aliases with environment variables.  For example:
+Commands can be aliases with environment variables. For example:
 
       sim> set env say=echo
       sim> say Hello there
@@ -493,17 +578,22 @@ Commands can be aliases with environment variables.  For example:
 
 ##### Do command argument manipulation
 
-The SHIFT command will shift the %1 thru %9 arguments to the left one position.
+The SHIFT command will shift the %1 thru %9 arguments to the left one
+position.
 
 ## Building and running a simulator
 
 <!-- ### Use Prebuilt Windows Simulators
 
-Simulators for the Windows platform are built and made available on a regular basis (at least once a week if substantive changes have been made to the codebase).
+Simulators for the Windows platform are built and made available on a regular
+basis (at least once a week if substantive changes have been made to the
+codebase).
 
-The prebuilt Windows binaries will run on all versions of Microsoft Windows from Windows XP onward.
+The prebuilt Windows binaries will run on all versions of Microsoft Windows
+from Windows XP onward.
 
-They can be accessed at https://github.com/open-simh/Win32-Development-Binaries
+They can be accessed at
+https://github.com/open-simh/Win32-Development-Binaries
 
 <!-- Several relatively recent versions should be available which you can download and use directly. -->
 
@@ -511,26 +601,39 @@ They can be accessed at https://github.com/open-simh/Win32-Development-Binaries
 
 <!-- First download the latest source code from the github repository's master branch at https://github.com/open-simh/simh/archive/master.zip -->
 
-Obtain the current source code using the "git clone" command to obtain the "master" branch of the open-simh/simh repository.
+Obtain the current source code using the "git clone" command to obtain the
+"master" branch of the open-simh/simh repository.
 
 Depending on your host platform one of the following steps should be followed:
 
 #### Linux/OSX other *nix platforms
 
-If you are interested in using a simulator with Ethernet networking support (i.e. one of the VAX simulators or the PDP11), then you should make sure you have the correct networking components available.  The instructions in https://github.com/open-simh/simh/blob/master/0readme_ethernet.txt describe the required steps to get ethernet networking components installed and how to configure your environment.
+If you are interested in using a simulator with Ethernet networking support
+(i.e. one of the VAX simulators or the PDP11), then you should make sure you
+have the correct networking components available. The instructions in
+https://github.com/open-simh/simh/blob/master/0readme_ethernet.txt describe
+the required steps to get ethernet networking components installed and how to
+configure your environment.
 
-See the 0readme_ethernet.txt file for details about the required network components for your platform.  Once your operating system build environment has the correct networking components available the following command will build working simulators:
+See the 0readme_ethernet.txt file for details about the required network
+components for your platform. Once your operating system build environment has
+the correct networking components available the following command will build
+working simulators:
 
-   $ make {simulator-name (i.e. vax)}
+$ make {simulator-name (i.e. vax)}
 
-The makefile provided requires GNU make, which is the default make facility for most systems these days.  Any host system which doesn't have GNU make available as the default make facility may have it installed as 'gmake'.  GNU make (gmake) is generally available an installation package for all current operating systems which have a package installation system.
+The makefile provided requires GNU make, which is the default make facility
+for most systems these days. Any host system which doesn't have GNU make
+available as the default make facility may have it installed as 'gmake'. GNU
+make (gmake) is generally available an installation package for all current
+operating systems which have a package installation system.
 
 ##### Build Dependencies
 
 Some simulators depend on external packages to provide the full scope of
-functionality they may be simulating.  These additional external packages
-may or may not be included in as part of the standard Operating System
-distributions.  If simulators are being built that could provide more
+functionality they may be simulating. These additional external packages may
+or may not be included in as part of the standard Operating System
+distributions. If simulators are being built that could provide more
 functionality than the currently installed packages will provide, the build
 will succeed with reduced functionality (i.e. limited network or no video
 support), but suggestions will be provided as to what could provide full
@@ -539,7 +642,9 @@ functionality.
 
 ###### OS X - Dependencies
 
-The MacPorts package manager is available to provide these external packages.  Once MacPorts is installed, these commands will install the required dependent packages:
+The MacPorts package manager is available to provide these external packages.
+Once MacPorts is installed, these commands will install the required dependent
+packages:
 
     # port install vde2
     # port install libsdl2
@@ -568,25 +673,37 @@ Ubuntu:
 
 #### Windows
 
-Compiling on windows is supported with recent versions of Microsoft Visual Studio (Standard or Express) and using GCC via the MinGW32 environment.  Things may also work under Cygwin, but that is not the preferred windows environment.  Not all features will be available as well as with either Visual Studio or MinGW32.
+Compiling on windows is supported with recent versions of Microsoft Visual
+Studio (Standard or Express) and using GCC via the MinGW32 environment. Things
+may also work under Cygwin, but that is not the preferred windows environment.
+Not all features will be available as well as with either Visual Studio or
+MinGW32.
 
 ##### Required related files
-The file https://github.com/open-simh/simh/blob/master/Visual%20Studio%20Projects/0ReadMe_Projects.txt
+The file
+https://github.com/open-simh/simh/blob/master/Visual%20Studio%20Projects/0ReadMe_Projects.txt
 
 ##### Visual Studio (Standard or Express) 2008, 2010, 2012, 2013 or Visual Studio Community 2015, 2017, 2019
 
-The file https://github.com/open-simh/simh/blob/master/Visual%20Studio%20Projects/0ReadMe_Projects.txt describes the required steps to use the setup your environment to build using Visual Studio.
+The file
+https://github.com/open-simh/simh/blob/master/Visual%20Studio%20Projects/0ReadMe_Projects.txt
+describes the required steps to use the setup your environment to build using
+Visual Studio.
 
 ##### MinGW32
 
-Building with MinGW32 requires the same directory organization and the dependent package support described for Visual Studio in the file https://github.com/open-simh/simh/blob/master/Visual%20Studio%20Projects/0ReadMe_Projects.txt.  Building with MinGW64 is not supported.
+Building with MinGW32 requires the same directory organization and the
+dependent package support described for Visual Studio in the file
+https://github.com/open-simh/simh/blob/master/Visual%20Studio%20Projects/0ReadMe_Projects.txt.
+Building with MinGW64 is not supported.
 
 <!-- #### VMS
 
-Download the latest source code as a zip file from: https://github.com/open-simh/simh/archive/master.zip
+Download the latest source code as a zip file from:
+https://github.com/open-simh/simh/archive/master.zip
 
-Unzip it in the directory that you want SIMH to reside in.  Unpack it and
-set the file attributes as follows:
+Unzip it in the directory that you want SIMH to reside in. Unpack it and set
+the file attributes as follows:
 
     $ unzip simh-master.zip
     $ set default [.simh-master]
@@ -596,16 +713,17 @@ Simulators with ethernet network devices (All the VAX simulators and the
 PDP11) can have functioning networking when running on Alpha or IA64 OpenVMS.
 
 In order to build and run simulators with networking support, the VMS-PCAP
-package must be available while building your simulator.  The simh-vms-pcap.zip
+package must be available while building your simulator. The simh-vms-pcap.zip
 file can be downloaded from https://github.com/simh/simh/archive/vms-pcap.zip
-This link will return a file called simh-vms-pcap.zip which should be unpacked as follows:
+This link will return a file called simh-vms-pcap.zip which should be unpacked
+as follows:
 
     $ unzip -a simh-vms-pcap.zip
     $ rename [.simh-vms-pcap]pcap-vms.dir []
 
-The PCAP-VMS components are presumed (by the descrip.mms file) to be
-located in a directory at the same level as the directory containing the
-simh source files.  For example, if these exist here:
+The PCAP-VMS components are presumed (by the descrip.mms file) to be located
+in a directory at the same level as the directory containing the simh source
+files. For example, if these exist here:
 
 []descrip.mms
 []scp.c
@@ -628,21 +746,28 @@ On a Alpha & IA64 hosts use:
     $ MMx                        ! With Ethernet support
     $ MMx/MACRO=(NONETWORK=1)    ! Without Ethernet support
 
-UNZIP can be found on the VMS freeware CDs, or from www.info-zip.org
-MMS (Module Management System) can be licensed from HP/Compaq/Digital as part of the VMS Hobbyist program (it is a component of the DECSET product).
-MMK can be found on the VMS freeware CDs, or from http://www.kednos.com/kednos/Open_Source/MMK
+UNZIP can be found on the VMS freeware CDs, or from www.info-zip.org MMS
+(Module Management System) can be licensed from HP/Compaq/Digital as part of
+the VMS Hobbyist program (it is a component of the DECSET product). MMK can be
+found on the VMS freeware CDs, or from
+http://www.kednos.com/kednos/Open_Source/MMK
 <!-- DEC C can be licensed from HP/Compaq/Digital as part of the VMS Hobbyist program. -->
 
 ## Problem Reports
 
-If you find problems or have suggestions relating to any simulator or the simh package as a whole, please report these using the github "Issue" interface at https://github.com/open-simh/simh/issues.
+If you find problems or have suggestions relating to any simulator or the simh
+package as a whole, please report these using the github "Issue" interface at
+https://github.com/open-simh/simh/issues.
 
-Problem reports should contain;
- - a description of the problem
- - the simulator you experience the problem with
- - your host platform (and OS version)
- - how you built the simulator or that you're using prebuilt binaries
- - the simulator build description should include the output produced by while building the simulator
- - the output of SHOW VERSION while running the simulator which is having an issue
- - the simulator configuration file (or commands) which were used when the problem occurred.
+Problem reports should contain:
 
+- a description of the problem
+- the simulator you experience the problem with
+- your host platform (and OS version)
+- how you built the simulator or that you're using prebuilt binaries
+- the simulator build description should include the output produced while
+  building the simulator
+- the output of SHOW VERSION while running the simulator which is having an
+  issue
+- the simulator configuration file (or commands) which were used when the
+  problem occurred
