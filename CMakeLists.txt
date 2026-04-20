@@ -8,9 +8,9 @@ if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
         ""
         "Create a subdirectory and build in that subdirectory, e.g.:"
         "\n"
-        "  $ mkdir cmake-build\n"
-        "  $ cd cmake-build\n"
-        "  $ cmake -G \"your generator here\" ..\n"
+        "  $ mkdir -p build/release\n"
+        "  $ cd build/release\n"
+        "  $ cmake -G \"your generator here\" ../..\n"
         ""
         "Preventing in-tree source build.")
 endif ()
@@ -279,12 +279,14 @@ if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/SIMH-install" CACHE PATH "${CMAKE_SOURCE_DIR}/SIMH-install default install prefix" FORCE)
 endif()
 
-## The default runtime output directory is the BIN subdirectory in the source tree's top
-set(SIMH_LEGACY_INSTALL "${CMAKE_SOURCE_DIR}/BIN")
-if (WIN32)
-    string(APPEND SIMH_LEGACY_INSTALL "/Win32")
-endif()
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${SIMH_LEGACY_INSTALL})
+## Keep runtime outputs in the active build tree.
+set(SIMH_RUNTIME_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin")
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${SIMH_RUNTIME_OUTPUT_DIR}")
+foreach(_cfg IN ITEMS Debug Release RelWithDebInfo MinSizeRel)
+    string(TOUPPER "${_cfg}" _cfg_uc)
+    set("CMAKE_RUNTIME_OUTPUT_DIRECTORY_${_cfg_uc}"
+        "${SIMH_RUNTIME_OUTPUT_DIR}")
+endforeach ()
 
 ## Source directory is always on the global include path.
 include_directories(${CMAKE_SOURCE_DIR})

@@ -369,10 +369,7 @@ add_simulator(vax
     PKG_FAMILY vax_family
     TEST vax-diag)
 
-set(vax_binary_dir ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-if (CMAKE_CONFIGURATION_TYPES)
-    string(APPEND vax_binary_dir "/$<CONFIG>")
-endif (CMAKE_CONFIGURATION_TYPES)
+set(vax_binary_dir "${SIMH_RUNTIME_OUTPUT_DIR}")
 
 ## Preserve the historical microvax3900 alias for the vax target in the build tree.
 add_custom_command(TARGET vax POST_BUILD

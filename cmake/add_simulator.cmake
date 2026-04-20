@@ -218,8 +218,14 @@ function (simh_executable_template _targ)
     add_executable("${_targ}" "${SIMH_SOURCES}")
     set_target_properties(${_targ} PROPERTIES
         C_STANDARD 99
-        RUNTIME_OUTPUT_DIRECTORY ${SIMH_LEGACY_INSTALL}
+        RUNTIME_OUTPUT_DIRECTORY "${SIMH_RUNTIME_OUTPUT_DIR}"
     )
+    foreach (_cfg IN ITEMS Debug Release RelWithDebInfo MinSizeRel)
+        string(TOUPPER "${_cfg}" _cfg_uc)
+        set_property(TARGET ${_targ}
+            PROPERTY "RUNTIME_OUTPUT_DIRECTORY_${_cfg_uc}"
+            "${SIMH_RUNTIME_OUTPUT_DIR}")
+    endforeach ()
     target_compile_options(${_targ} PRIVATE ${EXTRA_TARGET_CFLAGS})
     target_link_options(${_targ} PRIVATE ${EXTRA_TARGET_LFLAGS})
 
@@ -335,7 +341,7 @@ function (add_simulator _targ)
     if (BUILD_SHARED_DEPS)
         ## Make sure that the tests can find the DLLs/shared objects:
         file(TO_NATIVE_PATH "${SIMH_DEP_TOPDIR}/bin" native_dep_bindir)
-        file(TO_NATIVE_PATH "${CMAKE_BINARY_DIR}" native_binary_dir)
+        file(TO_NATIVE_PATH "${SIMH_RUNTIME_OUTPUT_DIR}" native_binary_dir)
     endif ()
 
     ## Build up test environment:

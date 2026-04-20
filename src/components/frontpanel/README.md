@@ -45,6 +45,10 @@ From a configured build tree:
 cmake --build build/release --target frontpaneltest
 ```
 
+The resulting executable is written to:
+
+- `build/release/bin/frontpaneltest`
+
 ## Related API Documentation
 
 The public API used by this sample is documented in:

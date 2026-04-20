@@ -25,6 +25,12 @@ Use out-of-tree builds under `build/`:
 - `build/release`
 - `build/debug`
 
+Built executables stay inside the active build tree under `bin/`, for
+example:
+
+- `build/release/bin`
+- `build/debug/bin`
+
 Typical release build:
 
 ```sh

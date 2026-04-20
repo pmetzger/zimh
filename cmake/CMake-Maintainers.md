@@ -89,6 +89,11 @@ The project assumes out-of-tree builds. The preferred layout is:
 - `build/release`
 - `build/debug`
 
+Runtime artifacts belong under the active build tree, normally in:
+
+- `build/release/bin`
+- `build/debug/bin`
+
 The compatibility `Makefile` auto-configures and uses `build/release`.
 
 ### Standard CMake Variables

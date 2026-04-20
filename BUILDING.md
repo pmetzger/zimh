@@ -98,6 +98,12 @@ mkdir -p build/release
 You may choose a different build directory name, but keep it separate
 from the source tree.
 
+Built executables stay inside the build tree. For the standard
+layouts above, look under:
+
+- `build/release/bin`
+- `build/debug/bin`
+
 ## Full-feature build
 
 Use this when all optional dependencies, including `SDL2_ttf`, are
@@ -193,6 +199,14 @@ Common top-level targets include:
   `cmake --build build/release --target extra-tools`
   Builds the developer/sample utility targets, currently `stub` and
   `frontpaneltest`.
+
+Resulting executables land in the configured build tree's `bin/`
+subdirectory. For example:
+
+- `build/release/bin/pdp11`
+- `build/release/bin/vax`
+- `build/release/bin/frontpaneltest`
+- `build/release/bin/stub`
 
 ## Running just the tests
 

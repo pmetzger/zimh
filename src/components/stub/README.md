@@ -52,3 +52,13 @@ SIMH event facilities:
 For broader simulator-writing guidance, also see:
 
 - `docs/developers/writing_a_simulator.md`
+
+To build the stub target from the standard build tree:
+
+```sh
+cmake --build build/release --target stub
+```
+
+The resulting executable is written to:
+
+- `build/release/bin/stub`
