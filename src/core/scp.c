@@ -239,6 +239,10 @@
 #include <ctype.h>
 #include <time.h>
 #include <math.h>
+#if defined(HAVE_PCRE2_H)
+#define PCRE2_CODE_UNIT_WIDTH 8
+#include <pcre2.h>
+#endif
 #if defined(_WIN32)
 #include <io.h>
 #include <fcntl.h>
@@ -2833,9 +2837,7 @@ if (!sim_quiet) {
     }
 sim_timer_precalibrate_execution_rate ();
 show_version (stdnul, NULL, NULL, 1, NULL);             /* Quietly set SIM_OSTYPE */
-#if defined (HAVE_PCRE_H)
-setenv ("SIM_REGEX_TYPE", "PCRE", 1);                   /* Publish regex type */
-#endif
+sim_publish_regex_environment ();
 sim_argv = argv;
 
 if (sim_switches & SWMASK ('T'))                        /* Command Line -T switch */
@@ -5721,6 +5723,63 @@ if (toolpath[0]) {
 return toolversion;
 }
 
+const char *sim_regex_backend_name (void)
+{
+#if defined(HAVE_PCRE2_H)
+    return "PCRE2";
+#elif defined(HAVE_PCRE_H)
+    return "PCRE";
+#else
+    return NULL;
+#endif
+}
+
+const char *sim_regex_backend_version (void)
+{
+#if defined(HAVE_PCRE2_H)
+    static char version[64];
+
+    if (version[0] == '\0')
+        if (0 != pcre2_config (PCRE2_CONFIG_VERSION, version))
+            strcpy (version, "unknown");
+    return version;
+#elif defined(HAVE_PCRE_H)
+    return pcre_version ();
+#else
+    return NULL;
+#endif
+}
+
+void sim_publish_regex_environment (void)
+{
+    const char *backend = sim_regex_backend_name ();
+
+    if (backend)
+        setenv ("SIM_REGEX_TYPE", backend, 1);
+    else
+        unsetenv ("SIM_REGEX_TYPE");
+}
+
+void sim_fprint_regex_support (FILE *st)
+{
+    const char *backend = sim_regex_backend_name ();
+
+    if (backend) {
+        const char *version = sim_regex_backend_version ();
+
+        if (version && *version)
+            fprintf (st,
+                     "\n        %s RegEx (Version %s) support for EXPECT "
+                     "commands",
+                     backend, version);
+        else
+            fprintf (st,
+                     "\n        %s RegEx support for EXPECT commands",
+                     backend);
+    } else
+        fprintf (st, "\n        No RegEx support for EXPECT commands");
+}
+
 /* Show <global name> processors  */
 
 t_stat show_version (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
@@ -5842,11 +5901,7 @@ if (flag) {
     fprintf (st, "\n        Memory Pointer Size: %d bits", (int)sizeof(dptr)*8);
     fprintf (st, "\n        %s", sim_toffset_64 ? "Large File (>2GB) support" : "No Large File support");
     fprintf (st, "\n        SDL Video support: %s", vid_version());
-#if defined (HAVE_PCRE_H)
-    fprintf (st, "\n        PCRE RegEx (Version %s) support for EXPECT commands", pcre_version());
-#else
-    fprintf (st, "\n        No RegEx support for EXPECT commands");
-#endif
+    sim_fprint_regex_support (st);
     fprintf (st, "\n        OS clock resolution: %dms", os_tick_size);
     fprintf (st, "\n        Time taken by msleep(1): %dms", os_ms_sleep_1);
     if (eth_version ())
