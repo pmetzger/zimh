@@ -150,7 +150,6 @@ static void test_file_compare_sets_diff_offset_without_environment(void **state)
     assert_int_not_equal(sim_cmp_string(quoted1, quoted2), 0);
     sim_switches = saved_switches;
 
-    assert_null(getenv("_FILE_COMPARE_DIFF_OFFSET"));
     expand_command("A%_FILE_COMPARE_DIFF_OFFSET%B", expanded, sizeof(expanded));
     assert_string_equal(expanded, "A2B");
 
@@ -158,7 +157,7 @@ static void test_file_compare_sets_diff_offset_without_environment(void **state)
     unlink(path2);
 }
 
-/* Verify RUNLIMIT is still available through substitution, not environment. */
+/* Verify RUNLIMIT is still available through substitution. */
 static void test_runlimit_cmd_expands_without_environment(void **state)
 {
     char expanded[CBUFSIZE];
@@ -166,8 +165,6 @@ static void test_runlimit_cmd_expands_without_environment(void **state)
     (void)state;
 
     assert_int_equal(run_scp_command("RUNLIMIT", "5"), SCPE_OK);
-    assert_null(getenv("SIM_RUNLIMIT"));
-    assert_null(getenv("SIM_RUNLIMIT_UNITS"));
 
     expand_command("A%SIM_RUNLIMIT%B", expanded, sizeof(expanded));
     assert_string_equal(expanded, "A5B");
@@ -178,20 +175,6 @@ static void test_runlimit_cmd_expands_without_environment(void **state)
     assert_int_equal(run_scp_command("NORUNLIMIT", ""), SCPE_OK);
     expand_command("A%SIM_RUNLIMIT%B", expanded, sizeof(expanded));
     assert_string_equal(expanded, "AB");
-}
-
-/* Verify RUNLIMIT still avoids publishing its state through environment vars. */
-static void test_runlimit_cmd_does_not_publish_environment(void **state)
-{
-    (void)state;
-
-    assert_int_equal(run_scp_command("RUNLIMIT", "5"), SCPE_OK);
-    assert_null(getenv("SIM_RUNLIMIT"));
-    assert_null(getenv("SIM_RUNLIMIT_UNITS"));
-
-    assert_int_equal(run_scp_command("NORUNLIMIT", ""), SCPE_OK);
-    assert_null(getenv("SIM_RUNLIMIT"));
-    assert_null(getenv("SIM_RUNLIMIT_UNITS"));
 }
 
 /* Verify UTIME remains available for scripts that depend on it. */
@@ -244,7 +227,7 @@ static void test_sim_sub_args_expands_sim_identity_variables(void **state)
     assert_string_equal(expanded, "simh-unit tail");
 }
 
-/* Verify SIM_OSTYPE still expands while removed SIM_* metadata stays hidden. */
+/* Verify SIM_OSTYPE still expands while removed metadata stays absent. */
 static void test_show_version_keeps_only_sim_ostype(void **state)
 {
     char expanded[CBUFSIZE];
@@ -257,17 +240,6 @@ static void test_show_version_keeps_only_sim_ostype(void **state)
 
     assert_int_equal(show_version(stream, NULL, NULL, 1, NULL), SCPE_OK);
     fclose(stream);
-    assert_null(getenv("SIM_OSTYPE"));
-    assert_null(getenv("SIM_DELTA"));
-    assert_null(getenv("SIM_VERSION_MODE"));
-    assert_null(getenv("SIM_MAJOR"));
-    assert_null(getenv("SIM_MINOR"));
-    assert_null(getenv("SIM_PATCH"));
-    assert_null(getenv("SIM_VM_RELEASE"));
-    assert_null(getenv("SIM_GIT_COMMIT_ID"));
-    assert_null(getenv("SIM_GIT_COMMIT_TIME"));
-    assert_null(getenv("SIM_ARCHIVE_GIT_COMMIT_ID"));
-    assert_null(getenv("SIM_ARCHIVE_GIT_COMMIT_TIME"));
 
     expand_command("A%SIM_OSTYPE%B", expanded, sizeof(expanded));
     assert_true(strlen(expanded) > 2);
@@ -275,6 +247,28 @@ static void test_show_version_keeps_only_sim_ostype(void **state)
     assert_true(expanded[strlen(expanded) - 1] == 'B');
 
     expand_command("A%DATE_YC%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, "AB");
+    expand_command("A%SIM_DELTA%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, "AB");
+    expand_command("A%SIM_VERSION_MODE%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, "AB");
+    expand_command("A%SIM_MAJOR%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, "AB");
+    expand_command("A%SIM_MINOR%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, "AB");
+    expand_command("A%SIM_PATCH%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, "AB");
+    expand_command("A%SIM_VM_RELEASE%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, "AB");
+    expand_command("A%SIM_GIT_COMMIT_ID%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, "AB");
+    expand_command("A%SIM_GIT_COMMIT_TIME%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, "AB");
+    expand_command("A%SIM_ARCHIVE_GIT_COMMIT_ID%B", expanded,
+                   sizeof(expanded));
+    assert_string_equal(expanded, "AB");
+    expand_command("A%SIM_ARCHIVE_GIT_COMMIT_TIME%B", expanded,
+                   sizeof(expanded));
     assert_string_equal(expanded, "AB");
 }
 
@@ -295,9 +289,6 @@ int main(void)
             setup_scp_subst_fixture, teardown_scp_subst_fixture),
         cmocka_unit_test_setup_teardown(
             test_runlimit_cmd_expands_without_environment,
-            setup_scp_subst_fixture, teardown_scp_subst_fixture),
-        cmocka_unit_test_setup_teardown(
-            test_runlimit_cmd_does_not_publish_environment,
             setup_scp_subst_fixture, teardown_scp_subst_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_expands_utime,

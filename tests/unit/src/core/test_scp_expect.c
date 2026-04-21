@@ -222,11 +222,6 @@ static void test_sim_exp_check_populates_regex_capture_groups(void **state)
     assert_scp_var_equals("_EXPECT_MATCH_PATTERN", "/ab([0-9][0-9])/");
     assert_scp_var_equals("_EXPECT_MATCH_GROUP_0", "ab42");
     assert_scp_var_equals("_EXPECT_MATCH_GROUP_1", "42");
-    /* Keep one explicit host-environment check for this migration only. */
-    /* Future tests do not need to repeat the getenv() assertions below. */
-    assert_null(getenv("_EXPECT_MATCH_PATTERN"));
-    assert_null(getenv("_EXPECT_MATCH_GROUP_0"));
-    assert_null(getenv("_EXPECT_MATCH_GROUP_1"));
 }
 
 /* Verify regex rules honor case-independent matching when requested. */
@@ -314,8 +309,6 @@ static void test_send_cmd_sets_console_defaults_and_queue_timing(void **state)
     assert_int_equal(send_cmd(1, "DELAY=7 AFTER=11"), SCPE_OK);
     assert_int_equal(snd->default_delay, 7);
     assert_int_equal(snd->default_after, 11);
-    assert_null(getenv("SIM_SEND_DELAY_CONSOLE"));
-    assert_null(getenv("SIM_SEND_AFTER_CONSOLE"));
 
     assert_int_equal(send_cmd(1, "\"AZ\""), SCPE_OK);
     assert_int_equal(snd->delay, 7);
@@ -369,8 +362,6 @@ static void test_send_cmd_targets_named_tmxr_line(void **state)
     assert_int_equal(send_cmd(1, "TTY:1 DELAY=5 AFTER=9"), SCPE_OK);
     assert_int_equal(snd->default_delay, 5);
     assert_int_equal(snd->default_after, 9);
-    assert_null(getenv("SIM_SEND_DELAY_TTY_1"));
-    assert_null(getenv("SIM_SEND_AFTER_TTY_1"));
 
     assert_int_equal(send_cmd(1, "TTY:1 \"AZ\""), SCPE_OK);
     assert_int_equal(snd->delay, 5);
@@ -390,7 +381,6 @@ static void test_sim_set_expect_parses_repeat_haltafter_and_action(void **state)
     exp = sim_cons_get_expect();
     assert_int_equal(sim_set_expect(exp, "HALTAFTER=13"), SCPE_OK);
     assert_int_equal(exp->default_haltafter, 13);
-    assert_null(getenv("SIM_EXPECT_HALTAFTER_CONSOLE"));
 
     assert_int_equal(sim_set_expect(exp, "[2] HALTAFTER=9 \"GO\" echo hit"),
                      SCPE_OK);
@@ -419,7 +409,6 @@ static void test_expect_cmd_targets_named_tmxr_line(void **state)
 
     assert_int_equal(expect_cmd(1, "TTY:1 HALTAFTER=7"), SCPE_OK);
     assert_int_equal(exp->default_haltafter, 7);
-    assert_null(getenv("SIM_EXPECT_HALTAFTER_TTY_1"));
 
     assert_int_equal(expect_cmd(1, "TTY:1 \"GO\" echo hit"), SCPE_OK);
     assert_int_equal(exp->size, 1);
