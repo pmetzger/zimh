@@ -3499,10 +3499,6 @@ sprintf(msgbuf, "Error %d", stat);
 return msgbuf;
 }
 
-#ifndef MAX
-#define MAX(a,b) (((a) > (b)) ? (a) : (b))
-#endif
-
 static t_stat sim_tape_validate_tape (UNIT *uptr)
 {
 t_addr saved_pos = uptr->pos;

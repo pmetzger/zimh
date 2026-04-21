@@ -339,8 +339,6 @@
 #include "sim_ether.h"
 #include "scp.h"
 
-#define MIN(a,b) (((a) < (b)) ? (a) : (b))
-
 #include <ctype.h>
 #include <math.h>
 

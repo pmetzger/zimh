@@ -254,13 +254,6 @@
 #if defined(SIM_NEED_GIT_COMMIT_ID)
 #include "git-commit-id.h"
 #endif
-
-#ifndef MAX
-#define MAX(a,b)  (((a) >= (b)) ? (a) : (b))
-#endif
-#ifndef MIN
-#define MIN(a,b)  (((a) <= (b)) ? (a) : (b))
-#endif
 /* search logical and boolean ops */
 
 #define SCH_OR          0                               /* search logicals */

@@ -231,8 +231,6 @@ See TX-0 memo M-5001-19 for a simple formula for cry, used in the code below.
 #define UNIT_EXT_INST   (1 << UNIT_V_EXT)
 #define UNIT_MSIZE      (1 << UNIT_V_MSIZE)
 
-#define MIN(a,b) (((a) < (b)) ? (a) : (b))
-
 #define HIST_PC         0x40000000
 #define HIST_V_SHF      18
 #define HIST_MIN        64

@@ -70,7 +70,6 @@
 #define TAGOFFSET   12                                  /* offset for tag field */
 #define FMTOFFSET   11                                  /* offset for format field */
 
-#define MIN(a,b)    ((a < b) ? a : b)
 #define AMSG        " with Assembler Reformat"
 #define FMSG        " with FORTRAN Reformat"
 #define WMSG        " with tab replacement"

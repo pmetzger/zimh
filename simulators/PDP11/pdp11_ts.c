@@ -265,7 +265,6 @@
 
 #define WCHX_HDS        0000040                         /* high density */
 
-#define MAX(a,b)        (((a) >= (b))? (a): (b))
 #define MAX_PLNT        8                               /* max pkt length */
 
 uint8 *tsxb = NULL;                                     /* xfer buffer */

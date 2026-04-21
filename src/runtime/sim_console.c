@@ -150,10 +150,6 @@
 #include <ctype.h>
 #include <math.h>
 
-#ifndef MIN
-#define MIN(a,b)  (((a) <= (b)) ? (a) : (b))
-#endif
-
 /* Forward declarations of platform specific routines */
 
 static t_stat sim_os_poll_kbd (void);

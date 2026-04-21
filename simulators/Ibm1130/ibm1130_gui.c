@@ -1642,10 +1642,6 @@ void end_critical_section (void)
     LeaveCriticalSection(&critsect);
 }
 
-#ifndef MIN
-#  define MIN(a,b) (((a) <= (b)) ? (a) : (b))
-#endif
-
 /* win32 - use a separate thread to read command lines so the GUI
  * can insert commands as well */
 

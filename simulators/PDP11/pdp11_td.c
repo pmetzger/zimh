@@ -456,8 +456,6 @@ OP CODE 11 (Resened)
 
 #include "pdp11_td.h"
 
-#define MIN(a,b) (((a) < (b)) ? (a) : (b))
-
 /* DL Definitions */
 
 /* registers */

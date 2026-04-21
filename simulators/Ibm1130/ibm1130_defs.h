@@ -18,9 +18,6 @@
 #include <setjmp.h>
 #include <stdlib.h>
 
-#define MIN(a,b)  (((a) <= (b)) ? (a) : (b))
-#define MAX(a,b)  (((a) >= (b)) ? (a) : (b))
-
 #ifndef _WIN32
    int strnicmp (const char *a, const char *b, size_t n);
    int strcmpi  (const char *a, const char *b);

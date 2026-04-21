@@ -371,8 +371,6 @@
 #include <unistd.h>
 #endif
 
-#define MAX(a,b) (((a) > (b)) ? (a) : (b))
-
 /* Internal routine - forward declaration */
 static int _eth_get_system_id (char *buf, size_t buf_size);
 static void eth_get_nic_hw_addr(ETH_DEV* dev, const char *devname, int set_on);

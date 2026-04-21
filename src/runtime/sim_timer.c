@@ -99,13 +99,6 @@
 
 #define SIM_INTERNAL_CLK (SIM_NTIMERS+(1<<30))
 #define SIM_INTERNAL_UNIT sim_internal_timer_unit
-#ifndef MIN
-#define MIN(a,b)  (((a) < (b)) ? (a) : (b))
-#endif
-#ifndef MAX
-#define MAX(a,b)  (((a) > (b)) ? (a) : (b))
-#endif
-
 uint32 sim_idle_ms_sleep (unsigned int msec);
 
 /* MS_MIN_GRANULARITY exists here so that timing behavior for hosts systems  */

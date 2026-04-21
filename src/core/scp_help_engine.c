@@ -19,10 +19,6 @@
 #include <io.h>
 #endif
 
-#ifndef MAX
-#define MAX(a, b) (((a) >= (b)) ? (a) : (b))
-#endif
-
 /* Used when sorting a list of command names. */
 static int _cmd_name_compare(const void *pa, const void *pb)
 {

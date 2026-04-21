@@ -84,13 +84,6 @@ t_bool sim_toffset_64;              /* Large File (>2GB) file I/O Support availa
 #undef fputc
 #endif
 
-#ifndef MAX
-#define MAX(a,b)  (((a) >= (b)) ? (a) : (b))
-#endif
-#ifndef MIN
-#define MIN(a,b)  (((a) <= (b)) ? (a) : (b))
-#endif
-
 /* OS-independent, endian independent binary I/O package
 
    For consistency, all binary data read and written by the simulator

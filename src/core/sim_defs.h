@@ -134,7 +134,6 @@
 #include <setjmp.h>
 #include <stdint.h>
 
-
 #ifndef EXIT_FAILURE
 #define EXIT_FAILURE 1
 #endif
@@ -174,6 +173,12 @@ extern "C" {
 #undef PAGESIZE
 #endif
 
+#ifndef MAX
+#define MAX(a, b) (((a) >= (b)) ? (a) : (b))
+#endif
+#ifndef MIN
+#define MIN(a, b) (((a) <= (b)) ? (a) : (b))
+#endif
 
 #ifndef TRUE
 #define TRUE            1

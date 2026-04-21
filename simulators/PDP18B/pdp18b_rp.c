@@ -144,8 +144,6 @@
 #define CCYL_RP03       0400000                         /* RP03 flag */
 
 #define RP_MIN 2
-#define MAX(x,y) (((x) > (y))? (x): (y))
-
 extern int32 *M;
 extern int32 int_hwre[API_HLVL+1], nexm;
 extern int32 api_vec[API_HLVL][32];

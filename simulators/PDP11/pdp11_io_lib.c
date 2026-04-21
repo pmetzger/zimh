@@ -882,8 +882,6 @@ AUTO_CON auto_tab[] = {/*c  #v  am vm  fxa   fxv */
 #endif
 #endif
 
-#define MAX(a,b) (((a)>(b))? (a) : (b))
-
 static void build_vector_tab (void)
 {
 static t_bool done = FALSE;

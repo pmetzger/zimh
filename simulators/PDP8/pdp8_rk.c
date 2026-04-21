@@ -122,8 +122,6 @@
                             int_req = int_req | INT_RK; \
                         else int_req = int_req & ~INT_RK
 #define RK_MIN          50
-#define MAX(x,y)        (((x) > (y))? (x): (y))
-
 extern uint16 M[];
 extern int32 int_req, stop_inst;
 extern UNIT cpu_unit;

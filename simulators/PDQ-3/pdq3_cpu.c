@@ -675,9 +675,6 @@ static void PushF(float f) {
   Push(t.i[1]);
 }
 
-#define MAX(a,b) (((a) > (b)) ? (a) : (b))
-#define MIN(a,b) (((a) < (b)) ? (a) : (b))
-
 static uint16 masks[] = {
 0x0000,
 0x0001, 0x0003, 0x0007, 0x000f,
@@ -1612,4 +1609,3 @@ static t_stat cpu_set_noflag(UNIT *uptr, int32 value, CONST char *cptr, void *de
   uptr->flags &= ~value;
   return SCPE_OK;
 }
-

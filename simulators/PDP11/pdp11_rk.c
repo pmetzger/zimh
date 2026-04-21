@@ -308,8 +308,6 @@ BITFIELD *rk_reg_bits[] = {
 
 
 #define RK_MIN          10
-#define MAX(x,y)        (((x) > (y))? (x): (y))
-
 extern int32 int_req[IPL_HLVL];
 
 RKCONTR *rkxb = NULL;                                   /* xfer buffer */
