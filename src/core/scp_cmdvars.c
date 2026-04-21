@@ -23,6 +23,7 @@
 #include "scp.h"
 
 #include "sim_console.h"
+#include "sim_dynstr.h"
 
 #if !defined(_WIN32)
 #include <sys/utsname.h>
@@ -60,6 +61,31 @@ static t_bool sim_cmdvars_localtime(time_t now, struct tm *tmnow);
 /* Test hooks can replace this probe to drive failure paths. */
 static sim_cmdvars_ostype_probe_fn sim_cmdvars_ostype_probe =
     sim_cmdvars_probe_uname;
+
+/* Assemble the %* expansion into one growable temporary string. */
+static t_bool sim_cmdvars_expand_star_args(sim_dynstr_t *ds, char *do_arg[])
+{
+    size_t i;
+
+    for (i = 1; i <= 9; ++i) {
+        if (do_arg[i] == NULL)
+            break;
+        if ((i != 1) && !sim_dynstr_append(ds, " "))
+            return FALSE;
+        if (strchr(do_arg[i], ' ')) {
+            char quote = '"';
+
+            if (strchr(do_arg[i], quote))
+                quote = '\'';
+            if (!sim_dynstr_append_ch(ds, quote) ||
+                !sim_dynstr_append(ds, do_arg[i]) ||
+                !sim_dynstr_append_ch(ds, quote))
+                return FALSE;
+        } else if (!sim_dynstr_append(ds, do_arg[i]))
+            return FALSE;
+    }
+    return TRUE;
+}
 
 /* Break down one wall-clock time value using the platform local-time API. */
 static t_bool sim_cmdvars_localtime(time_t now, struct tm *tmnow)
@@ -644,6 +670,10 @@ void sim_sub_args(char *instr, size_t instr_size, char *do_arg[])
             char parts[32];
 
             if (*ip == '%') {
+                char *expanded = NULL;
+                sim_dynstr_t star_args;
+
+                sim_dynstr_init(&star_args);
                 ap = NULL;
                 ++ip;
                 if (*ip == '~') {
@@ -664,45 +694,20 @@ void sim_sub_args(char *instr, size_t instr_size, char *do_arg[])
                             break;
                         }
                     ++ip;
+                } else if (*ip == '*') {
+                    if (sim_cmdvars_expand_star_args(&star_args, do_arg))
+                        ap = sim_dynstr_cstr(&star_args);
+                    ++ip;
+                } else if (*ip == '\0') {
+                    *op++ = '%';
                 } else {
-                    if (*ip == '*') {
-                        memset(rbuf, '\0', sizeof(rbuf));
-                        ap = rbuf;
-                        for (i = 1; i <= 9; ++i) {
-                            if (do_arg[i] == NULL)
-                                break;
-                            else if ((sizeof(rbuf) - strlen(rbuf)) >=
-                                     (2 + strlen(do_arg[i]))) {
-                                if (strchr(do_arg[i], ' ')) {
-                                    char quote = '"';
-
-                                    if (strchr(do_arg[i], quote))
-                                        quote = '\'';
-                                    sprintf(&rbuf[strlen(rbuf)], "%s%c%s%c",
-                                            (i != 1) ? " " : "", quote,
-                                            do_arg[i], quote);
-                                } else
-                                    sprintf(&rbuf[strlen(rbuf)], "%s%s",
-                                            (i != 1) ? " " : "", do_arg[i]);
-                            } else
-                                break;
-                        }
+                    get_glyph_nc(ip, gbuf, '%');
+                    ap = _sim_get_env_special(gbuf, rbuf, sizeof(rbuf));
+                    ip += strlen(gbuf);
+                    if (*ip == '%')
                         ++ip;
-                    } else {
-                        if (*ip == '\0') {
-                            *op++ = '%';
-                        } else {
-                            get_glyph_nc(ip, gbuf, '%');
-                            ap = _sim_get_env_special(gbuf, rbuf, sizeof(rbuf));
-                            ip += strlen(gbuf);
-                            if (*ip == '%')
-                                ++ip;
-                        }
-                    }
                 }
                 if (ap) {
-                    char *expanded = NULL;
-
                     if (expand_it) {
                         expanded = sim_filepath_parts(ap, parts);
                         ap = expanded;
@@ -711,8 +716,9 @@ void sim_sub_args(char *instr, size_t instr_size, char *do_arg[])
                         sim_sub_instr_off[outstr_off++] = ip - instr;
                         *op++ = *ap++;
                     }
-                    free(expanded);
                 }
+                free(expanded);
+                sim_dynstr_free(&star_args);
             } else {
                 if (ip == istart) {
                     get_glyph(istart, gbuf, 0);

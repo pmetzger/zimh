@@ -968,6 +968,57 @@ static void test_sim_sub_args_star_quotes_spaced_arguments(void **state)
     assert_string_equal(expanded, "A\"two words\" 'he\"llo world'B");
 }
 
+/* Verify %* with no remaining arguments expands to an empty string. */
+static void test_sim_sub_args_star_handles_no_remaining_arguments(void **state)
+{
+    char expanded[CBUFSIZE];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    do_arg[0] = "script";
+
+    expand_command_with_args("A%*B", expanded, sizeof(expanded), do_arg);
+    assert_string_equal(expanded, "AB");
+}
+
+/* Verify %* grows past its initial scratch size for long arguments. */
+static void test_sim_sub_args_star_grows_for_long_arguments(void **state)
+{
+    char expanded[CBUFSIZE];
+    char expected[CBUFSIZE];
+    char long_arg[96];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    memset(long_arg, 'x', sizeof(long_arg) - 1);
+    long_arg[sizeof(long_arg) - 1] = '\0';
+    do_arg[0] = "script";
+    do_arg[1] = long_arg;
+
+    expand_command_with_args("A%*B", expanded, sizeof(expanded), do_arg);
+    snprintf(expected, sizeof(expected), "A%sB", long_arg);
+    assert_string_equal(expanded, expected);
+}
+
+/* Verify %* truncates only at the final command-buffer boundary. */
+static void test_sim_sub_args_star_respects_final_output_limit(void **state)
+{
+    char expanded[10];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    do_arg[0] = "script";
+    do_arg[1] = "alpha";
+    do_arg[2] = "beta";
+    do_arg[3] = "gamma";
+
+    expand_command_with_args("A%*B", expanded, sizeof(expanded), do_arg);
+    assert_string_equal(expanded, "Aalpha b");
+}
+
 /* Verify a quoted whole-line command is decoded before substitution. */
 static void test_sim_sub_args_decodes_single_quoted_argument(void **state)
 {
@@ -1235,6 +1286,15 @@ int main(void)
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_star_quotes_spaced_arguments,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_star_handles_no_remaining_arguments,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_star_grows_for_long_arguments,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_star_respects_final_output_limit,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_decodes_single_quoted_argument,
