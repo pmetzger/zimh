@@ -2827,8 +2827,6 @@ if (!sim_quiet) {
     show_version (stdout, NULL, NULL, 0, NULL);
     }
 sim_timer_precalibrate_execution_rate ();
-show_version (stdnul, NULL, NULL, 1, NULL);             /* Quietly set SIM_OSTYPE */
-sim_publish_regex_environment ();
 sim_argv = argv;
 
 if (sim_switches & SWMASK ('T'))                        /* Command Line -T switch */
@@ -5727,11 +5725,6 @@ const char *sim_regex_backend_version (void)
         if (0 != pcre2_config (PCRE2_CONFIG_VERSION, version))
             strcpy (version, "unknown");
     return version;
-}
-
-void sim_publish_regex_environment (void)
-{
-    setenv ("SIM_REGEX_TYPE", sim_regex_backend_name (), 1);
 }
 
 void sim_fprint_regex_support (FILE *st)

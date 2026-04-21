@@ -220,7 +220,6 @@ const char *sim_fmt_numeric (double number);
 const char *sprint_capac (DEVICE *dptr, UNIT *uptr);
 const char *sim_regex_backend_name (void);
 const char *sim_regex_backend_version (void);
-void sim_publish_regex_environment (void);
 void sim_fprint_regex_support (FILE *st);
 REG *find_reg_glob (CONST char *ptr, CONST char **optr, DEVICE **gdptr);
 char *read_line (char *cptr, int32 size, FILE *stream);
