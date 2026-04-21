@@ -169,7 +169,7 @@ static char *sim_exp_build_regex_buffer(EXPECT *exp, char **tstr)
     return cbuf;
 }
 
-/* Export regex match groups into the documented environment variables. */
+/* Export regex match groups into the documented SCP variables. */
 static void sim_exp_export_regex_groups(EXPECT *exp, const char *cbuf,
                                         const PCRE2_SIZE *ovector, int rc,
                                         size_t *sim_exp_match_sub_count,
@@ -194,18 +194,18 @@ static void sim_exp_export_regex_groups(EXPECT *exp, const char *cbuf,
         if (have_range) {
             memcpy(buf, &cbuf[start_offs], end_offs - start_offs);
             buf[end_offs - start_offs] = '\0';
-            setenv(env_name, buf, 1);
+            sim_sub_var_set(env_name, buf);
             sim_debug(exp->dbit, exp->dptr, "%s=%s\n", env_name, buf);
         } else {
-            sim_debug(exp->dbit, exp->dptr, "unsetenv %s\n", env_name);
-            unsetenv(env_name);
+            sim_debug(exp->dbit, exp->dptr, "unset %s\n", env_name);
+            sim_sub_var_unset(env_name);
         }
     }
     for (; j < *sim_exp_match_sub_count; j++) {
         char env_name[32];
 
         sprintf(env_name, "_EXPECT_MATCH_GROUP_%d", (int)j);
-        setenv(env_name, "", 1);
+        sim_sub_var_set(env_name, "");
     }
     *sim_exp_match_sub_count = (size_t)re_nsub + 1;
     free(buf);
@@ -892,7 +892,7 @@ t_stat sim_exp_check(EXPECT *exp, uint8 data)
     if (i != exp->size) {
         sim_debug(exp->dbit, exp->dptr, "Matched expect pattern: %s\n",
                   ep->match_pattern);
-        setenv("_EXPECT_MATCH_PATTERN", ep->match_pattern, 1);
+        sim_sub_var_set("_EXPECT_MATCH_PATTERN", ep->match_pattern);
         if (ep->cnt > 0) {
             ep->cnt -= 1;
             sim_debug(exp->dbit, exp->dptr,

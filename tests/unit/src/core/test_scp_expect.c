@@ -26,6 +26,23 @@ static void assert_expect_string(EXPECT *exp, const char *text)
     assert_expect_bytes(exp, (const uint8 *)text, strlen(text));
 }
 
+/* Assert that one SCP substitution variable has the expected value. */
+static void assert_scp_var_equals(const char *name, const char *expected)
+{
+    char buf[CBUFSIZE];
+    const char *value;
+
+    value = _sim_get_env_special(name, buf, sizeof(buf));
+    assert_non_null(value);
+    assert_string_equal(value, expected);
+}
+
+/* Return one SCP substitution variable when optional emptiness matters. */
+static const char *get_scp_var(const char *name, char *buf, size_t buf_size)
+{
+    return _sim_get_env_special(name, buf, buf_size);
+}
+
 /* Poll one queued SEND byte and require the expected character. */
 static void assert_send_polls_byte(SEND *snd, uint8 value)
 {
@@ -191,7 +208,7 @@ static void test_sim_exp_clr_handles_empty_context_without_rules(void **state)
 
 /* Regex-specific matching behavior. */
 
-/* Verify regex expect rules capture groups into the documented environment. */
+/* Verify regex expect rules capture groups into SCP substitution state. */
 static void test_sim_exp_check_populates_regex_capture_groups(void **state)
 {
     struct scp_expect_fixture *fixture = *state;
@@ -202,9 +219,14 @@ static void test_sim_exp_check_populates_regex_capture_groups(void **state)
 
     assert_expect_string(&fixture->exp, "ab42");
 
-    assert_string_equal(getenv("_EXPECT_MATCH_PATTERN"), "/ab([0-9][0-9])/");
-    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "ab42");
-    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_1"), "42");
+    assert_scp_var_equals("_EXPECT_MATCH_PATTERN", "/ab([0-9][0-9])/");
+    assert_scp_var_equals("_EXPECT_MATCH_GROUP_0", "ab42");
+    assert_scp_var_equals("_EXPECT_MATCH_GROUP_1", "42");
+    /* Keep one explicit host-environment check for this migration only. */
+    /* Future tests do not need to repeat the getenv() assertions below. */
+    assert_null(getenv("_EXPECT_MATCH_PATTERN"));
+    assert_null(getenv("_EXPECT_MATCH_GROUP_0"));
+    assert_null(getenv("_EXPECT_MATCH_GROUP_1"));
 }
 
 /* Verify regex rules honor case-independent matching when requested. */
@@ -218,9 +240,9 @@ static void test_sim_exp_check_honors_case_independent_regex(void **state)
 
     assert_expect_string(&fixture->exp, "AB5");
 
-    assert_string_equal(getenv("_EXPECT_MATCH_PATTERN"), "/ab([0-9])/");
-    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "AB5");
-    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_1"), "5");
+    assert_scp_var_equals("_EXPECT_MATCH_PATTERN", "/ab([0-9])/");
+    assert_scp_var_equals("_EXPECT_MATCH_GROUP_0", "AB5");
+    assert_scp_var_equals("_EXPECT_MATCH_GROUP_1", "5");
 }
 
 /* Verify invalid regex syntax is rejected without installing a rule. */
@@ -245,18 +267,18 @@ static void test_sim_exp_check_clears_stale_regex_capture_groups(void **state)
                      SCPE_OK);
     assert_expect_string(&fixture->exp, "ab42");
 
-    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "ab42");
-    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_1"), "4");
-    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_2"), "2");
+    assert_scp_var_equals("_EXPECT_MATCH_GROUP_0", "ab42");
+    assert_scp_var_equals("_EXPECT_MATCH_GROUP_1", "4");
+    assert_scp_var_equals("_EXPECT_MATCH_GROUP_2", "2");
 
     assert_int_equal(sim_exp_set(&fixture->exp, "/cd([0-9])/", 0, 0,
                                  EXP_TYP_REGEX, NULL),
                      SCPE_OK);
     assert_expect_string(&fixture->exp, "cd7");
 
-    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "cd7");
-    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_1"), "7");
-    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_2"), "");
+    assert_scp_var_equals("_EXPECT_MATCH_GROUP_0", "cd7");
+    assert_scp_var_equals("_EXPECT_MATCH_GROUP_1", "7");
+    assert_scp_var_equals("_EXPECT_MATCH_GROUP_2", "");
 }
 
 /* Verify the SHOW helpers describe pending SEND and EXPECT state. */
@@ -517,7 +539,7 @@ static void test_sim_exp_check_matches_across_buffer_wrap(void **state)
     assert_int_equal(fixture->exp.buf_ins, 0);
     assert_expect_string(&fixture->exp, "E");
 
-    assert_string_equal(getenv("_EXPECT_MATCH_PATTERN"), "\"ABCDE\"");
+    assert_scp_var_equals("_EXPECT_MATCH_PATTERN", "\"ABCDE\"");
 }
 
 /* Verify regex buffers slide instead of wrapping when they fill. */
@@ -856,14 +878,15 @@ static void test_regex_optional_group_unsets_unmatched_capture_group(
 {
     struct scp_expect_fixture *fixture = *state;
     const char *group1;
+    char buf[CBUFSIZE];
 
     assert_int_equal(sim_exp_set(&fixture->exp, "/ab(c)?/", 0, 0,
                                  EXP_TYP_REGEX, NULL),
                      SCPE_OK);
     assert_expect_string(&fixture->exp, "ab");
 
-    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "ab");
-    group1 = getenv("_EXPECT_MATCH_GROUP_1");
+    assert_scp_var_equals("_EXPECT_MATCH_GROUP_0", "ab");
+    group1 = get_scp_var("_EXPECT_MATCH_GROUP_1", buf, sizeof(buf));
     assert_true((NULL == group1) || (group1[0] == '\0'));
 }
 
@@ -897,8 +920,8 @@ static void test_regex_matching_flattens_embedded_nul_buffer_segments(
         assert_expect_bytes(&fixture->exp, wrapped_data, sizeof(wrapped_data));
     }
 
-    assert_string_equal(getenv("_EXPECT_MATCH_PATTERN"), "/AB/");
-    assert_string_equal(getenv("_EXPECT_MATCH_GROUP_0"), "AB");
+    assert_scp_var_equals("_EXPECT_MATCH_PATTERN", "/AB/");
+    assert_scp_var_equals("_EXPECT_MATCH_GROUP_0", "AB");
 }
 
 /* Verify SHOW can render a decorated expect rule through the match filter. */

@@ -231,6 +231,9 @@ t_bool scp_has_oline (void);
 void sim_sub_args (char *in_str, size_t in_str_size, char *do_arg[]);
 const char *_sim_get_env_special(const char *gbuf, char *rbuf,
     size_t rbuf_size);
+void sim_sub_var_set(const char *name, const char *value);
+void sim_sub_var_unset(const char *name);
+void sim_sub_var_clear_prefix(const char *prefix);
 const char *sim_unsub_args(const char *cptr);
 t_bool scp_do_echo_enabled(void);
 int32 scp_do_depth(void);

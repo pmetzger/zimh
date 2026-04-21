@@ -620,12 +620,84 @@ static struct deleted_env_var {
     char *value;
     } *sim_external_env = NULL;
 static int sim_external_env_count = 0;
+static struct scp_sub_var {
+    char *name;
+    char *value;
+    } *sim_sub_vars = NULL;
+static int sim_sub_var_count = 0;
 
 t_stat sim_last_cmd_stat;                               /* Command Status */
 struct timespec cmd_time;                               /*  */
 
 static SCHTAB sim_stabr;                                /* Register search specifier */
 static SCHTAB sim_staba;                                /* Memory search specifier */
+
+/* Return the value of one SCP-owned substitution variable, if present. */
+static const char *sim_sub_var_get(const char *name)
+{
+int i;
+
+for (i = 0; i < sim_sub_var_count; ++i)
+    if (0 == strcmp(name, sim_sub_vars[i].name))
+        return sim_sub_vars[i].value;
+return NULL;
+}
+
+/* Set or replace one SCP-owned substitution variable. */
+void sim_sub_var_set(const char *name, const char *value)
+{
+int i;
+
+for (i = 0; i < sim_sub_var_count; ++i)
+    if (0 == strcmp(name, sim_sub_vars[i].name)) {
+        free(sim_sub_vars[i].value);
+        sim_sub_vars[i].value = (char *)malloc(1 + strlen(value));
+        strcpy(sim_sub_vars[i].value, value);
+        return;
+        }
+++sim_sub_var_count;
+sim_sub_vars = (struct scp_sub_var *)realloc(sim_sub_vars,
+              sim_sub_var_count * sizeof(*sim_sub_vars));
+sim_sub_vars[sim_sub_var_count - 1].name =
+    (char *)malloc(1 + strlen(name));
+strcpy(sim_sub_vars[sim_sub_var_count - 1].name, name);
+sim_sub_vars[sim_sub_var_count - 1].value =
+    (char *)malloc(1 + strlen(value));
+strcpy(sim_sub_vars[sim_sub_var_count - 1].value, value);
+}
+
+/* Remove one SCP-owned substitution variable, if present. */
+void sim_sub_var_unset(const char *name)
+{
+int i;
+
+for (i = 0; i < sim_sub_var_count; ++i)
+    if (0 == strcmp(name, sim_sub_vars[i].name)) {
+        int j;
+
+        free(sim_sub_vars[i].name);
+        free(sim_sub_vars[i].value);
+        for (j = i; j + 1 < sim_sub_var_count; ++j)
+            sim_sub_vars[j] = sim_sub_vars[j + 1];
+        --sim_sub_var_count;
+        if (sim_sub_var_count == 0) {
+            free(sim_sub_vars);
+            sim_sub_vars = NULL;
+        }
+        return;
+        }
+}
+
+/* Remove every SCP-owned substitution variable with one common prefix. */
+void sim_sub_var_clear_prefix(const char *prefix)
+{
+size_t prefix_len = strlen(prefix);
+int i;
+
+for (i = sim_sub_var_count - 1; i >= 0; --i)
+    if (0 == strncmp(sim_sub_vars[i].name, prefix, prefix_len))
+        sim_sub_var_unset(sim_sub_vars[i].name);
+}
 
 static const char *sim_int_step_description (DEVICE *dptr)
 {
@@ -2134,11 +2206,11 @@ static const char simh_help2[] =
       " parameter are in units of microseconds rather than %C.\n"
       "4Determining Which Output Matched\n"
       " When an expect rule matches data in the output stream, the rule which\n"
-      " matched is recorded in the environment variable _EXPECT_MATCH_PATTERN.\n"
-      " If the expect rule was a regular expression rule, then the environment\n"
+      " matched is recorded in the variable _EXPECT_MATCH_PATTERN.\n"
+      " If the expect rule was a regular expression rule, then the\n"
       " variable _EXPECT_MATCH_GROUP_0 is set to the whole string which matched\n"
       " and if the match pattern had any parentheses delimited sub-groups, the\n"
-      " environment variables _EXPECT_MATCH_GROUP_1 thru _EXPECT_MATCH_GROUP_n\n"
+      " variables _EXPECT_MATCH_GROUP_1 thru _EXPECT_MATCH_GROUP_n\n"
       " are set to the values within the string which matched the respective\n"
       " sub-groups.\n"
        /***************** 80 character line width template *************************/
@@ -4100,6 +4172,8 @@ if (!ap) {                              /* no SCP variable found? */
             }
         }
     }
+if (!ap)
+    ap = sim_sub_var_get(gbuf);
 if (!ap) {                              /* no SCP variable found? */
     for (i = 0; i < sim_external_env_count; i++) {
         if (0 == strcmp (gbuf, sim_external_env[i].name)) {

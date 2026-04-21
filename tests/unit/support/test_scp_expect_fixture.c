@@ -27,17 +27,10 @@ static void reset_expect_context(EXPECT *exp)
     exp->default_haltafter = 0;
 }
 
-/* Clear the published EXPECT match variables from the current process. */
-static void clear_expect_match_env(void)
+/* Clear the published EXPECT match variables from SCP substitution state. */
+static void clear_expect_match_vars(void)
 {
-    size_t i;
-    char name[32];
-
-    unsetenv("_EXPECT_MATCH_PATTERN");
-    for (i = 0; i < 8; ++i) {
-        snprintf(name, sizeof(name), "_EXPECT_MATCH_GROUP_%zu", i);
-        unsetenv(name);
-    }
+    sim_sub_var_clear_prefix("_EXPECT_MATCH_");
 }
 
 /* Build a fresh SCP/TMXR fixture and reset global SEND/EXPECT state. */
@@ -78,7 +71,7 @@ int simh_test_setup_scp_expect_fixture(void **state)
     assert_int_equal(sim_brk_init(), SCPE_OK);
     sim_switches = 0;
     sim_switch_number = 0;
-    clear_expect_match_env();
+    clear_expect_match_vars();
     assert_int_equal(sim_exp_clrall(sim_cons_get_expect()), SCPE_OK);
     reset_send_context(sim_cons_get_send());
     reset_expect_context(sim_cons_get_expect());
@@ -109,7 +102,7 @@ int simh_test_teardown_scp_expect_fixture(void **state)
     reset_send_context(sim_cons_get_send());
     reset_expect_context(sim_cons_get_expect());
     sim_brk_clract();
-    clear_expect_match_env();
+    clear_expect_match_vars();
     simh_test_reset_simulator_state();
     free(fixture);
     *state = NULL;

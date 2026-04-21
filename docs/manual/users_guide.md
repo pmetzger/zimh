@@ -1058,15 +1058,14 @@ and hex character values of the form:
 ### Determining which output matched
 
 When an expect rule matches data in the output stream, the rule which
-matched is recorded in the environment variable
-`_EXPECT_MATCH_PATTERN`.
+matched is recorded in the variable `_EXPECT_MATCH_PATTERN`.
 
-If the expect rule was a regular expression rule, then the environment
-variable `_EXPECT_MATCH_GROUP_0` is set to the whole string which
-matched and if the match pattern had any parentheses delimited
-sub-groups, the environment variables `_EXPECT_MATCH_GROUP_1` through
-`_EXPECT_MATCH_GROUP_n` are set to the values within the string which
-matched the respective sub-groups.
+If the expect rule was a regular expression rule, then the variable
+`_EXPECT_MATCH_GROUP_0` is set to the whole string which matched and if
+the match pattern had any parentheses delimited sub-groups, the
+variables `_EXPECT_MATCH_GROUP_1` through `_EXPECT_MATCH_GROUP_n` are
+set to the values within the string which matched the respective
+sub-groups.
 
 ## Injecting Input Data
 
