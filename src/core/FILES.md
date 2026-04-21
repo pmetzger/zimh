@@ -15,9 +15,7 @@ bridge the host `main()` to the SCP entrypoint.
 
 This is the main simulator control program implementation. It owns the
 top-level command processor, interactive control flow, and the larger SCP
-subsystems that have not been split into narrower helper modules. That
-still includes command-variable substitution and other broad
-interpreter-level command plumbing.
+subsystems that have not been split into narrower helper modules.
 
 ## `scp.h`
 
