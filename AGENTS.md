@@ -1,5 +1,18 @@
 # Repository Guidance
 
+Our dogma is that tests must provide us with complete assurance that
+changes have not broken the functionality of the system. We seek 100%
+test coverage with fully automated tests. We accept that the tests
+may, in the end, be much longer than the code itself. We always add
+tests when we are making changes that cover the changes so we are sure
+they worked.
+
+We must always design code for testability. If we discover that code
+is not testable, we must rearchitect it to be testable. Sometimes we
+will discover that code should be rewritten to make it cleaner and
+better, and to make tests easier a the same time; always point out
+such opportunities.
+
 When adding new source code to this repository, prefer keeping lines
 under 80 columns.
 
