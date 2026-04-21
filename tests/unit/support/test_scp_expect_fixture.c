@@ -11,17 +11,6 @@
 #include "test_simh_personality.h"
 #include "test_support.h"
 
-/* Reset the SEND and EXPECT default variables used by current SCP code. */
-static void clear_send_expect_default_env(void)
-{
-    unsetenv("SIM_SEND_DELAY_CONSOLE");
-    unsetenv("SIM_SEND_AFTER_CONSOLE");
-    unsetenv("SIM_EXPECT_HALTAFTER_CONSOLE");
-    unsetenv("SIM_SEND_DELAY_TTY_1");
-    unsetenv("SIM_SEND_AFTER_TTY_1");
-    unsetenv("SIM_EXPECT_HALTAFTER_TTY_1");
-}
-
 /* Return one SEND context to a clean empty state between tests. */
 static void reset_send_context(SEND *snd)
 {
@@ -29,9 +18,13 @@ static void reset_send_context(SEND *snd)
     free(snd->buffer);
     snd->buffer = NULL;
     snd->bufsize = 0;
-    snd->delay = 0;
-    snd->after = 0;
-    snd->next_time = 0.0;
+    sim_send_init_context(snd, snd->dptr, snd->dbit);
+}
+
+/* Return one EXPECT context to its default typed halt state. */
+static void reset_expect_context(EXPECT *exp)
+{
+    exp->default_haltafter = 0;
 }
 
 /* Clear the published EXPECT match variables from the current process. */
@@ -65,8 +58,8 @@ int simh_test_setup_scp_expect_fixture(void **state)
     assert_int_equal(simh_test_install_devices("simh-unit-scp-expect", devices),
                      0);
 
-    fixture->exp.dptr = &fixture->device;
-    fixture->snd.dptr = &fixture->device;
+    sim_expect_init_context(&fixture->exp, &fixture->device, 0);
+    sim_send_init_context(&fixture->snd, &fixture->device, 0);
     fixture->mux.dptr = &fixture->device;
     fixture->mux.uptr = &fixture->unit;
     fixture->mux.ldsc = fixture->lines;
@@ -86,9 +79,9 @@ int simh_test_setup_scp_expect_fixture(void **state)
     sim_switches = 0;
     sim_switch_number = 0;
     clear_expect_match_env();
-    clear_send_expect_default_env();
     assert_int_equal(sim_exp_clrall(sim_cons_get_expect()), SCPE_OK);
     reset_send_context(sim_cons_get_send());
+    reset_expect_context(sim_cons_get_expect());
 
     *state = fixture;
     return 0;
@@ -104,16 +97,19 @@ int simh_test_teardown_scp_expect_fixture(void **state)
     sim_send_clear(&fixture->snd);
     free(fixture->snd.buffer);
     fixture->snd.buffer = NULL;
+    reset_expect_context(&fixture->exp);
+    reset_send_context(&fixture->snd);
     for (i = 0; i < 2; ++i) {
         sim_exp_clrall(&fixture->lines[i].expect);
+        reset_expect_context(&fixture->lines[i].expect);
         reset_send_context(&fixture->lines[i].send);
     }
     assert_int_equal(tmxr_detach(&fixture->mux, &fixture->unit), SCPE_OK);
     assert_int_equal(sim_exp_clrall(sim_cons_get_expect()), SCPE_OK);
     reset_send_context(sim_cons_get_send());
+    reset_expect_context(sim_cons_get_expect());
     sim_brk_clract();
     clear_expect_match_env();
-    clear_send_expect_default_env();
     simh_test_reset_simulator_state();
     free(fixture);
     *state = NULL;

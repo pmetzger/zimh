@@ -4310,10 +4310,9 @@ uptr->dynflags |= TMUF_NOASYNCH;                        /* tag as no asynch */
 uptr->dynflags |= UNIT_TM_POLL;                         /* tag as polling unit */
 if (mp->dptr) {
     for (i=0; i<mp->lines; i++) {
-        mp->ldsc[i].expect.dptr = mp->dptr;
-        mp->ldsc[i].expect.dbit = TMXR_DBG_EXP;
-        mp->ldsc[i].send.dptr = mp->dptr;
-        mp->ldsc[i].send.dbit = TMXR_DBG_SEND;
+        sim_expect_init_context (&mp->ldsc[i].expect, mp->dptr,
+                                 TMXR_DBG_EXP);
+        sim_send_init_context (&mp->ldsc[i].send, mp->dptr, TMXR_DBG_SEND);
         if (mp->ldsc[i].uptr == NULL)
             mp->ldsc[i].uptr = mp->uptr;
         mp->ldsc[i].uptr->tmxr = (void *)mp;

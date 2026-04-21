@@ -290,8 +290,10 @@ static void test_send_cmd_sets_console_defaults_and_queue_timing(void **state)
 
     snd = sim_cons_get_send();
     assert_int_equal(send_cmd(1, "DELAY=7 AFTER=11"), SCPE_OK);
-    assert_string_equal(getenv("SIM_SEND_DELAY_CONSOLE"), "7");
-    assert_string_equal(getenv("SIM_SEND_AFTER_CONSOLE"), "11");
+    assert_int_equal(snd->default_delay, 7);
+    assert_int_equal(snd->default_after, 11);
+    assert_null(getenv("SIM_SEND_DELAY_CONSOLE"));
+    assert_null(getenv("SIM_SEND_AFTER_CONSOLE"));
 
     assert_int_equal(send_cmd(1, "\"AZ\""), SCPE_OK);
     assert_int_equal(snd->delay, 7);
@@ -343,8 +345,10 @@ static void test_send_cmd_targets_named_tmxr_line(void **state)
     SEND *snd = &fixture->lines[1].send;
 
     assert_int_equal(send_cmd(1, "TTY:1 DELAY=5 AFTER=9"), SCPE_OK);
-    assert_string_equal(getenv("SIM_SEND_DELAY_TTY_1"), "5");
-    assert_string_equal(getenv("SIM_SEND_AFTER_TTY_1"), "9");
+    assert_int_equal(snd->default_delay, 5);
+    assert_int_equal(snd->default_after, 9);
+    assert_null(getenv("SIM_SEND_DELAY_TTY_1"));
+    assert_null(getenv("SIM_SEND_AFTER_TTY_1"));
 
     assert_int_equal(send_cmd(1, "TTY:1 \"AZ\""), SCPE_OK);
     assert_int_equal(snd->delay, 5);
@@ -363,7 +367,8 @@ static void test_sim_set_expect_parses_repeat_haltafter_and_action(void **state)
 
     exp = sim_cons_get_expect();
     assert_int_equal(sim_set_expect(exp, "HALTAFTER=13"), SCPE_OK);
-    assert_string_equal(getenv("SIM_EXPECT_HALTAFTER_CONSOLE"), "13");
+    assert_int_equal(exp->default_haltafter, 13);
+    assert_null(getenv("SIM_EXPECT_HALTAFTER_CONSOLE"));
 
     assert_int_equal(sim_set_expect(exp, "[2] HALTAFTER=9 \"GO\" echo hit"),
                      SCPE_OK);
@@ -391,7 +396,8 @@ static void test_expect_cmd_targets_named_tmxr_line(void **state)
     EXPTAB *rule;
 
     assert_int_equal(expect_cmd(1, "TTY:1 HALTAFTER=7"), SCPE_OK);
-    assert_string_equal(getenv("SIM_EXPECT_HALTAFTER_TTY_1"), "7");
+    assert_int_equal(exp->default_haltafter, 7);
+    assert_null(getenv("SIM_EXPECT_HALTAFTER_TTY_1"));
 
     assert_int_equal(expect_cmd(1, "TTY:1 \"GO\" echo hit"), SCPE_OK);
     assert_int_equal(exp->size, 1);
@@ -776,8 +782,8 @@ static void test_send_state_compacts_pending_bytes_and_honors_timing(
 
 /* Additional SEND/EXPECT edge cases. */
 
-/* Verify SHOW SEND renders pending timing and invalid env vars fallback. */
-static void test_sim_show_send_input_renders_timing_and_env_fallback(
+/* Verify SHOW SEND renders pending timing using typed default values. */
+static void test_sim_show_send_input_renders_timing_and_default_fallback(
     void **state)
 {
     SEND *snd;
@@ -787,8 +793,6 @@ static void test_sim_show_send_input_renders_timing_and_env_fallback(
     (void)state;
 
     snd = sim_cons_get_send();
-    setenv("SIM_SEND_DELAY_CONSOLE", "bogus", 1);
-    setenv("SIM_SEND_AFTER_CONSOLE", "bogus", 1);
     assert_int_equal(
         sim_send_input(snd, payload, sizeof(payload), 5000, 2000000), SCPE_OK);
 
@@ -813,8 +817,8 @@ static void test_sim_show_send_input_reports_distinct_default_values(
     (void)state;
 
     snd = sim_cons_get_send();
-    setenv("SIM_SEND_DELAY_CONSOLE", "7", 1);
-    setenv("SIM_SEND_AFTER_CONSOLE", "11", 1);
+    snd->default_delay = 7;
+    snd->default_after = 11;
 
     text = capture_show_send_input_text(snd);
     assert_non_null(
@@ -906,7 +910,7 @@ static void test_sim_exp_show_renders_decorated_rule_details(void **state)
     (void)state;
 
     exp = sim_cons_get_expect();
-    setenv("SIM_EXPECT_HALTAFTER_CONSOLE", "1", 1);
+    exp->default_haltafter = 1;
     assert_int_equal(sim_exp_set(exp, "/A(B)?/", 2, 9,
                                  EXP_TYP_PERSIST | EXP_TYP_CLEARALL |
                                      EXP_TYP_REGEX | EXP_TYP_REGEX_I,
@@ -1059,7 +1063,7 @@ int main(void)
             simh_test_setup_scp_expect_fixture,
             simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(
-            test_sim_show_send_input_renders_timing_and_env_fallback,
+            test_sim_show_send_input_renders_timing_and_default_fallback,
             simh_test_setup_scp_expect_fixture,
             simh_test_teardown_scp_expect_fixture),
         cmocka_unit_test_setup_teardown(

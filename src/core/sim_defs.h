@@ -802,6 +802,7 @@ struct EXPECT {
     size_t              buf_ins;                        /* buffer insertion point for the next output data */
     size_t              buf_size;                       /* buffer size */
     size_t              buf_data;                       /* count of data in buffer */
+    uint32              default_haltafter;              /* default halt delay */
     };
 
 /* Send Context */
@@ -817,6 +818,8 @@ struct SEND {
     size_t              bufsize;                        /* buffer size */
     size_t              insoff;                         /* insert offset */
     size_t              extoff;                         /* extra offset */
+    uint32              default_delay;                  /* default character delay */
+    uint32              default_after;                  /* default initial delay */
     };
 
 /* Debug table */

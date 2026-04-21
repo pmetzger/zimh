@@ -29,6 +29,9 @@ t_stat sim_show_expect(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
 t_stat sim_send_input(SEND *snd, uint8 *data, size_t size, uint32 after,
                       uint32 delay);
 
+/* Initialize one SEND context with its typed default timing state. */
+void sim_send_init_context(SEND *snd, DEVICE *dptr, uint32 dbit);
+
 /* Display queued SEND state for a console or multiplexer line. */
 t_stat sim_show_send_input(FILE *st, const SEND *snd);
 
@@ -62,5 +65,8 @@ t_stat sim_exp_showall(FILE *st, const EXPECT *exp);
 
 /* Feed one byte of output to the expect matcher. */
 t_stat sim_exp_check(EXPECT *exp, uint8 data);
+
+/* Initialize one EXPECT context with its typed default halt state. */
+void sim_expect_init_context(EXPECT *exp, DEVICE *dptr, uint32 dbit);
 
 #endif

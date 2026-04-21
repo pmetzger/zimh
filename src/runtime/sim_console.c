@@ -262,8 +262,11 @@ TMLN sim_con_ldsc = { 0 };                                          /* console l
 TMXR sim_con_tmxr = { 1, 0, 0, &sim_con_ldsc, NULL, &sim_con_telnet };/* console line mux */
 
 
-SEND sim_con_send = {0, &sim_con_telnet, DBG_SND};
-EXPECT sim_con_expect = {&sim_con_telnet, DBG_EXP};
+SEND sim_con_send = {0, &sim_con_telnet, DBG_SND,
+                     0, 0, NULL, 0, 0, 0,
+                     SEND_DEFAULT_DELAY, SEND_DEFAULT_DELAY};
+EXPECT sim_con_expect = {&sim_con_telnet, DBG_EXP,
+                         NULL, 0, NULL, 0, 0, 0, 0};
 
 static t_bool sim_con_console_port = TRUE;
 

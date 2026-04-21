@@ -11,59 +11,24 @@
 #include "scp_pcre2.h"
 #include "sim_tmxr.h"
 
-/* Build one SEND/EXPECT environment-variable name from a target name. */
-static void format_default_env_parameter_name(char *varname, size_t varname_size,
-                                              const char *dev_name,
-                                              const char *param_name)
+/* Initialize one SEND context with the standard default timing values. */
+void sim_send_init_context(SEND *snd, DEVICE *dptr, uint32 dbit)
 {
-    const char *colon = strchr(dev_name, ':');
-
-    if (colon)
-        snprintf(varname, varname_size, "%s_%*.*s_%s", param_name,
-                 (int)(colon - dev_name), (int)(colon - dev_name), dev_name,
-                 colon + 1);
-    else
-        snprintf(varname, varname_size, "%s_%s", param_name, dev_name);
+    snd->dptr = dptr;
+    snd->dbit = dbit;
+    snd->default_delay = SEND_DEFAULT_DELAY;
+    snd->default_after = SEND_DEFAULT_DELAY;
+    snd->delay = 0;
+    snd->after = 0;
+    snd->next_time = 0.0;
 }
 
-/* Return the default SEND/EXPECT parameter value for one line or console. */
-static uint32 get_default_env_parameter(const char *dev_name,
-                                        const char *param_name,
-                                        uint32 default_value)
+/* Initialize one EXPECT context with the standard default halt value. */
+void sim_expect_init_context(EXPECT *exp, DEVICE *dptr, uint32 dbit)
 {
-    char varname[CBUFSIZE];
-    unsigned long val;
-    char *endptr;
-    char *env_val;
-
-    format_default_env_parameter_name(varname, sizeof(varname), dev_name,
-                                      param_name);
-
-    env_val = getenv(varname);
-
-    if (NULL == env_val)
-        val = default_value;
-    else {
-        val = strtoul(env_val, &endptr, 0);
-        if (*endptr)
-            val = default_value;
-    }
-
-    /* This narrows from unsigned long to uint32 by design. */
-    return (uint32)val;
-}
-
-/* Persist one default SEND/EXPECT parameter in the host environment. */
-static void set_default_env_parameter(const char *dev_name,
-                                      const char *param_name, uint32 value)
-{
-    char varname[CBUFSIZE];
-    char valbuf[CBUFSIZE];
-
-    format_default_env_parameter_name(varname, sizeof(varname), dev_name,
-                                      param_name);
-    snprintf(valbuf, sizeof(valbuf), "%u", value);
-    setenv(varname, valbuf, 1);
+    exp->dptr = dptr;
+    exp->dbit = dbit;
+    exp->default_haltafter = 0;
 }
 
 /* Describe the internal expect device in SHOW output. */
@@ -342,9 +307,7 @@ static t_stat sim_exp_clr_tab(EXPECT *exp, EXPTAB *ep)
 /* Display one expect rule in command-replay form. */
 static t_stat sim_exp_show_tab(FILE *st, const EXPECT *exp, const EXPTAB *ep)
 {
-    const char *dev_name = tmxr_expect_line_name(exp);
-    uint32 default_haltafter =
-        get_default_env_parameter(dev_name, "SIM_EXPECT_HALTAFTER", 0);
+    uint32 default_haltafter = exp->default_haltafter;
 
     if (!ep)
         return SCPE_OK;
@@ -429,7 +392,6 @@ t_stat send_cmd(int32 flag, CONST char *cptr)
     char gbuf[CBUFSIZE];
     uint8 dbuf[CBUFSIZE];
     uint32 dsize = 0;
-    const char *dev_name;
     uint32 delay;
     t_bool delay_set = FALSE;
     uint32 after;
@@ -441,12 +403,10 @@ t_stat send_cmd(int32 flag, CONST char *cptr)
     r = sim_exp_resolve_send_target(&cptr, &snd, &tptr);
     if (r != SCPE_OK)
         return r;
-    dev_name = tmxr_send_line_name(snd);
     if (!flag)
         return sim_send_clear(snd);
-    delay = get_default_env_parameter(dev_name, "SIM_SEND_DELAY",
-                                      SEND_DEFAULT_DELAY);
-    after = get_default_env_parameter(dev_name, "SIM_SEND_AFTER", delay);
+    delay = snd->default_delay;
+    after = snd->default_after;
     while (*cptr) {
         if ((!strncmp(gbuf, "DELAY=", 6)) && (gbuf[6])) {
             delay = (uint32)get_uint(&gbuf[6], 10, 2000000000, &r);
@@ -477,8 +437,8 @@ t_stat send_cmd(int32 flag, CONST char *cptr)
     if (!*cptr) {
         if ((!delay_set) && (!after_set))
             return SCPE_2FARG;
-        set_default_env_parameter(dev_name, "SIM_SEND_DELAY", delay);
-        set_default_env_parameter(dev_name, "SIM_SEND_AFTER", after);
+        snd->default_delay = delay;
+        snd->default_after = after;
         return SCPE_OK;
     }
     if ((*cptr != '"') && (*cptr != '\''))
@@ -556,7 +516,6 @@ t_stat sim_set_expect(EXPECT *exp, CONST char *cptr)
     char gbuf[CBUFSIZE];
     CONST char *tptr;
     CONST char *c1ptr;
-    const char *dev_name;
     uint32 after;
     t_bool after_set = FALSE;
     int32 cnt = 0;
@@ -564,8 +523,7 @@ t_stat sim_set_expect(EXPECT *exp, CONST char *cptr)
 
     if ((cptr == NULL) || (*cptr == 0))
         return SCPE_2FARG;
-    dev_name = tmxr_expect_line_name(exp);
-    after = get_default_env_parameter(dev_name, "SIM_EXPECT_HALTAFTER", 0);
+    after = exp->default_haltafter;
     if (*cptr == '[') {
         cnt = (int32)strtotv(cptr + 1, &c1ptr, 10);
         if ((cptr == c1ptr) || (*c1ptr != ']') || (cnt <= 0))
@@ -590,7 +548,7 @@ t_stat sim_set_expect(EXPECT *exp, CONST char *cptr)
     cptr = get_glyph_quoted(cptr, gbuf, 0);
 
     if ((gbuf[0] == '\0') && (*cptr == '\0') && after_set) {
-        set_default_env_parameter(dev_name, "SIM_EXPECT_HALTAFTER", after);
+        exp->default_haltafter = after;
         return SCPE_OK;
     }
 
@@ -759,9 +717,7 @@ t_stat sim_exp_set(EXPECT *exp, const char *match, int32 cnt, uint32 after,
 t_stat sim_exp_show(FILE *st, CONST EXPECT *exp, const char *match)
 {
     CONST EXPTAB *ep = (CONST EXPTAB *)sim_exp_fnd(exp, match, 0);
-    const char *dev_name = tmxr_expect_line_name(exp);
-    uint32 default_haltafter =
-        get_default_env_parameter(dev_name, "SIM_EXPECT_HALTAFTER", 0);
+    uint32 default_haltafter = exp->default_haltafter;
 
     sim_exp_show_context_state(st, exp, default_haltafter);
     if (!*match)
@@ -1014,10 +970,8 @@ t_stat sim_send_clear(SEND *snd)
 
 t_stat sim_show_send_input(FILE *st, const SEND *snd)
 {
-    const char *dev_name = tmxr_send_line_name(snd);
-    uint32 delay = get_default_env_parameter(dev_name, "SIM_SEND_DELAY",
-                                             SEND_DEFAULT_DELAY);
-    uint32 after = get_default_env_parameter(dev_name, "SIM_SEND_AFTER", delay);
+    uint32 delay = snd->default_delay;
+    uint32 after = snd->default_after;
 
     fprintf(st, "%s\n", tmxr_send_line_name(snd));
     sim_show_send_pending_data(st, snd);
