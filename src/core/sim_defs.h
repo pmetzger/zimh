@@ -157,12 +157,6 @@ extern "C" {
 #endif
 
 /* avoid macro names collisions */
-#ifdef MAX
-#undef MAX
-#endif
-#ifdef MIN
-#undef MIN
-#endif
 #ifdef PMASK
 #undef PMASK
 #endif
