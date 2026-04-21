@@ -1,4 +1,4 @@
-/* sim_time_win32.h: Windows compatibility for sim_time wrappers
+/* sim_time_win32.h: Windows compatibility for ZIMH time wrappers
 
    Copyright (c) 2026, The ZIMH Project
 

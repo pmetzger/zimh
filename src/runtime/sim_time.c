@@ -1,4 +1,4 @@
-/* sim_time.c: thin time wrappers for deterministic tests
+/* sim_time.c: Time API wrappers for ZIMH
 
    Copyright (c) 2026, The ZIMH Project
 
