@@ -29,6 +29,8 @@
 extern "C" {
 #endif
 
+typedef t_bool (*sim_cmdvars_ostype_probe_fn)(char *buf, size_t size);
+
 t_stat sim_set_environment(int32 flag, CONST char *cptr);
 void sim_sub_args(char *in_str, size_t in_str_size, char *do_arg[]);
 const char *_sim_get_env_special(const char *gbuf, char *rbuf,
@@ -39,6 +41,9 @@ void sim_sub_var_clear_prefix(const char *prefix);
 const char *sim_unsub_args(const char *cptr);
 void sim_cmdvars_capture_env_alias(const char *name);
 int sim_cmdvars_system(const char *command);
+void sim_cmdvars_set_ostype_probes(sim_cmdvars_ostype_probe_fn uname_probe,
+                                   sim_cmdvars_ostype_probe_fn env_probe);
+void sim_cmdvars_reset_ostype_cache(void);
 void sim_cmdvars_reset(void);
 
 #ifdef __cplusplus

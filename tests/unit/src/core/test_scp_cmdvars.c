@@ -11,6 +11,29 @@
 #include "test_support.h"
 
 static const char simh_test_prog_name[] = "/test/bin/simh-unit-scp-cmdvars";
+static int simh_test_uname_probe_calls = 0;
+
+static t_bool simh_test_ostype_probe_fail(char *buf, size_t size)
+{
+    (void)buf;
+    (void)size;
+
+    ++simh_test_uname_probe_calls;
+    return FALSE;
+}
+
+static t_bool simh_test_ostype_probe_cached(char *buf, size_t size)
+{
+    ++simh_test_uname_probe_calls;
+    strlcpy(buf, "ProbeOS", size);
+    return TRUE;
+}
+
+static t_bool simh_test_ostype_probe_env(char *buf, size_t size)
+{
+    strlcpy(buf, "EnvOS", size);
+    return TRUE;
+}
 
 /* Keep command-variable tests isolated from inherited process state. */
 static int setup_scp_cmdvars_fixture(void **state)
@@ -32,6 +55,7 @@ static int setup_scp_cmdvars_fixture(void **state)
     sim_prog_name = simh_test_prog_name;
     sim_switches = 0;
     sim_rem_cmd_active_line = -1;
+    simh_test_uname_probe_calls = 0;
     return 0;
 }
 
@@ -54,6 +78,7 @@ static int teardown_scp_cmdvars_fixture(void **state)
     simh_test_reset_simulator_state();
     sim_switches = 0;
     sim_rem_cmd_active_line = -1;
+    simh_test_uname_probe_calls = 0;
     return 0;
 }
 
@@ -531,6 +556,83 @@ static void test_show_version_keeps_only_sim_ostype(void **state)
     assert_string_equal(expanded, "AB");
 }
 
+/* Verify SIM_OSTYPE falls back to the secondary probe when uname fails. */
+static void test_sim_get_env_special_ostype_falls_back_to_env_probe(
+    void **state)
+{
+    char value[CBUFSIZE];
+
+    (void)state;
+
+    sim_cmdvars_set_ostype_probes(simh_test_ostype_probe_fail,
+                                  simh_test_ostype_probe_env);
+    assert_string_equal(
+        _sim_get_env_special("SIM_OSTYPE", value, sizeof(value)), "EnvOS");
+    assert_int_equal(simh_test_uname_probe_calls, 1);
+}
+
+/* Verify the real OSTYPE environment fallback still works when needed. */
+static void test_sim_get_env_special_ostype_uses_real_env_fallback(
+    void **state)
+{
+    char value[CBUFSIZE];
+
+    (void)state;
+
+    assert_int_equal(setenv("OSTYPE", "real-env-os", 1), 0);
+    sim_cmdvars_set_ostype_probes(simh_test_ostype_probe_fail, NULL);
+    assert_string_equal(
+        _sim_get_env_special("SIM_OSTYPE", value, sizeof(value)),
+        "real-env-os");
+}
+
+/* Verify SIM_OSTYPE cleanly reports no value when all probes fail. */
+static void test_sim_get_env_special_ostype_handles_total_probe_failure(
+    void **state)
+{
+    char value[CBUFSIZE];
+
+    (void)state;
+
+    sim_cmdvars_set_ostype_probes(simh_test_ostype_probe_fail,
+                                  simh_test_ostype_probe_fail);
+    assert_null(_sim_get_env_special("SIM_OSTYPE", value, sizeof(value)));
+    assert_int_equal(simh_test_uname_probe_calls, 2);
+}
+
+/* Verify the real OSTYPE env probe can also report total failure. */
+static void test_sim_get_env_special_ostype_real_env_probe_can_fail(
+    void **state)
+{
+    char value[CBUFSIZE];
+
+    (void)state;
+
+    unsetenv("OSTYPE");
+    sim_cmdvars_set_ostype_probes(simh_test_ostype_probe_fail, NULL);
+    assert_null(_sim_get_env_special("SIM_OSTYPE", value, sizeof(value)));
+}
+
+/* Verify SIM_OSTYPE caches the first discovered value. */
+static void test_sim_get_env_special_ostype_uses_cached_value(void **state)
+{
+    char value[CBUFSIZE];
+
+    (void)state;
+
+    sim_cmdvars_set_ostype_probes(simh_test_ostype_probe_cached,
+                                  simh_test_ostype_probe_fail);
+    assert_string_equal(
+        _sim_get_env_special("SIM_OSTYPE", value, sizeof(value)), "ProbeOS");
+    assert_int_equal(simh_test_uname_probe_calls, 1);
+
+    sim_cmdvars_set_ostype_probes(simh_test_ostype_probe_fail,
+                                  simh_test_ostype_probe_fail);
+    assert_string_equal(
+        _sim_get_env_special("SIM_OSTYPE", value, sizeof(value)), "ProbeOS");
+    assert_int_equal(simh_test_uname_probe_calls, 1);
+}
+
 /* Verify SET ENVIRONMENT stores a literal value. */
 static void test_sim_set_environment_literal_value(void **state)
 {
@@ -765,6 +867,37 @@ static void test_sim_sub_args_handles_missing_and_star_do_arguments(
     assert_string_equal(expanded, "Aalpha betaB");
 }
 
+/* Verify %n disappears if an earlier DO argument is omitted. */
+static void test_sim_sub_args_omits_sparse_do_arguments(void **state)
+{
+    char expanded[CBUFSIZE];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    do_arg[0] = "script";
+    do_arg[2] = "late";
+
+    expand_command_with_args("A%2B", expanded, sizeof(expanded), do_arg);
+    assert_string_equal(expanded, "AB");
+}
+
+/* Verify %* quotes spaced arguments and switches quote style if needed. */
+static void test_sim_sub_args_star_quotes_spaced_arguments(void **state)
+{
+    char expanded[CBUFSIZE];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    do_arg[0] = "script";
+    do_arg[1] = "two words";
+    do_arg[2] = "he\"llo world";
+
+    expand_command_with_args("A%*B", expanded, sizeof(expanded), do_arg);
+    assert_string_equal(expanded, "A\"two words\" 'he\"llo world'B");
+}
+
 /* Verify a quoted whole-line command is decoded before substitution. */
 static void test_sim_sub_args_decodes_single_quoted_argument(void **state)
 {
@@ -801,6 +934,20 @@ static void test_sim_sub_args_preserves_quoted_command_with_trailing_text(
 
     expand_command_with_args("\"a\" tail", expanded, sizeof(expanded), do_arg);
     assert_string_equal(expanded, "\"a\" tail");
+}
+
+/* Verify quoted commands skip intervening spaces before trailing text. */
+static void test_sim_sub_args_preserves_quoted_command_after_space_skip(
+    void **state)
+{
+    char expanded[CBUFSIZE];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    expand_command_with_args("\"a\"   tail", expanded, sizeof(expanded),
+                             do_arg);
+    assert_string_equal(expanded, "\"a\"   tail");
 }
 
 /* Verify quoted commands with trailing spaces skip whitespace cleanly. */
@@ -968,6 +1115,21 @@ int main(void)
         cmocka_unit_test_setup_teardown(test_show_version_keeps_only_sim_ostype,
                                         setup_scp_cmdvars_fixture,
                                         teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_get_env_special_ostype_falls_back_to_env_probe,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_get_env_special_ostype_uses_real_env_fallback,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_get_env_special_ostype_handles_total_probe_failure,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_get_env_special_ostype_real_env_probe_can_fail,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_get_env_special_ostype_uses_cached_value,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(test_sim_set_environment_literal_value,
                                         setup_scp_cmdvars_fixture,
                                         teardown_scp_cmdvars_fixture),
@@ -1002,6 +1164,12 @@ int main(void)
             test_sim_sub_args_handles_missing_and_star_do_arguments,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_omits_sparse_do_arguments,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_star_quotes_spaced_arguments,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_sub_args_decodes_single_quoted_argument,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
@@ -1009,6 +1177,9 @@ int main(void)
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_preserves_quoted_command_with_trailing_text,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_preserves_quoted_command_after_space_skip,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_preserves_quoted_command_with_trailing_spaces,

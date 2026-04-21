@@ -43,12 +43,21 @@ static char *sim_sub_instr_buf = NULL;
 static size_t sim_sub_instr_size = 0;
 static size_t *sim_sub_instr_off = NULL;
 static struct timespec cmd_time;
+static char sim_host_ostype[64];
 
 extern t_bool sim_runlimit_enabled;
 extern int32 sim_runlimit_value;
 extern const char *sim_runlimit_units;
 extern t_bool sim_file_compare_diff_valid;
 extern size_t sim_file_compare_diff_offset;
+
+static t_bool sim_cmdvars_probe_uname(char *buf, size_t size);
+static t_bool sim_cmdvars_probe_ostype_env(char *buf, size_t size);
+/* Test hooks can replace these probes to drive fallback/error paths. */
+static sim_cmdvars_ostype_probe_fn sim_cmdvars_ostype_uname_probe =
+    sim_cmdvars_probe_uname;
+static sim_cmdvars_ostype_probe_fn sim_cmdvars_ostype_env_probe =
+    sim_cmdvars_probe_ostype_env;
 
 /* Return the value of one SCP-owned substitution variable, if present. */
 static const char *sim_sub_var_get(const char *name)
@@ -111,37 +120,61 @@ static const char *sim_bin_name_value(char *rbuf, size_t rbuf_size)
     return rbuf;
 }
 
+/* Probe the host OS type by running uname. */
+static t_bool sim_cmdvars_probe_uname(char *buf, size_t size)
+{
+    FILE *pstream = NULL;
+    char cmd[128];
+    char *c;
+
+#if defined(_WIN32)
+    strlcpy(buf, "Windows", size);
+    return TRUE;
+#else
+    strlcpy(cmd, "uname", sizeof(cmd));
+    pstream = popen(cmd, "r");
+    if (pstream == NULL)
+        return FALSE;
+    if (fgets(buf, (int)size, pstream) == NULL) {
+        pclose(pstream);
+        return FALSE;
+    }
+    pclose(pstream);
+    if ((c = strchr(buf, '\n')))
+        *c = '\0';
+    return buf[0] != '\0';
+#endif
+}
+
+/* Probe the host OS type from the OSTYPE environment variable. */
+static t_bool sim_cmdvars_probe_ostype_env(char *buf, size_t size)
+{
+    const char *env_ostype = getenv("OSTYPE");
+
+    if (env_ostype == NULL)
+        return FALSE;
+    strlcpy(buf, env_ostype, size);
+    return buf[0] != '\0';
+}
+
+/* Discover the host OS type through the current probes.
+
+   The indirection is here so unit tests can force uname failure,
+   environment fallback, and total probe failure deterministically. */
+static t_bool sim_discover_ostype(char *buf, size_t size)
+{
+    if (sim_cmdvars_ostype_uname_probe(buf, size))
+        return TRUE;
+    return sim_cmdvars_ostype_env_probe(buf, size);
+}
+
 /* Return the cached or discovered host OS type. */
 static const char *sim_ostype_value(char *rbuf, size_t rbuf_size)
 {
-    static char host_ostype[64];
-
-    if (host_ostype[0] == '\0') {
-        FILE *pstream = NULL;
-        char cmd[128];
-        char *c;
-
-#if defined(_WIN32)
-        strlcpy(host_ostype, "Windows", sizeof(host_ostype));
-#else
-        strlcpy(cmd, "uname", sizeof(cmd));
-        pstream = popen(cmd, "r");
-        if (pstream) {
-            fgets(host_ostype, sizeof(host_ostype), pstream);
-            pclose(pstream);
-            if ((c = strchr(host_ostype, '\n')))
-                *c = '\0';
-        }
-#endif
-        if (host_ostype[0] == '\0') {
-            c = getenv("OSTYPE");
-            if (c)
-                strlcpy(host_ostype, c, sizeof(host_ostype));
-        }
-    }
-    if (host_ostype[0] == '\0')
+    if ((sim_host_ostype[0] == '\0') &&
+        !sim_discover_ostype(sim_host_ostype, sizeof(sim_host_ostype)))
         return NULL;
-    strlcpy(rbuf, host_ostype, rbuf_size);
+    strlcpy(rbuf, sim_host_ostype, rbuf_size);
     return rbuf;
 }
 
@@ -273,6 +306,28 @@ int sim_cmdvars_system(const char *command)
     return status;
 }
 
+/* Replace the OS type probes used by SIM_OSTYPE lookup.
+
+   Normal code leaves these at the real probe helpers. Tests can swap in
+   stubs to exercise the otherwise hard-to-reach fallback branches. */
+void sim_cmdvars_set_ostype_probes(sim_cmdvars_ostype_probe_fn uname_probe,
+                                   sim_cmdvars_ostype_probe_fn env_probe)
+{
+    sim_cmdvars_ostype_uname_probe = uname_probe ? uname_probe :
+        sim_cmdvars_probe_uname;
+    sim_cmdvars_ostype_env_probe = env_probe ? env_probe :
+        sim_cmdvars_probe_ostype_env;
+}
+
+/* Clear the cached host OS type used by SIM_OSTYPE lookup.
+
+   Tests use this to ensure one case does not reuse a previous case's cached
+   value. */
+void sim_cmdvars_reset_ostype_cache(void)
+{
+    sim_host_ostype[0] = '\0';
+}
+
 /* Reset command-variable state owned by this module. */
 void sim_cmdvars_reset(void)
 {
@@ -286,6 +341,8 @@ void sim_cmdvars_reset(void)
     sim_sub_instr_off = NULL;
     sim_sub_instr_buf = NULL;
     sim_sub_instr_size = 0;
+    sim_cmdvars_set_ostype_probes(NULL, NULL);
+    sim_cmdvars_reset_ostype_cache();
     memset(&cmd_time, 0, sizeof(cmd_time));
 }
 
