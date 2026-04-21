@@ -744,29 +744,25 @@ static void test_sim_sub_args_handles_escape_and_do_arguments(void **state)
     unlink(path);
 }
 
-/* Verify missing DO arguments and %* expansion edge handling remain stable. */
+/* Verify missing DO arguments and %* expansion use the remaining args. */
 static void test_sim_sub_args_handles_missing_and_star_do_arguments(
     void **state)
 {
     char expanded[CBUFSIZE];
-    char huge_arg[CBUFSIZE + 32];
     char *do_arg[10] = {0};
 
     (void)state;
 
-    memset(huge_arg, 'a', sizeof(huge_arg) - 1);
-    huge_arg[sizeof(huge_arg) - 1] = '\0';
-
     do_arg[0] = "script";
-    do_arg[2] = "late";
-    do_arg[3] = huge_arg;
+    do_arg[1] = "alpha";
+    do_arg[2] = "beta";
+    do_arg[4] = "late";
 
-    expand_command_with_args("A%2B", expanded, sizeof(expanded), do_arg);
+    expand_command_with_args("A%3B", expanded, sizeof(expanded), do_arg);
     assert_string_equal(expanded, "AB");
 
     expand_command_with_args("A%*B", expanded, sizeof(expanded), do_arg);
-    assert_true(expanded[0] == 'A');
-    assert_true(expanded[strlen(expanded) - 1] == 'B');
+    assert_string_equal(expanded, "Aalpha betaB");
 }
 
 /* Verify a quoted whole-line command is decoded before substitution. */

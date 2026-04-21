@@ -639,14 +639,14 @@ void sim_sub_args(char *instr, size_t instr_size, char *do_arg[])
                         for (i = 1; i <= 9; ++i) {
                             if (do_arg[i] == NULL)
                                 break;
-                            else if ((sizeof(rbuf) - strlen(rbuf)) <
+                            else if ((sizeof(rbuf) - strlen(rbuf)) >=
                                      (2 + strlen(do_arg[i]))) {
                                 if (strchr(do_arg[i], ' ')) {
                                     char quote = '"';
 
                                     if (strchr(do_arg[i], quote))
                                         quote = '\'';
-                                    sprintf(&rbuf[strlen(rbuf)], "%s%c%s%c\"",
+                                    sprintf(&rbuf[strlen(rbuf)], "%s%c%s%c",
                                             (i != 1) ? " " : "", quote,
                                             do_arg[i], quote);
                                 } else
