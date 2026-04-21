@@ -46,6 +46,7 @@ set(SIM_SOURCES
     ${SIMH_RUNTIME_ROOT}/sim_card.c
     ${SIMH_RUNTIME_ROOT}/sim_console.c
     ${SIMH_RUNTIME_ROOT}/sim_disk.c
+    ${SIMH_RUNTIME_ROOT}/sim_dynstr.c
     ${SIMH_RUNTIME_ROOT}/sim_ether.c
     ${SIMH_RUNTIME_ROOT}/sim_fio.c
     ${SIMH_RUNTIME_ROOT}/sim_imd.c
