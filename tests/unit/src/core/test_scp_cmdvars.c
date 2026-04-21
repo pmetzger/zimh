@@ -294,6 +294,12 @@ struct simh_test_cmdvars_time_case {
     const char *expected;
 };
 
+struct simh_test_cmdvars_iso_case {
+    time_t epoch;
+    const char *expected_week;
+    const char *expected_year;
+};
+
 /* Expand one command under a fixed clock and compare with the expectation. */
 static void run_fixed_time_expansion_case(void *ctx)
 {
@@ -329,23 +335,42 @@ static void test_sim_sub_args_expands_fixed_datetime_values(void **state)
                       (void *)&cases[i]);
 }
 
+/* Expand ISO week variables for one fixed epoch and compare the results. */
+static void run_fixed_iso_week_case(void *ctx)
+{
+    const struct simh_test_cmdvars_iso_case *test_case = ctx;
+    char expanded[CBUFSIZE];
+
+    simh_test_cmdvars_time = (struct timespec){.tv_sec = test_case->epoch,
+                                               .tv_nsec = 0};
+    sim_time_set_test_hooks(simh_test_cmdvars_clock_gettime, NULL);
+
+    expand_command("A%DATE_WW%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, test_case->expected_week);
+    expand_command("A%DATE_WYYYY%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, test_case->expected_year);
+}
+
 /* Verify ISO week and year logic uses the injected realtime clock. */
 static void test_sim_sub_args_expands_iso_week_boundary(void **state)
 {
-    const struct simh_test_cmdvars_time_case cases[] = {
-        {"A%DATE_WW%B", "A53B"},
-        {"A%DATE_WYYYY%B", "A2020B"},
+    const struct simh_test_cmdvars_iso_case cases[] = {
+        {1451606400, "A53B", "A2015B"}, /* 2016-01-01 */
+        {1483228800, "A52B", "A2016B"}, /* 2017-01-01 */
+        {1514678400, "A52B", "A2017B"}, /* 2017-12-31 */
+        {1514764800, "A01B", "A2018B"}, /* 2018-01-01 */
+        {1577664000, "A01B", "A2020B"}, /* 2019-12-30 */
+        {1609113600, "A53B", "A2020B"}, /* 2020-12-28 */
+        {1609504496, "A53B", "A2020B"}, /* 2021-01-01 */
+        {1640908800, "A52B", "A2021B"}, /* 2021-12-31 */
+        {1641081600, "A52B", "A2021B"}, /* 2022-01-02 */
     };
     size_t i;
 
     (void)state;
 
-    simh_test_cmdvars_time = (struct timespec){.tv_sec = 1609504496,
-                                               .tv_nsec = 0};
-    sim_time_set_test_hooks(simh_test_cmdvars_clock_gettime, NULL);
-
     for (i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i)
-        with_timezone("UTC", run_fixed_time_expansion_case,
+        with_timezone("UTC", run_fixed_iso_week_case,
                       (void *)&cases[i]);
 }
 
