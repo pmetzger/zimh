@@ -39,6 +39,8 @@ struct scp_sub_var {
     char *value;
 };
 
+#define SIM_CMDVARS_PARTS_SIZE 32
+
 static struct deleted_env_var *sim_external_env = NULL;
 static int sim_external_env_count = 0;
 static struct scp_sub_var *sim_sub_vars = NULL;
@@ -95,6 +97,130 @@ static t_bool sim_cmdvars_localtime(time_t now, struct tm *tmnow)
 #else
     return localtime_r(&now, tmnow) != NULL;
 #endif
+}
+
+/* Decode a whole-line quoted command before later substitution work. */
+static void sim_cmdvars_decode_initial_quoted_line(char *ip, size_t instr_size,
+                                                   char *instr,
+                                                   char *scratch)
+{
+    if ((*ip == '"') || (*ip == '\'')) {
+        const char *cptr = ip;
+        char *tp = scratch;
+
+        cptr = get_glyph_quoted(cptr, tp, 0);
+        while (sim_isspace(*cptr))
+            ++cptr;
+        if (*cptr == '\0') {
+            uint32 dsize;
+
+            if (SCPE_OK == sim_decode_quoted_string(tp, (uint8 *)tp, &dsize)) {
+                tp[dsize] = '\0';
+                while (sim_isspace(*tp))
+                    memmove(tp, tp + 1, strlen(tp));
+                strlcpy(ip, tp, instr_size - (ip - instr));
+                strlcpy(sim_sub_instr + (ip - instr), tp,
+                        instr_size - (ip - instr));
+            }
+        }
+    }
+}
+
+/* Copy one expanded value into the command output buffer. */
+static void sim_cmdvars_copy_expansion(const char *ap, char **op, char *oend,
+                                       const char *instr, const char *ip,
+                                       size_t *outstr_off)
+{
+    while (*ap && (*op < oend)) {
+        sim_sub_instr_off[(*outstr_off)++] = ip - instr;
+        *(*op)++ = *ap++;
+    }
+}
+
+/* Apply any %~ filepath-part fixup, then copy one expansion to the output. */
+static void sim_cmdvars_expand_and_copy(const char *ap, t_bool expand_it,
+                                        char *parts, char **op, char *oend,
+                                        const char *instr, const char *ip,
+                                        size_t *outstr_off)
+{
+    char *expanded = NULL;
+
+    if (ap == NULL)
+        return;
+    if (expand_it) {
+        expanded = sim_filepath_parts(ap, parts);
+        ap = expanded;
+    }
+    sim_cmdvars_copy_expansion(ap, op, oend, instr, ip, outstr_off);
+    free(expanded);
+}
+
+/* Parse one %-form after the leading percent character. */
+static const char *sim_cmdvars_parse_percent(const char **ipp, char *gbuf,
+                                             char *rbuf, size_t rbuf_size,
+                                             char *do_arg[], t_bool *expand_it,
+                                             char *parts,
+                                             sim_dynstr_t *star_args,
+                                             t_bool *emit_percent)
+{
+    const char *ip = *ipp;
+    const char *ap = NULL;
+    uint32 i;
+
+    *emit_percent = FALSE;
+    *expand_it = FALSE;
+    parts[0] = '\0';
+    if (*ip == '~') {
+        *expand_it = TRUE;
+        ++ip;
+        for (i = 0; (i < (SIM_CMDVARS_PARTS_SIZE - 1)) &&
+                    (strchr("fpnxtz", *ip));
+             i++, ip++) {
+            parts[i] = *ip;
+            parts[i + 1] = '\0';
+        }
+    }
+    if ((*ip >= '0') && (*ip <= ('9'))) {
+        ap = do_arg[*ip - '0'];
+        for (i = 0; i < (uint32)(*ip - '0'); ++i)
+            if (do_arg[i] == NULL) {
+                ap = NULL;
+                break;
+            }
+        ++ip;
+    } else if (*ip == '*') {
+        if (sim_cmdvars_expand_star_args(star_args, do_arg))
+            ap = sim_dynstr_cstr(star_args);
+        ++ip;
+    } else if (*ip == '\0') {
+        *emit_percent = TRUE;
+    } else {
+        get_glyph_nc(ip, gbuf, '%');
+        ap = _sim_get_env_special(gbuf, rbuf, rbuf_size);
+        ip += strlen(gbuf);
+        if (*ip == '%')
+            ++ip;
+    }
+    *ipp = ip;
+    return ap;
+}
+
+/* Expand the initial command token if it names one command variable. */
+static t_bool sim_cmdvars_expand_initial_token(char **ipp, char **op, char *oend,
+                                               const char *instr, char *gbuf,
+                                               char *rbuf, size_t *outstr_off)
+{
+    const char *ap;
+    char *ip = *ipp;
+
+    get_glyph(ip, gbuf, 0);
+    ap = _sim_get_env_special(gbuf, rbuf, sizeof(rbuf));
+    if (ap == NULL)
+        return FALSE;
+    sim_cmdvars_copy_expansion(ap, op, oend, instr, ip, outstr_off);
+    ip += strlen(gbuf);
+    *ipp = ip;
+    return TRUE;
 }
 
 /* Return the value of one SCP-owned substitution variable, if present. */
@@ -617,7 +743,6 @@ void sim_sub_args(char *instr, size_t instr_size, char *do_arg[])
     char *ip = instr, *op, *oend, *istart, *tmpbuf;
     const char *ap;
     char rbuf[CBUFSIZE];
-    uint32 i;
     size_t outstr_off = 0;
 
     scp_set_exp_argv(do_arg);
@@ -639,26 +764,7 @@ void sim_sub_args(char *instr, size_t instr_size, char *do_arg[])
         sim_sub_instr_off[outstr_off++] = ip - instr;
         *op++ = *ip++;
     }
-    if ((*ip == '"') || (*ip == '\'')) {
-        const char *cptr = ip;
-        char *tp = op;
-
-        cptr = get_glyph_quoted(cptr, tp, 0);
-        while (sim_isspace(*cptr))
-            ++cptr;
-        if (*cptr == '\0') {
-            uint32 dsize;
-
-            if (SCPE_OK == sim_decode_quoted_string(tp, (uint8 *)tp, &dsize)) {
-                tp[dsize] = '\0';
-                while (sim_isspace(*tp))
-                    memmove(tp, tp + 1, strlen(tp));
-                strlcpy(ip, tp, instr_size - (ip - instr));
-                strlcpy(sim_sub_instr + (ip - instr), tp,
-                        instr_size - (ip - instr));
-            }
-        }
-    }
+    sim_cmdvars_decode_initial_quoted_line(ip, instr_size, instr, op);
     istart = ip;
     for (; *ip && (op < oend);) {
         if ((ip[0] == '%') && (ip[1] == '%')) {
@@ -667,72 +773,34 @@ void sim_sub_args(char *instr, size_t instr_size, char *do_arg[])
             *op++ = *ip++;
         } else {
             t_bool expand_it = FALSE;
-            char parts[32];
+            char parts[SIM_CMDVARS_PARTS_SIZE];
 
             if (*ip == '%') {
-                char *expanded = NULL;
+                const char *percent_ip;
                 sim_dynstr_t star_args;
+                t_bool emit_percent;
 
                 sim_dynstr_init(&star_args);
-                ap = NULL;
                 ++ip;
-                if (*ip == '~') {
-                    expand_it = TRUE;
-                    ++ip;
-                    for (i = 0;
-                         (i < (sizeof(parts) - 1)) && (strchr("fpnxtz", *ip));
-                         i++, ip++) {
-                        parts[i] = *ip;
-                        parts[i + 1] = '\0';
-                    }
-                }
-                if ((*ip >= '0') && (*ip <= ('9'))) {
-                    ap = do_arg[*ip - '0'];
-                    for (i = 0; i < (uint32)(*ip - '0'); ++i)
-                        if (do_arg[i] == NULL) {
-                            ap = NULL;
-                            break;
-                        }
-                    ++ip;
-                } else if (*ip == '*') {
-                    if (sim_cmdvars_expand_star_args(&star_args, do_arg))
-                        ap = sim_dynstr_cstr(&star_args);
-                    ++ip;
-                } else if (*ip == '\0') {
+                percent_ip = ip;
+                ap = sim_cmdvars_parse_percent(
+                    &percent_ip, gbuf, rbuf, sizeof(rbuf), do_arg,
+                    &expand_it, parts, &star_args, &emit_percent);
+                ip = (char *)percent_ip;
+                if (emit_percent)
                     *op++ = '%';
-                } else {
-                    get_glyph_nc(ip, gbuf, '%');
-                    ap = _sim_get_env_special(gbuf, rbuf, sizeof(rbuf));
-                    ip += strlen(gbuf);
-                    if (*ip == '%')
-                        ++ip;
-                }
-                if (ap) {
-                    if (expand_it) {
-                        expanded = sim_filepath_parts(ap, parts);
-                        ap = expanded;
-                    }
-                    while (*ap && (op < oend)) {
-                        sim_sub_instr_off[outstr_off++] = ip - instr;
-                        *op++ = *ap++;
-                    }
-                }
-                free(expanded);
+                sim_cmdvars_expand_and_copy(ap, expand_it, parts, &op, oend,
+                                            instr, ip, &outstr_off);
                 sim_dynstr_free(&star_args);
             } else {
                 if (ip == istart) {
-                    get_glyph(istart, gbuf, 0);
-                    ap = _sim_get_env_special(gbuf, rbuf, sizeof(rbuf));
-                    if (!ap) {
+                    if (!sim_cmdvars_expand_initial_token(
+                            &ip, &op, oend, instr, gbuf, rbuf,
+                            &outstr_off)) {
                         sim_sub_instr_off[outstr_off++] = ip - instr;
                         *op++ = *ip++;
                         continue;
                     }
-                    while (*ap && (op < oend)) {
-                        sim_sub_instr_off[outstr_off++] = ip - instr;
-                        *op++ = *ap++;
-                    }
-                    ip += strlen(gbuf);
                 } else {
                     sim_sub_instr_off[outstr_off++] = ip - instr;
                     *op++ = *ip++;
