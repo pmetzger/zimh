@@ -36,6 +36,7 @@ endif ()
 set(SIM_SOURCES
     ${SIMH_CORE_ROOT}/scp.c
     ${SIMH_CORE_ROOT}/scp_breakpoint.c
+    ${SIMH_CORE_ROOT}/scp_cmdvars.c
     ${SIMH_CORE_ROOT}/scp_context.c
     ${SIMH_CORE_ROOT}/scp_expect.c
     ${SIMH_CORE_ROOT}/scp_expr.c

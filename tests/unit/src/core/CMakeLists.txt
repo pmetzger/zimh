@@ -38,10 +38,10 @@ add_unit_test(unit-scp-expr
         ${PROJECT_SOURCE_DIR}/tests/unit/support
 )
 
-add_unit_test(unit-scp-subst
+add_unit_test(unit-scp-cmdvars
     LABEL unit
     SOURCES
-        ${CMAKE_CURRENT_SOURCE_DIR}/test_scp_subst.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_scp_cmdvars.c
     INCLUDES
         ${PROJECT_SOURCE_DIR}/tests/unit/support
 )

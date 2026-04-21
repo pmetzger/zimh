@@ -41,6 +41,7 @@
 
 #include "sim_fio.h"
 #include "scp_breakpoint.h"
+#include "scp_cmdvars.h"
 #include "scp_context.h"
 #include "scp_expect.h"
 #include "scp_expr.h"
@@ -199,7 +200,6 @@ const char *put_switches (char *buf, size_t bufsize, uint32 sw);
 t_value get_uint (const char *cptr, uint32 radix, t_value max, t_stat *status);
 CONST char *get_range (DEVICE *dptr, CONST char *cptr, t_addr *lo, t_addr *hi,
     uint32 rdx, t_addr max, char term);
-t_stat sim_set_environment (int32 flag, CONST char *cptr);
 t_stat sim_decode_quoted_string (const char *iptr, uint8 *optr, uint32 *osize);
 char *sim_encode_quoted_string (const uint8 *iptr, size_t size);
 void fprint_buffer_string (FILE *st, const uint8 *buf, size_t size);
@@ -228,13 +228,6 @@ CTAB *find_cmd (const char *gbuf);
 CTAB *scp_cmd_table (void);
 const char *scp_argv0 (void);
 t_bool scp_has_oline (void);
-void sim_sub_args (char *in_str, size_t in_str_size, char *do_arg[]);
-const char *_sim_get_env_special(const char *gbuf, char *rbuf,
-    size_t rbuf_size);
-void sim_sub_var_set(const char *name, const char *value);
-void sim_sub_var_unset(const char *name);
-void sim_sub_var_clear_prefix(const char *prefix);
-const char *sim_unsub_args(const char *cptr);
 t_bool scp_do_echo_enabled(void);
 int32 scp_do_depth(void);
 const char *_get_dbg_verb(uint32 dbits, DEVICE *dptr, UNIT *uptr);

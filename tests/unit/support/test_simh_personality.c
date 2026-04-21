@@ -25,6 +25,7 @@ void simh_test_reset_simulator_state(void)
     sim_emax = 0;
     sim_dfdev = NULL;
     sim_dfunit = NULL;
+    sim_cmdvars_reset();
     free(sim_internal_devices);
     sim_internal_devices = NULL;
     sim_internal_device_count = 0;

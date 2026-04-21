@@ -226,6 +226,7 @@
 #define IN_SCP_C 1          /* Include from scp.c */
 
 #include "sim_defs.h"
+#include "scp_cmdvars.h"
 #include "scp_pcre2.h"
 #include "sim_rev.h"
 #include "sim_disk.h"
@@ -570,11 +571,6 @@ int32 sim_runlimit_value = 0;
 const char *sim_runlimit_units = NULL;
 t_bool sim_file_compare_diff_valid = FALSE;
 size_t sim_file_compare_diff_offset = 0;
-static char sim_ostype[128] = "";
-char *sim_sub_instr = NULL;         /* Copy of pre-substitution buffer contents */
-char *sim_sub_instr_buf = NULL;     /* Buffer address that substitutions were saved in */
-size_t sim_sub_instr_size = 0;      /* substitution buffer size */
-size_t *sim_sub_instr_off = NULL;   /* offsets in substitution buffer where original data started */
 static double sim_time;
 static uint32 sim_rtime;
 static int32 noqueue_time;
@@ -615,89 +611,11 @@ static t_bool sim_if_result[MAX_DO_NEST_LVL+1];
 static t_bool sim_if_result_last[MAX_DO_NEST_LVL+1];
 static t_bool sim_cptr_is_action[MAX_DO_NEST_LVL+1];
 static DEVICE *sim_failed_reset_dptr = NULL;
-static struct deleted_env_var {
-    char *name;
-    char *value;
-    } *sim_external_env = NULL;
-static int sim_external_env_count = 0;
-static struct scp_sub_var {
-    char *name;
-    char *value;
-    } *sim_sub_vars = NULL;
-static int sim_sub_var_count = 0;
 
 t_stat sim_last_cmd_stat;                               /* Command Status */
-struct timespec cmd_time;                               /*  */
 
 static SCHTAB sim_stabr;                                /* Register search specifier */
 static SCHTAB sim_staba;                                /* Memory search specifier */
-
-/* Return the value of one SCP-owned substitution variable, if present. */
-static const char *sim_sub_var_get(const char *name)
-{
-int i;
-
-for (i = 0; i < sim_sub_var_count; ++i)
-    if (0 == strcmp(name, sim_sub_vars[i].name))
-        return sim_sub_vars[i].value;
-return NULL;
-}
-
-/* Set or replace one SCP-owned substitution variable. */
-void sim_sub_var_set(const char *name, const char *value)
-{
-int i;
-
-for (i = 0; i < sim_sub_var_count; ++i)
-    if (0 == strcmp(name, sim_sub_vars[i].name)) {
-        free(sim_sub_vars[i].value);
-        sim_sub_vars[i].value = (char *)malloc(1 + strlen(value));
-        strcpy(sim_sub_vars[i].value, value);
-        return;
-        }
-++sim_sub_var_count;
-sim_sub_vars = (struct scp_sub_var *)realloc(sim_sub_vars,
-              sim_sub_var_count * sizeof(*sim_sub_vars));
-sim_sub_vars[sim_sub_var_count - 1].name =
-    (char *)malloc(1 + strlen(name));
-strcpy(sim_sub_vars[sim_sub_var_count - 1].name, name);
-sim_sub_vars[sim_sub_var_count - 1].value =
-    (char *)malloc(1 + strlen(value));
-strcpy(sim_sub_vars[sim_sub_var_count - 1].value, value);
-}
-
-/* Remove one SCP-owned substitution variable, if present. */
-void sim_sub_var_unset(const char *name)
-{
-int i;
-
-for (i = 0; i < sim_sub_var_count; ++i)
-    if (0 == strcmp(name, sim_sub_vars[i].name)) {
-        int j;
-
-        free(sim_sub_vars[i].name);
-        free(sim_sub_vars[i].value);
-        for (j = i; j + 1 < sim_sub_var_count; ++j)
-            sim_sub_vars[j] = sim_sub_vars[j + 1];
-        --sim_sub_var_count;
-        if (sim_sub_var_count == 0) {
-            free(sim_sub_vars);
-            sim_sub_vars = NULL;
-        }
-        return;
-        }
-}
-
-/* Remove every SCP-owned substitution variable with one common prefix. */
-void sim_sub_var_clear_prefix(const char *prefix)
-{
-size_t prefix_len = strlen(prefix);
-int i;
-
-for (i = sim_sub_var_count - 1; i >= 0; --i)
-    if (0 == strncmp(sim_sub_vars[i].name, prefix, prefix_len))
-        sim_sub_var_unset(sim_sub_vars[i].name);
-}
 
 static const char *sim_int_step_description (DEVICE *dptr)
 {
@@ -2792,24 +2710,11 @@ sim_tape_init ();                                       /* init tape package */
 for (i = 0; cmd_table[i].name; i++) {
     size_t alias_len = strlen (cmd_table[i].name);
     char *cmd_name = (char *)calloc (1 + alias_len, sizeof (*cmd_name));
-    char *env_cmd_val;
-    size_t env_cmd_val_len;
-
     strcpy (cmd_name, cmd_table[i].name);
     while (alias_len > 1) {
         cmd_name[alias_len] = '\0';                 /* Possible short form command name */
         --alias_len;
-        env_cmd_val = getenv (cmd_name);
-        if (env_cmd_val) {                          /* Externally defined command alias? */
-            env_cmd_val_len = strlen (env_cmd_val);
-            ++sim_external_env_count;
-            sim_external_env = (struct deleted_env_var *)realloc (sim_external_env, sim_external_env_count * sizeof (*sim_external_env));
-            sim_external_env[sim_external_env_count - 1].name = (char *)malloc (1 + strlen (cmd_name));
-            strcpy (sim_external_env[sim_external_env_count - 1].name, cmd_name);
-            sim_external_env[sim_external_env_count - 1].value = (char *)malloc (1 + env_cmd_val_len);
-            strlcpy (sim_external_env[sim_external_env_count - 1].value, env_cmd_val, 1 + env_cmd_val_len);
-            unsetenv (cmd_name);                    /* Remove it to protect against possibly malicious aliases */
-            }
+        sim_cmdvars_capture_env_alias (cmd_name);
         }
     free (cmd_name);
     }
@@ -3294,7 +3199,6 @@ return SCPE_OK;
 t_stat spawn_cmd (int32 flag, CONST char *cptr)
 {
 t_stat status;
-int i;
 
 if ((cptr == NULL) || (strlen (cptr) == 0))
     cptr = getenv("SHELL");
@@ -3305,13 +3209,7 @@ if (sim_log)                                            /* flush log if enabled 
     fflush (sim_log);
 if (sim_deb)                                            /* flush debug if enabled */
     fflush (sim_deb);
-/* Pass along externally defined (command alias conflicting) environment variables */
-for (i = 0; i < sim_external_env_count; i++)
-    setenv (sim_external_env[i].name, sim_external_env[i].value, 1);
-status = system (cptr);
-/* Remove the externally defined (command alias conflicting) environment variables again */
-for (i = 0; i < sim_external_env_count; i++)
-    unsetenv (sim_external_env[i].name);
+status = sim_cmdvars_system (cptr);
 return status;
 }
 
@@ -3780,597 +3678,6 @@ return result;
    untouched.
 */
 
-/* Return the simulator binary basename without any host path prefix. */
-static const char *
-sim_bin_name_value (char *rbuf, size_t rbuf_size)
-{
-const char *base;
-size_t len;
-
-if ((NULL == sim_prog_name) || ('\0' == sim_prog_name[0]))
-    return NULL;
-base = strrchr(sim_prog_name, '/');
-if (NULL == base)
-    base = strrchr(sim_prog_name, '\\');
-if (NULL == base)
-    base = sim_prog_name;
-else
-    ++base;
-strlcpy(rbuf, base, rbuf_size);
-len = strlen(rbuf);
-if ((len > 4) && (0 == sim_strncasecmp(&rbuf[len - 4], ".exe", 4)))
-    rbuf[len - 4] = '\0';
-return rbuf;
-}
-
-/* Determine a stable SCP-visible host OS type string on demand. */
-static const char *
-sim_ostype_value (char *rbuf, size_t rbuf_size)
-{
-if ('\0' == sim_ostype[0]) {
-#if defined(_WIN32)
-    strlcpy(sim_ostype, "Windows", sizeof(sim_ostype));
-#else
-    FILE *f;
-
-    if ((f = popen("uname", "r"))) {
-        do {
-            if (NULL == fgets(sim_ostype, sizeof(sim_ostype) - 1, f))
-                break;
-            sim_trim_endspc(sim_ostype);
-            } while ('\0' == sim_ostype[0]);
-        pclose(f);
-        }
-    if (('\0' == sim_ostype[0]) && getenv("OSTYPE"))
-        strlcpy(sim_ostype, getenv("OSTYPE"), sizeof(sim_ostype));
-#endif
-    if ('\0' == sim_ostype[0])
-        strlcpy(sim_ostype, "Unknown", sizeof(sim_ostype));
-    }
-strlcpy(rbuf, sim_ostype, rbuf_size);
-return rbuf;
-}
-
-static const char *
-sim_get_host_env_uplowcase (const char *gbuf, char *rbuf, size_t rbuf_size)
-{
-const char *ap;
-char tbuf[CBUFSIZE];
-
-ap = getenv(gbuf);                      /* first try using the literal name */
-if (!ap) {
-    get_glyph(gbuf, tbuf, 0);           /* now try using the upcased name */
-    if (strcmp(gbuf, tbuf))             /* upcase different? */
-        ap = getenv(tbuf);              /* lookup the upcase name */
-    }
-if (ap) {                               /* environment variable found? */
-    strlcpy(rbuf, ap, rbuf_size);       /* Return the environment value */
-    ap = rbuf;
-    }
-return ap;
-}
-
-/*
-Environment variable substitution:
-
-    %XYZ:str1=str2%
-
-would expand the XYZ environment variable, substituting each occurrence
-of "str1" in the expanded result with "str2".  "str2" can be the empty
-string to effectively delete all occurrences of "str1" from the expanded
-output.  "str1" can begin with an asterisk, in which case it will match
-everything from the beginning of the expanded output to the first
-occurrence of the remaining portion of str1.
-
-May also specify substrings for an expansion.
-
-    %XYZ:~10,5%
-
-would expand the XYZ environment variable, and then use only the 5
-characters that begin at the 11th (offset 10) character of the expanded
-result.  If the length is not specified, then it defaults to the
-remainder of the variable value.  If either number (offset or length) is
-negative, then the number used is the length of the environment variable
-value added to the offset or length specified.
-
-    %XYZ:~-10%
-
-would extract the last 10 characters of the XYZ variable.
-
-    %XYZ:~0,-2%
-
-would extract all but the last 2 characters of the XYZ variable.
-
- */
-
-static void _sim_subststr_substr (const char *ops, char *rbuf, size_t rbuf_size)
-{
-int rbuf_len = (int)strlen (rbuf);
-char *tstr = (char *)malloc (1 + rbuf_len);
-
-strcpy (tstr, rbuf);
-
-if (*ops == '~') {      /* Substring? */
-    int offset = 0, length = rbuf_len;
-    int o, l;
-
-    switch (sscanf (ops + 1, "%d,%d", &o, &l)) {
-        case 2:
-            if (l < 0)
-                length = rbuf_len - MIN(-l, rbuf_len);
-            else
-                length = l;
-            /* fall through */
-        case 1:
-            if (o < 0)
-                offset = rbuf_len - MIN(-o, rbuf_len);
-            else
-                offset = MIN(o, rbuf_len);
-            break;
-        case 0:
-            offset = 0;
-            length = rbuf_len;
-            break;
-        }
-    if (offset + length > rbuf_len)
-        length = rbuf_len - offset;
-    memcpy (rbuf, tstr + offset, length);
-    rbuf[length] = '\0';
-    }
-else {
-    const char *eq;
-
-    if ((eq = strchr (ops, '='))) {     /* Substitute? */
-        const char *last = tstr;
-        const char *curr = tstr;
-        char *match = (char *)malloc (1 + (eq - ops));
-        size_t move_size;
-        t_bool asterisk_match;
-
-        strlcpy (match, ops, 1 + (eq - ops));
-        asterisk_match = (*ops == '*');
-        if (asterisk_match)
-            memmove (match, match + 1, 1 + strlen (match + 1));
-        while ((curr = strstr (last, match))) {
-            if (!asterisk_match) {
-                move_size = MIN((size_t)(curr - last), rbuf_size);
-                memcpy (rbuf, last, move_size);
-                rbuf_size -= move_size;
-                rbuf += move_size;
-                }
-            else
-                asterisk_match = FALSE;
-            move_size = MIN(strlen (eq + 1), rbuf_size);
-            memcpy (rbuf, eq + 1, move_size);
-            rbuf_size -= move_size;
-            rbuf += move_size;
-            curr += strlen (match);
-            last = curr;
-            }
-        move_size = MIN(strlen (last), rbuf_size);
-        memcpy (rbuf, last, move_size);
-        rbuf_size -= move_size;
-        rbuf += move_size;
-        if (rbuf_size)
-            *rbuf = '\0';
-        free (match);
-        }
-    }
-free (tstr);
-}
-
-const char *
-_sim_get_env_special (const char *gbuf, char *rbuf, size_t rbuf_size)
-{
-int i;
-const char *ap;
-const char *fixup_needed = strchr (gbuf, ':');
-char *tgbuf = NULL;
-size_t tgbuf_size = MAX(rbuf_size, 1 + (size_t)(fixup_needed - gbuf));
-
-if (fixup_needed) {
-    tgbuf = (char *)calloc(tgbuf_size, 1);
-    memcpy(tgbuf, gbuf, (fixup_needed - gbuf));
-    gbuf = tgbuf;
-    }
-ap = NULL;
-if (!ap) {                              /* no SCP variable found? */
-    time_t now = (time_t)cmd_time.tv_sec;
-    struct tm *tmnow = localtime(&now);
-
-    /* ISO 8601 format date/time info */
-    if (!strcmp ("DATE", gbuf)) {
-        sprintf(rbuf, "%4d-%02d-%02d", tmnow->tm_year+1900, tmnow->tm_mon+1, tmnow->tm_mday);
-        ap = rbuf;
-        }
-    else if (!strcmp ("TIME", gbuf)) {
-        sprintf(rbuf, "%02d:%02d:%02d", tmnow->tm_hour, tmnow->tm_min, tmnow->tm_sec);
-        ap = rbuf;
-        }
-    else if (!strcmp ("DATETIME", gbuf)) {
-        sprintf(rbuf, "%04d-%02d-%02dT%02d:%02d:%02d", tmnow->tm_year+1900, tmnow->tm_mon+1, tmnow->tm_mday, tmnow->tm_hour, tmnow->tm_min, tmnow->tm_sec);
-        ap = rbuf;
-        }
-    /* Locale oriented formatted date/time info */
-    else if (!strcmp ("LDATE", gbuf)) {
-        strftime(rbuf, rbuf_size, "%x", tmnow);
-        ap = rbuf;
-        }
-    else if (!strcmp ("LTIME", gbuf)) {
-#if defined(HAVE_C99_STRFTIME)
-        strftime(rbuf, rbuf_size, "%r", tmnow);
-#else
-        strftime(rbuf, rbuf_size, "%p", tmnow);
-        if (rbuf[0])
-            strftime(rbuf, rbuf_size, "%I:%M:%S %p", tmnow);
-        else
-            strftime(rbuf, rbuf_size, "%H:%M:%S", tmnow);
-#endif
-        ap = rbuf;
-        }
-    else if (!strcmp ("CTIME", gbuf)) {
-#if defined(HAVE_C99_STRFTIME)
-        strftime(rbuf, rbuf_size, "%c", tmnow);
-#else
-        strcpy(rbuf, ctime(&now));
-        rbuf[strlen(rbuf)-1] = '\0';    /* remove trailing \n */
-#endif
-        ap = rbuf;
-        }
-    else if (!strcmp ("UTIME", gbuf)) {
-        sprintf(rbuf, "%" LL_FMT "d", (LL_TYPE)now);
-        ap = rbuf;
-        }
-    /* Separate Date/Time info */
-    else if (!strcmp ("DATE_YYYY", gbuf)) {/* Year (0000-9999) */
-        strftime (rbuf, rbuf_size, "%Y", tmnow);
-        ap = rbuf;
-        }
-    else if (!strcmp ("DATE_YY", gbuf)) {/* Year (00-99) */
-        strftime (rbuf, rbuf_size, "%y", tmnow);
-        ap = rbuf;
-        }
-    else if ((!strcmp ("DATE_19XX_YY", gbuf)) || /* Year with same calendar */
-             (!strcmp ("DATE_19XX_YYYY", gbuf))) {
-        int year = tmnow->tm_year + 1900;
-        int days = year - 2001;
-        int leaps = days/4 - days/100 + days/400;
-        int lyear = ((year % 4) == 0) && (((year % 100) != 0) || ((year % 400) == 0));
-        int selector = ((days + leaps + 7) % 7) + lyear * 7;
-        static int years[] = {90, 91, 97, 98, 99, 94, 89,
-                              96, 80, 92, 76, 88, 72, 84};
-        int cal_year = years[selector];
-
-        if (!strcmp ("DATE_19XX_YY", gbuf))
-            sprintf (rbuf, "%d", cal_year);        /* 2 digit year */
-        else
-            sprintf (rbuf, "%d", cal_year + 1900); /* 4 digit year */
-        ap = rbuf;
-        }
-    else if (!strcmp ("DATE_MM", gbuf)) {/* Month number (01-12) */
-        strftime (rbuf, rbuf_size, "%m", tmnow);
-        ap = rbuf;
-        }
-    else if (!strcmp ("DATE_MMM", gbuf)) {/* abbreviated Month name */
-        strftime (rbuf, rbuf_size, "%b", tmnow);
-        ap = rbuf;
-        }
-    else if (!strcmp ("DATE_MONTH", gbuf)) {/* full Month name */
-        strftime (rbuf, rbuf_size, "%B", tmnow);
-        ap = rbuf;
-        }
-    else if (!strcmp ("DATE_DD", gbuf)) {/* Day of Month (01-31) */
-        strftime (rbuf, rbuf_size, "%d", tmnow);
-        ap = rbuf;
-        }
-    else if (!strcmp ("DATE_D", gbuf)) { /* ISO 8601 weekday number (1-7) */
-        sprintf (rbuf, "%d", (tmnow->tm_wday ? tmnow->tm_wday : 7));
-        ap = rbuf;
-        }
-    else if ((!strcmp ("DATE_WW", gbuf)) ||   /* ISO 8601 week number (01-53) */
-             (!strcmp ("DATE_WYYYY", gbuf))) {/* ISO 8601 week year number (0000-9999) */
-        int iso_yr = tmnow->tm_year + 1900;
-        int iso_wk = (tmnow->tm_yday + 11 - (tmnow->tm_wday ? tmnow->tm_wday : 7))/7;;
-
-        if (iso_wk == 0) {
-            iso_yr = iso_yr - 1;
-            tmnow->tm_yday += 365 + (((iso_yr % 4) == 0) ? 1 : 0);  /* Adjust for Leap Year (Correct thru 2099) */
-            iso_wk = (tmnow->tm_yday + 11 - (tmnow->tm_wday ? tmnow->tm_wday : 7))/7;
-            }
-        else
-            if ((iso_wk == 53) && (((31 - tmnow->tm_mday) + tmnow->tm_wday) < 4)) {
-                ++iso_yr;
-                iso_wk = 1;
-                }
-        if (!strcmp ("DATE_WW", gbuf))
-            sprintf (rbuf, "%02d", iso_wk);
-        else
-            sprintf (rbuf, "%04d", iso_yr);
-        ap = rbuf;
-        }
-    else if (!strcmp ("DATE_JJJ", gbuf)) {/* day of year (001-366) */
-        strftime (rbuf, rbuf_size, "%j", tmnow);
-        ap = rbuf;
-        }
-    else if (!strcmp ("TIME_HH", gbuf)) {/* Hour of day (00-23) */
-        strftime (rbuf, rbuf_size, "%H", tmnow);
-        ap = rbuf;
-        }
-    else if (!strcmp ("TIME_MM", gbuf)) {/* Minute of hour (00-59) */
-        strftime (rbuf, rbuf_size, "%M", tmnow);
-        ap = rbuf;
-        }
-    else if (!strcmp ("TIME_SS", gbuf)) {/* Second of minute (00-59) */
-        strftime (rbuf, rbuf_size, "%S", tmnow);
-        ap = rbuf;
-        }
-    else if (!strcmp ("TIME_MSEC", gbuf)) {/* Milliseconds of Second (000-999) */
-        sprintf (rbuf, "%03d", (int)(cmd_time.tv_nsec / 1000000));
-        ap = rbuf;
-        }
-    else if (!strcmp ("STATUS", gbuf)) {
-        sprintf (rbuf, "%08X", sim_last_cmd_stat);
-        ap = rbuf;
-        }
-    else if (!strcmp ("TSTATUS", gbuf)) {
-        t_stat stat = SCPE_BARE_STATUS(sim_last_cmd_stat);
-        if ((stat > SCPE_OK) && (stat < SCPE_BASE) && (sim_stop_messages[stat] != NULL))
-            sprintf (rbuf, "%s", sim_stop_messages[stat]);
-        else
-            sprintf (rbuf, "%s", sim_error_text (stat));
-        ap = rbuf;
-        }
-    else if (!strcmp ("SIM_VERIFY", gbuf)) {
-        sprintf (rbuf, "%s", sim_do_echo ? "-V" : "");
-        ap = rbuf;
-        }
-    else if (!strcmp ("SIM_VERBOSE", gbuf)) {
-        sprintf (rbuf, "%s", sim_do_echo ? "-V" : "");
-        ap = rbuf;
-        }
-    else if (!strcmp ("SIM_QUIET", gbuf)) {
-        sprintf (rbuf, "%s", sim_quiet ? "-Q" : "");
-        ap = rbuf;
-        }
-    else if (!strcmp ("SIM_MESSAGE", gbuf)) {
-        sprintf (rbuf, "%s", sim_show_message ? "" : "-Q");
-        ap = rbuf;
-        }
-    else if (!strcmp ("SIM_NAME", gbuf)) {
-        strlcpy (rbuf, sim_name, rbuf_size);
-        ap = rbuf;
-        }
-    else if (!strcmp ("SIM_BIN_PATH", gbuf)) {
-        if (sim_prog_name) {
-            strlcpy (rbuf, sim_prog_name, rbuf_size);
-            ap = rbuf;
-            }
-        }
-    else if (!strcmp ("SIM_BIN_NAME", gbuf)) {
-        ap = sim_bin_name_value (rbuf, rbuf_size);
-        }
-    else if (!strcmp ("SIM_OSTYPE", gbuf)) {
-        ap = sim_ostype_value (rbuf, rbuf_size);
-        }
-    else if (!strcmp ("SIM_RUNLIMIT", gbuf)) {
-        if (sim_runlimit_enabled) {
-            sprintf (rbuf, "%d", sim_runlimit_value);
-            ap = rbuf;
-            }
-        }
-    else if (!strcmp ("SIM_RUNLIMIT_UNITS", gbuf)) {
-        if (sim_runlimit_enabled && sim_runlimit_units) {
-            strlcpy (rbuf, sim_runlimit_units, rbuf_size);
-            ap = rbuf;
-            }
-        }
-    else if (!strcmp ("_FILE_COMPARE_DIFF_OFFSET", gbuf)) {
-        if (sim_file_compare_diff_valid) {
-            snprintf (rbuf, rbuf_size, "%zu",
-                      sim_file_compare_diff_offset);
-            ap = rbuf;
-            }
-        }
-    }
-if (!ap)
-    ap = sim_sub_var_get(gbuf);
-if (!ap) {                              /* no SCP variable found? */
-    for (i = 0; i < sim_external_env_count; i++) {
-        if (0 == strcmp (gbuf, sim_external_env[i].name)) {
-            ap = sim_external_env[i].value;
-            break;
-            }
-        }
-    }
-if (!ap)                                /* no environment variable found? */
-    ap = sim_get_host_env_uplowcase (gbuf, rbuf, rbuf_size);
-if (ap && fixup_needed) {   /* substring/substituted needed? */
-    strlcpy (tgbuf, ap, tgbuf_size);
-    _sim_subststr_substr (fixup_needed + 1, tgbuf, tgbuf_size);
-    strlcpy (rbuf, tgbuf, rbuf_size);
-    }
-free (tgbuf);
-return ap;
-}
-
-/* Substitute_args - replace %n tokens in 'instr' with the do command's arguments
-
-   Calling sequence
-   instr        =       input string
-   tmpbuf       =       temp buffer
-   maxstr       =       min (len (instr), len (tmpbuf))
-   do_arg[10]   =       arguments
-
-   Token "%0" represents the command file name.
-
-   The input sequence "%%" represents a literal "%", and "\\" represents a
-   literal "\".  All other character combinations are rendered literally.
-
-   Omitted parameters result in null-string substitutions.
-*/
-
-void sim_sub_args (char *instr, size_t instr_size, char *do_arg[])
-{
-char gbuf[CBUFSIZE];
-char *ip = instr, *op, *oend, *istart, *tmpbuf;
-const char *ap;
-char rbuf[CBUFSIZE];
-uint32 i;
-size_t outstr_off = 0;
-
-scp_set_exp_argv (do_arg);
-sim_rtcn_get_time (&cmd_time, 0);
-tmpbuf = (char *)malloc(instr_size);
-op = tmpbuf;
-oend = tmpbuf + instr_size - 2;
-if (instr_size > sim_sub_instr_size) {
-    sim_sub_instr = (char *)realloc (sim_sub_instr, instr_size*sizeof(*sim_sub_instr));
-    sim_sub_instr_off = (size_t *)realloc (sim_sub_instr_off, instr_size*sizeof(*sim_sub_instr_off));
-    sim_sub_instr_size = instr_size;
-    }
-sim_sub_instr_buf = instr;
-strlcpy (sim_sub_instr, instr, instr_size*sizeof(*sim_sub_instr));
-while (sim_isspace (*ip)) {                                 /* skip leading spaces */
-    sim_sub_instr_off[outstr_off++] = ip - instr;
-    *op++ = *ip++;
-    }
-/* If entire string is within quotes, strip the quotes */
-if ((*ip == '"') || (*ip == '\'')) {                        /* start with a quote character? */
-    const char *cptr = ip;
-    char *tp = op;              /* use remainder of output buffer as temp buffer */
-
-    cptr = get_glyph_quoted (cptr, tp, 0);                  /* get quoted string */
-    while (sim_isspace (*cptr))
-        ++cptr;                                             /* skip over trailing spaces */
-    if (*cptr == '\0') {                                    /* full string was quoted? */
-        uint32 dsize;
-
-        if (SCPE_OK == sim_decode_quoted_string (tp, (uint8 *)tp, &dsize)) {
-            tp[dsize] = '\0';
-            while (sim_isspace (*tp))
-                memmove (tp, tp + 1, strlen (tp));
-            strlcpy (ip, tp, instr_size - (ip - instr));/* copy quoted contents to input buffer */
-            strlcpy (sim_sub_instr + (ip -  instr), tp, instr_size - (ip - instr));
-            }
-        }
-    }
-istart = ip;
-for (; *ip && (op < oend); ) {
-    if ((ip [0] == '%') && (ip [1] == '%')) {           /* literal % insert? */
-        sim_sub_instr_off[outstr_off++] = ip - instr;
-        ip++;                                           /* skip one */
-        *op++ = *ip++;                                  /* copy insert % */
-        }
-    else {
-        t_bool expand_it = FALSE;
-        char parts[32];
-
-        if (*ip == '%') {
-            ap = NULL;
-            ++ip;
-            if (*ip == '~') {
-                expand_it = TRUE;
-                ++ip;
-                for (i=0; (i < (sizeof (parts) - 1)) && (strchr ("fpnxtz", *ip)); i++, ip++) {
-                    parts[i] = *ip;
-                    parts[i + 1] = '\0';
-                    }
-                }
-            if ((*ip >= '0') && (*ip <= ('9'))) {       /* %n = sub */
-                ap = do_arg[*ip - '0'];
-                for (i=0; i < (uint32)(*ip - '0'); ++i) /* make sure we're not past the list end */
-                    if (do_arg[i] == NULL) {
-                        ap = NULL;
-                        break;
-                        }
-                ++ip;
-                }
-            else {
-                if (*ip == '*') {                       /* %1 ... %9 = sub */
-                    memset (rbuf, '\0', sizeof(rbuf));
-                    ap = rbuf;
-                    for (i=1; i<=9; ++i) {
-                        if (do_arg[i] == NULL)
-                            break;
-                        else
-                            if ((sizeof(rbuf)-strlen(rbuf)) < (2 + strlen(do_arg[i]))) {
-                                if (strchr(do_arg[i], ' ')) { /* need to surround this argument with quotes */
-                                    char quote = '"';
-                                    if (strchr(do_arg[i], quote))
-                                        quote = '\'';
-                                    sprintf(&rbuf[strlen(rbuf)], "%s%c%s%c\"", (i != 1) ? " " : "", quote, do_arg[i], quote);
-                                    }
-                                else
-                                    sprintf(&rbuf[strlen(rbuf)], "%s%s", (i != 1) ? " " : "", do_arg[i]);
-                                }
-                            else
-                                break;
-                        }
-                    ++ip;
-                    }
-                else {
-                    if (*ip == '\0') {                  /* is this a bare % at end of line? */
-                        *op++ = '%';                    /* leave it there as a literal percent sign */
-                        }
-                    else {
-                        get_glyph_nc (ip, gbuf, '%');   /* get the literal name */
-                        ap = _sim_get_env_special (gbuf, rbuf, sizeof (rbuf));
-                        ip += strlen (gbuf);
-                        if (*ip == '%')
-                            ++ip;
-                        }
-                    }
-                }
-            if (ap) {                                   /* non-null arg? */
-                char *expanded = NULL;
-
-                if (expand_it) {
-                    expanded = sim_filepath_parts (ap, parts);
-                    ap = expanded;
-                    }
-                while (*ap && (op < oend)) {            /* copy the argument */
-                    sim_sub_instr_off[outstr_off++] = ip - instr;
-                    *op++ = *ap++;
-                    }
-                free (expanded);
-                }
-            }
-        else {
-            if (ip == istart) {                         /* at beginning of input? */
-                get_glyph (istart, gbuf, 0);            /* substitute initial token */
-                ap = _sim_get_env_special (gbuf, rbuf, sizeof (rbuf));
-                if (!ap) {                              /* nope? */
-                    sim_sub_instr_off[outstr_off++] = ip - instr;
-                    *op++ = *ip++;                      /* press on with literal character */
-                    continue;
-                    }
-                while (*ap && (op < oend)) {            /* copy the translation */
-                    sim_sub_instr_off[outstr_off++] = ip - instr;
-                    *op++ = *ap++;
-                    }
-                ip += strlen(gbuf);
-                }
-            else {
-                sim_sub_instr_off[outstr_off++] = ip - instr;
-                *op++ = *ip++;                          /* literal character */
-                }
-            }
-        }
-    }
-*op = 0;                                                /* term buffer */
-sim_sub_instr_off[outstr_off] = 0;
-strcpy (instr, tmpbuf);
-free (tmpbuf);
-}
-
-const char *sim_unsub_args (const char *cptr)
-{
-if ((cptr > sim_sub_instr_buf) &&
-    ((size_t)(cptr - sim_sub_instr_buf) < sim_sub_instr_size))
-    return &sim_sub_instr[sim_sub_instr_off[cptr - sim_sub_instr_buf]];
-return cptr;
-}
-
 t_bool scp_do_echo_enabled (void)
 {
 return sim_do_echo != 0;
@@ -4657,9 +3964,7 @@ else {
     if (*cptr == '(') {
         t_svalue value;
 
-        if ((cptr > sim_sub_instr_buf) && ((size_t)(cptr - sim_sub_instr_buf) < sim_sub_instr_size))
-            cptr = &sim_sub_instr[sim_sub_instr_off[cptr - sim_sub_instr_buf]]; /* get un-substituted string */
-        cptr = sim_eval_expression (cptr, &value, TRUE, &r);
+        cptr = sim_eval_expression (sim_unsub_args (cptr), &value, TRUE, &r);
         result = (value != 0);
         }
     else {
@@ -4720,8 +4025,7 @@ else {
             }
         }
     }
-if ((cptr > sim_sub_instr_buf) && ((size_t)(cptr - sim_sub_instr_buf) < sim_sub_instr_size))
-    cptr = &sim_sub_instr[sim_sub_instr_off[cptr - sim_sub_instr_buf]]; /* get un-substituted string */
+cptr = sim_unsub_args (cptr);
 sim_if_cmd[sim_do_depth] = (flag == 0);                 /* record IF command */
 if (Not ^ result) {
     if (!flag) {
@@ -4907,8 +4211,7 @@ if ((NULL == cptr) || ('\0' == *cptr)) {                /* Empty Action */
     free(sim_on_actions[sim_do_depth][cond]);           /* Clear existing condition */
     sim_on_actions[sim_do_depth][cond] = NULL; }
 else {
-    if ((cptr > sim_sub_instr_buf) && ((size_t)(cptr - sim_sub_instr_buf) < sim_sub_instr_size))
-        cptr = &sim_sub_instr[sim_sub_instr_off[cptr - sim_sub_instr_buf]]; /* get un-substituted string */
+    cptr = sim_unsub_args (cptr);
     sim_on_actions[sim_do_depth][cond] =
         (char *)realloc(sim_on_actions[sim_do_depth][cond], 1+strlen(cptr));
     strcpy(sim_on_actions[sim_do_depth][cond], cptr);
@@ -5066,96 +4369,6 @@ fprintf (st, "Asynchronous Clock is %sabled\n", (sim_asynch_timer) ? "en" : "dis
 #else
 fprintf (st, "Asynchronous I/O is not available in this simulator\n");
 #endif
-return SCPE_OK;
-}
-
-/* Set environment routine */
-
-t_stat sim_set_environment (int32 flag, CONST char *cptr)
-{
-char varname[CBUFSIZE], prompt[CBUFSIZE], cbuf[CBUFSIZE];
-int i;
-
-if ((!cptr) || (*cptr == 0))                            /* now eol? */
-    return SCPE_2FARG;
-if (sim_switches & SWMASK ('P')) {
-    CONST char *deflt = NULL;
-
-    cptr = get_glyph_quoted (cptr, prompt, 0);          /* get prompt */
-    if (prompt[0] == '\0')
-        return sim_messagef (SCPE_2FARG, "Missing Prompt and Environment Variable Name\n");
-    if ((prompt[0] == '"') || (prompt[0] == '\'')) {
-        if (strlen (prompt) < 3)
-            return sim_messagef (SCPE_ARG, "Invalid Prompt\n");
-        prompt[strlen (prompt) - 1] = '\0';
-        memmove (prompt, prompt + 1, strlen (prompt));
-        }
-    deflt = get_glyph (cptr, varname, '=');             /* get environment variable name */
-    if (varname[0] == '\0')
-        return sim_messagef (SCPE_2FARG, "Missing Environment Variable Name\n");
-    if (deflt == NULL)
-        deflt = "";
-    if (*deflt) {
-        strlcat (prompt, " [", sizeof (prompt));
-        strlcat (prompt, deflt, sizeof (prompt));
-        strlcat (prompt, "] ", sizeof (prompt));
-        }
-    else
-        strlcat (prompt, " ", sizeof (prompt));
-    if (sim_rem_cmd_active_line == -1) {
-        cptr = read_line_p (prompt, cbuf, sizeof(cbuf), stdin);
-        if ((cptr == NULL) || (*cptr == 0))
-            cptr = deflt;
-        else
-            cptr = cbuf;
-        }
-    else
-        cptr = deflt;
-    }
-else {
-    cptr = get_glyph (cptr, varname, '=');              /* get environment variable name */
-    strlcpy (cbuf, cptr, sizeof(cbuf));
-    sim_trim_endspc (cbuf);
-    if (sim_switches & SWMASK ('S')) {                  /* Quote String argument? */
-        uint32 str_size;
-
-        cptr = cbuf;
-        get_glyph_quoted (cptr, cbuf, 0);
-        if (SCPE_OK != sim_decode_quoted_string (cbuf, (uint8 *)cbuf, &str_size))
-            return sim_messagef (SCPE_ARG, "Invalid quoted string: %s\n", cbuf);
-        cbuf[str_size] = '\0';
-        }
-    else {
-        if (sim_switches & SWMASK ('A')) {              /* Arithmetic Expression Evaluation argument? */
-            t_svalue val;
-            t_stat stat;
-            const char *eptr = cptr;
-
-            if ((cptr > sim_sub_instr_buf) && ((size_t)(cptr - sim_sub_instr_buf) < sim_sub_instr_size))
-                eptr = &sim_sub_instr[sim_sub_instr_off[cptr - sim_sub_instr_buf]]; /* get un-substituted string */
-            cptr = sim_eval_expression (eptr, &val, FALSE, &stat);
-            if (stat == SCPE_OK) {
-                sprintf (cbuf, "%ld", (long)val);
-                cptr = cbuf;
-                }
-            else
-                return stat;
-            }
-        }
-    }
-setenv(varname, cptr, 1);
-/* remove the newly set name from the collection of alias conflicting external names */
-for (i = 0; i < sim_external_env_count; i++) {
-    if (0 == strcmp (varname, sim_external_env[i].name)) {
-        int j;
-
-        free (sim_external_env[i].name);
-        free (sim_external_env[i].value);
-        for (j = 0; (i + j) < sim_external_env_count; j++)
-            sim_external_env[i + j] = sim_external_env[i + j + 1];
-        --sim_external_env_count;
-        }
-    }
 return SCPE_OK;
 }
 
@@ -6136,7 +5349,6 @@ if (flag) {
 #endif
     if ((!strcmp (os_type, "Unknown")) && (getenv ("OSTYPE")))
         strlcpy (os_type, getenv ("OSTYPE"), sizeof (os_type));
-    strlcpy (sim_ostype, os_type, sizeof (sim_ostype));
     }
 #if defined(SIM_ARCHIVE_GIT_COMMIT_ID)
 if (NULL == strchr (S_xstr(SIM_ARCHIVE_GIT_COMMIT_ID), '$')) {
@@ -6952,7 +6164,8 @@ return ssh_break (NULL, cptr, flg);                     /* call common code */
 
 t_stat ssh_break (FILE *st, const char *cptr, int32 flg)
 {
-char gbuf[CBUFSIZE], *aptr, abuf[4*CBUFSIZE];
+char gbuf[CBUFSIZE], *tptr_mut, abuf[4*CBUFSIZE];
+const char *aptr;
 CONST char *tptr, *t1ptr;
 DEVICE *dptr = sim_dflt_dev;
 UNIT *uptr;
@@ -6970,13 +6183,13 @@ if (uptr == NULL)
 max = uptr->capac - 1;
 abuf[sizeof(abuf)-1] = '\0';
 strlcpy (abuf, cptr, sizeof(abuf));
-if ((aptr = strchr (abuf, ';'))) {                      /* ;action? */
-    cptr += aptr - abuf + 1;
+tptr_mut = strchr (abuf, ';');
+if (tptr_mut) {                                         /* ;action? */
+    cptr += tptr_mut - abuf + 1;
     if (flg != SSH_ST)                                  /* only on SET */
         return sim_messagef (SCPE_ARG, "Invalid argument: %s\n", cptr);
-    *aptr++ = 0;                                        /* separate strings */
-    if ((cptr > sim_sub_instr_buf) && ((size_t)(cptr - sim_sub_instr_buf) < sim_sub_instr_size))
-        aptr = &sim_sub_instr[sim_sub_instr_off[cptr - sim_sub_instr_buf]]; /* get un-substituted string */
+    *tptr_mut++ = 0;                                    /* separate strings */
+    aptr = sim_unsub_args (cptr);
     }
 cptr = abuf;
 if (*cptr == 0) {                                       /* no argument? */

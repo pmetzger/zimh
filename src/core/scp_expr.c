@@ -555,11 +555,13 @@ static t_bool _value_of(const char *data, t_svalue *svalue, char *string,
         }
         gptr = _sim_get_env_special(data, string, string_size - 1);
         if (NULL != gptr) {
-            *svalue = strtotsv(string, &gptr, 0);
+            const char *endptr;
+
+            *svalue = strtotsv(gptr, &endptr, 0);
             sprint_val(string, *svalue, 10, string_size - 1, PV_LEFTSIGN);
             sim_debug(SIM_DBG_EXP_EVAL, &sim_scp_dev, "[Value: %s=%s]\n", data,
                       string);
-            return ((*gptr == '\0') && (*string));
+            return ((*endptr == '\0') && (*string));
         }
         data = "";
         data_size = 0;

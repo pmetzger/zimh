@@ -31,6 +31,13 @@ These files own SCP's breakpoint subsystem: breakpoint-table management,
 pending breakpoint actions, and the shared breakpoint status consumed by
 simulators and the command layer.
 
+## `scp_cmdvars.c` and `scp_cmdvars.h`
+
+These files own SCP's command-variable subsystem: command-line
+substitution, internal substitution-only variables, SCP's special
+variable lookup, and the `SET ENVIRONMENT` plumbing that bridges command
+variables to the real host environment.
+
 ## `scp_context.c` and `scp_context.h`
 
 These files own simulator-context and lookup support extracted from

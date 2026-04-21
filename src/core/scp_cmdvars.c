@@ -1,0 +1,799 @@
+/* scp_cmdvars.c: SCP command-variable substitution helpers
+
+   Copyright (c) 1993-2022, Robert M Supnik
+
+   Permission is hereby granted, free of charge, to any person obtaining a
+   copy of this software and associated documentation files (the "Software"),
+   to deal in the Software without restriction, including without limitation
+   the rights to use, copy, modify, merge, publish, distribute, sublicense,
+   and/or sell copies of the Software, and to permit persons to whom the
+   Software is furnished to do so, subject to the following conditions:
+
+   The above copyright notice and this permission notice shall be included in
+   all copies or substantial portions of the Software.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+   ROBERT M SUPNIK BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
+   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+#include "scp.h"
+
+#include "sim_console.h"
+
+#ifndef MAX
+#define MAX(a, b) (((a) >= (b)) ? (a) : (b))
+#endif
+#ifndef MIN
+#define MIN(a, b) (((a) <= (b)) ? (a) : (b))
+#endif
+
+struct deleted_env_var {
+    char *name;
+    char *value;
+};
+
+struct scp_sub_var {
+    char *name;
+    char *value;
+};
+
+static struct deleted_env_var *sim_external_env = NULL;
+static int sim_external_env_count = 0;
+static struct scp_sub_var *sim_sub_vars = NULL;
+static int sim_sub_var_count = 0;
+static char *sim_sub_instr = NULL;
+static char *sim_sub_instr_buf = NULL;
+static size_t sim_sub_instr_size = 0;
+static size_t *sim_sub_instr_off = NULL;
+static struct timespec cmd_time;
+
+extern t_bool sim_runlimit_enabled;
+extern int32 sim_runlimit_value;
+extern const char *sim_runlimit_units;
+extern t_bool sim_file_compare_diff_valid;
+extern size_t sim_file_compare_diff_offset;
+
+/* Return the value of one SCP-owned substitution variable, if present. */
+static const char *sim_sub_var_get(const char *name)
+{
+    int i;
+
+    for (i = 0; i < sim_sub_var_count; ++i)
+        if (0 == strcmp(name, sim_sub_vars[i].name))
+            return sim_sub_vars[i].value;
+    return NULL;
+}
+
+/* Remove one saved external environment variable by index. */
+static void sim_external_env_remove_index(int index)
+{
+    int j;
+
+    free(sim_external_env[index].name);
+    free(sim_external_env[index].value);
+    for (j = index; j + 1 < sim_external_env_count; ++j)
+        sim_external_env[j] = sim_external_env[j + 1];
+    --sim_external_env_count;
+    if (sim_external_env_count == 0) {
+        free(sim_external_env);
+        sim_external_env = NULL;
+    } else {
+        sim_external_env = (struct deleted_env_var *)realloc(
+            sim_external_env,
+            sim_external_env_count * sizeof(*sim_external_env));
+    }
+}
+
+/* Remove one saved external environment variable by name. */
+static void sim_external_env_remove_name(const char *name)
+{
+    int i;
+
+    for (i = 0; i < sim_external_env_count; ++i)
+        if (0 == strcmp(name, sim_external_env[i].name)) {
+            sim_external_env_remove_index(i);
+            return;
+        }
+}
+
+/* Return the executable basename used for %SIM_BIN_NAME%. */
+static const char *sim_bin_name_value(char *rbuf, size_t rbuf_size)
+{
+    const char *base;
+
+    if ((NULL == sim_prog_name) || ('\0' == sim_prog_name[0]))
+        return NULL;
+    base = strrchr(sim_prog_name, '/');
+    if (base == NULL)
+        base = strrchr(sim_prog_name, '\\');
+    if (base == NULL)
+        base = sim_prog_name;
+    else
+        ++base;
+    strlcpy(rbuf, base, rbuf_size);
+    return rbuf;
+}
+
+/* Return the cached or discovered host OS type. */
+static const char *sim_ostype_value(char *rbuf, size_t rbuf_size)
+{
+    static char host_ostype[64];
+
+    if (host_ostype[0] == '\0') {
+        FILE *pstream = NULL;
+        char cmd[128];
+        char *c;
+
+#if defined(_WIN32)
+        strlcpy(host_ostype, "Windows", sizeof(host_ostype));
+#else
+        strlcpy(cmd, "uname", sizeof(cmd));
+        pstream = popen(cmd, "r");
+        if (pstream) {
+            fgets(host_ostype, sizeof(host_ostype), pstream);
+            pclose(pstream);
+            if ((c = strchr(host_ostype, '\n')))
+                *c = '\0';
+        }
+#endif
+        if (host_ostype[0] == '\0') {
+            c = getenv("OSTYPE");
+            if (c)
+                strlcpy(host_ostype, c, sizeof(host_ostype));
+        }
+    }
+    if (host_ostype[0] == '\0')
+        return NULL;
+    strlcpy(rbuf, host_ostype, rbuf_size);
+    return rbuf;
+}
+
+/* Look up one real host environment variable by exact or uppercase name. */
+static const char *sim_get_host_env_uplowcase(const char *gbuf, char *rbuf,
+                                              size_t rbuf_size)
+{
+    const char *ap;
+    size_t i;
+
+    ap = getenv(gbuf);
+    if (ap)
+        return ap;
+    strlcpy(rbuf, gbuf, rbuf_size);
+    for (i = 0; rbuf[i]; i++)
+        rbuf[i] = (char)toupper((unsigned char)rbuf[i]);
+    return getenv(rbuf);
+}
+
+/* Perform :~ and := substring/substitution operations on one value. */
+static void sim_subststr_substr(const char *ops, char *rbuf, size_t rbuf_size)
+{
+    int rbuf_len = (int)strlen(rbuf);
+    char *tstr = (char *)malloc(1 + rbuf_len);
+
+    strcpy(tstr, rbuf);
+
+    if (*ops == '~') {
+        int offset = 0, length = rbuf_len;
+        int o, l;
+
+        switch (sscanf(ops + 1, "%d,%d", &o, &l)) {
+        case 2:
+            if (l < 0)
+                length = rbuf_len - MIN(-l, rbuf_len);
+            else
+                length = l;
+            /* fall through */
+        case 1:
+            if (o < 0)
+                offset = rbuf_len - MIN(-o, rbuf_len);
+            else
+                offset = MIN(o, rbuf_len);
+            break;
+        case 0:
+            offset = 0;
+            length = rbuf_len;
+            break;
+        }
+        if (offset + length > rbuf_len)
+            length = rbuf_len - offset;
+        memcpy(rbuf, tstr + offset, length);
+        rbuf[length] = '\0';
+    } else {
+        const char *eq;
+
+        if ((eq = strchr(ops, '='))) {
+            const char *last = tstr;
+            const char *curr = tstr;
+            char *match = (char *)malloc(1 + (eq - ops));
+            size_t move_size;
+            t_bool asterisk_match;
+
+            strlcpy(match, ops, 1 + (eq - ops));
+            asterisk_match = (*ops == '*');
+            if (asterisk_match)
+                memmove(match, match + 1, 1 + strlen(match + 1));
+            while ((curr = strstr(last, match))) {
+                if (!asterisk_match) {
+                    move_size = MIN((size_t)(curr - last), rbuf_size);
+                    memcpy(rbuf, last, move_size);
+                    rbuf_size -= move_size;
+                    rbuf += move_size;
+                } else
+                    asterisk_match = FALSE;
+                move_size = MIN(strlen(eq + 1), rbuf_size);
+                memcpy(rbuf, eq + 1, move_size);
+                rbuf_size -= move_size;
+                rbuf += move_size;
+                curr += strlen(match);
+                last = curr;
+            }
+            move_size = MIN(strlen(last), rbuf_size);
+            memcpy(rbuf, last, move_size);
+            rbuf_size -= move_size;
+            rbuf += move_size;
+            if (rbuf_size)
+                *rbuf = '\0';
+            free(match);
+        }
+    }
+    free(tstr);
+}
+
+/* Capture one external host variable whose name collides with an SCP alias. */
+void sim_cmdvars_capture_env_alias(const char *name)
+{
+    const char *env_value;
+    size_t value_len;
+
+    env_value = getenv(name);
+    if (env_value == NULL)
+        return;
+    value_len = strlen(env_value);
+    ++sim_external_env_count;
+    sim_external_env = (struct deleted_env_var *)realloc(
+        sim_external_env, sim_external_env_count * sizeof(*sim_external_env));
+    sim_external_env[sim_external_env_count - 1].name =
+        (char *)malloc(1 + strlen(name));
+    strcpy(sim_external_env[sim_external_env_count - 1].name, name);
+    sim_external_env[sim_external_env_count - 1].value =
+        (char *)malloc(1 + value_len);
+    strlcpy(sim_external_env[sim_external_env_count - 1].value, env_value,
+            1 + value_len);
+    unsetenv(name);
+}
+
+/* Execute one host command while restoring saved external env aliases. */
+int sim_cmdvars_system(const char *command)
+{
+    int i;
+    int status;
+
+    for (i = 0; i < sim_external_env_count; i++)
+        setenv(sim_external_env[i].name, sim_external_env[i].value, 1);
+    status = system(command);
+    for (i = 0; i < sim_external_env_count; i++)
+        unsetenv(sim_external_env[i].name);
+    return status;
+}
+
+/* Reset command-variable state owned by this module. */
+void sim_cmdvars_reset(void)
+{
+    while (sim_external_env_count > 0)
+        sim_external_env_remove_index(sim_external_env_count - 1);
+    while (sim_sub_var_count > 0)
+        sim_sub_var_unset(sim_sub_vars[sim_sub_var_count - 1].name);
+    free(sim_sub_instr);
+    sim_sub_instr = NULL;
+    free(sim_sub_instr_off);
+    sim_sub_instr_off = NULL;
+    sim_sub_instr_buf = NULL;
+    sim_sub_instr_size = 0;
+    memset(&cmd_time, 0, sizeof(cmd_time));
+}
+
+/* Set or replace one SCP-owned substitution variable. */
+void sim_sub_var_set(const char *name, const char *value)
+{
+    int i;
+
+    for (i = 0; i < sim_sub_var_count; ++i)
+        if (0 == strcmp(name, sim_sub_vars[i].name)) {
+            free(sim_sub_vars[i].value);
+            sim_sub_vars[i].value = (char *)malloc(1 + strlen(value));
+            strcpy(sim_sub_vars[i].value, value);
+            return;
+        }
+    ++sim_sub_var_count;
+    sim_sub_vars = (struct scp_sub_var *)realloc(
+        sim_sub_vars, sim_sub_var_count * sizeof(*sim_sub_vars));
+    sim_sub_vars[sim_sub_var_count - 1].name = (char *)malloc(1 + strlen(name));
+    strcpy(sim_sub_vars[sim_sub_var_count - 1].name, name);
+    sim_sub_vars[sim_sub_var_count - 1].value =
+        (char *)malloc(1 + strlen(value));
+    strcpy(sim_sub_vars[sim_sub_var_count - 1].value, value);
+}
+
+/* Remove one SCP-owned substitution variable, if present. */
+void sim_sub_var_unset(const char *name)
+{
+    int i;
+
+    for (i = 0; i < sim_sub_var_count; ++i)
+        if (0 == strcmp(name, sim_sub_vars[i].name)) {
+            int j;
+
+            free(sim_sub_vars[i].name);
+            free(sim_sub_vars[i].value);
+            for (j = i; j + 1 < sim_sub_var_count; ++j)
+                sim_sub_vars[j] = sim_sub_vars[j + 1];
+            --sim_sub_var_count;
+            if (sim_sub_var_count == 0) {
+                free(sim_sub_vars);
+                sim_sub_vars = NULL;
+            } else {
+                sim_sub_vars = (struct scp_sub_var *)realloc(
+                    sim_sub_vars, sim_sub_var_count * sizeof(*sim_sub_vars));
+            }
+            return;
+        }
+}
+
+/* Remove every SCP-owned substitution variable with one common prefix. */
+void sim_sub_var_clear_prefix(const char *prefix)
+{
+    size_t prefix_len = strlen(prefix);
+    int i;
+
+    for (i = sim_sub_var_count - 1; i >= 0; --i)
+        if (0 == strncmp(sim_sub_vars[i].name, prefix, prefix_len))
+            sim_sub_var_unset(sim_sub_vars[i].name);
+}
+
+const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
+{
+    int i;
+    const char *ap;
+    const char *fixup_needed = strchr(gbuf, ':');
+    char *tgbuf = NULL;
+    size_t tgbuf_size = MAX(rbuf_size, 1 + (size_t)(fixup_needed - gbuf));
+
+    if (fixup_needed) {
+        tgbuf = (char *)calloc(tgbuf_size, 1);
+        memcpy(tgbuf, gbuf, (fixup_needed - gbuf));
+        gbuf = tgbuf;
+    }
+    ap = NULL;
+    if (!ap) {
+        time_t now = (time_t)cmd_time.tv_sec;
+        struct tm *tmnow = localtime(&now);
+
+        if (!strcmp("DATE", gbuf)) {
+            sprintf(rbuf, "%4d-%02d-%02d", tmnow->tm_year + 1900,
+                    tmnow->tm_mon + 1, tmnow->tm_mday);
+            ap = rbuf;
+        } else if (!strcmp("TIME", gbuf)) {
+            sprintf(rbuf, "%02d:%02d:%02d", tmnow->tm_hour, tmnow->tm_min,
+                    tmnow->tm_sec);
+            ap = rbuf;
+        } else if (!strcmp("DATETIME", gbuf)) {
+            sprintf(rbuf, "%04d-%02d-%02dT%02d:%02d:%02d",
+                    tmnow->tm_year + 1900, tmnow->tm_mon + 1, tmnow->tm_mday,
+                    tmnow->tm_hour, tmnow->tm_min, tmnow->tm_sec);
+            ap = rbuf;
+        } else if (!strcmp("LDATE", gbuf)) {
+            strftime(rbuf, rbuf_size, "%x", tmnow);
+            ap = rbuf;
+        } else if (!strcmp("LTIME", gbuf)) {
+#if defined(HAVE_C99_STRFTIME)
+            strftime(rbuf, rbuf_size, "%r", tmnow);
+#else
+            strftime(rbuf, rbuf_size, "%p", tmnow);
+            if (rbuf[0])
+                strftime(rbuf, rbuf_size, "%I:%M:%S %p", tmnow);
+            else
+                strftime(rbuf, rbuf_size, "%H:%M:%S", tmnow);
+#endif
+            ap = rbuf;
+        } else if (!strcmp("CTIME", gbuf)) {
+#if defined(HAVE_C99_STRFTIME)
+            strftime(rbuf, rbuf_size, "%c", tmnow);
+#else
+            strcpy(rbuf, ctime(&now));
+            rbuf[strlen(rbuf) - 1] = '\0';
+#endif
+            ap = rbuf;
+        } else if (!strcmp("UTIME", gbuf)) {
+            sprintf(rbuf, "%" LL_FMT "d", (LL_TYPE)now);
+            ap = rbuf;
+        } else if (!strcmp("DATE_YYYY", gbuf)) {
+            strftime(rbuf, rbuf_size, "%Y", tmnow);
+            ap = rbuf;
+        } else if (!strcmp("DATE_YY", gbuf)) {
+            strftime(rbuf, rbuf_size, "%y", tmnow);
+            ap = rbuf;
+        } else if ((!strcmp("DATE_19XX_YY", gbuf)) ||
+                   (!strcmp("DATE_19XX_YYYY", gbuf))) {
+            int year = tmnow->tm_year + 1900;
+            int days = year - 2001;
+            int leaps = days / 4 - days / 100 + days / 400;
+            int lyear = ((year % 4) == 0) &&
+                        (((year % 100) != 0) || ((year % 400) == 0));
+            int selector = ((days + leaps + 7) % 7) + lyear * 7;
+            static int years[] = {90, 91, 97, 98, 99, 94, 89,
+                                  96, 80, 92, 76, 88, 72, 84};
+            int cal_year = years[selector];
+
+            if (!strcmp("DATE_19XX_YY", gbuf))
+                sprintf(rbuf, "%d", cal_year);
+            else
+                sprintf(rbuf, "%d", cal_year + 1900);
+            ap = rbuf;
+        } else if (!strcmp("DATE_MM", gbuf)) {
+            strftime(rbuf, rbuf_size, "%m", tmnow);
+            ap = rbuf;
+        } else if (!strcmp("DATE_MMM", gbuf)) {
+            strftime(rbuf, rbuf_size, "%b", tmnow);
+            ap = rbuf;
+        } else if (!strcmp("DATE_MONTH", gbuf)) {
+            strftime(rbuf, rbuf_size, "%B", tmnow);
+            ap = rbuf;
+        } else if (!strcmp("DATE_DD", gbuf)) {
+            strftime(rbuf, rbuf_size, "%d", tmnow);
+            ap = rbuf;
+        } else if (!strcmp("DATE_D", gbuf)) {
+            sprintf(rbuf, "%d", (tmnow->tm_wday ? tmnow->tm_wday : 7));
+            ap = rbuf;
+        } else if ((!strcmp("DATE_WW", gbuf)) ||
+                   (!strcmp("DATE_WYYYY", gbuf))) {
+            int iso_yr = tmnow->tm_year + 1900;
+            int iso_wk =
+                (tmnow->tm_yday + 11 - (tmnow->tm_wday ? tmnow->tm_wday : 7)) /
+                7;
+
+            if (iso_wk == 0) {
+                iso_yr = iso_yr - 1;
+                tmnow->tm_yday += 365 + (((iso_yr % 4) == 0) ? 1 : 0);
+                iso_wk = (tmnow->tm_yday + 11 -
+                          (tmnow->tm_wday ? tmnow->tm_wday : 7)) /
+                         7;
+            } else if ((iso_wk == 53) &&
+                       (((31 - tmnow->tm_mday) + tmnow->tm_wday) < 4)) {
+                ++iso_yr;
+                iso_wk = 1;
+            }
+            if (!strcmp("DATE_WW", gbuf))
+                sprintf(rbuf, "%02d", iso_wk);
+            else
+                sprintf(rbuf, "%04d", iso_yr);
+            ap = rbuf;
+        } else if (!strcmp("DATE_JJJ", gbuf)) {
+            strftime(rbuf, rbuf_size, "%j", tmnow);
+            ap = rbuf;
+        } else if (!strcmp("TIME_HH", gbuf)) {
+            strftime(rbuf, rbuf_size, "%H", tmnow);
+            ap = rbuf;
+        } else if (!strcmp("TIME_MM", gbuf)) {
+            strftime(rbuf, rbuf_size, "%M", tmnow);
+            ap = rbuf;
+        } else if (!strcmp("TIME_SS", gbuf)) {
+            strftime(rbuf, rbuf_size, "%S", tmnow);
+            ap = rbuf;
+        } else if (!strcmp("TIME_MSEC", gbuf)) {
+            sprintf(rbuf, "%03d", (int)(cmd_time.tv_nsec / 1000000));
+            ap = rbuf;
+        } else if (!strcmp("STATUS", gbuf)) {
+            sprintf(rbuf, "%08X", sim_last_cmd_stat);
+            ap = rbuf;
+        } else if (!strcmp("TSTATUS", gbuf)) {
+            t_stat stat = SCPE_BARE_STATUS(sim_last_cmd_stat);
+
+            if ((stat > SCPE_OK) && (stat < SCPE_BASE) &&
+                (sim_stop_messages[stat] != NULL))
+                sprintf(rbuf, "%s", sim_stop_messages[stat]);
+            else
+                sprintf(rbuf, "%s", sim_error_text(stat));
+            ap = rbuf;
+        } else if (!strcmp("SIM_VERIFY", gbuf)) {
+            sprintf(rbuf, "%s", scp_do_echo_enabled() ? "-V" : "");
+            ap = rbuf;
+        } else if (!strcmp("SIM_VERBOSE", gbuf)) {
+            sprintf(rbuf, "%s", scp_do_echo_enabled() ? "-V" : "");
+            ap = rbuf;
+        } else if (!strcmp("SIM_QUIET", gbuf)) {
+            sprintf(rbuf, "%s", sim_quiet ? "-Q" : "");
+            ap = rbuf;
+        } else if (!strcmp("SIM_MESSAGE", gbuf)) {
+            sprintf(rbuf, "%s", sim_show_message ? "" : "-Q");
+            ap = rbuf;
+        } else if (!strcmp("SIM_NAME", gbuf)) {
+            strlcpy(rbuf, sim_name, rbuf_size);
+            ap = rbuf;
+        } else if (!strcmp("SIM_BIN_PATH", gbuf)) {
+            if (sim_prog_name) {
+                strlcpy(rbuf, sim_prog_name, rbuf_size);
+                ap = rbuf;
+            }
+        } else if (!strcmp("SIM_BIN_NAME", gbuf)) {
+            ap = sim_bin_name_value(rbuf, rbuf_size);
+        } else if (!strcmp("SIM_OSTYPE", gbuf)) {
+            ap = sim_ostype_value(rbuf, rbuf_size);
+        } else if (!strcmp("SIM_RUNLIMIT", gbuf)) {
+            if (sim_runlimit_enabled) {
+                sprintf(rbuf, "%d", sim_runlimit_value);
+                ap = rbuf;
+            }
+        } else if (!strcmp("SIM_RUNLIMIT_UNITS", gbuf)) {
+            if (sim_runlimit_enabled && sim_runlimit_units) {
+                strlcpy(rbuf, sim_runlimit_units, rbuf_size);
+                ap = rbuf;
+            }
+        } else if (!strcmp("_FILE_COMPARE_DIFF_OFFSET", gbuf)) {
+            if (sim_file_compare_diff_valid) {
+                snprintf(rbuf, rbuf_size, "%zu", sim_file_compare_diff_offset);
+                ap = rbuf;
+            }
+        }
+    }
+    if (!ap)
+        ap = sim_sub_var_get(gbuf);
+    if (!ap) {
+        for (i = 0; i < sim_external_env_count; i++) {
+            if (0 == strcmp(gbuf, sim_external_env[i].name)) {
+                ap = sim_external_env[i].value;
+                break;
+            }
+        }
+    }
+    if (!ap)
+        ap = sim_get_host_env_uplowcase(gbuf, rbuf, rbuf_size);
+    if (ap && fixup_needed) {
+        strlcpy(tgbuf, ap, tgbuf_size);
+        sim_subststr_substr(fixup_needed + 1, tgbuf, tgbuf_size);
+        strlcpy(rbuf, tgbuf, rbuf_size);
+        ap = rbuf;
+    }
+    free(tgbuf);
+    return ap;
+}
+
+void sim_sub_args(char *instr, size_t instr_size, char *do_arg[])
+{
+    char gbuf[CBUFSIZE];
+    char *ip = instr, *op, *oend, *istart, *tmpbuf;
+    const char *ap;
+    char rbuf[CBUFSIZE];
+    uint32 i;
+    size_t outstr_off = 0;
+
+    scp_set_exp_argv(do_arg);
+    sim_rtcn_get_time(&cmd_time, 0);
+    tmpbuf = (char *)malloc(instr_size);
+    op = tmpbuf;
+    oend = tmpbuf + instr_size - 2;
+    if (instr_size > sim_sub_instr_size) {
+        sim_sub_instr =
+            (char *)realloc(sim_sub_instr, instr_size * sizeof(*sim_sub_instr));
+        sim_sub_instr_off = (size_t *)realloc(
+            sim_sub_instr_off, instr_size * sizeof(*sim_sub_instr_off));
+        sim_sub_instr_size = instr_size;
+    }
+    sim_sub_instr_buf = instr;
+    strlcpy(sim_sub_instr, instr, instr_size * sizeof(*sim_sub_instr));
+    while (sim_isspace(*ip)) {
+        sim_sub_instr_off[outstr_off++] = ip - instr;
+        *op++ = *ip++;
+    }
+    if ((*ip == '"') || (*ip == '\'')) {
+        const char *cptr = ip;
+        char *tp = op;
+
+        cptr = get_glyph_quoted(cptr, tp, 0);
+        while (sim_isspace(*cptr))
+            ++cptr;
+        if (*cptr == '\0') {
+            uint32 dsize;
+
+            if (SCPE_OK == sim_decode_quoted_string(tp, (uint8 *)tp, &dsize)) {
+                tp[dsize] = '\0';
+                while (sim_isspace(*tp))
+                    memmove(tp, tp + 1, strlen(tp));
+                strlcpy(ip, tp, instr_size - (ip - instr));
+                strlcpy(sim_sub_instr + (ip - instr), tp,
+                        instr_size - (ip - instr));
+            }
+        }
+    }
+    istart = ip;
+    for (; *ip && (op < oend);) {
+        if ((ip[0] == '%') && (ip[1] == '%')) {
+            sim_sub_instr_off[outstr_off++] = ip - instr;
+            ip++;
+            *op++ = *ip++;
+        } else {
+            t_bool expand_it = FALSE;
+            char parts[32];
+
+            if (*ip == '%') {
+                ap = NULL;
+                ++ip;
+                if (*ip == '~') {
+                    expand_it = TRUE;
+                    ++ip;
+                    for (i = 0;
+                         (i < (sizeof(parts) - 1)) && (strchr("fpnxtz", *ip));
+                         i++, ip++) {
+                        parts[i] = *ip;
+                        parts[i + 1] = '\0';
+                    }
+                }
+                if ((*ip >= '0') && (*ip <= ('9'))) {
+                    ap = do_arg[*ip - '0'];
+                    for (i = 0; i < (uint32)(*ip - '0'); ++i)
+                        if (do_arg[i] == NULL) {
+                            ap = NULL;
+                            break;
+                        }
+                    ++ip;
+                } else {
+                    if (*ip == '*') {
+                        memset(rbuf, '\0', sizeof(rbuf));
+                        ap = rbuf;
+                        for (i = 1; i <= 9; ++i) {
+                            if (do_arg[i] == NULL)
+                                break;
+                            else if ((sizeof(rbuf) - strlen(rbuf)) <
+                                     (2 + strlen(do_arg[i]))) {
+                                if (strchr(do_arg[i], ' ')) {
+                                    char quote = '"';
+
+                                    if (strchr(do_arg[i], quote))
+                                        quote = '\'';
+                                    sprintf(&rbuf[strlen(rbuf)], "%s%c%s%c\"",
+                                            (i != 1) ? " " : "", quote,
+                                            do_arg[i], quote);
+                                } else
+                                    sprintf(&rbuf[strlen(rbuf)], "%s%s",
+                                            (i != 1) ? " " : "", do_arg[i]);
+                            } else
+                                break;
+                        }
+                        ++ip;
+                    } else {
+                        if (*ip == '\0') {
+                            *op++ = '%';
+                        } else {
+                            get_glyph_nc(ip, gbuf, '%');
+                            ap = _sim_get_env_special(gbuf, rbuf, sizeof(rbuf));
+                            ip += strlen(gbuf);
+                            if (*ip == '%')
+                                ++ip;
+                        }
+                    }
+                }
+                if (ap) {
+                    char *expanded = NULL;
+
+                    if (expand_it) {
+                        expanded = sim_filepath_parts(ap, parts);
+                        ap = expanded;
+                    }
+                    while (*ap && (op < oend)) {
+                        sim_sub_instr_off[outstr_off++] = ip - instr;
+                        *op++ = *ap++;
+                    }
+                    free(expanded);
+                }
+            } else {
+                if (ip == istart) {
+                    get_glyph(istart, gbuf, 0);
+                    ap = _sim_get_env_special(gbuf, rbuf, sizeof(rbuf));
+                    if (!ap) {
+                        sim_sub_instr_off[outstr_off++] = ip - instr;
+                        *op++ = *ip++;
+                        continue;
+                    }
+                    while (*ap && (op < oend)) {
+                        sim_sub_instr_off[outstr_off++] = ip - instr;
+                        *op++ = *ap++;
+                    }
+                    ip += strlen(gbuf);
+                } else {
+                    sim_sub_instr_off[outstr_off++] = ip - instr;
+                    *op++ = *ip++;
+                }
+            }
+        }
+    }
+    *op = 0;
+    sim_sub_instr_off[outstr_off] = 0;
+    strcpy(instr, tmpbuf);
+    free(tmpbuf);
+}
+
+const char *sim_unsub_args(const char *cptr)
+{
+    if ((cptr > sim_sub_instr_buf) &&
+        ((size_t)(cptr - sim_sub_instr_buf) < sim_sub_instr_size))
+        return &sim_sub_instr[sim_sub_instr_off[cptr - sim_sub_instr_buf]];
+    return cptr;
+}
+
+t_stat sim_set_environment(int32 flag, CONST char *cptr)
+{
+    char varname[CBUFSIZE], prompt[CBUFSIZE], cbuf[CBUFSIZE];
+
+    (void)flag;
+
+    if ((!cptr) || (*cptr == 0))
+        return SCPE_2FARG;
+    if (sim_switches & SWMASK('P')) {
+        CONST char *deflt = NULL;
+
+        cptr = get_glyph_quoted(cptr, prompt, 0);
+        if (prompt[0] == '\0')
+            return sim_messagef(
+                SCPE_2FARG, "Missing Prompt and Environment Variable Name\n");
+        if ((prompt[0] == '"') || (prompt[0] == '\'')) {
+            if (strlen(prompt) < 3)
+                return sim_messagef(SCPE_ARG, "Invalid Prompt\n");
+            prompt[strlen(prompt) - 1] = '\0';
+            memmove(prompt, prompt + 1, strlen(prompt));
+        }
+        deflt = get_glyph(cptr, varname, '=');
+        if (varname[0] == '\0')
+            return sim_messagef(SCPE_2FARG,
+                                "Missing Environment Variable Name\n");
+        if (deflt == NULL)
+            deflt = "";
+        if (*deflt) {
+            strlcat(prompt, " [", sizeof(prompt));
+            strlcat(prompt, deflt, sizeof(prompt));
+            strlcat(prompt, "] ", sizeof(prompt));
+        } else
+            strlcat(prompt, " ", sizeof(prompt));
+        if (sim_rem_cmd_active_line == -1) {
+            cptr = read_line_p(prompt, cbuf, sizeof(cbuf), stdin);
+            if ((cptr == NULL) || (*cptr == 0))
+                cptr = deflt;
+            else
+                cptr = cbuf;
+        } else
+            cptr = deflt;
+    } else {
+        cptr = get_glyph(cptr, varname, '=');
+        strlcpy(cbuf, cptr, sizeof(cbuf));
+        sim_trim_endspc(cbuf);
+        if (sim_switches & SWMASK('S')) {
+            uint32 str_size;
+
+            cptr = cbuf;
+            get_glyph_quoted(cptr, cbuf, 0);
+            if (SCPE_OK !=
+                sim_decode_quoted_string(cbuf, (uint8 *)cbuf, &str_size))
+                return sim_messagef(SCPE_ARG, "Invalid quoted string: %s\n",
+                                    cbuf);
+            cbuf[str_size] = '\0';
+        } else {
+            if (sim_switches & SWMASK('A')) {
+                t_svalue val;
+                t_stat stat;
+                const char *eptr = sim_unsub_args(cptr);
+
+                cptr = sim_eval_expression(eptr, &val, FALSE, &stat);
+                if (stat == SCPE_OK) {
+                    sprintf(cbuf, "%ld", (long)val);
+                    cptr = cbuf;
+                } else
+                    return stat;
+            }
+        }
+    }
+    setenv(varname, cptr, 1);
+    sim_external_env_remove_name(varname);
+    return SCPE_OK;
+}
