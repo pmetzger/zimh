@@ -15,7 +15,9 @@ bridge the host `main()` to the SCP entrypoint.
 
 This is the main simulator control program implementation. It owns the
 top-level command processor, interactive control flow, and the larger SCP
-subsystems that have not been split into narrower helper modules.
+subsystems that have not been split into narrower helper modules. That
+still includes command-variable substitution and other broad
+interpreter-level command plumbing.
 
 ## `scp.h`
 
@@ -63,6 +65,12 @@ by SCP and by devices that participate in that help system.
 These files own reusable SCP tokenization and switch-parsing support:
 generic command-token handling, quoted-token handling, and simulator
 switch parsing.
+
+## `scp_pcre2.h`
+
+This private header centralizes SCP's PCRE2 setup so the command layer
+can share one `pcre2.h` inclusion policy without dragging that dependency
+through broader shared headers.
 
 ## `scp_size.h`
 
