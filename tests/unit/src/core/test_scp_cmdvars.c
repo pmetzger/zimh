@@ -3,11 +3,15 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#if !defined(_WIN32)
+#include <sys/utsname.h>
+#endif
 
 #include <cmocka.h>
 
 #include "scp.h"
 #include "sim_console.h"
+#include "sim_dynstr.h"
 #include "test_simh_personality.h"
 #include "test_support.h"
 
@@ -15,6 +19,8 @@ static const char simh_test_prog_name[] = "/test/bin/simh-unit-scp-cmdvars";
 static int simh_test_uname_probe_calls = 0;
 static struct timespec simh_test_cmdvars_time = {0};
 static int simh_test_cmdvars_time_status = 0;
+static int simh_test_dynstr_fail_at_call = 0;
+static int simh_test_dynstr_realloc_calls = 0;
 
 static int simh_test_cmdvars_clock_gettime(int clock_id, struct timespec *tp)
 {
@@ -27,20 +33,35 @@ static int simh_test_cmdvars_clock_gettime(int clock_id, struct timespec *tp)
     return simh_test_cmdvars_time_status;
 }
 
-static t_bool simh_test_ostype_probe_fail(char *buf, size_t size)
+#if !defined(_WIN32)
+static int simh_test_uname_hook_fail(struct utsname *utsname_info)
 {
-    (void)buf;
-    (void)size;
+    (void)utsname_info;
 
     ++simh_test_uname_probe_calls;
-    return FALSE;
+    errno = EINVAL;
+    return -1;
 }
 
-static t_bool simh_test_ostype_probe_cached(char *buf, size_t size)
+static int simh_test_uname_hook_cached(struct utsname *utsname_info)
 {
     ++simh_test_uname_probe_calls;
-    strlcpy(buf, "ProbeOS", size);
-    return TRUE;
+    memset(utsname_info, 0, sizeof(*utsname_info));
+    strlcpy(utsname_info->sysname, "ProbeOS", sizeof(utsname_info->sysname));
+    return 0;
+}
+#endif
+
+static void *simh_test_dynstr_realloc_fail_on_call(void *ptr, size_t size)
+{
+    ++simh_test_dynstr_realloc_calls;
+    if ((simh_test_dynstr_fail_at_call != 0) &&
+        (simh_test_dynstr_realloc_calls == simh_test_dynstr_fail_at_call)) {
+        (void)ptr;
+        (void)size;
+        return NULL;
+    }
+    return realloc(ptr, size);
 }
 
 /* Keep command-variable tests isolated from inherited process state. */
@@ -66,7 +87,13 @@ static int setup_scp_cmdvars_fixture(void **state)
     simh_test_uname_probe_calls = 0;
     simh_test_cmdvars_time = (struct timespec){0};
     simh_test_cmdvars_time_status = 0;
+    simh_test_dynstr_fail_at_call = 0;
+    simh_test_dynstr_realloc_calls = 0;
     sim_time_reset_test_hooks();
+    sim_dynstr_reset_test_hooks();
+#if !defined(_WIN32)
+    sim_cmdvars_set_test_uname_hook(NULL);
+#endif
     return 0;
 }
 
@@ -91,6 +118,10 @@ static int teardown_scp_cmdvars_fixture(void **state)
     sim_rem_cmd_active_line = -1;
     simh_test_uname_probe_calls = 0;
     sim_time_reset_test_hooks();
+    sim_dynstr_reset_test_hooks();
+#if !defined(_WIN32)
+    sim_cmdvars_set_test_uname_hook(NULL);
+#endif
     return 0;
 }
 
@@ -217,6 +248,20 @@ static void test_sim_sub_args_expands_uppercased_external_environment(
 
     expand_command("A%zimh_test_upper%B", expanded, sizeof(expanded));
     assert_string_equal(expanded, "AupperB");
+}
+
+/* Verify malformed :~ substring modifiers leave the value unchanged. */
+static void test_sim_sub_args_handles_malformed_substring_modifier(void **state)
+{
+    char expanded[CBUFSIZE];
+
+    (void)state;
+
+    assert_int_equal(setenv("ZIMH_TEST_EXTERNAL", "value", 1), 0);
+
+    expand_command("A%ZIMH_TEST_EXTERNAL:~bogus%B", expanded,
+                   sizeof(expanded));
+    assert_string_equal(expanded, "AvalueB");
 }
 
 /* Verify SCP-owned substitution variables can be set and removed directly. */
@@ -680,7 +725,9 @@ static void test_sim_get_env_special_ostype_handles_total_probe_failure(
 
     (void)state;
 
-    sim_cmdvars_set_ostype_probe(simh_test_ostype_probe_fail);
+#if !defined(_WIN32)
+    sim_cmdvars_set_test_uname_hook(simh_test_uname_hook_fail);
+#endif
     assert_null(_sim_get_env_special("SIM_OSTYPE", value, sizeof(value)));
     assert_int_equal(simh_test_uname_probe_calls, 1);
 }
@@ -692,12 +739,16 @@ static void test_sim_get_env_special_ostype_uses_cached_value(void **state)
 
     (void)state;
 
-    sim_cmdvars_set_ostype_probe(simh_test_ostype_probe_cached);
+#if !defined(_WIN32)
+    sim_cmdvars_set_test_uname_hook(simh_test_uname_hook_cached);
+#endif
     assert_string_equal(
         _sim_get_env_special("SIM_OSTYPE", value, sizeof(value)), "ProbeOS");
     assert_int_equal(simh_test_uname_probe_calls, 1);
 
-    sim_cmdvars_set_ostype_probe(simh_test_ostype_probe_fail);
+#if !defined(_WIN32)
+    sim_cmdvars_set_test_uname_hook(simh_test_uname_hook_fail);
+#endif
     assert_string_equal(
         _sim_get_env_special("SIM_OSTYPE", value, sizeof(value)), "ProbeOS");
     assert_int_equal(simh_test_uname_probe_calls, 1);
@@ -1002,6 +1053,58 @@ static void test_sim_sub_args_star_grows_for_long_arguments(void **state)
     assert_string_equal(expanded, expected);
 }
 
+/* Verify %* drops out cleanly if the first append allocation fails. */
+static void test_sim_sub_args_star_handles_first_append_oom(void **state)
+{
+    char expanded[CBUFSIZE];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    do_arg[0] = "script";
+    do_arg[1] = "alpha";
+    simh_test_dynstr_fail_at_call = 1;
+    sim_dynstr_set_test_realloc_hook(simh_test_dynstr_realloc_fail_on_call);
+
+    expand_command_with_args("A%*B", expanded, sizeof(expanded), do_arg);
+    assert_string_equal(expanded, "AB");
+}
+
+/* Verify %* drops out cleanly if separator growth allocation fails. */
+static void test_sim_sub_args_star_handles_separator_oom(void **state)
+{
+    char expanded[CBUFSIZE];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    do_arg[0] = "script";
+    do_arg[1] = "123456789012345";
+    do_arg[2] = "beta";
+    simh_test_dynstr_fail_at_call = 2;
+    sim_dynstr_set_test_realloc_hook(simh_test_dynstr_realloc_fail_on_call);
+
+    expand_command_with_args("A%*B", expanded, sizeof(expanded), do_arg);
+    assert_string_equal(expanded, "AB");
+}
+
+/* Verify %* drops out cleanly if quoted-argument growth fails. */
+static void test_sim_sub_args_star_handles_quoted_arg_oom(void **state)
+{
+    char expanded[CBUFSIZE];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    do_arg[0] = "script";
+    do_arg[1] = "12345678901234 x";
+    simh_test_dynstr_fail_at_call = 2;
+    sim_dynstr_set_test_realloc_hook(simh_test_dynstr_realloc_fail_on_call);
+
+    expand_command_with_args("A%*B", expanded, sizeof(expanded), do_arg);
+    assert_string_equal(expanded, "AB");
+}
+
 /* Verify %* truncates only at the final command-buffer boundary. */
 static void test_sim_sub_args_star_respects_final_output_limit(void **state)
 {
@@ -1182,6 +1285,9 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_expands_uppercased_external_environment,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_handles_malformed_substring_modifier,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(test_sim_sub_vars_set_get_and_unset,
                                         setup_scp_cmdvars_fixture,
                                         teardown_scp_cmdvars_fixture),
@@ -1292,6 +1398,15 @@ int main(void)
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_star_grows_for_long_arguments,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_star_handles_first_append_oom,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_star_handles_separator_oom,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_star_handles_quoted_arg_oom,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_star_respects_final_output_limit,

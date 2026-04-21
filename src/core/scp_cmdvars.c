@@ -60,9 +60,16 @@ extern size_t sim_file_compare_diff_offset;
 
 static t_bool sim_cmdvars_probe_uname(char *buf, size_t size);
 static t_bool sim_cmdvars_localtime(time_t now, struct tm *tmnow);
-/* Test hooks can replace this probe to drive failure paths. */
-static sim_cmdvars_ostype_probe_fn sim_cmdvars_ostype_probe =
-    sim_cmdvars_probe_uname;
+#if !defined(_WIN32)
+/* Tests can replace the underlying uname(3) call to drive failure paths. */
+static int sim_cmdvars_default_uname_call(struct utsname *utsname_info)
+{
+    return uname(utsname_info);
+}
+
+static sim_cmdvars_uname_hook_fn sim_cmdvars_uname_hook =
+    sim_cmdvars_default_uname_call;
+#endif
 
 /* Assemble the %* expansion into one growable temporary string. */
 static t_bool sim_cmdvars_expand_star_args(sim_dynstr_t *ds, char *do_arg[])
@@ -109,8 +116,6 @@ static void sim_cmdvars_decode_initial_quoted_line(char *ip, size_t instr_size,
         char *tp = scratch;
 
         cptr = get_glyph_quoted(cptr, tp, 0);
-        while (sim_isspace(*cptr))
-            ++cptr;
         if (*cptr == '\0') {
             uint32 dsize;
 
@@ -294,27 +299,18 @@ static t_bool sim_cmdvars_probe_uname(char *buf, size_t size)
 #else
     struct utsname utsname_info;
 
-    if (uname(&utsname_info) != 0)
+    if (sim_cmdvars_uname_hook(&utsname_info) != 0)
         return FALSE;
     strlcpy(buf, utsname_info.sysname, size);
     return buf[0] != '\0';
 #endif
 }
 
-/* Discover the host OS type through the current probe.
-
-   The indirection is here so unit tests can force uname failure
-   deterministically. */
-static t_bool sim_discover_ostype(char *buf, size_t size)
-{
-    return sim_cmdvars_ostype_probe(buf, size);
-}
-
 /* Return the cached or discovered host OS type. */
 static const char *sim_ostype_value(char *rbuf, size_t rbuf_size)
 {
     if ((sim_host_ostype[0] == '\0') &&
-        !sim_discover_ostype(sim_host_ostype, sizeof(sim_host_ostype)))
+        !sim_cmdvars_probe_uname(sim_host_ostype, sizeof(sim_host_ostype)))
         return NULL;
     strlcpy(rbuf, sim_host_ostype, rbuf_size);
     return rbuf;
@@ -448,14 +444,13 @@ int sim_cmdvars_system(const char *command)
     return status;
 }
 
-/* Replace the OS type probe used by SIM_OSTYPE lookup.
-
-   Normal code leaves this at the real uname(3) helper. Tests can swap in
-   a stub to exercise the otherwise hard-to-reach failure branches. */
-void sim_cmdvars_set_ostype_probe(sim_cmdvars_ostype_probe_fn probe)
+#if !defined(_WIN32)
+/* Replace the underlying uname(3) call used by SIM_OSTYPE lookup. */
+void sim_cmdvars_set_test_uname_hook(sim_cmdvars_uname_hook_fn hook)
 {
-    sim_cmdvars_ostype_probe = probe ? probe : sim_cmdvars_probe_uname;
+    sim_cmdvars_uname_hook = hook ? hook : sim_cmdvars_default_uname_call;
 }
+#endif
 
 /* Clear the cached host OS type used by SIM_OSTYPE lookup.
 
@@ -479,7 +474,9 @@ void sim_cmdvars_reset(void)
     sim_sub_instr_off = NULL;
     sim_sub_instr_buf = NULL;
     sim_sub_instr_size = 0;
-    sim_cmdvars_set_ostype_probe(NULL);
+#if !defined(_WIN32)
+    sim_cmdvars_set_test_uname_hook(NULL);
+#endif
     sim_cmdvars_reset_ostype_cache();
     memset(&cmd_time, 0, sizeof(cmd_time));
 }
