@@ -251,10 +251,6 @@ typedef uint32          t_addr;
 #define LL_TYPE long long
 #endif
 
-#if defined (__linux) || defined (__APPLE__)
-#define HAVE_C99_STRFTIME 1
-#endif
-
 #if defined (_WIN32)
 #define NULL_DEVICE "NUL:"
 #else

@@ -56,9 +56,20 @@ extern t_bool sim_file_compare_diff_valid;
 extern size_t sim_file_compare_diff_offset;
 
 static t_bool sim_cmdvars_probe_uname(char *buf, size_t size);
+static t_bool sim_cmdvars_localtime(time_t now, struct tm *tmnow);
 /* Test hooks can replace this probe to drive failure paths. */
 static sim_cmdvars_ostype_probe_fn sim_cmdvars_ostype_probe =
     sim_cmdvars_probe_uname;
+
+/* Break down one wall-clock time value using the platform local-time API. */
+static t_bool sim_cmdvars_localtime(time_t now, struct tm *tmnow)
+{
+#if defined(_WIN32)
+    return localtime_s(tmnow, &now) == 0;
+#else
+    return localtime_r(&now, tmnow) != NULL;
+#endif
+}
 
 /* Return the value of one SCP-owned substitution variable, if present. */
 static const char *sim_sub_var_get(const char *name)
@@ -394,54 +405,43 @@ const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
     ap = NULL;
     if (!ap) {
         time_t now = (time_t)cmd_time.tv_sec;
-        struct tm *tmnow = localtime(&now);
+        struct tm tm_storage;
+        struct tm *tmnow = sim_cmdvars_localtime(now, &tm_storage) ?
+            &tm_storage : NULL;
 
-        if (!strcmp("DATE", gbuf)) {
+        if (tmnow && !strcmp("DATE", gbuf)) {
             sprintf(rbuf, "%4d-%02d-%02d", tmnow->tm_year + 1900,
                     tmnow->tm_mon + 1, tmnow->tm_mday);
             ap = rbuf;
-        } else if (!strcmp("TIME", gbuf)) {
+        } else if (tmnow && !strcmp("TIME", gbuf)) {
             sprintf(rbuf, "%02d:%02d:%02d", tmnow->tm_hour, tmnow->tm_min,
                     tmnow->tm_sec);
             ap = rbuf;
-        } else if (!strcmp("DATETIME", gbuf)) {
+        } else if (tmnow && !strcmp("DATETIME", gbuf)) {
             sprintf(rbuf, "%04d-%02d-%02dT%02d:%02d:%02d",
                     tmnow->tm_year + 1900, tmnow->tm_mon + 1, tmnow->tm_mday,
                     tmnow->tm_hour, tmnow->tm_min, tmnow->tm_sec);
             ap = rbuf;
-        } else if (!strcmp("LDATE", gbuf)) {
+        } else if (tmnow && !strcmp("LDATE", gbuf)) {
             strftime(rbuf, rbuf_size, "%x", tmnow);
             ap = rbuf;
-        } else if (!strcmp("LTIME", gbuf)) {
-#if defined(HAVE_C99_STRFTIME)
+        } else if (tmnow && !strcmp("LTIME", gbuf)) {
             strftime(rbuf, rbuf_size, "%r", tmnow);
-#else
-            strftime(rbuf, rbuf_size, "%p", tmnow);
-            if (rbuf[0])
-                strftime(rbuf, rbuf_size, "%I:%M:%S %p", tmnow);
-            else
-                strftime(rbuf, rbuf_size, "%H:%M:%S", tmnow);
-#endif
             ap = rbuf;
-        } else if (!strcmp("CTIME", gbuf)) {
-#if defined(HAVE_C99_STRFTIME)
+        } else if (tmnow && !strcmp("CTIME", gbuf)) {
             strftime(rbuf, rbuf_size, "%c", tmnow);
-#else
-            strcpy(rbuf, ctime(&now));
-            rbuf[strlen(rbuf) - 1] = '\0';
-#endif
             ap = rbuf;
         } else if (!strcmp("UTIME", gbuf)) {
             sprintf(rbuf, "%" LL_FMT "d", (LL_TYPE)now);
             ap = rbuf;
-        } else if (!strcmp("DATE_YYYY", gbuf)) {
+        } else if (tmnow && !strcmp("DATE_YYYY", gbuf)) {
             strftime(rbuf, rbuf_size, "%Y", tmnow);
             ap = rbuf;
-        } else if (!strcmp("DATE_YY", gbuf)) {
+        } else if (tmnow && !strcmp("DATE_YY", gbuf)) {
             strftime(rbuf, rbuf_size, "%y", tmnow);
             ap = rbuf;
-        } else if ((!strcmp("DATE_19XX_YY", gbuf)) ||
-                   (!strcmp("DATE_19XX_YYYY", gbuf))) {
+        } else if (tmnow && ((!strcmp("DATE_19XX_YY", gbuf)) ||
+                   (!strcmp("DATE_19XX_YYYY", gbuf)))) {
             int year = tmnow->tm_year + 1900;
             int days = year - 2001;
             int leaps = days / 4 - days / 100 + days / 400;
@@ -457,23 +457,23 @@ const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
             else
                 sprintf(rbuf, "%d", cal_year + 1900);
             ap = rbuf;
-        } else if (!strcmp("DATE_MM", gbuf)) {
+        } else if (tmnow && !strcmp("DATE_MM", gbuf)) {
             strftime(rbuf, rbuf_size, "%m", tmnow);
             ap = rbuf;
-        } else if (!strcmp("DATE_MMM", gbuf)) {
+        } else if (tmnow && !strcmp("DATE_MMM", gbuf)) {
             strftime(rbuf, rbuf_size, "%b", tmnow);
             ap = rbuf;
-        } else if (!strcmp("DATE_MONTH", gbuf)) {
+        } else if (tmnow && !strcmp("DATE_MONTH", gbuf)) {
             strftime(rbuf, rbuf_size, "%B", tmnow);
             ap = rbuf;
-        } else if (!strcmp("DATE_DD", gbuf)) {
+        } else if (tmnow && !strcmp("DATE_DD", gbuf)) {
             strftime(rbuf, rbuf_size, "%d", tmnow);
             ap = rbuf;
-        } else if (!strcmp("DATE_D", gbuf)) {
+        } else if (tmnow && !strcmp("DATE_D", gbuf)) {
             sprintf(rbuf, "%d", (tmnow->tm_wday ? tmnow->tm_wday : 7));
             ap = rbuf;
-        } else if ((!strcmp("DATE_WW", gbuf)) ||
-                   (!strcmp("DATE_WYYYY", gbuf))) {
+        } else if (tmnow && ((!strcmp("DATE_WW", gbuf)) ||
+                   (!strcmp("DATE_WYYYY", gbuf)))) {
             int iso_yr = tmnow->tm_year + 1900;
             int iso_wk =
                 (tmnow->tm_yday + 11 - (tmnow->tm_wday ? tmnow->tm_wday : 7)) /
@@ -495,16 +495,16 @@ const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
             else
                 sprintf(rbuf, "%04d", iso_yr);
             ap = rbuf;
-        } else if (!strcmp("DATE_JJJ", gbuf)) {
+        } else if (tmnow && !strcmp("DATE_JJJ", gbuf)) {
             strftime(rbuf, rbuf_size, "%j", tmnow);
             ap = rbuf;
-        } else if (!strcmp("TIME_HH", gbuf)) {
+        } else if (tmnow && !strcmp("TIME_HH", gbuf)) {
             strftime(rbuf, rbuf_size, "%H", tmnow);
             ap = rbuf;
-        } else if (!strcmp("TIME_MM", gbuf)) {
+        } else if (tmnow && !strcmp("TIME_MM", gbuf)) {
             strftime(rbuf, rbuf_size, "%M", tmnow);
             ap = rbuf;
-        } else if (!strcmp("TIME_SS", gbuf)) {
+        } else if (tmnow && !strcmp("TIME_SS", gbuf)) {
             strftime(rbuf, rbuf_size, "%S", tmnow);
             ap = rbuf;
         } else if (!strcmp("TIME_MSEC", gbuf)) {
@@ -595,7 +595,8 @@ void sim_sub_args(char *instr, size_t instr_size, char *do_arg[])
     size_t outstr_off = 0;
 
     scp_set_exp_argv(do_arg);
-    sim_rtcn_get_time(&cmd_time, 0);
+    if (sim_clock_gettime(CLOCK_REALTIME, &cmd_time) != 0)
+        memset(&cmd_time, 0, sizeof(cmd_time));
     tmpbuf = (char *)malloc(instr_size);
     op = tmpbuf;
     oend = tmpbuf + instr_size - 2;

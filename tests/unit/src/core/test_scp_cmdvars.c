@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #include <cmocka.h>
@@ -12,6 +13,19 @@
 
 static const char simh_test_prog_name[] = "/test/bin/simh-unit-scp-cmdvars";
 static int simh_test_uname_probe_calls = 0;
+static struct timespec simh_test_cmdvars_time = {0};
+static int simh_test_cmdvars_time_status = 0;
+
+static int simh_test_cmdvars_clock_gettime(int clock_id, struct timespec *tp)
+{
+    (void)clock_id;
+
+    if (tp != NULL)
+        *tp = simh_test_cmdvars_time;
+    if (simh_test_cmdvars_time_status != 0)
+        errno = EINVAL;
+    return simh_test_cmdvars_time_status;
+}
 
 static t_bool simh_test_ostype_probe_fail(char *buf, size_t size)
 {
@@ -50,6 +64,9 @@ static int setup_scp_cmdvars_fixture(void **state)
     sim_switches = 0;
     sim_rem_cmd_active_line = -1;
     simh_test_uname_probe_calls = 0;
+    simh_test_cmdvars_time = (struct timespec){0};
+    simh_test_cmdvars_time_status = 0;
+    sim_time_reset_test_hooks();
     return 0;
 }
 
@@ -73,6 +90,7 @@ static int teardown_scp_cmdvars_fixture(void **state)
     sim_switches = 0;
     sim_rem_cmd_active_line = -1;
     simh_test_uname_probe_calls = 0;
+    sim_time_reset_test_hooks();
     return 0;
 }
 
@@ -150,6 +168,25 @@ static void with_redirected_stdin(const char *contents,
     assert_int_equal(dup2(saved_stdin, STDIN_FILENO), STDIN_FILENO);
     close(saved_stdin);
     unlink(path);
+}
+
+/* Run one callback with TZ set to a known value, then restore it. */
+static void with_timezone(const char *timezone, void (*fn)(void *ctx),
+                          void *ctx)
+{
+    const char *saved_tz = getenv("TZ");
+    char *saved_copy = saved_tz ? strdup(saved_tz) : NULL;
+
+    assert_int_equal(setenv("TZ", timezone, 1), 0);
+    tzset();
+    fn(ctx);
+    if (saved_copy != NULL) {
+        assert_int_equal(setenv("TZ", saved_copy, 1), 0);
+        free(saved_copy);
+    } else {
+        unsetenv("TZ");
+    }
+    tzset();
 }
 
 /* Verify ordinary host environment variables still expand normally. */
@@ -250,6 +287,66 @@ static void test_sim_get_env_special_expands_documented_builtins(void **state)
                                              sizeof(value)));
         assert_true(value[0] != '\0');
     }
+}
+
+struct simh_test_cmdvars_time_case {
+    const char *input;
+    const char *expected;
+};
+
+/* Expand one command under a fixed clock and compare with the expectation. */
+static void run_fixed_time_expansion_case(void *ctx)
+{
+    const struct simh_test_cmdvars_time_case *test_case = ctx;
+    char expanded[CBUFSIZE];
+
+    expand_command(test_case->input, expanded, sizeof(expanded));
+    assert_string_equal(expanded, test_case->expected);
+}
+
+/* Verify date and time variables honor the injected realtime clock. */
+static void test_sim_sub_args_expands_fixed_datetime_values(void **state)
+{
+    const struct simh_test_cmdvars_time_case cases[] = {
+        {"A%DATE%B", "A2021-01-01B"},
+        {"A%TIME%B", "A12:34:56B"},
+        {"A%DATETIME%B", "A2021-01-01T12:34:56B"},
+        {"A%UTIME%B", "A1609504496B"},
+        {"A%TIME_MSEC%B", "A789B"},
+        {"A%DATE_D%B", "A5B"},
+        {"A%DATE_JJJ%B", "A001B"},
+    };
+    size_t i;
+
+    (void)state;
+
+    simh_test_cmdvars_time = (struct timespec){.tv_sec = 1609504496,
+                                               .tv_nsec = 789000000};
+    sim_time_set_test_hooks(simh_test_cmdvars_clock_gettime, NULL);
+
+    for (i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i)
+        with_timezone("UTC", run_fixed_time_expansion_case,
+                      (void *)&cases[i]);
+}
+
+/* Verify ISO week and year logic uses the injected realtime clock. */
+static void test_sim_sub_args_expands_iso_week_boundary(void **state)
+{
+    const struct simh_test_cmdvars_time_case cases[] = {
+        {"A%DATE_WW%B", "A53B"},
+        {"A%DATE_WYYYY%B", "A2020B"},
+    };
+    size_t i;
+
+    (void)state;
+
+    simh_test_cmdvars_time = (struct timespec){.tv_sec = 1609504496,
+                                               .tv_nsec = 0};
+    sim_time_set_test_hooks(simh_test_cmdvars_clock_gettime, NULL);
+
+    for (i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i)
+        with_timezone("UTC", run_fixed_time_expansion_case,
+                      (void *)&cases[i]);
 }
 
 /* Verify mode-reporting variables reflect current SCP state. */
@@ -1014,6 +1111,12 @@ int main(void)
                                         teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_get_env_special_expands_documented_builtins,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_expands_fixed_datetime_values,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_expands_iso_week_boundary,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_get_env_special_expands_mode_variables,
