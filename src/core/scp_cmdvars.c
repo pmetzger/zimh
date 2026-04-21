@@ -208,13 +208,14 @@ static const char *sim_cmdvars_parse_percent(const char **ipp, char *gbuf,
 /* Expand the initial command token if it names one command variable. */
 static t_bool sim_cmdvars_expand_initial_token(char **ipp, char **op, char *oend,
                                                const char *instr, char *gbuf,
-                                               char *rbuf, size_t *outstr_off)
+                                               char *rbuf, size_t rbuf_size,
+                                               size_t *outstr_off)
 {
     const char *ap;
     char *ip = *ipp;
 
     get_glyph(ip, gbuf, 0);
-    ap = _sim_get_env_special(gbuf, rbuf, sizeof(rbuf));
+    ap = _sim_get_env_special(gbuf, rbuf, rbuf_size);
     if (ap == NULL)
         return FALSE;
     sim_cmdvars_copy_expansion(ap, op, oend, instr, ip, outstr_off);
@@ -795,7 +796,7 @@ void sim_sub_args(char *instr, size_t instr_size, char *do_arg[])
             } else {
                 if (ip == istart) {
                     if (!sim_cmdvars_expand_initial_token(
-                            &ip, &op, oend, instr, gbuf, rbuf,
+                            &ip, &op, oend, instr, gbuf, rbuf, sizeof(rbuf),
                             &outstr_off)) {
                         sim_sub_instr_off[outstr_off++] = ip - instr;
                         *op++ = *ip++;
