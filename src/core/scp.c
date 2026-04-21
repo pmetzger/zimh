@@ -6165,7 +6165,7 @@ return ssh_break (NULL, cptr, flg);                     /* call common code */
 t_stat ssh_break (FILE *st, const char *cptr, int32 flg)
 {
 char gbuf[CBUFSIZE], *tptr_mut, abuf[4*CBUFSIZE];
-const char *aptr;
+const char *aptr = NULL;
 CONST char *tptr, *t1ptr;
 DEVICE *dptr = sim_dflt_dev;
 UNIT *uptr;

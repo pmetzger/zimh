@@ -11,6 +11,8 @@
 #include "test_simh_personality.h"
 #include "test_support.h"
 
+t_stat ssh_break(FILE *st, const char *cptr, int32 flg);
+
 static BRKTYPTAB breakpoint_types[] = {
     BRKTYPE('A', "Alpha breakpoint"),
     BRKTYPE('B', "Beta breakpoint"),
@@ -142,6 +144,24 @@ static void test_sim_brk_show_and_clear_update_output_and_state(void **state)
     assert_null(sim_brk_fnd(0x20));
 }
 
+/*
+ * Verify plain BREAK commands with no ";action" leave no queued action
+ * on the installed breakpoint.
+ */
+static void test_ssh_break_without_action_leaves_breakpoint_action_empty(
+    void **state)
+{
+    struct scp_breakpoint_fixture *fixture = *state;
+    char action[CBUFSIZE];
+
+    (void)fixture;
+
+    sim_switches = SWMASK('B');
+    assert_int_equal(ssh_break(NULL, "34", SSH_ST), SCPE_OK);
+    assert_int_equal(sim_brk_test(0x34, SWMASK('B')), SWMASK('B'));
+    assert_null(sim_brk_getact(action, sizeof(action)));
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -156,6 +176,9 @@ int main(void)
             setup_scp_breakpoint_fixture, teardown_scp_breakpoint_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_brk_show_and_clear_update_output_and_state,
+            setup_scp_breakpoint_fixture, teardown_scp_breakpoint_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_ssh_break_without_action_leaves_breakpoint_action_empty,
             setup_scp_breakpoint_fixture, teardown_scp_breakpoint_fixture),
     };
 
