@@ -848,8 +848,6 @@ t_stat sim_set_environment(int32 flag, CONST char *cptr)
         if (varname[0] == '\0')
             return sim_messagef(SCPE_2FARG,
                                 "Missing Environment Variable Name\n");
-        if (deflt == NULL)
-            deflt = "";
         if (*deflt) {
             strlcat(prompt, " [", sizeof(prompt));
             strlcat(prompt, deflt, sizeof(prompt));
