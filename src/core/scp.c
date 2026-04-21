@@ -277,7 +277,7 @@
             _x = noqueue_time;                                  \
         else                                                    \
             _x = sim_clock_queue->time;                         \
-        sim_time = sim_time + (_x - sim_interval);              \
+        sim_vm_time = sim_vm_time + (_x - sim_interval);        \
         sim_rtime = sim_rtime + ((uint32) (_x - sim_interval)); \
         if (sim_clock_queue == QUEUE_LIST_END)                  \
             noqueue_time = sim_interval;                        \
@@ -564,7 +564,7 @@ int32 sim_runlimit_value = 0;
 const char *sim_runlimit_units = NULL;
 t_bool sim_file_compare_diff_valid = FALSE;
 size_t sim_file_compare_diff_offset = 0;
-static double sim_time;
+static double sim_vm_time;
 static uint32 sim_rtime;
 static int32 noqueue_time;
 volatile t_bool stop_cpu = FALSE;
@@ -2713,7 +2713,7 @@ for (i = 0; cmd_table[i].name; i++) {
     }
 stop_cpu = FALSE;
 sim_interval = 0;
-sim_time = sim_rtime = 0;
+sim_vm_time = sim_rtime = 0;
 noqueue_time = 0;
 sim_clock_queue = QUEUE_LIST_END;
 sim_is_running = FALSE;
@@ -5438,13 +5438,13 @@ if (cptr && (*cptr != 0))
     return SCPE_2MARG;
 if (sim_clock_queue == QUEUE_LIST_END)
     fprintf (st, "%s event queue empty, time = %.0f, executing %s %s/sec\n",
-             sim_name, sim_time, sim_fmt_numeric (sim_timer_inst_per_sec ()), sim_vm_interval_units);
+             sim_name, sim_vm_time, sim_fmt_numeric (sim_timer_inst_per_sec ()), sim_vm_interval_units);
 else {
     const char *tim = "";
     double inst_per_sec = sim_timer_inst_per_sec ();
 
     fprintf (st, "%s event queue status, time = %.0f, executing %s %s/sec\n",
-             sim_name, sim_time, sim_fmt_numeric (inst_per_sec), sim_vm_interval_units);
+             sim_name, sim_vm_time, sim_fmt_numeric (inst_per_sec), sim_vm_interval_units);
     for (uptr = sim_clock_queue; uptr != QUEUE_LIST_END; uptr = uptr->next) {
         if (uptr == &sim_step_unit)
             fprintf (st, "  Step timer");
@@ -6840,7 +6840,7 @@ fprintf (sfile, "%s\n%s\n%s\n%s\n%s\n%.0f\n",
     save_vercur,                                        /* [V2.5] save format */
     sim_savename,                                       /* sim name */
     sim_si64, sim_sa64, eth_capabilities(),             /* [V3.5] options */
-    sim_time);                                          /* [V3.2] sim time */
+    sim_vm_time);                                       /* [V3.2] sim time */
 WRITE_I (sim_rtime);                                    /* [V2.6] sim rel time */
 #if defined(SIM_GIT_COMMIT_ID)
 #define S_xstr(a) S_str(a)
@@ -7062,9 +7062,9 @@ if (v35) {                                              /* [V3.5+] options */
     }
 if (v32) {                                              /* [V3.2+] time as string */
     READ_S (buf);
-    sscanf (buf, "%lf", &sim_time);
+    sscanf (buf, "%lf", &sim_vm_time);
     }
-else READ_I (sim_time);                                 /* sim time */
+else READ_I (sim_vm_time);                              /* sim time */
 READ_I (sim_rtime);                                     /* [V2.6+] sim rel time */
 if (v40) {
     READ_S (buf);                                       /* read git commit id */
@@ -7686,7 +7686,7 @@ t_stat r;
 /* reset queue */
 while (sim_clock_queue != QUEUE_LIST_END)
     sim_cancel (sim_clock_queue);
-sim_time = sim_rtime = 0;
+sim_vm_time = sim_rtime = 0;
 noqueue_time = sim_interval = 0;
 r = reset_all (0);
 if ((r == SCPE_OK) && (flag == RU_RUN)) {
@@ -9880,7 +9880,7 @@ if (sim_interval < 0) {
     if (sim_clock_queue->next != QUEUE_LIST_END)
         sim_debug (SIM_DBG_EVENT_NEG, &sim_scp_dev, "- Next event for %s after = %d\n",
             sim_uname (sim_clock_queue->next), sim_clock_queue->next->time);
-    sim_time -= sim_clock_queue->time;
+    sim_vm_time -= sim_clock_queue->time;
     sim_rtime -= sim_clock_queue->time;
     }
 else
@@ -9912,7 +9912,7 @@ do {
     AIO_EVENT_COMPLETE(uptr, reason);
     if (sim_interval_catchup < -1) {
         sim_interval_catchup += sim_clock_queue->time;
-        sim_time += sim_clock_queue->time;
+        sim_vm_time += sim_clock_queue->time;
         sim_rtime += sim_clock_queue->time;
         }
     else
@@ -10245,7 +10245,7 @@ double sim_gtime (void)
 if (AIO_MAIN_THREAD) {
     UPDATE_SIM_TIME;
     }
-return sim_time;
+return sim_vm_time;
 }
 
 uint32 sim_grtime (void)
@@ -11547,7 +11547,7 @@ sim_scp_dev.dctrl = 0xFFFFFFFF;
 /* reset queue */
 while (sim_clock_queue != QUEUE_LIST_END)
     sim_cancel (sim_clock_queue);
-sim_time = sim_rtime = 0;
+sim_vm_time = sim_rtime = 0;
 noqueue_time = sim_interval = 0;
 
 /* queue test unit events */
@@ -11674,7 +11674,7 @@ char gbuf[CBUFSIZE];
 
 GET_SWITCHES (cptr);                        /* get switches */
 saved_switches |= sim_switches;
-if (sim_time != 0.0)
+if (sim_vm_time != 0.0)
     return sim_messagef (SCPE_UNK, "Library tests can only be performed before any other commands are processed.\n");
 sim_switches = 0;
 detach_all (0, 0);                          /* Assure that all units are unattached */
