@@ -6,6 +6,23 @@
 ## Not yet: if this directory later gets a local unit-test subtree, declare
 ## it explicitly here with add_subdirectory(unit-tests).
 
+find_program(BISON_COMMAND bison REQUIRED)
+
+set(altairz80_m68kasm_c "${CMAKE_CURRENT_BINARY_DIR}/m68k/m68kasm.c")
+
+add_custom_command(
+    OUTPUT
+        "${altairz80_m68kasm_c}"
+    COMMAND "${CMAKE_COMMAND}" -E make_directory
+        "${CMAKE_CURRENT_BINARY_DIR}/m68k"
+    COMMAND "${BISON_COMMAND}"
+        -o "${altairz80_m68kasm_c}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/m68k/m68kasm.y"
+    DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/m68k/m68kasm.y"
+    VERBATIM
+)
+
 add_simulator(altairz80
     SOURCES
         altairz80_cpu.c
@@ -61,7 +78,7 @@ add_simulator(altairz80
         s100_adcs6.c
         m68k/m68kcpu.c
         m68k/m68kdasm.c
-        m68k/m68kasm.c
+        ${altairz80_m68kasm_c}
         m68k/m68kopac.c
         m68k/m68kopdm.c
         m68k/softfloat/softfloat.c
@@ -70,6 +87,7 @@ add_simulator(altairz80
         m68ksim.c
     INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_BINARY_DIR}
     FEATURE_VIDEO
     LABEL AltairZ80
     PKG_FAMILY altairz80_family

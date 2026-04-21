@@ -536,7 +536,7 @@ static void init_ophash()
 	}
 }
 
-static char* yystream;
+static const char* yystream;
 
 int yylex()
 {
@@ -596,7 +596,7 @@ int yylex()
 static t_value *yyvalptr;
 static t_addr yyaddr;
 
-t_stat parse_sym(char* c, t_addr a, UNIT* u, t_value* val, int32 sw)
+t_stat parse_sym(CONST char* c, t_addr a, UNIT* u, t_value* val, int32 sw)
 {
 	char ch;
 	
