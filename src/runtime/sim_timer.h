@@ -36,38 +36,9 @@
 extern "C" {
 #endif
 
-/* Pick up a struct timespec definition if it is available */
-#include <time.h>
-#if defined(__struct_timespec_defined)
-#define _TIMESPEC_DEFINED
-#endif
+#include "sim_time.h"
 #if defined(SIM_ASYNCH_IO) || defined(USE_READER_THREAD)
 #include <pthread.h>
-#endif
-
-#if defined (__APPLE__)
-#define HAVE_STRUCT_TIMESPEC     /* OSX defined the structure but doesn't tell us */
-#endif
-
-/* Provide a fallback CLOCK_REALTIME if the host headers omit it. */
-#if !defined(CLOCK_REALTIME)
-#define CLOCK_REALTIME 1
-#define NEED_CLOCK_GETTIME 1
-#if defined(_MSC_VER)       /* Modern Visual Studio */
-#define HAVE_STRUCT_TIMESPEC
-#define _TIMESPEC_DEFINED
-#endif /* defined(_MSC_VER) */
-#if !defined(HAVE_STRUCT_TIMESPEC)
-#define HAVE_STRUCT_TIMESPEC
-#if !defined(_TIMESPEC_DEFINED)
-#define _TIMESPEC_DEFINED
-struct timespec {
-    time_t tv_sec;
-    long   tv_nsec;
-};
-#endif /* !defined(_TIMESPEC_DEFINED) */
-#endif /* !defined(HAVE_STRUCT_TIMESPEC) */
-int clock_gettime(int clock_id, struct timespec *tp);
 #endif
 
 

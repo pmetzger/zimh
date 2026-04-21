@@ -53,6 +53,7 @@ set(SIM_SOURCES
     ${SIMH_RUNTIME_ROOT}/sim_serial.c
     ${SIMH_RUNTIME_ROOT}/sim_sock.c
     ${SIMH_RUNTIME_ROOT}/sim_tape.c
+    ${SIMH_RUNTIME_ROOT}/sim_time.c
     ${SIMH_RUNTIME_ROOT}/sim_timer.c
     ${SIMH_RUNTIME_ROOT}/sim_tmxr.c
     ${SIMH_RUNTIME_ROOT}/sim_video.c)
