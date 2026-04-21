@@ -29,12 +29,6 @@ static t_bool simh_test_ostype_probe_cached(char *buf, size_t size)
     return TRUE;
 }
 
-static t_bool simh_test_ostype_probe_env(char *buf, size_t size)
-{
-    strlcpy(buf, "EnvOS", size);
-    return TRUE;
-}
-
 /* Keep command-variable tests isolated from inherited process state. */
 static int setup_scp_cmdvars_fixture(void **state)
 {
@@ -556,37 +550,7 @@ static void test_show_version_keeps_only_sim_ostype(void **state)
     assert_string_equal(expanded, "AB");
 }
 
-/* Verify SIM_OSTYPE falls back to the secondary probe when uname fails. */
-static void test_sim_get_env_special_ostype_falls_back_to_env_probe(
-    void **state)
-{
-    char value[CBUFSIZE];
-
-    (void)state;
-
-    sim_cmdvars_set_ostype_probes(simh_test_ostype_probe_fail,
-                                  simh_test_ostype_probe_env);
-    assert_string_equal(
-        _sim_get_env_special("SIM_OSTYPE", value, sizeof(value)), "EnvOS");
-    assert_int_equal(simh_test_uname_probe_calls, 1);
-}
-
-/* Verify the real OSTYPE environment fallback still works when needed. */
-static void test_sim_get_env_special_ostype_uses_real_env_fallback(
-    void **state)
-{
-    char value[CBUFSIZE];
-
-    (void)state;
-
-    assert_int_equal(setenv("OSTYPE", "real-env-os", 1), 0);
-    sim_cmdvars_set_ostype_probes(simh_test_ostype_probe_fail, NULL);
-    assert_string_equal(
-        _sim_get_env_special("SIM_OSTYPE", value, sizeof(value)),
-        "real-env-os");
-}
-
-/* Verify SIM_OSTYPE cleanly reports no value when all probes fail. */
+/* Verify SIM_OSTYPE cleanly reports no value when uname probing fails. */
 static void test_sim_get_env_special_ostype_handles_total_probe_failure(
     void **state)
 {
@@ -594,23 +558,9 @@ static void test_sim_get_env_special_ostype_handles_total_probe_failure(
 
     (void)state;
 
-    sim_cmdvars_set_ostype_probes(simh_test_ostype_probe_fail,
-                                  simh_test_ostype_probe_fail);
+    sim_cmdvars_set_ostype_probe(simh_test_ostype_probe_fail);
     assert_null(_sim_get_env_special("SIM_OSTYPE", value, sizeof(value)));
-    assert_int_equal(simh_test_uname_probe_calls, 2);
-}
-
-/* Verify the real OSTYPE env probe can also report total failure. */
-static void test_sim_get_env_special_ostype_real_env_probe_can_fail(
-    void **state)
-{
-    char value[CBUFSIZE];
-
-    (void)state;
-
-    unsetenv("OSTYPE");
-    sim_cmdvars_set_ostype_probes(simh_test_ostype_probe_fail, NULL);
-    assert_null(_sim_get_env_special("SIM_OSTYPE", value, sizeof(value)));
+    assert_int_equal(simh_test_uname_probe_calls, 1);
 }
 
 /* Verify SIM_OSTYPE caches the first discovered value. */
@@ -620,14 +570,12 @@ static void test_sim_get_env_special_ostype_uses_cached_value(void **state)
 
     (void)state;
 
-    sim_cmdvars_set_ostype_probes(simh_test_ostype_probe_cached,
-                                  simh_test_ostype_probe_fail);
+    sim_cmdvars_set_ostype_probe(simh_test_ostype_probe_cached);
     assert_string_equal(
         _sim_get_env_special("SIM_OSTYPE", value, sizeof(value)), "ProbeOS");
     assert_int_equal(simh_test_uname_probe_calls, 1);
 
-    sim_cmdvars_set_ostype_probes(simh_test_ostype_probe_fail,
-                                  simh_test_ostype_probe_fail);
+    sim_cmdvars_set_ostype_probe(simh_test_ostype_probe_fail);
     assert_string_equal(
         _sim_get_env_special("SIM_OSTYPE", value, sizeof(value)), "ProbeOS");
     assert_int_equal(simh_test_uname_probe_calls, 1);
@@ -1116,16 +1064,7 @@ int main(void)
                                         setup_scp_cmdvars_fixture,
                                         teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
-            test_sim_get_env_special_ostype_falls_back_to_env_probe,
-            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
-        cmocka_unit_test_setup_teardown(
-            test_sim_get_env_special_ostype_uses_real_env_fallback,
-            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
-        cmocka_unit_test_setup_teardown(
             test_sim_get_env_special_ostype_handles_total_probe_failure,
-            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
-        cmocka_unit_test_setup_teardown(
-            test_sim_get_env_special_ostype_real_env_probe_can_fail,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_get_env_special_ostype_uses_cached_value,

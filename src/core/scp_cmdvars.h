@@ -41,8 +41,7 @@ void sim_sub_var_clear_prefix(const char *prefix);
 const char *sim_unsub_args(const char *cptr);
 void sim_cmdvars_capture_env_alias(const char *name);
 int sim_cmdvars_system(const char *command);
-void sim_cmdvars_set_ostype_probes(sim_cmdvars_ostype_probe_fn uname_probe,
-                                   sim_cmdvars_ostype_probe_fn env_probe);
+void sim_cmdvars_set_ostype_probe(sim_cmdvars_ostype_probe_fn probe);
 void sim_cmdvars_reset_ostype_cache(void);
 void sim_cmdvars_reset(void);
 

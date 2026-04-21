@@ -24,6 +24,10 @@
 
 #include "sim_console.h"
 
+#if !defined(_WIN32)
+#include <sys/utsname.h>
+#endif
+
 struct deleted_env_var {
     char *name;
     char *value;
@@ -52,12 +56,9 @@ extern t_bool sim_file_compare_diff_valid;
 extern size_t sim_file_compare_diff_offset;
 
 static t_bool sim_cmdvars_probe_uname(char *buf, size_t size);
-static t_bool sim_cmdvars_probe_ostype_env(char *buf, size_t size);
-/* Test hooks can replace these probes to drive fallback/error paths. */
-static sim_cmdvars_ostype_probe_fn sim_cmdvars_ostype_uname_probe =
+/* Test hooks can replace this probe to drive failure paths. */
+static sim_cmdvars_ostype_probe_fn sim_cmdvars_ostype_probe =
     sim_cmdvars_probe_uname;
-static sim_cmdvars_ostype_probe_fn sim_cmdvars_ostype_env_probe =
-    sim_cmdvars_probe_ostype_env;
 
 /* Return the value of one SCP-owned substitution variable, if present. */
 static const char *sim_sub_var_get(const char *name)
@@ -120,52 +121,29 @@ static const char *sim_bin_name_value(char *rbuf, size_t rbuf_size)
     return rbuf;
 }
 
-/* Probe the host OS type by running uname. */
+/* Probe the host OS type with uname(3). */
 static t_bool sim_cmdvars_probe_uname(char *buf, size_t size)
 {
-    FILE *pstream = NULL;
-    char cmd[128];
-    char *c;
-
 #if defined(_WIN32)
     strlcpy(buf, "Windows", size);
     return TRUE;
 #else
-    strlcpy(cmd, "uname", sizeof(cmd));
-    pstream = popen(cmd, "r");
-    if (pstream == NULL)
+    struct utsname utsname_info;
+
+    if (uname(&utsname_info) != 0)
         return FALSE;
-    if (fgets(buf, (int)size, pstream) == NULL) {
-        pclose(pstream);
-        return FALSE;
-    }
-    pclose(pstream);
-    if ((c = strchr(buf, '\n')))
-        *c = '\0';
+    strlcpy(buf, utsname_info.sysname, size);
     return buf[0] != '\0';
 #endif
 }
 
-/* Probe the host OS type from the OSTYPE environment variable. */
-static t_bool sim_cmdvars_probe_ostype_env(char *buf, size_t size)
-{
-    const char *env_ostype = getenv("OSTYPE");
+/* Discover the host OS type through the current probe.
 
-    if (env_ostype == NULL)
-        return FALSE;
-    strlcpy(buf, env_ostype, size);
-    return buf[0] != '\0';
-}
-
-/* Discover the host OS type through the current probes.
-
-   The indirection is here so unit tests can force uname failure,
-   environment fallback, and total probe failure deterministically. */
+   The indirection is here so unit tests can force uname failure
+   deterministically. */
 static t_bool sim_discover_ostype(char *buf, size_t size)
 {
-    if (sim_cmdvars_ostype_uname_probe(buf, size))
-        return TRUE;
-    return sim_cmdvars_ostype_env_probe(buf, size);
+    return sim_cmdvars_ostype_probe(buf, size);
 }
 
 /* Return the cached or discovered host OS type. */
@@ -306,17 +284,13 @@ int sim_cmdvars_system(const char *command)
     return status;
 }
 
-/* Replace the OS type probes used by SIM_OSTYPE lookup.
+/* Replace the OS type probe used by SIM_OSTYPE lookup.
 
-   Normal code leaves these at the real probe helpers. Tests can swap in
-   stubs to exercise the otherwise hard-to-reach fallback branches. */
-void sim_cmdvars_set_ostype_probes(sim_cmdvars_ostype_probe_fn uname_probe,
-                                   sim_cmdvars_ostype_probe_fn env_probe)
+   Normal code leaves this at the real uname(3) helper. Tests can swap in
+   a stub to exercise the otherwise hard-to-reach failure branches. */
+void sim_cmdvars_set_ostype_probe(sim_cmdvars_ostype_probe_fn probe)
 {
-    sim_cmdvars_ostype_uname_probe = uname_probe ? uname_probe :
-        sim_cmdvars_probe_uname;
-    sim_cmdvars_ostype_env_probe = env_probe ? env_probe :
-        sim_cmdvars_probe_ostype_env;
+    sim_cmdvars_ostype_probe = probe ? probe : sim_cmdvars_probe_uname;
 }
 
 /* Clear the cached host OS type used by SIM_OSTYPE lookup.
@@ -341,7 +315,7 @@ void sim_cmdvars_reset(void)
     sim_sub_instr_off = NULL;
     sim_sub_instr_buf = NULL;
     sim_sub_instr_size = 0;
-    sim_cmdvars_set_ostype_probes(NULL, NULL);
+    sim_cmdvars_set_ostype_probe(NULL);
     sim_cmdvars_reset_ostype_cache();
     memset(&cmd_time, 0, sizeof(cmd_time));
 }
