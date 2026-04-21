@@ -566,6 +566,11 @@ double sim_runlimit_d = 0.0;
 double sim_runlimit_d_initial = 0.0;
 int32 sim_runlimit_switches = 0;
 t_bool sim_runlimit_enabled = FALSE;
+int32 sim_runlimit_value = 0;
+const char *sim_runlimit_units = NULL;
+t_bool sim_file_compare_diff_valid = FALSE;
+size_t sim_file_compare_diff_offset = 0;
+static char sim_ostype[128] = "";
 char *sim_sub_instr = NULL;         /* Copy of pre-substitution buffer contents */
 char *sim_sub_instr_buf = NULL;     /* Buffer address that substitutions were saved in */
 size_t sim_sub_instr_size = 0;      /* substitution buffer size */
@@ -1608,12 +1613,15 @@ static const char simh_help2[] =
       " calling context.\n"
        /***************** 80 character line width template *************************/
       "3Variable_Insertion\n"
-      " Built In variables %%DATE%%, %%TIME%%, %%DATETIME%%, %%LDATE%%, %%LTIME%%,\n"
-      " %%CTIME%%, %%DATE_YYYY%%, %%DATE_YY%%, %%DATE_YC%%, %%DATE_MM%%, %%DATE_MMM%%,\n"
-      " %%DATE_MONTH%%, %%DATE_DD%%, %%DATE_D%%, %%DATE_WYYYY%%, %%DATE_WW%%,\n"
-      " %%TIME_HH%%, %%TIME_MM%%, %%TIME_SS%%, %%TIME_MSEC%%, %%STATUS%%, %%TSTATUS%%,\n"
-      " %%SIM_VERIFY%%, %%SIM_QUIET%%, %%SIM_MESSAGE%%, %%SIM_NAME%%, %%SIM_BIN_NAME%%,\n"
-      " %%SIM_BIN_PATH%%, %%SIM_OSTYPE%%\n\n"
+      " Built In variables %%DATE%%, %%TIME%%, %%DATETIME%%, %%LDATE%%,\n"
+      " %%LTIME%%, %%CTIME%%, %%UTIME%%, %%DATE_YYYY%%, %%DATE_YY%%,\n"
+      " %%DATE_MM%%,\n"
+      " %%DATE_MMM%%, %%DATE_MONTH%%, %%DATE_DD%%, %%DATE_D%%,\n"
+      " %%DATE_WYYYY%%, %%DATE_WW%%, %%TIME_HH%%, %%TIME_MM%%,\n"
+      " %%TIME_SS%%, %%TIME_MSEC%%, %%STATUS%%, %%TSTATUS%%,\n"
+      " %%SIM_VERIFY%%, %%SIM_QUIET%%, %%SIM_MESSAGE%%, %%SIM_NAME%%,\n"
+      " %%SIM_BIN_NAME%%, %%SIM_BIN_PATH%%, %%SIM_OSTYPE%%,\n"
+      " %%SIM_RUNLIMIT%%, %%SIM_RUNLIMIT_UNITS%%\n\n"
       "+Token %%0 expands to the command file name.\n"
       "+Token %%n (n being a single digit) expands to the n'th argument\n"
       "+Token %%* expands to the whole set of arguments (%%1 ... %%9)\n\n"
@@ -1657,7 +1665,9 @@ static const char simh_help2[] =
       "++%%SIM_NAME%%          The name of the current simulator\n"
       "++%%SIM_BIN_NAME%%      The program name of the current simulator\n"
       "++%%SIM_BIN_PATH%%      The program path that invoked the current simulator\n"
-      "++%%SIM_OSTYPE%%        The Operating System running the current simulator\n\n"
+      "++%%SIM_OSTYPE%%        The Operating System running the current simulator\n"
+      "++%%SIM_RUNLIMIT%%      The active RUNLIMIT value\n"
+      "++%%SIM_RUNLIMIT_UNITS%% The units of the active RUNLIMIT\n\n"
       "+Environment variable lookups are done first with the precise name between\n"
       "+the %% characters and if that fails, then the name between the %% characters\n"
       "+is upcased and a lookup of that value is attempted.\n\n"
@@ -2334,9 +2344,9 @@ static const char simh_help2[] =
       " have the same contents.  If the -W switch is present, allows\n"
       " arbitrary runs of whitespace to be considered a single space\n"
       " during file content comparison.\n\n"
-      " When a file comparison determines that files are different, the environment\n"
-      " variable _FILE_COMPARE_DIFF_OFFSET is set to the file offset where the first\n"
-      " difference in the files was observed\n\n"
+      " When a file comparison determines that files are different, the\n"
+      " variable _FILE_COMPARE_DIFF_OFFSET is set to the file offset where\n"
+      " the first difference in the files was observed\n\n"
       "5Debugging Expression Evaluation\n"
       " Debug output can be produced which will walk through the details\n"
       " involved during expression evaluation.  This output can, for example,\n"
@@ -2699,20 +2709,6 @@ for (i = 1; i < argc; i++) {                            /* loop thru args */
         lookswitch = FALSE;                             /* no more switches */
         }
     }                                                   /* end for */
-if (*argv[0]) {                                         /* sim name arg? */
-    char *np;                                           /* "path.ini" */
-
-    strlcpy (nbuf, argv[0], PATH_MAX + 2);              /* copy sim name */
-    if ((np = (char *)match_ext (nbuf, "EXE")))         /* remove .exe */
-        *np = 0;
-    np = strrchr (nbuf, '/');                           /* strip path and try again in cwd */
-    if (np == NULL)
-        np = strrchr (nbuf, '\\');                      /* windows path separator */
-    if (np != NULL)
-        setenv ("SIM_BIN_NAME", np+1, 1);               /* Publish simulator binary name */
-    setenv ("SIM_BIN_PATH", argv[0], 1);
-    }
-
 sim_quiet = sim_switches & SWMASK ('Q');                /* -q means quiet */
 sim_on_inherit = sim_switches & SWMASK ('O');           /* -o means inherit on state */
 
@@ -2745,7 +2741,6 @@ for (i = 0; cmd_table[i].name; i++) {
         }
     free (cmd_name);
     }
-setenv ("SIM_NAME", sim_name, 1);                       /* Publish simulator name */
 stop_cpu = FALSE;
 sim_interval = 0;
 sim_time = sim_rtime = 0;
@@ -3692,7 +3687,6 @@ return result;
           %DATE%              yyyy-mm-dd
           %TIME%              hh:mm:ss
           %DATETIME%          yyyy-mm-ddThh:mm:ss
-          %STIME%             hh_mm_ss
           %CTIME%             Www Mmm dd hh:mm:ss yyyy
           %UTIME%             nnn (Unix time - seconds since 1/1/1970)
           %STATUS%            Status value from the last command executed
@@ -3701,6 +3695,8 @@ return result;
           %SIM_VERBOSE%       The Verify/Verbose mode of the current Do command file
           %SIM_QUIET%         The Quiet mode of the current Do command file
           %SIM_MESSAGE%       The message display status of the current Do command file
+          %SIM_RUNLIMIT%      The active RUNLIMIT value
+          %SIM_RUNLIMIT_UNITS% The units of the active RUNLIMIT
    Environment variable lookups are done first with the precise name between
    the % characters and if that fails, then the name between the % characters
    is upcased and a lookup of that value is attempted.
@@ -3712,20 +3708,71 @@ return result;
    untouched.
 */
 
+/* Return the simulator binary basename without any host path prefix. */
 static const char *
-_sim_gen_env_uplowcase (const char *gbuf, char *rbuf, size_t rbuf_size)
+sim_bin_name_value (char *rbuf, size_t rbuf_size)
+{
+const char *base;
+size_t len;
+
+if ((NULL == sim_prog_name) || ('\0' == sim_prog_name[0]))
+    return NULL;
+base = strrchr(sim_prog_name, '/');
+if (NULL == base)
+    base = strrchr(sim_prog_name, '\\');
+if (NULL == base)
+    base = sim_prog_name;
+else
+    ++base;
+strlcpy(rbuf, base, rbuf_size);
+len = strlen(rbuf);
+if ((len > 4) && (0 == sim_strncasecmp(&rbuf[len - 4], ".exe", 4)))
+    rbuf[len - 4] = '\0';
+return rbuf;
+}
+
+/* Determine a stable SCP-visible host OS type string on demand. */
+static const char *
+sim_ostype_value (char *rbuf, size_t rbuf_size)
+{
+if ('\0' == sim_ostype[0]) {
+#if defined(_WIN32)
+    strlcpy(sim_ostype, "Windows", sizeof(sim_ostype));
+#else
+    FILE *f;
+
+    if ((f = popen("uname", "r"))) {
+        do {
+            if (NULL == fgets(sim_ostype, sizeof(sim_ostype) - 1, f))
+                break;
+            sim_trim_endspc(sim_ostype);
+            } while ('\0' == sim_ostype[0]);
+        pclose(f);
+        }
+    if (('\0' == sim_ostype[0]) && getenv("OSTYPE"))
+        strlcpy(sim_ostype, getenv("OSTYPE"), sizeof(sim_ostype));
+#endif
+    if ('\0' == sim_ostype[0])
+        strlcpy(sim_ostype, "Unknown", sizeof(sim_ostype));
+    }
+strlcpy(rbuf, sim_ostype, rbuf_size);
+return rbuf;
+}
+
+static const char *
+sim_get_host_env_uplowcase (const char *gbuf, char *rbuf, size_t rbuf_size)
 {
 const char *ap;
 char tbuf[CBUFSIZE];
 
 ap = getenv(gbuf);                      /* first try using the literal name */
 if (!ap) {
-    get_glyph (gbuf, tbuf, 0);          /* now try using the upcased name */
-    if (strcmp (gbuf, tbuf))            /* upcase different? */
+    get_glyph(gbuf, tbuf, 0);           /* now try using the upcased name */
+    if (strcmp(gbuf, tbuf))             /* upcase different? */
         ap = getenv(tbuf);              /* lookup the upcase name */
     }
 if (ap) {                               /* environment variable found? */
-    strlcpy (rbuf, ap, rbuf_size);      /* Return the environment value */
+    strlcpy(rbuf, ap, rbuf_size);       /* Return the environment value */
     ap = rbuf;
     }
 return ap;
@@ -3850,64 +3897,56 @@ char *tgbuf = NULL;
 size_t tgbuf_size = MAX(rbuf_size, 1 + (size_t)(fixup_needed - gbuf));
 
 if (fixup_needed) {
-    tgbuf = (char *)calloc (tgbuf_size, 1);
-    memcpy (tgbuf, gbuf, (fixup_needed - gbuf));
+    tgbuf = (char *)calloc(tgbuf_size, 1);
+    memcpy(tgbuf, gbuf, (fixup_needed - gbuf));
     gbuf = tgbuf;
     }
-ap = _sim_gen_env_uplowcase (gbuf, rbuf, rbuf_size);/* Look for environment variable */
-if (!ap) {                              /* no environment variable found? */
-    for (i = 0; i < sim_external_env_count; i++) {
-        if (0 == strcmp (gbuf, sim_external_env[i].name)) {
-            ap = sim_external_env[i].value;
-            break;
-            }
-        }
-    }
-if (!ap) {                              /* no environment variable found? */
+ap = NULL;
+if (!ap) {                              /* no SCP variable found? */
     time_t now = (time_t)cmd_time.tv_sec;
     struct tm *tmnow = localtime(&now);
 
     /* ISO 8601 format date/time info */
     if (!strcmp ("DATE", gbuf)) {
-        sprintf (rbuf, "%4d-%02d-%02d", tmnow->tm_year+1900, tmnow->tm_mon+1, tmnow->tm_mday);
+        sprintf(rbuf, "%4d-%02d-%02d", tmnow->tm_year+1900, tmnow->tm_mon+1, tmnow->tm_mday);
         ap = rbuf;
         }
     else if (!strcmp ("TIME", gbuf)) {
-        sprintf (rbuf, "%02d:%02d:%02d", tmnow->tm_hour, tmnow->tm_min, tmnow->tm_sec);
+        sprintf(rbuf, "%02d:%02d:%02d", tmnow->tm_hour, tmnow->tm_min, tmnow->tm_sec);
         ap = rbuf;
         }
     else if (!strcmp ("DATETIME", gbuf)) {
-        sprintf (rbuf, "%04d-%02d-%02dT%02d:%02d:%02d", tmnow->tm_year+1900, tmnow->tm_mon+1, tmnow->tm_mday, tmnow->tm_hour, tmnow->tm_min, tmnow->tm_sec);
+        sprintf(rbuf, "%04d-%02d-%02dT%02d:%02d:%02d", tmnow->tm_year+1900, tmnow->tm_mon+1, tmnow->tm_mday, tmnow->tm_hour, tmnow->tm_min, tmnow->tm_sec);
         ap = rbuf;
         }
     /* Locale oriented formatted date/time info */
     else if (!strcmp ("LDATE", gbuf)) {
-        strftime (rbuf, rbuf_size, "%x", tmnow);
+        strftime(rbuf, rbuf_size, "%x", tmnow);
         ap = rbuf;
         }
     else if (!strcmp ("LTIME", gbuf)) {
 #if defined(HAVE_C99_STRFTIME)
-        strftime (rbuf, rbuf_size, "%r", tmnow);
+        strftime(rbuf, rbuf_size, "%r", tmnow);
 #else
-        strftime (rbuf, rbuf_size, "%p", tmnow);
+        strftime(rbuf, rbuf_size, "%p", tmnow);
         if (rbuf[0])
-            strftime (rbuf, rbuf_size, "%I:%M:%S %p", tmnow);
+            strftime(rbuf, rbuf_size, "%I:%M:%S %p", tmnow);
         else
-            strftime (rbuf, rbuf_size, "%H:%M:%S", tmnow);
+            strftime(rbuf, rbuf_size, "%H:%M:%S", tmnow);
 #endif
         ap = rbuf;
         }
     else if (!strcmp ("CTIME", gbuf)) {
 #if defined(HAVE_C99_STRFTIME)
-        strftime (rbuf, rbuf_size, "%c", tmnow);
+        strftime(rbuf, rbuf_size, "%c", tmnow);
 #else
-        strcpy (rbuf, ctime(&now));
-        rbuf[strlen (rbuf)-1] = '\0';    /* remove trailing \n */
+        strcpy(rbuf, ctime(&now));
+        rbuf[strlen(rbuf)-1] = '\0';    /* remove trailing \n */
 #endif
         ap = rbuf;
         }
     else if (!strcmp ("UTIME", gbuf)) {
-        sprintf (rbuf, "%" LL_FMT "d", (LL_TYPE)now);
+        sprintf(rbuf, "%" LL_FMT "d", (LL_TYPE)now);
         ap = rbuf;
         }
     /* Separate Date/Time info */
@@ -3917,10 +3956,6 @@ if (!ap) {                              /* no environment variable found? */
         }
     else if (!strcmp ("DATE_YY", gbuf)) {/* Year (00-99) */
         strftime (rbuf, rbuf_size, "%y", tmnow);
-        ap = rbuf;
-        }
-    else if (!strcmp ("DATE_YC", gbuf)) {/* Century (year/100) */
-        sprintf (rbuf, "%d", (tmnow->tm_year + 1900)/100);
         ap = rbuf;
         }
     else if ((!strcmp ("DATE_19XX_YY", gbuf)) || /* Year with same calendar */
@@ -4029,7 +4064,52 @@ if (!ap) {                              /* no environment variable found? */
         sprintf (rbuf, "%s", sim_show_message ? "" : "-Q");
         ap = rbuf;
         }
+    else if (!strcmp ("SIM_NAME", gbuf)) {
+        strlcpy (rbuf, sim_name, rbuf_size);
+        ap = rbuf;
+        }
+    else if (!strcmp ("SIM_BIN_PATH", gbuf)) {
+        if (sim_prog_name) {
+            strlcpy (rbuf, sim_prog_name, rbuf_size);
+            ap = rbuf;
+            }
+        }
+    else if (!strcmp ("SIM_BIN_NAME", gbuf)) {
+        ap = sim_bin_name_value (rbuf, rbuf_size);
+        }
+    else if (!strcmp ("SIM_OSTYPE", gbuf)) {
+        ap = sim_ostype_value (rbuf, rbuf_size);
+        }
+    else if (!strcmp ("SIM_RUNLIMIT", gbuf)) {
+        if (sim_runlimit_enabled) {
+            sprintf (rbuf, "%d", sim_runlimit_value);
+            ap = rbuf;
+            }
+        }
+    else if (!strcmp ("SIM_RUNLIMIT_UNITS", gbuf)) {
+        if (sim_runlimit_enabled && sim_runlimit_units) {
+            strlcpy (rbuf, sim_runlimit_units, rbuf_size);
+            ap = rbuf;
+            }
+        }
+    else if (!strcmp ("_FILE_COMPARE_DIFF_OFFSET", gbuf)) {
+        if (sim_file_compare_diff_valid) {
+            snprintf (rbuf, rbuf_size, "%zu",
+                      sim_file_compare_diff_offset);
+            ap = rbuf;
+            }
+        }
     }
+if (!ap) {                              /* no SCP variable found? */
+    for (i = 0; i < sim_external_env_count; i++) {
+        if (0 == strcmp (gbuf, sim_external_env[i].name)) {
+            ap = sim_external_env[i].value;
+            break;
+            }
+        }
+    }
+if (!ap)                                /* no environment variable found? */
+    ap = sim_get_host_env_uplowcase (gbuf, rbuf, rbuf_size);
 if (ap && fixup_needed) {   /* substring/substituted needed? */
     strlcpy (tgbuf, ap, tgbuf_size);
     _sim_subststr_substr (fixup_needed + 1, tgbuf, tgbuf_size);
@@ -4184,7 +4264,7 @@ for (; *ip && (op < oend); ) {
         else {
             if (ip == istart) {                         /* at beginning of input? */
                 get_glyph (istart, gbuf, 0);            /* substitute initial token */
-                ap = getenv(gbuf);                      /* if it is an environment variable name */
+                ap = _sim_get_env_special (gbuf, rbuf, sizeof (rbuf));
                 if (!ap) {                              /* nope? */
                     sim_sub_instr_off[outstr_off++] = ip - instr;
                     *op++ = *ip++;                      /* press on with literal character */
@@ -4247,6 +4327,9 @@ if (sim_switches & SWMASK ('F')) {      /* File Compare? */
     size_t diff_offset = 0;
     char *filename1, *filename2;
 
+    sim_file_compare_diff_valid = FALSE;
+    sim_file_compare_diff_offset = 0;
+
     filename1 = (char *)malloc (strlen (s1));
     strcpy (filename1, s1 + 1);
     filename1[strlen (filename1) - 1] = '\0';
@@ -4254,7 +4337,6 @@ if (sim_switches & SWMASK ('F')) {      /* File Compare? */
     strcpy (filename2, s2 + 1);
     filename2[strlen (filename2) - 1] = '\0';
 
-    setenv ("_FILE_COMPARE_DIFF_OFFSET", "", 1);    /* Remove previous environment variable */
     f1 = sim_fopen (filename1, "rb");
     f2 = sim_fopen (filename2, "rb");
     free (filename1);
@@ -4308,10 +4390,8 @@ if (sim_switches & SWMASK ('F')) {      /* File Compare? */
     fclose (f1);
     fclose (f2);
     if (c1 != c2) {
-        char offset_buf[32];
-
-        snprintf (offset_buf, sizeof (offset_buf), "%u", (uint32)diff_offset);
-        setenv ("_FILE_COMPARE_DIFF_OFFSET", offset_buf, 1);
+        sim_file_compare_diff_valid = TRUE;
+        sim_file_compare_diff_offset = diff_offset;
         }
     return c1 - c2;
     }
@@ -5747,7 +5827,7 @@ void sim_fprint_regex_support (FILE *st)
 t_stat show_version (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
 {
 int32 vmaj = SIM_MAJOR, vmin = SIM_MINOR, vpat = SIM_PATCH, vdelt = SIM_DELTA;
-char vmaj_s[12], vmin_s[12], vpat_s[12], vdelt_s[12];
+char vdelt_s[12];
 const char *cpp = "";
 const char *build = "";
 const char *arch = "";
@@ -5756,20 +5836,12 @@ const char *arch = "";
 #define S_str(a) #a
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
-sprintf (vmaj_s, "%d", vmaj);
-setenv ("SIM_MAJOR", vmaj_s, 1);
-sprintf (vmin_s, "%d", vmin);
-setenv ("SIM_MINOR", vmin_s, 1);
-sprintf (vpat_s, "%d", vpat);
-setenv ("SIM_PATCH", vpat_s, 1);
 fprintf (st, "%s simulator Open SIMH V%d.%d-%d", sim_name, vmaj, vmin, vpat);
 if (sim_vm_release != NULL) {                           /* if a release string is defined */
-    setenv ("SIM_VM_RELEASE", sim_vm_release, 1);
     fprintf (st, " Release %s", sim_vm_release);        /*   then display it */
     }
 if (vdelt) {
     sprintf (vdelt_s, "%d", vdelt);
-    setenv ("SIM_DELTA", vdelt_s, 1);
     fprintf (st, " delta %d", vdelt);
     }
 #if defined (SIM_VERSION_MODE)
@@ -5781,7 +5853,6 @@ if (1) {
         memmove (mode, mode + 1, strlen (mode));
         }
     fprintf (st, " %s", mode);
-    setenv ("SIM_VERSION_MODE", mode, 1);
     }
 #endif
 if (flag) {
@@ -5991,18 +6062,16 @@ if (flag) {
 #endif
     if ((!strcmp (os_type, "Unknown")) && (getenv ("OSTYPE")))
         strlcpy (os_type, getenv ("OSTYPE"), sizeof (os_type));
-    setenv ("SIM_OSTYPE", os_type, 1);
+    strlcpy (sim_ostype, os_type, sizeof (sim_ostype));
     }
 #if defined(SIM_ARCHIVE_GIT_COMMIT_ID)
 if (NULL == strchr (S_xstr(SIM_ARCHIVE_GIT_COMMIT_ID), '$')) {
     const char *extras = strchr (S_xstr(SIM_ARCHIVE_GIT_COMMIT_ID), '+');
 
     fprintf (st, "%ssimh git commit id: %8.8s%s", flag ? "\n        " : "        ", S_xstr(SIM_ARCHIVE_GIT_COMMIT_ID), extras ? extras : "");
-    setenv ("SIM_ARCHIVE_GIT_COMMIT_ID", S_xstr(SIM_ARCHIVE_GIT_COMMIT_ID), 1);
     }
 #if defined(SIM_ARCHIVE_GIT_COMMIT_TIME)
 if (NULL == strchr (S_xstr(SIM_ARCHIVE_GIT_COMMIT_TIME), '$')) {
-    setenv ("SIM_ARCHIVE_GIT_COMMIT_TIME", S_xstr(SIM_ARCHIVE_GIT_COMMIT_TIME), 1);
     if (flag)
         fprintf (st, "%ssimh git commit time: %s", "\n        ", S_xstr(SIM_ARCHIVE_GIT_COMMIT_TIME));
     }
@@ -6013,10 +6082,8 @@ if (1) {
     const char *extras = strchr (S_xstr(SIM_GIT_COMMIT_ID), '+');
 
     fprintf (st, "%sgit commit id: %8.8s%s", flag ? "\n        " : "        ", S_xstr(SIM_GIT_COMMIT_ID), extras ? extras : "");
-    setenv ("SIM_GIT_COMMIT_ID", S_xstr(SIM_GIT_COMMIT_ID), 1);
     }
 #if defined(SIM_GIT_COMMIT_TIME)
-setenv ("SIM_GIT_COMMIT_TIME", S_xstr(SIM_GIT_COMMIT_TIME), 1);
 if (flag)
     fprintf (st, "%sgit commit time: %s", "\n        ", S_xstr(SIM_GIT_COMMIT_TIME));
 #endif
@@ -6937,7 +7004,6 @@ int32 num;
 t_stat r;
 double usec_factor = 1.0;
 const char *units = "";
-char runlimit[32];
 
 GET_SWITCHES (cptr);                                    /* get switches */
 if (0 == flag) {
@@ -6946,9 +7012,9 @@ if (0 == flag) {
     sim_runlimit = 0;
     sim_runlimit_switches = 0;
     sim_runlimit_enabled = FALSE;
+    sim_runlimit_value = 0;
+    sim_runlimit_units = NULL;
     sim_cancel (&sim_runlimit_unit);
-    unsetenv ("SIM_RUNLIMIT");
-    unsetenv ("SIM_RUNLIMIT_UNITS");
     return SCPE_OK;
     }
 
@@ -6991,20 +7057,16 @@ if (*cptr)
 sim_runlimit_enabled = TRUE;
 sim_cancel (&sim_runlimit_unit);
 sim_runlimit_switches = sim_switches;
+sim_runlimit_value = num;
+sim_runlimit_units = units;
 if (sim_runlimit_switches & SWMASK ('T')) {
     sim_runlimit_d_initial = sim_runlimit_d = num * usec_factor * sim_host_speed_factor ();
     if (sim_host_speed_factor () > 1.0)
         sim_messagef (SCPE_OK, "Slow host - adjusting RUNLIMIT from %d %s to %.1f %s\n", num, units, num * sim_host_speed_factor (), units);
-    snprintf (runlimit, sizeof (runlimit), "%.f", num * sim_host_speed_factor ());
-    setenv ("SIM_RUNLIMIT", runlimit, 1);
-    setenv ("SIM_RUNLIMIT_UNITS", units, 1);
     return sim_activate_after_d (&sim_runlimit_unit, sim_runlimit_d);
     }
 else {
     sim_runlimit_initial = sim_runlimit = num;
-    snprintf (runlimit, sizeof (runlimit), "%d", num);
-    setenv ("SIM_RUNLIMIT", runlimit, 1);
-    setenv ("SIM_RUNLIMIT_UNITS", units, 1);
     return sim_activate (&sim_runlimit_unit, sim_runlimit);
     }
 }

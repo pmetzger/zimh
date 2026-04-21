@@ -38,6 +38,14 @@ add_unit_test(unit-scp-expr
         ${PROJECT_SOURCE_DIR}/tests/unit/support
 )
 
+add_unit_test(unit-scp-subst
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_scp_subst.c
+    INCLUDES
+        ${PROJECT_SOURCE_DIR}/tests/unit/support
+)
+
 add_unit_test(unit-scp-expect
     LABEL unit
     SOURCES

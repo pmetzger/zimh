@@ -1954,6 +1954,7 @@ left one position.
 | `%LDATE%`      | `mm/dd/yy` (Locale Formatted)               |
 | `%LTIME%`      | `hh:mm:ss am/pm` (Locale Formatted)           |
 | `%CTIME%`      | `Www Mmm dd hh:mm:ss yyyy` (Locale Formatted) |
+| `%UTIME%`      | Unix time in seconds since January 1, 1970 UTC |
 | `%DATE_YYYY%`  | `yyyy` (0000-9999)                            |
 | `%DATE_YY%`    | `yy` (00-99)                                  |
 | `%DATE_MM%`    | `mm` (01-12)                                  |
@@ -1979,6 +1980,18 @@ left one position.
 | `%SIM_NAME%`     | The name of the computer that is being simulated. |
 | `%SIM_BIN_NAME%` | The name of the simulator program binary          |
 | `%SIM_BIN_PATH%` | The full path of the simulator program binary     |
+| `%SIM_OSTYPE%`   | The host operating system running the simulator   |
+| `%SIM_RUNLIMIT%` | The active `RUNLIMIT` numeric value, if any       |
+| `%SIM_RUNLIMIT_UNITS%` | The units of the active `RUNLIMIT`, if any |
+
+#### Command-Published Variables
+
+Some commands publish additional variables for later command
+substitution.
+
+- `_FILE_COMPARE_DIFF_OFFSET`
+  When a `FILE COMPARE` operation finds a difference, this variable is
+  set to the zero-based file offset of the first differing byte.
 
 #### Environment Variables
 
