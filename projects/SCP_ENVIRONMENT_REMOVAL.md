@@ -112,8 +112,9 @@ interpreter scratch state being forced through the host environment.
 
 - `SIM_REGEX_TYPE`
 
-That should become an SCP-managed variable, not a process-environment
-variable.
+This does not appear to justify any user-visible substitution surface at
+all. Unless a real use case emerges, it should be removed rather than
+replaced with an SCP-managed variable.
 
 #### 6. Simulator identity and version metadata
 
@@ -175,18 +176,13 @@ This should be replaced with a real interpreter-owned variable system.
 
 ## Desired end state
 
-SCP should have its own internal variable store.
+SCP should have its own internal substitution mechanism, separate from
+the host process environment.
 
-That store should be the authoritative home for SCP-managed variables,
-including:
-
-- SEND defaults
-- EXPECT defaults
-- EXPECT match state
-- RUNLIMIT state
-- FILE COMPARE scratch state
-- regex/backend reporting variables
-- simulator identity/version/build metadata that SCP wants to expose
+That mechanism should not become a new generic stringly typed home for
+all SCP state. Most of the current environment-backed values should
+become ordinary typed runtime state in the structures that naturally own
+them.
 
 The process environment should remain available only as a separate host
 environment source.
@@ -239,36 +235,79 @@ Examples:
 Those should live in a much smaller SCP-managed variable layer used only
 for interpreter exposure and substitution.
 
+This layer should be limited to values whose natural representation is
+already textual or whose main purpose is ad hoc substitution.
+
 ### Resulting model
 
 The intended model is therefore:
 
 - typed state first
-- a smaller string-valued SCP substitution layer second
+- provider-based substitution second
+- a small string-valued SCP variable map only where strings are the
+  natural representation
 - host environment as a separate external source
 
 The substitution layer should expose typed state when needed, but it
 should not become the primary home for that state.
 
+In particular, the preferred design is:
+
+- typed providers for things like SEND defaults, RUNLIMIT state, version
+  fields, and simulator identity
+- a small internal string map for ad hoc interpreter variables such as
+  EXPECT match captures
+- host environment lookup only as a fallback external source
+
+This avoids replacing one global string-based design with another.
+
+It should also be selective about what remains substitutable at all.
+Accidental substitutability caused by the current `getenv()` design
+should not be preserved by default.
+
+Keep substitutable:
+
+- informational simulator/version/build metadata that is genuinely
+  useful in command expansion
+- explicit EXPECT match-result variables intended for command actions
+
+Do not keep substitutable:
+
+- SEND defaults
+- EXPECT defaults
+- FILE COMPARE scratch state
+- internal control state such as RUNLIMIT, unless a concrete user-facing
+  need is identified
+- `SIM_REGEX_TYPE`, which should be removed unless a real consumer
+  appears
+
 ## Proposed implementation plan
 
-### Phase 1. Introduce an internal SCP substitution-variable table
+### Phase 1. Introduce an internal SCP substitution layer
 
-Add a small internal SCP-managed string variable table with at least:
+Add an internal SCP substitution mechanism that can resolve names from
+sources owned by SCP rather than from the process environment.
+
+The preferred structure is:
+
+- provider callbacks or equivalent logic for typed runtime state
+- a small SCP-managed string variable map for ad hoc textual variables
+
+If a string map is introduced, it should support at least:
 
 - set by name
 - unset by name
 - lookup by name
 - optional clear-by-prefix or grouped clear support
 
-This table is for SCP substitution exposure, not for general runtime
-state storage. It should be owned by the SCP runtime and should not
-depend on host-environment APIs.
+That string map is for ad hoc substitution values, not for general
+runtime state storage. It should be owned by the SCP runtime and should
+not depend on host-environment APIs.
 
-### Phase 2. Teach SCP substitution to consult the SCP variable table
+### Phase 2. Teach SCP substitution to consult the internal SCP layer
 
 Update SCP substitution so it can resolve names from the internal SCP
-substitution-variable table.
+substitution layer.
 
 This must cover:
 
@@ -300,14 +339,15 @@ Likely ownership:
 The existing `dev:line` split in `scp_expect.c` already provides the
 natural ownership boundary.
 
-### Phase 4. Move EXPECT match publication into the internal table
+### Phase 4. Move EXPECT match publication into the internal substitution
+### layer
 
 Publish:
 
 - `_EXPECT_MATCH_PATTERN`
 - `_EXPECT_MATCH_GROUP_n`
 
-into the internal SCP substitution-variable table instead of the host
+into the internal SCP substitution layer instead of the host
 environment.
 
 This phase must preserve current action semantics.
@@ -317,16 +357,19 @@ This phase must preserve current action semantics.
 Migrate the other SCP-owned internal variables away from `setenv()`.
 
 Where they represent real runtime state, move them into typed ownership.
-Where they need to remain visible to SCP substitution, publish them into
-the SCP substitution-variable table.
+Where they need to remain visible to SCP substitution, expose them
+through typed providers or, if they are genuinely ad hoc textual
+variables, publish them into the small SCP string variable map.
 
 This includes:
 
 - RUNLIMIT variables
 - FILE COMPARE result variables
-- regex/backend-reporting variables
 - simulator identity/version/build metadata that SCP exposes to command
   expansion
+
+`SIM_REGEX_TYPE` should be deleted rather than migrated unless a real
+consumer appears.
 
 The goal is not to keep a special case for "most internal variables."
 The goal is to stop using the process environment as SCP's internal
@@ -350,8 +393,9 @@ Those should not be used as back doors for internal interpreter state.
 Existing unit tests currently use `getenv()`, `setenv()`, and
 `unsetenv()` to validate SCP-owned behavior.
 
-Rewrite those tests to assert against the internal SCP variable table or
-against owned runtime state instead.
+Rewrite those tests to assert against typed SCP state, provider-backed
+substitution results, or the small SCP string variable map as
+appropriate.
 
 This includes:
 
@@ -373,6 +417,8 @@ Also review documentation around:
 - version/reporting variables
 - RUNLIMIT-visible variables
 - any other SCP-published internal names
+
+Remove any user-facing mention of `SIM_REGEX_TYPE` if one exists.
 
 ## Compatibility questions to decide explicitly
 
@@ -407,8 +453,11 @@ This project is complete when all of the following are true:
 - RUNLIMIT, FILE COMPARE, regex reporting, and version/identity metadata
   are no longer published through `setenv()` merely to reach SCP
   substitution
+- accidental substitution of SEND/EXPECT defaults, FILE COMPARE scratch
+  state, and similar internal plumbing has been removed rather than
+  preserved
 - SCP substitution can resolve SCP-owned variables from an internal SCP
-  variable table
+  substitution layer without using the process environment as storage
 - tests no longer seed or inspect the host environment to validate
   SCP-owned state
 - docs and help text no longer describe SCP internal state as environment
