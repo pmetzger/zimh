@@ -1,8 +1,8 @@
 cd %~p0
 
 # The tests check writing to the tape, so use a copy.
-copy classic-test.linc clobbered.linc
-attach tape0 clobbered.linc
+copy classic-test.linc "%SIMH_TEST_OUTPUT_DIR%/clobbered.linc"
+attach tape0 "%SIMH_TEST_OUTPUT_DIR%/clobbered.linc"
 
 echo CONTRL
 load -e classic-test.linc block=0 start=0 length=400

@@ -338,6 +338,10 @@ function (add_simulator _targ)
     endif ()
     set_tests_properties("simh-${_targ}" PROPERTIES LABELS "${TEST_LABELS}")
 
+    set(test_output_dir "${CMAKE_CURRENT_BINARY_DIR}/tests/${_targ}")
+    file(MAKE_DIRECTORY "${test_output_dir}")
+    file(TO_NATIVE_PATH "${test_output_dir}" native_test_output_dir)
+
     if (BUILD_SHARED_DEPS)
         ## Make sure that the tests can find the DLLs/shared objects:
         file(TO_NATIVE_PATH "${SIMH_DEP_TOPDIR}/bin" native_dep_bindir)
@@ -349,6 +353,8 @@ function (add_simulator _targ)
     ##   the CI/CD environment. While not STRICTLY necessary, it's a good idea.
     list(APPEND test_add_env "SDL_VIDEODRIVER=dummy")
     list(APPEND test_add_env "SDL_AUDIODRIVER=dummy")
+    list(APPEND test_add_env
+         "SIMH_TEST_OUTPUT_DIR=${native_test_output_dir}")
 
     if (WIN32)
         if (BUILD_SHARED_DEPS)
