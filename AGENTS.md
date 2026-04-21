@@ -38,6 +38,12 @@ cleaner, then do that.
 
 Comment what all non-obvious functions do.
 
+Do not try to run multiple git commands in parallel; they will race
+each other and conflict. Similarly, do not try to run multiple cmake
+and ctest commands in parallel, they will race each other and
+conflict. Similarly, do not run multiple bd commands in parallel, they
+will race each other and conflict.
+
 Use `cmake --build` with Ninja and no -j to make sure we get optimal
 parallelism.
 
