@@ -42,6 +42,8 @@ int sim_cmdvars_system(const char *command);
 typedef int (*sim_cmdvars_uname_hook_fn)(struct utsname *utsname_info);
 void sim_cmdvars_set_test_uname_hook(sim_cmdvars_uname_hook_fn hook);
 #endif
+typedef t_bool (*sim_cmdvars_localtime_hook_fn)(time_t now, struct tm *tmnow);
+void sim_cmdvars_set_test_localtime_hook(sim_cmdvars_localtime_hook_fn hook);
 void sim_cmdvars_reset_ostype_cache(void);
 void sim_cmdvars_reset(void);
 

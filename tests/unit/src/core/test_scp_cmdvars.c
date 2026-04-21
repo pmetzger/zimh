@@ -17,10 +17,16 @@
 
 static const char simh_test_prog_name[] = "/test/bin/simh-unit-scp-cmdvars";
 static int simh_test_uname_probe_calls = 0;
+static int simh_test_localtime_calls = 0;
 static struct timespec simh_test_cmdvars_time = {0};
 static int simh_test_cmdvars_time_status = 0;
 static int simh_test_dynstr_fail_at_call = 0;
 static int simh_test_dynstr_realloc_calls = 0;
+
+extern t_bool sim_runlimit_enabled;
+extern int32 sim_runlimit_value;
+extern const char *sim_runlimit_units;
+extern t_stat set_verify(int32 flag, const char *cptr);
 
 static int simh_test_cmdvars_clock_gettime(int clock_id, struct timespec *tp)
 {
@@ -51,6 +57,15 @@ static int simh_test_uname_hook_cached(struct utsname *utsname_info)
     return 0;
 }
 #endif
+
+static t_bool simh_test_localtime_hook_fail(time_t now, struct tm *tmnow)
+{
+    (void)now;
+    (void)tmnow;
+
+    ++simh_test_localtime_calls;
+    return FALSE;
+}
 
 static void *simh_test_dynstr_realloc_fail_on_call(void *ptr, size_t size)
 {
@@ -85,6 +100,7 @@ static int setup_scp_cmdvars_fixture(void **state)
     sim_switches = 0;
     sim_rem_cmd_active_line = -1;
     simh_test_uname_probe_calls = 0;
+    simh_test_localtime_calls = 0;
     simh_test_cmdvars_time = (struct timespec){0};
     simh_test_cmdvars_time_status = 0;
     simh_test_dynstr_fail_at_call = 0;
@@ -94,6 +110,7 @@ static int setup_scp_cmdvars_fixture(void **state)
 #if !defined(_WIN32)
     sim_cmdvars_set_test_uname_hook(NULL);
 #endif
+    sim_cmdvars_set_test_localtime_hook(NULL);
     return 0;
 }
 
@@ -117,11 +134,13 @@ static int teardown_scp_cmdvars_fixture(void **state)
     sim_switches = 0;
     sim_rem_cmd_active_line = -1;
     simh_test_uname_probe_calls = 0;
+    simh_test_localtime_calls = 0;
     sim_time_reset_test_hooks();
     sim_dynstr_reset_test_hooks();
 #if !defined(_WIN32)
     sim_cmdvars_set_test_uname_hook(NULL);
 #endif
+    sim_cmdvars_set_test_localtime_hook(NULL);
     return 0;
 }
 
@@ -264,6 +283,18 @@ static void test_sim_sub_args_handles_malformed_substring_modifier(void **state)
     assert_string_equal(expanded, "AvalueB");
 }
 
+/* Verify %VAR still expands if the closing percent is omitted. */
+static void test_sim_sub_args_expands_variable_without_trailing_percent(
+    void **state)
+{
+    char expanded[CBUFSIZE];
+
+    (void)state;
+
+    expand_command("A%SIM_NAME", expanded, sizeof(expanded));
+    assert_string_equal(expanded, "Asimh-unit");
+}
+
 /* Verify SCP-owned substitution variables can be set and removed directly. */
 static void test_sim_sub_vars_set_get_and_unset(void **state)
 {
@@ -380,6 +411,43 @@ static void test_sim_sub_args_expands_fixed_datetime_values(void **state)
                       (void *)&cases[i]);
 }
 
+/* Verify DATE_19XX_* covers leap-year branches in its calendar mapping. */
+static void test_sim_sub_args_expands_date_19xx_leap_years(void **state)
+{
+    struct simh_test_cmdvars_time_case case_2000_yy = {
+        "A%DATE_19XX_YY%B", "A84B"};
+    struct simh_test_cmdvars_time_case case_2000_yyyy = {
+        "A%DATE_19XX_YYYY%B", "A1984B"};
+    struct simh_test_cmdvars_time_case case_2004_yy = {
+        "A%DATE_19XX_YY%B", "A76B"};
+    struct simh_test_cmdvars_time_case case_2004_yyyy = {
+        "A%DATE_19XX_YYYY%B", "A1976B"};
+    struct simh_test_cmdvars_time_case case_2100_yy = {
+        "A%DATE_19XX_YY%B", "A99B"};
+    struct simh_test_cmdvars_time_case case_2100_yyyy = {
+        "A%DATE_19XX_YYYY%B", "A1999B"};
+
+    (void)state;
+
+    simh_test_cmdvars_time =
+        (struct timespec){.tv_sec = 946684800, .tv_nsec = 0};
+    sim_time_set_test_hooks(simh_test_cmdvars_clock_gettime, NULL);
+    with_timezone("UTC", run_fixed_time_expansion_case, &case_2000_yy);
+    with_timezone("UTC", run_fixed_time_expansion_case, &case_2000_yyyy);
+
+    simh_test_cmdvars_time =
+        (struct timespec){.tv_sec = 1072915200, .tv_nsec = 0};
+    sim_time_set_test_hooks(simh_test_cmdvars_clock_gettime, NULL);
+    with_timezone("UTC", run_fixed_time_expansion_case, &case_2004_yy);
+    with_timezone("UTC", run_fixed_time_expansion_case, &case_2004_yyyy);
+
+    simh_test_cmdvars_time =
+        (struct timespec){.tv_sec = 4102444800, .tv_nsec = 0};
+    sim_time_set_test_hooks(simh_test_cmdvars_clock_gettime, NULL);
+    with_timezone("UTC", run_fixed_time_expansion_case, &case_2100_yy);
+    with_timezone("UTC", run_fixed_time_expansion_case, &case_2100_yyyy);
+}
+
 /* Expand ISO week variables for one fixed epoch and compare the results. */
 static void run_fixed_iso_week_case(void *ctx)
 {
@@ -440,6 +508,21 @@ static void test_sim_get_env_special_expands_mode_variables(void **state)
 
     assert_non_null(_sim_get_env_special("SIM_MESSAGE", value, sizeof(value)));
     assert_string_equal(value, "-Q");
+
+    sim_quiet = 0;
+    sim_show_message = 1;
+
+    assert_non_null(_sim_get_env_special("SIM_QUIET", value, sizeof(value)));
+    assert_string_equal(value, "");
+
+    assert_non_null(_sim_get_env_special("SIM_MESSAGE", value, sizeof(value)));
+    assert_string_equal(value, "");
+
+    assert_int_equal(set_verify(1, NULL), SCPE_OK);
+    assert_string_equal(_sim_get_env_special("SIM_VERIFY", value, sizeof(value)),
+                        "-V");
+    assert_string_equal(
+        _sim_get_env_special("SIM_VERBOSE", value, sizeof(value)), "-V");
 }
 
 /* Verify SIM_BIN_NAME handles plain and missing program-name values. */
@@ -454,8 +537,12 @@ static void test_sim_get_env_special_handles_sim_bin_name_edge_cases(void **stat
         _sim_get_env_special("SIM_BIN_NAME", value, sizeof(value)),
         "plain-name");
 
+    sim_prog_name = "";
+    assert_null(_sim_get_env_special("SIM_BIN_NAME", value, sizeof(value)));
+
     sim_prog_name = NULL;
     assert_null(_sim_get_env_special("SIM_BIN_NAME", value, sizeof(value)));
+    assert_null(_sim_get_env_special("SIM_BIN_PATH", value, sizeof(value)));
 }
 
 /* Verify SIM_BIN_NAME strips Windows-style path prefixes too. */
@@ -488,6 +575,19 @@ static void test_sim_sub_args_expands_substrings_and_replacements(void **state)
     assert_string_equal(expanded, "AabXYefB");
 }
 
+/* Verify an empty substitution fixup leaves the source value unchanged. */
+static void test_sim_sub_args_preserves_value_for_empty_fixup(void **state)
+{
+    char expanded[CBUFSIZE];
+
+    (void)state;
+
+    assert_int_equal(setenv("ZIMH_TEST_EXTERNAL", "abcdef", 1), 0);
+
+    expand_command("A%ZIMH_TEST_EXTERNAL:%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, "AabcdefB");
+}
+
 /* Verify less common substring modifiers still behave as documented. */
 static void
 test_sim_sub_args_expands_negative_and_global_substring_modifiers(void **state)
@@ -499,6 +599,9 @@ test_sim_sub_args_expands_negative_and_global_substring_modifiers(void **state)
     assert_int_equal(setenv("ZIMH_TEST_EXTERNAL", "abcdef", 1), 0);
 
     expand_command("A%ZIMH_TEST_EXTERNAL:~-2,2%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, "AefB");
+
+    expand_command("A%ZIMH_TEST_EXTERNAL:~-2%B", expanded, sizeof(expanded));
     assert_string_equal(expanded, "AefB");
 
     expand_command("A%ZIMH_TEST_EXTERNAL:~1,-1%B", expanded, sizeof(expanded));
@@ -548,6 +651,35 @@ static void test_sim_cmdvars_capture_env_alias_ignores_missing_environment(
 
     sim_cmdvars_capture_env_alias("ZIMH_ALIAS");
     assert_null(_sim_get_env_special("ZIMH_ALIAS", value, sizeof(value)));
+}
+
+/* Verify missing lookups skip over unrelated captured aliases cleanly. */
+static void test_sim_get_env_special_ignores_unmatched_captured_aliases(
+    void **state)
+{
+    char value[CBUFSIZE];
+
+    (void)state;
+
+    assert_int_equal(setenv("ZIMH_ALIAS", "from-host", 1), 0);
+    sim_cmdvars_capture_env_alias("ZIMH_ALIAS");
+
+    assert_null(_sim_get_env_special("ZIMH_MISSING_ALIAS", value,
+                                     sizeof(value)));
+}
+
+/* Verify unsetting a missing SCP-owned variable leaves others untouched. */
+static void test_sim_sub_var_unset_ignores_missing_name(void **state)
+{
+    char value[CBUFSIZE];
+
+    (void)state;
+
+    sim_sub_var_set("ZIMH_TEST_VAR", "value");
+    sim_sub_var_unset("ZIMH_MISSING_VAR");
+
+    assert_string_equal(
+        _sim_get_env_special("ZIMH_TEST_VAR", value, sizeof(value)), "value");
 }
 
 /* Verify SCP does not publish SEND defaults unless it has a real value. */
@@ -754,6 +886,121 @@ static void test_sim_get_env_special_ostype_uses_cached_value(void **state)
     assert_int_equal(simh_test_uname_probe_calls, 1);
 }
 
+/* Verify time lookup degrades cleanly if localtime breakdown fails. */
+static void test_sim_get_env_special_handles_localtime_failure(void **state)
+{
+    char value[CBUFSIZE];
+
+    (void)state;
+
+    sim_cmdvars_set_test_localtime_hook(simh_test_localtime_hook_fail);
+
+    assert_null(_sim_get_env_special("DATE", value, sizeof(value)));
+    assert_string_equal(_sim_get_env_special("SIM_NAME", value, sizeof(value)),
+                        sim_name);
+    assert_string_equal(_sim_get_env_special("UTIME", value, sizeof(value)),
+                        "0");
+    assert_int_equal(simh_test_localtime_calls, 3);
+}
+
+/* Verify TSTATUS prefers simulator stop-message text when present. */
+static void test_sim_get_env_special_tstatus_prefers_stop_message(void **state)
+{
+    char value[CBUFSIZE];
+    const char *saved_message;
+
+    (void)state;
+
+    saved_message = sim_stop_messages[1];
+    sim_stop_messages[1] = "test stop message";
+
+    sim_last_cmd_stat = 1;
+    assert_string_equal(_sim_get_env_special("TSTATUS", value, sizeof(value)),
+                        "test stop message");
+
+    sim_stop_messages[1] = saved_message;
+}
+
+/* Verify TSTATUS falls back to generic error text when needed. */
+static void test_sim_get_env_special_tstatus_falls_back_to_error_text(
+    void **state)
+{
+    char value[CBUFSIZE];
+
+    (void)state;
+
+    sim_last_cmd_stat = SCPE_UNATT;
+    assert_string_equal(_sim_get_env_special("TSTATUS", value, sizeof(value)),
+                        sim_error_text(SCPE_UNATT));
+}
+
+/* Verify TSTATUS falls back cleanly for the plain OK status too. */
+static void test_sim_get_env_special_tstatus_handles_ok_status(void **state)
+{
+    char value[CBUFSIZE];
+
+    (void)state;
+
+    sim_last_cmd_stat = SCPE_OK;
+    assert_string_equal(_sim_get_env_special("TSTATUS", value, sizeof(value)),
+                        sim_error_text(SCPE_OK));
+}
+
+/* Verify TSTATUS falls back when an in-range stop message is absent. */
+static void test_sim_get_env_special_tstatus_handles_missing_stop_message(
+    void **state)
+{
+    char value[CBUFSIZE];
+    const char *saved_message;
+
+    (void)state;
+
+    saved_message = sim_stop_messages[2];
+    sim_stop_messages[2] = NULL;
+
+    sim_last_cmd_stat = 2;
+    assert_string_equal(_sim_get_env_special("TSTATUS", value, sizeof(value)),
+                        sim_error_text(2));
+
+    sim_stop_messages[2] = saved_message;
+}
+
+/* Verify runlimit variables disappear cleanly in their edge cases. */
+static void test_sim_get_env_special_handles_runlimit_edge_cases(void **state)
+{
+    char value[CBUFSIZE];
+
+    (void)state;
+
+    sim_runlimit_enabled = TRUE;
+    sim_runlimit_value = 12;
+    sim_runlimit_units = NULL;
+
+    assert_string_equal(_sim_get_env_special("SIM_RUNLIMIT", value,
+                                             sizeof(value)),
+                        "12");
+    assert_null(_sim_get_env_special("SIM_RUNLIMIT_UNITS", value,
+                                     sizeof(value)));
+
+    sim_runlimit_enabled = FALSE;
+    assert_null(_sim_get_env_special("SIM_RUNLIMIT_UNITS", value,
+                                     sizeof(value)));
+}
+
+/* Verify substitution fixups cope with a caller buffer too small for NUL. */
+static void test_sim_get_env_special_handles_exhausted_fixup_buffer(
+    void **state)
+{
+    char value[1];
+
+    (void)state;
+
+    assert_int_equal(setenv("ZIMH_TEST_EXTERNAL", "abcdef", 1), 0);
+    assert_non_null(_sim_get_env_special("ZIMH_TEST_EXTERNAL:cd=1234567890123456789",
+                                         value, sizeof(value)));
+    assert_string_equal(value, "");
+}
+
 /* Verify SET ENVIRONMENT stores a literal value. */
 static void test_sim_set_environment_literal_value(void **state)
 {
@@ -762,6 +1009,15 @@ static void test_sim_set_environment_literal_value(void **state)
     sim_switches = 0;
     assert_int_equal(sim_set_environment(0, "ZIMH_TEST_SET=hello"), SCPE_OK);
     assert_string_equal(getenv("ZIMH_TEST_SET"), "hello");
+}
+
+/* Verify SET ENVIRONMENT rejects a NULL input string. */
+static void test_sim_set_environment_rejects_null_input(void **state)
+{
+    (void)state;
+
+    sim_switches = 0;
+    assert_int_equal(sim_set_environment(0, NULL), SCPE_2FARG);
 }
 
 /* Verify SET ENVIRONMENT /S decodes a quoted string value. */
@@ -793,6 +1049,31 @@ static void test_sim_set_environment_prompt_uses_default(void **state)
     sim_switches = SWMASK('P');
     sim_rem_cmd_active_line = 0;
     assert_int_equal(sim_set_environment(0, "\"Prompt\" ZIMH_TEST_SET=default"),
+                     SCPE_OK);
+    assert_string_equal(getenv("ZIMH_TEST_SET"), "default");
+}
+
+/* Verify /P strips a single-quoted prompt before use. */
+static void test_sim_set_environment_prompt_uses_single_quoted_prompt(
+    void **state)
+{
+    (void)state;
+
+    sim_switches = SWMASK('P');
+    sim_rem_cmd_active_line = 0;
+    assert_int_equal(sim_set_environment(0, "'Prompt' ZIMH_TEST_SET=default"),
+                     SCPE_OK);
+    assert_string_equal(getenv("ZIMH_TEST_SET"), "default");
+}
+
+/* Verify /P also accepts an unquoted prompt string. */
+static void test_sim_set_environment_prompt_uses_unquoted_prompt(void **state)
+{
+    (void)state;
+
+    sim_switches = SWMASK('P');
+    sim_rem_cmd_active_line = 0;
+    assert_int_equal(sim_set_environment(0, "Prompt ZIMH_TEST_SET=default"),
                      SCPE_OK);
     assert_string_equal(getenv("ZIMH_TEST_SET"), "default");
 }
@@ -868,6 +1149,22 @@ static void test_sim_set_environment_replaces_captured_alias(void **state)
     unlink(path);
 }
 
+/* Verify SET ENVIRONMENT leaves unrelated captured aliases alone. */
+static void test_sim_set_environment_keeps_unmatched_captured_alias(
+    void **state)
+{
+    (void)state;
+
+    assert_int_equal(setenv("ZIMH_ALIAS", "from-host", 1), 0);
+    sim_cmdvars_capture_env_alias("ZIMH_ALIAS");
+    assert_null(getenv("ZIMH_ALIAS"));
+
+    sim_switches = 0;
+    assert_int_equal(sim_set_environment(0, "ZIMH_TEST_SET=hello"), SCPE_OK);
+    assert_null(getenv("ZIMH_ALIAS"));
+    assert_string_equal(getenv("ZIMH_TEST_SET"), "hello");
+}
+
 struct prompt_test_context {
     const char *command;
     const char *expected_value;
@@ -909,6 +1206,20 @@ static void test_sim_set_environment_prompt_uses_default_after_empty_input(
     (void)state;
 
     with_redirected_stdin("\n", run_prompt_environment_read, &prompt_ctx);
+}
+
+/* Verify /P falls back to the default when stdin immediately hits EOF. */
+static void test_sim_set_environment_prompt_uses_default_after_eof(
+    void **state)
+{
+    struct prompt_test_context prompt_ctx = {
+        "\"Prompt\" ZIMH_TEST_SET=default",
+        "default"
+    };
+
+    (void)state;
+
+    with_redirected_stdin("", run_prompt_environment_read, &prompt_ctx);
 }
 
 /* Verify % expansion still handles escapes, arguments, and filepath parts. */
@@ -988,6 +1299,53 @@ static void test_sim_sub_args_handles_missing_and_star_do_arguments(
     assert_string_equal(expanded, "Aalpha betaB");
 }
 
+/* Verify clock failure falls back to a zeroed command timestamp. */
+static void test_sim_sub_args_uses_zero_time_after_clock_failure(void **state)
+{
+    (void)state;
+
+    simh_test_cmdvars_time = (struct timespec){.tv_sec = 123, .tv_nsec = 456};
+    simh_test_cmdvars_time_status = -1;
+    sim_time_set_test_hooks(simh_test_cmdvars_clock_gettime, NULL);
+
+    with_timezone("UTC", run_fixed_time_expansion_case,
+                  &(struct simh_test_cmdvars_time_case){
+                      "A%DATE% %UTIME% %TIME_MSEC% %DATE_D%B",
+                      "A1970-01-01 0 000 4B"});
+}
+
+/* Verify malformed overlong %~ parts strings fail closed cleanly. */
+static void test_sim_sub_args_ignores_overlong_filepath_parts_spec(
+    void **state)
+{
+    char expanded[CBUFSIZE];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    do_arg[0] = "script";
+    do_arg[1] = "/tmp/example.bin";
+
+    expand_command_with_args("A%~fpnxtzfpnxtzfpnxtzfpnxtzfpnxtzfpnxtz1B",
+                             expanded, sizeof(expanded), do_arg);
+    assert_string_equal(expanded, "AB");
+}
+
+/* Verify DATE_D maps Sunday to 7 rather than 0. */
+static void test_sim_sub_args_expands_date_d_for_sunday(void **state)
+{
+    struct simh_test_cmdvars_time_case sunday_case = {
+        "A%DATE_D%B", "A7B"
+    };
+
+    (void)state;
+
+    simh_test_cmdvars_time =
+        (struct timespec){.tv_sec = 1609632000, .tv_nsec = 0};
+    sim_time_set_test_hooks(simh_test_cmdvars_clock_gettime, NULL);
+    with_timezone("UTC", run_fixed_time_expansion_case, &sunday_case);
+}
+
 /* Verify %n disappears if an earlier DO argument is omitted. */
 static void test_sim_sub_args_omits_sparse_do_arguments(void **state)
 {
@@ -1017,6 +1375,29 @@ static void test_sim_sub_args_star_quotes_spaced_arguments(void **state)
 
     expand_command_with_args("A%*B", expanded, sizeof(expanded), do_arg);
     assert_string_equal(expanded, "A\"two words\" 'he\"llo world'B");
+}
+
+/* Verify %* can consume all nine available DO arguments without early stop. */
+static void test_sim_sub_args_star_handles_all_do_arguments(void **state)
+{
+    char expanded[CBUFSIZE];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    do_arg[0] = "script";
+    do_arg[1] = "a1";
+    do_arg[2] = "a2";
+    do_arg[3] = "a3";
+    do_arg[4] = "a4";
+    do_arg[5] = "a5";
+    do_arg[6] = "a6";
+    do_arg[7] = "a7";
+    do_arg[8] = "a8";
+    do_arg[9] = "a9";
+
+    expand_command_with_args("A%*B", expanded, sizeof(expanded), do_arg);
+    assert_string_equal(expanded, "Aa1 a2 a3 a4 a5 a6 a7 a8 a9B");
 }
 
 /* Verify %* with no remaining arguments expands to an empty string. */
@@ -1105,6 +1486,40 @@ static void test_sim_sub_args_star_handles_quoted_arg_oom(void **state)
     assert_string_equal(expanded, "AB");
 }
 
+/* Verify %* drops out cleanly if the opening quote allocation fails. */
+static void test_sim_sub_args_star_handles_open_quote_oom(void **state)
+{
+    char expanded[CBUFSIZE];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    do_arg[0] = "script";
+    do_arg[1] = "two words";
+    simh_test_dynstr_fail_at_call = 1;
+    sim_dynstr_set_test_realloc_hook(simh_test_dynstr_realloc_fail_on_call);
+
+    expand_command_with_args("A%*B", expanded, sizeof(expanded), do_arg);
+    assert_string_equal(expanded, "AB");
+}
+
+/* Verify %* drops out cleanly if the closing quote allocation fails. */
+static void test_sim_sub_args_star_handles_close_quote_oom(void **state)
+{
+    char expanded[CBUFSIZE];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    do_arg[0] = "script";
+    do_arg[1] = "123456789012 x";
+    simh_test_dynstr_fail_at_call = 2;
+    sim_dynstr_set_test_realloc_hook(simh_test_dynstr_realloc_fail_on_call);
+
+    expand_command_with_args("A%*B", expanded, sizeof(expanded), do_arg);
+    assert_string_equal(expanded, "AB");
+}
+
 /* Verify %* truncates only at the final command-buffer boundary. */
 static void test_sim_sub_args_star_respects_final_output_limit(void **state)
 {
@@ -1145,6 +1560,32 @@ static void test_sim_sub_args_decodes_single_quoted_argument_with_spaces(
 
     expand_command_with_args("\"  a\"", expanded, sizeof(expanded), do_arg);
     assert_string_equal(expanded, "a");
+}
+
+/* Verify a single-quoted whole-line command is decoded too. */
+static void test_sim_sub_args_decodes_single_quoted_argument_single_quotes(
+    void **state)
+{
+    char expanded[CBUFSIZE];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    expand_command_with_args("'a\\tb'", expanded, sizeof(expanded), do_arg);
+    assert_memory_equal(expanded, "a\tb", 3);
+}
+
+/* Verify invalid whole-line quoted decode falls back to the original text. */
+static void test_sim_sub_args_preserves_invalid_single_argument_decode(
+    void **state)
+{
+    char expanded[CBUFSIZE];
+    char *do_arg[10] = {0};
+
+    (void)state;
+
+    expand_command_with_args("\"\\q\"", expanded, sizeof(expanded), do_arg);
+    assert_string_equal(expanded, "\"\\q\"");
 }
 
 /* Verify quoted-only commands with trailing tokens bypass decode cleanly. */
@@ -1288,6 +1729,9 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_handles_malformed_substring_modifier,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_expands_variable_without_trailing_percent,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(test_sim_sub_vars_set_get_and_unset,
                                         setup_scp_cmdvars_fixture,
                                         teardown_scp_cmdvars_fixture),
@@ -1296,6 +1740,9 @@ int main(void)
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_expands_fixed_datetime_values,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_expands_date_19xx_leap_years,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_expands_iso_week_boundary,
@@ -1316,6 +1763,9 @@ int main(void)
             test_sim_sub_args_expands_substrings_and_replacements,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_preserves_value_for_empty_fixup,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_sub_args_expands_negative_and_global_substring_modifiers,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
@@ -1326,6 +1776,12 @@ int main(void)
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_cmdvars_capture_env_alias_ignores_missing_environment,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_get_env_special_ignores_unmatched_captured_aliases,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_var_unset_ignores_missing_name,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_omits_missing_send_default,
@@ -1354,9 +1810,33 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_sim_get_env_special_ostype_uses_cached_value,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_get_env_special_handles_localtime_failure,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_get_env_special_tstatus_prefers_stop_message,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_get_env_special_tstatus_falls_back_to_error_text,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_get_env_special_tstatus_handles_ok_status,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_get_env_special_tstatus_handles_missing_stop_message,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_get_env_special_handles_runlimit_edge_cases,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_get_env_special_handles_exhausted_fixup_buffer,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(test_sim_set_environment_literal_value,
                                         setup_scp_cmdvars_fixture,
                                         teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_set_environment_rejects_null_input,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_set_environment_decodes_quoted_string,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
@@ -1365,6 +1845,12 @@ int main(void)
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_set_environment_prompt_uses_default,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_set_environment_prompt_uses_single_quoted_prompt,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_set_environment_prompt_uses_unquoted_prompt,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_cmdvars_system_restores_captured_alias,
@@ -1376,10 +1862,16 @@ int main(void)
             test_sim_set_environment_replaces_captured_alias,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_set_environment_keeps_unmatched_captured_alias,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_set_environment_prompt_reads_stdin,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_set_environment_prompt_uses_default_after_empty_input,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_set_environment_prompt_uses_default_after_eof,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_handles_escape_and_do_arguments,
@@ -1388,10 +1880,22 @@ int main(void)
             test_sim_sub_args_handles_missing_and_star_do_arguments,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_uses_zero_time_after_clock_failure,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_ignores_overlong_filepath_parts_spec,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_expands_date_d_for_sunday,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_sub_args_omits_sparse_do_arguments,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_star_quotes_spaced_arguments,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_star_handles_all_do_arguments,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_star_handles_no_remaining_arguments,
@@ -1409,6 +1913,12 @@ int main(void)
             test_sim_sub_args_star_handles_quoted_arg_oom,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_star_handles_open_quote_oom,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_star_handles_close_quote_oom,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_sub_args_star_respects_final_output_limit,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
@@ -1416,6 +1926,12 @@ int main(void)
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_decodes_single_quoted_argument_with_spaces,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_decodes_single_quoted_argument_single_quotes,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_preserves_invalid_single_argument_decode,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_preserves_quoted_command_with_trailing_text,

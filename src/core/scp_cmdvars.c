@@ -71,6 +71,19 @@ static sim_cmdvars_uname_hook_fn sim_cmdvars_uname_hook =
     sim_cmdvars_default_uname_call;
 #endif
 
+/* Tests can replace the underlying localtime call to drive failure paths. */
+static t_bool sim_cmdvars_default_localtime_call(time_t now, struct tm *tmnow)
+{
+#if defined(_WIN32)
+    return localtime_s(tmnow, &now) == 0;
+#else
+    return localtime_r(&now, tmnow) != NULL;
+#endif
+}
+
+static sim_cmdvars_localtime_hook_fn sim_cmdvars_localtime_hook =
+    sim_cmdvars_default_localtime_call;
+
 /* Assemble the %* expansion into one growable temporary string. */
 static t_bool sim_cmdvars_expand_star_args(sim_dynstr_t *ds, char *do_arg[])
 {
@@ -99,11 +112,7 @@ static t_bool sim_cmdvars_expand_star_args(sim_dynstr_t *ds, char *do_arg[])
 /* Break down one wall-clock time value using the platform local-time API. */
 static t_bool sim_cmdvars_localtime(time_t now, struct tm *tmnow)
 {
-#if defined(_WIN32)
-    return localtime_s(tmnow, &now) == 0;
-#else
-    return localtime_r(&now, tmnow) != NULL;
-#endif
+    return sim_cmdvars_localtime_hook(now, tmnow);
 }
 
 /* Decode a whole-line quoted command before later substitution work. */
@@ -170,6 +179,7 @@ static const char *sim_cmdvars_parse_percent(const char **ipp, char *gbuf,
 {
     const char *ip = *ipp;
     const char *ap = NULL;
+    t_bool malformed_parts = FALSE;
     uint32 i;
 
     *emit_percent = FALSE;
@@ -184,6 +194,23 @@ static const char *sim_cmdvars_parse_percent(const char **ipp, char *gbuf,
             parts[i] = *ip;
             parts[i + 1] = '\0';
         }
+        if ((i == (SIM_CMDVARS_PARTS_SIZE - 1)) && strchr("fpnxtz", *ip)) {
+            malformed_parts = TRUE;
+            while (strchr("fpnxtz", *ip))
+                ++ip;
+        }
+    }
+    if (malformed_parts) {
+        if (((*ip >= '0') && (*ip <= '9')) || (*ip == '*'))
+            ++ip;
+        else if (*ip != '\0') {
+            get_glyph_nc(ip, gbuf, '%');
+            ip += strlen(gbuf);
+            if (*ip == '%')
+                ++ip;
+        }
+        *ipp = ip;
+        return NULL;
     }
     if ((*ip >= '0') && (*ip <= ('9'))) {
         ap = do_arg[*ip - '0'];
@@ -216,7 +243,7 @@ static t_bool sim_cmdvars_expand_initial_token(char **ipp, char **op, char *oend
                                                char *rbuf, size_t rbuf_size,
                                                size_t *outstr_off)
 {
-    const char *ap;
+    const char *ap = NULL;
     char *ip = *ipp;
 
     get_glyph(ip, gbuf, 0);
@@ -320,7 +347,7 @@ static const char *sim_ostype_value(char *rbuf, size_t rbuf_size)
 static const char *sim_get_host_env_uplowcase(const char *gbuf, char *rbuf,
                                               size_t rbuf_size)
 {
-    const char *ap;
+    const char *ap = NULL;
     size_t i;
 
     ap = getenv(gbuf);
@@ -452,6 +479,12 @@ void sim_cmdvars_set_test_uname_hook(sim_cmdvars_uname_hook_fn hook)
 }
 #endif
 
+/* Replace the underlying localtime call used by time-variable lookup. */
+void sim_cmdvars_set_test_localtime_hook(sim_cmdvars_localtime_hook_fn hook)
+{
+    sim_cmdvars_localtime_hook = hook ? hook : sim_cmdvars_default_localtime_call;
+}
+
 /* Clear the cached host OS type used by SIM_OSTYPE lookup.
 
    Tests use this to ensure one case does not reuse a previous case's cached
@@ -477,6 +510,7 @@ void sim_cmdvars_reset(void)
 #if !defined(_WIN32)
     sim_cmdvars_set_test_uname_hook(NULL);
 #endif
+    sim_cmdvars_set_test_localtime_hook(NULL);
     sim_cmdvars_reset_ostype_cache();
     memset(&cmd_time, 0, sizeof(cmd_time));
 }
@@ -542,7 +576,7 @@ void sim_sub_var_clear_prefix(const char *prefix)
 const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
 {
     int i;
-    const char *ap;
+    const char *ap = NULL;
     const char *fixup_needed = strchr(gbuf, ':');
     char *tgbuf = NULL;
     size_t tgbuf_size = MAX(rbuf_size, 1 + (size_t)(fixup_needed - gbuf));
@@ -552,8 +586,7 @@ const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
         memcpy(tgbuf, gbuf, (fixup_needed - gbuf));
         gbuf = tgbuf;
     }
-    ap = NULL;
-    if (!ap) {
+    {
         time_t now = (time_t)cmd_time.tv_sec;
         struct tm tm_storage;
         struct tm *tmnow = sim_cmdvars_localtime(now, &tm_storage) ?
