@@ -165,12 +165,6 @@ int sim_strcasecmp (const char *string1, const char *string2);
 #if defined(_WIN32)
 #include "sim_compat.h"
 #endif
-#ifndef sim_strlcpy
-#define sim_strlcpy(dst, src, size) strlcpy((dst), (src), (size))
-#endif
-#ifndef sim_strlcat
-#define sim_strlcat(dst, src, size) strlcat((dst), (src), (size))
-#endif
 #ifndef strncasecmp
 #define strncasecmp(str1, str2, len) sim_strncasecmp((str1), (str2), (len))
 #endif
