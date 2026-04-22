@@ -13,6 +13,11 @@ will discover that code should be rewritten to make it cleaner and
 better, and to make tests easier a the same time; always point out
 such opportunities.
 
+Assume C17 on all host platforms and favor removing support for older
+versions of C and the C standard. Our two supported host platform
+types are POSIX and recent Windows; assume a recent POSIX on all POSIX
+platforms and recent levels of Windows APIs.
+
 When adding new source code to this repository, prefer keeping lines
 under 80 columns.
 
