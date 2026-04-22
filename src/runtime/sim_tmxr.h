@@ -41,6 +41,7 @@ typedef struct SERPORT *SERHANDLE;
 #define TMXR_DTR_DROP_TIME 500                          /* milliseconds to drop DTR for 'pseudo' modem control */
 #define TMXR_MODEM_RING_TIME 3                          /* seconds to wait for DTR for incoming connections */
 #define TMXR_DEFAULT_CONNECT_POLL_INTERVAL 1            /* seconds between connection polls */
+#define TMXR_LINE_DISABLED (-1)                         /* line unavailable for connections */
 
 #define TMXR_DBG_XMT    0x00100000                       /* Debug Transmit Data */
 #define TMXR_DBG_RCV    0x00200000                       /* Debug Received Data */

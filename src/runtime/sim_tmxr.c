@@ -458,8 +458,6 @@ static u_char mantra[] = {                  /* Telnet Option Negotiation Mantra 
 
 #define TMXR_GUARD  ((int32)(lp->serport ? 1 : sizeof(mantra)))/* buffer guard */
 
-#define TMXR_LINE_DISABLED (-1)
-
 /* Local routines */
 static void tmxr_setup_framer(TMLN *line, ETH_PACK *packet, int len);
 static int  tmxr_framer_read (TMLN *line, char *buf, int nbytes);
@@ -1673,7 +1671,9 @@ t_stat tmxr_set_port_speed_control (TMXR *mp)
 {
 int i;
 
-if (!mp->port_speed_control && mp->uptr && !(mp->uptr->flags & UNIT_ATT))
+/* Speed-control mode is a pre-attach configuration option.  Once the
+   mux is attached, changing it would invalidate the active line setup. */
+if (!mp->port_speed_control && mp->uptr && (mp->uptr->flags & UNIT_ATT))
     return sim_messagef (SCPE_ALATT, "Can't change speed mode while attached.\n:");
 mp->port_speed_control = TRUE;
 for (i=0; i<mp->lines; ++i)
@@ -1692,7 +1692,7 @@ t_stat tmxr_clear_port_speed_control (TMXR *mp)
 {
 int i;
 
-if (mp->port_speed_control && mp->uptr && !(mp->uptr->flags & UNIT_ATT))
+if (mp->port_speed_control && mp->uptr && (mp->uptr->flags & UNIT_ATT))
     return sim_messagef (SCPE_ALATT, "Can't change speed mode while attached.\n:");
 mp->port_speed_control = FALSE;
 for (i=0; i<mp->lines; ++i)
@@ -1711,7 +1711,7 @@ return SCPE_OK;
 */
 t_stat tmxr_set_line_port_speed_control (TMXR *mp, int line)
 {
-if (mp->uptr && !(mp->uptr->flags & UNIT_ATT))
+if (mp->uptr && (mp->uptr->flags & UNIT_ATT))
     return sim_messagef (SCPE_ALATT, "Can't change speed mode while attached.\n:");
 if (line >= mp->lines)
     return sim_messagef (SCPE_ARG, "Invalid line for multiplexer: %d\n", line);
@@ -1728,7 +1728,7 @@ return SCPE_OK;
 */
 t_stat tmxr_clear_line_port_speed_control (TMXR *mp, int line)
 {
-if (mp->uptr && !(mp->uptr->flags & UNIT_ATT))
+if (mp->uptr && (mp->uptr->flags & UNIT_ATT))
     return sim_messagef (SCPE_ALATT, "Can't change speed mode while attached.\n:");
 if (line >= mp->lines)
     return sim_messagef (SCPE_ARG, "Invalid line for multiplexer: %d\n", line);
