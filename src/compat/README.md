@@ -11,6 +11,8 @@ Examples of the intended scope:
 
 - `strlcpy`
 - `strlcat`
+- `localtime_r`
+- `gmtime_r`
 - other small libc-style compatibility routines
 
 Rules for code placed here:
