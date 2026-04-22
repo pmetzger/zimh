@@ -198,6 +198,64 @@ static void test_tmxr_connection_poll_interval_validates_zero(void **state)
     assert_int_equal(fixture->mux.poll_interval, 5);
 }
 
+/* Verify line-speed configuration sets per-line timing and attached unit
+   wait values from one explicit speed. */
+static void test_tmxr_set_line_speed_updates_timing_state(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+    UNIT out_unit;
+
+    memset(&out_unit, 0, sizeof(out_unit));
+    line->uptr = &fixture->unit;
+    line->o_uptr = &out_unit;
+
+    assert_int_equal(tmxr_set_line_speed(line, "9600"), SCPE_OK);
+    assert_int_equal(line->rxbps, 9600);
+    assert_int_equal(line->txbps, 9600);
+    assert_true(line->bpsfactor == 1.0);
+    assert_int_equal(line->rxdeltausecs, TMLN_SPD_9600_BPS);
+    assert_int_equal(line->txdeltausecs, TMLN_SPD_9600_BPS);
+    assert_true(line->rxnexttime == 0.0);
+    assert_int_equal(fixture->unit.wait, TMLN_SPD_9600_BPS);
+    assert_int_equal(out_unit.wait, TMLN_SPD_9600_BPS);
+}
+
+/* Verify factor-only speed updates reuse the current receive speed when the
+   line is not attached to a serial port. */
+static void test_tmxr_set_line_speed_factor_only_reuses_current_bps(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[1];
+    UNIT out_unit;
+
+    memset(&out_unit, 0, sizeof(out_unit));
+    line->uptr = &fixture->unit;
+    line->o_uptr = &out_unit;
+    line->rxbps = 9600;
+
+    assert_int_equal(tmxr_set_line_speed(line, "*2"), SCPE_OK);
+    assert_int_equal(line->rxbps, 9600);
+    assert_true(line->bpsfactor == 2.0);
+    assert_int_equal(line->rxdeltausecs, TMLN_SPD_9600_BPS / 2);
+    assert_int_equal(line->txdeltausecs, TMLN_SPD_9600_BPS / 2);
+    assert_int_equal(fixture->unit.wait, TMLN_SPD_9600_BPS / 2);
+    assert_int_equal(out_unit.wait, TMLN_SPD_9600_BPS / 2);
+}
+
+/* Verify invalid line-speed strings are rejected cleanly. */
+static void test_tmxr_set_line_speed_rejects_invalid_input(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+
+    assert_int_equal(tmxr_set_line_speed(line, NULL), SCPE_2FARG);
+    assert_int_equal(tmxr_set_line_speed(line, ""), SCPE_2FARG);
+    assert_int_equal(tmxr_set_line_speed(line, "bogus"), SCPE_ARG);
+    assert_int_equal(tmxr_set_line_speed(line, "9600*99"), SCPE_ARG);
+}
+
 /* Verify an unconfigured line reports no attach-string state. */
 static void test_tmxr_line_attach_string_returns_null_for_unconfigured_line(
     void **state)
@@ -791,6 +849,15 @@ int main(void)
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
             test_tmxr_connection_poll_interval_validates_zero,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_set_line_speed_updates_timing_state,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_set_line_speed_factor_only_reuses_current_bps,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_set_line_speed_rejects_invalid_input,
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
             test_tmxr_line_attach_string_returns_null_for_unconfigured_line,

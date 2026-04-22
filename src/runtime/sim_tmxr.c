@@ -2772,39 +2772,54 @@ if (uptr && uptr->filename) {
 return SCPE_OK;
 }
 
-static int32 _tmln_speed_delta (CONST char *cptr)
+/* Map one numeric line speed to the configured inter-character delay. */
+static int32 _tmln_speed_delta_bps (int32 nspeed)
 {
 static struct {
-    const char *bps;
+    int32 bps;
     int32 delta;
     } *spd, speeds[] = {
-    {"50",      TMLN_SPD_50_BPS},
-    {"75",      TMLN_SPD_75_BPS},
-    {"110",     TMLN_SPD_110_BPS},
-    {"134",     TMLN_SPD_134_BPS},
-    {"150",     TMLN_SPD_150_BPS},
-    {"300",     TMLN_SPD_300_BPS},
-    {"600",     TMLN_SPD_600_BPS},
-    {"1200",    TMLN_SPD_1200_BPS},
-    {"1800",    TMLN_SPD_1800_BPS},
-    {"2000",    TMLN_SPD_2000_BPS},
-    {"2400",    TMLN_SPD_2400_BPS},
-    {"3600",    TMLN_SPD_3600_BPS},
-    {"4800",    TMLN_SPD_4800_BPS},
-    {"7200",    TMLN_SPD_7200_BPS},
-    {"9600",    TMLN_SPD_9600_BPS},
-    {"19200",   TMLN_SPD_19200_BPS},
-    {"25000",   TMLN_SPD_25000_BPS},
-    {"38400",   TMLN_SPD_38400_BPS},
-    {"40000",   TMLN_SPD_40000_BPS},
-    {"50000",   TMLN_SPD_50000_BPS},
-    {"57600",   TMLN_SPD_57600_BPS},
-    {"76800",   TMLN_SPD_76800_BPS},
-    {"80000",   TMLN_SPD_80000_BPS},
-    {"115200",  TMLN_SPD_115200_BPS},
-    {"0",       0}};                    /* End of List, last valid value */
-int nspeed;
-char speed[24];
+    {50,      TMLN_SPD_50_BPS},
+    {75,      TMLN_SPD_75_BPS},
+    {110,     TMLN_SPD_110_BPS},
+    {134,     TMLN_SPD_134_BPS},
+    {150,     TMLN_SPD_150_BPS},
+    {300,     TMLN_SPD_300_BPS},
+    {600,     TMLN_SPD_600_BPS},
+    {1200,    TMLN_SPD_1200_BPS},
+    {1800,    TMLN_SPD_1800_BPS},
+    {2000,    TMLN_SPD_2000_BPS},
+    {2400,    TMLN_SPD_2400_BPS},
+    {3600,    TMLN_SPD_3600_BPS},
+    {4800,    TMLN_SPD_4800_BPS},
+    {7200,    TMLN_SPD_7200_BPS},
+    {9600,    TMLN_SPD_9600_BPS},
+    {19200,   TMLN_SPD_19200_BPS},
+    {25000,   TMLN_SPD_25000_BPS},
+    {38400,   TMLN_SPD_38400_BPS},
+    {40000,   TMLN_SPD_40000_BPS},
+    {50000,   TMLN_SPD_50000_BPS},
+    {57600,   TMLN_SPD_57600_BPS},
+    {76800,   TMLN_SPD_76800_BPS},
+    {80000,   TMLN_SPD_80000_BPS},
+    {115200,  TMLN_SPD_115200_BPS},
+    {0,       0}};                    /* End of List, last valid value */
+
+spd = speeds;
+while (1) {
+    if (spd->bps == nspeed)
+        return spd->delta;
+    if (spd->delta == 0)
+        break;
+    ++spd;
+    }
+return -1;
+}
+
+/* Parse one line-speed string and return the configured delay. */
+static int32 _tmln_speed_delta (CONST char *cptr)
+{
+int32 nspeed;
 int nfactor = 1;
 
 nspeed = (uint32)strtotv (cptr, &cptr, 10);
@@ -2815,17 +2830,7 @@ if (*cptr == '*') {
     if ((nfactor < 1) || (nfactor > 32))
         return -1;
     }
-sprintf (speed, "%d", nspeed);
-
-spd = speeds;
-while (1) {
-    if (0 == strcmp(spd->bps, speed))
-        return spd->delta;
-    if (spd->delta == 0)
-        break;
-    ++spd;
-    }
-return -1;
+return _tmln_speed_delta_bps (nspeed);
 }
 
 t_stat tmxr_set_line_modem_control (TMLN *lp, t_bool enab_disab)
@@ -2854,10 +2859,8 @@ if (*cptr == '*') {
     lp->bpsfactor = bpsfactor;
     if (!(lp->serport) &&               /* Not a serial port */
         (speed == cptr)) {              /* AND just changing bps factor? */
-        char speedbps[16];
-
-        sprintf (speedbps, "%d", lp->rxbps);
-        lp->rxdeltausecs = (uint32)(_tmln_speed_delta (speedbps) / lp->bpsfactor);
+        lp->rxdeltausecs = (uint32)(_tmln_speed_delta_bps ((int32)lp->rxbps) /
+                                    lp->bpsfactor);
         lp->txdeltausecs = lp->rxdeltausecs;
         return SCPE_OK;                 /* Done now */
         }
