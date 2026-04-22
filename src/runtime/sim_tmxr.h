@@ -32,6 +32,7 @@
 typedef struct SERPORT *SERHANDLE;
 #endif
 
+#include "sim_ether.h"
 #include "sim_sock.h"
 
 #define TMXR_V_VALID    15
@@ -106,6 +107,53 @@ struct framer_data;
 
 typedef struct tmln TMLN;
 typedef struct tmxr TMXR;
+typedef SOCKET (*tmxr_master_sock_fn)(char *port, t_stat *status);
+typedef SOCKET (*tmxr_accept_conn_ex_fn)(SOCKET master, char **connectaddr,
+                                         int opt_flags);
+typedef SOCKET (*tmxr_connect_sock_ex_fn)(const char *sourcehostport,
+                                          const char *hostport,
+                                          const char *default_host,
+                                          const char *default_port,
+                                          int opt_flags);
+typedef int (*tmxr_check_conn_fn)(SOCKET sock, int rd);
+typedef void (*tmxr_close_sock_fn)(SOCKET sock);
+typedef int (*tmxr_write_sock_fn)(SOCKET sock, const char *msg, int nbytes);
+typedef int (*tmxr_getnames_sock_fn)(SOCKET sock, char **socknamebuf,
+                                     char **peernamebuf);
+typedef void (*tmxr_close_serial_fn)(SERHANDLE port);
+typedef t_stat (*tmxr_control_serial_fn)(SERHANDLE port, int32 bits_to_set,
+                                         int32 bits_to_clear,
+                                         int32 *incoming_bits);
+typedef uint32 (*tmxr_ms_sleep_fn)(unsigned int msec);
+typedef SERHANDLE (*tmxr_open_serial_fn)(char *name, TMLN *lp,
+                                         t_stat *status);
+typedef int (*tmxr_eth_devices_fn)(int max, ETH_LIST *dev, ETH_BOOL framers);
+typedef t_stat (*tmxr_eth_open_fn)(ETH_DEV *dev, const char *name,
+                                   DEVICE *dptr, uint32 dbit);
+typedef t_stat (*tmxr_eth_close_fn)(ETH_DEV *dev);
+typedef t_stat (*tmxr_eth_filter_fn)(ETH_DEV *dev, int addr_count,
+                                     const ETH_MAC addresses[],
+                                     ETH_BOOL all_multicast,
+                                     ETH_BOOL promiscuous);
+
+typedef struct {
+    tmxr_master_sock_fn master_sock;
+    tmxr_accept_conn_ex_fn accept_conn_ex;
+    tmxr_connect_sock_ex_fn connect_sock_ex;
+    tmxr_check_conn_fn check_conn;
+    tmxr_close_sock_fn close_sock;
+    tmxr_write_sock_fn write_sock;
+    tmxr_getnames_sock_fn getnames_sock;
+    tmxr_close_serial_fn close_serial;
+    tmxr_control_serial_fn control_serial;
+    tmxr_ms_sleep_fn ms_sleep;
+    tmxr_open_serial_fn open_serial;
+    tmxr_eth_devices_fn eth_devices;
+    tmxr_eth_open_fn eth_open;
+    tmxr_eth_close_fn eth_close;
+    tmxr_eth_filter_fn eth_filter;
+} TMXR_IO_HOOKS;
+
 struct loopbuf {
     int32               bpr;                          /* xmt buf remove */
     int32               bpi;                          /* xmt buf insert */
@@ -238,7 +286,10 @@ t_stat tmxr_connection_poll_interval (TMXR *mp, uint32 seconds);
 t_stat tmxr_attach_ex (TMXR *mp, UNIT *uptr, CONST char *cptr, t_bool async);
 t_stat tmxr_detach (TMXR *mp, UNIT *uptr);
 t_stat tmxr_attach_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+char *tmxr_connection_message(const TMXR *mp, const TMLN *lp, t_bool force);
 char *tmxr_line_attach_string(TMLN *lp);
+void tmxr_set_io_hooks(const TMXR_IO_HOOKS *hooks);
+void tmxr_reset_io_hooks(void);
 t_stat tmxr_set_modem_control_passthru (TMXR *mp);
 t_stat tmxr_clear_modem_control_passthru (TMXR *mp);
 t_stat tmxr_set_notelnet (TMXR *mp);

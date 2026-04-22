@@ -10,17 +10,347 @@
 
 #include "scp.h"
 #include "sim_defs.h"
+#include "sim_serial.h"
 #include "sim_tmxr.h"
 #include "test_simh_personality.h"
 #include "test_support.h"
 
+extern t_stat tmxr_close_ln(TMLN *lp);
+
 struct sim_tmxr_fixture {
     DEVICE device;
     UNIT unit;
+    UNIT line_units[4];
+    UNIT out_units[4];
     TMXR mux;
     int32 lnorder[4];
     TMLN lines[4];
+    struct {
+        int master_sock_calls;
+        SOCKET master_sock_result;
+        t_stat master_sock_status;
+        char last_master_sock_port[128];
+
+        int accept_calls;
+        SOCKET accept_results[4];
+        char *accept_addresses[4];
+        int accept_opt_flags[4];
+        int next_accept_result;
+
+        int connect_calls;
+        SOCKET connect_result;
+        char last_sourcehostport[128];
+        char last_hostport[128];
+        int last_connect_opt_flags;
+
+        int check_conn_calls;
+        SOCKET checked_socks[4];
+        int checked_rd[4];
+        int check_conn_results[4];
+        int next_check_conn_result;
+
+        int close_sock_calls;
+        SOCKET closed_socks[4];
+
+        int write_sock_calls;
+        SOCKET written_socks[8];
+        char write_messages[8][256];
+        int write_lengths[8];
+
+        int getnames_sock_calls;
+        SOCKET named_socks[4];
+        char sockname[128];
+        char peername[128];
+
+        int close_serial_calls;
+        SERHANDLE closed_serial_ports[4];
+
+        int control_serial_calls;
+        SERHANDLE control_serial_ports[4];
+        int32 control_bits_set[4];
+        int32 control_bits_clear[4];
+        t_stat control_result;
+        int32 control_status_bits;
+        t_bool have_control_status_bits;
+
+        int sleep_calls;
+        unsigned int sleep_msec[4];
+        uint32 sleep_result;
+
+        int open_serial_calls;
+        char last_open_serial_name[128];
+        TMLN *last_open_serial_line;
+        SERHANDLE open_serial_result;
+        t_stat open_serial_status;
+
+        int eth_devices_calls;
+        int eth_devices_result;
+        ETH_LIST eth_devices_list[4];
+
+        int eth_open_calls;
+        char last_eth_open_name[128];
+        ETH_DEV *last_eth_open_dev;
+        t_stat eth_open_result;
+
+        int eth_filter_calls;
+        ETH_DEV *last_eth_filter_dev;
+        t_stat eth_filter_result;
+
+        int eth_close_calls;
+        ETH_DEV *last_eth_close_dev;
+    } io;
 };
+
+static struct sim_tmxr_fixture *tmxr_io_fixture;
+
+static SOCKET test_tmxr_master_sock(char *port, t_stat *status)
+{
+    assert_non_null(tmxr_io_fixture);
+    tmxr_io_fixture->io.master_sock_calls++;
+    snprintf(tmxr_io_fixture->io.last_master_sock_port,
+             sizeof(tmxr_io_fixture->io.last_master_sock_port), "%s",
+             port ? port : "");
+    if (status != NULL)
+        *status = tmxr_io_fixture->io.master_sock_status;
+    return tmxr_io_fixture->io.master_sock_result;
+}
+
+static SOCKET test_tmxr_accept_conn_ex(SOCKET master, char **connectaddr,
+                                       int opt_flags)
+{
+    int call;
+
+    assert_non_null(tmxr_io_fixture);
+    (void)master;
+    call = tmxr_io_fixture->io.accept_calls;
+    if (call < 4)
+        tmxr_io_fixture->io.accept_opt_flags[call] = opt_flags;
+    tmxr_io_fixture->io.accept_calls++;
+
+    if (tmxr_io_fixture->io.next_accept_result >= 4)
+        return INVALID_SOCKET;
+
+    if (tmxr_io_fixture->io.next_accept_result >= 0) {
+        int idx = tmxr_io_fixture->io.next_accept_result++;
+        SOCKET result = tmxr_io_fixture->io.accept_results[idx];
+
+        if (connectaddr != NULL) {
+            if (tmxr_io_fixture->io.accept_addresses[idx] != NULL)
+                *connectaddr = strdup(
+                    tmxr_io_fixture->io.accept_addresses[idx]);
+            else
+                *connectaddr = NULL;
+        }
+        return result;
+    }
+
+    return INVALID_SOCKET;
+}
+
+static SOCKET test_tmxr_connect_sock_ex(const char *sourcehostport,
+                                        const char *hostport,
+                                        const char *default_host,
+                                        const char *default_port,
+                                        int opt_flags)
+{
+    (void)default_host;
+    (void)default_port;
+
+    assert_non_null(tmxr_io_fixture);
+    tmxr_io_fixture->io.connect_calls++;
+    snprintf(tmxr_io_fixture->io.last_sourcehostport,
+             sizeof(tmxr_io_fixture->io.last_sourcehostport), "%s",
+             sourcehostport ? sourcehostport : "");
+    snprintf(tmxr_io_fixture->io.last_hostport,
+             sizeof(tmxr_io_fixture->io.last_hostport), "%s",
+             hostport ? hostport : "");
+    tmxr_io_fixture->io.last_connect_opt_flags = opt_flags;
+    return tmxr_io_fixture->io.connect_result;
+}
+
+static int test_tmxr_check_conn(SOCKET sock, int rd)
+{
+    int call;
+
+    assert_non_null(tmxr_io_fixture);
+    call = tmxr_io_fixture->io.check_conn_calls;
+    if (call < 4) {
+        tmxr_io_fixture->io.checked_socks[call] = sock;
+        tmxr_io_fixture->io.checked_rd[call] = rd;
+    }
+    tmxr_io_fixture->io.check_conn_calls++;
+
+    if (tmxr_io_fixture->io.next_check_conn_result >= 4)
+        return 0;
+    return tmxr_io_fixture
+        ->io.check_conn_results[tmxr_io_fixture->io.next_check_conn_result++];
+}
+
+static void test_tmxr_close_sock(SOCKET sock)
+{
+    assert_non_null(tmxr_io_fixture);
+    if (tmxr_io_fixture->io.close_sock_calls < 4)
+        tmxr_io_fixture->io.closed_socks[tmxr_io_fixture->io.close_sock_calls] =
+            sock;
+    tmxr_io_fixture->io.close_sock_calls++;
+}
+
+static int test_tmxr_write_sock(SOCKET sock, const char *msg, int nbytes)
+{
+    int call;
+
+    assert_non_null(tmxr_io_fixture);
+    call = tmxr_io_fixture->io.write_sock_calls;
+    if (call < 8) {
+        tmxr_io_fixture->io.written_socks[call] = sock;
+        tmxr_io_fixture->io.write_lengths[call] = nbytes;
+        snprintf(tmxr_io_fixture->io.write_messages[call],
+                 sizeof(tmxr_io_fixture->io.write_messages[call]), "%.*s",
+                 nbytes, msg ? msg : "");
+    }
+    tmxr_io_fixture->io.write_sock_calls++;
+    return nbytes;
+}
+
+static int test_tmxr_getnames_sock(SOCKET sock, char **socknamebuf,
+                                   char **peernamebuf)
+{
+    assert_non_null(tmxr_io_fixture);
+    if (tmxr_io_fixture->io.getnames_sock_calls < 4)
+        tmxr_io_fixture->io.named_socks
+            [tmxr_io_fixture->io.getnames_sock_calls] = sock;
+    tmxr_io_fixture->io.getnames_sock_calls++;
+    if (socknamebuf != NULL)
+        *socknamebuf = strdup(tmxr_io_fixture->io.sockname);
+    if (peernamebuf != NULL)
+        *peernamebuf = strdup(tmxr_io_fixture->io.peername);
+    return 0;
+}
+
+static void test_tmxr_close_serial(SERHANDLE port)
+{
+    assert_non_null(tmxr_io_fixture);
+    if (tmxr_io_fixture->io.close_serial_calls < 4)
+        tmxr_io_fixture->io.closed_serial_ports
+            [tmxr_io_fixture->io.close_serial_calls] = port;
+    tmxr_io_fixture->io.close_serial_calls++;
+}
+
+static t_stat test_tmxr_control_serial(SERHANDLE port, int32 bits_to_set,
+                                       int32 bits_to_clear,
+                                       int32 *incoming_bits)
+{
+    int call;
+
+    assert_non_null(tmxr_io_fixture);
+    call = tmxr_io_fixture->io.control_serial_calls;
+    if (call < 4) {
+        tmxr_io_fixture->io.control_serial_ports[call] = port;
+        tmxr_io_fixture->io.control_bits_set[call] = bits_to_set;
+        tmxr_io_fixture->io.control_bits_clear[call] = bits_to_clear;
+    }
+    tmxr_io_fixture->io.control_serial_calls++;
+    if (incoming_bits != NULL && tmxr_io_fixture->io.have_control_status_bits)
+        *incoming_bits = tmxr_io_fixture->io.control_status_bits;
+    return tmxr_io_fixture->io.control_result;
+}
+
+static uint32 test_tmxr_ms_sleep(unsigned int msec)
+{
+    assert_non_null(tmxr_io_fixture);
+    if (tmxr_io_fixture->io.sleep_calls < 4)
+        tmxr_io_fixture->io.sleep_msec[tmxr_io_fixture->io.sleep_calls] = msec;
+    tmxr_io_fixture->io.sleep_calls++;
+    return tmxr_io_fixture->io.sleep_result;
+}
+
+static SERHANDLE test_tmxr_open_serial(char *name, TMLN *lp, t_stat *status)
+{
+    assert_non_null(tmxr_io_fixture);
+    tmxr_io_fixture->io.open_serial_calls++;
+    snprintf(tmxr_io_fixture->io.last_open_serial_name,
+             sizeof(tmxr_io_fixture->io.last_open_serial_name), "%s",
+             name ? name : "");
+    tmxr_io_fixture->io.last_open_serial_line = lp;
+    if (status != NULL)
+        *status = tmxr_io_fixture->io.open_serial_status;
+    return tmxr_io_fixture->io.open_serial_result;
+}
+
+static int test_tmxr_eth_devices(int max, ETH_LIST *dev, ETH_BOOL framers)
+{
+    int i;
+
+    assert_non_null(tmxr_io_fixture);
+    assert_true(framers);
+    tmxr_io_fixture->io.eth_devices_calls++;
+    assert_true(max >= tmxr_io_fixture->io.eth_devices_result);
+    for (i = 0; i < tmxr_io_fixture->io.eth_devices_result; i++)
+        dev[i] = tmxr_io_fixture->io.eth_devices_list[i];
+    return tmxr_io_fixture->io.eth_devices_result;
+}
+
+static t_stat test_tmxr_eth_open(ETH_DEV *dev, const char *name, DEVICE *dptr,
+                                 uint32 dbit)
+{
+    (void)dptr;
+    (void)dbit;
+
+    assert_non_null(tmxr_io_fixture);
+    tmxr_io_fixture->io.eth_open_calls++;
+    tmxr_io_fixture->io.last_eth_open_dev = dev;
+    snprintf(tmxr_io_fixture->io.last_eth_open_name,
+             sizeof(tmxr_io_fixture->io.last_eth_open_name), "%s",
+             name ? name : "");
+    return tmxr_io_fixture->io.eth_open_result;
+}
+
+static t_stat test_tmxr_eth_filter(ETH_DEV *dev, int addr_count,
+                                   const ETH_MAC addresses[],
+                                   ETH_BOOL all_multicast,
+                                   ETH_BOOL promiscuous)
+{
+    (void)addr_count;
+    (void)addresses;
+    (void)all_multicast;
+    (void)promiscuous;
+
+    assert_non_null(tmxr_io_fixture);
+    tmxr_io_fixture->io.eth_filter_calls++;
+    tmxr_io_fixture->io.last_eth_filter_dev = dev;
+    return tmxr_io_fixture->io.eth_filter_result;
+}
+
+static t_stat test_tmxr_eth_close(ETH_DEV *dev)
+{
+    assert_non_null(tmxr_io_fixture);
+    tmxr_io_fixture->io.eth_close_calls++;
+    tmxr_io_fixture->io.last_eth_close_dev = dev;
+    return SCPE_OK;
+}
+
+static void install_tmxr_test_io_hooks(void)
+{
+    static const TMXR_IO_HOOKS hooks = {
+        test_tmxr_master_sock,
+        test_tmxr_accept_conn_ex,
+        test_tmxr_connect_sock_ex,
+        test_tmxr_check_conn,
+        test_tmxr_close_sock,
+        test_tmxr_write_sock,
+        test_tmxr_getnames_sock,
+        test_tmxr_close_serial,
+        test_tmxr_control_serial,
+        test_tmxr_ms_sleep,
+        test_tmxr_open_serial,
+        test_tmxr_eth_devices,
+        test_tmxr_eth_open,
+        test_tmxr_eth_close,
+        test_tmxr_eth_filter,
+    };
+
+    tmxr_set_io_hooks(&hooks);
+}
 
 static void ensure_line_tx_buffer(TMLN *line, int32 size)
 {
@@ -97,9 +427,25 @@ static int setup_sim_tmxr_fixture(void **state)
 
     memset(&fixture->device, 0, sizeof(fixture->device));
     memset(&fixture->unit, 0, sizeof(fixture->unit));
+    memset(&fixture->line_units, 0, sizeof(fixture->line_units));
+    memset(&fixture->out_units, 0, sizeof(fixture->out_units));
     memset(&fixture->mux, 0, sizeof(fixture->mux));
     memset(&fixture->lnorder, 0, sizeof(fixture->lnorder));
     memset(&fixture->lines, 0, sizeof(fixture->lines));
+    memset(&fixture->io, 0, sizeof(fixture->io));
+    fixture->io.master_sock_result = INVALID_SOCKET;
+    fixture->io.master_sock_status = SCPE_OPENERR;
+    fixture->io.next_accept_result = 4;
+    fixture->io.connect_result = INVALID_SOCKET;
+    fixture->io.next_check_conn_result = 4;
+    fixture->io.open_serial_result = INVALID_HANDLE;
+    fixture->io.open_serial_status = SCPE_OPENERR;
+    fixture->io.eth_open_result = SCPE_OK;
+    fixture->io.eth_filter_result = SCPE_OK;
+    snprintf(fixture->io.sockname, sizeof(fixture->io.sockname), "%s",
+             "127.0.0.1:1000");
+    snprintf(fixture->io.peername, sizeof(fixture->io.peername), "%s",
+             "127.0.0.1:2000");
 
     fixture->device.name = "TMXR";
     assert_int_equal(simh_test_set_sim_name("simh-unit-sim-tmxr"), 0);
@@ -112,9 +458,14 @@ static int setup_sim_tmxr_fixture(void **state)
     for (i = 0; i < fixture->mux.lines; i++) {
         fixture->lines[i].mp = &fixture->mux;
         fixture->lines[i].dptr = &fixture->device;
+        fixture->lines[i].uptr = &fixture->line_units[i];
+        fixture->lines[i].o_uptr = &fixture->out_units[i];
         fixture->lines[i].rxbsz = 16;
         fixture->lines[i].txbsz = 16;
     }
+
+    tmxr_io_fixture = fixture;
+    tmxr_reset_io_hooks();
 
     *state = fixture;
     return 0;
@@ -142,6 +493,8 @@ static int teardown_sim_tmxr_fixture(void **state)
         free(fixture->lines[i].lpb);
     }
     free(fixture->unit.filename);
+    tmxr_reset_io_hooks();
+    tmxr_io_fixture = NULL;
     free(fixture);
     *state = NULL;
     return 0;
@@ -286,6 +639,593 @@ static void test_tmxr_set_line_speed_rejects_invalid_input(void **state)
     assert_int_equal(tmxr_set_line_speed(line, "9600*99"), SCPE_ARG);
 }
 
+/* Verify modem-control passthrough toggles on an unattached mux and rejects
+   changes while a listener is active. */
+static void test_tmxr_modem_control_passthru_toggles_and_rejects_attached_mux(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    size_t i;
+
+    assert_int_equal(tmxr_set_modem_control_passthru(&fixture->mux), SCPE_OK);
+    assert_true(fixture->mux.modem_control);
+    for (i = 0; i < fixture->mux.lines; i++)
+        assert_true(fixture->lines[i].modem_control);
+
+    fixture->mux.master = (SOCKET)(uintptr_t)77;
+    assert_int_equal(tmxr_clear_modem_control_passthru(&fixture->mux),
+                     SCPE_ALATT);
+    fixture->mux.master = 0;
+
+    assert_int_equal(tmxr_clear_modem_control_passthru(&fixture->mux), SCPE_OK);
+    assert_false(fixture->mux.modem_control);
+    for (i = 0; i < fixture->mux.lines; i++)
+        assert_false(fixture->lines[i].modem_control);
+}
+
+/* Verify per-line input/output unit assignment updates the target pointers and
+   polling dynflags, while rejecting invalid line numbers. */
+static void test_tmxr_set_line_units_update_poll_state(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    UNIT prior_in;
+    UNIT prior_out;
+
+    memset(&prior_in, 0, sizeof(prior_in));
+    memset(&prior_out, 0, sizeof(prior_out));
+    prior_in.dynflags = UNIT_TM_POLL;
+    prior_out.dynflags = UNIT_TM_POLL;
+    fixture->lines[0].uptr = &prior_in;
+    fixture->lines[0].o_uptr = &prior_out;
+    fixture->line_units[1].tmxr = &fixture->mux;
+    fixture->out_units[1].tmxr = &fixture->mux;
+
+    assert_int_equal(tmxr_set_line_unit(&fixture->mux, -1,
+                                        &fixture->line_units[1]),
+                     SCPE_ARG);
+    assert_int_equal(tmxr_set_line_output_unit(&fixture->mux, 9,
+                                               &fixture->out_units[1]),
+                     SCPE_ARG);
+
+    assert_int_equal(tmxr_set_line_unit(&fixture->mux, 0,
+                                        &fixture->line_units[1]),
+                     SCPE_OK);
+    assert_ptr_equal(fixture->lines[0].uptr, &fixture->line_units[1]);
+    assert_int_equal(prior_in.dynflags & UNIT_TM_POLL, 0);
+    assert_true(fixture->line_units[1].dynflags & UNIT_TM_POLL);
+
+    assert_int_equal(tmxr_set_line_output_unit(&fixture->mux, 0,
+                                               &fixture->out_units[1]),
+                     SCPE_OK);
+    assert_ptr_equal(fixture->lines[0].o_uptr, &fixture->out_units[1]);
+    assert_int_equal(prior_out.dynflags & UNIT_TM_POLL, 0);
+    assert_true(fixture->out_units[1].dynflags & UNIT_TM_POLL);
+}
+
+/* Verify the per-line half-duplex and modem-control setters toggle the stored
+   state cleanly. */
+static void test_tmxr_line_mode_setters_toggle_state(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+
+    assert_int_equal(tmxr_set_line_halfduplex(line, TRUE), SCPE_OK);
+    assert_true(tmxr_get_line_halfduplex(line));
+    assert_int_equal(tmxr_set_line_halfduplex(line, FALSE), SCPE_OK);
+    assert_false(tmxr_get_line_halfduplex(line));
+
+    assert_int_equal(tmxr_set_line_modem_control(line, TRUE), SCPE_OK);
+    assert_true(line->modem_control);
+    assert_int_equal(tmxr_set_line_modem_control(line, FALSE), SCPE_OK);
+    assert_false(line->modem_control);
+}
+
+/* Verify non-serial line configuration stores the config text and updates
+   the derived line-speed state. */
+static void test_tmxr_set_config_line_updates_cached_config_and_speed(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+
+    line->uptr = &fixture->unit;
+
+    assert_int_equal(tmxr_set_config_line(line, "19200-8N1"), SCPE_OK);
+    assert_non_null(line->serconfig);
+    assert_string_equal(line->serconfig, "19200-8N1");
+    assert_int_equal(line->rxbps, 19200);
+    assert_int_equal(line->txbps, 19200);
+    assert_int_equal(line->rxdeltausecs, TMLN_SPD_19200_BPS);
+    assert_int_equal(line->txdeltausecs, TMLN_SPD_19200_BPS);
+}
+
+/* Verify invalid non-serial configuration is rejected and the cached config
+   text is discarded. */
+static void test_tmxr_set_config_line_rejects_invalid_config(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[1];
+
+    assert_int_equal(tmxr_set_config_line(line, "bogus"), SCPE_ARG);
+    assert_null(line->serconfig);
+}
+
+/* Verify mux-wide BUFFERED with no explicit size selects the documented
+   default and resizes all line buffers. */
+static void test_tmxr_open_master_buffered_defaults_to_32768(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    size_t i;
+
+    assert_int_equal(tmxr_open_master(&fixture->mux, "BUFFERED"), SCPE_OK);
+    assert_int_equal(fixture->mux.buffered, 32768);
+    for (i = 0; i < fixture->mux.lines; i++) {
+        assert_int_equal(fixture->lines[i].txbsz, 32768);
+        assert_int_equal(fixture->lines[i].rxbsz, 32768);
+        assert_true(fixture->lines[i].txbfd);
+    }
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
+/* Verify a mux listener specification validates the port, opens the listener,
+   and applies mux-wide telnet/message flags. */
+static void test_tmxr_open_master_listener_sets_mux_listener_state(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+
+    install_tmxr_test_io_hooks();
+    fixture->io.master_sock_result = (SOCKET)(uintptr_t)44;
+    fixture->io.master_sock_status = SCPE_OK;
+
+    assert_int_equal(
+        tmxr_open_master(&fixture->mux, "1234;notelnet;nomessage"), SCPE_OK);
+    assert_int_equal(fixture->io.master_sock_calls, 2);
+    assert_string_equal(fixture->io.last_master_sock_port, "1234");
+    assert_int_equal(fixture->io.close_sock_calls, 1);
+    assert_int_equal((int)(uintptr_t)fixture->io.closed_socks[0], 44);
+    assert_int_equal((int)(uintptr_t)fixture->mux.master, 44);
+    assert_non_null(fixture->mux.port);
+    assert_string_equal(fixture->mux.port, "1234");
+    assert_true(fixture->mux.notelnet);
+    assert_true(fixture->mux.nomessage);
+
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+    assert_int_equal(fixture->io.close_sock_calls, 2);
+}
+
+/* Verify mux-wide BUFFERED accepts an explicit size and propagates it to all
+   line buffers. */
+static void test_tmxr_open_master_buffered_accepts_explicit_size(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    size_t i;
+
+    assert_int_equal(tmxr_open_master(&fixture->mux, "BUFFERED=128"), SCPE_OK);
+    assert_int_equal(fixture->mux.buffered, 128);
+    for (i = 0; i < fixture->mux.lines; i++) {
+        assert_int_equal(fixture->lines[i].txbsz, 128);
+        assert_int_equal(fixture->lines[i].rxbsz, 128);
+        assert_true(fixture->lines[i].txbfd);
+    }
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
+/* Verify SHOW SYNC reports when synchronous Ethernet support is unavailable. */
+static void test_tmxr_show_sync_reports_missing_network_support(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    char *output = NULL;
+    size_t output_size = 0;
+    FILE *stream;
+
+    install_tmxr_test_io_hooks();
+    fixture->io.eth_devices_result = -1;
+    stream = open_memstream(&output, &output_size);
+    assert_non_null(stream);
+
+    assert_int_equal(
+        tmxr_show_sync_devices(stream, &fixture->device, &fixture->unit, 0,
+                               NULL),
+        SCPE_OK);
+    assert_int_equal(fflush(stream), 0);
+    assert_int_equal(fclose(stream), 0);
+    assert_non_null(output);
+    assert_non_null(strstr(output, "DDCMP synchronous link devices:\n"));
+    assert_non_null(
+        strstr(output, "network support not available in simulator\n"));
+    free(output);
+}
+
+/* Verify a line-specific listener uses the listener hook and retains the
+   line-local telnet/message flags. */
+static void test_tmxr_open_master_line_listener_sets_line_state(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[2];
+
+    install_tmxr_test_io_hooks();
+    fixture->io.master_sock_result = (SOCKET)(uintptr_t)45;
+    fixture->io.master_sock_status = SCPE_OK;
+
+    assert_int_equal(
+        tmxr_open_master(&fixture->mux, "Line=2,2345;notelnet;nomessage"),
+        SCPE_OK);
+    assert_int_equal(fixture->io.master_sock_calls, 2);
+    assert_string_equal(fixture->io.last_master_sock_port, "2345");
+    assert_int_equal(fixture->io.close_sock_calls, 1);
+    assert_int_equal((int)(uintptr_t)line->master, 45);
+    assert_non_null(line->port);
+    assert_string_equal(line->port, "2345");
+    assert_true(line->notelnet);
+    assert_true(line->nomessage);
+
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+    assert_int_equal(fixture->io.close_sock_calls, 2);
+}
+
+/* Verify SYNC=syncN translates the host framer alias through the Ethernet
+   inventory hook before opening the framer device. */
+static void test_tmxr_open_master_translates_sync_aliases_via_eth_inventory(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[1];
+
+    install_tmxr_test_io_hooks();
+    fixture->io.eth_devices_result = 1;
+    snprintf(fixture->io.eth_devices_list[0].name,
+             sizeof(fixture->io.eth_devices_list[0].name), "%s", "framer0");
+    fixture->io.eth_devices_list[0].eth_api = ETH_API_PCAP;
+
+    assert_int_equal(
+        tmxr_open_master(&fixture->mux, "Line=1,SYNC=sync0:integral:56000"),
+        SCPE_OK);
+    assert_int_equal(fixture->io.eth_devices_calls, 1);
+    assert_int_equal(fixture->io.eth_open_calls, 1);
+    assert_string_equal(fixture->io.last_eth_open_name, "framer0");
+    assert_int_equal(fixture->io.eth_filter_calls, 1);
+    assert_non_null(line->framer);
+    assert_true(line->datagram);
+    assert_true(line->notelnet);
+    assert_int_equal(line->rxdeltausecs, (uint32)(8000000 / 56000));
+    assert_int_equal(line->txdeltausecs, (uint32)(8000000 / 56000));
+
+    assert_int_equal(tmxr_detach_ln(line), SCPE_OK);
+    assert_int_equal(fixture->io.eth_close_calls, 1);
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
+/* Verify SHOW SYNC lists framer aliases using the host Ethernet inventory. */
+static void test_tmxr_show_sync_lists_framer_aliases(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    char *output = NULL;
+    size_t output_size = 0;
+    FILE *stream;
+
+    install_tmxr_test_io_hooks();
+    fixture->io.eth_devices_result = 2;
+    snprintf(fixture->io.eth_devices_list[0].name,
+             sizeof(fixture->io.eth_devices_list[0].name), "%s", "framer0");
+    snprintf(fixture->io.eth_devices_list[1].name,
+             sizeof(fixture->io.eth_devices_list[1].name), "%s", "framer1");
+    stream = open_memstream(&output, &output_size);
+    assert_non_null(stream);
+
+    assert_int_equal(tmxr_show_sync(stream, &fixture->unit, 0, NULL), SCPE_OK);
+    assert_int_equal(fflush(stream), 0);
+    assert_int_equal(fclose(stream), 0);
+    assert_non_null(output);
+    assert_non_null(strstr(output, " sync0\tframer0\n"));
+    assert_non_null(strstr(output, " sync1\tframer1\n"));
+    free(output);
+}
+
+/* Verify loopback attach on a single-line mux updates loopback and line-speed
+   state without needing host I/O. */
+static void test_tmxr_open_master_loopback_sets_line_state(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+
+    fixture->mux.lines = 1;
+
+    assert_int_equal(
+        tmxr_open_master(&fixture->mux, "Loopback,SPEED=2400"), SCPE_OK);
+    assert_true(line->loopback);
+    assert_int_equal(line->rxbps, 2400);
+    assert_int_equal(line->txbps, 2400);
+    assert_int_equal(line->rxdeltausecs, TMLN_SPD_2400_BPS);
+    assert_int_equal(line->txdeltausecs, TMLN_SPD_2400_BPS);
+
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
+/* Verify single-line Connect=host:port uses the socket hook and caches the
+   destination/address text on the line. */
+static void test_tmxr_open_master_connect_sets_destination_and_ipad(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+
+    fixture->mux.lines = 1;
+    install_tmxr_test_io_hooks();
+    fixture->io.connect_result = (SOCKET)(uintptr_t)88;
+
+    assert_int_equal(
+        tmxr_open_master(&fixture->mux, "Connect=remote:1234"), SCPE_OK);
+    assert_int_equal(fixture->io.open_serial_calls, 2);
+    assert_string_equal(fixture->io.last_open_serial_name, "remote:1234");
+    assert_int_equal(fixture->io.connect_calls, 2);
+    assert_string_equal(fixture->io.last_sourcehostport, "");
+    assert_string_equal(fixture->io.last_hostport, "remote:1234");
+    assert_int_equal((int)(uintptr_t)line->connecting, 88);
+    assert_non_null(line->destination);
+    assert_string_equal(line->destination, "remote:1234");
+    assert_non_null(line->ipad);
+    assert_string_equal(line->ipad, "remote:1234");
+
+    assert_int_equal(tmxr_detach_ln(line), SCPE_OK);
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
+/* Verify an in-progress outgoing connection is finalized through the
+   TMXR-local connection-state hooks. */
+static void test_tmxr_poll_conn_marks_outgoing_connection_established(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+
+    install_tmxr_test_io_hooks();
+    fixture->io.check_conn_results[0] = 1;
+    fixture->io.next_check_conn_result = 0;
+    line->destination = strdup("remote.example:2222");
+    assert_non_null(line->destination);
+    line->connecting = (SOCKET)30;
+
+    assert_int_equal(tmxr_poll_conn(&fixture->mux), 0);
+    assert_true(line->conn);
+    assert_int_equal((int)(uintptr_t)line->sock, 30);
+    assert_int_equal((int)(uintptr_t)line->connecting, 0);
+    assert_non_null(line->ipad);
+    assert_string_equal(line->ipad, "remote.example:2222");
+    assert_non_null(line->telnet_sent_opts);
+    assert_int_equal(fixture->io.check_conn_calls, 1);
+    assert_int_equal((int)(uintptr_t)fixture->io.checked_socks[0], 30);
+    assert_int_equal(fixture->io.getnames_sock_calls, 1);
+    assert_int_equal(fixture->io.write_sock_calls, 1);
+}
+
+/* Verify a failed outgoing connection is closed and immediately retried
+   through the TMXR-local connect hooks. */
+static void test_tmxr_poll_conn_retries_failed_outgoing_connection(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+
+    install_tmxr_test_io_hooks();
+    fixture->io.check_conn_results[0] = -1;
+    fixture->io.next_check_conn_result = 0;
+    fixture->io.connect_result = (SOCKET)44;
+    line->destination = strdup("remote.example:3333");
+    assert_non_null(line->destination);
+    line->connecting = (SOCKET)30;
+
+    assert_int_equal(tmxr_poll_conn(&fixture->mux), -1);
+    assert_false(line->conn);
+    assert_int_equal((int)(uintptr_t)line->connecting, 44);
+    assert_int_equal(fixture->io.check_conn_calls, 1);
+    assert_int_equal((int)(uintptr_t)fixture->io.checked_socks[0], 30);
+    assert_int_equal(fixture->io.close_sock_calls, 1);
+    assert_int_equal((int)(uintptr_t)fixture->io.closed_socks[0], 30);
+    assert_int_equal(fixture->io.connect_calls, 1);
+    assert_string_equal(fixture->io.last_hostport, "remote.example:3333");
+}
+
+/* Verify closing a serial line closes the host port and clears the cached
+   destination/configuration state. */
+static void test_tmxr_close_ln_closes_serial_and_clears_cached_state(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+
+    install_tmxr_test_io_hooks();
+    line->serport = (SERHANDLE)(uintptr_t)1;
+    line->destination = strdup("ser0");
+    line->serconfig = strdup("9600-8N1");
+    line->cnms = 7;
+    line->xmte = 0;
+
+    assert_non_null(line->destination);
+    assert_non_null(line->serconfig);
+    assert_int_equal(tmxr_close_ln(line), SCPE_OK);
+    assert_int_equal(fixture->io.close_serial_calls, 1);
+    assert_ptr_equal(fixture->io.closed_serial_ports[0],
+                     (SERHANDLE)(uintptr_t)1);
+    assert_ptr_equal(line->serport, 0);
+    assert_null(line->destination);
+    assert_null(line->serconfig);
+    assert_int_equal(line->cnms, 0);
+    assert_int_equal(line->xmte, 1);
+}
+
+/* Verify resetting a non-modem-control serial line pulses DTR/RTS instead of
+   closing the underlying host port. */
+static void test_tmxr_reset_ln_pulses_serial_control_lines(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[1];
+
+    install_tmxr_test_io_hooks();
+    line->serport = (SERHANDLE)(uintptr_t)2;
+    line->modem_control = FALSE;
+
+    assert_int_equal(tmxr_reset_ln(line), SCPE_OK);
+    assert_int_equal(fixture->io.close_serial_calls, 0);
+    assert_int_equal(fixture->io.control_serial_calls, 3);
+    assert_ptr_equal(fixture->io.control_serial_ports[0],
+                     (SERHANDLE)(uintptr_t)2);
+    assert_int_equal(fixture->io.control_bits_set[0], 0);
+    assert_int_equal(fixture->io.control_bits_clear[0],
+                     TMXR_MDM_DTR | TMXR_MDM_RTS);
+    assert_ptr_equal(fixture->io.control_serial_ports[1],
+                     (SERHANDLE)(uintptr_t)2);
+    assert_int_equal(fixture->io.control_bits_set[1],
+                     TMXR_MDM_DTR | TMXR_MDM_RTS);
+    assert_int_equal(fixture->io.control_bits_clear[1], 0);
+    assert_ptr_equal(fixture->io.control_serial_ports[2],
+                     (SERHANDLE)(uintptr_t)2);
+    assert_int_equal(fixture->io.control_bits_set[2], 0);
+    assert_int_equal(fixture->io.control_bits_clear[2], 0);
+    assert_int_equal(fixture->io.sleep_calls, 1);
+    assert_int_equal(fixture->io.sleep_msec[0], TMXR_DTR_DROP_TIME);
+}
+
+/* Verify resetting a network line closes the current sockets and restarts any
+   configured outgoing destination through the TMXR connect hook. */
+static void test_tmxr_reset_ln_restarts_configured_outgoing_destination(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[2];
+
+    install_tmxr_test_io_hooks();
+    fixture->io.connect_result = (SOCKET)(uintptr_t)77;
+    line->sock = (SOCKET)(uintptr_t)21;
+    line->connecting = (SOCKET)(uintptr_t)22;
+    line->conn = TRUE;
+    line->destination = strdup("remote:1234");
+    line->ipad = strdup("127.0.0.1");
+
+    assert_non_null(line->destination);
+    assert_non_null(line->ipad);
+    assert_int_equal(tmxr_reset_ln(line), SCPE_OK);
+    assert_int_equal(fixture->io.close_sock_calls, 2);
+    assert_int_equal((int)(uintptr_t)fixture->io.closed_socks[0], 21);
+    assert_int_equal((int)(uintptr_t)fixture->io.closed_socks[1], 22);
+    assert_int_equal(fixture->io.connect_calls, 1);
+    assert_string_equal(fixture->io.last_sourcehostport, "");
+    assert_string_equal(fixture->io.last_hostport, "remote:1234");
+    assert_int_equal((int)(uintptr_t)line->connecting, 77);
+    assert_ptr_equal(line->sock, 0);
+    assert_null(line->ipad);
+}
+
+/* Verify raising DTR on a modem-control null-modem line starts the outgoing
+   connection and reports the updated modem bits. */
+static void test_tmxr_set_get_modem_bits_raises_dtr_and_starts_connect(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[3];
+    int32 status_bits = 0;
+
+    install_tmxr_test_io_hooks();
+    fixture->io.connect_result = (SOCKET)(uintptr_t)55;
+    line->modem_control = TRUE;
+    line->destination = strdup("remote:4321");
+    line->port = strdup("listen:9999");
+
+    assert_non_null(line->destination);
+    assert_non_null(line->port);
+    assert_int_equal(
+        tmxr_set_get_modem_bits(line, TMXR_MDM_DTR, 0, &status_bits), SCPE_OK);
+    assert_int_equal(fixture->io.connect_calls, 1);
+    assert_string_equal(fixture->io.last_sourcehostport, "");
+    assert_string_equal(fixture->io.last_hostport, "remote:4321");
+    assert_int_equal((int)(uintptr_t)line->connecting, 55);
+    assert_int_equal(status_bits, TMXR_MDM_DTR | TMXR_MDM_DSR);
+}
+
+/* Verify detaching a mux clears the unit attachment state and line polling
+   flags without requiring live sockets or serial ports. */
+static void test_tmxr_detach_clears_attached_state_and_line_poll_flags(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    size_t i;
+
+    fixture->unit.flags = UNIT_ATT;
+    fixture->unit.filename = strdup("attached");
+    fixture->unit.tmxr = &fixture->mux;
+    assert_non_null(fixture->unit.filename);
+
+    for (i = 0; i < fixture->mux.lines; i++) {
+        fixture->line_units[i].dynflags = UNIT_TM_POLL;
+        fixture->line_units[i].tmxr = &fixture->mux;
+        fixture->out_units[i].dynflags = UNIT_TM_POLL;
+        fixture->out_units[i].tmxr = &fixture->mux;
+    }
+
+    assert_int_equal(tmxr_detach(&fixture->mux, &fixture->unit), SCPE_OK);
+    assert_int_equal(fixture->unit.flags & UNIT_ATT, 0);
+    assert_ptr_equal(fixture->unit.filename, NULL);
+    assert_ptr_equal(fixture->unit.tmxr, NULL);
+    for (i = 0; i < fixture->mux.lines; i++) {
+        assert_int_equal(fixture->line_units[i].dynflags & UNIT_TM_POLL, 0);
+        assert_ptr_equal(fixture->line_units[i].tmxr, NULL);
+        assert_int_equal(fixture->out_units[i].dynflags & UNIT_TM_POLL, 0);
+        assert_ptr_equal(fixture->out_units[i].tmxr, NULL);
+    }
+}
+
+/* Verify the extracted connection banner helper suppresses output when line
+   messages are disabled unless forced. */
+static void test_tmxr_connection_message_honors_suppression_flags(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+
+    line->notelnet = TRUE;
+    assert_null(tmxr_connection_message(&fixture->mux, line, FALSE));
+
+    line->notelnet = FALSE;
+    line->nomessage = TRUE;
+    assert_null(tmxr_connection_message(&fixture->mux, line, FALSE));
+}
+
+/* Verify the extracted connection banner helper formats the simulator,
+   device, and line fields for multi-line muxes. */
+static void test_tmxr_connection_message_formats_multiline_banner(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[2];
+    char *message;
+
+    message = tmxr_connection_message(&fixture->mux, line, FALSE);
+    assert_non_null(message);
+    assert_string_equal(
+        message,
+        "\n\r\nConnected to the simh-unit-sim-tmxr simulator TMXR device,"
+        " line 2\r\n\n");
+    free(message);
+}
+
+/* Verify the extracted connection banner helper omits the line suffix for
+   single-line muxes and can be forced despite message suppression. */
+static void test_tmxr_connection_message_formats_single_line_forced_banner(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+    char *message;
+
+    fixture->mux.lines = 1;
+    line->notelnet = TRUE;
+
+    message = tmxr_connection_message(&fixture->mux, line, TRUE);
+    assert_non_null(message);
+    assert_string_equal(
+        message,
+        "\n\r\nConnected to the simh-unit-sim-tmxr simulator TMXR device\r\n\n");
+    free(message);
+}
+
 /* Verify an unconfigured line reports no attach-string state. */
 static void test_tmxr_line_attach_string_returns_null_for_unconfigured_line(
     void **state)
@@ -348,6 +1288,175 @@ static void test_tmxr_line_attach_string_formats_serial_destination(void **state
     assert_non_null(attach);
     assert_string_equal(attach, ",Connect=ttyUSB0;19200-7E1");
     free(attach);
+}
+
+/* Verify unbuffered output on a disconnected line is rejected and counted as
+   dropped output. */
+static void test_tmxr_putc_ln_reports_lost_output_on_disconnected_line(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[1];
+
+    line->conn = FALSE;
+    line->txbfd = FALSE;
+    line->notelnet = FALSE;
+
+    assert_int_equal(tmxr_putc_ln(line, 'A'), SCPE_LOST);
+    assert_int_equal(line->txdrp, 1);
+}
+
+/* Verify Telnet output duplicates IAC bytes in the transmit buffer. */
+static void test_tmxr_putc_ln_duplicates_telnet_iac(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[2];
+    t_bool saved_running = sim_is_running;
+    const unsigned char telnet_iac = 255;
+
+    ensure_line_tx_buffer(line, 16);
+    line->conn = TRUE;
+    line->notelnet = FALSE;
+    line->xmte = 1;
+    sim_is_running = TRUE;
+
+    assert_int_equal(tmxr_putc_ln(line, telnet_iac), SCPE_OK);
+    assert_int_equal(tmxr_tqln(line), 2);
+    assert_int_equal((unsigned char)line->txb[0], telnet_iac);
+    assert_int_equal((unsigned char)line->txb[1], telnet_iac);
+
+    sim_is_running = saved_running;
+}
+
+/* Verify loopback output is sent through the buffered transmit path and can
+   be read back as input. */
+static void test_tmxr_putc_ln_loopback_round_trips_through_buffered_send(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line;
+    int32 value;
+
+    fixture->mux.lines = 1;
+    line = &fixture->lines[0];
+
+    assert_int_equal(
+        tmxr_open_master(&fixture->mux, "BUFFERED=16,LOOPBACK"), SCPE_OK);
+    assert_true(line->loopback);
+    assert_true(line->txbfd);
+    assert_int_equal(line->txbsz, 16);
+
+    line->rcve = 1;
+    line->xmte = 1;
+
+    assert_int_equal(tmxr_putc_ln(line, 'A'), SCPE_OK);
+    tmxr_poll_rx(&fixture->mux);
+    value = tmxr_getc_ln(line);
+    assert_true(value & TMXR_VALID);
+    assert_int_equal(value & 0xFF, 'A');
+
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
+/* Verify packet send reports transmit busy when a prior packet is still
+   pending on the line. */
+static void test_tmxr_put_packet_ln_stalls_when_packet_transmit_is_busy(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+    const uint8 payload[] = {0x11, 0x22, 0x33};
+
+    line->loopback = TRUE;
+    line->txppsize = 4;
+    line->txppoffset = 0;
+    line->txpb = calloc((size_t)line->txppsize, sizeof(*line->txpb));
+    assert_non_null(line->txpb);
+
+    assert_int_equal(tmxr_put_packet_ln(line, payload, sizeof(payload)),
+                     SCPE_STALL);
+    assert_true(tmxr_tpbusyln(line));
+    assert_int_equal(line->txpcnt, 0);
+}
+
+/* Verify empty packet receive distinguishes between connected and
+   disconnected lines. */
+static void test_tmxr_get_packet_ln_reports_empty_and_lost_states(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+    const uint8 *received = NULL;
+    size_t received_size = 0;
+
+    line->conn = TRUE;
+    line->rcve = 1;
+
+    assert_int_equal(
+        tmxr_get_packet_ln_ex(line, &received, &received_size, 0x7e),
+        SCPE_OK);
+    assert_null(received);
+    assert_int_equal(received_size, 0);
+
+    line->conn = FALSE;
+    assert_int_equal(
+        tmxr_get_packet_ln_ex(line, &received, &received_size, 0x7e),
+        SCPE_LOST);
+    assert_null(received);
+    assert_int_equal(received_size, 0);
+}
+
+/* Verify poll_tx drains a queued loopback character and re-enables output
+   when the transmit queue becomes empty. */
+static void test_tmxr_poll_tx_drains_loopback_queue_and_reenables_xmte(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line;
+    int32 value;
+
+    fixture->mux.lines = 1;
+    line = &fixture->lines[0];
+
+    assert_int_equal(
+        tmxr_open_master(&fixture->mux, "BUFFERED=16,LOOPBACK"), SCPE_OK);
+    line->rcve = 1;
+    line->txb[0] = 'Z';
+    line->txbpi = 1;
+    line->txbpr = 0;
+    line->xmte = 0;
+
+    tmxr_poll_tx(&fixture->mux);
+    assert_int_equal(tmxr_tqln(line), 0);
+    assert_true(line->xmte);
+
+    tmxr_poll_rx(&fixture->mux);
+    value = tmxr_getc_ln(line);
+    assert_true(value & TMXR_VALID);
+    assert_int_equal(value & 0xFF, 'Z');
+
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
+/* Verify txdone transitions from pending to done and then to already-done
+   once transmit timing has elapsed. */
+static void test_tmxr_txdone_ln_tracks_pending_and_completed_output(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+
+    line->conn = TRUE;
+    line->txbps = 9600;
+    line->txdone = FALSE;
+    line->txnexttime = sim_gtime() + 1000.0;
+
+    assert_int_equal(tmxr_txdone_ln(line), 0);
+
+    line->txnexttime = sim_gtime() - 1.0;
+    assert_int_equal(tmxr_txdone_ln(line), 1);
+    assert_true(line->txdone);
+    assert_int_equal(tmxr_txdone_ln(line), -1);
 }
 
 /* Verify line-order parsing preserves explicit order and fills in the
@@ -929,6 +2038,78 @@ int main(void)
             test_tmxr_set_line_speed_rejects_invalid_input,
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
+            test_tmxr_modem_control_passthru_toggles_and_rejects_attached_mux,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_set_line_units_update_poll_state,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_line_mode_setters_toggle_state,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_set_config_line_updates_cached_config_and_speed,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_set_config_line_rejects_invalid_config,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_open_master_buffered_defaults_to_32768,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_open_master_listener_sets_mux_listener_state,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_open_master_buffered_accepts_explicit_size,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_show_sync_reports_missing_network_support,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_open_master_line_listener_sets_line_state,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_open_master_translates_sync_aliases_via_eth_inventory,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_show_sync_lists_framer_aliases,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_open_master_loopback_sets_line_state,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_open_master_connect_sets_destination_and_ipad,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_poll_conn_marks_outgoing_connection_established,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_poll_conn_retries_failed_outgoing_connection,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_close_ln_closes_serial_and_clears_cached_state,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_reset_ln_pulses_serial_control_lines,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_reset_ln_restarts_configured_outgoing_destination,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_set_get_modem_bits_raises_dtr_and_starts_connect,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_detach_clears_attached_state_and_line_poll_flags,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_connection_message_honors_suppression_flags,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_connection_message_formats_multiline_banner,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_connection_message_formats_single_line_forced_banner,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
             test_tmxr_line_attach_string_returns_null_for_unconfigured_line,
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
@@ -936,6 +2117,27 @@ int main(void)
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
             test_tmxr_line_attach_string_formats_serial_destination,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_putc_ln_reports_lost_output_on_disconnected_line,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_putc_ln_duplicates_telnet_iac,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_putc_ln_loopback_round_trips_through_buffered_send,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_put_packet_ln_stalls_when_packet_transmit_is_busy,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_get_packet_ln_reports_empty_and_lost_states,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_poll_tx_drains_loopback_queue_and_reenables_xmte,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_txdone_ln_tracks_pending_and_completed_output,
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
             test_tmxr_set_lnorder_fills_unspecified_lines_with_all,
