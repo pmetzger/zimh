@@ -312,6 +312,7 @@
 #define NOT_MUX_USING_CODE /* sim_tmxr library define */
 
 #include "sim_defs.h"
+#include "sim_dynstr.h"
 #include "sim_serial.h"
 #include "sim_sock.h"
 #include "sim_timer.h"
@@ -874,63 +875,73 @@ return lp;                                              /* return pointer to lin
         a complete attach string for the current state of the multiplexer
 
 */
-static char *growstring(char **string, size_t growth)
+/* Append one comma-prefixed key=value style ACL fragment. */
+static t_bool tmxr_dynstr_append_acl (sim_dynstr_t *ds, const char *acl)
 {
-*string = (char *)realloc (*string, 1 + (*string ? strlen (*string) : 0) + growth);
-return *string + strlen(*string);
+char gbuf[CBUFSIZE];
+const char *c = acl;
+
+while (*c != '\0') {
+    c = get_glyph_nc (c, gbuf, ',');
+    if (!sim_dynstr_appendf (
+            ds, ";%s=%s", (gbuf[0] == '+') ? "Accept" : "Reject", gbuf + 1))
+        return FALSE;
+    }
+return TRUE;
 }
 
 static char *tmxr_mux_attach_string(char *old, TMXR *mp)
 {
-char* tptr = NULL;
+sim_dynstr_t ds;
 int32 i;
 TMLN *lp;
 
 free (old);
-tptr = (char *) calloc (1, 1);
-
-if (tptr == NULL)                                       /* no more mem? */
-    return tptr;
+sim_dynstr_init (&ds);
 
 if (mp->port) {                                         /* copy port */
-    sprintf (growstring(&tptr, 33 + strlen (mp->port)), "%s%s", mp->port,
-                                                                mp->notelnet ? ";notelnet" :
-                                                                               (mp->nomessage ? ";nomessage" :
-                                                                                                ""));
+    if (!sim_dynstr_appendf (&ds, "%s%s", mp->port,
+                             mp->notelnet ? ";notelnet" :
+                                            (mp->nomessage ? ";nomessage" :
+                                                             "")))
+        goto oom;
     if (mp->acl) {                                      /* copy acl in pieces */
-        char gbuf[CBUFSIZE];
-        const char *c = mp->acl;
-
-        while (*c != '\0') {
-            c = get_glyph_nc (c, gbuf, ',');
-            sprintf (growstring(&tptr, 9 + strlen (gbuf)), ";%s=%s", (gbuf[0] == '+') ? "Accept" : "Reject", gbuf + 1);
-            }
+        if (!tmxr_dynstr_append_acl (&ds, mp->acl))
+            goto oom;
         }
     }
 if (mp->logfiletmpl[0])                                 /* logfile info */
-    sprintf (growstring(&tptr, 7 + strlen (mp->logfiletmpl)), ",Log=%s", mp->logfiletmpl);
+    if (!sim_dynstr_appendf (&ds, ",Log=%s", mp->logfiletmpl))
+        goto oom;
 if (mp->buffered)
-    sprintf (growstring(&tptr, 10 + 10), ",Buffered=%d", mp->buffered);
-while ((*tptr == ',') || (*tptr == ' '))
-    memmove (tptr, tptr+1, strlen(tptr+1)+1);
+    if (!sim_dynstr_appendf (&ds, ",Buffered=%d", mp->buffered))
+        goto oom;
+sim_dynstr_ltrim_chars (&ds, ", ");
 for (i=0; i<mp->lines; ++i) {
     char *lptr;
     lp = mp->ldsc + i;
 
     lptr = tmxr_line_attach_string(lp);
     if (lptr) {
-        sprintf (growstring(&tptr, 10+strlen(lptr)), "%s%s", *tptr ? "," : "", lptr);
+        if ((!sim_dynstr_append (&ds, ds.len ? "," : "")) ||
+            (!sim_dynstr_append (&ds, lptr))) {
+            free (lptr);
+            goto oom;
+            }
         free (lptr);
         }
     }
 if (mp->lines == 1)
-    while ((*tptr == ',') || (*tptr == ' '))
-        memmove (tptr, tptr+1, strlen(tptr+1)+1);
-if (*tptr == '\0') {
-    free (tptr);
-    tptr = NULL;
+    sim_dynstr_ltrim_chars (&ds, ", ");
+if (ds.len == 0) {
+    sim_dynstr_free (&ds);
+    return NULL;
     }
-return tptr;
+return sim_dynstr_take (&ds);
+
+oom:
+sim_dynstr_free (&ds);
+return NULL;
 }
 
 
@@ -953,40 +964,44 @@ return tptr;
 
 char *tmxr_line_attach_string(TMLN *lp)
 {
-char* tptr = NULL;
+sim_dynstr_t ds;
 
-tptr = (char *) calloc (1, 1);
-
-if (tptr == NULL)                                       /* no more mem? */
-    return tptr;
+sim_dynstr_init (&ds);
 
 if (lp->destination || lp->port || lp->txlogname || (lp->conn == TMXR_LINE_DISABLED)) {
     if ((lp->mp->lines > 1) || (lp->port))
-        sprintf (growstring(&tptr, 32), "Line=%d", (int)(lp-lp->mp->ldsc));
+        if (!sim_dynstr_appendf (&ds, "Line=%d", (int)(lp-lp->mp->ldsc)))
+            goto oom;
     if (lp->conn == TMXR_LINE_DISABLED)
-        sprintf (growstring(&tptr, 32), ",Disabled");
+        if (!sim_dynstr_append (&ds, ",Disabled"))
+            goto oom;
     if (lp->modem_control != lp->mp->modem_control)
-        sprintf (growstring(&tptr, 32), ",%s", lp->modem_control ? "Modem" : "NoModem");
+        if (!sim_dynstr_appendf (
+                &ds, ",%s", lp->modem_control ? "Modem" : "NoModem"))
+            goto oom;
     if (lp->txbfd && (lp->txbsz != lp->mp->buffered))
-        sprintf (growstring(&tptr, 32), ",Buffered=%d", lp->txbsz);
+        if (!sim_dynstr_appendf (&ds, ",Buffered=%d", lp->txbsz))
+            goto oom;
     if (!lp->txbfd && (lp->mp->buffered > 0))
-        sprintf (growstring(&tptr, 32), ",UnBuffered");
+        if (!sim_dynstr_append (&ds, ",UnBuffered"))
+            goto oom;
     if (lp->mp->datagram != lp->datagram)
-        sprintf (growstring(&tptr, 8), ",%s", lp->datagram ? "UDP" : "TCP");
+        if (!sim_dynstr_appendf (&ds, ",%s", lp->datagram ? "UDP" : "TCP"))
+            goto oom;
     if (lp->mp->packet != lp->packet)
-        sprintf (growstring(&tptr, 8), ",Packet");
+        if (!sim_dynstr_append (&ds, ",Packet"))
+            goto oom;
     if (lp->port) {
-        sprintf (growstring(&tptr, 32 + strlen (lp->port)), ",%s%s%s", lp->port,
-                                                                       ((lp->mp->notelnet != lp->notelnet) && (!lp->datagram)) ? (lp->notelnet ? ";notelnet" : ";telnet") : "",
-                                                                       ((lp->mp->nomessage != lp->nomessage) && (!lp->datagram)) ? (lp->nomessage ? ";nomessage" : ";message") : "");
+        if (!sim_dynstr_appendf (
+                &ds, ",%s%s%s", lp->port,
+                ((lp->mp->notelnet != lp->notelnet) && (!lp->datagram)) ?
+                    (lp->notelnet ? ";notelnet" : ";telnet") : "",
+                ((lp->mp->nomessage != lp->nomessage) && (!lp->datagram)) ?
+                    (lp->nomessage ? ";nomessage" : ";message") : ""))
+            goto oom;
         if (lp->acl) {                                      /* copy acl in pieces */
-            char gbuf[CBUFSIZE];
-            const char *c = lp->acl;
-
-            while (*c != '\0') {
-                c = get_glyph_nc (c, gbuf, ',');
-                sprintf (growstring(&tptr, 9 + strlen (gbuf)), ";%s=%s", (gbuf[0] == '+') ? "Accept" : "Reject", gbuf + 1);
-                }
+            if (!tmxr_dynstr_append_acl (&ds, lp->acl))
+                goto oom;
             }
         }
     if (lp->destination) {
@@ -994,21 +1009,37 @@ if (lp->destination || lp->port || lp->txlogname || (lp->conn == TMXR_LINE_DISAB
             char portname[CBUFSIZE];
 
             get_glyph_nc (lp->destination, portname, ';');
-            sprintf (growstring(&tptr, 25 + strlen (lp->destination)), ",Connect=%s%s%s", portname, strcmp("9600-8N1", lp->serconfig ? lp->serconfig : "") ? ";" : "", strcmp("9600-8N1", lp->serconfig ? lp->serconfig : "") ? lp->serconfig : "");
+            if (!sim_dynstr_appendf (
+                    &ds, ",Connect=%s%s%s", portname,
+                    strcmp ("9600-8N1", lp->serconfig ? lp->serconfig : "") ?
+                        ";" : "",
+                    strcmp ("9600-8N1", lp->serconfig ? lp->serconfig : "") ?
+                        lp->serconfig : ""))
+                goto oom;
             }
         else
-            sprintf (growstring(&tptr, 25 + strlen (lp->destination)), ",Connect=%s%s", lp->destination, ((lp->mp->notelnet != lp->notelnet) && (!lp->datagram)) ? (lp->notelnet ? ";notelnet" : ";telnet") : "");
+            if (!sim_dynstr_appendf (
+                    &ds, ",Connect=%s%s", lp->destination,
+                    ((lp->mp->notelnet != lp->notelnet) && (!lp->datagram)) ?
+                        (lp->notelnet ? ";notelnet" : ";telnet") : ""))
+                goto oom;
         }
     if (lp->txlogname)
-        sprintf (growstring(&tptr, 12 + strlen (lp->txlogname)), ",Log=%s", lp->txlogname);
+        if (!sim_dynstr_appendf (&ds, ",Log=%s", lp->txlogname))
+            goto oom;
     if (lp->loopback)
-        sprintf (growstring(&tptr, 12 ), ",Loopback");
+        if (!sim_dynstr_append (&ds, ",Loopback"))
+            goto oom;
     }
-if (*tptr == '\0') {
-    free (tptr);
-    tptr = NULL;
+if (ds.len == 0) {
+    sim_dynstr_free (&ds);
+    return NULL;
     }
-return tptr;
+return sim_dynstr_take (&ds);
+
+oom:
+sim_dynstr_free (&ds);
+return NULL;
 }
 
 /*
