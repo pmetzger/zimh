@@ -117,8 +117,7 @@ static t_bool sim_cmdvars_localtime(time_t now, struct tm *tmnow)
 
 /* Decode a whole-line quoted command before later substitution work. */
 static void sim_cmdvars_decode_initial_quoted_line(char *ip, size_t instr_size,
-                                                   char *instr,
-                                                   char *scratch)
+                                                   char *instr, char *scratch)
 {
     if ((*ip == '"') || (*ip == '\'')) {
         const char *cptr = ip;
@@ -188,8 +187,8 @@ static const char *sim_cmdvars_parse_percent(const char **ipp, char *gbuf,
     if (*ip == '~') {
         *expand_it = TRUE;
         ++ip;
-        for (i = 0; (i < (SIM_CMDVARS_PARTS_SIZE - 1)) &&
-                    (strchr("fpnxtz", *ip));
+        for (i = 0;
+             (i < (SIM_CMDVARS_PARTS_SIZE - 1)) && (strchr("fpnxtz", *ip));
              i++, ip++) {
             parts[i] = *ip;
             parts[i + 1] = '\0';
@@ -238,9 +237,10 @@ static const char *sim_cmdvars_parse_percent(const char **ipp, char *gbuf,
 }
 
 /* Expand the initial command token if it names one command variable. */
-static t_bool sim_cmdvars_expand_initial_token(char **ipp, char **op, char *oend,
-                                               const char *instr, char *gbuf,
-                                               char *rbuf, size_t rbuf_size,
+static t_bool sim_cmdvars_expand_initial_token(char **ipp, char **op,
+                                               char *oend, const char *instr,
+                                               char *gbuf, char *rbuf,
+                                               size_t rbuf_size,
                                                size_t *outstr_off)
 {
     const char *ap = NULL;
@@ -482,7 +482,8 @@ void sim_cmdvars_set_test_uname_hook(sim_cmdvars_uname_hook_fn hook)
 /* Replace the underlying localtime call used by time-variable lookup. */
 void sim_cmdvars_set_test_localtime_hook(sim_cmdvars_localtime_hook_fn hook)
 {
-    sim_cmdvars_localtime_hook = hook ? hook : sim_cmdvars_default_localtime_call;
+    sim_cmdvars_localtime_hook =
+        hook ? hook : sim_cmdvars_default_localtime_call;
 }
 
 /* Clear the cached host OS type used by SIM_OSTYPE lookup.
@@ -592,17 +593,17 @@ const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
     tmnow = sim_cmdvars_localtime(now, &tm_storage) ? &tm_storage : NULL;
 
     if (tmnow && !strcmp("DATE", gbuf)) {
-        sprintf(rbuf, "%4d-%02d-%02d", tmnow->tm_year + 1900,
-                tmnow->tm_mon + 1, tmnow->tm_mday);
+        sprintf(rbuf, "%4d-%02d-%02d", tmnow->tm_year + 1900, tmnow->tm_mon + 1,
+                tmnow->tm_mday);
         ap = rbuf;
     } else if (tmnow && !strcmp("TIME", gbuf)) {
         sprintf(rbuf, "%02d:%02d:%02d", tmnow->tm_hour, tmnow->tm_min,
                 tmnow->tm_sec);
         ap = rbuf;
     } else if (tmnow && !strcmp("DATETIME", gbuf)) {
-        sprintf(rbuf, "%04d-%02d-%02dT%02d:%02d:%02d",
-                tmnow->tm_year + 1900, tmnow->tm_mon + 1, tmnow->tm_mday,
-                tmnow->tm_hour, tmnow->tm_min, tmnow->tm_sec);
+        sprintf(rbuf, "%04d-%02d-%02dT%02d:%02d:%02d", tmnow->tm_year + 1900,
+                tmnow->tm_mon + 1, tmnow->tm_mday, tmnow->tm_hour,
+                tmnow->tm_min, tmnow->tm_sec);
         ap = rbuf;
     } else if (tmnow && !strcmp("LDATE", gbuf)) {
         strftime(rbuf, rbuf_size, "%x", tmnow);
@@ -623,16 +624,16 @@ const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
         strftime(rbuf, rbuf_size, "%y", tmnow);
         ap = rbuf;
     } else if (tmnow && ((!strcmp("DATE_19XX_YY", gbuf)) ||
-               (!strcmp("DATE_19XX_YYYY", gbuf)))) {
-            int year = tmnow->tm_year + 1900;
-            int days = year - 2001;
-            int leaps = days / 4 - days / 100 + days / 400;
-            int lyear = ((year % 4) == 0) &&
-                        (((year % 100) != 0) || ((year % 400) == 0));
-            int selector = ((days + leaps + 7) % 7) + lyear * 7;
-            static int years[] = {90, 91, 97, 98, 99, 94, 89,
-                                  96, 80, 92, 76, 88, 72, 84};
-            int cal_year = years[selector];
+                         (!strcmp("DATE_19XX_YYYY", gbuf)))) {
+        int year = tmnow->tm_year + 1900;
+        int days = year - 2001;
+        int leaps = days / 4 - days / 100 + days / 400;
+        int lyear =
+            ((year % 4) == 0) && (((year % 100) != 0) || ((year % 400) == 0));
+        int selector = ((days + leaps + 7) % 7) + lyear * 7;
+        static int years[] = {90, 91, 97, 98, 99, 94, 89,
+                              96, 80, 92, 76, 88, 72, 84};
+        int cal_year = years[selector];
 
         if (!strcmp("DATE_19XX_YY", gbuf))
             sprintf(rbuf, "%d", cal_year);
@@ -654,96 +655,95 @@ const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
     } else if (tmnow && !strcmp("DATE_D", gbuf)) {
         sprintf(rbuf, "%d", (tmnow->tm_wday ? tmnow->tm_wday : 7));
         ap = rbuf;
-    } else if (tmnow && ((!strcmp("DATE_WW", gbuf)) ||
-               (!strcmp("DATE_WYYYY", gbuf)))) {
-            int iso_yr = tmnow->tm_year + 1900;
-            int iso_wk =
+    } else if (tmnow &&
+               ((!strcmp("DATE_WW", gbuf)) || (!strcmp("DATE_WYYYY", gbuf)))) {
+        int iso_yr = tmnow->tm_year + 1900;
+        int iso_wk =
+            (tmnow->tm_yday + 11 - (tmnow->tm_wday ? tmnow->tm_wday : 7)) / 7;
+
+        if (iso_wk == 0) {
+            iso_yr = iso_yr - 1;
+            tmnow->tm_yday += 365 + (((iso_yr % 4) == 0) ? 1 : 0);
+            iso_wk =
                 (tmnow->tm_yday + 11 - (tmnow->tm_wday ? tmnow->tm_wday : 7)) /
                 7;
-
-            if (iso_wk == 0) {
-                iso_yr = iso_yr - 1;
-                tmnow->tm_yday += 365 + (((iso_yr % 4) == 0) ? 1 : 0);
-                iso_wk = (tmnow->tm_yday + 11 -
-                          (tmnow->tm_wday ? tmnow->tm_wday : 7)) /
-                         7;
-            } else if ((iso_wk == 53) &&
-                       (((31 - tmnow->tm_mday) + tmnow->tm_wday) < 4)) {
-                ++iso_yr;
-                iso_wk = 1;
-            }
-            if (!strcmp("DATE_WW", gbuf))
-                sprintf(rbuf, "%02d", iso_wk);
-            else
-                sprintf(rbuf, "%04d", iso_yr);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("DATE_JJJ", gbuf)) {
-            strftime(rbuf, rbuf_size, "%j", tmnow);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("TIME_HH", gbuf)) {
-            strftime(rbuf, rbuf_size, "%H", tmnow);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("TIME_MM", gbuf)) {
-            strftime(rbuf, rbuf_size, "%M", tmnow);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("TIME_SS", gbuf)) {
-            strftime(rbuf, rbuf_size, "%S", tmnow);
-            ap = rbuf;
-        } else if (!strcmp("TIME_MSEC", gbuf)) {
-            sprintf(rbuf, "%03d", (int)(cmd_time.tv_nsec / 1000000));
-            ap = rbuf;
-        } else if (!strcmp("STATUS", gbuf)) {
-            sprintf(rbuf, "%08X", sim_last_cmd_stat);
-            ap = rbuf;
-        } else if (!strcmp("TSTATUS", gbuf)) {
-            t_stat stat = SCPE_BARE_STATUS(sim_last_cmd_stat);
-
-            if ((stat > SCPE_OK) && (stat < SCPE_BASE) &&
-                (sim_stop_messages[stat] != NULL))
-                sprintf(rbuf, "%s", sim_stop_messages[stat]);
-            else
-                sprintf(rbuf, "%s", sim_error_text(stat));
-            ap = rbuf;
-        } else if (!strcmp("SIM_VERIFY", gbuf)) {
-            sprintf(rbuf, "%s", scp_do_echo_enabled() ? "-V" : "");
-            ap = rbuf;
-        } else if (!strcmp("SIM_VERBOSE", gbuf)) {
-            sprintf(rbuf, "%s", scp_do_echo_enabled() ? "-V" : "");
-            ap = rbuf;
-        } else if (!strcmp("SIM_QUIET", gbuf)) {
-            sprintf(rbuf, "%s", sim_quiet ? "-Q" : "");
-            ap = rbuf;
-        } else if (!strcmp("SIM_MESSAGE", gbuf)) {
-            sprintf(rbuf, "%s", sim_show_message ? "" : "-Q");
-            ap = rbuf;
-        } else if (!strcmp("SIM_NAME", gbuf)) {
-            strlcpy(rbuf, sim_name, rbuf_size);
-            ap = rbuf;
-        } else if (!strcmp("SIM_BIN_PATH", gbuf)) {
-            if (sim_prog_name) {
-                strlcpy(rbuf, sim_prog_name, rbuf_size);
-                ap = rbuf;
-            }
-        } else if (!strcmp("SIM_BIN_NAME", gbuf)) {
-            ap = sim_bin_name_value(rbuf, rbuf_size);
-        } else if (!strcmp("SIM_OSTYPE", gbuf)) {
-            ap = sim_ostype_value(rbuf, rbuf_size);
-        } else if (!strcmp("SIM_RUNLIMIT", gbuf)) {
-            if (sim_runlimit_enabled) {
-                sprintf(rbuf, "%d", sim_runlimit_value);
-                ap = rbuf;
-            }
-        } else if (!strcmp("SIM_RUNLIMIT_UNITS", gbuf)) {
-            if (sim_runlimit_enabled && sim_runlimit_units) {
-                strlcpy(rbuf, sim_runlimit_units, rbuf_size);
-                ap = rbuf;
-            }
-        } else if (!strcmp("_FILE_COMPARE_DIFF_OFFSET", gbuf)) {
-            if (sim_file_compare_diff_valid) {
-                snprintf(rbuf, rbuf_size, "%zu", sim_file_compare_diff_offset);
-                ap = rbuf;
-            }
+        } else if ((iso_wk == 53) &&
+                   (((31 - tmnow->tm_mday) + tmnow->tm_wday) < 4)) {
+            ++iso_yr;
+            iso_wk = 1;
         }
+        if (!strcmp("DATE_WW", gbuf))
+            sprintf(rbuf, "%02d", iso_wk);
+        else
+            sprintf(rbuf, "%04d", iso_yr);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("DATE_JJJ", gbuf)) {
+        strftime(rbuf, rbuf_size, "%j", tmnow);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("TIME_HH", gbuf)) {
+        strftime(rbuf, rbuf_size, "%H", tmnow);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("TIME_MM", gbuf)) {
+        strftime(rbuf, rbuf_size, "%M", tmnow);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("TIME_SS", gbuf)) {
+        strftime(rbuf, rbuf_size, "%S", tmnow);
+        ap = rbuf;
+    } else if (!strcmp("TIME_MSEC", gbuf)) {
+        sprintf(rbuf, "%03d", (int)(cmd_time.tv_nsec / 1000000));
+        ap = rbuf;
+    } else if (!strcmp("STATUS", gbuf)) {
+        sprintf(rbuf, "%08X", sim_last_cmd_stat);
+        ap = rbuf;
+    } else if (!strcmp("TSTATUS", gbuf)) {
+        t_stat stat = SCPE_BARE_STATUS(sim_last_cmd_stat);
+
+        if ((stat > SCPE_OK) && (stat < SCPE_BASE) &&
+            (sim_stop_messages[stat] != NULL))
+            sprintf(rbuf, "%s", sim_stop_messages[stat]);
+        else
+            sprintf(rbuf, "%s", sim_error_text(stat));
+        ap = rbuf;
+    } else if (!strcmp("SIM_VERIFY", gbuf)) {
+        sprintf(rbuf, "%s", scp_do_echo_enabled() ? "-V" : "");
+        ap = rbuf;
+    } else if (!strcmp("SIM_VERBOSE", gbuf)) {
+        sprintf(rbuf, "%s", scp_do_echo_enabled() ? "-V" : "");
+        ap = rbuf;
+    } else if (!strcmp("SIM_QUIET", gbuf)) {
+        sprintf(rbuf, "%s", sim_quiet ? "-Q" : "");
+        ap = rbuf;
+    } else if (!strcmp("SIM_MESSAGE", gbuf)) {
+        sprintf(rbuf, "%s", sim_show_message ? "" : "-Q");
+        ap = rbuf;
+    } else if (!strcmp("SIM_NAME", gbuf)) {
+        strlcpy(rbuf, sim_name, rbuf_size);
+        ap = rbuf;
+    } else if (!strcmp("SIM_BIN_PATH", gbuf)) {
+        if (sim_prog_name) {
+            strlcpy(rbuf, sim_prog_name, rbuf_size);
+            ap = rbuf;
+        }
+    } else if (!strcmp("SIM_BIN_NAME", gbuf)) {
+        ap = sim_bin_name_value(rbuf, rbuf_size);
+    } else if (!strcmp("SIM_OSTYPE", gbuf)) {
+        ap = sim_ostype_value(rbuf, rbuf_size);
+    } else if (!strcmp("SIM_RUNLIMIT", gbuf)) {
+        if (sim_runlimit_enabled) {
+            sprintf(rbuf, "%d", sim_runlimit_value);
+            ap = rbuf;
+        }
+    } else if (!strcmp("SIM_RUNLIMIT_UNITS", gbuf)) {
+        if (sim_runlimit_enabled && sim_runlimit_units) {
+            strlcpy(rbuf, sim_runlimit_units, rbuf_size);
+            ap = rbuf;
+        }
+    } else if (!strcmp("_FILE_COMPARE_DIFF_OFFSET", gbuf)) {
+        if (sim_file_compare_diff_valid) {
+            snprintf(rbuf, rbuf_size, "%zu", sim_file_compare_diff_offset);
+            ap = rbuf;
+        }
+    }
     if (!ap)
         ap = sim_sub_var_get(gbuf);
     if (!ap) {
@@ -813,8 +813,8 @@ void sim_sub_args(char *instr, size_t instr_size, char *do_arg[])
                 ++ip;
                 percent_ip = ip;
                 ap = sim_cmdvars_parse_percent(
-                    &percent_ip, gbuf, rbuf, sizeof(rbuf), do_arg,
-                    &expand_it, parts, &star_args, &emit_percent);
+                    &percent_ip, gbuf, rbuf, sizeof(rbuf), do_arg, &expand_it,
+                    parts, &star_args, &emit_percent);
                 ip = (char *)percent_ip;
                 if (emit_percent)
                     *op++ = '%';
