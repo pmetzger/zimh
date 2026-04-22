@@ -59,6 +59,12 @@ set(SIM_SOURCES
     ${SIMH_RUNTIME_ROOT}/sim_tmxr.c
     ${SIMH_RUNTIME_ROOT}/sim_video.c)
 
+if (WIN32)
+    list(APPEND SIM_SOURCES
+        ${SIMH_COMPAT_ROOT}/strlcat.c
+        ${SIMH_COMPAT_ROOT}/strlcpy.c)
+endif ()
+
 set(SIM_VIDEO_SOURCES
     ${SIMH_COMPONENTS_ROOT}/display/display.c
     ${SIMH_COMPONENTS_ROOT}/display/sim_ws.c)
@@ -87,6 +93,7 @@ function(build_simcore _targ)
 
         # Make sure the shared source roots are part of the library include path.
         target_include_directories("${lib}" PUBLIC
+            "${SIMH_COMPAT_ROOT}"
             "${SIMH_CORE_ROOT}"
             "${SIMH_RUNTIME_ROOT}"
             "${SIMH_COMPONENTS_ROOT}"

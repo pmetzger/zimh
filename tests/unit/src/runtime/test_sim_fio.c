@@ -164,19 +164,19 @@ static void test_sim_trim_endspc_strips_trailing_whitespace(void **state)
     assert_string_equal(text, "alpha beta");
 }
 
-/* Verify the portable strlcpy/strlcat helpers report truncation like
-   their BSD counterparts. */
-static void test_sim_strlcpy_and_strlcat_follow_bsd_semantics(void **state)
+/* Verify the portable strlcpy/strlcat API reports truncation like
+   the BSD originals. */
+static void test_strlcpy_and_strlcat_follow_bsd_semantics(void **state)
 {
     char copy_buf[5];
     char cat_buf[7] = "abc";
 
     (void)state;
 
-    assert_int_equal(sim_strlcpy(copy_buf, "sample", sizeof(copy_buf)), 6);
+    assert_int_equal(strlcpy(copy_buf, "sample", sizeof(copy_buf)), 6);
     assert_string_equal(copy_buf, "samp");
 
-    assert_int_equal(sim_strlcat(cat_buf, "defghi", sizeof(cat_buf)), 9);
+    assert_int_equal(strlcat(cat_buf, "defghi", sizeof(cat_buf)), 9);
     assert_string_equal(cat_buf, "abcdef");
 }
 
@@ -822,7 +822,7 @@ int main(void)
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_sim_trim_endspc_strips_trailing_whitespace),
-        cmocka_unit_test(test_sim_strlcpy_and_strlcat_follow_bsd_semantics),
+    cmocka_unit_test(test_strlcpy_and_strlcat_follow_bsd_semantics),
         cmocka_unit_test(
             test_sim_string_compare_helpers_handle_case_and_whitespace),
         cmocka_unit_test_setup_teardown(
