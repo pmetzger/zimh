@@ -264,16 +264,6 @@ Building on Windows:
 
     https://github.com/simh/windows-build/archive/windows-build.zip
 
-
- There are Windows batch files provided to initiate compiles using the MinGW
- compiler tool chain.  These batch files are located in the same directory
- as this file and are called: build_mingw.bat, build_mingw_ether.bat, and
- build_mingw_noasync.bat.  These batch files each presume that the MinGW
- toolchain is either in the current path or, if not that it is located at
- C:\MinGW\bin.  These batch files merely invoke the MinGW make (GNU make)
- passing some specific arguments along with the optional arguments the batch
- file is invoked with.
-
  The current windows network built binaries will run on any system without
  regard to whether or not Npcap or WinPcap is installed, and will provide
  Network functionality when Npcap or WinPcap is available.

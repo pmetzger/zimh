@@ -188,7 +188,8 @@ asm1130 -l program.asm
 
 --------------------------------------------------------------------------
 
-Note: the DMS disk is built with the Windows batch file "mkdms.bat".
+Note: the DMS disk can be built with the IBM 1130 utility and script
+files in this tree.
 
 Subnote: DMS cannot be built with the 1130's native assembler.
 

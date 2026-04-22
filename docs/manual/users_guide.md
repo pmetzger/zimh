@@ -399,13 +399,10 @@ files which make up your simulator) can be added or adjusted here.
 
 MinGW (Minimalist GNU for Windows) is a free C compiler available from
 <https://www.mingw.org/>. Msys is a minimal set of Unix utilities to
-support MinGW, also available from <https://www.mingw.org/>. The
-distribution includes a batch file (`build_mingw.bat`) that will build
-all the simulators from source. By default, the PDP-11 and VAX family
-simulators are built with Ethernet support if the necessary Winpcap
-components are available at build time. The compiled executables will
-be produced in the configured build tree's `bin/` subdirectory, such as
-`build/release/bin`.
+support MinGW, also available from <https://www.mingw.org/>. Build
+under MinGW using the normal CMake-based build flow. The compiled
+executables will be produced in the configured build tree's `bin/`
+subdirectory, such as `build/release/bin`.
 
 # Simulator Conventions
 

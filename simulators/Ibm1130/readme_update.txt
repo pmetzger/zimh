@@ -45,9 +45,6 @@ programs:
 	mkboot		object deck to IPL and core image converter
 	viewdeck	binary to hollerith deck viewer if needed to view phase ID cards and ident fields
 
-batch file:
-	mkdms.bat	builds DMS objects and binary cards. Need a shell script version of this.
-
 IBM1130 simulator DO command scripts:
 	format		format a disk image named DMS.DSK
 	loaddms		format and install DMS onto the formatted DMS.DSK
