@@ -33,3 +33,32 @@ Rule:
 - If new architectural cleanup opportunities are discovered while expanding
   coverage or doing the remaining TMXR cleanup, add them here instead of
   silently deferring them.
+
+Later decomposition direction:
+
+- `sim_tmxr.c` is now carrying enough distinct responsibilities that it
+  should eventually be decomposed for architectural clarity as well as
+  testability
+- the historical common abstraction seems to have been "one host-side
+  communication endpoint attached to one simulated line"
+- that was enough for terminal/Telnet muxing, but the same subsystem later
+  accumulated:
+  - raw stream connections
+  - host serial ports
+  - outbound connects and reconnect logic
+  - packet and datagram delivery
+  - synchronous/framed protocol support
+  - send/expect helpers
+  - logging and status/reporting glue
+- so the module has effectively become a generic host communications line
+  layer rather than just a terminal multiplexer
+- that history explains why stream/Telnet, packet/datagram, synchronous line,
+  attach/config, connection management, and reporting logic are all
+  co-resident now, but it no longer justifies keeping them in one file
+- likely split boundaries are:
+  - attach/config parsing and attach-string synthesis
+  - connection/reset/poll-connection host-I/O logic
+  - line I/O, buffering, Telnet, and packet paths
+  - show/help/status formatting
+  - a small shared core for open-list management and common helpers
+- prefer decomposition by responsibility rather than many tiny files
