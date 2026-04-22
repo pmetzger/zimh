@@ -4,6 +4,8 @@
    be reused by smaller core modules and by host-side tests without
    dragging in the full command loop implementation.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #ifndef SIM_SCP_PARSE_H_
 #define SIM_SCP_PARSE_H_ 0

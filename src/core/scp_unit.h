@@ -4,6 +4,8 @@
    tests need unit attachment logic without depending on the entire SCP
    command processor.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #ifndef SIM_SCP_UNIT_H_
 #define SIM_SCP_UNIT_H_ 0

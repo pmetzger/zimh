@@ -5,6 +5,8 @@
    tokens mean, but the tokenization itself lives here so it can be
    reused and tested independently.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #include "sim_defs.h"
 #include "scp.h"

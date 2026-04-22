@@ -5,6 +5,8 @@
    input, expect-match rules, and the internal device used to stop the
    simulator when an expect rule fires.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #ifndef SCP_EXPECT_H_
 #define SCP_EXPECT_H_

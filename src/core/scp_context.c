@@ -6,6 +6,8 @@
    used by the command processor and by shared support code, but they are
    separate from command parsing and the top-level control loop.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #include "sim_defs.h"
 #include "scp.h"

@@ -4,6 +4,8 @@
    operations.  These routines are reused by runtime modules and tests,
    but they are separate from the SCP command parser and control loop.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #include "sim_defs.h"
 #include "scp.h"

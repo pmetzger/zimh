@@ -4,6 +4,8 @@
    It owns generic HELP output, device-help rendering, and the VMS-style
    topic parser used by SCP and device help strings.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #include "sim_defs.h"
 #include "sim_disk.h"

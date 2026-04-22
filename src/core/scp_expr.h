@@ -4,6 +4,8 @@
    by the simulator control program.  The implementation owns the parser,
    operator tables, and temporary evaluation state.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #ifndef SCP_EXPR_H
 #define SCP_EXPR_H

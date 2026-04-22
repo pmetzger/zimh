@@ -1,28 +1,8 @@
-/* sim_frontpanel.h: simulator frontpanel API definitions
+/* sim_frontpanel.h: simulator frontpanel API definitions */
+// SPDX-FileCopyrightText: 2015 Mark Pizzolato
+// SPDX-License-Identifier: MIT
 
-   Copyright (c) 2015, Mark Pizzolato
-
-   Permission is hereby granted, free of charge, to any person obtaining a
-   copy of this software and associated documentation files (the "Software"),
-   to deal in the Software without restriction, including without limitation
-   the rights to use, copy, modify, merge, publish, distribute, sublicense,
-   and/or sell copies of the Software, and to permit persons to whom the
-   Software is furnished to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
-   MARK PIZZOLATO BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-   Except as contained in this notice, the name of Mark Pizzolato shall not be
-   used in advertising or otherwise to promote the sale, use or other dealings
-   in this Software without prior written authorization from Mark Pizzolato.
-
+/*
    15-Jan-15    MP      Initial implementation
    01-Apr-15    MP      Added register indirect, mem_examine and mem_deposit
    03-Apr-15    MP      Added logic to pass simulator startup messages in

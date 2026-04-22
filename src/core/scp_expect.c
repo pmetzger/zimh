@@ -5,6 +5,8 @@
    command handlers, the expect rule matcher, and the internal device used
    to stop simulation when an expect rule fires.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #include "sim_defs.h"
 #include "scp.h"

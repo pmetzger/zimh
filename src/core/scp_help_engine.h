@@ -4,6 +4,8 @@
    scp_help_engine.c: generic HELP command output, device-help rendering,
    and the shared helpers used by the SCP command layer.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #ifndef SCP_HELP_ENGINE_H_
 #define SCP_HELP_ENGINE_H_ 0

@@ -5,6 +5,8 @@
    that width-to-storage policy so SCP save/restore, buffered unit I/O,
    and tests all use the same rule.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #ifndef SIM_SCP_SIZE_H_
 #define SIM_SCP_SIZE_H_ 0

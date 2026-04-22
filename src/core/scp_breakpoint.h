@@ -4,6 +4,8 @@
    scp.c.  The implementation manages breakpoint tables, pending actions,
    and the public status used by simulators when checking breakpoint hits.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #ifndef SCP_BREAKPOINT_H_
 #define SCP_BREAKPOINT_H_

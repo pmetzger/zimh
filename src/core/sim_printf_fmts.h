@@ -8,6 +8,8 @@
  *
  * "scooter me fecit"
  *~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~*/
+// SPDX-FileCopyrightText: B. Scott Michel
+// SPDX-License-Identifier: MIT
 
 #pragma once
 #if !defined(SIM_PRINTF_H)

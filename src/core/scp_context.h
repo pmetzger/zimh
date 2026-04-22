@@ -7,6 +7,8 @@
    boundary between generic SCP helpers and the command loop easier to
    follow.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #ifndef SIM_SCP_CONTEXT_H_
 #define SIM_SCP_CONTEXT_H_ 0

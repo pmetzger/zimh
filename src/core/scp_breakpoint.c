@@ -4,6 +4,8 @@
    scp.c.  It owns breakpoint tables, pending breakpoint actions, and the
    shared breakpoint status consumed by simulators and the SCP command layer.
 */
+// SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
+// SPDX-License-Identifier: MIT
 
 #include "sim_defs.h"
 #include "scp.h"
