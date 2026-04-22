@@ -39,8 +39,3 @@ tmp/word-text-stage.*/
 # Temporary working tree containing existing Markdown conversions and
 # exported assets while the Word-document replacement effort is ongoing.
 simh-docs/
-
-# Beads / Dolt files (added by bd init)
-.dolt/
-*.db
-.beads-credential-key
