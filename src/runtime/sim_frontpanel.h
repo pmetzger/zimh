@@ -1,6 +1,6 @@
 /* sim_frontpanel.h: simulator frontpanel API definitions */
 // SPDX-FileCopyrightText: 2015 Mark Pizzolato
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    15-Jan-15    MP      Initial implementation

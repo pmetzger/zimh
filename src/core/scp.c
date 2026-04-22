@@ -1,6 +1,6 @@
 /* scp.c: simulator control program */
 // SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    01-Oct-22    RMS     Replaced readline with editline due to licensing issues (Paul Koning)

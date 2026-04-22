@@ -1,6 +1,6 @@
 /* sim_console.c: simulator console I/O library */
 // SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    30-Nov-22    RMS     Made definitions of sim_os_fd_isatty consistent (Dave Bryan)

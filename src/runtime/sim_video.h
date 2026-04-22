@@ -1,6 +1,6 @@
 /* sim_video.c: Bitmap video output */
 // SPDX-FileCopyrightText: 2011-2013 Matt Burke
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    08-Nov-2013  MB      Added globals for current mouse status

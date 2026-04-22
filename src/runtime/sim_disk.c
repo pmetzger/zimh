@@ -1,6 +1,6 @@
 /* sim_disk.c: simulator disk support library */
 // SPDX-FileCopyrightText: 2011 Mark Pizzolato
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    This is the place which hides processing of various disk formats,

@@ -1,6 +1,6 @@
 /* sim_tmxr.h: terminal multiplexer definitions */
 // SPDX-FileCopyrightText: 2001-2008 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    Based on the original DZ11 simulator by Thord Nilson, as updated by

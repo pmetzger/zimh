@@ -1,6 +1,6 @@
 /* sim_tape.c: simulator tape support library */
 // SPDX-FileCopyrightText: 1993-2008 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    Ultimately, this will be a place to hide processing of various tape formats,

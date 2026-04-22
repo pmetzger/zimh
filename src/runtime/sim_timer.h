@@ -1,6 +1,6 @@
 /* sim_timer.h: simulator timer library headers */
 // SPDX-FileCopyrightText: 1993-2008 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    28-Apr-07    RMS     Added sim_rtc_init_all

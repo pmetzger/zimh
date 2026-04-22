@@ -1,6 +1,6 @@
 /* sim_serial.c: OS-dependent serial port routines */
 // SPDX-FileCopyrightText: 2008 J. David Bryan, Mark Pizzolato
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    The author gratefully acknowledges the assistance of Holger Veit with the

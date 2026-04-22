@@ -1,6 +1,6 @@
 /* sim_rev.h: simulator revisions and current rev level */
 // SPDX-FileCopyrightText: 1993-2012 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 #ifndef SIM_REV_H_
 #define SIM_REV_H_     0

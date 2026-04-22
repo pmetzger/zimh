@@ -1,6 +1,6 @@
 /* sim_fio.h: simulator file I/O library headers */
 // SPDX-FileCopyrightText: 1993-2008 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    02-Feb-11    MP      Added sim_fsize_ex and sim_fsize_name_ex returning t_addr

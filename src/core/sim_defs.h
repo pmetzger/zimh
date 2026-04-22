@@ -1,6 +1,6 @@
 /* sim_defs.h: simulator definitions */
 // SPDX-FileCopyrightText: 1993-2016 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    06-Jun-22    RMS     Deprecated UNIT_TEXT, deleted UNIT_RAW

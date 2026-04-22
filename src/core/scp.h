@@ -1,6 +1,6 @@
 /* scp.h: simulator control program headers */
 // SPDX-FileCopyrightText: 1993-2009 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    05-Dec-10    MP      Added macro invocation of sim_debug

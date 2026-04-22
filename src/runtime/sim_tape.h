@@ -1,6 +1,6 @@
 /* sim_tape.h: simulator tape support library definitions */
 // SPDX-FileCopyrightText: 1993-2008 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    18-Jul-16    JDB     Added sim_tape_errecf, sim_tape_errecr functions

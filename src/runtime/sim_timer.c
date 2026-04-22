@@ -1,6 +1,6 @@
 /* sim_timer.c: simulator timer library */
 // SPDX-FileCopyrightText: 1993-2022 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    27-Sep-22    RMS     Removed OS/2 and Mac "Classic" support

@@ -1,6 +1,6 @@
 /* sim_scsi.h: SCSI bus simulation */
 // SPDX-FileCopyrightText: 2019 Matt Burke
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 #ifndef _SIM_SCSI_H_
 #define _SIM_SCSI_H_     0

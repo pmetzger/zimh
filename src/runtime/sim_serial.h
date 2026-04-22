@@ -1,6 +1,6 @@
 /* sim_serial.h: OS-dependent serial port routines header file */
 // SPDX-FileCopyrightText: 2008 J. David Bryan, Mark Pizzolato
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    07-Oct-08    JDB     [serial] Created file

@@ -1,6 +1,6 @@
 /* sim_sock.h: OS-dependent socket routines header file */
 // SPDX-FileCopyrightText: 2001-2008 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    15-Oct-12    MP      Added definitions needed to detect possible tcp

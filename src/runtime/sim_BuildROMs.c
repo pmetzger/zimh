@@ -1,6 +1,6 @@
 /* sim_buildROMs.c: Boot ROM / Boot program load internal support */
 // SPDX-FileCopyrightText: 2011 Mark Pizzolato
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 #include <stdio.h>
 #include <errno.h>

@@ -1,6 +1,6 @@
 /* sim_console.h: simulator console I/O library headers */
 // SPDX-FileCopyrightText: 1993-2008 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    27-Sep-22    RMS     Added sim_ttisatty

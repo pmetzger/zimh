@@ -1,6 +1,6 @@
 /* sim_fio.c: simulator file I/O library */
 // SPDX-FileCopyrightText: 1993-2008 Robert M Supnik
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
    03-Jun-11    MP      Simplified VMS 64b support and made more portable

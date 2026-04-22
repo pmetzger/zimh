@@ -1,6 +1,6 @@
 /* scp_help.h: hierarchical help definitions */
 // SPDX-FileCopyrightText: 2013 Timothe Litt
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 #ifndef SCP_HELP_H_
 #define SCP_HELP_H_  0

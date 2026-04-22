@@ -1,6 +1,6 @@
 /* sim_ether.h: OS-dependent network information */
 // SPDX-FileCopyrightText: 2002-2005 David T. Hittner
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 /*
   ------------------------------------------------------------------------------

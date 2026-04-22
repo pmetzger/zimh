@@ -1,6 +1,6 @@
 /* sim_scsi.c: SCSI bus simulation */
 // SPDX-FileCopyrightText: 2019 Matt Burke
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: X11
 
 #include "sim_scsi.h"
 #include "sim_disk.h"
