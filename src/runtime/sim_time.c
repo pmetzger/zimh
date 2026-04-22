@@ -28,11 +28,13 @@
 static sim_clock_gettime_fn sim_clock_gettime_hook = NULL;
 static sim_nanosleep_fn sim_nanosleep_hook = NULL;
 
+/* Call the platform clock API used for wall-clock lookups. */
 static int sim_time_clock_gettime_default(int clock_id, struct timespec *tp)
 {
     return clock_gettime(clock_id, tp);
 }
 
+/* Call the platform sleep API used for interruptible delays. */
 static int sim_time_nanosleep_default(const struct timespec *req,
                                       struct timespec *rem)
 {
@@ -51,6 +53,7 @@ static int sim_time_nanosleep_default(const struct timespec *req,
 #endif
 }
 
+/* Fetch one timestamp through the active clock wrapper. */
 int sim_clock_gettime(int clock_id, struct timespec *tp)
 {
     sim_clock_gettime_fn clock_fn = sim_clock_gettime_hook
@@ -60,6 +63,7 @@ int sim_clock_gettime(int clock_id, struct timespec *tp)
     return clock_fn(clock_id, tp);
 }
 
+/* Sleep through the active nanosleep wrapper. */
 int sim_nanosleep(const struct timespec *req, struct timespec *rem)
 {
     sim_nanosleep_fn sleep_fn =
@@ -68,6 +72,7 @@ int sim_nanosleep(const struct timespec *req, struct timespec *rem)
     return sleep_fn(req, rem);
 }
 
+/* Return the current wall-clock seconds value in time(3) form. */
 time_t sim_time(time_t *now)
 {
     struct timespec ts_now;
@@ -82,6 +87,7 @@ time_t sim_time(time_t *now)
     return ts_now.tv_sec;
 }
 
+/* Sleep for a whole-second interval, retrying after EINTR. */
 void sim_sleep(unsigned int sec)
 {
     struct timespec req = {.tv_sec = (time_t)sec, .tv_nsec = 0};
@@ -94,6 +100,7 @@ void sim_sleep(unsigned int sec)
     }
 }
 
+/* Install deterministic test hooks for clock and sleep calls. */
 void sim_time_set_test_hooks(sim_clock_gettime_fn clock_hook,
                              sim_nanosleep_fn sleep_hook)
 {
@@ -101,6 +108,7 @@ void sim_time_set_test_hooks(sim_clock_gettime_fn clock_hook,
     sim_nanosleep_hook = sleep_hook;
 }
 
+/* Restore the default time hooks after a test case completes. */
 void sim_time_reset_test_hooks(void)
 {
     sim_time_set_test_hooks(NULL, NULL);

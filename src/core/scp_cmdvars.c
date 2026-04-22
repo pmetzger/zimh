@@ -62,6 +62,7 @@ static t_bool sim_cmdvars_probe_uname(char *buf, size_t size);
 static t_bool sim_cmdvars_localtime(time_t now, struct tm *tmnow);
 #if !defined(_WIN32)
 /* Tests can replace the underlying uname(3) call to drive failure paths. */
+/* Call uname(3) through the default host implementation. */
 static int sim_cmdvars_default_uname_call(struct utsname *utsname_info)
 {
     return uname(utsname_info);
@@ -72,6 +73,7 @@ static sim_cmdvars_uname_hook_fn sim_cmdvars_uname_hook =
 #endif
 
 /* Tests can replace the underlying localtime call to drive failure paths. */
+/* Break down one time_t value with the platform local-time routine. */
 static t_bool sim_cmdvars_default_localtime_call(time_t now, struct tm *tmnow)
 {
 #if defined(_WIN32)
@@ -574,6 +576,8 @@ void sim_sub_var_clear_prefix(const char *prefix)
             sim_sub_var_unset(sim_sub_vars[i].name);
 }
 
+/* Resolve one SCP substitution name from built-ins, internal variables,
+   saved external aliases, or the host environment. */
 const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
 {
     int i;
@@ -766,6 +770,7 @@ const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
     return ap;
 }
 
+/* Expand one command line in place using SCP command-variable rules. */
 void sim_sub_args(char *instr, size_t instr_size, char *do_arg[])
 {
     char gbuf[CBUFSIZE];
@@ -843,6 +848,7 @@ void sim_sub_args(char *instr, size_t instr_size, char *do_arg[])
     free(tmpbuf);
 }
 
+/* Map a substituted pointer back to its original command text. */
 const char *sim_unsub_args(const char *cptr)
 {
     if ((cptr > sim_sub_instr_buf) &&
@@ -851,6 +857,8 @@ const char *sim_unsub_args(const char *cptr)
     return cptr;
 }
 
+/* Implement SET ENVIRONMENT, including prompt-driven and decoded-string
+   forms. */
 t_stat sim_set_environment(int32 flag, CONST char *cptr)
 {
     char varname[CBUFSIZE], prompt[CBUFSIZE], cbuf[CBUFSIZE];
