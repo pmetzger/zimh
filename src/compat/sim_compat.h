@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: The ZIMH Project
+// SPDX-License-Identifier: MIT
+
 #ifndef H_SIM_COMPAT
 #define H_SIM_COMPAT 1
 
