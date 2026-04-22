@@ -29,12 +29,17 @@ What remains:
   `tmxr_show_cstat()`
 - consider whether `tmxr_fstats()` should report raw buffered count instead of
   the speed-throttled `tmxr_rqln()` view
+- `tmxr_report_connection()` wants a small pure message formatter extraction;
+  right now the string assembly is buried in connection-establishment paths,
+  which makes unit testing awkward
 - split `tmxr_set_log()` / `tmxr_set_nolog()` responsibilities with a helper
   for refreshing the owning mux attach string
 - revisit the `mp->uptr->filename` synthetic attach-string contract
 - factor the repeated mux-wide state-setter pattern used by
   `tmxr_set_notelnet_state()` and `tmxr_set_nomessage_state()`
 - consider breaking `tmxr_attach_help()` into a few focused helpers
+- `_tmxr_getname()` depends on live host Ethernet inventory, so any string
+  cleanup there likely wants a narrow `eth_devices()` seam first
 
 Rule:
 

@@ -8,8 +8,11 @@
 
 #include <cmocka.h>
 
+#include "scp.h"
 #include "sim_defs.h"
 #include "sim_tmxr.h"
+#include "test_simh_personality.h"
+#include "test_support.h"
 
 struct sim_tmxr_fixture {
     DEVICE device;
@@ -58,6 +61,32 @@ static char *make_temp_log_path(void)
     return path;
 }
 
+static char *capture_tmxr_debug_output(uint32 dbits, TMLN *line,
+                                       const char *msg, char *buf,
+                                       int bufsize)
+{
+    FILE *saved_deb = sim_deb;
+    int32 saved_deb_switches = sim_deb_switches;
+    FILE *capture;
+    char *output = NULL;
+    size_t output_size = 0;
+
+    capture = tmpfile();
+    assert_non_null(capture);
+
+    sim_deb = capture;
+    sim_deb_switches |= SWMASK('F');
+    _tmxr_debug(dbits, line, msg, buf, bufsize);
+    assert_int_equal(fflush(capture), 0);
+    assert_int_equal(
+        simh_test_read_stream(capture, &output, &output_size), 0);
+    assert_int_equal(fclose(capture), 0);
+    sim_deb = saved_deb;
+    sim_deb_switches = saved_deb_switches;
+
+    return output;
+}
+
 static int setup_sim_tmxr_fixture(void **state)
 {
     struct sim_tmxr_fixture *fixture;
@@ -73,6 +102,7 @@ static int setup_sim_tmxr_fixture(void **state)
     memset(&fixture->lines, 0, sizeof(fixture->lines));
 
     fixture->device.name = "TMXR";
+    assert_int_equal(simh_test_set_sim_name("simh-unit-sim-tmxr"), 0);
     fixture->mux.dptr = &fixture->device;
     fixture->mux.ldsc = fixture->lines;
     fixture->mux.lines = 4;
@@ -835,6 +865,45 @@ static void test_tmxr_port_speed_control_setters_update_expected_state(
     free(output);
 }
 
+/* Verify TMXR debug text mode formats printable, Telnet, and octal byte
+   escapes into the shared debug stream. */
+static void test_tmxr_debug_formats_telnet_and_octal_text(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+    char buffer[] = {'A', '\r', '\n', 0177};
+    char *output;
+
+    fixture->device.dctrl = TMXR_DBG_RCV;
+    line->notelnet = FALSE;
+
+    output = capture_tmxr_debug_output(TMXR_DBG_RCV, line, "recv",
+                                       buffer, (int)sizeof(buffer));
+    assert_non_null(strstr(output, "Line:0 recv 4 bytes"));
+    assert_non_null(strstr(output, "A_TN_CR__TN_LF__\\177_"));
+    free(output);
+}
+
+/* Verify TMXR debug hex-dump mode formats non-Telnet data as grouped hex
+   plus printable text. */
+static void test_tmxr_debug_formats_notelnet_hex_dump(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[1];
+    char buffer[] = {'A', 001, 'B'};
+    char *output;
+
+    fixture->device.dctrl = TMXR_DBG_RCV;
+    line->notelnet = TRUE;
+
+    output = capture_tmxr_debug_output(TMXR_DBG_RCV, line, "recv",
+                                       buffer, (int)sizeof(buffer));
+    assert_non_null(strstr(output, "Line:1 0000"));
+    assert_non_null(strstr(output, "41 01 42"));
+    assert_non_null(strstr(output, "A.B"));
+    free(output);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -915,6 +984,12 @@ int main(void)
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
             test_tmxr_port_speed_control_setters_update_expected_state,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_debug_formats_telnet_and_octal_text,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_debug_formats_notelnet_hex_dump,
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
     };
 

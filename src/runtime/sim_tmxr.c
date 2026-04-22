@@ -4231,7 +4231,7 @@ static const char *_tmxr_send_expect_line_name (const SEND *snd, const EXPECT *e
 static char line_name[CBUFSIZE];
 int i, j;
 
-strcpy (line_name, "");
+line_name[0] = '\0';
 for (i=0; i<tmxr_open_device_count; ++i)
     for (j=0; j<tmxr_open_devices[i]->lines; ++j)
         if ((snd == &tmxr_open_devices[i]->ldsc[j].send) ||
@@ -5443,6 +5443,7 @@ t_addr low, high, min, max;
 int32  *list;
 t_bool *set;
 uint32 line, idx;
+size_t tbuf_size;
 t_addr lncount = (t_addr) (mp->lines - 1);
 t_stat result = SCPE_OK;
 
@@ -5475,14 +5476,15 @@ if (set == NULL) {                                      /* if the allocation fai
     return SCPE_MEM;                                    /*      and report a "Memory exhausted" error */
     }
 
-tbuf = (char *) calloc (strlen(cptr)+2, sizeof(*cptr));
+tbuf_size = strlen (cptr) + 2;
+tbuf = (char *) calloc (tbuf_size, sizeof (*cptr));
 if (tbuf == NULL) {                                     /* if the allocation failed */
     free (set);                                         /*   then free the line set tracking array */
     free (list);                                        /*        and successful list allocation */
     return SCPE_MEM;                                    /*      and report a "Memory exhausted" error */
     }
 
-strcpy (tbuf, cptr);
+strlcpy (tbuf, cptr, tbuf_size);
 tptr = tbuf + strlen (tbuf);                            /* append a semicolon */
 *tptr++ = ';';                                          /*   to the command string */
 *tptr = '\0';                                           /*   to make parsing easier for get_range */
@@ -5794,7 +5796,7 @@ for (j=0; 1; ++j) {
             else {
                 char octal[8];
 
-                sprintf(octal, "\\%03o", (u_char)chr);
+                snprintf(octal, sizeof(octal), "\\%03o", (u_char)chr);
                 tmxr_buf_debug_string (octal);
                 }
             tmxr_buf_debug_char ('_');
@@ -5914,7 +5916,8 @@ if ((dptr) && (dbits & dptr->dctrl)) {
                         else {
                             char octal[8];
 
-                            sprintf(octal, "\\%03o", (u_char)buf[i]);
+                            snprintf(octal, sizeof(octal), "\\%03o",
+                                     (u_char)buf[i]);
                             tmxr_buf_debug_string (octal);
                             }
                         tmxr_buf_debug_char ('_');
@@ -6029,12 +6032,14 @@ SIM_TEST((sim_parse_addr ("localhost:telnet", host, sizeof(host), "localhost", p
 SIM_TEST((sim_parse_addr ("telnet", host, sizeof(host), "localhost", port, sizeof(port), "1234", NULL) == -1) || (strcmp(host, "localhost")) || (strcmp(port,"telnet")));
 dptr->dctrl = 0xFFFFFFFF;
 dptr->dctrl &= ~TMXR_DBG_TRC;
-sprintf (cmd, "%s -u localhost:65500;telnet;nomessage", dptr->name);
+snprintf (cmd, sizeof (cmd), "%s -u localhost:65500;telnet;nomessage",
+          dptr->name);
 SIM_TEST(attach_cmd (0, cmd));
 tmxr = (TMXR *)dptr->units->tmxr;
 ln = &tmxr->ldsc[tmxr->lines - 1];
 SIM_TEST(detach_cmd (0, dptr->name));
-sprintf (cmd, "%s -u localhost:65500;notelnet", dptr->name);
+snprintf (cmd, sizeof (cmd), "%s -u localhost:65500;notelnet",
+          dptr->name);
 SIM_TEST(attach_cmd (0, cmd));
 tmxr = (TMXR *)dptr->units->tmxr;
 ln = &tmxr->ldsc[tmxr->lines - 1];
