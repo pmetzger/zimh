@@ -2859,9 +2859,16 @@ if (*cptr == '*') {
     lp->bpsfactor = bpsfactor;
     if (!(lp->serport) &&               /* Not a serial port */
         (speed == cptr)) {              /* AND just changing bps factor? */
+        uptr = lp->uptr;
+        if ((!uptr) && (lp->mp))
+            uptr = lp->mp->uptr;
         lp->rxdeltausecs = (uint32)(_tmln_speed_delta_bps ((int32)lp->rxbps) /
                                     lp->bpsfactor);
         lp->txdeltausecs = lp->rxdeltausecs;
+        if (uptr)
+            uptr->wait = lp->rxdeltausecs;
+        if (lp->o_uptr)
+            lp->o_uptr->wait = lp->txdeltausecs;
         return SCPE_OK;                 /* Done now */
         }
     }
