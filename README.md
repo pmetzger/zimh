@@ -37,7 +37,7 @@ certainly not be interested in adopting the kinds of changes planned
 here. Accordingly, this fork is being developed independently and we
 have changed the name of the project to ZIMH.
 
-This project is made available under the MIT license; see
+This project is made available under an X11 style license; see
 [LICENSE.txt](LICENSE.txt) for details.
 
 A detailed listing of features in the inherited code base as of 12 May
