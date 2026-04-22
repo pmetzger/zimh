@@ -718,8 +718,8 @@ int TransferIAS(CONST char * dir, int bEOB)
             // copy symbolic info from drum to ias (so code copies to ias to be executed faster
             // keeps its symbolic info)
             memset(&IAS_Symbolic_Buffer[IAS_TimingRing * 80], 0, 80);            // clear ias symbolic info
-            sim_strlcpy(&IAS_Symbolic_Buffer[IAS_TimingRing * 80],
-                        &DRUM_Symbolic_Buffer[AR * 80], 80);
+            strlcpy(&IAS_Symbolic_Buffer[IAS_TimingRing * 80],
+                    &DRUM_Symbolic_Buffer[AR * 80], 80);
         } else {
             // copy ias to drum
             d = DRUM[AR] = IAS[IAS_TimingRing];
@@ -2142,4 +2142,3 @@ cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr) {
 const char * cpu_description (DEVICE *dptr) {
     return "IBM 650 CPU";
 }
-

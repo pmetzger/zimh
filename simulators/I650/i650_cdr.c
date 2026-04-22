@@ -183,7 +183,7 @@ void decode_soap_symb_info(uint16 image[80])
     buf[i2++] = 0; // terminate string
 
     memset(Symbolic_Buffer, 0, 80);            // clear drum/ias symbolic info
-    sim_strlcpy(Symbolic_Buffer, buf, i2);
+    strlcpy(Symbolic_Buffer, buf, i2);
 }
 
 t_int64 decode_num_word(char * buf, int nDigits, int bSpaceIsZero) 
@@ -1344,5 +1344,4 @@ cdr_description(DEVICE *dptr)
 {
    return "533 Card Read-Punch unit";
 }
-
 
