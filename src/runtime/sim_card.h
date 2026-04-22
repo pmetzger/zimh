@@ -79,10 +79,6 @@
 #ifndef SIM_CARD_H_
 #define SIM_CARD_H_     0
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 #define SIM_CARD_API    2               /* API Version */
 
 #define DEBUG_CARD      0x80000000      /* Show details */
@@ -150,9 +146,5 @@ extern const uint8     sim_parity_table[64];        /* 64 entry odd parity table
 
 /* Unit test routine */
 extern t_stat sim_card_test (DEVICE *dptr, const char *cptr);
-
-#ifdef  __cplusplus
-}
-#endif
 
 #endif

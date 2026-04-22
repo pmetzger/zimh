@@ -39,10 +39,6 @@
 #include <sys/stat.h>
 #include <time.h>
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 #define FLIP_SIZE       (1 << 16)                       /* flip buf size */
 #define fxread(a,b,c,d)         sim_fread (a, b, c, d)
 #define fxwrite(a,b,c,d)        sim_fwrite (a, b, c, d)
@@ -182,9 +178,5 @@ size_t sim_strlcpy (char *dst, const char *src, size_t size);
 #endif
 int sim_strwhitecasecmp (const char *string1, const char *string2, t_bool casecmp);
 
-
-#ifdef  __cplusplus
-}
-#endif
 
 #endif

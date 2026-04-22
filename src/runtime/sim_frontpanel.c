@@ -42,10 +42,6 @@
 
 */
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 #include "sim_sock.h"
 
 #include "sim_frontpanel.h"
@@ -2746,7 +2742,6 @@ status = _panel_vsendf_completion (p, completion_status, response, NULL, fmt, ar
 va_end (arglist);
 return status;
 }
-
 static int
 _panel_sendf_completion (PANEL *p, char **response, const char *completion, const char *fmt, ...)
 {
@@ -2758,8 +2753,3 @@ status = _panel_vsendf_completion (p, NULL, response, completion, fmt, arglist);
 va_end (arglist);
 return status;
 }
-
-
-#ifdef  __cplusplus
-}
-#endif

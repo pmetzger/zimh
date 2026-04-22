@@ -24,9 +24,6 @@
  * from the authors.
  */
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
 #ifndef SIM_DEFS_H_
 typedef unsigned short uint16;
 typedef int int32;
@@ -58,7 +55,3 @@ extern int  ng_cycle(int, int);
 
 extern int  ng_fetch(uint32, uint16 *);       /* get a display-file word */
 extern int  ng_store(uint32, uint16);
-
-#if defined(__cplusplus)
-}
-#endif

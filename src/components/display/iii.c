@@ -28,10 +28,6 @@
 #include "display.h"
 #include "iii.h"
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 int iii_init(void *dev, int debug)
 {
   return display_init(DIS_III, 1, dev);
@@ -186,7 +182,3 @@ iii_draw_line(int x1, int y1, int x2, int y2, int l)
         }
     }
 }
-
-#if defined(__cplusplus)
-}
-#endif

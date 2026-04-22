@@ -25,15 +25,7 @@
 
 */
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
-
 extern int iii_init(void *, int);
 extern int iii_cycle(int, int);
 extern void iii_point(int, int, int);
 extern void iii_draw_line(int x1, int y1, int x2, int y2, int l);
-
-#if defined(__cplusplus)
-}
-#endif

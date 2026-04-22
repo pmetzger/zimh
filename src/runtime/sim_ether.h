@@ -69,10 +69,6 @@
 #include "sim_defs.h"
 #include "sim_sock.h"
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 /* make common BSD code a bit easier to read in this file */
 /* OS/X seems to define and compile using one of these BSD types */
 #if defined(__NetBSD__) || defined (__OpenBSD__) || defined (__FreeBSD__)
@@ -421,10 +417,6 @@ static inline int eth_mac_cmp(const ETH_MAC a, const ETH_MAC b)
 #if !defined(SIM_TEST_INIT)     /* Need stubs for test APIs */
 #define SIM_TEST_INIT
 #define SIM_TEST(xxx)
-#endif
-
-#ifdef  __cplusplus
-}
 #endif
 
 #endif                                                  /* _SIM_ETHER_H */

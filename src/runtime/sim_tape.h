@@ -39,10 +39,6 @@
 #ifndef SIM_TAPE_H_
 #define SIM_TAPE_H_    0
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 /* SIMH/E11 tape format */
 
 typedef uint32          t_mtrlnt;                       /* magtape rec lnt */
@@ -236,9 +232,5 @@ t_stat sim_tape_set_asynch (UNIT *uptr, int latency);
 t_stat sim_tape_clr_asynch (UNIT *uptr);
 t_stat sim_tape_test (DEVICE *dptr, const char *cptr);
 t_stat sim_tape_add_debug (DEVICE *dptr);
-
-#ifdef  __cplusplus
-}
-#endif
 
 #endif

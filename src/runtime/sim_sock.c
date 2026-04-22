@@ -42,10 +42,6 @@
    02-Sep-01    RMS     Fixed UNIX bugs found by Mirian Lennox and Tom Markson
 */
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 #include "sim_sock.h"
 #include <signal.h>
 #include <stdio.h>
@@ -1318,7 +1314,3 @@ void sim_close_sock (SOCKET sock)
 shutdown(sock, SD_BOTH);
 closesocket (sock);
 }
-
-#ifdef  __cplusplus
-}
-#endif

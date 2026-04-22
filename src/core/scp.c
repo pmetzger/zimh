@@ -5108,7 +5108,6 @@ t_stat show_version (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char 
 {
 int32 vmaj = SIM_MAJOR, vmin = SIM_MINOR, vpat = SIM_PATCH, vdelt = SIM_DELTA;
 char vdelt_s[12];
-const char *cpp = "";
 const char *build = "";
 const char *arch = "";
 
@@ -5194,15 +5193,10 @@ if (flag) {
     arch = " arch: ARM";
 #endif
 #if defined (__DATE__) && defined (__TIME__)
-#ifdef  __cplusplus
-    cpp = "C++";
-#else
-    cpp = "C";
-#endif
 #if !defined (SIM_BUILD_OS)
-    fprintf (st, "\n        Simulator Compiled as %s%s%s on %s at %s", cpp, arch, build, __DATE__, __TIME__);
+    fprintf (st, "\n        Simulator Compiled as %s%s on %s at %s", arch, build, __DATE__, __TIME__);
 #else
-    fprintf (st, "\n        Simulator Compiled as %s%s%s on %s at %s %s", cpp, arch, build, __DATE__, __TIME__, S_xstr(SIM_BUILD_OS));
+    fprintf (st, "\n        Simulator Compiled as %s%s on %s at %s %s", arch, build, __DATE__, __TIME__, S_xstr(SIM_BUILD_OS));
 #endif
 #endif
 #if defined (SIM_BUILD_TOOL)

@@ -47,10 +47,6 @@
 #ifndef SIM_TMXR_H_
 #define SIM_TMXR_H_    0
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 #ifndef SIMH_SERHANDLE_DEFINED
 #define SIMH_SERHANDLE_DEFINED 0
 typedef struct SERPORT *SERHANDLE;
@@ -362,9 +358,5 @@ t_stat tmxr_add_debug (DEVICE *dptr);
 #define sim_clock_coschedule_tmr_abs tmxr_clock_coschedule_tmr_abs
 #endif
 
-
-#ifdef  __cplusplus
-}
-#endif
 
 #endif /* _SIM_TMXR_H_ */

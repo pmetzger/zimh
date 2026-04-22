@@ -1220,13 +1220,7 @@ return used;
 #endif /* HAVE_TAP_NETWORK */
 
 #ifdef HAVE_VDE_NETWORK
-#ifdef  __cplusplus
-extern "C" {
-#endif
 #include <libvdeplug.h>
-#ifdef  __cplusplus
-}
-#endif
 #endif /* HAVE_VDE_NETWORK */
 
 #ifdef HAVE_SLIRP_NETWORK

@@ -48,10 +48,6 @@
 #ifndef SIM_FRONTPANEL_H_
 #define SIM_FRONTPANEL_H_     0
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 #include <stdlib.h>
 
 #define SIM_FRONTPANEL_VERSION   12
@@ -600,9 +596,5 @@ sim_panel_debug (PANEL *panel, const char *fmt, ...);
 
 void
 sim_panel_flush_debug (PANEL *panel);
-
-#ifdef  __cplusplus
-}
-#endif
 
 #endif /* SIM_FRONTPANEL_H_ */

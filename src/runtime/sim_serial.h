@@ -32,10 +32,6 @@
 #ifndef SIM_SERIAL_H_
 #define SIM_SERIAL_H_    0
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 #ifndef SIMH_SERHANDLE_DEFINED
 #define SIMH_SERHANDLE_DEFINED 0
 typedef struct SERPORT *SERHANDLE;
@@ -89,9 +85,5 @@ extern int32     sim_read_serial    (SERHANDLE port, char *buffer, int32 count, 
 extern int32     sim_write_serial   (SERHANDLE port, char *buffer, int32 count);
 extern void      sim_close_serial   (SERHANDLE port);
 extern t_stat    sim_show_serial    (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, CONST char* desc);
-
-#ifdef  __cplusplus
-}
-#endif
 
 #endif

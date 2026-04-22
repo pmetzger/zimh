@@ -37,10 +37,6 @@
 #ifndef SIM_CONSOLE_H_
 #define SIM_CONSOLE_H_ 0
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 #define TTUF_V_MODE     (UNIT_V_UF + 0)
 #define TTUF_W_MODE     2
 #define  TTUF_MODE_7B   0
@@ -142,9 +138,5 @@ extern int32 sim_tt_pchar;              /* printable character mask */
 extern int32 sim_del_char;              /* delete character */
 extern t_bool sim_signaled_int_char;    /* WRU character detected by signal while running  */
 extern uint32 sim_last_poll_kbd_time;   /* time when sim_poll_kbd was called */
-
-#ifdef  __cplusplus
-}
-#endif
 
 #endif

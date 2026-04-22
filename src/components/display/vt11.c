@@ -135,9 +135,6 @@ static int vt11_dbit;
 
 #include <stdio.h>
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
 #define DEVICE void
 
 #define DBG_CALL 1
@@ -150,9 +147,6 @@ extern void _sim_debug_device (unsigned int dbits, DEVICE* dptr, const char* fmt
 #else /* DEBUG_VT11 */
 #define DEBUGF(...) do {if (vt11_debug & DBG_CALL) { printf(##  __VA_ARGS__); fflush(stdout); };} while (0)
 #endif /* defined(DEBUG_VT11) || defined(VM_PDP11) */
-#if defined(__cplusplus)
-}
-#endif
 #else
 
 #define DEBUGF(...) 

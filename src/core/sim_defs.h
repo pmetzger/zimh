@@ -152,10 +152,6 @@
 #include <process.h>
 #endif
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 /* avoid macro names collisions */
 #ifdef PMASK
 #undef PMASK
@@ -1122,9 +1118,7 @@ extern int32 sim_asynch_inst_latency;
 
    This branch should be removable once our supported Windows C toolchain has
    portable `_Thread_local` support in C mode. */
-#ifdef __cplusplus
-#define AIO_TLS thread_local
-#elif defined(_MSC_VER)
+#if defined(_MSC_VER)
 #define AIO_TLS __declspec(thread)
 #else
 #define AIO_TLS _Thread_local
@@ -1324,9 +1318,5 @@ extern int32 sim_asynch_inst_latency;
 #define AIO_SET_INTERRUPT_LATENCY(instpersec)
 #define AIO_TLS
 #endif /* SIM_ASYNCH_IO */
-
-#ifdef  __cplusplus
-}
-#endif
 
 #endif

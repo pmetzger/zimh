@@ -30,10 +30,6 @@
 #ifndef SIM_DISK_H_
 #define SIM_DISK_H_    0
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 /* SIMH/Disk format */
 
 typedef uint32          t_seccnt;                       /* disk sector count */
@@ -130,9 +126,5 @@ void sim_disk_data_trace (UNIT *uptr, const uint8 *data, size_t lba, size_t len,
 t_stat sim_disk_info_cmd (int32 flag, CONST char *ptr);
 t_stat sim_disk_set_noautosize (int32 flag, CONST char *cptr);
 t_stat sim_disk_test (DEVICE *dptr, const char *cptr);
-
-#ifdef  __cplusplus
-}
-#endif
 
 #endif

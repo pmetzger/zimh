@@ -32,10 +32,6 @@
 #define SIM_TIMER_H_   0
 
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 #include "sim_time.h"
 #if defined(SIM_ASYNCH_IO) || defined(USE_READER_THREAD)
 #include <pthread.h>
@@ -137,9 +133,5 @@ extern t_bool sim_asynch_timer;
 extern DEVICE sim_timer_dev;
 extern UNIT * volatile sim_clock_cosched_queue[SIM_NTIMERS+1];
 extern const t_bool rtc_avail;
-
-#ifdef  __cplusplus
-}
-#endif
 
 #endif

@@ -32,10 +32,6 @@
 
 #include "sim_defs.h"
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 #define SIM_KEYPRESS_DOWN      0                        /* key states */
 #define SIM_KEYPRESS_UP        1
 #define SIM_KEYPRESS_REPEAT    2
@@ -251,10 +247,6 @@ extern int (*vid_display_kb_event_process)(SIM_KEY_EVENT *kev);
 #define SIM_VID_DBG_CURSOR   0x20000000
 #define SIM_VID_DBG_KEY      0x40000000
 #define SIM_VID_DBG_VIDEO    0x80000000
-
-#ifdef  __cplusplus
-}
-#endif
 
 #if defined(USE_SIM_VIDEO) && defined(HAVE_LIBSDL)
 #include <SDL.h>

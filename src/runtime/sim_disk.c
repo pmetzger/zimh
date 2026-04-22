@@ -3827,13 +3827,7 @@ errno = EINVAL;
 #include <winioctl.h>
 #endif
 
-#if defined(__cplusplus)
-extern "C" {
-#endif
 WINBASEAPI BOOL WINAPI GetFileSizeEx(HANDLE hFile, PLARGE_INTEGER lpFileSize);
-#if defined(__cplusplus)
-    }
-#endif
 
 struct _device_type {
     int32 Type;

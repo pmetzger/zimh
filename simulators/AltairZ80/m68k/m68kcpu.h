@@ -33,10 +33,6 @@
 #ifndef M68KCPU__HEADER
 #define M68KCPU__HEADER
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "m68k.h"
 
 #include <limits.h>
@@ -2148,9 +2144,5 @@ static inline void m68ki_check_interrupts(void)
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* M68KCPU__HEADER */

@@ -52,10 +52,6 @@
 #include "scp_unit.h"
 #include <sys/stat.h>
 
-#ifdef  __cplusplus
-extern "C" {
-#endif
-
 /* run_cmd parameters */
 
 #define RU_RUN          0                               /* run */
@@ -378,9 +374,5 @@ extern const char *sim_vm_step_unit;                    /* Simulator can change 
                 }                                               \
             } while (0)
 
-
-#ifdef  __cplusplus
-}
-#endif
 
 #endif
