@@ -1,6 +1,7 @@
 #include <setjmp.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include <cmocka.h>
 
@@ -8,6 +9,7 @@
 
 static int simh_test_dynstr_realloc_calls = 0;
 static int simh_test_dynstr_fail_after = -1;
+static t_bool simh_test_dynstr_vsnprintf_fail = FALSE;
 
 /* Fail allocation after the configured number of successful calls. */
 static void *simh_test_dynstr_realloc_fail(void *ptr, size_t size)
@@ -20,6 +22,15 @@ static void *simh_test_dynstr_realloc_fail(void *ptr, size_t size)
     return realloc(ptr, size);
 }
 
+/* Force formatted append down the negative-return path when requested. */
+static int simh_test_dynstr_vsnprintf_fail_hook(
+    char *buf, size_t size, const char *fmt, va_list args)
+{
+    if (simh_test_dynstr_vsnprintf_fail)
+        return -1;
+    return vsnprintf(buf, size, fmt, args);
+}
+
 /* Reset hooks and counters so each dynamic-string case is isolated. */
 static int setup_sim_dynstr_fixture(void **state)
 {
@@ -27,6 +38,7 @@ static int setup_sim_dynstr_fixture(void **state)
 
     simh_test_dynstr_realloc_calls = 0;
     simh_test_dynstr_fail_after = -1;
+    simh_test_dynstr_vsnprintf_fail = FALSE;
     sim_dynstr_reset_test_hooks();
     return 0;
 }
@@ -70,6 +82,20 @@ static void test_sim_dynstr_append_builds_string(void **state)
     sim_dynstr_free(&ds);
 }
 
+/* Verify appendf formats short text through the stack buffer path. */
+static void test_sim_dynstr_appendf_builds_short_string(void **state)
+{
+    sim_dynstr_t ds;
+
+    (void)state;
+
+    sim_dynstr_init(&ds);
+    assert_true(sim_dynstr_appendf(&ds, "%s=%d", "alpha", 7));
+    assert_string_equal(sim_dynstr_cstr(&ds), "alpha=7");
+    assert_int_equal(ds.len, 7);
+    sim_dynstr_free(&ds);
+}
+
 /* Verify append_ch extends an existing string by one character. */
 static void test_sim_dynstr_append_ch_extends_string(void **state)
 {
@@ -102,6 +128,24 @@ static void test_sim_dynstr_grows_and_preserves_contents(void **state)
                         "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                         "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
     assert_true(ds.cap > 16);
+    sim_dynstr_free(&ds);
+}
+
+/* Verify appendf handles output larger than the stack buffer. */
+static void test_sim_dynstr_appendf_handles_long_formatted_output(void **state)
+{
+    sim_dynstr_t ds;
+    char long_text[CBUFSIZE * 2];
+
+    (void)state;
+
+    memset(long_text, 'y', sizeof(long_text) - 1);
+    long_text[sizeof(long_text) - 1] = '\0';
+    sim_dynstr_init(&ds);
+    assert_true(sim_dynstr_appendf(&ds, "<%s>", long_text));
+    assert_int_equal(ds.len, strlen(long_text) + 2);
+    assert_int_equal(sim_dynstr_cstr(&ds)[0], '<');
+    assert_int_equal(sim_dynstr_cstr(&ds)[ds.len - 1], '>');
     sim_dynstr_free(&ds);
 }
 
@@ -149,6 +193,118 @@ static void test_sim_dynstr_append_ch_failure_preserves_state(void **state)
     sim_dynstr_free(&ds);
 }
 
+/* Verify appendf failure also preserves the earlier text. */
+static void test_sim_dynstr_appendf_failure_preserves_state(void **state)
+{
+    sim_dynstr_t ds;
+    char long_text[CBUFSIZE * 2];
+    size_t old_cap;
+
+    (void)state;
+
+    memset(long_text, 'z', sizeof(long_text) - 1);
+    long_text[sizeof(long_text) - 1] = '\0';
+    sim_dynstr_init(&ds);
+    assert_true(sim_dynstr_append(&ds, "alpha"));
+    old_cap = ds.cap;
+    simh_test_dynstr_fail_after = 0;
+    sim_dynstr_set_test_realloc_hook(simh_test_dynstr_realloc_fail);
+
+    assert_false(sim_dynstr_appendf(&ds, "<%s>", long_text));
+    assert_int_equal(simh_test_dynstr_realloc_calls, 1);
+    assert_string_equal(sim_dynstr_cstr(&ds), "alpha");
+    assert_int_equal(ds.len, 5);
+    assert_int_equal(ds.cap, old_cap);
+    sim_dynstr_free(&ds);
+}
+
+/* Verify appendf also handles formatter failure without changing state. */
+static void test_sim_dynstr_appendf_vsnprintf_failure_preserves_state(
+    void **state)
+{
+    sim_dynstr_t ds;
+
+    (void)state;
+
+    sim_dynstr_init(&ds);
+    assert_true(sim_dynstr_append(&ds, "alpha"));
+    simh_test_dynstr_vsnprintf_fail = TRUE;
+    sim_dynstr_set_test_vsnprintf_hook(simh_test_dynstr_vsnprintf_fail_hook);
+
+    assert_false(sim_dynstr_appendf(&ds, "%s", "beta"));
+    assert_string_equal(sim_dynstr_cstr(&ds), "alpha");
+    assert_int_equal(ds.len, 5);
+    sim_dynstr_free(&ds);
+}
+
+/* Verify leading-character trimming updates the visible contents. */
+static void test_sim_dynstr_ltrim_chars_removes_requested_prefix(void **state)
+{
+    sim_dynstr_t ds;
+
+    (void)state;
+
+    sim_dynstr_init(&ds);
+    assert_true(sim_dynstr_append(&ds, ", ,alpha"));
+    sim_dynstr_ltrim_chars(&ds, ", ");
+    assert_string_equal(sim_dynstr_cstr(&ds), "alpha");
+    assert_int_equal(ds.len, 5);
+    sim_dynstr_free(&ds);
+}
+
+/* Verify ltrim is a no-op for strings that do not need trimming. */
+static void test_sim_dynstr_ltrim_chars_leaves_other_strings_unchanged(
+    void **state)
+{
+    sim_dynstr_t ds;
+
+    (void)state;
+
+    sim_dynstr_init(&ds);
+    sim_dynstr_ltrim_chars(&ds, ", ");
+    assert_null(ds.buf);
+
+    assert_true(sim_dynstr_append(&ds, "beta"));
+    sim_dynstr_ltrim_chars(&ds, ", ");
+    assert_string_equal(sim_dynstr_cstr(&ds), "beta");
+    assert_int_equal(ds.len, 4);
+    sim_dynstr_free(&ds);
+}
+
+/* Verify take transfers ownership of the allocated buffer. */
+static void test_sim_dynstr_take_transfers_buffer_ownership(void **state)
+{
+    sim_dynstr_t ds;
+    char *taken;
+
+    (void)state;
+
+    sim_dynstr_init(&ds);
+    assert_true(sim_dynstr_append(&ds, "alpha"));
+    taken = sim_dynstr_take(&ds);
+    assert_non_null(taken);
+    assert_string_equal(taken, "alpha");
+    assert_null(ds.buf);
+    assert_int_equal(ds.len, 0);
+    assert_int_equal(ds.cap, 0);
+    free(taken);
+}
+
+/* Verify take returns NULL when no storage has ever been allocated. */
+static void test_sim_dynstr_take_returns_null_for_empty_unallocated_string(
+    void **state)
+{
+    sim_dynstr_t ds;
+
+    (void)state;
+
+    sim_dynstr_init(&ds);
+    assert_null(sim_dynstr_take(&ds));
+    assert_null(ds.buf);
+    assert_int_equal(ds.len, 0);
+    assert_int_equal(ds.cap, 0);
+}
+
 /* Verify free releases storage and resets the struct to the empty state. */
 static void test_sim_dynstr_free_resets_state(void **state)
 {
@@ -192,16 +348,40 @@ int main(void)
                                         setup_sim_dynstr_fixture,
                                         teardown_sim_dynstr_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_dynstr_appendf_builds_short_string,
+            setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_dynstr_append_ch_extends_string, setup_sim_dynstr_fixture,
             teardown_sim_dynstr_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_dynstr_grows_and_preserves_contents,
             setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_dynstr_appendf_handles_long_formatted_output,
+            setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_dynstr_append_failure_preserves_state,
             setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_dynstr_append_ch_failure_preserves_state,
+            setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_dynstr_appendf_failure_preserves_state,
+            setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_dynstr_appendf_vsnprintf_failure_preserves_state,
+            setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_dynstr_ltrim_chars_removes_requested_prefix,
+            setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_dynstr_ltrim_chars_leaves_other_strings_unchanged,
+            setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_dynstr_take_transfers_buffer_ownership,
+            setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_dynstr_take_returns_null_for_empty_unallocated_string,
             setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
         cmocka_unit_test_setup_teardown(test_sim_dynstr_free_resets_state,
                                         setup_sim_dynstr_fixture,

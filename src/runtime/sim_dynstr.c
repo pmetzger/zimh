@@ -2,10 +2,13 @@
 // SPDX-FileCopyrightText: 2026 The ZIMH Project
 // SPDX-License-Identifier: MIT
 
+#include <stdarg.h>
+
 #include "sim_dynstr.h"
 
 /* Tests can replace the allocator to drive allocation-failure paths. */
 static sim_dynstr_realloc_fn sim_dynstr_realloc_hook = NULL;
+static sim_dynstr_vsnprintf_fn sim_dynstr_vsnprintf_hook = NULL;
 
 /* Use the host allocator for normal dynamic-string growth. */
 static void *sim_dynstr_default_realloc(void *ptr, size_t size)
@@ -18,6 +21,20 @@ static sim_dynstr_realloc_fn sim_dynstr_realloc_impl(void)
 {
     return sim_dynstr_realloc_hook ? sim_dynstr_realloc_hook
                                    : sim_dynstr_default_realloc;
+}
+
+/* Use the host formatter for normal dynamic-string formatted append. */
+static int sim_dynstr_default_vsnprintf(
+    char *buf, size_t size, const char *fmt, va_list args)
+{
+    return vsnprintf(buf, size, fmt, args);
+}
+
+/* Resolve the formatting implementation currently in force. */
+static sim_dynstr_vsnprintf_fn sim_dynstr_vsnprintf_impl(void)
+{
+    return sim_dynstr_vsnprintf_hook ? sim_dynstr_vsnprintf_hook
+                                     : sim_dynstr_default_vsnprintf;
 }
 
 /* Ensure the string buffer can hold the requested byte count. */
@@ -68,6 +85,38 @@ t_bool sim_dynstr_append(sim_dynstr_t *ds, const char *text)
     return TRUE;
 }
 
+/* Append one formatted string fragment. */
+t_bool sim_dynstr_appendf(sim_dynstr_t *ds, const char *fmt, ...)
+{
+    sim_dynstr_vsnprintf_fn vsnprintf_fn;
+    char stackbuf[CBUFSIZE];
+    va_list args;
+    va_list copy;
+    int len;
+
+    vsnprintf_fn = sim_dynstr_vsnprintf_impl();
+    va_start(args, fmt);
+    va_copy(copy, args);
+    len = vsnprintf_fn(stackbuf, sizeof(stackbuf), fmt, copy);
+    va_end(copy);
+    if (len < 0) {
+        va_end(args);
+        return FALSE;
+    }
+    if ((size_t)len < sizeof(stackbuf)) {
+        va_end(args);
+        return sim_dynstr_append(ds, stackbuf);
+    }
+    if (!sim_dynstr_reserve(ds, ds->len + (size_t)len + 1)) {
+        va_end(args);
+        return FALSE;
+    }
+    (void)vsnprintf_fn(ds->buf + ds->len, (size_t)len + 1, fmt, args);
+    va_end(args);
+    ds->len += (size_t)len;
+    return TRUE;
+}
+
 /* Append one character and keep the buffer NUL-terminated. */
 t_bool sim_dynstr_append_ch(sim_dynstr_t *ds, char ch)
 {
@@ -84,14 +133,47 @@ const char *sim_dynstr_cstr(const sim_dynstr_t *ds)
     return ds->buf ? ds->buf : "";
 }
 
+/* Remove any leading characters that appear in the trim set. */
+void sim_dynstr_ltrim_chars(sim_dynstr_t *ds, const char *trimchars)
+{
+    size_t skip = 0;
+
+    if (ds->buf == NULL)
+        return;
+    while ((skip < ds->len) && strchr(trimchars, ds->buf[skip]))
+        ++skip;
+    if (skip == 0)
+        return;
+    memmove(ds->buf, ds->buf + skip, ds->len - skip + 1);
+    ds->len -= skip;
+}
+
+/* Transfer ownership of the backing buffer and reset the dynamic string. */
+char *sim_dynstr_take(sim_dynstr_t *ds)
+{
+    char *buf = ds->buf;
+
+    ds->buf = NULL;
+    ds->len = 0;
+    ds->cap = 0;
+    return buf;
+}
+
 /* Install a test allocator hook for deterministic failure coverage. */
 void sim_dynstr_set_test_realloc_hook(sim_dynstr_realloc_fn hook)
 {
     sim_dynstr_realloc_hook = hook;
 }
 
+/* Install a test formatting hook for deterministic error coverage. */
+void sim_dynstr_set_test_vsnprintf_hook(sim_dynstr_vsnprintf_fn hook)
+{
+    sim_dynstr_vsnprintf_hook = hook;
+}
+
 /* Restore the default allocator after one test case completes. */
 void sim_dynstr_reset_test_hooks(void)
 {
     sim_dynstr_set_test_realloc_hook(NULL);
+    sim_dynstr_set_test_vsnprintf_hook(NULL);
 }
