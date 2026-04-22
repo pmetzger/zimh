@@ -257,28 +257,25 @@ static t_bool sim_exp_check_regex_rule(EXPECT *exp, EXPTAB *ep, char **tstr,
                                        size_t *sim_exp_match_sub_count)
 {
     char *cbuf;
+    pcre2_match_data *match_data;
+    int rc;
+    PCRE2_SIZE *ovector;
 
     cbuf = sim_exp_build_regex_buffer(exp, tstr);
     sim_exp_log_regex_check(exp, cbuf, ep);
-    {
-        pcre2_match_data *match_data;
-        int rc;
-        PCRE2_SIZE *ovector;
-
-        match_data = pcre2_match_data_create_from_pattern(ep->regex, NULL);
-        if (NULL == match_data)
-            return FALSE;
-        rc = pcre2_match(ep->regex, (PCRE2_SPTR)cbuf, (PCRE2_SIZE)exp->buf_ins,
-                         0, PCRE2_NOTBOL, match_data, NULL);
-        if (rc >= 0) {
-            ovector = pcre2_get_ovector_pointer(match_data);
-            sim_exp_export_regex_groups(exp, cbuf, ovector, rc,
-                                        sim_exp_match_sub_count, ep->re_nsub);
-            pcre2_match_data_free(match_data);
-            return TRUE;
-        }
+    match_data = pcre2_match_data_create_from_pattern(ep->regex, NULL);
+    if (NULL == match_data)
+        return FALSE;
+    rc = pcre2_match(ep->regex, (PCRE2_SPTR)cbuf, (PCRE2_SIZE)exp->buf_ins,
+                     0, PCRE2_NOTBOL, match_data, NULL);
+    if (rc >= 0) {
+        ovector = pcre2_get_ovector_pointer(match_data);
+        sim_exp_export_regex_groups(exp, cbuf, ovector, rc,
+                                    sim_exp_match_sub_count, ep->re_nsub);
         pcre2_match_data_free(match_data);
+        return TRUE;
     }
+    pcre2_match_data_free(match_data);
     return FALSE;
 }
 

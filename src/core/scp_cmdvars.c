@@ -579,6 +579,9 @@ const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
     const char *ap = NULL;
     const char *fixup_needed = strchr(gbuf, ':');
     char *tgbuf = NULL;
+    time_t now = (time_t)cmd_time.tv_sec;
+    struct tm tm_storage;
+    struct tm *tmnow;
     size_t tgbuf_size = MAX(rbuf_size, 1 + (size_t)(fixup_needed - gbuf));
 
     if (fixup_needed) {
@@ -586,45 +589,41 @@ const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
         memcpy(tgbuf, gbuf, (fixup_needed - gbuf));
         gbuf = tgbuf;
     }
-    {
-        time_t now = (time_t)cmd_time.tv_sec;
-        struct tm tm_storage;
-        struct tm *tmnow = sim_cmdvars_localtime(now, &tm_storage) ?
-            &tm_storage : NULL;
+    tmnow = sim_cmdvars_localtime(now, &tm_storage) ? &tm_storage : NULL;
 
-        if (tmnow && !strcmp("DATE", gbuf)) {
-            sprintf(rbuf, "%4d-%02d-%02d", tmnow->tm_year + 1900,
-                    tmnow->tm_mon + 1, tmnow->tm_mday);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("TIME", gbuf)) {
-            sprintf(rbuf, "%02d:%02d:%02d", tmnow->tm_hour, tmnow->tm_min,
-                    tmnow->tm_sec);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("DATETIME", gbuf)) {
-            sprintf(rbuf, "%04d-%02d-%02dT%02d:%02d:%02d",
-                    tmnow->tm_year + 1900, tmnow->tm_mon + 1, tmnow->tm_mday,
-                    tmnow->tm_hour, tmnow->tm_min, tmnow->tm_sec);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("LDATE", gbuf)) {
-            strftime(rbuf, rbuf_size, "%x", tmnow);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("LTIME", gbuf)) {
-            strftime(rbuf, rbuf_size, "%r", tmnow);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("CTIME", gbuf)) {
-            strftime(rbuf, rbuf_size, "%c", tmnow);
-            ap = rbuf;
-        } else if (!strcmp("UTIME", gbuf)) {
-            sprintf(rbuf, "%" LL_FMT "d", (LL_TYPE)now);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("DATE_YYYY", gbuf)) {
-            strftime(rbuf, rbuf_size, "%Y", tmnow);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("DATE_YY", gbuf)) {
-            strftime(rbuf, rbuf_size, "%y", tmnow);
-            ap = rbuf;
-        } else if (tmnow && ((!strcmp("DATE_19XX_YY", gbuf)) ||
-                   (!strcmp("DATE_19XX_YYYY", gbuf)))) {
+    if (tmnow && !strcmp("DATE", gbuf)) {
+        sprintf(rbuf, "%4d-%02d-%02d", tmnow->tm_year + 1900,
+                tmnow->tm_mon + 1, tmnow->tm_mday);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("TIME", gbuf)) {
+        sprintf(rbuf, "%02d:%02d:%02d", tmnow->tm_hour, tmnow->tm_min,
+                tmnow->tm_sec);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("DATETIME", gbuf)) {
+        sprintf(rbuf, "%04d-%02d-%02dT%02d:%02d:%02d",
+                tmnow->tm_year + 1900, tmnow->tm_mon + 1, tmnow->tm_mday,
+                tmnow->tm_hour, tmnow->tm_min, tmnow->tm_sec);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("LDATE", gbuf)) {
+        strftime(rbuf, rbuf_size, "%x", tmnow);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("LTIME", gbuf)) {
+        strftime(rbuf, rbuf_size, "%r", tmnow);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("CTIME", gbuf)) {
+        strftime(rbuf, rbuf_size, "%c", tmnow);
+        ap = rbuf;
+    } else if (!strcmp("UTIME", gbuf)) {
+        sprintf(rbuf, "%" LL_FMT "d", (LL_TYPE)now);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("DATE_YYYY", gbuf)) {
+        strftime(rbuf, rbuf_size, "%Y", tmnow);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("DATE_YY", gbuf)) {
+        strftime(rbuf, rbuf_size, "%y", tmnow);
+        ap = rbuf;
+    } else if (tmnow && ((!strcmp("DATE_19XX_YY", gbuf)) ||
+               (!strcmp("DATE_19XX_YYYY", gbuf)))) {
             int year = tmnow->tm_year + 1900;
             int days = year - 2001;
             int leaps = days / 4 - days / 100 + days / 400;
@@ -635,28 +634,28 @@ const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
                                   96, 80, 92, 76, 88, 72, 84};
             int cal_year = years[selector];
 
-            if (!strcmp("DATE_19XX_YY", gbuf))
-                sprintf(rbuf, "%d", cal_year);
-            else
-                sprintf(rbuf, "%d", cal_year + 1900);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("DATE_MM", gbuf)) {
-            strftime(rbuf, rbuf_size, "%m", tmnow);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("DATE_MMM", gbuf)) {
-            strftime(rbuf, rbuf_size, "%b", tmnow);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("DATE_MONTH", gbuf)) {
-            strftime(rbuf, rbuf_size, "%B", tmnow);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("DATE_DD", gbuf)) {
-            strftime(rbuf, rbuf_size, "%d", tmnow);
-            ap = rbuf;
-        } else if (tmnow && !strcmp("DATE_D", gbuf)) {
-            sprintf(rbuf, "%d", (tmnow->tm_wday ? tmnow->tm_wday : 7));
-            ap = rbuf;
-        } else if (tmnow && ((!strcmp("DATE_WW", gbuf)) ||
-                   (!strcmp("DATE_WYYYY", gbuf)))) {
+        if (!strcmp("DATE_19XX_YY", gbuf))
+            sprintf(rbuf, "%d", cal_year);
+        else
+            sprintf(rbuf, "%d", cal_year + 1900);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("DATE_MM", gbuf)) {
+        strftime(rbuf, rbuf_size, "%m", tmnow);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("DATE_MMM", gbuf)) {
+        strftime(rbuf, rbuf_size, "%b", tmnow);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("DATE_MONTH", gbuf)) {
+        strftime(rbuf, rbuf_size, "%B", tmnow);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("DATE_DD", gbuf)) {
+        strftime(rbuf, rbuf_size, "%d", tmnow);
+        ap = rbuf;
+    } else if (tmnow && !strcmp("DATE_D", gbuf)) {
+        sprintf(rbuf, "%d", (tmnow->tm_wday ? tmnow->tm_wday : 7));
+        ap = rbuf;
+    } else if (tmnow && ((!strcmp("DATE_WW", gbuf)) ||
+               (!strcmp("DATE_WYYYY", gbuf)))) {
             int iso_yr = tmnow->tm_year + 1900;
             int iso_wk =
                 (tmnow->tm_yday + 11 - (tmnow->tm_wday ? tmnow->tm_wday : 7)) /
@@ -745,7 +744,6 @@ const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
                 ap = rbuf;
             }
         }
-    }
     if (!ap)
         ap = sim_sub_var_get(gbuf);
     if (!ap) {
