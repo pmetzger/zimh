@@ -751,12 +751,21 @@ static void test_tmxr_port_speed_control_setters_update_expected_state(
 
     fixture->unit.flags |= UNIT_ATT;
 
-    assert_int_equal(tmxr_set_port_speed_control(&fixture->mux), SCPE_ALATT);
-    assert_int_equal(tmxr_clear_port_speed_control(&fixture->mux), SCPE_ALATT);
     assert_int_equal(
-        tmxr_set_line_port_speed_control(&fixture->mux, 2), SCPE_ALATT);
+        tmxr_set_port_speed_control(&fixture->mux),
+        SCPE_ALATT | SCPE_NOMESSAGE);
+    fixture->unit.flags &= ~UNIT_ATT;
+    assert_int_equal(tmxr_set_port_speed_control(&fixture->mux), SCPE_OK);
+    fixture->unit.flags |= UNIT_ATT;
     assert_int_equal(
-        tmxr_clear_line_port_speed_control(&fixture->mux, 2), SCPE_ALATT);
+        tmxr_clear_port_speed_control(&fixture->mux),
+        SCPE_ALATT | SCPE_NOMESSAGE);
+    assert_int_equal(
+        tmxr_set_line_port_speed_control(&fixture->mux, 2),
+        SCPE_ALATT | SCPE_NOMESSAGE);
+    assert_int_equal(
+        tmxr_clear_line_port_speed_control(&fixture->mux, 2),
+        SCPE_ALATT | SCPE_NOMESSAGE);
 
     stream = open_memstream(&output, &output_size);
     assert_non_null(stream);
