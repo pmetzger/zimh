@@ -121,6 +121,8 @@ typedef int (*tmxr_write_sock_fn)(SOCKET sock, const char *msg, int nbytes);
 typedef int (*tmxr_getnames_sock_fn)(SOCKET sock, char **socknamebuf,
                                      char **peernamebuf);
 typedef void (*tmxr_close_serial_fn)(SERHANDLE port);
+typedef int32 (*tmxr_write_serial_fn)(SERHANDLE port, char *buffer,
+                                      int32 count);
 typedef t_stat (*tmxr_control_serial_fn)(SERHANDLE port, int32 bits_to_set,
                                          int32 bits_to_clear,
                                          int32 *incoming_bits);
@@ -145,6 +147,7 @@ typedef struct {
     tmxr_write_sock_fn write_sock;
     tmxr_getnames_sock_fn getnames_sock;
     tmxr_close_serial_fn close_serial;
+    tmxr_write_serial_fn write_serial;
     tmxr_control_serial_fn control_serial;
     tmxr_ms_sleep_fn ms_sleep;
     tmxr_open_serial_fn open_serial;

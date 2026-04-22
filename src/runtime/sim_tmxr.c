@@ -481,6 +481,7 @@ static tmxr_close_sock_fn tmxr_close_sock_hook = sim_close_sock;
 static tmxr_write_sock_fn tmxr_write_sock_hook = sim_write_sock;
 static tmxr_getnames_sock_fn tmxr_getnames_sock_hook = sim_getnames_sock;
 static tmxr_close_serial_fn tmxr_close_serial_hook = sim_close_serial;
+static tmxr_write_serial_fn tmxr_write_serial_hook = sim_write_serial;
 static tmxr_control_serial_fn tmxr_control_serial_hook = sim_control_serial;
 static tmxr_ms_sleep_fn tmxr_ms_sleep_hook = sim_os_ms_sleep;
 static tmxr_open_serial_fn tmxr_open_serial_hook = sim_open_serial;
@@ -500,6 +501,7 @@ tmxr_close_sock_hook = sim_close_sock;
 tmxr_write_sock_hook = sim_write_sock;
 tmxr_getnames_sock_hook = sim_getnames_sock;
 tmxr_close_serial_hook = sim_close_serial;
+tmxr_write_serial_hook = sim_write_serial;
 tmxr_control_serial_hook = sim_control_serial;
 tmxr_ms_sleep_hook = sim_os_ms_sleep;
 tmxr_open_serial_hook = sim_open_serial;
@@ -533,6 +535,8 @@ tmxr_getnames_sock_hook = hooks->getnames_sock ?
     hooks->getnames_sock : sim_getnames_sock;
 tmxr_close_serial_hook = hooks->close_serial ?
     hooks->close_serial : sim_close_serial;
+tmxr_write_serial_hook = hooks->write_serial ?
+    hooks->write_serial : sim_write_serial;
 tmxr_control_serial_hook = hooks->control_serial ?
     hooks->control_serial : sim_control_serial;
 tmxr_ms_sleep_hook = hooks->ms_sleep ?
@@ -648,7 +652,7 @@ else
 psave = lp->txbpi;                                      /* save insertion pointer */
 lp->txbpi = lp->txbpr;                                  /* insert connection message */
 if ((lp->serport) && (!sim_is_running)) {
-    sim_os_ms_sleep (TMXR_DTR_DROP_TIME);               /* Wait for DTR to be noticed */
+    tmxr_ms_sleep_hook (TMXR_DTR_DROP_TIME);            /* Wait for DTR to be noticed */
     lp->ser_connect_pending = FALSE;                    /* Mark line as ready for action */
     lp->conn = TRUE;
     }
@@ -816,7 +820,7 @@ if (lp->loopback)
     return loop_write (lp, &(lp->txb[i]), length);
 
 if (lp->serport) {                                      /* serial port connection? */
-    written = sim_write_serial (lp->serport, &(lp->txb[i]), length);
+    written = tmxr_write_serial_hook (lp->serport, &(lp->txb[i]), length);
     }
 else {
     if (lp->framer)
@@ -1155,6 +1159,54 @@ return sim_dynstr_take (&ds);
 oom:
 sim_dynstr_free (&ds);
 return NULL;
+}
+
+/* Parse one listener option fragment and apply it to the current settings. */
+static t_stat tmxr_apply_listener_option (const char *option,
+                                          t_bool *notelnet,
+                                          t_bool *nomessage,
+                                          char *acl,
+                                          size_t acl_size)
+{
+if (0 == MATCH_CMD (option, "NOTELNET")) {
+    *notelnet = TRUE;
+    return SCPE_OK;
+    }
+if (0 == MATCH_CMD (option, "TELNET")) {
+    *notelnet = FALSE;
+    return SCPE_OK;
+    }
+if (0 == MATCH_CMD (option, "NOMESSAGE")) {
+    *nomessage = TRUE;
+    return SCPE_OK;
+    }
+if (0 == MATCH_CMD (option, "MESSAGE")) {
+    *nomessage = FALSE;
+    return SCPE_OK;
+    }
+if (0 == memcmp (option, "ACCEPT=", 7)) {
+    if (sim_addr_acl_check (option + 7, NULL))
+        return sim_messagef (SCPE_ARG,
+                             "Invalid Accept Criteria: %s\n",
+                             option + 7);
+    if (acl[0] != '\0')
+        strlcat (acl, ",", acl_size);
+    strlcat (acl, "+", acl_size);
+    strlcat (acl, option + 7, acl_size);
+    return SCPE_OK;
+    }
+if (0 == memcmp (option, "REJECT=", 7)) {
+    if (sim_addr_acl_check (option + 7, NULL))
+        return sim_messagef (SCPE_ARG,
+                             "Invalid Reject Criteria: %s\n",
+                             option + 7);
+    if (acl[0] != '\0')
+        strlcat (acl, ",", acl_size);
+    strlcat (acl, "-", acl_size);
+    strlcat (acl, option + 7, acl_size);
+    return SCPE_OK;
+    }
+return sim_messagef (SCPE_ARG, "Invalid Specifier: %s\n", option);
 }
 
 /*
@@ -1533,8 +1585,11 @@ for (i = 0; i < mp->lines; i++) {                       /* check each line in se
         (!lp->modem_control || (lp->modembits & TMXR_MDM_DTR))) {
         snprintf (msg, sizeof (msg) - 1, "tmxr_poll_conn() - establishing outgoing connection to: %s", lp->destination);
         tmxr_debug_connect_line (lp, msg);
-        lp->connecting = sim_connect_sock_ex (lp->datagram ? lp->port : NULL, lp->destination, "localhost", NULL, (lp->datagram ? SIM_SOCK_OPT_DATAGRAM : 0)  |
-                                                                                                                  (lp->mp->packet ? SIM_SOCK_OPT_NODELAY : 0));
+        lp->connecting = tmxr_connect_sock_ex_hook (
+            lp->datagram ? lp->port : NULL, lp->destination,
+            "localhost", NULL,
+            (lp->datagram ? SIM_SOCK_OPT_DATAGRAM : 0) |
+            (lp->mp->packet ? SIM_SOCK_OPT_NODELAY : 0));
         }
 
     }
@@ -2285,7 +2340,8 @@ while (TMXR_VALID & (c = tmxr_getc_ln (lp))) {
         lp->rxpbsize += 512;
         lp->rxpb = (uint8 *)realloc (lp->rxpb, lp->rxpbsize);
         }
-    if ((lp->rxpboffset == 0) && (fc_size) && (c != frame_byte)) {
+    if ((lp->rxpboffset == 0) && (fc_size) &&
+        ((c & 0xFF) != frame_byte)) {
         tmxr_debug (TMXR_DBG_PRCV, lp, "Received Unexpected Framing Byte", (char *)&lp->rxpb[lp->rxpboffset], 1);
         continue;
         }
@@ -2300,7 +2356,7 @@ while (TMXR_VALID & (c = tmxr_getc_ln (lp))) {
     lp->rxpb[lp->rxpboffset++] = c & 0xFF;
     if (lp->rxpboffset >= (2 + fc_size)) {
         pktsize = (lp->rxpb[0+fc_size] << 8) | lp->rxpb[1+fc_size];
-        if (pktsize == (lp->rxpboffset - 2)) {
+        if (pktsize == (lp->rxpboffset - (2 + fc_size))) {
             ++lp->rxpcnt;
             *pbuf = &lp->rxpb[2+fc_size];
             *psize = pktsize;
@@ -2312,7 +2368,7 @@ while (TMXR_VALID & (c = tmxr_getc_ln (lp))) {
     }
 *pbuf = NULL;
 *psize = 0;
-if (lp->conn)
+if (lp->conn || lp->loopback)
     return SCPE_OK;
 return SCPE_LOST;
 }
@@ -2338,8 +2394,10 @@ for (i = 0; i < mp->lines; i++) {                       /* loop thru lines */
 
     nbytes = 0;
     if (lp->rxbpi == 0)                                 /* need input? */
+        /* Reserve Telnet mantra space only for lines that interpret
+           Telnet protocol; raw/notelnet input can use the full buffer. */
         nbytes = tmxr_read (lp,                         /* yes, read */
-            lp->rxbsz - TMXR_GUARD);                    /* leave spc for Telnet cruft */
+            lp->rxbsz - (lp->notelnet ? 0 : TMXR_GUARD));/* leave spc for Telnet cruft */
     else {
         if (lp->tsta)                                   /* in Telnet seq? */
             nbytes = tmxr_read (lp,                     /* yes, read to end */
@@ -2614,6 +2672,7 @@ return (lp->rxbpi - lp->rxbpr);
 t_stat tmxr_putc_ln (TMLN *lp, int32 chr)
 {
 if ((lp->conn == FALSE) &&                              /* no conn & not buffered telnet? */
+    (!lp->loopback) &&
     (!lp->txbfd || lp->notelnet)) {
     ++lp->txdrp;                                        /* lost */
     return SCPE_LOST;
@@ -2629,7 +2688,7 @@ tmxr_debug_trace_line (lp, "tmxr_putc_ln()");
 if ((lp->xmte == 0) && (TXBUF_AVAIL(lp) > 1) &&
     ((lp->txbps == 0) || (lp->txnexttime <= sim_gtime ())))
     lp->xmte = 1;                                       /* enable line transmit */
-if ((lp->conn && (TXBUF_AVAIL(lp) > 1)) ||              /* connected and room for char (+ IAC)? OR */
+if (((lp->conn || lp->loopback) && (TXBUF_AVAIL(lp) > 1)) || /* connected/loopback and room for char (+ IAC)? OR */
     (!lp->conn && !lp->notelnet && lp->txbfd)) {        /* not connected and buffered ? */
     if ((TN_IAC == (u_char) chr) && (!lp->notelnet))    /* char == IAC in telnet session? */
         TXBUF_CHAR (lp, TN_IAC);                        /* stuff extra IAC char */
@@ -2648,11 +2707,12 @@ if ((lp->conn && (TXBUF_AVAIL(lp) > 1)) ||              /* connected and room fo
         }
     sim_exp_check (&lp->expect, chr);                   /* process expect rules as needed */
     if (!sim_is_running &&                              /* attach message or other non simulation time message? */
-        !sim_is_remote_console_master_line (lp)) {
+        !sim_is_remote_console_master_line (lp) &&
+        (lp->txppoffset >= lp->txppsize)) {             /* not while packet transmit is active */
         tmxr_send_buffered_data (lp);                   /* put data on wire */
-        sim_os_ms_sleep(((lp->txbps) && (lp->txdeltausecs > 1000)) ? /* rate limiting output slower than 1000 cps */
-                        (lp->txdeltausecs - 1000) / 1000 :
-                        1);                             /* wait an approximate character delay */
+        tmxr_ms_sleep_hook (((lp->txbps) && (lp->txdeltausecs > 1000)) ? /* rate limiting output slower than 1000 cps */
+                            (lp->txdeltausecs - 1000) / 1000 :
+                            1);                        /* wait an approximate character delay */
         }
     return SCPE_OK;                                     /* char sent */
     }
@@ -2891,6 +2951,97 @@ if (lp->serport) {                          /* close current serial connection *
     lp->destination = NULL;
     }
 tmxr_set_line_loopback (lp, FALSE);
+}
+
+/* Attach an open serial destination to a line and refresh its state. */
+static void tmxr_attach_serial_destination (TMXR *mp, TMLN *lp,
+                                            SERHANDLE serport,
+                                            const char *destination)
+{
+_mux_detach_line (lp, TRUE, TRUE);
+lp->mp = mp;
+tmxr_replace_string (&lp->destination, destination);
+lp->serport = serport;
+lp->ser_connect_pending = TRUE;
+lp->notelnet = TRUE;
+tmxr_init_line (lp);
+if (!lp->mp->modem_control)                 /* raise DTR/RTS on plain serial */
+    tmxr_control_serial_hook (lp->serport, TMXR_MDM_DTR | TMXR_MDM_RTS,
+                              0, NULL);
+lp->cnms = sim_os_msec ();
+if (sim_switches & SWMASK ('V'))
+    tmxr_report_connection (mp, lp);
+}
+
+/* Attach a pending outbound socket destination to a line. */
+static void tmxr_attach_connecting_destination (TMXR *mp, TMLN *lp,
+                                                SOCKET sock,
+                                                const char *hostport,
+                                                const char *listen,
+                                                t_bool datagram,
+                                                t_bool packet,
+                                                t_bool notelnet,
+                                                t_bool nomessage,
+                                                const char *speed)
+{
+lp->mp = mp;
+lp->datagram = datagram;
+if (datagram && listen[0])
+    tmxr_replace_string (&lp->port, listen);
+lp->packet = packet;
+_mux_detach_line (lp, FALSE, TRUE);
+tmxr_replace_string (&lp->destination, hostport);
+if (!lp->modem_control || (lp->modembits & TMXR_MDM_DTR)) {
+    lp->connecting = sock;
+    tmxr_replace_string (&lp->ipad, lp->destination);
+    }
+else
+    tmxr_close_sock_hook (sock);
+lp->notelnet = notelnet;
+lp->nomessage = nomessage;
+tmxr_init_line (lp);
+if (speed[0] && (!datagram))
+    tmxr_set_line_speed (lp, speed);
+}
+
+/* Parse and validate a SYNC framer specification. */
+static t_stat tmxr_parse_framer_spec (const char *framer, char *fr_eth,
+                                      size_t fr_eth_size, int8 *fr_mode,
+                                      int32 *fr_speed)
+{
+CONST char *cptr;
+char option[CBUFSIZE];
+int32 speed;
+
+cptr = get_glyph_nc (framer, fr_eth, ':');
+cptr = get_glyph (cptr, option, ':');
+if (0 == MATCH_CMD (option, "INTEGRAL") ||
+    0 == MATCH_CMD (option, "COAX"))
+    *fr_mode = 1;
+else {
+    if (0 == MATCH_CMD (option, "LOOPBACK"))
+        *fr_mode = 1 | 4;  /* Integral modem, loopback */
+    else if (0 == MATCH_CMD (option, "RS232_DCE"))
+        *fr_mode = 2;
+    else if (0 == MATCH_CMD (option, "RS232_DTE"))
+        *fr_mode = 0;
+    else
+        return sim_messagef (SCPE_ARG,
+                             "Invalid framer mode: %s\n",
+                             option);
+    }
+
+speed = 0;
+if (cptr)
+    speed = atoi (cptr);
+if (speed < 500 || speed > 1000000 ||
+    (speed < 56000 && (*fr_mode & 1)))
+    return sim_messagef (SCPE_ARG,
+                         "Invalid framer speed %d\n",
+                         speed);
+
+*fr_speed = speed;
+return SCPE_OK;
 }
 
 t_stat tmxr_detach_ln (TMLN *lp)
@@ -3239,41 +3390,14 @@ while (*tptr) {
             memset (acl, '\0', sizeof (acl));
             while (cptr && *cptr) {
                 char *tptr = gbuf + (cptr - gbuf);
+                t_stat option_status;
 
                 cptr = get_glyph (cptr, tptr, ';');
-                if (0 == MATCH_CMD (tptr, "NOTELNET"))
-                    listennotelnet = TRUE;
-                else
-                    if (0 == MATCH_CMD (tptr, "TELNET"))
-                        listennotelnet = FALSE;
-                    else
-                        if (0 == MATCH_CMD (tptr, "NOMESSAGE"))
-                            listennomessage = TRUE;
-                        else
-                            if (0 == MATCH_CMD (tptr, "MESSAGE"))
-                                listennomessage = FALSE;
-                            else
-                                if (0 == memcmp (option, "ACCEPT=", 7)) {
-                                    if (sim_addr_acl_check (option + 7, NULL))
-                                        return sim_messagef (SCPE_ARG, "Invalid Accept Criteria: %s\n", option + 7);
-                                    if (acl[0] != '\0')
-                                        strlcat (acl, ",", sizeof (acl));
-                                    strlcat (acl, "+", sizeof (acl));       /* Tag as Accept rule */
-                                    strlcat (acl, option + 7, sizeof (acl));
-                                    }
-                                else
-                                    if (0 == memcmp (option, "REJECT=", 7)) {
-                                        if (sim_addr_acl_check (option + 7, NULL))
-                                            return sim_messagef (SCPE_ARG, "Invalid Reject Criteria: %s\n", option + 7);
-                                        if (acl[0] != '\0')
-                                            strlcat (acl, ",", sizeof (acl));
-                                        strlcat (acl, "-", sizeof (acl));   /* Tag as Reject rule */
-                                        strlcat (acl, option + 7, sizeof (acl));
-                                        }
-                                    else {
-                                        if (*tptr)
-                                            return sim_messagef (SCPE_ARG, "Invalid Specifier: %s\n", tptr);
-                                        }
+                option_status = tmxr_apply_listener_option (
+                    tptr, &listennotelnet, &listennomessage,
+                    acl, sizeof (acl));
+                if (option_status != SCPE_OK)
+                    return option_status;
                 }
             cptr = init_cptr;
             }
@@ -3284,42 +3408,16 @@ while (*tptr) {
         if (sock == INVALID_SOCKET)                             /* open error */
             return sim_messagef (SCPE_OPENERR, "Can't open network port: %s\n", port);
         tmxr_close_sock_hook (sock);
-        sim_os_ms_sleep (2);                                    /* let the close finish (required on some platforms) */
+        tmxr_ms_sleep_hook (2);                                 /* let the close finish (required on some platforms) */
         strlcpy (listen, port, sizeof (listen));
         memset (acl, '\0', sizeof (acl));
         cptr = get_glyph (cptr, option, ';');
         while (option[0]) {
-            if (0 == MATCH_CMD (option, "NOTELNET"))
-                listennotelnet = TRUE;
-            else
-                if (0 == MATCH_CMD (option, "TELNET"))
-                    listennotelnet = FALSE;
-                else
-                    if (0 == MATCH_CMD (option, "NOMESSAGE"))
-                        listennomessage = TRUE;
-                    else
-                        if (0 == MATCH_CMD (option, "MESSAGE"))
-                            listennomessage = FALSE;
-                        else
-                            if (0 == memcmp (option, "ACCEPT=", 7)) {
-                                if (sim_addr_acl_check (option + 7, NULL))
-                                    return sim_messagef (SCPE_ARG, "Invalid Accept Criteria: %s\n", option + 7);
-                                if (acl[0] != '\0')
-                                    strlcat (acl, ",", sizeof (acl));
-                                strlcat (acl, "+", sizeof (acl));       /* Tag as Accept rule */
-                                strlcat (acl, option + 7, sizeof (acl));
-                                }
-                            else
-                                if (0 == memcmp (option, "REJECT=", 7)) {
-                                    if (sim_addr_acl_check (option + 7, NULL))
-                                        return sim_messagef (SCPE_ARG, "Invalid Reject Criteria: %s\n", option + 7);
-                                    if (acl[0] != '\0')
-                                        strlcat (acl, ",", sizeof (acl));
-                                    strlcat (acl, "-", sizeof (acl));   /* Tag as Reject rule */
-                                    strlcat (acl, option + 7, sizeof (acl));
-                                    }
-                                else
-                                    return sim_messagef (SCPE_ARG, "Invalid Specifier: %s\n", option);
+            r = tmxr_apply_listener_option (
+                option, &listennotelnet, &listennomessage,
+                acl, sizeof (acl));
+            if (r != SCPE_OK)
+                return r;
             cptr = get_glyph (cptr, option, ';');
             }
         }
@@ -3327,6 +3425,9 @@ while (*tptr) {
         if (destination[0] || listen[0] || loopback || framer[0])
             return sim_messagef (SCPE_ARG, "Can't disable line with%s%s%s%s%s%s%s\n", destination[0] ? " CONNECT=" : "", destination, listen[0] ? " " : "", listen, loopback ? " LOOPBACK" : "", framer[0] ? " SYNC=" : "", framer);
         }
+    if ((line == -1) && destination[0] && (mp->lines > 1))
+        return sim_messagef (SCPE_ARG,
+                             "Ambiguous Destination specification\n");
     if (destination[0]) {
         /* Validate destination */
         if (framer[0])
@@ -3340,6 +3441,9 @@ while (*tptr) {
         else {
             char *eptr;
 
+            if (datagram && !listen[0])
+                return sim_messagef (SCPE_ARG,
+                                     "Missing listen port for Datagram socket\n");
             memset (hostport, '\0', sizeof(hostport));
             strlcpy (hostport, destination, sizeof(hostport));
             if ((eptr = strchr (hostport, ';')))
@@ -3373,32 +3477,14 @@ while (*tptr) {
                     listen[0] ? " " : "", listen, loopback ? " LOOPBACK" : "",
                                                   notelnet ? "" : " TELNET",
                                                   datagram ? "" : " STREAM");
-        /* Validate framer spec */
-        cptr = get_glyph_nc (framer, fr_eth, ':');
-        cptr = get_glyph (cptr, option, ':');
-        if (0 == MATCH_CMD (option, "INTEGRAL") ||
-            0 == MATCH_CMD (option, "COAX"))
-            fr_mode = 1;
-        else {
-            if (0 == MATCH_CMD (option, "LOOPBACK"))
-                fr_mode = 1 | 4;  /* Integral modem, loopback */
-            else
-                if (0 == MATCH_CMD (option, "RS232_DCE"))
-                    fr_mode = 2;
-                else
-                    if (0 == MATCH_CMD (option, "RS232_DTE"))
-                        fr_mode = 0;
-                    else
-                        return sim_messagef (SCPE_ARG, "Invalid framer mode: %s\n", cptr);
-            }
-        /* Speed is a third value in the SYNC argument.  We don't
-         * use the SPEED parameter because that only accepts the
-         * standard UART rates, which for the most part are not normal
-         * DDCMP line rates.
+        /* Validate framer spec.  Speed is encoded in the SYNC value,
+         * not the general SPEED option, because these line rates are
+         * not the standard UART speeds.
          */
-        fr_speed = 0;
-        if (cptr)
-            fr_speed = atoi (cptr);
+        r = tmxr_parse_framer_spec (framer, fr_eth, sizeof (fr_eth),
+                                    &fr_mode, &fr_speed);
+        if (r != SCPE_OK)
+            return r;
         /* Note that the framer ignores the speed parameter for DTE
          * mode, but we require it here in order to have a speed value
          * to control the scheduling machinery.  It would be possible
@@ -3413,10 +3499,6 @@ while (*tptr) {
          * matches the lowest speed supported by DEC hardware for that
          * interface type.
          */
-        if (fr_speed < 500 || fr_speed > 1000000 ||
-            (fr_speed < 56000 && (fr_mode & 1))) {
-            return sim_messagef (SCPE_ARG, "Invalid framer speed %d\n", fr_speed);
-            }
         }
     if (line == -1) {
         if (disabled)
@@ -3534,61 +3616,31 @@ while (*tptr) {
                 }
             }
         if (destination[0]) {
-            if (mp->lines > 1)
-                return sim_messagef (SCPE_ARG, "Ambiguous Destination specification\n");
             lp = &mp->ldsc[0];
             serport = tmxr_open_serial_hook (destination, lp, &r);
             if (serport != INVALID_HANDLE) {
-                _mux_detach_line (lp, TRUE, TRUE);
                 if (lp->mp && lp->mp->master) {             /* if existing listener, close it */
                     tmxr_close_sock_hook (lp->mp->master);
                     lp->mp->master = 0;
                     free (lp->mp->port);
                     lp->mp->port = NULL;
                     }
-                tmxr_replace_string (&lp->destination, destination);
-                lp->mp = mp;
-                lp->serport = serport;
-                lp->ser_connect_pending = TRUE;
-                lp->notelnet = TRUE;
-                tmxr_init_line (lp);                        /* init the line state */
-                if (!lp->mp->modem_control)                 /* raise DTR and RTS for non modem control lines */
-                    tmxr_control_serial_hook (lp->serport,
-                                              TMXR_MDM_DTR|TMXR_MDM_RTS,
-                                              0, NULL);
-                lp->cnms = sim_os_msec ();                  /* record time of connection */
-                if (sim_switches & SWMASK ('V'))            /* -V flag reports connection on port */
-                    tmxr_report_connection (mp, lp);        /* report the connection to the line */
+                tmxr_attach_serial_destination (mp, lp, serport,
+                                                destination);
                 }
             else {
-                lp->datagram = datagram;
                 if (datagram) {
-                    if (listen[0]) {
-                        tmxr_replace_string (&lp->port, listen);
-                        }
-                    else
+                    if (!listen[0])
                         return sim_messagef (SCPE_ARG, "Missing listen port for Datagram socket\n");
                     }
-                lp->packet = packet;
                 sock = tmxr_connect_sock_ex_hook (
                     datagram ? listen : NULL, hostport, "localhost", NULL,
                     (datagram ? SIM_SOCK_OPT_DATAGRAM : 0) |
                     (packet ? SIM_SOCK_OPT_NODELAY : 0));
                 if (sock != INVALID_SOCKET) {
-                    _mux_detach_line (lp, FALSE, TRUE);
-                    tmxr_replace_string (&lp->destination, hostport);
-                    lp->mp = mp;
-                    if (!lp->modem_control || (lp->modembits & TMXR_MDM_DTR)) {
-                        lp->connecting = sock;
-                        tmxr_replace_string (&lp->ipad, lp->destination);
-                        }
-                    else
-                        tmxr_close_sock_hook (sock);
-                    lp->notelnet = notelnet;
-                    lp->nomessage = nomessage;
-                    tmxr_init_line (lp);                    /* init the line state */
-                    if (speed[0] && (!datagram))
-                        tmxr_set_line_speed (lp, speed);
+                    tmxr_attach_connecting_destination (
+                        mp, lp, sock, hostport, listen, datagram,
+                        packet, notelnet, nomessage, speed);
                     return SCPE_OK;
                     }
                 else
@@ -3720,28 +3772,13 @@ while (*tptr) {
         if (destination[0]) {
             serport = tmxr_open_serial_hook (destination, lp, &r);
             if (serport != INVALID_HANDLE) {
-                _mux_detach_line (lp, TRUE, TRUE);
-                tmxr_replace_string (&lp->destination, destination);
-                lp->serport = serport;
-                lp->ser_connect_pending = TRUE;
-                lp->notelnet = TRUE;
-                tmxr_init_line (lp);                        /* init the line state */
-                if (!lp->mp->modem_control)                 /* raise DTR and RTS for non modem control lines */
-                    tmxr_control_serial_hook (lp->serport,
-                                              TMXR_MDM_DTR|TMXR_MDM_RTS,
-                                              0, NULL);
-                lp->cnms = sim_os_msec ();                  /* record time of connection */
-                if (sim_switches & SWMASK ('V'))            /* -V flag reports connection on port */
-                    tmxr_report_connection (mp, lp);        /* report the connection to the line */
+                tmxr_attach_serial_destination (mp, lp, serport,
+                                                destination);
                 }
             else {
                 if (!lp->framer) {
-                    lp->datagram = datagram;
                     if (datagram) {
-                        if (listen[0]) {
-                            tmxr_replace_string (&lp->port, listen);
-                            }
-                        else
+                        if (!listen[0])
                             return sim_messagef (SCPE_ARG, "Missing listen port for Datagram socket\n");
                         }
                     sock = tmxr_connect_sock_ex_hook (
@@ -3749,17 +3786,9 @@ while (*tptr) {
                         (datagram ? SIM_SOCK_OPT_DATAGRAM : 0) |
                         (packet ? SIM_SOCK_OPT_NODELAY : 0));
                     if (sock != INVALID_SOCKET) {
-                        _mux_detach_line (lp, FALSE, TRUE);
-                        tmxr_replace_string (&lp->destination, hostport);
-                        if (!lp->modem_control || (lp->modembits & TMXR_MDM_DTR)) {
-                            lp->connecting = sock;
-                            tmxr_replace_string (&lp->ipad, lp->destination);
-                            }
-                        else
-                            tmxr_close_sock_hook (sock);
-                        lp->notelnet = notelnet;
-                        lp->nomessage = nomessage;
-                        tmxr_init_line (lp);                    /* init the line state */
+                        tmxr_attach_connecting_destination (
+                            mp, lp, sock, hostport, listen, datagram,
+                            packet, notelnet, nomessage, speed);
                         }
                     else
                         return sim_messagef (SCPE_ARG, "Can't open %s socket on %s%s%s\n", datagram ? "Datagram" : "Stream", datagram ? listen : "", datagram ? "<->" : "", hostport);
@@ -4006,7 +4035,7 @@ while (sim_asynch_enabled) {
     timeout.tv_usec = timeout_usec%1000000;
     select_errno = 0;
     if (socket_count == 0) {
-        sim_os_ms_sleep (timeout_usec/1000);
+        tmxr_ms_sleep_hook (timeout_usec/1000);
         status = 0;
         }
     else
@@ -4341,7 +4370,8 @@ if (!dptr)
 
 for (i=0; i<tmxr_open_device_count; ++i)
     if (tmxr_open_devices[i]->dptr == dptr) {
-        int line = (int)get_uint (cptr, 10, tmxr_open_devices[i]->lines, &r);
+        int line = (int)get_uint (cptr, 10,
+                                  tmxr_open_devices[i]->lines - 1, &r);
         if (r != SCPE_OK)
             return r;
         if (lp)
@@ -5222,7 +5252,7 @@ void tmxr_linemsg (TMLN *lp, const char *msg)
 while (*msg) {
     while (SCPE_STALL == tmxr_putc_ln (lp, (int32)(*msg)))
         if (lp->txbsz == tmxr_send_buffered_data (lp))
-            sim_os_ms_sleep (10);
+            tmxr_ms_sleep_hook (10);
     ++msg;
     }
 }
@@ -5274,11 +5304,11 @@ for (i = 0; i < len; ++i) {
     if (('\n' == buf[i]) && ((i == 0) || ('\r' != buf[i-1]))) {
         while (SCPE_STALL == tmxr_putc_ln (lp, '\r'))
             if (lp->txbsz == tmxr_send_buffered_data (lp))
-                sim_os_ms_sleep (10);
+                tmxr_ms_sleep_hook (10);
         }
     while (SCPE_STALL == tmxr_putc_ln (lp, buf[i]))
         if (lp->txbsz == tmxr_send_buffered_data (lp))
-            sim_os_ms_sleep (10);
+            tmxr_ms_sleep_hook (10);
     }
 if (buf != stackbuf)
     free (buf);
