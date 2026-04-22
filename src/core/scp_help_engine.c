@@ -195,7 +195,7 @@ void fprint_reg_help_ex(FILE *st, DEVICE *dptr, t_bool silent)
                 snprintf(rangebuf, sizeof(rangebuf), "[%d:%d]", 0,
                          rptr->depth - 1);
             else
-                strcpy(rangebuf, "");
+                rangebuf[0] = '\0';
             if (max_namelen < (strlen(rptr->name) + strlen(rangebuf)))
                 max_namelen = strlen(rptr->name) + strlen(rangebuf);
             found = TRUE;
@@ -332,7 +332,8 @@ void fprint_set_help_ex(FILE *st, DEVICE *dptr, t_bool silent)
     uint32 unit, found_unit = 0;
     const char *gap = "  ";
 
-    sprintf(header, "\n%s device SET commands:\n\n", dptr->name);
+    snprintf(header, sizeof(header), "\n%s device SET commands:\n\n",
+             dptr->name);
     for (unit = 0; unit < dptr->numunits; unit++)
         if (dptr->units[unit].flags & UNIT_DIS)
             --enabled_units;
@@ -373,7 +374,7 @@ void fprint_set_help_ex(FILE *st, DEVICE *dptr, t_bool silent)
                         (strcasecmp(gbuf, "Show") == 0)) {
                         char *thelp = (char *)malloc(9 + strlen(rem));
 
-                        sprintf(thelp, "Specify %s", rem);
+                        snprintf(thelp, 9 + strlen(rem), "Specify %s", rem);
                         fprint_wrapped(st, buf, 30, gap, thelp, 80);
                         free(thelp);
                     } else
@@ -446,7 +447,7 @@ void fprint_set_help_ex(FILE *st, DEVICE *dptr, t_bool silent)
                      "Disables debugging for device unit %s", unit_spec);
             fprint_wrapped(st, buf, 30, gap, extra, 80);
             if (dptr->debflags) {
-                strcpy(buf, "");
+                buf[0] = '\0';
                 fprintf(st, "set %s DEBUG=", unit_spec);
                 for (dep = dptr->debflags; dep->name != NULL; dep++)
                     fprintf(st, "%s%s", ((dep == dptr->debflags) ? "" : ";"),
@@ -493,7 +494,7 @@ void fprint_set_help_ex(FILE *st, DEVICE *dptr, t_bool silent)
                         (strcasecmp(gbuf, "Show") == 0)) {
                         char *thelp = (char *)malloc(9 + strlen(rem));
 
-                        sprintf(thelp, "Specify %s", rem);
+                        snprintf(thelp, 9 + strlen(rem), "Specify %s", rem);
                         fprint_wrapped(st, buf, 30, gap, thelp, 80);
                         free(thelp);
                     } else
@@ -543,7 +544,8 @@ void fprint_show_help_ex(FILE *st, DEVICE *dptr, t_bool silent)
     uint32 unit, found_unit = 0;
     const char *gap = "  ";
 
-    sprintf(header, "\n%s device SHOW commands:\n\n", dptr->name);
+    snprintf(header, sizeof(header), "\n%s device SHOW commands:\n\n",
+             dptr->name);
     for (unit = 0; unit < dptr->numunits; unit++)
         if (dptr->units[unit].flags & UNIT_DIS)
             --enabled_units;
@@ -564,23 +566,25 @@ void fprint_show_help_ex(FILE *st, DEVICE *dptr, t_bool silent)
             if ((!mptr->disp) || (!mptr->pstring) || !(*mptr->pstring))
                 continue;
             fprint_header(st, &found, header);
-            sprintf(buf, "show %s %s%s", sim_dname(dptr), mptr->pstring,
-                    MODMASK(mptr, MTAB_SHP) ? "{=arg}" : "");
+            snprintf(buf, sizeof(buf), "show %s %s%s", sim_dname(dptr),
+                     mptr->pstring, MODMASK(mptr, MTAB_SHP) ? "{=arg}" : "");
             fprint_wrapped(st, buf, 30, gap, mptr->help, 80);
         }
     }
     if ((dptr->flags & DEV_DEBUG) || (dptr->debflags)) {
         fprint_header(st, &found, header);
-        sprintf(buf, "show %s DEBUG", sim_dname(dptr));
-        sprintf(extra, "Displays debugging status for device %s",
-                sim_dname(dptr));
+        snprintf(buf, sizeof(buf), "show %s DEBUG", sim_dname(dptr));
+        snprintf(extra, sizeof(extra),
+                 "Displays debugging status for device %s",
+                 sim_dname(dptr));
         fprint_wrapped(st, buf, 30, gap, extra, 80);
     }
     if (((dptr->flags & DEV_DEBUG) || (dptr->debflags)) &&
         ((DEV_TYPE(dptr) == DEV_DISK) || (DEV_TYPE(dptr) == DEV_TAPE))) {
-        sprintf(buf, "show %s DEBUG", unit_spec);
-        sprintf(extra, "Displays debugging status for device unit %s",
-                unit_spec);
+        snprintf(buf, sizeof(buf), "show %s DEBUG", unit_spec);
+        snprintf(extra, sizeof(extra),
+                 "Displays debugging status for device unit %s",
+                 unit_spec);
         fprint_wrapped(st, buf, 30, gap, extra, 80);
     }
 
@@ -591,8 +595,8 @@ void fprint_show_help_ex(FILE *st, DEVICE *dptr, t_bool silent)
             if ((!mptr->disp) || (!mptr->pstring))
                 continue;
             fprint_header(st, &found, header);
-            sprintf(buf, "show %s %s%s", unit_spec, mptr->pstring,
-                    MODMASK(mptr, MTAB_SHP) ? "=arg" : "");
+            snprintf(buf, sizeof(buf), "show %s %s%s", unit_spec,
+                     mptr->pstring, MODMASK(mptr, MTAB_SHP) ? "=arg" : "");
             fprint_wrapped(st, buf, 30, gap, mptr->help, 80);
         }
     }
@@ -840,7 +844,8 @@ static TOPIC *buildHelp(TOPIC *topic, DEVICE *dptr, UNIT *uptr,
                             if (dptr) {
                                 char buf[129];
                                 n = uptr ? uptr - dptr->units : 0;
-                                sprintf(buf, "%s%u", dptr->name, (int)n);
+                                snprintf(buf, sizeof(buf), "%s%u",
+                                         dptr->name, (int)n);
                                 appendText(topic, buf, strlen(buf));
                             }
                             break;
@@ -995,7 +1000,7 @@ static TOPIC *buildHelp(TOPIC *topic, DEVICE *dptr, UNIT *uptr,
                 n = strlen(newt->title);
                 if (n > topic->kidwid)
                     topic->kidwid = n;
-                sprintf(nbuf, ".%u", topic->kids);
+                snprintf(nbuf, sizeof(nbuf), ".%u", topic->kids);
                 n = strlen(topic->label) + strlen(nbuf) + 1;
                 newt->label = (char *)malloc(n);
                 if (NULL == newt->label) {
@@ -1004,7 +1009,7 @@ static TOPIC *buildHelp(TOPIC *topic, DEVICE *dptr, UNIT *uptr,
                     free(newt);
                     FAIL(SCPE_MEM, No memory, NULL);
                 }
-                sprintf(newt->label, "%s%s", topic->label, nbuf);
+                snprintf(newt->label, n, "%s%s", topic->label, nbuf);
                 topic = newt;
                 continue;
             }
@@ -1026,6 +1031,7 @@ static char *helpPrompt(TOPIC *topic, const char *pstring, t_bool oneword)
 {
     char *prefix;
     char *newp, *newt;
+    size_t newpsz;
 
     if (topic->level == 0) {
         prefix = (char *)calloc(2, 1);
@@ -1036,16 +1042,17 @@ static char *helpPrompt(TOPIC *topic, const char *pstring, t_bool oneword)
     } else
         prefix = helpPrompt(topic->parent, "", oneword);
 
-    newp = (char *)malloc(strlen(prefix) + 1 + strlen(topic->title) + 1 +
-                          strlen(pstring) + 1);
+    newpsz = strlen(prefix) + 1 + strlen(topic->title) + 1 +
+             strlen(pstring) + 1;
+    newp = (char *)malloc(newpsz);
     if (!newp) {
         free(prefix);
         FAIL(SCPE_MEM, No memory, NULL);
     }
-    strcpy(newp, prefix);
+    strlcpy(newp, prefix, newpsz);
     if (topic->children) {
         if (topic->level != 0)
-            strcat(newp, " ");
+            strlcat(newp, " ", newpsz);
         newt =
             (topic->flags & HLP_MAGIC_TOPIC) ? topic->title + 1 : topic->title;
         if (oneword) {
@@ -1056,11 +1063,11 @@ static char *helpPrompt(TOPIC *topic, const char *pstring, t_bool oneword)
             }
             *np = '\0';
         } else
-            strcat(newp, newt);
+            strlcat(newp, newt, newpsz);
         if (*pstring && *pstring != '?')
-            strcat(newp, " ");
+            strlcat(newp, " ", newpsz);
     }
-    strcat(newp, pstring);
+    strlcat(newp, pstring, newpsz);
     free(prefix);
     return newp;
 }
@@ -1238,10 +1245,10 @@ t_stat scp_vhelp(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
         top.title[i] = (char)sim_toupper(p[i]);
     top.title[i] = '\0';
     if (flag & SCP_HELP_ATTACH)
-        strcpy(top.title + i, attach_help);
+        memcpy(top.title + i, attach_help, sizeof(attach_help));
 
     top.label = (char *)malloc(sizeof("1"));
-    strcpy(top.label, "1");
+    strlcpy(top.label, "1", 2);
 
     flat_help = flat_help || !sim_ttisatty() || (flag & SCP_HELP_FLAT);
 
@@ -1454,14 +1461,14 @@ t_stat scp_vhelpFromFile(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                 }
             }
             if (p && (strlen(fbuf) + strlen(helpfile) + 1) <= sizeof(fbuf)) {
-                strcat(fbuf, helpfile);
+                strlcat(fbuf, helpfile, sizeof(fbuf));
                 fp = sim_fopen(fbuf, "r");
             }
             if (!fp && p &&
                 (strlen(fbuf) + strlen(d) + sizeof("help") + strlen(helpfile) +
                  1) <= sizeof(fbuf)) {
-                sprintf(p + 1, d, "help");
-                strcat(p + 1, helpfile);
+                snprintf(p + 1, sizeof(fbuf) - ((p + 1) - fbuf), d, "help");
+                strlcat(p + 1, helpfile, sizeof(fbuf) - ((p + 1) - fbuf));
                 fp = sim_fopen(fbuf, "r");
             }
         }

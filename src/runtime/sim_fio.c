@@ -664,7 +664,7 @@ if ((*shmem)->shm_name == NULL) {
     *shmem = NULL;
     return SCPE_MEM;
     }
-strcpy ((*shmem)->shm_name, name);
+strlcpy ((*shmem)->shm_name, name, 1 + strlen (name));
 (*shmem)->hMapping = INVALID_HANDLE_VALUE;
 (*shmem)->shm_size = size;
 (*shmem)->shm_base = NULL;
@@ -863,7 +863,11 @@ if ((*shmem)->shm_name == NULL) {
     return SCPE_MEM;
     }
 
-sprintf ((*shmem)->shm_name, "%s%s", ((*name != '/') ? "/" : ""), name);
+snprintf ((*shmem)->shm_name,
+          2 + strlen (name),
+          "%s%s",
+          ((*name != '/') ? "/" : ""),
+          name);
 (*shmem)->shm_base = MAP_FAILED;
 (*shmem)->shm_size = size;
 (*shmem)->shm_fd = shm_open ((*shmem)->shm_name, O_RDWR, 0);
@@ -1027,7 +1031,7 @@ if ((filepath[1] == ':')  ||
         fullpath = (char *)malloc (tot_len);
         if (fullpath == NULL)
             return NULL;
-        strcpy (fullpath, filepath);
+        strlcpy (fullpath, filepath, tot_len);
     }
 else {          /* Need to prepend current directory */
     char dir[PATH_MAX+1] = "";
@@ -1085,12 +1089,17 @@ if (strchr (parts, 't') ||      /* modification time or */
     memset (&filestat, 0, sizeof (filestat));
     (void)stat (fullpath, &filestat);
     if (sizeof (filestat.st_size) == 4)
-        sprintf (filesizebuf, "%ld ", (long)filestat.st_size);
+        snprintf (filesizebuf, sizeof (filesizebuf), "%ld ",
+                  (long)filestat.st_size);
     else
-        sprintf (filesizebuf, "%" LL_FMT "d ", (LL_TYPE)filestat.st_size);
+        snprintf (filesizebuf, sizeof (filesizebuf),
+                  "%" LL_FMT "d ", (LL_TYPE)filestat.st_size);
     tm = localtime (&filestat.st_mtime);
-    sprintf (filedatetimebuf, "%02d/%02d/%04d %02d:%02d %cM ", 1 + tm->tm_mon, tm->tm_mday, 1900 + tm->tm_year,
-                                                              tm->tm_hour % 12, tm->tm_min, (0 == (tm->tm_hour % 12)) ? 'A' : 'P');
+    snprintf (filedatetimebuf, sizeof (filedatetimebuf),
+              "%02d/%02d/%04d %02d:%02d %cM ",
+              1 + tm->tm_mon, tm->tm_mday, 1900 + tm->tm_year,
+              tm->tm_hour % 12, tm->tm_min,
+              (0 == (tm->tm_hour % 12)) ? 'A' : 'P');
     }
 for (p = parts; *p; p++) {
     switch (*p) {
@@ -1181,7 +1190,8 @@ if ((hFind =  FindFirstFileA (cptr, &File)) != INVALID_HANDLE_VALUE) {
         while ((c = strchr (DirName, '\\')))
             *c = '/';                           /* Convert backslash to slash */
         }
-    sprintf (&DirName[strlen (DirName)], "%c", *pathsep);
+    DirName[strlen (DirName)] = *pathsep;
+    DirName[strlen (DirName) + 1] = '\0';
     do {
         FileSize = (((t_int64)(File.nFileSizeHigh)) << 32) | File.nFileSizeLow;
         strlcpy (FileName, DirName, sizeof (FileName));
@@ -1259,7 +1269,8 @@ if (dir) {
 #if defined (HAVE_GLOB)
     for (i=0; i<paths.gl_pathc; i++) {
         FileName = (char *)malloc (1 + strlen (paths.gl_pathv[i]));
-        sprintf (FileName, "%s", paths.gl_pathv[i]);
+        snprintf (FileName, 1 + strlen (paths.gl_pathv[i]), "%s",
+                  paths.gl_pathv[i]);
 #else /* !defined (HAVE_GLOB) */
     while ((ent = readdir (dir))) {
 #if defined (HAVE_FNMATCH)
@@ -1271,8 +1282,10 @@ if (dir) {
             (strcmp(MatchName, ent->d_name) != 0))
             continue;
 #endif /* defined (HAVE_FNMATCH) */
-        FileName = (char *)malloc (1 + strlen (DirName) + strlen (ent->d_name));
-        sprintf (FileName, "%s%s", DirName, ent->d_name);
+        FileName = (char *)malloc (1 + strlen (DirName) +
+                                   strlen (ent->d_name));
+        snprintf (FileName, 1 + strlen (DirName) + strlen (ent->d_name),
+                  "%s%s", DirName, ent->d_name);
 #endif /* defined (HAVE_GLOB) */
         p_name = FileName + strlen (DirName);
         memset (&filestat, 0, sizeof (filestat));
@@ -1467,69 +1480,4 @@ while ((s1 == s2) && (s1 != '\0')) {
         return 1;
     }
 return 0;
-}
-
-/* strlcat() and strlcpy() are not available on all platforms */
-/* Copyright (c) 1998 Todd C. Miller <Todd.Miller@courtesan.com> */
-/*
- * Appends src to string dst of size siz (unlike strncat, siz is the
- * full size of dst, not space left).  At most siz-1 characters
- * will be copied.  Always NUL terminates (unless siz <= strlen(dst)).
- * Returns strlen(src) + MIN(siz, strlen(initial dst)).
- * If retval >= siz, truncation occurred.
- */
-size_t sim_strlcat(char *dst, const char *src, size_t size)
-{
-char *d = dst;
-const char *s = src;
-size_t n = size;
-size_t dlen;
-
-/* Find the end of dst and adjust bytes left but don't go past end */
-while (n-- != 0 && *d != '\0')
-    d++;
-dlen = d - dst;
-n = size - dlen;
-
-if (n == 0)
-    return (dlen + strlen(s));
-while (*s != '\0') {
-    if (n != 1) {
-        *d++ = *s;
-        n--;
-        }
-    s++;
-    }
-*d = '\0';
-
-return (dlen + (s - src));          /* count does not include NUL */
-}
-
-/*
- * Copy src to string dst of size siz.  At most siz-1 characters
- * will be copied.  Always NUL terminates (unless siz == 0).
- * Returns strlen(src); if retval >= siz, truncation occurred.
- */
-size_t sim_strlcpy (char *dst, const char *src, size_t size)
-{
-char *d = dst;
-const char *s = src;
-size_t n = size;
-
-/* Copy as many bytes as will fit */
-if (n != 0) {
-    while (--n != 0) {
-        if ((*d++ = *s++) == '\0')
-            break;
-        }
-    }
-
-    /* Not enough room in dst, add NUL and traverse rest of src */
-    if (n == 0) {
-        if (size != 0)
-            *d = '\0';              /* NUL-terminate dst */
-        while (*s++)
-            ;
-        }
-return (s - src - 1);               /* count does not include NUL */
 }

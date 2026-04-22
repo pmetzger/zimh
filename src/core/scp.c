@@ -10655,16 +10655,12 @@ va_list arglist;
 
 while (1) {                                         /* format passed string, args */
     va_start (arglist, fmt);
-#if defined(NO_vsnprintf)
-    len = vsprintf (buf, fmt, arglist);
-#else                                               /* !defined(NO_vsnprintf) */
-    len = vsnprintf (buf, bufsize-1, fmt, arglist);
-#endif                                              /* NO_vsnprintf */
+    len = vsnprintf (buf, bufsize, fmt, arglist);
     va_end (arglist);
 
 /* If the formatted result didn't fit into the buffer, then grow the buffer and try again */
 
-    if ((len < 0) || (len >= bufsize-1)) {
+    if ((len < 0) || (len >= bufsize)) {
         if (buf != stackbuf)
             free (buf);
         bufsize = bufsize * 2;
@@ -10673,7 +10669,6 @@ while (1) {                                         /* format passed string, arg
         buf = (char *) malloc (bufsize);
         if (buf == NULL)                            /* out of memory */
             return;
-        buf[bufsize-1] = '\0';
         continue;
         }
     break;
@@ -10732,16 +10727,15 @@ prefix_len = strlen (msg_prefix);
 while (1) {                                         /* format passed string, args */
     va_start (arglist, fmt);
     strlcpy (buf, msg_prefix, bufsize);
-#if defined(NO_vsnprintf)
-    len = prefix_len + vsprintf (buf + prefix_len, fmt, arglist);
-#else                                               /* !defined(NO_vsnprintf) */
-    len = prefix_len + vsnprintf (buf + prefix_len, bufsize - (1 + prefix_len), fmt, arglist);
-#endif                                              /* NO_vsnprintf */
+    len = prefix_len + vsnprintf (buf + prefix_len,
+                                  bufsize - prefix_len,
+                                  fmt,
+                                  arglist);
     va_end (arglist);
 
 /* If the formatted result didn't fit into the buffer, then grow the buffer and try again */
 
-    if (len >= bufsize-1) {
+    if ((len < 0) || (len >= bufsize)) {
         if (buf != stackbuf)
             free (buf);
         bufsize = bufsize * 2;
@@ -10750,7 +10744,6 @@ while (1) {                                         /* format passed string, arg
         buf = (char *) malloc (bufsize);
         if (buf == NULL)                            /* out of memory */
             return SCPE_MEM;
-        buf[bufsize-1] = '\0';
         continue;
         }
     break;
@@ -10820,20 +10813,18 @@ if (sim_deb && dptr && ((dptr->dctrl | (uptr ? uptr->dctrl : 0)) & dbits)) {
     char *buf = stackbuf;
     int32 i, j, len;
     const char* debug_prefix = sim_debug_prefix(dbits, dptr, uptr);   /* prefix to print if required */
+    va_list args;
 
     sim_oline = NULL;                                   /* avoid potential debug to active socket */
-    buf[bufsize-1] = '\0';
 
     while (1) {                                         /* format passed string, args */
-#if defined(NO_vsnprintf)
-        len = vsprintf (buf, fmt, arglist);
-#else                                                   /* !defined(NO_vsnprintf) */
-        len = vsnprintf (buf, bufsize-1, fmt, arglist);
-#endif                                                  /* NO_vsnprintf */
+        va_copy (args, arglist);
+        len = vsnprintf (buf, bufsize, fmt, args);
+        va_end (args);
 
 /* If the formatted result didn't fit into the buffer, then grow the buffer and try again */
 
-        if ((len < 0) || (len >= bufsize-1)) {
+        if ((len < 0) || (len >= bufsize)) {
             if (buf != stackbuf)
                 free (buf);
             bufsize = bufsize * 2;
@@ -10842,7 +10833,6 @@ if (sim_deb && dptr && ((dptr->dctrl | (uptr ? uptr->dctrl : 0)) & dbits)) {
             buf = (char *) malloc (bufsize);
             if (buf == NULL)                            /* out of memory */
                 return;
-            buf[bufsize-1] = '\0';
             continue;
             }
         break;
@@ -11031,22 +11021,16 @@ if (sim_mfile || (sim_deb && (f == sim_deb))) {
     va_list arglist;
     int32 len;
 
-    buf[bufsize-1] = '\0';
-
     while (1) {                                         /* format passed string, args */
         va_start (arglist, fmt);
-#if defined(NO_vsnprintf)
-        len = vsprintf (buf, fmt, arglist);
-#else                                                   /* !defined(NO_vsnprintf) */
-        len = vsnprintf (buf, bufsize-1, fmt, arglist);
-#endif                                                  /* NO_vsnprintf */
+        len = vsnprintf (buf, bufsize, fmt, arglist);
         va_end (arglist);
 
         /* If the formatted result didn't fit into the buffer,
          * then grow the buffer and try again
          */
 
-        if ((len < 0) || (len >= bufsize-1)) {
+        if ((len < 0) || (len >= bufsize)) {
             if (buf != stackbuf)
                 free (buf);
             bufsize = bufsize * 2;
@@ -11055,7 +11039,6 @@ if (sim_mfile || (sim_deb && (f == sim_deb))) {
             buf = (char *) malloc (bufsize);
             if (buf == NULL)                            /* out of memory */
                 return -1;
-            buf[bufsize-1] = '\0';
             continue;
             }
         break;
@@ -11165,11 +11148,7 @@ static int Mprintf (MFILE *f, const char* fmt, ...)
         size_t buf_space = (f->size - f->pos);
 
         va_start (arglist, fmt);
-#if defined(NO_vsnprintf)
-        len = vsprintf (f->buf + f->pos, fmt, arglist);
-#else                                                   /* !defined(NO_vsnprintf) */
         len = vsnprintf (f->buf + f->pos, buf_space, fmt, arglist);
-#endif                                                  /* NO_vsnprintf */
         va_end (arglist);
 
         if ((len < 0) || (len >= (int)buf_space)) {

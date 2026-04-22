@@ -5079,18 +5079,16 @@ char stackbuf[STACKBUFSIZE];
 int32 bufsize = sizeof(stackbuf);
 char *buf = stackbuf;
 int32 i, len;
+va_list args;
 
-buf[bufsize-1] = '\0';
 while (1) {                                         /* format passed string, args */
-#if defined(NO_vsnprintf)
-    len = vsprintf (buf, fmt, arglist);
-#else                                               /* !defined(NO_vsnprintf) */
-    len = vsnprintf (buf, bufsize-1, fmt, arglist);
-#endif                                              /* NO_vsnprintf */
+    va_copy (args, arglist);
+    len = vsnprintf (buf, bufsize, fmt, args);
+    va_end (args);
 
 /* If the formatted result didn't fit into the buffer, then grow the buffer and try again */
 
-    if ((len < 0) || (len >= bufsize-1)) {
+    if ((len < 0) || (len >= bufsize)) {
         if (buf != stackbuf)
             free (buf);
         bufsize = bufsize * 2;
@@ -5099,7 +5097,6 @@ while (1) {                                         /* format passed string, arg
         buf = (char *) malloc (bufsize);
         if (buf == NULL)                            /* out of memory */
             return;
-        buf[bufsize-1] = '\0';
         continue;
         }
     break;
