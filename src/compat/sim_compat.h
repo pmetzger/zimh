@@ -10,9 +10,12 @@
    available on all supported host platforms. */
 
 #include <stddef.h>
+#include <time.h>
 
 size_t strlcpy(char *dst, const char *src, size_t dsize);
 
 size_t strlcat(char *dst, const char *src, size_t dsize);
+struct tm *localtime_r(const time_t *timer, struct tm *result);
+struct tm *gmtime_r(const time_t *timer, struct tm *result);
 
 #endif /* H_SIM_COMPAT */
