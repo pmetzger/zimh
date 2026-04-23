@@ -7,7 +7,6 @@
     "dependencies": [
         "cmocka",
         "freetype",
-        "libedit",
         "libpcap",
         "libpng",
         "pcre2",
