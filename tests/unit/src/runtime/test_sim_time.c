@@ -107,6 +107,25 @@ static void test_sim_nanosleep_uses_installed_hook(void **state)
     assert_int_equal(rem.tv_nsec, 200);
 }
 
+/* Verify sim_nanosleep propagates hook failures and errno unchanged. */
+static void test_sim_nanosleep_propagates_hook_failure(void **state)
+{
+    struct timespec req = {.tv_sec = 1, .tv_nsec = 500};
+
+    (void)state;
+
+    simh_test_sleep_status = -1;
+    simh_test_sleep_errno = EBUSY;
+    sim_time_set_test_hooks(NULL, simh_test_nanosleep_stub);
+
+    errno = 0;
+    assert_int_equal(sim_nanosleep(&req, NULL), -1);
+    assert_int_equal(simh_test_sleep_calls, 1);
+    assert_int_equal(simh_test_last_sleep_req.tv_sec, 1);
+    assert_int_equal(simh_test_last_sleep_req.tv_nsec, 500);
+    assert_int_equal(errno, EBUSY);
+}
+
 /* Verify sim_time reads CLOCK_REALTIME seconds through sim_clock_gettime. */
 static void test_sim_time_returns_seconds_and_stores_output(void **state)
 {
@@ -242,6 +261,9 @@ int main(void)
         cmocka_unit_test_setup_teardown(test_sim_nanosleep_uses_installed_hook,
                                         setup_sim_time_fixture,
                                         teardown_sim_time_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_nanosleep_propagates_hook_failure,
+            setup_sim_time_fixture, teardown_sim_time_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_time_returns_seconds_and_stores_output,
             setup_sim_time_fixture, teardown_sim_time_fixture),
