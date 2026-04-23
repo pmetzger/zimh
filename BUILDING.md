@@ -69,6 +69,8 @@ Notes:
   not configure successfully.
 - `libedit` is optional, but without it SCP falls back to plainer
   console input without interactive line-editing support.
+  `libedit` support is not currently available for Windows because no
+  port of the library to Windows exists.
 - Some networking features may also use additional system libraries,
   such as `libpcap`, depending on the platform and enabled options.
 
