@@ -14,11 +14,11 @@ are effectively bounded today. The purpose of the audit is to:
 
 Tree scan of `.c` and `.h` files found:
 
-- `sprintf`: `1692`
-- `vsprintf`: `6`
-- `strcpy`: `345`
-- `strcat`: `158`
-- `strncpy`: `52`
+- `sprintf`: `1634`
+- `vsprintf`: `0`
+- `strcpy`: `316`
+- `strcat`: `152`
+- `strncpy`: `50`
 - `gets`: `0`
 - `strncat`: `0`
 
@@ -26,34 +26,31 @@ By top-level area:
 
 - `simulators`
   - `sprintf`: `1403`
+  - `vsprintf`: `0`
   - `strcpy`: `201`
   - `strcat`: `151`
   - `strncpy`: `43`
 
 - `src`
-  - `sprintf`: `287`
-  - `vsprintf`: `6`
-  - `strcpy`: `140`
-  - `strcat`: `7`
+  - `sprintf`: `231`
+  - `vsprintf`: `0`
+  - `strcpy`: `115`
+  - `strcat`: `1`
   - `strncpy`: `7`
+
+- `tests`
+  - `sprintf`: `0`
+  - `vsprintf`: `0`
+  - `strcpy`: `0`
+  - `strcat`: `0`
+  - `strncpy`: `0`
 
 ## Priority Order
 
-### 1. `vsprintf`
+### 1. `sprintf`
 
-These are the clearest high-priority fixes because they are inherently
-unbounded formatting interfaces.
-
-Desired direction:
-
-- replace with `vsnprintf`
-- carry buffer sizes explicitly
-- review any helper APIs that currently hide the destination size
-
-### 2. `sprintf`
-
-Not every `sprintf` is automatically dangerous, but the count is high
-enough that it should be treated as the main migration category.
+`vsprintf` has already been driven to zero. The remaining largest risky
+category is `sprintf`.
 
 Desired direction:
 
@@ -62,7 +59,7 @@ Desired direction:
 - where append-style code is being used, consider restructuring around
   tracked offsets or growable strings instead of repeated formatting
 
-### 3. `strcpy` and `strcat`
+### 2. `strcpy` and `strcat`
 
 These should be reviewed together because they often appear in code that
 is building strings incrementally.
@@ -73,7 +70,7 @@ Desired direction:
 - otherwise replace with better-structured assembly logic
 - prefer explicit capacity tracking over implicit assumptions
 
-### 4. `strncpy`
+### 3. `strncpy`
 
 These need review, not blanket replacement. Some are trying to do
 bounded copies, but `strncpy` has awkward truncation and padding
@@ -100,9 +97,9 @@ Reasons:
 
 Recommended order inside `src/`:
 
-1. `vsprintf` sites
-2. obviously unsafe `sprintf` sites
-3. `strcpy` / `strcat` chains that should become bounded copies
+1. obviously unsafe `sprintf` sites
+2. `strcpy` / `strcat` chains that should become bounded copies
+3. targeted `strncpy` review
 
 ## Likely Follow-On Work
 
@@ -114,7 +111,6 @@ Recommended order inside `src/`:
 
 ## Definition of Done
 
-- no remaining `vsprintf` in maintained code
 - high-risk `sprintf` sites in `src/` migrated to bounded formatting
 - obvious `strcpy` / `strcat` misuse in `src/` eliminated
 - a clear migration pattern established before wider `simulators/`
