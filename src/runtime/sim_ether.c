@@ -344,9 +344,11 @@
 #include <ctype.h>
 #include "sim_ether.h"
 #include "sim_sock.h"
+#include "sim_time.h"
 #include "sim_timer.h"
 #if defined(_WIN32)
 #include <direct.h>
+#include "sim_compat.h"
 #else
 #include <unistd.h>
 #endif
@@ -2779,9 +2781,16 @@ _eth_error(ETH_DEV* dev, const char* where)
 char msg[64];
 const char *netname = "";
 time_t now;
+struct tm tm_now;
+char time_buf[32];
 
-time(&now);
-sim_printf ("%s", asctime(localtime(&now)));
+if ((sim_time (&now) != (time_t)-1) &&
+    (localtime_r (&now, &tm_now) != NULL) &&
+    (strftime (time_buf, sizeof (time_buf), "%Y-%m-%d %H:%M:%S\n",
+               &tm_now) != 0))
+    sim_printf ("%s", time_buf);
+else
+    sim_printf ("unknown time\n");
 switch (dev->eth_api) {
   case ETH_API_PCAP:
       netname = "pcap";

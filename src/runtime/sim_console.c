@@ -124,11 +124,16 @@
 */
 
 #include "sim_defs.h"
+#include "sim_time.h"
 #include "sim_tmxr.h"
 #include "sim_serial.h"
 #include "sim_timer.h"
 #include <ctype.h>
 #include <math.h>
+
+#if defined(_WIN32)
+#include "sim_compat.h"
+#endif
 
 /* Forward declarations of platform specific routines */
 
@@ -245,6 +250,21 @@ EXPECT sim_con_expect = {&sim_con_telnet, DBG_EXP,
                          NULL, 0, NULL, 0, 0, 0, 0};
 
 static t_bool sim_con_console_port = TRUE;
+
+/* Format the current local wall-clock time for console log banners. */
+static const char *sim_console_format_now (char *buf, size_t size)
+{
+time_t now;
+struct tm tm_now;
+
+if (sim_time (&now) == (time_t)-1)
+    return "unknown time";
+if (localtime_r (&now, &tm_now) == NULL)
+    return "unknown time";
+if (strftime (buf, size, "%Y-%m-%d %H:%M:%S", &tm_now) == 0)
+    return "unknown time";
+return buf;
+}
 
 /* Enable automatic WRU console polling */
 
@@ -2225,7 +2245,6 @@ t_stat sim_set_logon (int32 flag, CONST char *cptr)
 {
 char gbuf[CBUFSIZE];
 t_stat r;
-time_t now;
 
 if ((cptr == NULL) || (*cptr == 0))                     /* need arg */
     return SCPE_2FARG;
@@ -2242,9 +2261,13 @@ if ((!sim_quiet) && (!(sim_switches & SWMASK ('Q'))))
              sim_logfile_name (sim_log, sim_log_ref));
 fprintf (sim_log, "Logging to file \"%s\"\n",
              sim_logfile_name (sim_log, sim_log_ref));  /* start of log */
-time(&now);
-if ((!sim_quiet) && (!(sim_switches & SWMASK ('Q'))))
-    fprintf (sim_log, "Logging to file \"%s\" at %s", sim_logfile_name (sim_log, sim_log_ref), ctime(&now));
+if ((!sim_quiet) && (!(sim_switches & SWMASK ('Q')))) {
+    char time_buf[32];
+
+    fprintf (sim_log, "Logging to file \"%s\" at %s\n",
+             sim_logfile_name (sim_log, sim_log_ref),
+             sim_console_format_now (time_buf, sizeof (time_buf)));
+    }
 return SCPE_OK;
 }
 
@@ -2299,7 +2322,6 @@ t_stat sim_set_debon (int32 flag, CONST char *cptr)
 {
 char gbuf[CBUFSIZE];
 t_stat r;
-time_t now;
 size_t buffer_size = 0;
 
 if ((cptr == NULL) || (*cptr == 0))                     /* need arg */
@@ -2347,9 +2369,12 @@ if (sim_deb_switches & SWMASK ('E'))
 if (sim_deb_switches & SWMASK ('B'))
     sim_messagef (SCPE_OK, "   Debug messages will be written to a %u MB circular memory buffer\n",
                                 (unsigned int)buffer_size);
-time(&now);
 if (!sim_quiet) {
-    fprintf (sim_deb, "Debug output to \"%s\" at %s", sim_logfile_name (sim_deb, sim_deb_ref), ctime(&now));
+    char time_buf[32];
+
+    fprintf (sim_deb, "Debug output to \"%s\" at %s\n",
+             sim_logfile_name (sim_deb, sim_deb_ref),
+             sim_console_format_now (time_buf, sizeof (time_buf)));
     show_version (sim_deb, NULL, NULL, 0, NULL);
     }
 if (sim_deb_switches & SWMASK ('N'))

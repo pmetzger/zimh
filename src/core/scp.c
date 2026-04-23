@@ -222,6 +222,9 @@
 #include <time.h>
 #include <math.h>
 #if defined(_WIN32)
+#include "sim_compat.h"
+#endif
+#if defined(_WIN32)
 #include <io.h>
 #include <fcntl.h>
 #endif
@@ -10524,9 +10527,13 @@ if (sim_deb_switches & (SWMASK ('T') | SWMASK ('R') | SWMASK ('A'))) {
         sim_timespec_diff (&time_now, &time_now, &sim_deb_basetime);
     if (sim_deb_switches & SWMASK ('T')) {
         time_t tnow = (time_t)time_now.tv_sec;
-        struct tm *now = localtime(&tnow);
+        struct tm now_storage;
+        struct tm *now = localtime_r (&tnow, &now_storage);
 
-        sprintf(tim_t, "%02d:%02d:%02d.%03d ", now->tm_hour, now->tm_min, now->tm_sec, (int)(time_now.tv_nsec/1000000));
+        if (now != NULL)
+            snprintf(tim_t, sizeof (tim_t), "%02d:%02d:%02d.%03d ",
+                     now->tm_hour, now->tm_min, now->tm_sec,
+                     (int)(time_now.tv_nsec/1000000));
         }
     if (sim_deb_switches & SWMASK ('A')) {
         sprintf(tim_t, "%" LL_FMT "d.%03d ", (LL_TYPE)(time_now.tv_sec), (int)(time_now.tv_nsec/1000000));
