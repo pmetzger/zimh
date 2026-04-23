@@ -70,7 +70,9 @@
 
 #define NOT_MUX_USING_CODE /* sim_tmxr library provider or agnostic */
 
+#include "sim_compat.h"
 #include "sim_defs.h"
+#include "sim_time.h"
 #include <ctype.h>
 #include <math.h>
 #ifdef HAVE_WINMM
@@ -80,6 +82,22 @@
 #define SIM_INTERNAL_CLK (SIM_NTIMERS+(1<<30))
 #define SIM_INTERNAL_UNIT sim_internal_timer_unit
 uint32 sim_idle_ms_sleep (unsigned int msec);
+
+static uint32 sim_timer_timespec_msec (const struct timespec *tp)
+{
+return (((uint32)tp->tv_sec) * 1000) + (((uint32)tp->tv_nsec) / 1000000);
+}
+
+static const char *sim_timer_format_hms (time_t when, char *buf, size_t size)
+{
+struct tm tm_buf;
+
+if (localtime_r (&when, &tm_buf) == NULL)
+    return "??:??:??";
+if (strftime (buf, size, "%H:%M:%S", &tm_buf) == 0)
+    return "??:??:??";
+return buf;
+}
 
 /* MS_MIN_GRANULARITY exists here so that timing behavior for hosts systems  */
 /* with slow clock ticks can be assessed and tested without actually having  */
@@ -272,14 +290,9 @@ struct timespec start_time, end_time, done_time, delta_time;
 uint32 delta_ms;
 t_bool timedout = FALSE;
 
-clock_gettime(CLOCK_REALTIME, &start_time);
-end_time = start_time;
-end_time.tv_sec += (msec/1000);
-end_time.tv_nsec += 1000000*(msec%1000);
-if (end_time.tv_nsec >= 1000000000) {
-  end_time.tv_sec += end_time.tv_nsec/1000000000;
-  end_time.tv_nsec = end_time.tv_nsec%1000000000;
-  }
+if (sim_timer_deadline_msec (&end_time, msec) != 0)
+    return sim_os_ms_sleep (msec);
+(void) sim_clock_gettime (CLOCK_REALTIME, &start_time);
 pthread_mutex_lock (&sim_asynch_lock);
 sim_idle_wait = TRUE;
 if (pthread_cond_timedwait (&sim_asynch_wake, &sim_asynch_lock, &end_time))
@@ -288,7 +301,7 @@ else
     sim_asynch_check = 0;                 /* force check of asynch queue now */
 sim_idle_wait = FALSE;
 pthread_mutex_unlock (&sim_asynch_lock);
-clock_gettime(CLOCK_REALTIME, &done_time);
+(void) sim_clock_gettime (CLOCK_REALTIME, &done_time);
 if (!timedout) {
     AIO_UPDATE_QUEUE;
     }
@@ -358,21 +371,36 @@ return SCPE_OK;
 
 /* OS-dependent timer and clock routines */
 
-#if defined (_WIN32)  ||  defined(HAVE_WINMM)
-
-/* Win32 routines */
-
 const t_bool rtc_avail = TRUE;
 
 uint32 sim_os_msec (void)
 {
-return timeGetTime ();                      /* use Multi-Media time source */
+struct timespec now = {0};
+
+if (sim_clock_gettime (CLOCK_REALTIME, &now) != 0)
+    return 0;
+return sim_timer_timespec_msec (&now);
 }
 
 void sim_os_sleep (unsigned int sec)
 {
-Sleep (sec * 1000);
+sim_sleep (sec);
 }
+
+uint32 sim_os_ms_sleep (unsigned int msec)
+{
+uint32 stime = sim_os_msec ();
+struct timespec treq;
+
+treq.tv_sec = msec / 1000;
+treq.tv_nsec = (long)((msec % 1000) * 1000000);
+(void) sim_nanosleep (&treq, NULL);
+return sim_os_msec () - stime;
+}
+
+#if defined (_WIN32)  ||  defined(HAVE_WINMM)
+
+/* Win32 routines */
 
 static TIMECAPS timers;
 
@@ -404,14 +432,6 @@ atexit (sim_timer_exit);
 return _compute_minimum_sleep ();
 }
 
-uint32 sim_os_ms_sleep (unsigned int msec)
-{
-uint32 stime = sim_os_msec();
-
-Sleep (msec);
-return sim_os_msec () - stime;
-}
-
 #if defined(NEED_CLOCK_GETTIME)
 int clock_gettime(int clk_id, struct timespec *tp)
 {
@@ -436,59 +456,10 @@ return 0;
 #include <time.h>
 #include <sys/time.h>
 #include <unistd.h>
-#define NANOS_PER_MILLI     1000000
-#define MILLIS_PER_SEC      1000
-
-const t_bool rtc_avail = TRUE;
-
-uint32 sim_os_msec (void)
-{
-struct timeval cur;
-struct timezone foo;
-uint32 msec;
-
-gettimeofday (&cur, &foo);
-msec = (((uint32) cur.tv_sec) * 1000) + (((uint32) cur.tv_usec) / 1000);
-return msec;
-}
-
-void sim_os_sleep (unsigned int sec)
-{
-sleep (sec);
-}
 
 uint32 sim_os_ms_sleep_init (void)
 {
 return _compute_minimum_sleep ();
-}
-
-#if !defined(_POSIX_SOURCE)
-#ifdef NEED_CLOCK_GETTIME
-typedef int clockid_t;
-int clock_gettime(clockid_t clk_id, struct timespec *tp)
-{
-struct timeval cur;
-struct timezone foo;
-
-if (clk_id != CLOCK_REALTIME)
-  return -1;
-gettimeofday (&cur, &foo);
-tp->tv_sec = cur.tv_sec;
-tp->tv_nsec = cur.tv_usec*1000;
-return 0;
-}
-#endif /* CLOCK_REALTIME */
-#endif /* !defined(_POSIX_SOURCE) && defined(SIM_ASYNCH_IO) */
-
-uint32 sim_os_ms_sleep (unsigned int milliseconds)
-{
-uint32 stime = sim_os_msec ();
-struct timespec treq;
-
-treq.tv_sec = milliseconds / MILLIS_PER_SEC;
-treq.tv_nsec = (milliseconds % MILLIS_PER_SEC) * NANOS_PER_MILLI;
-(void) nanosleep (&treq, NULL);
-return sim_os_msec () - stime;
 }
 
 #if defined(NEED_THREAD_PRIORITY)
@@ -557,6 +528,20 @@ while (diff->tv_nsec >= 1000000000) {
     ++diff->tv_sec;
     diff->tv_nsec -= 1000000000;
     }
+}
+
+/* Build an absolute CLOCK_REALTIME deadline msec milliseconds from now. */
+int sim_timer_deadline_msec (struct timespec *deadline, unsigned int msec)
+{
+if (sim_clock_gettime (CLOCK_REALTIME, deadline) != 0)
+    return -1;
+deadline->tv_sec += (msec / 1000);
+deadline->tv_nsec += 1000000L * (long)(msec % 1000);
+while (deadline->tv_nsec >= 1000000000L) {
+    ++deadline->tv_sec;
+    deadline->tv_nsec -= 1000000000L;
+    }
+return 0;
 }
 
 /* Forward declarations */
@@ -1099,25 +1084,50 @@ for (tmr=clocks=0; tmr<=SIM_NTIMERS; ++tmr) {
     if (rtc->clock_catchup_ticks_tot+rtc->clock_catchup_ticks != rtc->clock_catchup_ticks)
         fprintf (st, "  Total Catchup Ticks Sched: %s\n",   sim_fmt_numeric ((double)(rtc->clock_catchup_ticks_tot+rtc->clock_catchup_ticks)));
     if (rtc->clock_init_base_time) {
+        char time_buf[16];
+
         _double_to_timespec (&now, rtc->clock_init_base_time);
         time_t_now = (time_t)now.tv_sec;
-        fprintf (st, "  Initialize Base Time:      %8.8s.%03d\n", 11+ctime(&time_t_now), (int)(now.tv_nsec/1000000));
+        fprintf (st, "  Initialize Base Time:      %s.%03d\n",
+                 sim_timer_format_hms (time_t_now, time_buf,
+                                       sizeof (time_buf)),
+                 (int)(now.tv_nsec/1000000));
         }
     if (rtc->clock_tick_start_time) {
+        char time_buf[16];
+
         _double_to_timespec (&now, rtc->clock_tick_start_time);
         time_t_now = (time_t)now.tv_sec;
-        fprintf (st, "  Tick Start Time:           %8.8s.%03d\n", 11+ctime(&time_t_now), (int)(now.tv_nsec/1000000));
+        fprintf (st, "  Tick Start Time:           %s.%03d\n",
+                 sim_timer_format_hms (time_t_now, time_buf,
+                                       sizeof (time_buf)),
+                 (int)(now.tv_nsec/1000000));
         }
-    clock_gettime (CLOCK_REALTIME, &now);
+    (void) sim_clock_gettime (CLOCK_REALTIME, &now);
     time_t_now = (time_t)now.tv_sec;
-    fprintf (st, "  Wall Clock Time Now:       %8.8s.%03d\n", 11+ctime(&time_t_now), (int)(now.tv_nsec/1000000));
+    {
+        char time_buf[16];
+
+        fprintf (st, "  Wall Clock Time Now:       %s.%03d\n",
+                 sim_timer_format_hms (time_t_now, time_buf,
+                                       sizeof (time_buf)),
+                 (int)(now.tv_nsec/1000000));
+    }
     if (sim_catchup_ticks && rtc->clock_catchup_eligible) {
+        char time_buf[16];
+
         _double_to_timespec (&now, rtc->clock_catchup_base_time+rtc->calib_tick_time);
         time_t_now = (time_t)now.tv_sec;
-        fprintf (st, "  Catchup Tick Time:         %8.8s.%03d\n", 11+ctime(&time_t_now), (int)(now.tv_nsec/1000000));
+        fprintf (st, "  Catchup Tick Time:         %s.%03d\n",
+                 sim_timer_format_hms (time_t_now, time_buf,
+                                       sizeof (time_buf)),
+                 (int)(now.tv_nsec/1000000));
         _double_to_timespec (&now, rtc->clock_catchup_base_time);
         time_t_now = (time_t)now.tv_sec;
-        fprintf (st, "  Catchup Base Time:         %8.8s.%03d\n", 11+ctime(&time_t_now), (int)(now.tv_nsec/1000000));
+        fprintf (st, "  Catchup Base Time:         %s.%03d\n",
+                 sim_timer_format_hms (time_t_now, time_buf,
+                                       sizeof (time_buf)),
+                 (int)(now.tv_nsec/1000000));
         }
     if (rtc->clock_time_idled)
         fprintf (st, "  Total Time Idled:          %s\n",   sim_fmt_secs (rtc->clock_time_idled/1000.0));
@@ -1153,7 +1163,14 @@ if (sim_asynch_timer) {
             tim = sim_fmt_secs(uptr->a_usec_delay/1000000.0);
             _double_to_timespec (&due, uptr->a_due_time);
             time_t_due = (time_t)due.tv_sec;
-            fprintf (st, " after %s due at %8.8s.%06d\n", tim, 11+ctime(&time_t_due), (int)(due.tv_nsec/1000));
+            {
+                char time_buf[16];
+
+                fprintf (st, " after %s due at %s.%06d\n", tim,
+                         sim_timer_format_hms (time_t_due, time_buf,
+                                               sizeof (time_buf)),
+                         (int)(due.tv_nsec/1000));
+            }
             }
         }
     }
@@ -1971,7 +1988,7 @@ if ((stat == SCPE_OK)                               &&
         struct timespec now;
         double skew;
 
-        clock_gettime(CLOCK_REALTIME, &now);
+        (void) sim_clock_gettime (CLOCK_REALTIME, &now);
         skew = (_timespec_to_double(&now) - (rtc->calib_tick_time+rtc->clock_catchup_base_time));
 
         if (fabs(skew) > fabs(rtc->clock_skew_max))
@@ -2023,7 +2040,7 @@ return SCPE_STOP;
 void sim_rtcn_get_time (struct timespec *now, int tmr)
 {
 sim_debug (DBG_GET, &sim_timer_dev, "sim_rtcn_get_time(tmr=%d)\n", tmr);
-clock_gettime (CLOCK_REALTIME, now);
+(void) sim_clock_gettime (CLOCK_REALTIME, now);
 }
 
 time_t sim_get_time (time_t *now)
@@ -2237,7 +2254,7 @@ while (sim_asynch_timer && sim_is_running) {
         due_time.tv_sec = 0x7FFFFFFF;                   /* Sometime when 32 bit time_t wraps */
         due_time.tv_nsec = 0;
         }
-    clock_gettime(CLOCK_REALTIME, &start_time);
+    (void) sim_clock_gettime (CLOCK_REALTIME, &start_time);
     wait_usec = floor(1000000.0*(_timespec_to_double (&due_time) - _timespec_to_double (&start_time)));
     if (sim_wallclock_queue == QUEUE_LIST_END)
         sim_debug (DBG_TIM, &sim_timer_dev, "_timer_thread() - waiting forever\n");
@@ -2254,7 +2271,7 @@ while (sim_asynch_timer && sim_is_running) {
         sim_wallclock_queue = uptr->a_next;
         uptr->a_next = NULL;                            /* hygiene */
 
-        clock_gettime(CLOCK_REALTIME, &stop_time);
+        (void) sim_clock_gettime (CLOCK_REALTIME, &stop_time);
         if (1 != sim_timespec_compare (&due_time, &stop_time))
             inst_delay = 0;
         else
