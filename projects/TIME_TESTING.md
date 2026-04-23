@@ -28,6 +28,11 @@ In practice that means:
   - `mktime()`
   - `difftime()`
 
+For platforms that do not supply `localtime_r()` / `gmtime_r()`
+directly, the tree now provides compatibility shims in `src/compat/`,
+so callers can treat those interfaces as the standard broken-down-time
+API going forward.
+
 And replace direct calls to:
 
 - `time()`
