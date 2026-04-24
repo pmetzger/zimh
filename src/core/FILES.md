@@ -98,10 +98,6 @@ types, structures, flags, and macros used across the codebase.
 This header centralizes `printf`-style format strings for SIMH's shared
 types.
 
-## `sim_rev.h`
-
-This header owns revision and version metadata for the build.
-
 ## Placement Guidelines
 
 When deciding where new core code should go:

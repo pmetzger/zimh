@@ -100,8 +100,6 @@
 #ifndef SIM_DEFS_H_
 #define SIM_DEFS_H_    0
 
-#include "sim_rev.h"
-
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
