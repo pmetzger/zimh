@@ -257,7 +257,7 @@ while true; do
             shift
             ;;
         --cpack_suffix)
-            generateArgs="${generateArgs} -DSIMH_PACKAGE_SUFFIX=$2"
+            generateArgs="${generateArgs} -DZIMH_PACKAGE_SUFFIX=$2"
             shift 2
             ;;
         -p | --parallel)

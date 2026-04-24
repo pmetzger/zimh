@@ -28,13 +28,6 @@ if (CMAKE_VERSION VERSION_LESS "3.21" AND NOT DEFINED SIMH_INSTALLER_WARNING)
     set(SIMH_INSTALLER_WARNING TRUE CACHE BOOL "Installer/CPack warning issued when CMAKE_VERSION < 3.21" FORCE)
 endif ()
 
-## SIMH Version variables:
-set(SIMH_VERSION_MAJOR 4)
-set(SIMH_VERSION_MINOR 1)
-set(SIMH_VERSION_PATCH 0)
-set(SIMH_VERSION "${SIMH_VERSION_MAJOR}.${SIMH_VERSION_MINOR}.${SIMH_VERSION_PATCH}"
-    CACHE PATH "Open-Simh version string.")
-
 set(SIMH_CORE_ROOT ${CMAKE_SOURCE_DIR}/src/core)
 set(SIMH_COMPAT_ROOT ${CMAKE_SOURCE_DIR}/src/compat)
 set(SIMH_RUNTIME_ROOT ${CMAKE_SOURCE_DIR}/src/runtime)
@@ -43,6 +36,32 @@ set(SIMH_SIMULATOR_ROOT ${CMAKE_SOURCE_DIR}/simulators)
 set(SIMH_THIRD_PARTY_ROOT ${CMAKE_SOURCE_DIR}/third_party)
 set(SIMH_TOOLS_ROOT ${CMAKE_SOURCE_DIR}/tools)
 set(SIMH_DOCS_ROOT ${CMAKE_SOURCE_DIR}/docs)
+set(ZIMH_GENERATED_INCLUDE_DIR "${CMAKE_BINARY_DIR}/generated")
+
+## ZIMH Version variables:
+set(ZIMH_VERSION_MAJOR 2026)
+set(ZIMH_VERSION_MINOR 4)
+set(ZIMH_VERSION_PATCH 24)
+set(ZIMH_VERSION_TWEAK 0)
+math(EXPR ZIMH_VERSION_YEAR_VALUE "${ZIMH_VERSION_MAJOR} * 10000")
+math(EXPR ZIMH_VERSION_MONTH_VALUE "${ZIMH_VERSION_MINOR} * 100")
+math(EXPR ZIMH_VERSION_DATE_BASE
+     "${ZIMH_VERSION_YEAR_VALUE} + ${ZIMH_VERSION_MONTH_VALUE}")
+math(EXPR ZIMH_VERSION_DATE
+     "${ZIMH_VERSION_DATE_BASE} + ${ZIMH_VERSION_PATCH}")
+if (ZIMH_VERSION_TWEAK EQUAL 0)
+    set(ZIMH_VERSION
+        "${ZIMH_VERSION_MAJOR}.${ZIMH_VERSION_MINOR}.${ZIMH_VERSION_PATCH}")
+else ()
+    string(CONCAT ZIMH_VERSION
+           "${ZIMH_VERSION_MAJOR}.${ZIMH_VERSION_MINOR}."
+           "${ZIMH_VERSION_PATCH}.${ZIMH_VERSION_TWEAK}")
+endif ()
+file(MAKE_DIRECTORY "${ZIMH_GENERATED_INCLUDE_DIR}")
+configure_file(
+    "${CMAKE_SOURCE_DIR}/cmake/zimh_version.h.in"
+    "${ZIMH_GENERATED_INCLUDE_DIR}/zimh_version.h"
+    @ONLY)
 
 # Places to look for CMake modules/includes
 set(SIMH_INCLUDE_PATH_LIST
@@ -89,7 +108,7 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.15)
     cmake_policy(SET CMP0091 NEW)
 endif()
 
-project(simh VERSION "${SIMH_VERSION}" LANGUAGES C)
+project(zimh VERSION "${ZIMH_VERSION}" LANGUAGES C)
 
 include(vcpkg-setup)
 include(GNUInstallDirs)
@@ -228,8 +247,8 @@ option(DEBUG_WALL
 option(DEBUG_WARNINGS
        "Turn on additional strict compiler warnings in Debug builds."
        FALSE)
-option(SIMH_PACKAGE_SUFFIX
-       "The packaging suffix for CPack artifacts, e.g. simh-SIMH_VERSION-SIMH_PACKAGE_SUFFIX."
+option(ZIMH_PACKAGE_SUFFIX
+       "Packaging suffix for CPack artifacts."
        "")
 option(MAC_UNIVERSAL
        "macOS universal binary flag: TRUE -> build universal binaries, FALSE -> don't."

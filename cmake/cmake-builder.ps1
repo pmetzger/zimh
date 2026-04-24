@@ -90,7 +90,7 @@ param (
     [Parameter(Mandatory=$false)]
     [string] $config         = "Release",
 
-    ## Supply a suffix for CPack package names via -DSIMH_PACKAGE_SUFFIX
+    ## Supply a suffix for CPack package names via -DZIMH_PACKAGE_SUFFIX
     [Parameter(Mandatory=$false)]
     [string] $cpack_suffix = "",
 
@@ -445,7 +445,7 @@ if (($scriptPhases -contains "generate") -or ($scriptPhases -contains "build"))
     }
     if (![String]::IsNullOrEmpty($cpack_suffix))
     {
-        $generateArgs += @("-DSIMH_PACKAGE_SUFFIX:Bool=${cpack_suffix}")
+        $generateArgs += @("-DZIMH_PACKAGE_SUFFIX:STRING=${cpack_suffix}")
     }
 
     $buildArgs     =  @("--build", "${buildDir}", "--config", "${config}")

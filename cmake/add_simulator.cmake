@@ -2,36 +2,6 @@
 
 include (CTest)
 
-## TODO: Revisit or remove build-time Git provenance generation.
-## Temporarily disable it because builds should not assume they can run
-## Git commands or write to the Git index while compiling.
-set(SIMH_ENABLE_BUILD_GIT_PROVENANCE FALSE)
-
-## Regenerate the git commit ID if git exists.
-find_program(GIT_COMMAND git)
-if (GIT_COMMAND AND SIMH_ENABLE_BUILD_GIT_PROVENANCE)
-    message(STATUS "Git command is ${GIT_COMMAND}")
-else ()
-    message(STATUS "Build-time git provenance generation disabled")
-endif ()
-
-set(SIMH_GENERATED_INCLUDE_DIR "${CMAKE_BINARY_DIR}/generated")
-
-if (GIT_COMMAND AND SIMH_ENABLE_BUILD_GIT_PROVENANCE)
-    add_custom_target(update_sim_commit ALL
-        COMMAND ${CMAKE_COMMAND}
-            -D GIT_COMMIT_DEST=${SIMH_GENERATED_INCLUDE_DIR}
-            -P ${CMAKE_SOURCE_DIR}/cmake/git-commit-id.cmake
-        BYPRODUCTS
-            ${SIMH_GENERATED_INCLUDE_DIR}/git-commit-id.txt
-            ${SIMH_GENERATED_INCLUDE_DIR}/git-commit-id.h
-        WORKING_DIRECTORY
-            ${CMAKE_SOURCE_DIR}
-    )
-else ()
-    add_custom_target(update_sim_commit)
-endif ()
-
 ## Simulator sources and library:
 set(SIM_SOURCES
     ${SIMH_CORE_ROOT}/scp.c
@@ -99,7 +69,7 @@ function(build_simcore _targ)
             "${SIMH_CORE_ROOT}"
             "${SIMH_RUNTIME_ROOT}"
             "${SIMH_COMPONENTS_ROOT}"
-            "${SIMH_GENERATED_INCLUDE_DIR}")
+            "${ZIMH_GENERATED_INCLUDE_DIR}")
 
         if (SIMH_INT64)
             target_compile_definitions(${lib} PUBLIC USE_INT64)
@@ -138,13 +108,6 @@ function(build_simcore _targ)
             thread_lib
         )
 
-        # Ensure that sim_rev.h picks up git-commit-id.h if the git command is
-        # available.
-        if (GIT_COMMAND AND SIMH_ENABLE_BUILD_GIT_PROVENANCE)
-            target_compile_definitions("${lib}" PRIVATE SIM_NEED_GIT_COMMIT_ID)
-        endif ()
-
-        add_dependencies(${lib} update_sim_commit)
     endforeach ()
 
     target_compile_definitions(${sim_aio_lib} PUBLIC ${AIO_FLAGS})

@@ -28,8 +28,8 @@ set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME "runtime_support")
 # how to assemble it into a package file.
 set(CPACK_PACKAGE_VENDOR "The Open-SIMH project")
 
-if (SIMH_PACKAGE_SUFFIX)
-    set(buildSuffix "${SIMH_PACKAGE_SUFFIX}")
+if (ZIMH_PACKAGE_SUFFIX)
+    set(buildSuffix "${ZIMH_PACKAGE_SUFFIX}")
 else ()
     set(buildSuffix "")
     if (WIN32)
@@ -59,7 +59,8 @@ else ()
 
     list(JOIN buildSuffix "-" buildSuffix)
 
-    message(STATUS "No SIMH_PACKAGE_SUFFIX supplied, default is ${buildSuffix}.")
+    message(STATUS
+        "No ZIMH_PACKAGE_SUFFIX supplied, default is ${buildSuffix}.")
 endif ()
 
 string(JOIN "-" CPACK_PACKAGE_FILE_NAME
@@ -71,8 +72,8 @@ string(JOIN "-" CPACK_PACKAGE_FILE_NAME
 message(STATUS "CPack output file name: ${CPACK_PACKAGE_FILE_NAME}")
 unset(buildSuffix)
 
-## When applicable (e.g., NSIS Windows), install under the SIMH-x.y directory:
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "SIMH-${SIMH_VERSION_MAJOR}.${SIMH_VERSION_MINOR}")
+## Install under the ZIMH versioned directory when CPack supports it:
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "ZIMH-${ZIMH_VERSION}")
 ## License file:
 set(CPACK_RESOURCE_FILE_LICENSE ${CMAKE_SOURCE_DIR}/LICENSE.txt)
 

@@ -14,6 +14,7 @@
 #include "sim_dynstr.h"
 #include "test_simh_personality.h"
 #include "test_support.h"
+#include "zimh_version.h"
 
 static const char simh_test_prog_name[] = "/test/bin/simh-unit-scp-cmdvars";
 static int simh_test_uname_probe_calls = 0;
@@ -847,6 +848,28 @@ static void test_show_version_keeps_only_sim_ostype(void **state)
     expand_command("A%SIM_ARCHIVE_GIT_COMMIT_TIME%B", expanded,
                    sizeof(expanded));
     assert_string_equal(expanded, "AB");
+}
+
+/* Verify show_version renders the public ZIMH version banner contract. */
+static void test_show_version_prints_zimh_banner(void **state)
+{
+    char actual[CBUFSIZE];
+    char expected[CBUFSIZE];
+    FILE *stream;
+
+    (void)state;
+
+    stream = tmpfile();
+    assert_non_null(stream);
+
+    assert_int_equal(show_version(stream, NULL, NULL, 0, NULL), SCPE_OK);
+    rewind(stream);
+    assert_non_null(fgets(actual, sizeof(actual), stream));
+    fclose(stream);
+
+    snprintf(expected, sizeof(expected), "%s simulator ZIMH %s\n", sim_name,
+             ZIMH_VERSION);
+    assert_string_equal(actual, expected);
 }
 
 /* Verify SIM_OSTYPE cleanly reports no value when uname probing fails. */
@@ -1802,6 +1825,9 @@ int main(void)
             test_sim_sub_args_expands_sim_identity_variables,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(test_show_version_keeps_only_sim_ostype,
+                                        setup_scp_cmdvars_fixture,
+                                        teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(test_show_version_prints_zimh_banner,
                                         setup_scp_cmdvars_fixture,
                                         teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(

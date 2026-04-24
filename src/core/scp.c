@@ -208,7 +208,6 @@
 #include "sim_defs.h"
 #include "scp_cmdvars.h"
 #include "scp_pcre2.h"
-#include "sim_rev.h"
 #include "sim_disk.h"
 #include "sim_tape.h"
 #include "sim_ether.h"
@@ -217,6 +216,7 @@
 #include "sim_video.h"
 #include "sim_sock.h"
 #include "sim_frontpanel.h"
+#include "zimh_version.h"
 #include <signal.h>
 #include <ctype.h>
 #include <time.h>
@@ -234,9 +234,6 @@
 #include <editline/readline.h>
 #endif
 
-#if defined(SIM_NEED_GIT_COMMIT_ID)
-#include "git-commit-id.h"
-#endif
 /* search logical and boolean ops */
 
 #define SCH_OR          0                               /* search logicals */
@@ -5089,8 +5086,6 @@ void sim_fprint_regex_support (FILE *st)
 
 t_stat show_version (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
 {
-int32 vmaj = SIM_MAJOR, vmin = SIM_MINOR, vpat = SIM_PATCH, vdelt = SIM_DELTA;
-char vdelt_s[12];
 const char *build = "";
 const char *arch = "";
 
@@ -5098,25 +5093,10 @@ const char *arch = "";
 #define S_str(a) #a
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
-fprintf (st, "%s simulator Open SIMH V%d.%d-%d", sim_name, vmaj, vmin, vpat);
+fprintf (st, "%s simulator ZIMH %s", sim_name, ZIMH_VERSION);
 if (sim_vm_release != NULL) {                           /* if a release string is defined */
     fprintf (st, " Release %s", sim_vm_release);        /*   then display it */
     }
-if (vdelt) {
-    sprintf (vdelt_s, "%d", vdelt);
-    fprintf (st, " delta %d", vdelt);
-    }
-#if defined (SIM_VERSION_MODE)
-if (1) {
-    char mode[] = S_xstr(SIM_VERSION_MODE);
-
-    if (NULL != strchr (mode, '\"')) {              /* Quoted String? */
-        mode[strlen (mode) - 1] = '\0';             /* strip quotes */
-        memmove (mode, mode + 1, strlen (mode));
-        }
-    fprintf (st, " %s", mode);
-    }
-#endif
 if (flag) {
     t_bool idle_capable;
     uint32 os_ms_sleep_1, os_tick_size;
@@ -5320,30 +5300,6 @@ if (flag) {
     if ((!strcmp (os_type, "Unknown")) && (getenv ("OSTYPE")))
         strlcpy (os_type, getenv ("OSTYPE"), sizeof (os_type));
     }
-#if defined(SIM_ARCHIVE_GIT_COMMIT_ID)
-if (NULL == strchr (S_xstr(SIM_ARCHIVE_GIT_COMMIT_ID), '$')) {
-    const char *extras = strchr (S_xstr(SIM_ARCHIVE_GIT_COMMIT_ID), '+');
-
-    fprintf (st, "%ssimh git commit id: %8.8s%s", flag ? "\n        " : "        ", S_xstr(SIM_ARCHIVE_GIT_COMMIT_ID), extras ? extras : "");
-    }
-#if defined(SIM_ARCHIVE_GIT_COMMIT_TIME)
-if (NULL == strchr (S_xstr(SIM_ARCHIVE_GIT_COMMIT_TIME), '$')) {
-    if (flag)
-        fprintf (st, "%ssimh git commit time: %s", "\n        ", S_xstr(SIM_ARCHIVE_GIT_COMMIT_TIME));
-    }
-#endif
-#endif
-#if defined(SIM_GIT_COMMIT_ID)
-if (1) {
-    const char *extras = strchr (S_xstr(SIM_GIT_COMMIT_ID), '+');
-
-    fprintf (st, "%sgit commit id: %8.8s%s", flag ? "\n        " : "        ", S_xstr(SIM_GIT_COMMIT_ID), extras ? extras : "");
-    }
-#if defined(SIM_GIT_COMMIT_TIME)
-if (flag)
-    fprintf (st, "%sgit commit time: %s", "\n        ", S_xstr(SIM_GIT_COMMIT_TIME));
-#endif
-#endif
 #if defined(SIM_BUILD)
 fprintf (st, "%sBuild: %s", flag ? "\n        " : "        ", S_xstr(SIM_BUILD));
 #endif
@@ -6819,15 +6775,7 @@ fprintf (sfile, "%s\n%s\n%s\n%s\n%s\n%.0f\n",
     sim_si64, sim_sa64, eth_capabilities(),             /* [V3.5] options */
     sim_vm_time);                                       /* [V3.2] sim time */
 WRITE_I (sim_rtime);                                    /* [V2.6] sim rel time */
-#if defined(SIM_GIT_COMMIT_ID)
-#define S_xstr(a) S_str(a)
-#define S_str(a) #a
-fprintf (sfile, "git commit id: %8.8s\n", S_xstr(SIM_GIT_COMMIT_ID));
-#undef S_str
-#undef S_xstr
-#else
-fprintf (sfile, "git commit id: unknown\n");
-#endif
+fprintf (sfile, "zimh version: %s\n", ZIMH_VERSION);
 
 for (device_count = 0; sim_devices[device_count]; device_count++);/* count devices */
 for (i = 0; i < (device_count + sim_internal_device_count); i++) {/* loop thru devices */
@@ -7043,20 +6991,8 @@ if (v32) {                                              /* [V3.2+] time as strin
     }
 else READ_I (sim_vm_time);                              /* sim time */
 READ_I (sim_rtime);                                     /* [V2.6+] sim rel time */
-if (v40) {
-    READ_S (buf);                                       /* read git commit id */
-#if defined(SIM_GIT_COMMIT_ID)
-#define S_xstr(a) S_str(a)
-#define S_str(a) #a
-    if ((memcmp (buf, "git commit id: " S_xstr(SIM_GIT_COMMIT_ID), 23)) &&
-        (!sim_quiet) && (!suppress_warning)) {
-        sim_printf ("warning - different simulator git versions.\nSaved commit id: %8.8s, Running commit id: %8.8s\n", buf + 15, S_xstr(SIM_GIT_COMMIT_ID));
-        warned = TRUE;
-        }
-#undef S_str
-#undef S_xstr
-#endif
-    }
+if (v40)
+    READ_S (buf);                                       /* read saved version */
 if (!dont_detach_attach)
     detach_all (0, 0);                                  /* Detach everything to start from a consistent state */
 else {
