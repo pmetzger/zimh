@@ -40,13 +40,20 @@ have changed the name of the project to ZIMH.
 This project is made available under an X11 style license; see
 [LICENSE.txt](LICENSE.txt) for details.
 
-A detailed listing of features in the inherited code base as of 12 May
-2022 may be found in [SIMH-V4-status](docs/history/SIMH-V4-status.md);
-however, it is likely that the code will not resemble SIMH much in the
-near future.
-
 For a current catalog of the simulator targets in this tree, see
 [docs/manual/simulators.md](docs/manual/simulators.md).
+
+# Version Numbers
+
+ZIMH uses calendar versioning.
+
+Release versions have the form YYYY.M.D, for example 2026.4.24.
+
+If more than one release is made on the same day (not very often), an
+additional numeric component is appended, for example 2026.4.24.1.
+
+The version number indicates release date, not API compatibility.
+Compatibility-affecting changes are documented in the release notes.
 
 ## Repository Layout
 
