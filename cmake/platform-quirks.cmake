@@ -138,6 +138,9 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES ".*Clang")
         "$<$<CONFIG:Debug>:$<$<OR:$<BOOL:${DEBUG_WALL}>,$<BOOL:${DEBUG_WARNINGS}>>:-Wall>>"
         "$<$<CONFIG:Release>:-Wall>"
         "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wextra>>"
+        # Keep this warning disabled for now; legacy aggregate
+        # initializers produce too much noise during warning sweeps.
+        "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wno-missing-field-initializers>>"
         "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wformat=2>>"
         "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wundef>>"
         "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wimplicit-fallthrough>>"
