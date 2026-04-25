@@ -36,7 +36,7 @@
 #include "3b2_csr.h"
 
 /* Static function declarations */
-static SIM_INLINE uint32 if_lba();
+static SIM_INLINE uint32 if_lba(void);
 
 /*
  * Disk Format:
@@ -250,7 +250,7 @@ uint32 if_read(uint32 pa, size_t size) {
 }
 
 /* Handle the most recently received command */
-void if_handle_command()
+void if_handle_command(void)
 {
     uint32 delay_ms = 0;
     uint32 head_switch_delay = 0;
@@ -629,7 +629,7 @@ t_stat if_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 /*
  * Compute the offset of the currently selected C/H/S (in # of sectors)
  */
-static SIM_INLINE uint32 if_lba()
+static SIM_INLINE uint32 if_lba(void)
 {
     /* Reminder that sectors are numbered 1-9 instead
      * of being numbered 0-8 */
@@ -638,7 +638,7 @@ static SIM_INLINE uint32 if_lba()
            (if_state.sector - 1));
 }
 
-void if_after_dma()
+void if_after_dma(void)
 {
     if_state.drq = FALSE;
     if_state.status &= ~IF_DRQ;

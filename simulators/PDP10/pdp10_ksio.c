@@ -1527,7 +1527,7 @@ sim_debug (DBG_DMA_NXM, &uba_dev, "%s Error at address=%7o, ba=%o, bc=%o\n", msg
 
 /* Evaluate Unibus priority interrupts */
 
-int32 pi_ub_eval ()
+int32 pi_ub_eval (void)
 {
 int32 i, lvl;
 

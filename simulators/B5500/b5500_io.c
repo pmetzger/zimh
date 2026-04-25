@@ -117,7 +117,7 @@ chan_boot(t_uint64 desc)
 }
 
 int 
-find_chan() {
+find_chan(void) {
      int                i;
      int                chan;
     
@@ -168,7 +168,7 @@ chan_advance(int chan) {
 }
 
 void
-start_io() {
+start_io(void) {
      int                i;
      int                chan;
      t_stat             r;

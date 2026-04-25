@@ -383,7 +383,7 @@ uint32  chan_next_addr(int chan) {
 
 /* Execute the next channel instruction. */
 void
-chan_proc()
+chan_proc(void)
 {
     int                 chan;
     int                 cmask;
@@ -978,7 +978,7 @@ chan_cmd(uint16 dev, uint16 dcmd, uint32 addr)
  * Process the CHR 3 13 command and abort all channel activity
  */
 void
-chan_chr_13()
+chan_chr_13(void)
 {
     int                 chan;
 

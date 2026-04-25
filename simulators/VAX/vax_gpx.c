@@ -1365,7 +1365,7 @@ switch (adp_opc) {                                      /* address processor opc
 sim_debug (DBG_ROP, gpx_dev, "Scroll Command: Unknown(%02X)\n", cmd);
 }
 
-void va_scroll ()
+void va_scroll (void)
 {
 uint32 x_min, x_max, y_min, y_max, x_lim;
 uint32 src, dest;
@@ -1552,7 +1552,7 @@ else {                                                  /* up, left or right */
 va_adp[ADP_PYSC] = 0;
 }
 
-void va_adp_setup ()
+void va_adp_setup (void)
 {
 int32 sx, sy;
 uint32 pix;
@@ -1635,7 +1635,7 @@ if ((va_adp[ADP_CMD1] & 0x400) && (va_adp[ADP_MDE] & 0x80)) /* dest enabled, pen
 sim_debug (DBG_ROP, gpx_dev, "\n");
 }
 
-void va_fill_setup ()
+void va_fill_setup (void)
 {
 int32 sx, sy;
 uint32 pix;

@@ -227,7 +227,7 @@ int ch_test_int (void)
   }
 }
 
-t_stat ch_transmit ()
+t_stat ch_transmit (void)
 {
   size_t len;
   t_stat r;

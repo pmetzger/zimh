@@ -518,7 +518,7 @@ void set_via_ICW(t_uint64 word) {
 }
 
 /* Make sure that B is empty */
-void B_empty() {
+void B_empty(void) {
     if (BROF) {
         next_addr(S);
         if (NCSF && (S & 077700) == R) {
@@ -531,7 +531,7 @@ void B_empty() {
 }
 
 /* Make sure A is empty, push to B if not */
-void A_empty() {
+void A_empty(void) {
     if (AROF) {
         B_empty();
         B = A;
@@ -541,7 +541,7 @@ void A_empty() {
 }
 
 /* Make sure both A and B are empty */
-void AB_empty() {
+void AB_empty(void) {
     B_empty();
     if (AROF) {
         next_addr(S);
@@ -555,7 +555,7 @@ void AB_empty() {
 }
 
 /* Make sure that A is valid, copy from B or memory */
-void A_valid() {
+void A_valid(void) {
     if (!AROF) {
         if (BROF) {             /* Transfer B to A */
             A = B;
@@ -573,7 +573,7 @@ void A_valid() {
 }
 
 /* Make sure both A and B are valid */
-void AB_valid() {
+void AB_valid(void) {
     A_valid();
     if (!BROF) {
         if (NCSF && (S & 077700) == R) {
@@ -586,7 +586,7 @@ void AB_valid() {
 }
 
 /* Make sure A is empty and B is valid */
-void B_valid() {
+void B_valid(void) {
     A_empty();
     if (!BROF) {
         if (NCSF && (S & 077700) == R) {
@@ -599,7 +599,7 @@ void B_valid() {
 }
 
 /* Make sure B is valid, don't care about A */
-void B_valid_and_A() {
+void B_valid_and_A(void) {
     if (!BROF) {
         if (NCSF && (S & 077700) == R) {
             Q |= STK_OVERFL; /* Stack fault */
@@ -611,7 +611,7 @@ void B_valid_and_A() {
 }
 
 /* Saves the top word on the stack into MA */
-void save_tos() {
+void save_tos(void) {
     if (AROF) {
         memory_cycle(014);      /* Store A in Ma */
         AROF = 0;
@@ -666,7 +666,7 @@ void enterSubr(int flag) {
 }
 
 /* Make B register into an integer, return 1 if failed */
-int mkint() {
+int mkint(void) {
         int     exp_b;
         int     last_digit;
         int     f = 0;
@@ -709,7 +709,7 @@ int mkint() {
 }
 
 /* Compute an index word return true if failed. */
-int indexWord() {
+int indexWord(void) {
     if (A & WCOUNT) {
         B_valid_and_A();
         if (mkint()) {
@@ -741,7 +741,7 @@ int indexWord() {
 /* Character mode helper routines */
 
 /* Adjust source bit pointers to point to char */
-void adjust_source() {
+void adjust_source(void) {
     if (GH & 07) {
         GH &= 070;
         GH += 010;
@@ -754,7 +754,7 @@ void adjust_source() {
 }
 
 /* Adjust destination bit pointers to point to char */
-void adjust_dest() {
+void adjust_dest(void) {
     if (KV & 07) {
         KV &= 070;
         KV += 010;
@@ -816,7 +816,7 @@ void prev_dest(int bit) {
 }
 
 /* Make sure destination have valid data */
-void fill_dest() {
+void fill_dest(void) {
     if (BROF == 0) {
        memory_cycle(3);
        BROF = 1;
@@ -865,7 +865,7 @@ void prev_src(int bit) {
 }
 
 /* Make sure source has valid data */
-void fill_src() {
+void fill_src(void) {
     if (AROF == 0) {
        memory_cycle(4);
        AROF = 1;
@@ -876,7 +876,7 @@ void fill_src() {
 /* Helper routines for managing processor */
 
 /* Fetch next program sylable */
-void next_prog() {
+void next_prog(void) {
     if (!PROF)
         memory_cycle(020);
     T = (P >> ((3 - L) * 12)) & 07777;
@@ -889,7 +889,7 @@ void next_prog() {
 }
 
 /* Initiate a processor, A must contain the ICW */
-void initiate() {
+void initiate(void) {
     int brflg, arflg, temp;
 
     set_via_INCW(A);    /* Set up Stack */
@@ -1023,7 +1023,7 @@ void storeInterrupt(int forced, int test) {
 
 */
 
-int check_idle() {
+int check_idle(void) {
     static uint16  loop_data[7] = {
           WMOP_TUS, WMOP_OPDC, WMOP_LOR, WMOP_OPDC,
           WMOP_NEQ, WMOP_LITC, WMOP_BBC };
@@ -1069,7 +1069,7 @@ int check_idle() {
         return 2 if B > A
         return 4 if B < A
 */
-uint8   compare() {
+uint8   compare(void) {
     int         sign_a, sign_b;
     int         exp_a, exp_b;
     t_uint64    ma, mb;
@@ -1294,7 +1294,7 @@ void mult_step(t_uint64 a, t_uint64 *b, t_uint64 *x) {
 }
 
 /* Do multiply instruction */
-void multiply() {
+void multiply(void) {
     int         exp_a, exp_b;
     int         f;
     int         int_f;
@@ -1672,7 +1672,7 @@ void double_add(int opcode) {
 /* Double precision multiply.
    A & Y (not in real B5500) have operand 1.
    B & X have operand 2 */
-void double_mult() {
+void double_mult(void) {
     int         exp_a, exp_b;
     int         f;
     int         ld;
@@ -1789,7 +1789,7 @@ void double_mult() {
 /* Double precision divide.
    A & Y (not in real B5500) have operand 1.
    B & X have operand 2 */
-void double_divide() {
+void double_divide(void) {
     int exp_a, exp_b;
     int f;
     int         n;

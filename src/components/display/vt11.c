@@ -1119,7 +1119,7 @@ vt11_reset(void *dev, int debug)
 /* VS60 display subroutine support (see stack layout for SDR, above) */
 
 static void
-push()
+push(void)
 {
     stack_over = STACK_FULL;            /* BOS? */
     if (!stack_over) {

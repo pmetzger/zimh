@@ -44,7 +44,7 @@ IOWRITE iowriters[IOSIZE];
  * a unit will register its own I/O addresses together with its handler 
  * in a hash which allows simple lookup of memory mapped I/O addresses
  */
-t_stat pdq3_ioinit() {
+t_stat pdq3_ioinit(void) {
   int i;
   if (!initio) {
     for (i=0; i < IOSIZE; i++) {

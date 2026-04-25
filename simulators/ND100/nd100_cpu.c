@@ -1596,7 +1596,7 @@ nd_tra(int reg)
 }
 
 int
-highest_level()
+highest_level(void)
 {
         int i, d = pid & pie;
 

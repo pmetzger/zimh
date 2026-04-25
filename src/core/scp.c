@@ -11525,7 +11525,7 @@ sim_set_deb_switches (start_deb_switches);
 return r;
 }
 
-static t_stat test_scp_debug_logging()
+static t_stat test_scp_debug_logging (void)
 {
 uint32 saved_scp_dev_dbits = sim_scp_dev.dctrl;
 FILE *saved_sim_deb = sim_deb;

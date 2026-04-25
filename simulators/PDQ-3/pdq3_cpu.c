@@ -57,9 +57,9 @@ t_stat cpu_show_size (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 /* some forwards */
 static t_stat Raise(uint16 err);
-static uint16 Pop();
+static uint16 Pop(void);
 static void Push(uint16 val);
-static int16 PopS();
+static int16 PopS(void);
 static void PushS(int16 val);
 static uint16 createMSCW(uint16 ptbl, uint8 procno, uint16 stat, uint8 segno, uint16 osegb);
 static uint16 enque(uint16 qhead, uint16 qtask); /* return new qhead */
@@ -198,7 +198,7 @@ DEVICE cpu_dev = {
 };
 
 /* return start address of proctbl of current code segment */
-static uint16 GetPtbl() {
+static uint16 GetPtbl(void) {
   uint16 ptbl;
   Read(reg_segb, 0, &ptbl, DBG_NONE);
   return reg_segb + ptbl;
@@ -215,7 +215,7 @@ static uint16 GetSegbase(uint8 segno) {
 /* get segment# from code segment:
  * this is the first byte of the proctbl at the end of the code segment 
  *(the second byte is the proc count) */
-static uint8 GetSegno() {
+static uint8 GetSegno(void) {
   uint16 data;
   uint16 ptbl = GetPtbl();
   ReadB(ptbl, 0, &data, DBG_NONE); /* get first byte from proctbl */
@@ -240,7 +240,7 @@ static void AdjustRefCount(uint8 segno, int incr) {
 }
 
 /* save CPU regs into TIB */
-static void save_to_tib() {
+static void save_to_tib(void) {
   Write(reg_ctp, OFF_SP, reg_sp, DBG_NONE);
   Write(reg_ctp, OFF_MP, reg_mp, DBG_NONE);
   Write(reg_ctp, OFF_BP, reg_bp, DBG_NONE);
@@ -249,7 +249,7 @@ static void save_to_tib() {
 }
 
 /* restore CPU regs from TIB */
-static void restore_from_tib() {
+static void restore_from_tib(void) {
   Read(reg_ctp, OFF_SP, &reg_sp, DBG_NONE);
   Read(reg_ctp, OFF_SPLOW, &reg_splow, DBG_NONE);
   Read(reg_ctp, OFF_SPUPR, &reg_spupr, DBG_NONE);
@@ -329,7 +329,7 @@ t_stat cpu_boot(int32 unitnum, DEVICE *dptr) {
   return SCPE_OK;
 }
 
-void cpu_finishAutoload() {
+void cpu_finishAutoload(void) {
   uint16 ssv, rq, sbase;
   uint16 ctp = reg_dmabase;
   Read(ctp, OFF_SIBS, &ssv, DBG_NONE);
@@ -405,7 +405,7 @@ t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
   return SCPE_OK;
 }
 
-t_stat cpu_buserror() {
+t_stat cpu_buserror(void) {
   reg_ssr |= SSR_BERR;
   return cpu_raiseInt(INT_BERR);
 }
@@ -482,7 +482,7 @@ static uint16 int_vectors[32] = {
   NIL
 };
 
-t_bool cpu_isIntEnabled() {
+t_bool cpu_isIntEnabled(void) {
   return reg_ssr & SSR_INTEN;
 }
 
@@ -526,7 +526,7 @@ t_stat cpu_setIntVec(uint16 vec, int level) {
   return SCPE_OK;
 }
 
-static int getIntLevel() {
+static int getIntLevel(void) {
   int i;
   uint32 bit = 1;
   for (i=0; i<31; i++) {
@@ -536,7 +536,7 @@ static int getIntLevel() {
   return -1;
 }
 
-static t_stat cpu_processInt() {
+static t_stat cpu_processInt(void) {
   int level = getIntLevel(); /* obtain highest pending interupt */
   uint16 vector, sem;
   t_stat rc;
@@ -563,12 +563,12 @@ static t_stat cpu_processInt() {
  * instruction interpreter
  ************************************************************************************/
 
-static uint8 UB() {
+static uint8 UB(void) {
   uint16 val;
   ReadB(reg_segb, reg_ipc++, &val, DBG_CPU_FETCH);
   return val & 0xff;
 }
-static uint16 W() {
+static uint16 W(void) {
   uint16 high, data;
   if (ReadB(reg_segb, reg_ipc++, &data, DBG_CPU_FETCH) != SCPE_OK)
     return data;
@@ -577,16 +577,16 @@ static uint16 W() {
   data |= (high << 8);
   return data;
 }
-static uint16 DB() {
+static uint16 DB(void) {
   return UB();
 }
-static uint16 SB() {
+static uint16 SB(void) {
   uint16 data;
   ReadB(reg_segb, reg_ipc++, &data, DBG_CPU_FETCH);
   if (data & 0x80) data |= 0xff80;
   return data;
 }
-static uint16 B() {
+static uint16 B(void) {
   uint16 high, data;
   if (ReadB(reg_segb, reg_ipc++, &high, DBG_CPU_FETCH) != SCPE_OK)
     return high;
@@ -624,7 +624,7 @@ static uint16 TraverseMSstat(uint16 db) {
   return lm;
 }
 
-static uint16 Tos() {
+static uint16 Tos(void) {
   uint16 val;
   if (reg_sp >= reg_spupr) { Raise(PASERROR_STKOVFL); return 0; }
   Read(0,reg_sp,&val, DBG_CPU_PICK);
@@ -638,7 +638,7 @@ static uint16 Pick(int i) {
   return val;
 }
 
-static uint16 Pop() {
+static uint16 Pop(void) {
   uint16 val;
   if ((reg_sp+1) > reg_spupr) { Raise(PASERROR_STKOVFL); return 0; }
   Read(0,reg_sp++,&val, DBG_CPU_POP);
@@ -651,7 +651,7 @@ static void Push(uint16 val) {
     Write(0,--reg_sp,val,DBG_CPU_PUSH);
 }
 
-static int16 PopS() {
+static int16 PopS(void) {
   return (int16)Pop();
 }
 
@@ -659,7 +659,7 @@ static void PushS(int16 val) {
   Push((uint16)val);
 }
 
-static float PopF() {
+static float PopF(void) {
   T_FLCVT t;
   t.i[1] = Pop();
   t.i[0] = Pop();
@@ -785,7 +785,7 @@ static uint16 enque(uint16 qhead, uint16 qtask) {
 }
 
 /* perform a task switch. If no task ready to run, wait for an interrupt */
-static t_stat taskswitch6() {
+static t_stat taskswitch6(void) {
   uint16 vector, sem;
   int level, kbdc;
   t_stat rc = SCPE_OK;
@@ -823,7 +823,7 @@ static t_stat taskswitch6() {
   return rc;
 }
 
-static t_stat taskswitch5() {
+static t_stat taskswitch5(void) {
   t_stat rc;
   sim_debug(DBG_CPU_CONC2, &cpu_dev, DBG_PCFORMAT0 "Taskswitch5: reg_rq=$%04x\n",DBG_PC, reg_rq);
   save_to_tib(); /* save current context into ctp */

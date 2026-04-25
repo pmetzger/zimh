@@ -1277,7 +1277,7 @@ static int     (*p_pcap_setfilter) (pcap_t *, struct bpf_program *);
 static int     (*p_pcap_setnonblock)(pcap_t* a, int nonblock, char *errbuf);
 
 /* load function pointer from DLL */
-typedef int (*_func)();
+typedef int (*_func)(void);
 
 static void load_function(const char* function, _func* func_ptr) {
 #ifdef _WIN32
@@ -2593,7 +2593,7 @@ sim_slirp_attach_help (st, dptr, uptr, flag, cptr);
 return SCPE_OK;
 }
 
-static int _eth_rand_byte()
+static int _eth_rand_byte (void)
 {
 static int rand_initialized = 0;
 

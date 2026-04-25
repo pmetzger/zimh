@@ -280,7 +280,7 @@ t_stat              com_send_ccmp(uint32 ln);
 void                com_skip_outc(uint32 ln);
 t_bool              com_get(int ln, uint16 *ch);
 t_bool              com_put(int ln, uint16 ch);
-void                com_post_eom();
+void                com_post_eom(void);
 t_bool              com_inp_msg(uint32 ln, uint16 msg);
 const char          *com_description(DEVICE *dptr);
 t_stat              com_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
@@ -1087,7 +1087,7 @@ com_put(int ln, uint16 ch)
 
 /* Put EOM on input queue and post interupt to wake up CPU */
 void
-com_post_eom()
+com_post_eom(void)
 {
      int          ent;
      int          chan = UNIT_G_CHAN(com_unit[0].flags);

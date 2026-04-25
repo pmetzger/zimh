@@ -145,7 +145,7 @@ static void cpu_ndxp(int flag)
     P = X(P + 1);
 }
 
-static void cpu_ndxc()
+static void cpu_ndxc(void)
 {
   C = (C & ~BMASK) | ((C + 1) & BMASK);
 }
@@ -160,12 +160,12 @@ static void cpu_set_B(uint16 data)
   B = data & WMASK;
 }
 
-static void cpu_4ndxb()
+static void cpu_4ndxb(void)
 {
   cpu_set_B(B + 4);
 }
 
-static void cpu_4ndxa()
+static void cpu_4ndxa(void)
 {
   A = (A + 4) & WMASK;
 }
@@ -191,7 +191,7 @@ static void cpu_mem_write(void)
   cpu_mem_modify();
 }
 
-static void cpu_insn_addr()
+static void cpu_insn_addr(void)
 {
   if (!DO) {
     cpu_set_S(P);
@@ -199,13 +199,13 @@ static void cpu_insn_addr()
   }
 }
 
-static void cpu_insn_read()
+static void cpu_insn_read(void)
 {
   if (!DO)
     cpu_mem_read();
 }
 
-static void cpu_fetch()
+static void cpu_fetch(void)
 {
   cpu_insn_addr();
   cpu_insn_read();

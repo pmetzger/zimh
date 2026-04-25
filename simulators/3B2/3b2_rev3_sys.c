@@ -65,7 +65,7 @@ DEVICE *sim_devices[] = {
     NULL
 };
 
-void full_reset()
+void full_reset(void)
 {
     cpu_reset(&cpu_dev);
     mau_reset(&mau_dev);

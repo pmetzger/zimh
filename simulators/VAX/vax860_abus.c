@@ -200,7 +200,7 @@ The logic here fills as many slots as possible with memory boards to describe
 the total system memory size.
 */
 
-void init_pamm()
+void init_pamm(void)
 {
 int32 addr = 0;
 int32 mem = (int32)(MEMSIZE >> 20);

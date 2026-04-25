@@ -166,7 +166,7 @@ t_stat fdc_attach(UNIT *uptr, CONST char *cptr);
 t_stat fdc_detach(UNIT *uptr);
 t_stat pdq3_diskCreate(FILE *fileref, const char *ctlr_comment);
 t_stat pdq3_diskFormat(DISK_INFO *myDisk);
-static void dma_reqinterrupt();
+static void dma_reqinterrupt(void);
 
 /* data structures */
 typedef struct _drvdata {
@@ -408,7 +408,7 @@ static t_bool fdc_stepout(DRVDATA *curdrv, t_bool upd) {
    return fdc_istrk0(curdrv, reg_fdc_track);
 }
 
-static void fdc_clr_st1_error() {
+static void fdc_clr_st1_error(void) {
   clrbit(reg_fdc_status,FDC_ST1_NOTREADY|FDC_ST1_SEEKERROR|FDC_ST1_CRCERROR);
 }
 
@@ -436,7 +436,7 @@ static t_bool dma_abort(t_bool fromfinish) {
 }
 
 /* all data transferred */
-static void dma_finish() {
+static void dma_finish(void) {
   setbit(reg_dma_status,DMA_ST_TCZI);
   dma_abort(TRUE);
   dma_interrupt(DMA_CTRL_TCIE);
@@ -444,12 +444,12 @@ static void dma_finish() {
 }
 
 /* request interrupt from FDC */
-static void dma_reqinterrupt() {
+static void dma_reqinterrupt(void) {
   setbit(reg_dma_status,DMA_ST_DINT);
   dma_interrupt(DMA_CTRL_DIE);
 }
 
-static void dma_fix_regs() {
+static void dma_fix_regs(void) {
   reg_dma_cntl = _reg_dma_cnt & 0xff;
   reg_dma_cnth = _reg_dma_cnt>>8;
   reg_dma_addre = (_reg_dma_addr>>16) & 0x03;
@@ -628,7 +628,7 @@ static t_bool fdc_writesec(DRVDATA *curdrv) {
   return TRUE;
 }
 
-static t_bool fdc_rwerror() {
+static t_bool fdc_rwerror(void) {
  /* note: LOSTDATA cannot occur */
  return isbitset(reg_fdc_status,FDC_ST2_TYPEWFLT|FDC_ST2_RECNOTFND|FDC_ST2_CRCERROR /*|FDC_ST2_LOSTDATA*/);
 }
@@ -745,7 +745,7 @@ t_stat fdc_svc(UNIT *uptr) {
   return SCPE_OK;
 }
 
-t_stat fdc_binit() {
+t_stat fdc_binit(void) {
   fdc_selected = -1;
   fdc_intpending = 0;
   
@@ -793,7 +793,7 @@ t_stat fdc_reset (DEVICE *dptr) {
 }
 
 /* select drive, according to select register */
-static DRVDATA *fdc_select() {
+static DRVDATA *fdc_select(void) {
   DRVDATA *curdrv = NULL;
 
   if (isbitset(reg_fdc_drvsel,FDC_SEL_UNIT0)) fdc_selected = 0;

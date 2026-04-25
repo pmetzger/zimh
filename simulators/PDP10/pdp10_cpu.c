@@ -257,7 +257,7 @@ extern t_stat build_dib_tab (void);
 extern t_stat show_iospace (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
 extern void set_dyn_ptrs (void);
 extern a10 conmap (a10 ea, int32 mode, int32 sw);
-extern void fe_intr ();
+extern void fe_intr (void);
 extern void dfad (int32 ac, d10 *rs, int32 inv);
 extern void dfmp (int32 ac, d10 *rs);
 extern void dfdv (int32 ac, d10 *rs);
@@ -2324,7 +2324,7 @@ return ((PIHWORD & ea)? TRUE: FALSE);
 int32 pi_eval (void)
 {
 int32 reqlvl, actlvl;
-extern int32 pi_ub_eval ();
+extern int32 pi_ub_eval (void);
 
 qintr = 0;
 if (pi_on) {

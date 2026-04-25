@@ -80,7 +80,7 @@ void chan_store_diag(int chan, uint16 addr);
 int chan_write(int chan, t_uint64 *data, int flags);
 int chan_read(int chan, t_uint64 *data, int flags);
 
-void chan_proc();
+void chan_proc(void);
 
 extern uint16    dev_pulse[NUM_CHAN];                   /* Device pulse */
 #define PUNCH_1  000001

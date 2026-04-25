@@ -121,8 +121,8 @@ void if_write(uint32 pa, uint32 val, size_t size);
 uint32 if_csr_read(uint32 pa, size_t size);
 void if_csr_write(uint32 pa, uint32 val, size_t size);
 #endif
-void if_handle_command();
-void if_after_dma();
+void if_handle_command(void);
+void if_after_dma(void);
 CONST char *if_description(DEVICE *dptr);
 t_stat if_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 

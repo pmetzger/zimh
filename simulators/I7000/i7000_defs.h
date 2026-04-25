@@ -391,7 +391,7 @@ void chan9_clear_error(int chan, int sel);
 void chan9_set_attn(int chan, int sel);
 void chan9_set_error(int chan, uint32 mask);
 
-void chan_proc();
+void chan_proc(void);
 
 #ifdef I7010
 /* Sets the device that will interrupt on the channel. */

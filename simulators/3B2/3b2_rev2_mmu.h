@@ -347,8 +347,8 @@ t_stat mmu_decode_vaddr(uint32 vaddr, uint8 r_acc,
     (r_acc == ACC_W && !((pd) & PD_M_MASK))
 
 t_stat mmu_decode_va(uint32 va, uint8 r_acc, t_bool fc, uint32 *pa);
-void   mmu_enable();
-void   mmu_disable();
+void   mmu_enable(void);
+void   mmu_disable(void);
 
 extern MMU_STATE mmu_state;
 

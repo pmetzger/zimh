@@ -473,7 +473,7 @@ static const char *xio_funcs[] = {
     "func0?",  "write", "read",  "sense_irq",
     "control", "initw", "initr", "sense"
 };
-static int32 ibm1130_qcount ()
+static int32 ibm1130_qcount (void)
 {
     int32 i, cnt;
     UNIT *uptr;

@@ -303,7 +303,7 @@ extern OPTABLE optable[];
 #define DEBUG_VALIDOP(op)     (optable[op].flags >= 0)
 #define DEBUG_PRE             0x01
 #define DEBUG_POST            0x02
-extern t_stat dbg_init();
+extern t_stat dbg_init(void);
 extern t_stat dbg_check(t_value data,uint8 prepost);
 extern t_stat dbg_dump_tib(FILE* fd, uint16 base);
 extern t_stat dbg_dump_queue(FILE* fd, const char* qname, uint16 q);
@@ -312,8 +312,8 @@ extern t_stat dbg_dump_seg(FILE* fd, uint16 segptr);
 extern t_stat dbg_dump_segtbl(FILE* fd);
 extern t_stat dbg_segtrack(uint16 segbase);
 extern t_stat dbg_procenter(uint16 segbase, uint16 procno, uint16 mscw, uint16 osegb);
-extern t_stat dbg_procleave();
-extern void dbg_enable();
+extern t_stat dbg_procleave(void);
+extern void dbg_enable(void);
 extern t_stat dbg_calltree(FILE* fd);
 extern t_stat dbg_enteralias(const char* key, const char* value);
 extern t_stat dbg_listalias(FILE*);
@@ -363,12 +363,12 @@ extern t_stat fprint_sym_m (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int
 
 extern t_stat con_read(t_addr ioaddr, uint16 *data);
 extern t_stat con_write(t_addr ioaddr, uint16 data);
-extern t_stat con_binit();
+extern t_stat con_binit(void);
 extern t_stat fdc_boot(int32 unitnum, DEVICE *dptr);
 extern t_stat fdc_read(t_addr ioaddr, uint16 *data);
 extern t_stat fdc_write(t_addr ioaddr, uint16 data);
 extern t_stat fdc_autoload(int unitnum);
-extern t_stat fdc_binit();
+extern t_stat fdc_binit(void);
 extern t_stat tim_read(t_addr ioaddr, uint16 *data);
 extern t_stat tim_write(t_addr ioaddr, uint16 data);
 
@@ -376,8 +376,8 @@ extern void cpu_assertInt(int level, t_bool tf);
 extern t_stat cpu_raiseInt(int level);
 extern t_stat cpu_setIntVec(uint16 vector,int level);
 extern void   cpu_setRegs(uint16 ctp, uint16 ssv, uint16 rq);
-extern void   cpu_finishAutoload();
-extern t_stat cpu_buserror();
+extern void   cpu_finishAutoload(void);
+extern t_stat cpu_buserror(void);
 
 typedef t_stat (*IOREAD)(t_addr ioaddr, uint16 *data);
 typedef t_stat (*IOWRITE)(t_addr ioaddr, uint16 data);
@@ -396,7 +396,7 @@ typedef struct _devctxt {
   IOINFO* ioi;
 } DEVCTXT;
 
-extern t_stat pdq3_ioinit();
+extern t_stat pdq3_ioinit(void);
 extern t_stat add_ioh(IOINFO* ioi);
 extern t_stat del_ioh(IOINFO* ioi);
 extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);

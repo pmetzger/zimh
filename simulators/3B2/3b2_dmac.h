@@ -73,14 +73,14 @@ typedef struct {
     uint32 service_address;
     t_bool *drq;
     void  (*dma_handler)(uint8 channel, uint32 service_address);
-    void  (*after_dma_callback)();
+    void  (*after_dma_callback)(void);
 } dmac_dma_handler;
 
 /* DMAC */
 t_stat dmac_reset(DEVICE *dptr);
 uint32 dmac_read(uint32 pa, size_t size);
 void dmac_write(uint32 pa, uint32 val, size_t size);
-void dmac_service_drqs();
+void dmac_service_drqs(void);
 void dmac_generic_dma(uint8 channel, uint32 service_address);
 uint32 dma_address(uint8 channel, uint32 offset);
 

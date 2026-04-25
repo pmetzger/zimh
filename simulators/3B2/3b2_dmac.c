@@ -463,7 +463,7 @@ void dmac_generic_dma(uint8 channel, uint32 service_address)
 /*
  * Service pending DRQs
  */
-void dmac_service_drqs()
+void dmac_service_drqs(void)
 {
     volatile dmac_dma_handler *h;
 

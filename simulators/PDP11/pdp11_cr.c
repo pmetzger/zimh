@@ -1187,7 +1187,7 @@ t_stat cr_wr (  int32   data,
  * not seem to call this entry point.
  */
 
-int32 cr_intac() {
+int32 cr_intac(void) {
     if CR11_CTL(&cr_unit) {
         if (schedule_svc) {
             sim_activate_after (&cr_unit, cr_unit.wait);

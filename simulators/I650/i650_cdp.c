@@ -485,7 +485,7 @@ void encode_soap_wiring(int bMultiPass)
     }
 }
 
-void encode_supersoap_wiring() 
+void encode_supersoap_wiring(void)
 {
     // encode soap card simulating soap control panel wiring for 533 
     // storage in output block (one card format)
@@ -1551,5 +1551,4 @@ cdp_description(DEVICE *dptr)
 {
    return "533 Card Punch + 407 Accounting for printing";
 }
-
 

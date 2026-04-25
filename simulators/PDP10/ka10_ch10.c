@@ -220,7 +220,7 @@ void ch10_validate (const uint8 *p, int count)
     sim_debug (DBG_TRC, &ch10_dev, "Checksum: %05o\n", chksum);
 }
 
-t_stat ch10_transmit ()
+t_stat ch10_transmit (void)
 {
   size_t len;
   t_stat r;

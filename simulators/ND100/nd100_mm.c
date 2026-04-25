@@ -391,7 +391,7 @@ wrmem(int vaddr, int val, int how)
 }
 
 void
-mm_wrpcr()
+mm_wrpcr(void)
 {
         if (ISDIS())
                 return;

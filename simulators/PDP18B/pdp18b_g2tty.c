@@ -163,23 +163,23 @@ extern int32 tmxr_poll;
 extern int32 stop_inst;
 
 /* SIMH G2IN DEVICE */
-t_bool g2kb_test_done ();
-void g2kb_set_done ();
-void g2kb_clr_done ();
+t_bool g2kb_test_done (void);
+void g2kb_set_done (void);
+void g2kb_clr_done (void);
 int32 g2kb_iot (int32 dev, int32 pulse, int32 dat); /* device 043 */
 
-t_bool g2bb_test_flag ();
-void g2bb_set_flag ();
-void g2bb_clr_flag ();
+t_bool g2bb_test_flag (void);
+void g2bb_set_flag (void);
+void g2bb_clr_flag (void);
 int32 g2bb_iot (int32 dev, int32 pulse, int32 dat); /* device 044 */
 
 t_stat g2in_svc (UNIT *uptr);
 
 /* SIMH G2OUT DEVICE */
 int32 g2d1_iot (int32 dev, int32 pulse, int32 dat); /* device 05 */
-static void g2out_clear ();
-static void g2out_process_display_list ();
-static int g2out_send_new ();
+static void g2out_clear (void);
+static void g2out_process_display_list (void);
+static int g2out_send_new (void);
 
 /* both G2IN/G2OUT: */
 t_stat g2_attach (UNIT *uptr, CONST char *cptr);
@@ -372,38 +372,38 @@ return SCPE_OK;
 
 /* Interrupt handling routines */
 
-t_bool g2kb_test_done ()
+t_bool g2kb_test_done (void)
 {
 return g2kb_done != 0;
 }
 
-void g2kb_set_done ()
+void g2kb_set_done (void)
 {
 g2kb_done = 1;
 SET_INT (G2);
 return;
 }
 
-void g2kb_clr_done ()
+void g2kb_clr_done (void)
 {
 g2kb_done = 0;
 CLR_INT (G2);
 return;
 }
 
-t_bool g2bb_test_flag ()
+t_bool g2bb_test_flag (void)
 {
 return g2bb_flag != 0;
 }
 
-void g2bb_set_flag ()
+void g2bb_set_flag (void)
 {
 g2bb_flag = 1;
 SET_INT (G2);
 return;
 }
 
-void g2bb_clr_flag ()
+void g2bb_clr_flag (void)
 {
 g2bb_flag = 0;
 CLR_INT (G2);
@@ -471,7 +471,7 @@ return dat;
  * which just resets the buffer (and not issuing any IOTs)
  */
 
-static void g2out_clear() {
+static void g2out_clear(void) {
     g2out_stuffcr = 0;
     g2out_which = 0;
     g2out_count = 0;
@@ -481,7 +481,7 @@ static void g2out_clear() {
 /* interpret display list; save characters into "new" dspbuf
  * quits early if display list doesn't conform to what's expected
  */
-static void g2out_process_display_list() {
+static void g2out_process_display_list(void) {
     uint32 i;
     struct dspbuf *dp = g2out_dspbufs + NEW;
 
@@ -516,7 +516,7 @@ static void g2out_process_display_list() {
  * truncates new->count to the number sent so far
  * returns number of new characters sent
  */
-static int g2out_send_new() {
+static int g2out_send_new(void) {
     struct dspbuf *old = g2out_dspbufs + OLD;
     struct dspbuf *New = g2out_dspbufs + NEW;
     char *cp = New->buffer;

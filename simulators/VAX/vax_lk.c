@@ -290,7 +290,7 @@ fifo->tail = 0;
 fifo->count = 0;
 }
 
-void lk_cmd ()
+void lk_cmd (void)
 {
 int32 i, group, mode;
 uint8 data;

@@ -3290,7 +3290,7 @@ do_compare(int reg, int tluop) {
 
 /* Initialize memory to all blank */
 void
-mem_init() {
+mem_init(void) {
     int                 i;
     /* Force memory to be blanks on load */
     for(i = 0; i < (MAXMEMSIZE-1); i++)

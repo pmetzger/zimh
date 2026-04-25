@@ -152,7 +152,7 @@ extern t_stat rschnlxio(uint16 addr, uint32 *status);   /* reset channel XIO */
 extern t_stat haltxio(uint16 addr, uint32 *status);     /* halt XIO */
 extern t_stat grabxio(uint16 addr, uint32 *status);     /* grab XIO n/u */
 extern t_stat rsctlxio(uint16 addr, uint32 *status);    /* reset controller XIO */
-extern t_stat chan_set_devs();                          /* set up the defined devices on the simulator */
+extern t_stat chan_set_devs(void);                          /* set up the defined devices on the simulator */
 extern uint32 scan_chan(uint32 *ilev);                  /* go scan for I/O int pending */
 extern uint32 cont_chan(uint16 chsa);                   /* continue channel program */
 extern uint16 loading;                                  /* set when doing IPL */
@@ -542,7 +542,7 @@ LOCAL void clr_simsem()
 }
 #else
 /* use pthread mutexs */
-LOCAL void lock_mutex()
+LOCAL void lock_mutex(void)
 {
     if (IPC != 0) {
         if (pthread_mutex_trylock((pthread_mutex_t *)&(IPC->mutex)) == 0) {
@@ -555,7 +555,7 @@ LOCAL void lock_mutex()
     }
 }
 
-LOCAL void unlock_mutex()
+LOCAL void unlock_mutex(void)
 {
     if (IPC) {
         pthread_mutex_unlock((pthread_mutex_t *)&(IPC->mutex));

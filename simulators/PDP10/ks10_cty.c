@@ -109,7 +109,7 @@ DEVICE cty_dev = {
     };
 
 void
-cty_wakeup()
+cty_wakeup(void)
 {
     sim_debug(DEBUG_EXP, &cty_dev, "CTY wakeup\n");
     sim_activate(&cty_unit[0], cty_unit[0].wait);

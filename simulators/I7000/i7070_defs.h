@@ -101,7 +101,7 @@ uint32              dec_bin_idx(t_uint64 a);
 uint32              dec_bin_lim(t_uint64 a, uint32 b);
 int                 get_rdw(t_uint64 a, uint32 *base, uint32 *limit);
 void                upd_idx(t_uint64 *a, uint32 b);
-int                 scan_irq();
+int                 scan_irq(void);
 
 /* Opcodes */
 #define OP_HB           0x000

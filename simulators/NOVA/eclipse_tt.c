@@ -49,7 +49,7 @@ t_stat tto_svc (UNIT *uptr);
 t_stat tti_reset (DEVICE *dptr);
 t_stat tto_reset (DEVICE *dptr);
 t_stat ttx_setmod (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-void translate_in();
+void translate_in(void);
 int32 translate_out(int32 c);
 int32 putseq(char *seq);
 
@@ -175,7 +175,7 @@ int spec200 = 0;                                        /* signals next char is 
 
 /* Translation: VT100 input to D200 keycodes. */
 
-void translate_in()
+void translate_in(void)
 {
     char rev = 0;
     

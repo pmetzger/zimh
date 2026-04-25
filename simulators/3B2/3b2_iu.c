@@ -368,7 +368,7 @@ t_stat contty_detach(UNIT *uptr)
     return r;
 }
 
-void increment_modep_a()
+void increment_modep_a(void)
 {
     iu_increment_a = FALSE;
     iu_console.modep++;
@@ -378,7 +378,7 @@ void increment_modep_a()
     }
 }
 
-void increment_modep_b()
+void increment_modep_b(void)
 {
     iu_increment_b = FALSE;
     iu_contty.modep++;

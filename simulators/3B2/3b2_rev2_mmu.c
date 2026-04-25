@@ -246,7 +246,7 @@ static SIM_INLINE void flush_cache_sec(uint8 sec)
     }
 }
 
-static SIM_INLINE void flush_caches()
+static SIM_INLINE void flush_caches(void)
 {
     uint8 i;
 
@@ -802,14 +802,14 @@ uint32 mmu_xlate_addr(uint32 va, uint8 r_acc)
     }
 }
 
-void mmu_enable()
+void mmu_enable(void)
 {
     sim_debug(EXECUTE_MSG, &mmu_dev,
               "Enabling MMU.\n");
     mmu_state.enabled = TRUE;
 }
 
-void mmu_disable()
+void mmu_disable(void)
 {
     sim_debug(EXECUTE_MSG, &mmu_dev,
               "Disabling MMU.\n");

@@ -192,7 +192,7 @@ static SIM_INLINE void id_set_srqm(t_bool state)
     UPDATE_INT;
 }
 
-static SIM_INLINE void id_clear_fifo()
+static SIM_INLINE void id_clear_fifo(void)
 {
     id_dpr = 0;
     id_dpw = 0;
@@ -421,7 +421,7 @@ static void SIM_INLINE id_end_rw(uint8 est)
 
 /* The controller wraps id_lsn, id_lhn, and id_lcnl on each sector
  * read, so that they point to the next C/H/S */
-static void SIM_INLINE id_update_chs()
+static void SIM_INLINE id_update_chs(void)
 {
     uint8 id = id_sel_unit->u3;
 
@@ -961,7 +961,7 @@ void id_handle_command(uint8 val)
     }
 }
 
-void id_after_dma()
+void id_after_dma(void)
 {
     id_clr_status(ID_STAT_DRQ);
     id_drq = FALSE;

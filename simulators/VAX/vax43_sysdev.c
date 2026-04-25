@@ -109,7 +109,7 @@ int32 ka_rd (int32 pa);
 void ka_wr (int32 pa, int32 val, int32 lnt);
 int32 con_halt (int32 code, int32 cc);
 int32 tmr_tir_rd (void);
-void tmr_sched ();
+void tmr_sched (void);
 
 extern t_stat or_map (uint32 index, uint8 *rom, t_addr size);
 extern t_stat or_unmap (uint32 index);
@@ -883,7 +883,7 @@ return SCPE_OK;
 
 /* Timer scheduling */
 
-void tmr_sched ()
+void tmr_sched (void)
 {
 uint32 usecs_sched = tmr_tir ? (~tmr_tir + 1) : 0xFFFF;
 tmr_tir = 0;

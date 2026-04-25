@@ -477,7 +477,7 @@ void besm6_okno (const char *message)
 /*
  * Команда "рег"
  */
-static void cmd_002 ()
+static void cmd_002 (void)
 {
 #if 0
     besm6_debug ("*** рег %03o", Aex & 0377);
@@ -550,7 +550,7 @@ static void cmd_002 ()
 /*
  * Команда "увв"
  */
-static void cmd_033 ()
+static void cmd_033 (void)
 {
 #if 0
     besm6_debug ("*** увв %04o, СМ[24:1]=%08o",
@@ -792,7 +792,7 @@ static void cmd_033 ()
     }
 }
 
-void check_initial_setup ()
+void check_initial_setup (void)
 {
     const int MGRP_COPY = 01455;    /* OS version specific? */
     const int TAKEN = 0442;         /* fixed? */
@@ -859,7 +859,7 @@ void check_initial_setup ()
  * When stopped, perform a longjmp to cpu_halt,
  * sending a stop code.
  */
-void cpu_one_inst ()
+void cpu_one_inst (void)
 {
     int reg, opcode, addr, nextpc, next_mod;
     t_value word;
@@ -1567,7 +1567,7 @@ void op_int_1 (const char *msg)
  * Операция прерывания 2: внешнее прерывание.
  * Описана в 9-м томе технического описания БЭСМ-6, страница 129.
  */
-void op_int_2 ()
+void op_int_2 (void)
 {
     /*besm6_okno ("Внешнее прерывание");*/
     M[SPSW] = (M[PSW] & (PSW_INTR_DISABLE | PSW_MMAP_DISABLE |

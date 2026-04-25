@@ -191,7 +191,7 @@ void   dte_its(UNIT *uptr);
 #endif
 void   dte_transfer(UNIT *uptr);
 void   dte_function(UNIT *uptr);
-void   dte_input();
+void   dte_input(void);
 int    dte_start(UNIT *uptr);
 int    dte_queue(int func, int dev, int dcnt, uint16 *data);
 t_stat dtei_svc (UNIT *uptr);
@@ -1509,7 +1509,7 @@ error:
 
 /* Process input from CTY and TTY's to 10.  */
 void
-dte_input()
+dte_input(void)
 {
     uint16  data1;
     uint16  dataq[32];

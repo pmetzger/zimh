@@ -85,7 +85,7 @@ t_stat i8255_cfg(uint16 base, uint16 devnum, uint8 dummy);
 t_stat i8255_clr(void);
 t_stat i8255_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
 t_stat i8255_reset (DEVICE *dptr);
-t_stat i8255_reset_dev ();
+t_stat i8255_reset_dev (void);
 uint8 i8255a(t_bool io, uint8 data, uint8 devnum);
 uint8 i8255b(t_bool io, uint8 data, uint8 devnum);
 uint8 i8255c(t_bool io, uint8 data, uint8 devnum);
@@ -260,7 +260,7 @@ t_stat i8255_reset (DEVICE *dptr)
     return SCPE_OK;
 }
 
-t_stat i8255_reset_dev ()
+t_stat i8255_reset_dev (void)
 {
     uint8 devnum;
     

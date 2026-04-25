@@ -106,8 +106,8 @@ t_bool ni_conf = FALSE;
 
 /* Static Function Declarations */
 static void dump_packet(const char *direction, ETH_PACK *pkt);
-static void ni_enable();
-static void ni_disable();
+static void ni_enable(void);
+static void ni_disable(void);
 static void ni_cmd(uint8 slot, cio_entry *rentry, uint8 *rapp_data, t_bool is_exp);
 
 /*
@@ -267,7 +267,7 @@ static void dump_packet(const char *direction, ETH_PACK *pkt)
     }
 }
 
-static void ni_enable()
+static void ni_enable(void)
 {
     sim_debug(DBG_TRACE, &ni_dev,
               "[ni_enable] Enabling the interface.\n");
@@ -291,7 +291,7 @@ static void ni_enable()
     ni.enabled = TRUE;
 }
 
-static void ni_disable()
+static void ni_disable(void)
 {
     sim_debug(DBG_TRACE, &ni_dev,
               "[ni_disable] Disabling the interface.\n");
@@ -860,7 +860,7 @@ t_stat ni_cio_svc(UNIT *uptr)
 /*
  * Do the work of trying to process the most recently received packet
  */
-void ni_process_packet()
+void ni_process_packet(void)
 {
     int i, rp;
     uint32 addr;

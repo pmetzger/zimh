@@ -135,7 +135,7 @@ chan_boot(int32 unit_num, DEVICE * dptr)
 
 /* Execute the next channel instruction. */
 void
-chan_proc()
+chan_proc(void)
 {
     if (chan_flags[0] & CHS_ATTN) {
         chan_flags[0] &= ~(CHS_ATTN | STA_START | STA_ACTIVE | STA_WAIT);

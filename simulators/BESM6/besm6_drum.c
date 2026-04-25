@@ -369,7 +369,7 @@ t_stat drum_event (UNIT *u)
 /*
  * Опрос ошибок обмена командой 033 4035.
  */
-int drum_errors ()
+int drum_errors (void)
 {
     return drum_fail;
 }

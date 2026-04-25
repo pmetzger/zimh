@@ -201,7 +201,7 @@ t_stat ni_show_filters(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
 const char *ni_description(DEVICE *dptr);
 t_stat ni_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 void ni_cio_reset(uint8 slot);
-void ni_process_packet();
+void ni_process_packet(void);
 void ni_int_ack(uint8 slot);
 void ni_sysgen(uint8 slot);
 void ni_express(uint8 slot);

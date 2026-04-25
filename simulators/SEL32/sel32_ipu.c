@@ -495,7 +495,7 @@ void millinap(int msec)
 
 #ifndef DEBUG4IPU
 /* Dump instruction history */
-static void DumpHist()
+static void DumpHist(void)
 {
     /* dump instruction history */
 //  ipu_show_hist(stdout, (UNIT *)0, (int32)0, (void *)0);
@@ -528,7 +528,7 @@ LOCAL void clr_simsem()
 }
 #else
 /* use pthread mutexs */
-LOCAL void lock_mutex()
+LOCAL void lock_mutex(void)
 {
     if (IPC != 0) {
         if (pthread_mutex_trylock((pthread_mutex_t *)&(IPC->mutex)) == 0) {
@@ -541,7 +541,7 @@ LOCAL void lock_mutex()
     }
 }
 
-LOCAL void unlock_mutex()
+LOCAL void unlock_mutex(void)
 {
     if (IPC) {
         pthread_mutex_unlock((pthread_mutex_t *)&(IPC->mutex));

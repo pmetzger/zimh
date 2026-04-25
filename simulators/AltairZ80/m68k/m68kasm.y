@@ -518,7 +518,7 @@ static int oplookup(const char* s)
 	return 0;
 }
 
-static void init_ophash() 
+static void init_ophash(void)
 {
 	struct _optable* op = ops;
 	OPHASH* oph;
@@ -535,7 +535,7 @@ static void init_ophash()
 
 static char* yystream;
 
-static int yylex()
+static int yylex(void)
 {
 	char ident[30];
 	char *p = ident;

@@ -76,9 +76,9 @@ void print_opcode(FILE * ofile, uint16 val, int chr_mode);
 
 t_stat chan_reset(DEVICE *);
 t_stat chan_boot(t_uint64);
-int find_chan();
+int find_chan(void);
 void chan_release(int);
-void start_io();
+void start_io(void);
 void chan_set_end(int) ;
 void chan_set_parity(int) ;
 void chan_set_eof(int) ;

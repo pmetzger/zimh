@@ -346,12 +346,12 @@ extern int32 tmxr_poll;
 static CONST ETH_MAC broadcast_ethaddr = {0xff,0xff,0xff,0xff,0xff,0xff};
 
 t_stat         nia_devio(uint32 dev, uint64 *data);
-void           nia_start();
-void           nia_stop();
-void           nia_enable();
-void           nia_disable();
-void           nia_load_ptt();
-void           nia_load_mcast();
+void           nia_start(void);
+void           nia_stop(void);
+void           nia_enable(void);
+void           nia_disable(void);
+void           nia_load_ptt(void);
+void           nia_load_mcast(void);
 void           nia_error(int);
 t_stat         nia_eth_srv(UNIT *);
 t_stat         nia_rec_srv(UNIT *);
@@ -547,7 +547,7 @@ void nia_error(int err)
 /*
  * Start NIA device, load in 2 words using RH20 mode.
  */
-void nia_start()
+void nia_start(void)
 {
     sim_debug(DEBUG_DETAIL, &nia_dev, "NIA start\n");
     /* Set up RH20 to read 2 words */
@@ -577,7 +577,7 @@ void nia_start()
     eth_copy_mac(nia_data.macs[1], broadcast_ethaddr);
 }
 
-void nia_stop()
+void nia_stop(void)
 {
     sim_debug(DEBUG_DETAIL, &nia_dev, "NIA stop\n");
     nia_data.status &= ~NIA_MRN;
@@ -588,7 +588,7 @@ void nia_stop()
  *
  * Read in PTT and MACS table.
  */
-void nia_enable()
+void nia_enable(void)
 {
     uint64   word;
     sim_debug(DEBUG_DETAIL, &nia_dev, "NIA enable\n");
@@ -625,7 +625,7 @@ void nia_enable()
 /*
  * Disable NIA 20.
  */
-void nia_disable()
+void nia_disable(void)
 {
     nia_data.status |= NIA_DCP;
     nia_data.status &= ~NIA_ECP;
@@ -854,7 +854,7 @@ int nia_putq(t_addr head, t_addr *entry)
 /*
  * Load in the protocol type table
  */
-void nia_load_ptt()
+void nia_load_ptt(void)
 {
     int      i;
     int      n = 0;
@@ -893,7 +893,7 @@ void nia_load_ptt()
 /*
  * Load in the multi-cast table
  */
-void nia_load_mcast()
+void nia_load_mcast(void)
 {
     int      i;
     int      n = 0;
@@ -1366,7 +1366,7 @@ t_stat nia_cmd_srv(UNIT * uptr)
 
 
 int
-nia_rec_pkt()
+nia_rec_pkt(void)
 {
     struct nia_eth_hdr  *hdr;
     uint16              type;

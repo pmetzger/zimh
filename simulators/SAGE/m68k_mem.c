@@ -73,7 +73,7 @@ t_stat m68k_set_nommu(UNIT *uptr, int32 value, CONST char *cptr, void *desc)
  * The handler has the option to enqueue an event for its unit for
  * asynchronous callback, e.g. interrupt processing
  */
-t_stat m68k_ioinit() 
+t_stat m68k_ioinit(void)
 {
     if (iohash == NULL) {
         iohash = (IOHANDLER**)calloc(IOHASHSIZE,sizeof(IOHANDLER*));

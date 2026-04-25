@@ -785,7 +785,7 @@ if (cmd > 0)
     rz_last_cmd = cmd;
 }
 
-void rz_sw_reset ()
+void rz_sw_reset (void)
 {
 uint32 i;
 

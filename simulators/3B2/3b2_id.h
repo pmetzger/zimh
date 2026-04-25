@@ -178,7 +178,7 @@ CONST char *id_description(DEVICE *dptr);
 t_stat id_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 void id_handle_data(uint8 val);
 void id_handle_command(uint8 val);
-void id_after_dma();
+void id_after_dma(void);
 
 extern t_bool id_drq;
 

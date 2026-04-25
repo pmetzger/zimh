@@ -470,10 +470,10 @@ extern void set_interrupt_mpx(int dev, int lvl, int mpx);
 #endif
 extern void     set_interrupt(int dev, int lvl);
 extern void     clr_interrupt(int dev);
-extern void     check_apr_irq();
-extern int      check_irq_level();
-extern void     restore_pi_hold();
-extern void     set_pi_hold();
+extern void     check_apr_irq(void);
+extern int      check_irq_level(void);
+extern void     restore_pi_hold(void);
+extern void     set_pi_hold(void);
 extern UNIT     cpu_unit[];
 extern UNIT     ten11_unit[];
 #if KS
@@ -585,8 +585,8 @@ struct pdp_dib {
 };
 typedef struct pdp_dib DIB;
 
-void    cty_wakeup();
-void    cty_interrupt();
+void    cty_wakeup(void);
+void    cty_interrupt(void);
 void    cty_execute(int addr);
 t_stat  cty_reset (DEVICE *dptr);
 
@@ -607,7 +607,7 @@ t_addr  uba_get_vect(t_addr addr, int lvl, int dev);
 void    uba_set_parity(uint16 ctl);
 int     uba_rh_read(DEVICE *dptr, t_addr addr, uint16 *data, int32 access);
 int     uba_rh_write(DEVICE *dptr, t_addr addr, uint16 data, int32 access);
-void    uba_reset();
+void    uba_reset(void);
 
 t_stat  uba_set_addr(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
 t_stat  uba_show_addr (FILE *st, UNIT *uptr, int32 val, CONST void *desc);

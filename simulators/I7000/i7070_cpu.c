@@ -2587,7 +2587,7 @@ void upd_idx(t_uint64 *a, uint32 b) {
 }
 
 /* Scan for interupt */
-int scan_irq() {
+int scan_irq(void) {
     int irq = 0;
     int tmp;
 
@@ -2767,7 +2767,7 @@ int scan_irq() {
 
 /* Initialize memory to all plus zero */
 void
-mem_init() {
+mem_init(void) {
     int                 i;
     /* Force memory to have all valid signs */
     for(i = 0; i < MAXMEMSIZE; i++)

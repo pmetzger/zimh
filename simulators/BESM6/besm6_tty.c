@@ -100,8 +100,8 @@ uint32 CONS_READY[2] = { 0200, 040 };
 char vt_cbuf [CBUFSIZE] [LINES_MAX+1];
 char *vt_cptr [LINES_MAX+1];
 
-void tt_print();
-void consul_receive();
+void tt_print(void);
+void consul_receive(void);
 t_stat vt_clk(UNIT *);
 extern const char *get_sim_sw (const char *cptr);
 
@@ -634,7 +634,7 @@ void vt_send(int num, uint32 sym)
 /*
  * Handling output to all connected terminals.
  */
-void vt_print()
+void vt_print(void)
 {
     uint32 workset = (TTY_OUT & vt_mask) | vt_sending;
     int num;
@@ -680,7 +680,7 @@ void vt_print()
 
 /* Input from Baudot TTYs not implemented. Output may require some additional work.
  */
-void tt_print()
+void tt_print(void)
 {
     uint32 workset = (TTY_OUT & tt_mask) | tt_sending;
     int num;
@@ -1235,7 +1235,7 @@ int vt_fix(int num, int c) {
 /*
  * Handling input from all connected terminals.
  */
-void vt_receive()
+void vt_receive(void)
 {
     uint32 workset = vt_mask;
     int num;
@@ -1313,12 +1313,12 @@ void vt_receive()
  * Checking if all terminals are idle.
  * SIMH should not enter idle mode until they are.
  */
-int vt_is_idle ()
+int vt_is_idle (void)
 {
     return (tt_mask ? vt_idle > 300 : vt_idle > 10);
 }
 
-int tty_query ()
+int tty_query (void)
 {
     /*      besm6_debug ("*** TTY: query");*/
     return TTY_IN;
@@ -1352,7 +1352,7 @@ void consul_print (int dev_num, uint32 cmd)
     vt_idle = 0;
 }
 
-void consul_receive ()
+void consul_receive (void)
 {
     int c, line_num, dev_num;
 

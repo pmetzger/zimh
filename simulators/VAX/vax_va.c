@@ -686,7 +686,7 @@ if (rg >= VA_RAM_OF) {                                  /* RAM */
 
 /* Display list processing */
 
-void va_dlist ()
+void va_dlist (void)
 {
 t_bool nodec = FALSE;
 uint32 inst, saved_inst;

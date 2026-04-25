@@ -233,7 +233,7 @@ DEVICE m68kcpu_dev = {
 
 static DEVICE* cpudev_self = 0;
 
-t_stat m68kcpu_peripheral_reset()
+t_stat m68kcpu_peripheral_reset(void)
 {
     t_stat rc;
     DEVICE** devs = sim_devices;
@@ -331,7 +331,7 @@ void m68k_setipl(int ipl)
 /* interrupt logic */
 static int intvectors[8];
 
-static t_stat m68k_irqinit()
+static t_stat m68k_irqinit(void)
 {
     int i;
     for (i=0; i<8; i++) intvectors[i] = 0;
@@ -1362,7 +1362,7 @@ static t_stat m68k_stop(t_addr* pc)
     return rc;
 }
 
-t_stat sim_instr()
+t_stat sim_instr(void)
 {
     t_stat rc;
     uint32 IR, IRE, src1, src2, res, ea;

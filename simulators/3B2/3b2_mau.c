@@ -118,7 +118,7 @@
 static SIM_INLINE void mau_case_div_zero(XFP *op1, XFP *op2, XFP *result);
 
 static SIM_INLINE void mau_exc(uint32 flag, uint32 mask);
-static SIM_INLINE void abort_on_fault();
+static SIM_INLINE void abort_on_fault(void);
 static SIM_INLINE void mau_decode(uint32 cmd, uint32 src, uint32 dst);
 static SIM_INLINE t_bool le_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1);
 static SIM_INLINE t_bool eq_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1);
@@ -197,30 +197,30 @@ static void store_op3_int(uint32 val);
 static void store_op3_decimal(DEC *d);
 static void store_op3(XFP *xfp);
 
-static void mau_rdasr();
-static void mau_wrasr();
-static void mau_move();
-static void mau_cmp();
-static void mau_cmps();
-static void mau_cmpe();
-static void mau_cmpes();
-static void mau_ldr();
-static void mau_erof();
-static void mau_rtoi();
-static void mau_ftoi();
-static void mau_dtof();
-static void mau_ftod();
-static void mau_add();
-static void mau_sub();
-static void mau_mul();
-static void mau_div();
-static void mau_neg();
-static void mau_abs();
-static void mau_sqrt();
-static void mau_itof();
-static void mau_remainder();
+static void mau_rdasr(void);
+static void mau_wrasr(void);
+static void mau_move(void);
+static void mau_cmp(void);
+static void mau_cmps(void);
+static void mau_cmpe(void);
+static void mau_cmpes(void);
+static void mau_ldr(void);
+static void mau_erof(void);
+static void mau_rtoi(void);
+static void mau_ftoi(void);
+static void mau_dtof(void);
+static void mau_ftod(void);
+static void mau_add(void);
+static void mau_sub(void);
+static void mau_mul(void);
+static void mau_div(void);
+static void mau_neg(void);
+static void mau_abs(void);
+static void mau_sqrt(void);
+static void mau_itof(void);
+static void mau_remainder(void);
 
-static void mau_execute();
+static void mau_execute(void);
 
 UNIT mau_unit = { UDATA(NULL, 0, 0) };
 
@@ -432,7 +432,7 @@ static SIM_INLINE void mau_exc(uint32 flag, uint32 mask)
 /*
  * Returns true if an exceptional condition is present.
  */
-static SIM_INLINE t_bool mau_exception_present()
+static SIM_INLINE t_bool mau_exception_present(void)
 {
 
     return mau_state.asr & MAU_ASR_ECP &&
@@ -444,7 +444,7 @@ static SIM_INLINE t_bool mau_exception_present()
          ((mau_state.asr & MAU_ASR_QS) && (mau_state.asr & MAU_ASR_QM)));
 }
 
-static SIM_INLINE void abort_on_fault()
+static SIM_INLINE void abort_on_fault(void)
 {
     switch(mau_state.opcode) {
     case M_NOP:
@@ -487,7 +487,7 @@ static SIM_INLINE void abort_on_fault()
 /*
  * Clears N and Z flags in the ASR if appropriate.
  */
-static void clear_asr()
+static void clear_asr(void)
 {
     mau_state.ntnan = FALSE;
 
@@ -510,7 +510,7 @@ static void clear_asr()
  * here. If an exception has occured, the Z and N flags are not to be
  * set!
  */
-static t_bool set_nz()
+static t_bool set_nz(void)
 {
     switch(mau_state.opcode) {
     case M_NOP:
@@ -3105,7 +3105,7 @@ static void store_op3(XFP *xfp)
  *
  *************************************************************************/
 
-static void mau_rdasr()
+static void mau_rdasr(void)
 {
     switch (mau_state.op3) {
         /* Handled */
@@ -3130,7 +3130,7 @@ static void mau_rdasr()
     }
 }
 
-static void mau_wrasr()
+static void mau_wrasr(void)
 {
     switch (mau_state.op1) {
         /* Handled */
@@ -3151,7 +3151,7 @@ static void mau_wrasr()
 /*
  * OP3 = OP1
  */
-static void mau_move()
+static void mau_move(void)
 {
     XFP xfp = {0};
 
@@ -3159,7 +3159,7 @@ static void mau_move()
     store_op3(&xfp);
 }
 
-static void mau_cmp()
+static void mau_cmp(void)
 {
     XFP a, b;
 
@@ -3168,7 +3168,7 @@ static void mau_cmp()
     xfp_cmp(&a, &b);
 }
 
-static void mau_cmps()
+static void mau_cmps(void)
 {
     XFP a, b;
 
@@ -3177,7 +3177,7 @@ static void mau_cmps()
     xfp_cmps(&a, &b);
 }
 
-static void mau_cmpe()
+static void mau_cmpe(void)
 {
     XFP a, b;
 
@@ -3186,7 +3186,7 @@ static void mau_cmpe()
     xfp_cmpe(&a, &b);
 }
 
-static void mau_cmpes()
+static void mau_cmpes(void)
 {
     XFP a, b;
 
@@ -3195,7 +3195,7 @@ static void mau_cmpes()
     xfp_cmpes(&a, &b);
 }
 
-static void mau_ldr()
+static void mau_ldr(void)
 {
     XFP xfp;
 
@@ -3207,7 +3207,7 @@ static void mau_ldr()
     mau_state.dr.frac = xfp.frac;
 }
 
-static void mau_erof()
+static void mau_erof(void)
 {
     DFP dfp;
     SFP sfp;
@@ -3259,7 +3259,7 @@ static void mau_erof()
 }
 
 
-static void mau_rtoi()
+static void mau_rtoi(void)
 {
     XFP a, result;
 
@@ -3268,7 +3268,7 @@ static void mau_rtoi()
     store_op3(&result);
 }
 
-static void mau_ftoi()
+static void mau_ftoi(void)
 {
     XFP a;
     uint32 result;
@@ -3278,7 +3278,7 @@ static void mau_ftoi()
     store_op3_int(result);
 }
 
-static void mau_dtof()
+static void mau_dtof(void)
 {
     DEC d;
     XFP result;
@@ -3288,7 +3288,7 @@ static void mau_dtof()
     store_op3(&result);
 }
 
-static void mau_ftod()
+static void mau_ftod(void)
 {
     XFP a;
     DEC d;
@@ -3298,7 +3298,7 @@ static void mau_ftod()
     store_op3_decimal(&d);
 }
 
-static void mau_add()
+static void mau_add(void)
 {
     XFP a, b, result;
 
@@ -3311,7 +3311,7 @@ static void mau_add()
 /*
  * OP3 = OP2 - OP1
  */
-static void mau_sub()
+static void mau_sub(void)
 {
     XFP a, b, result;
 
@@ -3324,7 +3324,7 @@ static void mau_sub()
 /*
  * OP3 = OP1 * OP2
  */
-static void mau_mul()
+static void mau_mul(void)
 {
     XFP a, b, result;
 
@@ -3337,7 +3337,7 @@ static void mau_mul()
 /*
  * OP3 = OP1 / OP2
  */
-static void mau_div()
+static void mau_div(void)
 {
     XFP a, b, result;
 
@@ -3351,7 +3351,7 @@ static void mau_div()
     store_op3(&result);
 }
 
-static void mau_neg()
+static void mau_neg(void)
 {
     XFP a, result;
 
@@ -3363,7 +3363,7 @@ static void mau_neg()
     store_op3(&result);
 }
 
-static void mau_abs()
+static void mau_abs(void)
 {
     XFP a, result;
 
@@ -3378,7 +3378,7 @@ static void mau_abs()
 /*
  * OP3 = sqrt(OP1)
  */
-static void mau_sqrt()
+static void mau_sqrt(void)
 {
     XFP a, result;
 
@@ -3393,7 +3393,7 @@ static void mau_sqrt()
  * If the source operand is more than one word wide, only the last
  * word is converted.
  */
-static void mau_itof()
+static void mau_itof(void)
 {
     XFP xfp;
     int32 val = 0;
@@ -3428,7 +3428,7 @@ static void mau_itof()
 /*
  * OP3 = REMAINDER(b/a)
  */
-static void mau_remainder()
+static void mau_remainder(void)
 {
     XFP a, b, result;
 
@@ -3464,7 +3464,7 @@ static SIM_INLINE void mau_decode(uint32 cmd, uint32 src, uint32 dst)
 /*
  * Handle a command.
  */
-static void mau_execute()
+static void mau_execute(void)
 {
     clear_asr();
 

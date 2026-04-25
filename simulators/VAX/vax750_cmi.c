@@ -501,7 +501,7 @@ return;
 
 /* Set CMI timeout */
 
-void cmi_set_tmo ()
+void cmi_set_tmo (void)
 {
 if ((cmi_err & CMIERR_ME) == 0) {                       /* not yet set? */
     if (mchk_ref == REF_V)                              /* virt? add mode */

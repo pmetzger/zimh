@@ -41,7 +41,7 @@ t_stat port_svc(UNIT *uptr);
 t_stat port_reset(DEVICE *dptr);
 uint8 nulldev(t_bool io, uint8 port, uint8 devnum);
 extern uint8 reg_dev(uint8 (*routine)(t_bool, uint8, uint8), uint16, uint16, uint8);
-void clr_dev();
+void clr_dev(void);
 uint8 unreg_dev(uint16 port);
 
 /* external function prototypes */
@@ -230,7 +230,7 @@ uint8 reg_dev(uint8 (*routine)(t_bool io, uint8 data, uint8 devnum),
     return 0;
 }
 
-void clr_dev()
+void clr_dev(void)
 {
     int i;
     

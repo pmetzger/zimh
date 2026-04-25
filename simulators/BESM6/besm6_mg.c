@@ -650,7 +650,7 @@ t_stat mg_event (UNIT *u)
 /*
  * Опрос ошибок обмена командой 033 4035.
  */
-int mg_errors ()
+int mg_errors (void)
 {
 #if 0
     if (mg_dev[0].dctrl)

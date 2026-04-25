@@ -359,12 +359,12 @@ UNIT               *pmp_cur_unit;    /* Currently addressed unit */
 
 
 t_stat              pmp_devio(uint32 dev, uint64 *data);
-int                 pmp_checkirq();
+int                 pmp_checkirq(void);
 int                 pmp_posterror(uint64);
 int                 chan_read_byte(uint8 *data);
 int                 chan_write_byte(uint8 *data);
 void                chan_end(uint8 flags);
-void                pmp_startcmd();
+void                pmp_startcmd(void);
 void                pmp_adjpos(UNIT * uptr);
 t_stat              pmp_srv(UNIT *);
 t_stat              pmp_reset(DEVICE *);
@@ -542,7 +542,7 @@ pmp_devio(uint32 dev, uint64 *data) {
 
 /* Check if interrupt pending for device */
 int
-pmp_checkirq() {
+pmp_checkirq(void) {
     int   f = 0;
 
     clr_interrupt(PMP_DEV);
@@ -797,7 +797,7 @@ chan_end(uint8 flags) {
 
 /* Issue command to device */
 void
-pmp_startcmd() {
+pmp_startcmd(void) {
     uint16         addr;
     int            i;
     int            unit;

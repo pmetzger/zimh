@@ -348,8 +348,8 @@ t_stat mmu_decode_vaddr(uint32 vaddr, uint8 r_acc,
                         t_bool fc, uint32 *pa);
 
 t_stat mmu_decode_va(uint32 va, uint8 r_acc, t_bool fc, uint32 *pa);
-void   mmu_enable();
-void   mmu_disable();
+void   mmu_enable(void);
+void   mmu_disable(void);
 
 t_stat mmu_show_sdt(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
 t_stat mmu_show_sdc(FILE *st, UNIT *uptr, int32 val, CONST void *desc);

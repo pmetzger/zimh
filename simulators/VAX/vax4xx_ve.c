@@ -1170,7 +1170,7 @@ for (y = ystart; y < yend; y++) {
 cp_int_status |= 0x2;
 }
 
-void spx_stream_data ()
+void spx_stream_data (void)
 {
 uint32 xstart, xend, ystart, yend;
 uint32 dstpix;

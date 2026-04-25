@@ -326,7 +326,7 @@ bcd_xlat(int chan, int direction)
 
 /* Execute the next channel instruction. */
 void
-chan_proc()
+chan_proc(void)
 {
     int                 chan;
 #ifdef I7090

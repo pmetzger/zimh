@@ -91,7 +91,7 @@ t_stat m68k_show_cpu(FILE* st,UNIT *uptr, int32 value, CONST void *desc)
     return SCPE_OK;
 }
 
-t_stat m68k_alloc_mem() 
+t_stat m68k_alloc_mem(void)
 {
     if (M == NULL)
         M = (uint8*)calloc(MEMORYSIZE, 1);

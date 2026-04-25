@@ -282,7 +282,7 @@ chan_issue_cmd(uint16 chan, uint16 dcmd, uint16 dev) {
 
 /* Execute the next channel instruction. */
 void
-chan_proc()
+chan_proc(void)
 {
     int                 chan;
     int                 cmask;

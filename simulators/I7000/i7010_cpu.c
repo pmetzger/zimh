@@ -100,8 +100,8 @@ t_stat              cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
 const char          *cpu_description (DEVICE *dptr);
 int                 do_addint(int val);
 t_stat              do_addsub(int mode);
-t_stat              do_mult();
-t_stat              do_divide();
+t_stat              do_mult(void);
+t_stat              do_divide(void);
 
 /* Interval timer option */
 t_stat              rtc_srv(UNIT * uptr);
@@ -3661,7 +3661,7 @@ t_stat do_addsub(int mode) {
 }
 
 t_stat
-do_mult()
+do_mult(void)
 {
     uint8               br;
     uint8               ar;
@@ -3745,7 +3745,7 @@ do_mult()
 }
 
 t_stat
-do_divide()
+do_divide(void)
 {
     uint16              t;
     int                 temp;

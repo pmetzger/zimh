@@ -115,7 +115,7 @@ uint32  scan_chan(uint32 *ilev);
 uint32  cont_chan(uint16 chsa);
 t_stat  set_inch(UNIT *uptr, uint32 inch_addr, uint32 num_inch);    /* set inch addr */
 t_stat  chan_boot(uint16 chsa, DEVICE *dptr);
-t_stat  chan_set_devs();
+t_stat  chan_set_devs(void);
 t_stat  set_dev_addr(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
 t_stat  show_dev_addr(FILE *st, UNIT *uptr, int32 v, CONST void *desc);
 DEVICE  *get_dev(UNIT *uptr);
@@ -2875,7 +2875,7 @@ DEVICE *get_dev(UNIT *uptr)
 
 /* set up the devices configured into the simulator */
 /* only devices with a DIB will be processed */
-t_stat chan_set_devs() {
+t_stat chan_set_devs(void) {
     uint32 i, j;
 
     for (i = 0; i < MAX_DEV; i++) {

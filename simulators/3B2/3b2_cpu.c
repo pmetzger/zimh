@@ -93,20 +93,20 @@ static SIM_INLINE int8 op_type(operand *op);
 static SIM_INLINE t_bool op_signed(operand *op);
 static SIM_INLINE uint32 sign_extend_b(uint8 val);
 static SIM_INLINE uint32 sign_extend_h(uint16 val);
-static SIM_INLINE t_bool cpu_z_flag();
-static SIM_INLINE t_bool cpu_n_flag();
-static SIM_INLINE t_bool cpu_c_flag();
-static SIM_INLINE t_bool cpu_v_flag();
+static SIM_INLINE t_bool cpu_z_flag(void);
+static SIM_INLINE t_bool cpu_n_flag(void);
+static SIM_INLINE t_bool cpu_c_flag(void);
+static SIM_INLINE t_bool cpu_v_flag(void);
 static SIM_INLINE void cpu_set_z_flag(t_bool val);
 static SIM_INLINE void cpu_set_n_flag(t_bool val);
 static SIM_INLINE void cpu_set_c_flag(t_bool val);
 static SIM_INLINE void cpu_set_v_flag(t_bool val);
 static SIM_INLINE void cpu_set_v_flag_op(t_uint64 val, operand *op);
-static SIM_INLINE uint8 cpu_execution_level();
+static SIM_INLINE uint8 cpu_execution_level(void);
 static SIM_INLINE void cpu_push_word(uint32 val);
-static SIM_INLINE uint32 cpu_pop_word();
+static SIM_INLINE uint32 cpu_pop_word(void);
 static SIM_INLINE void irq_push_word(uint32 val);
-static SIM_INLINE uint32 irq_pop_word();
+static SIM_INLINE uint32 irq_pop_word(void);
 static SIM_INLINE void cpu_context_switch_1(uint32 pcbp);
 static SIM_INLINE void cpu_context_switch_2(uint32 pcbp);
 static SIM_INLINE void cpu_context_switch_3(uint32 pcbp);
@@ -989,7 +989,7 @@ t_stat cpu_dep(t_value val, t_addr addr, UNIT *uptr, int32 sw)
 /*
  * Pre-populate the interrupt->IPL map "int_map"
  */
-static void build_int_map()
+static void build_int_map(void)
 {
     int i;
     uint8 ipl;
@@ -4559,33 +4559,33 @@ static SIM_INLINE uint32 sign_extend_h(uint16 val)
 /*
  * Returns the current CPU execution level.
  */
-static SIM_INLINE uint8 cpu_execution_level()
+static SIM_INLINE uint8 cpu_execution_level(void)
 {
     return (R[NUM_PSW] & PSW_CM_MASK) >> PSW_CM;
 }
 
-static SIM_INLINE t_bool cpu_z_flag()
+static SIM_INLINE t_bool cpu_z_flag(void)
 {
     return (R[NUM_PSW] & PSW_Z_MASK) != 0;
 }
 
-static SIM_INLINE t_bool cpu_n_flag()
+static SIM_INLINE t_bool cpu_n_flag(void)
 {
     return (R[NUM_PSW] & PSW_N_MASK) != 0;
 }
 
-static SIM_INLINE t_bool cpu_c_flag()
+static SIM_INLINE t_bool cpu_c_flag(void)
 {
     return (R[NUM_PSW] & PSW_C_MASK) != 0;
 }
 
-static SIM_INLINE t_bool cpu_v_flag()
+static SIM_INLINE t_bool cpu_v_flag(void)
 {
     return (R[NUM_PSW] & PSW_V_MASK) != 0;
 }
 
 #if defined(REV3)
-static SIM_INLINE t_bool cpu_x_flag()
+static SIM_INLINE t_bool cpu_x_flag(void)
 {
     return (R[NUM_PSW] & PSW_X_MASK) != 0;
 }
@@ -4689,7 +4689,7 @@ static SIM_INLINE void cpu_push_word(uint32 val)
     R[NUM_SP] += 4;
 }
 
-static SIM_INLINE uint32 cpu_pop_word()
+static SIM_INLINE uint32 cpu_pop_word(void)
 {
     uint32 result;
     /* We always read fromthe stack first BEFORE decrementing,
@@ -4705,7 +4705,7 @@ static SIM_INLINE void irq_push_word(uint32 val)
     R[NUM_ISP] += 4;
 }
 
-static SIM_INLINE uint32 irq_pop_word()
+static SIM_INLINE uint32 irq_pop_word(void)
 {
     R[NUM_ISP] -= 4;
     return read_w(R[NUM_ISP], ACC_AF, BUS_CPU);

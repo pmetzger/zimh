@@ -193,7 +193,7 @@ void uba_ub_nxm (int32 ua);
 void uba_inv_map (int32 ublk);
 void uba_eval_int (void);
 void uba_adap_set_int (int32 flg);
-void uba_adap_clr_int ();
+void uba_adap_clr_int (void);
 void uba_set_dpr (uint32 ua, t_bool wr);
 void uba_ubpdn (int32 time);
 t_bool uba_map_addr (uint32 ua, uint32 *ma);
@@ -899,7 +899,7 @@ if (((flg & UBACR_SUEFIE) && (uba_sr & UBA_SUEFIE_SR)) ||
 return;
 }
 
-void uba_adap_clr_int ()
+void uba_adap_clr_int (void)
 {
 if ((!(uba_cr & UBACR_SUEFIE) || !(uba_sr & UBA_SUEFIE_SR)) &&
     (!(uba_cr & UBACR_USEFIE) || !(uba_sr & UBA_USEFIE_SR)) &&

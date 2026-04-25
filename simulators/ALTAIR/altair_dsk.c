@@ -122,7 +122,7 @@
 
 t_stat dsk_svc (UNIT *uptr);
 t_stat dsk_reset (DEVICE *dptr);
-void writebuf();
+void writebuf(void);
 
 extern int32 PCX;
 
@@ -347,7 +347,7 @@ int32 dsk12(int32 io, int32 data)
     }
 }
 
-void writebuf()
+void writebuf(void)
 {
     long pos;
     int32 rtn, i;

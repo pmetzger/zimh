@@ -324,7 +324,7 @@ void mmu_flush (int idx)
     }
 }
 
-void mmu_update_oldest ()
+void mmu_update_oldest (void)
 {
     int i;
 
@@ -354,7 +354,7 @@ int mmu_match (int addr, int fail)
  * по адресам пультовых регистров. Тест УУ проходит дальше всего
  * с mmu_flush_by_age().
  */
-void mmu_flush_by_age()
+void mmu_flush_by_age(void)
 {
     switch (FLUSH) {
     case 0:
@@ -372,7 +372,7 @@ void mmu_flush_by_age()
     ++FLUSH;
 }
 
-void mmu_flush_by_number()
+void mmu_flush_by_number(void)
 {
     switch (FLUSH) {
     case 0:
@@ -717,7 +717,7 @@ void mmu_setrp (int idx, t_value val)
     TLB[idx*4+3] = p3;
 }
 
-void mmu_setup ()
+void mmu_setup (void)
 {
     const uint32 mask = (MEMSIZE >> 10) - 1;
     int i;
@@ -749,7 +749,7 @@ t_value mmu_getcache (int idx)
     return BRZ[idx] & BITS48;
 }
 
-void mmu_print_brz ()
+void mmu_print_brz (void)
 {
     int i, k;
 

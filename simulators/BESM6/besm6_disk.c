@@ -959,7 +959,7 @@ t_stat disk_event (UNIT *u)
 /*
  * Опрос ошибок обмена командой 033 4035.
  */
-int disk_errors ()
+int disk_errors (void)
 {
 #if 0
     if (u->dptr->dctrl & DEB_RRD)

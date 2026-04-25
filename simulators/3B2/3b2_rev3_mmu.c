@@ -366,7 +366,7 @@ static void flush_pdc(uint32 va)
 /*
  * Flush all entries in both SDC and PDC.
  */
-static void flush_caches()
+static void flush_caches(void)
 {
     uint32 i;
 
@@ -1058,7 +1058,7 @@ uint32 mmu_xlate_addr(uint32 va, uint8 r_acc)
 /*
  * Enable the MMU and allow virtual address translation.
  */
-void mmu_enable()
+void mmu_enable(void)
 {
     mmu_state.enabled = TRUE;
 }
@@ -1066,7 +1066,7 @@ void mmu_enable()
 /*
  * Disable the MMU. All memory access will be through physical addresses only.
  */
-void mmu_disable()
+void mmu_disable(void)
 {
     mmu_state.enabled = FALSE;
 }

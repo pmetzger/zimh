@@ -143,8 +143,8 @@ void uba_ub_nxm (int32 ua);
 void uba_bi_nxm (int32 ba);
 void uba_inv_map (int32 ublk);
 void uba_eval_int (void);
-void uba_adap_set_int ();
-void uba_adap_clr_int ();
+void uba_adap_set_int (void);
+void uba_adap_clr_int (void);
 void uba_ubpdn (int32 time);
 t_bool uba_map_addr (uint32 ua, uint32 *ma);
 t_stat uba_show_virt (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
@@ -871,7 +871,7 @@ return SCPE_OK;
 
 /* Interrupt routines */
 
-void uba_adap_set_int ()
+void uba_adap_set_int (void)
 {
 if (uba_csr & UBACSR_EIE) {
     uba_int = 1;
@@ -881,7 +881,7 @@ if (uba_csr & UBACSR_EIE) {
 return;
 }
 
-void uba_adap_clr_int ()
+void uba_adap_clr_int (void)
 {
 if (!(uba_csr & UBACSR_EIE))
     uba_int = 0;

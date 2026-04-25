@@ -62,7 +62,7 @@ static int movemd[] = { 0x0080, 0x0040, 0x0020, 0x0010, 0x0008, 0x0004, 0x0002, 
 					    0x8000, 0x4000, 0x2000, 0x1000, 0x0800, 0x0400, 0x0200, 0x0100 };
 static int yyrc;
 static int yyerrc;
-extern int yylex();
+extern int yylex(void);
 static int _genop(t_value arg);
 static int _genea(struct _ea arg);
 static int _genbr(t_value arg,t_value,int);
@@ -521,7 +521,7 @@ static int oplookup(const char* s)
 	return 0;
 }
 
-static void init_ophash() 
+static void init_ophash(void)
 {
 	struct _optable* op = ops;
 	OPHASH* oph;
@@ -538,7 +538,7 @@ static void init_ophash()
 
 static const char* yystream;
 
-int yylex()
+int yylex(void)
 {
 	char ident[30];
 	char *p = ident;

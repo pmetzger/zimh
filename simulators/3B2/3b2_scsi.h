@@ -276,7 +276,7 @@ t_stat ha_rq_svc(UNIT *uptr);
 t_stat ha_attach(UNIT *uptr, CONST char *cptr);
 t_stat ha_detach(UNIT *uptr);
 
-void ha_fast_queue_check();
+void ha_fast_queue_check(void);
 void ha_sysgen(uint8 slot);
 void ha_express(uint8 slot);
 void ha_full(uint8 slot);

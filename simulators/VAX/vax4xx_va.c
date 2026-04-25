@@ -815,7 +815,7 @@ if (rg >= VA_ADP_OF) {                                  /* address processor */
     }
 }
 
-void va_dlist ()
+void va_dlist (void)
 {
 t_bool nodec = FALSE;
 uint32 inst, saved_inst;

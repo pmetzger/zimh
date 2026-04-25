@@ -368,7 +368,7 @@ uba_clr_irq(DIB *idev, int vect)
 }
 
 void
-uba_reset()
+uba_reset(void)
 {
     int     i;
 

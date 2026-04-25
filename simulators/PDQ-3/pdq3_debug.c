@@ -33,7 +33,7 @@
 
 static uint8 *opdebug = NULL;
 
-static void dbg_opdbgcreate() {
+static void dbg_opdbgcreate(void) {
   int i;
   FILE *fd = fopen(DEBUG_OPDBGFILE, "w");
   if (fd==NULL) {
@@ -54,7 +54,7 @@ static void dbg_opdbgcreate() {
   exit(2);
 }
 
-static void dbg_opdbginit() {
+static void dbg_opdbginit(void) {
   char line[100];
   int i, f;
   FILE* fd = fopen(DEBUG_OPDBGFILE,"r");
@@ -143,7 +143,7 @@ t_stat dbg_dump_mscw(FILE* fd, uint16 base) {
   return SCPE_OK;
 }
 
-void dbg_enable() {
+void dbg_enable(void) {
   cpu_dev.dctrl |= (DBG_CPU_READ|DBG_CPU_WRITE|DBG_CPU_STACK);
 }
   
@@ -227,7 +227,7 @@ typedef struct _seginfo {
 SEGINFO* seghash[SEGHASHSIZE];
 #define SEGHASHFUNC(i) (i % SEGHASHSIZE)
 
-t_stat dbg_segtrackinit() {
+t_stat dbg_segtrackinit(void) {
   int i;
   for (i=0; i<SEGHASHSIZE; i++)
     seghash[i] = NULL;
@@ -277,7 +277,7 @@ typedef struct _aliases {
 #define ALIASHASHSIZE 97
 static ALIASES* aliases[ALIASHASHSIZE];
 
-static t_stat dbg_aliasesinit() {
+static t_stat dbg_aliasesinit(void) {
   int i;
   for (i=0; i<ALIASHASHSIZE; i++)
     aliases[i] = NULL;
@@ -396,7 +396,7 @@ t_stat dbg_procenter(uint16 segbase, uint16 procno, uint16 mscw, uint16 osegb) {
   return SCPE_OK;
 }
 
-t_stat dbg_procleave() {
+t_stat dbg_procleave(void) {
   t_stat rc;
   PROCINFO* p = procroot;
   uint16 ipc,pipc;
@@ -436,7 +436,7 @@ t_stat dbg_calltree(FILE* fd) {
  * Initialization
  *****************************************************************************/
 
-t_stat dbg_init() {
+t_stat dbg_init(void) {
   dbg_opdbginit();
   dbg_segtrackinit();
   dbg_aliasesinit();

@@ -152,7 +152,7 @@ DEVICE con_dev = {
 };
 
 /* bus reset handler */
-t_stat con_binit() {
+t_stat con_binit(void) {
   con_status = CONS_THRE;
   setbit(con_status, CONS_DSR);
   

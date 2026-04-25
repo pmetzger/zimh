@@ -105,7 +105,7 @@ typedef struct tod_data {
 
 #endif
 
-void tod_update_delta();
+void tod_update_delta(void);
 t_stat tod_reset(DEVICE *dptr);
 t_stat tod_attach(UNIT *uptr, CONST char *cptr);
 t_stat tod_detach(UNIT *uptr);

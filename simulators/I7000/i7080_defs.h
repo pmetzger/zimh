@@ -35,7 +35,7 @@ int chan_cmd(uint16 dev, uint16 cmd, uint32 addr);
 /* Map device to channel */
 int chan_mapdev(uint16 dev);
 /* Process the CHR 3 13 command and abort all channel activity */
-void chan_chr_13();
+void chan_chr_13(void);
 uint32 load_addr(uint32 *loc);
 void store_addr(uint32 addr, uint32 *loc);
 

@@ -832,7 +832,7 @@ struct _byte {
  */
 
 void
-set_quantum()
+set_quantum(void)
 {
     double us;
     sim_cancel(&cpu_unit[1]);
@@ -846,7 +846,7 @@ set_quantum()
  * Update the qua_time variable.
  */
 void
-load_quantum()
+load_quantum(void)
 {
     if (sim_is_active(&cpu_unit[1])) {
        double us;
@@ -863,7 +863,7 @@ load_quantum()
  * Get the current quantum time.
  */
 uint32
-get_quantum()
+get_quantum(void)
 {
     uint32  t = qua_time;
     if (sim_is_active(&cpu_unit[1])) {
@@ -931,7 +931,7 @@ void clr_interrupt(int dev) {
  * Check if there is any pending interrupts return 0 if none,
  * else set pi_enc to highest level and return 1.
  */
-int check_irq_level() {
+int check_irq_level(void) {
     int i, lvl;
     int pi_req;
 
@@ -993,7 +993,7 @@ int check_irq_level() {
 /*
  * Recover from held interrupt.
  */
-void restore_pi_hold() {
+void restore_pi_hold(void) {
      int lvl;
 
      if (!pi_enable)
@@ -1018,7 +1018,7 @@ void restore_pi_hold() {
 /*
  * Hold interrupts at the current level.
  */
-void set_pi_hold() {
+void set_pi_hold(void) {
      int pi = pi_enc;
 #if MPX_DEV
      if (mpx_enable && cpu_unit[0].flags & UNIT_MPX && pi > 07)
@@ -1292,7 +1292,7 @@ t_stat dev_cca(uint32 dev, uint64 *data) {
 /*
  * Check if the last operation caused a APR IRQ to be generated.
  */
-void check_apr_irq() {
+void check_apr_irq(void) {
      if (pi_enable && apr_irq) {
          int flg = 0;
          clr_interrupt(0);
@@ -1547,7 +1547,7 @@ t_stat dev_pag(uint32 dev, uint64 *data) {
 /*
  * Check if the last operation caused a APR IRQ to be generated.
  */
-void check_apr_irq() {
+void check_apr_irq(void) {
      if (nxm_stop && nxm_flag) {
          RUN = 0;
      }
@@ -1699,7 +1699,7 @@ t_stat dev_pag(uint32 dev, uint64 *data) {
 /*
  * Check if the last operation caused a APR IRQ to be generated.
  */
-void check_apr_irq() {
+void check_apr_irq(void) {
      if (nxm_stop && nxm_flag) {
          RUN = 0;
      }
@@ -1825,7 +1825,7 @@ sim_debug(DEBUG_DATAIO, &cpu_dev, "Rl=%06o Pl=%06o, Rh=%06o, Ph=%06o\n", Rl, Pl,
 /*
  * Check if the last operation caused a APR IRQ to be generated.
  */
-void check_apr_irq() {
+void check_apr_irq(void) {
      if (pi_enable && apr_irq) {
          int flg = 0;
          clr_interrupt(0);
@@ -1838,7 +1838,7 @@ void check_apr_irq() {
 /*
  * Set interrupt from CTY.
  */
-void cty_interrupt()
+void cty_interrupt(void)
 {
      irq_flags |= CON_IRQ;
      sim_debug(DEBUG_IRQ, &cpu_dev, "cty interrupt %06o\n", irq_enable);
@@ -4183,7 +4183,7 @@ int Mem_write_ka(int flag, int cur_context) {
 /*
  * Check if the last operation caused a APR IRQ to be generated.
  */
-void check_apr_irq() {
+void check_apr_irq(void) {
      if (pi_enable && apr_irq) {
          int flg = 0;
          clr_interrupt(0);
@@ -4355,7 +4355,7 @@ int Mem_write(int flag, int cur_context) {
  *
  * Return of 0 if successful, 1 if there was an error.
  */
-int Mem_read_nopage() {
+int Mem_read_nopage(void) {
 #if KA | KI
     if (adr_cond && AB == AS)
         address_conditions (0, 0);
@@ -4380,7 +4380,7 @@ int Mem_read_nopage() {
  *
  * Return of 0 if successful, 1 if there was an error.
  */
-int Mem_write_nopage() {
+int Mem_write_nopage(void) {
 #if KA | KI
     if (adr_cond && AB == AS)
         address_conditions (0, 1);

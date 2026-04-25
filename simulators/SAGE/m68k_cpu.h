@@ -203,9 +203,9 @@ extern t_stat m68kcpu_reset(DEVICE* dptr);
 extern t_stat m68kcpu_ex(t_value* eval_array, t_addr addr, UNIT *uptr, int32 switches);
 extern t_stat m68kcpu_dep(t_value value, t_addr addr, UNIT* uptr, int32 switches);
 extern t_stat m68kcpu_boot(int32 unitno,DEVICE* dptr);
-extern t_stat m68k_ioinit();
-extern t_stat m68kcpu_peripheral_reset();
-extern t_stat m68k_alloc_mem();
+extern t_stat m68k_ioinit(void);
+extern t_stat m68kcpu_peripheral_reset(void);
+extern t_stat m68k_alloc_mem(void);
 extern t_stat m68k_raise_vectorint(int level,int vector);
 extern t_stat m68k_raise_autoint(int level);
 

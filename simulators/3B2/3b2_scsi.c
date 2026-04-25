@@ -229,7 +229,7 @@ t_stat ha_reset(DEVICE *dptr)
     return SCPE_OK;
 }
 
-static void ha_calc_subdevs()
+static void ha_calc_subdevs(void)
 {
     uint32 tc;
     UNIT *uptr;
@@ -392,7 +392,7 @@ void ha_sysgen(uint8 slot)
     sim_activate_abs(cio_unit, 1000);
 }
 
-void ha_fast_queue_check()
+void ha_fast_queue_check(void)
 {
     uint8 busy, op, subdev;
     uint32 addr, len, rqp;
