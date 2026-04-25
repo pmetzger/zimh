@@ -1,0 +1,187 @@
+#include <setjmp.h>
+#include <stddef.h>
+#include <stdint.h>
+
+#include <cmocka.h>
+
+#include "sigma_io_defs.h"
+
+extern UNIT dk_unit[];
+uint32 dk_tio_status(uint32 un);
+
+uint32 chan_ctl_time = 0;
+
+uint32 chan_get_cmd(uint32 dva, uint32 *cmd)
+{
+    (void)dva;
+    (void)cmd;
+    return SCPE_IERR;
+}
+
+uint32 chan_set_chf(uint32 dva, uint32 fl)
+{
+    (void)dva;
+    (void)fl;
+    return SCPE_IERR;
+}
+
+int32 chan_clr_chi(uint32 dva)
+{
+    (void)dva;
+    return -1;
+}
+
+t_bool chan_chk_dvi(uint32 dva)
+{
+    (void)dva;
+    return FALSE;
+}
+
+uint32 chan_end(uint32 dva)
+{
+    (void)dva;
+    return SCPE_IERR;
+}
+
+uint32 chan_uen(uint32 dva)
+{
+    (void)dva;
+    return SCPE_IERR;
+}
+
+uint32 chan_RdMemB(uint32 dva, uint32 *dat)
+{
+    (void)dva;
+    (void)dat;
+    return SCPE_IERR;
+}
+
+uint32 chan_WrMemB(uint32 dva, uint32 dat)
+{
+    (void)dva;
+    (void)dat;
+    return SCPE_IERR;
+}
+
+uint32 chan_RdMemW(uint32 dva, uint32 *dat)
+{
+    (void)dva;
+    (void)dat;
+    return SCPE_IERR;
+}
+
+uint32 chan_WrMemW(uint32 dva, uint32 dat)
+{
+    (void)dva;
+    (void)dat;
+    return SCPE_IERR;
+}
+
+t_stat chan_reset_dev(uint32 dva)
+{
+    (void)dva;
+    return SCPE_IERR;
+}
+
+t_stat io_set_dvc(UNIT *uptr, int32 val, const char *cptr, void *desc)
+{
+    (void)uptr;
+    (void)val;
+    (void)cptr;
+    (void)desc;
+    return SCPE_IERR;
+}
+
+t_stat io_show_dvc(FILE *st, UNIT *uptr, int32 val, const void *desc)
+{
+    (void)st;
+    (void)uptr;
+    (void)val;
+    (void)desc;
+    return SCPE_IERR;
+}
+
+t_stat io_set_dva(UNIT *uptr, int32 val, const char *cptr, void *desc)
+{
+    (void)uptr;
+    (void)val;
+    (void)cptr;
+    (void)desc;
+    return SCPE_IERR;
+}
+
+t_stat io_show_dva(FILE *st, UNIT *uptr, int32 val, const void *desc)
+{
+    (void)st;
+    (void)uptr;
+    (void)val;
+    (void)desc;
+    return SCPE_IERR;
+}
+
+t_stat io_show_cst(FILE *st, UNIT *uptr, int32 val, const void *desc)
+{
+    (void)st;
+    (void)uptr;
+    (void)val;
+    (void)desc;
+    return SCPE_IERR;
+}
+
+static void cancel_dk_units(void)
+{
+    for (uint32 i = 0; i < 8; i++)
+        sim_cancel(&dk_unit[i]);
+}
+
+static int setup_sigma_dk(void **state)
+{
+    (void)state;
+    cancel_dk_units();
+    return 0;
+}
+
+static int teardown_sigma_dk(void **state)
+{
+    (void)state;
+    cancel_dk_units();
+    return 0;
+}
+
+static void assert_controller_busy(uint32 status)
+{
+    assert_int_equal(status & DVS_CBUSY, DVS_CBUSY);
+    assert_int_equal(status & (CC2 << DVT_V_CC), CC2 << DVT_V_CC);
+}
+
+static void test_dk_tio_status_reports_unit_zero_busy(void **state)
+{
+    (void)state;
+
+    assert_int_equal(sim_activate_abs(&dk_unit[0], 100), SCPE_OK);
+
+    assert_controller_busy(dk_tio_status(0));
+}
+
+static void test_dk_tio_status_reports_nonzero_unit_busy(void **state)
+{
+    (void)state;
+
+    assert_int_equal(sim_activate_abs(&dk_unit[1], 100), SCPE_OK);
+
+    assert_controller_busy(dk_tio_status(0));
+}
+
+int main(void)
+{
+    const struct CMUnitTest tests[] = {
+        cmocka_unit_test_setup_teardown(
+            test_dk_tio_status_reports_unit_zero_busy, setup_sigma_dk,
+            teardown_sigma_dk),
+        cmocka_unit_test_setup_teardown(
+            test_dk_tio_status_reports_nonzero_unit_busy, setup_sigma_dk,
+            teardown_sigma_dk),
+    };
+
+    return cmocka_run_group_tests(tests, NULL, NULL);
+}

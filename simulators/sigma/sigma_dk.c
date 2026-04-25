@@ -426,11 +426,12 @@ if (sim_is_active (&dk_unit[un]))                       /* active => busy */
 else if ((dk_unit[un].flags & UNIT_ATT) == 0)           /* not att => offl */
     st |= DVS_DOFFL;
 for (i = 0; i < DK_NUMDR; i++) {                        /* loop thru units */
-    if (sim_is_active (&dk_unit[i]))                    /* active? */
+    if (sim_is_active (&dk_unit[i])) {                  /* active? */
         st |= (DVS_CBUSY | (CC2 << DVT_V_CC));          /* ctrl is busy */
-        return st;
+        break;
     }
-return DVS_AUTO;
+}
+return st;
 }
 
 uint32 dk_tdv_status (uint32 un)
