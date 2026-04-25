@@ -241,10 +241,10 @@ int   dtc_dct = 0;
 t_stat         dtc_devio(uint32 dev, uint64 *data);
 t_stat         dtc_svc (UNIT *uptr);
 t_stat         dtc_boot(int32 unit_num, DEVICE * dptr);
-t_stat         dtc_set_dct (UNIT *, int32, CONST char *, void *);
-t_stat         dtc_show_dct (FILE *, UNIT *, int32, CONST void *);
+t_stat         dtc_set_dct (UNIT *, int32, const char *, void *);
+t_stat         dtc_show_dct (FILE *, UNIT *, int32, const void *);
 t_stat         dtc_reset (DEVICE *dptr);
-t_stat         dtc_attach (UNIT *uptr, CONST char *cptr);
+t_stat         dtc_attach (UNIT *uptr, const char *cptr);
 void           dtc_flush (UNIT *uptr);
 t_stat         dtc_detach (UNIT *uptr);
 
@@ -1103,7 +1103,7 @@ dtc_boot(int32 unit_num, DEVICE * dptr)
 
 /* set DCT channel and unit. */
 t_stat
-dtc_set_dct (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+dtc_set_dct (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32 dct;
     t_stat r;
@@ -1118,7 +1118,7 @@ dtc_set_dct (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-dtc_show_dct (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+dtc_show_dct (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    if (uptr == NULL)
       return SCPE_IERR;
@@ -1154,7 +1154,7 @@ dtc_reset (DEVICE *dptr)
 */
 
 t_stat
-dtc_attach (UNIT *uptr, CONST char *cptr)
+dtc_attach (UNIT *uptr, const char *cptr)
 {
     uint16 pdp8b[D8_NBSIZE];
     uint16 pdp11b[D18_BSIZE];

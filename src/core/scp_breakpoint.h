@@ -25,7 +25,7 @@ extern BRKTYPTAB *sim_brk_type_desc;
 t_stat sim_brk_init(void);
 
 /* Set, clear, and display breakpoint definitions. */
-t_stat sim_brk_set(t_addr loc, int32 sw, int32 ncnt, CONST char *act);
+t_stat sim_brk_set(t_addr loc, int32 sw, int32 ncnt, const char *act);
 t_stat sim_brk_clr(t_addr loc, int32 sw);
 t_stat sim_brk_clrall(int32 sw);
 t_stat sim_brk_show(FILE *st, t_addr loc, int32 sw);

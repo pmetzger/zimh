@@ -93,7 +93,7 @@ iolink iotable[] = {
  * If no room is availalbe, return SCPE_NXM.
  */
 t_stat cio_install(uint16 id,
-                   CONST char *name,
+                   const char *name,
                    uint8 ipl,
                    void (*exp_handler)(uint8 slot),
                    void (*full_handler)(uint8 slot),

@@ -39,7 +39,7 @@
 #endif /* DONT_USE_INTERNAL_ROM */
 
 
-t_stat vax43a_boot (int32 flag, CONST char *ptr);
+t_stat vax43a_boot (int32 flag, const char *ptr);
 
 /* Special boot command, overrides regular boot */
 
@@ -956,7 +956,7 @@ return 0;                                               /* new cc = 0 */
 
 */
 
-t_stat vax43a_boot (int32 flag, CONST char *ptr)
+t_stat vax43a_boot (int32 flag, const char *ptr)
 {
 char gbuf[CBUFSIZE];
 
@@ -1043,7 +1043,7 @@ t_stat build_dib_tab (void)
 return SCPE_OK;
 }
 
-t_stat cpu_set_model (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 char gbuf[CBUFSIZE];
 

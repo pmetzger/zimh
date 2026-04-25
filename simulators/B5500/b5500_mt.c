@@ -83,7 +83,7 @@
 #define CLR_BUF(u)     u->hwmark = 0xFFFFFFFF
 
 t_stat              mt_srv(UNIT *);
-t_stat              mt_attach(UNIT *, CONST char *);
+t_stat              mt_attach(UNIT *, const char *);
 t_stat              mt_detach(UNIT *);
 t_stat              mt_reset(DEVICE *);
 t_stat              mt_help(FILE *, DEVICE *, UNIT *, int32, const char *);
@@ -569,7 +569,7 @@ t_stat mt_srv(UNIT * uptr)
 
 
 t_stat
-mt_attach(UNIT * uptr, CONST char *file)
+mt_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
 

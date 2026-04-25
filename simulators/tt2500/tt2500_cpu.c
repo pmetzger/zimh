@@ -63,8 +63,8 @@ static HISTORY *history = NULL;
 static uint32 history_i, history_m, history_n;
 
 /* Function declaration. */
-static t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc);
 static t_stat cpu_ex (t_value *vptr, t_addr ea, UNIT *uptr, int32 sw);
 static t_stat cpu_dep (t_value val, t_addr ea, UNIT *uptr, int32 sw);
 static t_stat cpu_reset (DEVICE *dptr);
@@ -547,7 +547,7 @@ t_stat sim_instr (void)
 }
 
 static t_stat
-cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   t_stat r;
   uint32 x;
@@ -570,7 +570,7 @@ cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 static t_stat
-cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   t_value insn;
   uint32 i, j;

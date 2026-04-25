@@ -529,10 +529,10 @@ t_stat  hsdp_srv(UNIT *);
 t_stat  hsdp_boot(int32 unitnum, DEVICE *);
 void    hsdp_ini(UNIT *, t_bool);
 t_stat  hsdp_reset(DEVICE *);
-t_stat  hsdp_attach(UNIT *, CONST char *);
+t_stat  hsdp_attach(UNIT *, const char *);
 t_stat  hsdp_detach(UNIT *);
-t_stat  hsdp_set_type(UNIT * uptr, int32 val, CONST char *cptr, void *desc);
-t_stat  hsdp_get_type(FILE * st, UNIT * uptr, int32 v, CONST void *desc);
+t_stat  hsdp_set_type(UNIT * uptr, int32 val, const char *cptr, void *desc);
+t_stat  hsdp_get_type(FILE * st, UNIT * uptr, int32 v, const void *desc);
 t_stat  hsdp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char  *hsdp_description (DEVICE *dptr);
 extern  uint32  inbusy;
@@ -3371,7 +3371,7 @@ int hsdp_format(UNIT *uptr) {
 }
 
 /* attach the selected file to the disk */
-t_stat hsdp_attach(UNIT *uptr, CONST char *file)
+t_stat hsdp_attach(UNIT *uptr, const char *file)
 {
     uint16          chsa = GET_UADDR(uptr->CMD);
     CHANP           *chp = find_chanp_ptr(chsa);    /* get channel prog pointer */
@@ -3702,7 +3702,7 @@ t_stat hsdp_boot(int32 unit_num, DEVICE * dptr) {
 
 /* Disk option setting commands */
 /* set the disk type attached to unit */
-t_stat hsdp_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat hsdp_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int     i;
 
@@ -3726,7 +3726,7 @@ t_stat hsdp_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_ARG;
 }
 
-t_stat hsdp_get_type(FILE *st, UNIT * uptr, int32 v, CONST void *desc)
+t_stat hsdp_get_type(FILE *st, UNIT * uptr, int32 v, const void *desc)
 {
     if (uptr == NULL)
             return SCPE_IERR;

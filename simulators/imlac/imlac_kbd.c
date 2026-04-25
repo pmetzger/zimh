@@ -45,8 +45,8 @@ static int kbd_type = KBD_DISPLAY;
 
 /* Function declaration. */
 static t_stat kbd_svc (UNIT *uptr);
-static t_stat kbd_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat kbd_show_type (FILE *st, UNIT *up, int32 v, CONST void *dp);
+static t_stat kbd_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat kbd_show_type (FILE *st, UNIT *up, int32 v, const void *dp);
 static t_stat kbd_reset (DEVICE *dptr);
 static uint16 kbd_iot (uint16, uint16);
 
@@ -614,7 +614,7 @@ kbd_iot (uint16 insn, uint16 AC)
 }
 
 static t_stat
-kbd_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+kbd_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (strcmp (cptr, "DISPLAY") == 0)
     kbd_type = KBD_DISPLAY;
@@ -626,7 +626,7 @@ kbd_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 static t_stat
-kbd_show_type (FILE *st, UNIT *up, int32 v, CONST void *dp)
+kbd_show_type (FILE *st, UNIT *up, int32 v, const void *dp)
 {
   switch (kbd_type) {
   case KBD_DISPLAY:

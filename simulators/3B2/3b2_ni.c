@@ -549,7 +549,7 @@ static void ni_cmd(uint8 slot, cio_entry *rentry, uint8 *rapp_data, t_bool is_ex
     sim_activate_abs(cio_unit, delay);
 }
 
-t_stat ni_setmac(UNIT *uptr, int32 val, CONST char* cptr, void* desc)
+t_stat ni_setmac(UNIT *uptr, int32 val, const char* cptr, void* desc)
 {
     t_stat status;
 
@@ -569,7 +569,7 @@ t_stat ni_setmac(UNIT *uptr, int32 val, CONST char* cptr, void* desc)
     return status;
 }
 
-t_stat ni_showmac(FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat ni_showmac(FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
     char buffer[20];
 
@@ -582,7 +582,7 @@ t_stat ni_showmac(FILE* st, UNIT* uptr, int32 val, CONST void* desc)
     return SCPE_OK;
 }
 
-t_stat ni_show_filters(FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat ni_show_filters(FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
     char  buffer[20];
     int i;
@@ -920,7 +920,7 @@ void ni_process_packet(void)
     CIO_SET_INT(ni.slot);
 }
 
-t_stat ni_attach(UNIT *uptr, CONST char *cptr)
+t_stat ni_attach(UNIT *uptr, const char *cptr)
 {
     t_stat status;
     char *tptr;
@@ -996,7 +996,7 @@ t_stat ni_detach(UNIT *uptr)
     return SCPE_OK;
 }
 
-t_stat ni_set_stats(UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat ni_set_stats(UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
     int init, elements, i;
     uint32 *stats_array;
@@ -1022,7 +1022,7 @@ t_stat ni_set_stats(UNIT* uptr, int32 val, CONST char* cptr, void* desc)
     return SCPE_OK;
 }
 
-t_stat ni_show_stats(FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat ni_show_stats(FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
     const char *fmt = "  %-15s%d\n";
 
@@ -1042,7 +1042,7 @@ t_stat ni_show_stats(FILE* st, UNIT* uptr, int32 val, CONST void* desc)
     return SCPE_OK;
 }
 
-t_stat ni_show_poll(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat ni_show_poll(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     UNUSED(uptr);
     UNUSED(val);

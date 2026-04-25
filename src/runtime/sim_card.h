@@ -107,7 +107,7 @@ t_addr   sim_hopper_size(UNIT * uptr);
 t_addr   sim_punch_count(UNIT * uptr);
 t_addr   sim_card_input_hopper_count(UNIT *uptr);
 t_addr   sim_card_output_hopper_count(UNIT *uptr);
-t_stat   sim_card_attach(UNIT * uptr, CONST char *file);
+t_stat   sim_card_attach(UNIT * uptr, const char *file);
 t_stat   sim_card_detach(UNIT *uptr);
 
 /* Conversion routines to save code */
@@ -117,8 +117,8 @@ uint8    sim_hol_to_bcd(uint16 hol);
 uint16   sim_hol_to_ebcdic(uint16 hol);
 
 /* Format control routines. */
-t_stat   sim_card_set_fmt (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat   sim_card_show_fmt (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat   sim_card_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat   sim_card_show_fmt (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 /* Help information */
 t_stat   sim_card_attach_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);

@@ -104,7 +104,7 @@ t_stat uc15_reset (DEVICE *dptr);
 t_stat uc15_svc (UNIT *uptr);
 t_stat uc15_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat uc15_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw);
-t_stat uc15_attach (UNIT *uptr, CONST char *cptr);
+t_stat uc15_attach (UNIT *uptr, const char *cptr);
 t_stat uc15_detach (UNIT *uptr);
 
 void uc15_set_memsize (void);
@@ -431,7 +431,7 @@ return SCPE_OK;
 
 /* Fake attach routine to kill attach attempts */
 
-t_stat uc15_attach (UNIT *uptr, CONST char *cptr)
+t_stat uc15_attach (UNIT *uptr, const char *cptr)
 {
 return SCPE_NOFNC;
 }

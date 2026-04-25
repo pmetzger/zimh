@@ -182,7 +182,7 @@ static void g2out_process_display_list (void);
 static int g2out_send_new (void);
 
 /* both G2IN/G2OUT: */
-t_stat g2_attach (UNIT *uptr, CONST char *cptr);
+t_stat g2_attach (UNIT *uptr, const char *cptr);
 t_stat g2_detach (UNIT *uptr);
 t_stat g2_reset (DEVICE *dptr);
 
@@ -580,7 +580,7 @@ return SCPE_OK;
 }
 
 /* Attach master unit */
-t_stat g2_attach (UNIT *uptr, CONST char *cptr)
+t_stat g2_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 

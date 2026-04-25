@@ -94,15 +94,15 @@ t_stat tto_rd (int32 *data, int32 PA, int32 access);
 t_stat tto_wr (int32 data, int32 PA, int32 access);
 t_stat tto_svc (UNIT *uptr);
 t_stat tto_reset (DEVICE *dptr);
-t_stat tty_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat tty_set_parity (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat tty_set_parity (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat clk_rd (int32 *data, int32 PA, int32 access);
 t_stat clk_wr (int32 data, int32 PA, int32 access);
 t_stat clk_svc (UNIT *uptr);
 int32 clk_inta (void);
 t_stat clk_reset (DEVICE *dptr);
-t_stat clk_set_freq (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat clk_show_freq (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat clk_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat clk_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc);
 const char *clk_description (DEVICE *dptr);
 
 
@@ -470,14 +470,14 @@ sim_cancel (&tto_unit);                                 /* deactivate unit */
 return SCPE_OK;
 }
 
-t_stat tty_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 sim_tt_set_mode (&tti_unit, val, cptr, desc);
 sim_tt_set_mode (&tto_unit, val, cptr, desc);
 return SCPE_OK;
 }
 
-t_stat tty_set_parity (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tty_set_parity (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 sim_tt_set_parity (&tti_unit, val, cptr, desc);
 sim_tt_set_parity (&tto_unit, val, cptr, desc);
@@ -579,7 +579,7 @@ return SCPE_OK;
 
 /* Set frequency */
 
-t_stat clk_set_freq (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat clk_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (cptr)
     return SCPE_ARG;
@@ -591,7 +591,7 @@ return SCPE_OK;
 
 /* Show frequency */
 
-t_stat clk_show_freq (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat clk_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "%dHz", clk_tps);
 return SCPE_OK;

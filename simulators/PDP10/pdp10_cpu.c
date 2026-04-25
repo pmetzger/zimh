@@ -211,10 +211,10 @@ t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_reset (DEVICE *dptr);
 t_bool cpu_is_pc_a_subroutine_call (t_addr **ret_addrs);
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat cpu_set_serial (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_serial (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat cpu_set_serial (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_serial (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 d10 adjsp (d10 val, a10 ea);
 void ibp (a10 ea, int32 pflgs);
@@ -254,7 +254,7 @@ int32 test_int (void);
 void set_ac_display (d10 *acbase);
 
 extern t_stat build_dib_tab (void);
-extern t_stat show_iospace (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat show_iospace (FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern void set_dyn_ptrs (void);
 extern a10 conmap (a10 ea, int32 mode, int32 sw);
 extern void fe_intr (void);
@@ -321,7 +321,7 @@ extern t_bool wrpcst (a10 ea, int32 prv);
 extern t_bool spm (a10 ea, int32 prv);
 extern t_bool lpmr (a10 ea, int32 prv);
 extern int32 pi_ub_vec (int32 lvl, int32 *uba);
-extern t_stat tim_set_mod (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+extern t_stat tim_set_mod (UNIT *uptr, int32 val, const char *cptr, void *desc);
 
 /* CPU data structures
 
@@ -2507,7 +2507,7 @@ return;
 
 /* Set history */
 
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i, lnt;
 t_stat r;
@@ -2538,10 +2538,10 @@ return SCPE_OK;
 
 /* Show history */
 
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 k, di, lnt;
-CONST char *cptr = (CONST char *) desc;
+const char *cptr = (const char *) desc;
 t_stat r;
 InstHistory *h;
 
@@ -2577,7 +2577,7 @@ return SCPE_OK;
 
 /* Set serial */
 
-t_stat cpu_set_serial (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_serial (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 lnt;
 t_stat r;
@@ -2595,7 +2595,7 @@ return SCPE_OK;
 
 /* Show serial */
 
-t_stat cpu_show_serial (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_serial (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "Serial: " );
 if( (apr_serial == -1) || (!Q_ITS && apr_serial < 4096) ) {

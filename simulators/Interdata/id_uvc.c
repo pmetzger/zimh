@@ -83,8 +83,8 @@ uint32 lfc_arm = 0;                                     /* int arm */
 uint32 lfc (uint32 dev, uint32 op, uint32 dat);
 t_stat lfc_svc (UNIT *uptr);
 t_stat lfc_reset (DEVICE *dptr);
-t_stat lfc_set_freq (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat lfc_show_freq (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat lfc_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat lfc_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 /* PIC data structures
 
@@ -374,7 +374,7 @@ return SCPE_OK;
 
 /* Set frequency */
 
-t_stat lfc_set_freq (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat lfc_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (cptr)
     return SCPE_ARG;
@@ -386,7 +386,7 @@ return SCPE_OK;
 
 /* Show frequency */
 
-t_stat lfc_show_freq (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat lfc_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, (lfc_tps == 100)? "50Hz": "60Hz");
 return SCPE_OK;

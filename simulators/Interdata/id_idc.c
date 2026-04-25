@@ -219,8 +219,8 @@ uint8 idc_tplte[] = { 0, 1, 2, 3, 4, TPL_END };         /* ctrl + drive */
 uint32 id (uint32 dev, uint32 op, uint32 dat);
 t_stat idc_svc (UNIT *uptr);
 t_stat idc_reset (DEVICE *dptr);
-t_stat idc_attach (UNIT *uptr, CONST char *cptr);
-t_stat idc_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat idc_attach (UNIT *uptr, const char *cptr);
+t_stat idc_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
 void idc_wd_byte (uint32 dat);
 t_stat idc_rds (UNIT *uptr);
 t_stat idc_wds (UNIT *uptr);
@@ -768,7 +768,7 @@ return SCPE_OK;
 
 /* Attach routine (with optional autosizing) */
 
-t_stat idc_attach (UNIT *uptr, CONST char *cptr)
+t_stat idc_attach (UNIT *uptr, const char *cptr)
 {
 uint32 i, p;
 t_stat r;
@@ -794,7 +794,7 @@ return SCPE_OK;
 
 /* Set size command validation routine */
 
-t_stat idc_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat idc_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (uptr->flags & UNIT_ATT)
     return SCPE_ALATT;

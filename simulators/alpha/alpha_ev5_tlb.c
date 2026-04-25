@@ -532,13 +532,13 @@ return SCPE_OK;
 
 /* Show TLB entry or entries */
 
-t_stat cpu_show_tlb (FILE *of, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_tlb (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
 t_addr lo, hi;
 uint32 lnt;
 TLBENT *tlbp;
 DEVICE *dptr;
-CONST char *cptr = (CONST char *) desc;
+const char *cptr = (const char *) desc;
 
 lnt = (val)? DTLB_SIZE: ITLB_SIZE;
 dptr = find_dev_from_unit (uptr);

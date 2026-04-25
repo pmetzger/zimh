@@ -76,9 +76,9 @@ uint32  cp_tdv_status(void);
 t_stat  cp_chan_err (uint32 st);
 t_stat  cp_svc(UNIT *);
 t_stat  cp_reset (DEVICE *dptr);
-t_stat  cp_attach(UNIT * uptr, CONST char *file);
+t_stat  cp_attach(UNIT * uptr, const char *file);
 t_stat  cp_detach(UNIT * uptr);
-t_stat  cp_show_cap (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat  cp_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 uint8 cp_op[] = {
     1, 1, 0, 0, 0, 1, 0, 0,
@@ -312,7 +312,7 @@ t_stat cp_reset (DEVICE *dptr)
 
 /* Attach routine */
 
-t_stat cp_attach(UNIT * uptr, CONST char *cptr) {
+t_stat cp_attach(UNIT * uptr, const char *cptr) {
 
     return  (attach_unit(uptr, cptr));
 }
@@ -323,7 +323,7 @@ t_stat cp_detach(UNIT * uptr) {
 }
 
 
-t_stat cp_show_cap (FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
+t_stat cp_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc) {
     int n;
     
     if ((n = cp_stacker1) == 0)

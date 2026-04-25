@@ -43,7 +43,7 @@ int32 lpt_stopioe = 0;                                  /* stop on error */
 int32 lpt (int32 IR, int32 AC);
 t_stat lpt_svc (UNIT *uptr);
 t_stat lpt_reset (DEVICE *dptr);
-t_stat lpt_attach (UNIT *uptr, CONST char *cptr);
+t_stat lpt_attach (UNIT *uptr, const char *cptr);
 t_stat lpt_detach (UNIT *uptr);
 const char *lpt_description (DEVICE *dptr);
 
@@ -174,7 +174,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat lpt_attach (UNIT *uptr, CONST char *cptr)
+t_stat lpt_attach (UNIT *uptr, const char *cptr)
 {
 t_stat reason;
 

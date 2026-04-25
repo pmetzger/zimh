@@ -79,7 +79,7 @@ extern uint16    PCX;
 
 t_stat ioc_cont_cfg(uint16 base, uint16 devnum, uint8 dummy);
 t_stat ioc_cont_clr(void);
-t_stat ioc_cont_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat ioc_cont_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat ioc_cont_reset (DEVICE *dptr);
 uint8 ioc_cont0(t_bool io, uint8 data, uint8 devnum);    /* ioc_cont*/
 uint8 ioc_cont1(t_bool io, uint8 data, uint8 devnum);    /* ioc_cont*/
@@ -173,7 +173,7 @@ t_stat ioc_cont_clr(void)
 
 // show configuration parameters
 
-t_stat ioc_cont_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat ioc_cont_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;

@@ -119,11 +119,11 @@ t_stat              mt_srv(UNIT *);
 t_stat              mt_boot(int32, DEVICE *);
 void                mt_ini(UNIT *, t_bool);
 t_stat              mt_reset(DEVICE *);
-t_stat              mt_attach(UNIT *, CONST char *);
+t_stat              mt_attach(UNIT *, const char *);
 t_stat              mt_detach(UNIT *);
-t_stat              mt_rew(UNIT * uptr, int32 val, CONST char *cptr,
+t_stat              mt_rew(UNIT * uptr, int32 val, const char *cptr,
                         void *desc);
-t_stat              mt_tape_density(UNIT * uptr, int32 val, CONST char *cptr,
+t_stat              mt_tape_density(UNIT * uptr, int32 val, const char *cptr,
                         void *desc);
 t_stat              mt_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                         const char *cptr);
@@ -355,7 +355,7 @@ uint8               parity_table[64] = {
 
 /* Rewind tape drive */
 t_stat
-mt_rew(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+mt_rew(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     /* If drive is offline or not attached return not ready */
     if ((uptr->flags & (UNIT_ATT | MTUF_ONLINE)) == 0)
@@ -1361,13 +1361,13 @@ mt_reset(DEVICE * dptr)
 }
 
 t_stat
-mt_tape_density(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+mt_tape_density(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
 return sim_tape_set_dens(uptr, (val == MTUF_LDN) ? MT_DENS_200 : MT_DENS_556, NULL, NULL);
 }
 
 t_stat
-mt_attach(UNIT * uptr, CONST char *file)
+mt_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
 

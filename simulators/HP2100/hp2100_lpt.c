@@ -566,15 +566,15 @@ static void report_error  (FILE *stream);
 
 /* Printer local SCP support routines */
 
-static t_stat lp_attach         (UNIT *uptr, CONST char *cptr);
+static t_stat lp_attach         (UNIT *uptr, const char *cptr);
 static t_stat lp_detach         (UNIT *uptr);
 
-static t_stat lp_set_mode       (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat lp_set_model      (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat lp_set_on_offline (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat lp_set_vfu        (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat lp_show_mode      (FILE *st,   UNIT *uptr,  int32 value,      CONST void *desc);
-static t_stat lp_show_vfu       (FILE *st,   UNIT *uptr,  int32 value,      CONST void *desc);
+static t_stat lp_set_mode       (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat lp_set_model      (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat lp_set_on_offline (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat lp_set_vfu        (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat lp_show_mode      (FILE *st,   UNIT *uptr,  int32 value,      const void *desc);
+static t_stat lp_show_vfu       (FILE *st,   UNIT *uptr,  int32 value,      const void *desc);
 
 
 /* Printer local utility routines */
@@ -1413,7 +1413,7 @@ return;
        otherwise).
 */
 
-static t_stat lp_attach (UNIT *uptr, CONST char *cptr)
+static t_stat lp_attach (UNIT *uptr, const char *cptr)
 {
 t_stat result;
 
@@ -1517,7 +1517,7 @@ else {
    cleared.  The unit, character, and descriptor pointers are not used.
 */
 
-static t_stat lp_set_mode (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat lp_set_mode (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 switch ((DEVICE_MODES) value) {                         /* dispatch the mode to set */
 
@@ -1559,7 +1559,7 @@ return SCPE_OK;                                         /* mode changes always s
    the real-time delays accordingly.
 */
 
-static t_stat lp_set_model (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat lp_set_model (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if (lpt_dev.flags & DEV_REALTIME)                       /* if the printer is in real-time mode */
     dlyptr = &real_times [GET_MODEL (value)];           /*   then use the times for the new model */
@@ -1601,7 +1601,7 @@ return SCPE_OK;                                         /* allow the reassignmen
        before the printer actually goes offline.
 */
 
-static t_stat lp_set_on_offline (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat lp_set_on_offline (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if ((uptr->flags & UNIT_ATT) == 0)                      /* if the printer is detached */
     return SCPE_UNATT;                                  /*   then it can't be set online or offline */
@@ -1646,7 +1646,7 @@ return SCPE_OK;                                         /* return operation succ
    load the VFU tape image contained therein.
 */
 
-static t_stat lp_set_vfu (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat lp_set_vfu (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 FILE   *vfu_stream;
 t_stat result;
@@ -1679,7 +1679,7 @@ return result;                                          /* return the result of 
    ignored.  The timing mode and connection mode are printed.
 */
 
-static t_stat lp_show_mode (FILE *st, UNIT *uptr, int32 value, CONST void *desc)
+static t_stat lp_show_mode (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
 fprintf (st, "%s timing, %s mode",                      /* print the timing and connection modes */
          (lpt_dev.flags & DEV_REALTIME ? "realistic" : "fast"),
@@ -1709,7 +1709,7 @@ return SCPE_OK;
        appropriate number of channels.
 */
 
-static t_stat lp_show_vfu (FILE *st, UNIT *uptr, int32 value, CONST void *desc)
+static t_stat lp_show_vfu (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
 static const char header_1 [] = " Ch 1 Ch 2 Ch 3 Ch 4 Ch 5 Ch 6 Ch 7 Ch 8 Ch 9 Ch10 Ch11 Ch12";
 static const char header_2 [] = " ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----";

@@ -91,16 +91,16 @@ t_stat vt_wr(int32 data, int32 PA, int32 access);
 t_stat vt_svc(UNIT *uptr);
 t_stat vt_reset(DEVICE *dptr);
 t_stat vt_boot(int32 unit, DEVICE *dptr);
-t_stat vt_set_crt(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat vt_show_crt(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat vt_set_scale(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat vt_show_scale(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat vt_set_hspace(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat vt_show_hspace(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat vt_set_vspace(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat vt_show_vspace(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat vt_set_kb(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat vt_show_kb(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat vt_set_crt(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat vt_show_crt(FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat vt_set_scale(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat vt_show_scale(FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat vt_set_hspace(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat vt_show_hspace(FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat vt_set_vspace(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat vt_show_vspace(FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat vt_set_kb(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat vt_show_kb(FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat vt_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *vt_description (DEVICE *dptr);
 
@@ -767,7 +767,7 @@ vt_boot(int32 unit, DEVICE *dptr)
 /* SET/SHOW VT options: */
 
 t_stat
-vt_set_crt(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+vt_set_crt(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     char gbuf[CBUFSIZE];
 
@@ -792,14 +792,14 @@ vt_set_crt(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-vt_show_crt(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+vt_show_crt(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "crt=VR%d", (int)vt11_display);
     return SCPE_OK;
 }
 
 t_stat
-vt_set_scale(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+vt_set_scale(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_stat r;
     t_value v;
@@ -817,14 +817,14 @@ vt_set_scale(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-vt_show_scale(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+vt_show_scale(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "scale=%d", (int)vt11_scale);
     return SCPE_OK;
 }
 
 t_stat
-vt_set_hspace(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+vt_set_hspace(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     char gbuf[CBUFSIZE];
     if (vt11_init)
@@ -842,14 +842,14 @@ vt_set_hspace(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-vt_show_hspace(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+vt_show_hspace(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "hspace=%s", vt11_csp_w==12 ? "narrow" : "normal");
     return SCPE_OK;
 }
 
 t_stat
-vt_set_vspace(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+vt_set_vspace(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     char gbuf[CBUFSIZE];
     if (vt11_init)
@@ -867,7 +867,7 @@ vt_set_vspace(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-vt_show_vspace(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+vt_show_vspace(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "vspace=%s", vt11_csp_h==26 ? "tall" : "normal");
     return SCPE_OK;
@@ -949,7 +949,7 @@ extern int32 SR;                        /* switch register */
 int32 SR;                               /* switch register */
 #endif
 
-t_stat vt_set_kb(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat vt_set_kb(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 char gbuf[CBUFSIZE];
 
@@ -965,7 +965,7 @@ else
 return SCPE_OK;
 }
 
-t_stat vt_show_kb(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat vt_show_kb(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf(st, "keyboard=%s",
         (uptr->flags & UNIT_NOSPACEWAR) ? "nospacewar" : "spacewar");

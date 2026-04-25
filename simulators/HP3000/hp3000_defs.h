@@ -682,15 +682,15 @@ extern const BITSET_FORMAT outbound_format;     /* the outbound signal format st
 
 /* System interface global SCP support routines declared in scp.h
 
-extern t_stat sim_load   (FILE       *fptr,  CONST char *cptr, CONST char *fnam, int     flag);
+extern t_stat sim_load   (FILE       *fptr,  const char *cptr, const char *fnam, int     flag);
 extern t_stat fprint_sym (FILE       *ofile, t_addr     addr,  t_value    *val,  UNIT    *uptr, int32 sw);
-extern t_stat parse_sym  (CONST char *cptr,  t_addr     addr,  UNIT       *uptr, t_value *val,  int32 sw);
+extern t_stat parse_sym  (const char *cptr,  t_addr     addr,  UNIT       *uptr, t_value *val,  int32 sw);
 */
 
 /* System interface global SCP support routines */
 
-extern t_stat hp_set_dib  (UNIT *uptr, int32 code,  CONST char *cptr, void       *desc);
-extern t_stat hp_show_dib (FILE *st,   UNIT  *uptr, int32      code,  CONST void *desc);
+extern t_stat hp_set_dib  (UNIT *uptr, int32 code,  const char *cptr, void       *desc);
+extern t_stat hp_show_dib (FILE *st,   UNIT  *uptr, int32      code,  const void *desc);
 
 
 /* System interface global utility routines */

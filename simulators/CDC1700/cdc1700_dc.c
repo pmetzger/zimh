@@ -53,9 +53,9 @@ extern enum IOstatus fw_doBDCIO(IO_DEVICE *, uint16 *, t_bool, uint8);
 extern uint16 LoadFromMem(uint16);
 extern t_bool IOStoreToMem(uint16, uint16, t_bool);
 
-t_stat set_intr(UNIT *uptr, int32 val, CONST char *, void *);
-t_stat show_intr(FILE *, UNIT *, int32, CONST void *);
-t_stat show_target(FILE *, UNIT *, int32, CONST void *);
+t_stat set_intr(UNIT *uptr, int32 val, const char *, void *);
+t_stat show_intr(FILE *, UNIT *, int32, const void *);
+t_stat show_target(FILE *, UNIT *, int32, const void *);
 
 t_stat dc_svc(UNIT *);
 t_stat dc_reset(DEVICE *);
@@ -487,7 +487,7 @@ t_stat dc_reset(DEVICE *dptr)
 /*
  * Set the interrupt level for a buffered data channel.
  */
-t_stat set_intr(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_intr(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   IO_DEVICE *iod = (IO_DEVICE *)uptr->up7;
   t_value v;
@@ -510,7 +510,7 @@ t_stat set_intr(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 /*
  * Display the current interrupt level.
  */
-t_stat show_intr(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_intr(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   IO_DEVICE *iod = (IO_DEVICE *)uptr->up7;
 
@@ -524,7 +524,7 @@ t_stat show_intr(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 /*
  * Display buffered data channel target device and equipment address
  */
-t_stat show_target(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_target(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   IO_DEVICE *iod;
 

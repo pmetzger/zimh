@@ -554,7 +554,7 @@ static t_bool _sim_coschedule_cancel (UNIT *uptr);
 static t_bool _sim_wallclock_cancel (UNIT *uptr);
 static t_bool _sim_wallclock_is_active (UNIT *uptr);
 static void _sim_timer_adjust_cal(void);
-t_stat sim_timer_show_idle_mode (FILE* st, UNIT* uptr, int32 val, CONST void *  desc);
+t_stat sim_timer_show_idle_mode (FILE* st, UNIT* uptr, int32 val, const void *  desc);
 
 
 #if defined(SIM_ASYNCH_CLOCKS)
@@ -980,7 +980,7 @@ return (sim_idle_rate_ms != 0);
 }
 
 /* sim_show_timers - show running timer information */
-t_stat sim_show_timers (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, CONST char* desc)
+t_stat sim_show_timers (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, const char* desc)
 {
 int tmr, clocks;
 struct timespec now;
@@ -1137,7 +1137,7 @@ if (clocks == 0)
 return SCPE_OK;
 }
 
-t_stat sim_show_clock_queues (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat sim_show_clock_queues (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 int tmr;
 
@@ -1254,7 +1254,7 @@ REG sim_throttle_reg[] = {
 
 /* Set/Clear catchup */
 
-t_stat sim_timer_set_catchup (int32 flag, CONST char *cptr)
+t_stat sim_timer_set_catchup (int32 flag, const char *cptr)
 {
 if (flag) {
     if (!sim_catchup_ticks)
@@ -1268,7 +1268,7 @@ else {
 return SCPE_OK;
 }
 
-t_stat sim_timer_show_catchup (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat sim_timer_show_catchup (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "Calibrated Ticks%s", sim_catchup_ticks ? " with Catchup Ticks" : "");
 return SCPE_OK;
@@ -1276,7 +1276,7 @@ return SCPE_OK;
 
 /* Set idle calibration threshold */
 
-t_stat sim_timer_set_idle_pct (int32 flag, CONST char *cptr)
+t_stat sim_timer_set_idle_pct (int32 flag, const char *cptr)
 {
 t_stat r = SCPE_OK;
 
@@ -1306,7 +1306,7 @@ return SCPE_OK;
 
 /* Set stop time */
 
-t_stat sim_timer_set_stop (int32 flag, CONST char *cptr)
+t_stat sim_timer_set_stop (int32 flag, const char *cptr)
 {
 t_stat r;
 t_value stop_time;
@@ -1326,7 +1326,7 @@ return SCPE_OK;
 
 /* Set/Clear asynch */
 
-t_stat sim_timer_set_async (int32 flag, CONST char *cptr)
+t_stat sim_timer_set_async (int32 flag, const char *cptr)
 {
 if (flag) {
     if (sim_asynch_enabled && (!sim_asynch_timer)) {
@@ -1411,7 +1411,7 @@ DEVICE sim_throttle_dev = {
 
 /* SET CLOCK command */
 
-t_stat sim_set_timers (int32 arg, CONST char *cptr)
+t_stat sim_set_timers (int32 arg, const char *cptr)
 {
 char *cvptr, gbuf[CBUFSIZE];
 CTAB *ctptr;
@@ -1558,7 +1558,7 @@ return TRUE;
 
 /* Set idling - implicitly disables throttling */
 
-t_stat sim_set_idle (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat sim_set_idle (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 t_stat r;
 uint32 v;
@@ -1579,7 +1579,7 @@ return SCPE_OK;
 
 /* Clear idling */
 
-t_stat sim_clr_idle (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat sim_clr_idle (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 sim_idle_enab = FALSE;
 return SCPE_OK;
@@ -1587,7 +1587,7 @@ return SCPE_OK;
 
 /* Show idling */
 
-t_stat sim_show_idle (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat sim_show_idle (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if (sim_idle_enab)
     fprintf (st, "idle enabled");
@@ -1600,9 +1600,9 @@ return SCPE_OK;
 
 /* Throttling package */
 
-t_stat sim_set_throt (int32 arg, CONST char *cptr)
+t_stat sim_set_throt (int32 arg, const char *cptr)
 {
-CONST char *tptr;
+const char *tptr;
 char c;
 t_value val, val2 = 0;
 
@@ -1667,7 +1667,7 @@ if (sim_throt_type == SIM_THROT_SPC) {  /* Set initial value while correct one i
 return SCPE_OK;
 }
 
-t_stat sim_show_throt (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, CONST char *cptr)
+t_stat sim_show_throt (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, const char *cptr)
 {
 if (sim_idle_rate_ms == 0)
     fprintf (st, "Throttling:                    Not Available\n");

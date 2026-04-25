@@ -841,7 +841,7 @@ const char *sim_unsub_args(const char *cptr)
 
 /* Implement SET ENVIRONMENT, including prompt-driven and decoded-string
    forms. */
-t_stat sim_set_environment(int32 flag, CONST char *cptr)
+t_stat sim_set_environment(int32 flag, const char *cptr)
 {
     char varname[CBUFSIZE], prompt[CBUFSIZE], cbuf[CBUFSIZE];
 
@@ -850,7 +850,7 @@ t_stat sim_set_environment(int32 flag, CONST char *cptr)
     if ((!cptr) || (*cptr == 0))
         return SCPE_2FARG;
     if (sim_switches & SWMASK('P')) {
-        CONST char *deflt = NULL;
+        const char *deflt = NULL;
 
         cptr = get_glyph_quoted(cptr, prompt, 0);
         if (prompt[0] == '\0')

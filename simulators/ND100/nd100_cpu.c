@@ -70,8 +70,8 @@ t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_reset (DEVICE *dptr);
 
-t_stat hist_set(UNIT * uptr, int32 val, CONST char * cptr, void * desc);
-t_stat hist_show(FILE * st, UNIT * uptr, int32 val, CONST void * desc);
+t_stat hist_set(UNIT * uptr, int32 val, const char * cptr, void * desc);
+t_stat hist_show(FILE * st, UNIT * uptr, int32 val, const void * desc);
 static void hist_fprintf(FILE *fp, int itemNum, Hist_entry *hptr);
 static void hist_save(int ir);
 
@@ -264,7 +264,7 @@ cpu_dep(t_value val, t_addr addr, UNIT *uptr, int32 sw)
 }
 
 t_stat
-cpu_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+cpu_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
         return SCPE_ARG;
 }
@@ -1698,7 +1698,7 @@ hist_save(int ir)
 }
 
 t_stat
-hist_set(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+hist_set(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
         int32 i, lnt;
         t_stat r;
@@ -1758,10 +1758,10 @@ ioxprint(FILE *fp, Hist_entry *hptr, int ioaddr)
 }
 
 t_stat
-hist_show(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+hist_show(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
         int32 k, di, lnt;
-        CONST char *cptr = (CONST char *) desc;
+        const char *cptr = (const char *) desc;
         t_stat r;
         Hist_entry *hptr;
 

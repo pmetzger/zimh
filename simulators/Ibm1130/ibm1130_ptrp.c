@@ -35,12 +35,12 @@
 
 static t_stat ptr_svc    (UNIT *uptr);
 static t_stat ptr_reset  (DEVICE *dptr);
-static t_stat ptr_attach (UNIT *uptr, CONST char *cptr);
+static t_stat ptr_attach (UNIT *uptr, const char *cptr);
 static t_stat ptr_detach (UNIT *uptr);
 static t_stat ptr_boot   (int32 unitno, DEVICE *dptr);
 static t_stat ptp_svc    (UNIT *uptr);
 static t_stat ptp_reset  (DEVICE *dptr);
-static t_stat ptp_attach (UNIT *uptr, CONST char *cptr);
+static t_stat ptp_attach (UNIT *uptr, const char *cptr);
 static t_stat ptp_detach (UNIT *uptr);
 
 static int16 ptr_dsw   = 0;                             /* device status word */
@@ -203,7 +203,7 @@ static t_stat ptp_reset (DEVICE *dptr)
 
 /* ptr_attach - attach file to simulated paper tape reader */
 
-static t_stat ptr_attach (UNIT *uptr, CONST char *cptr)
+static t_stat ptr_attach (UNIT *uptr, const char *cptr)
 {
     t_stat rval;
 
@@ -282,7 +282,7 @@ static t_stat ptr_boot (int32 unitno, DEVICE *dptr)
 
 /* ptp_attach - attach file to simulated paper tape punch */
 
-static t_stat ptp_attach (UNIT *uptr, CONST char *cptr)
+static t_stat ptp_attach (UNIT *uptr, const char *cptr)
 {
     t_stat rval;
 

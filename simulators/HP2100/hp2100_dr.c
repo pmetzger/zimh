@@ -237,13 +237,13 @@ static INTERFACE drc_interface;
 
 static t_stat drc_svc (UNIT *uptr);
 static t_stat drc_reset (DEVICE *dptr);
-static t_stat drc_attach (UNIT *uptr, CONST char *cptr);
+static t_stat drc_attach (UNIT *uptr, const char *cptr);
 static t_stat drc_boot (int32 unitno, DEVICE *dptr);
 static int32  dr_incda (int32 trk, int32 sec, int32 ptr);
 static int32  dr_seccntr (double simtime);
-static t_stat dr_set_prot (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat dr_show_prot (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat dr_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+static t_stat dr_set_prot (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat dr_show_prot (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat dr_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
 
 
 /* Device information blocks */
@@ -793,7 +793,7 @@ return SCPE_OK;
    mark to the last byte in the file.
 */
 
-t_stat drc_attach (UNIT *uptr, CONST char *cptr)
+t_stat drc_attach (UNIT *uptr, const char *cptr)
 {
 t_stat      result;
 const int32 sz = sz_tab [DR_GETSZ (uptr->flags)];
@@ -813,7 +813,7 @@ return result;                                          /* return the result of 
 
 /* Set protected track count */
 
-t_stat dr_set_prot (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dr_set_prot (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 count;
 t_stat status;
@@ -849,7 +849,7 @@ return SCPE_OK;
 
 /* Show protected track count */
 
-t_stat dr_show_prot (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dr_show_prot (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "protected tracks=%d", drc_pcount);
 return SCPE_OK;
@@ -857,7 +857,7 @@ return SCPE_OK;
 
 /* Set size routine */
 
-t_stat dr_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dr_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 sz;
 int32 szindex;

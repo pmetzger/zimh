@@ -102,7 +102,7 @@
                               &vax610_set_instruction_set, NULL, NULL,                 "Set the CPU Instruction Set" },                    \
                             { MTAB_XTD|MTAB_VDV, 0, "INSTRUCTIONS", NULL,                                                                    \
                               NULL,                     &cpu_show_instruction_set, NULL, "Show the CPU Instruction Set (SHOW -V)" },
-t_stat vax610_set_instruction_set (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat vax610_set_instruction_set (UNIT *uptr, int32 val, const char *cptr, void *desc);
 
 /* QVSS memory space */
 
@@ -133,7 +133,7 @@ extern uint32 *vc_buf;
                         { UNIT_MSIZE, (1u << 21), NULL, "2M",   &cpu_set_size, NULL, NULL, "Set Memory to 2M bytes" },  \
                         { UNIT_MSIZE, (1u << 22), NULL, "4M",   &cpu_set_size, NULL, NULL, "Set Memory to 4M bytes" },  \
                         { MTAB_XTD|MTAB_VDV|MTAB_NMO, 0, "MEMORY", NULL, NULL, &cpu_show_memory, NULL, "Display memory configuration" }
-extern t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
+extern t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc);
 
 /* Qbus I/O page */
 
@@ -368,7 +368,7 @@ int32 ReadRegU (uint32 pa, int32 lnt);
 void WriteIOU (uint32 pa, int32 val, int32 lnt);
 void WriteRegU (uint32 pa, int32 val, int32 lnt);
 
-t_stat cpu_show_leds (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat cpu_show_leds (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 #include "pdp11_io_lib.h"
 

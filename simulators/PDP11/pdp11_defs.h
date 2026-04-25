@@ -879,7 +879,7 @@ void mba_upd_ata (uint32 mbus, uint32 val);
 void mba_set_exc (uint32 mbus);
 void mba_set_don (uint32 mbus);
 void mba_set_enbdis (DEVICE *dptr);
-t_stat mba_show_num (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat mba_show_num (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 t_stat build_dib_tab (void);
 

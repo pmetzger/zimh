@@ -326,7 +326,7 @@ t_stat id_unit_svc(UNIT *uptr)
     return SCPE_OK;
 }
 
-t_stat id_set_large(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat id_set_large(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     id_large = (t_bool)val;
 
@@ -338,7 +338,7 @@ t_stat id_set_large(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat id_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat id_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (val < 0 || val > ID_MAX_DTYPE) {
         return SCPE_ARG;
@@ -362,7 +362,7 @@ t_stat id_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat id_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat id_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "%s%s",
             id_dtab[ID_GET_DTYPE(uptr->flags)].name,
@@ -376,7 +376,7 @@ t_stat id_reset(DEVICE *dptr)
     return SCPE_OK;
 }
 
-t_stat id_attach(UNIT *uptr, CONST char *cptr)
+t_stat id_attach(UNIT *uptr, const char *cptr)
 {
 
     if (ID_GET_DTYPE(uptr->flags) == ID_HD161_DTYPE && !id_large) {
@@ -967,7 +967,7 @@ void id_after_dma(void)
     id_drq = FALSE;
 }
 
-CONST char *id_description(DEVICE *dptr)
+const char *id_description(DEVICE *dptr)
 {
     return "Integrated Hard Disk";
 }

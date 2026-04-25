@@ -86,7 +86,7 @@
 #define TYMBAS_DATA  0200
 
 static t_stat tym_reset(DEVICE *dptr);
-static t_stat tym_attach(UNIT * uptr, CONST char * cptr);
+static t_stat tym_attach(UNIT * uptr, const char * cptr);
 static t_stat tym_detach(UNIT * uptr);
 static t_stat tym_interface_srv(UNIT *);
 static t_stat tym_alive_srv(UNIT *);
@@ -173,7 +173,7 @@ static void block(void)
     }
 }
 
-static t_stat tym_attach(UNIT *uptr, CONST char *cptr)
+static t_stat tym_attach(UNIT *uptr, const char *cptr)
 {
     t_stat stat = tmxr_attach(&tym_desc, uptr, cptr);
     block();

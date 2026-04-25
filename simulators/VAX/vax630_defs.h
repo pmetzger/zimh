@@ -127,7 +127,7 @@
                         { UNIT_MSIZE, (1u << 23) + (1u << 22) + (1u << 20), NULL, "13M", &cpu_set_size, NULL, NULL, "Set Memory to 13M bytes" }, \
                         { UNIT_MSIZE, (1u << 24), NULL, "16M", &cpu_set_size, NULL, NULL, "Set Memory to 16M bytes" },                           \
                         { MTAB_XTD|MTAB_VDV|MTAB_NMO, 0, "MEMORY", NULL, NULL, &cpu_show_memory, NULL, "Display memory configuration" }
-extern t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
+extern t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc);
 
 /* Qbus I/O page */
 
@@ -440,11 +440,11 @@ int32 ReadRegU (uint32 pa, int32 lnt);
 void WriteIOU (uint32 pa, int32 val, int32 lnt);
 void WriteRegU (uint32 pa, int32 val, int32 lnt);
 
-extern t_stat sysd_set_diag (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat sysd_show_diag (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat sysd_set_halt (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat sysd_show_halt (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat sysd_show_leds (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat sysd_set_diag (UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat sysd_show_diag (FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat sysd_set_halt (UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat sysd_show_halt (FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat sysd_show_leds (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 #include "pdp11_io_lib.h"
 

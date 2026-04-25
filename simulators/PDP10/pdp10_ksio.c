@@ -1694,7 +1694,7 @@ return SCPE_OK;
 
 /* Change device address */
 
-t_stat set_addr (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_addr (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -1725,7 +1725,7 @@ return SCPE_OK;
 
 /* Show device address */
 
-t_stat show_addr (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_addr (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -1751,7 +1751,7 @@ return SCPE_OK;
 
 /* Change device vector */
 
-t_stat set_vec (UNIT *uptr, int32 arg, CONST char *cptr, void *desc)
+t_stat set_vec (UNIT *uptr, int32 arg, const char *cptr, void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -1780,7 +1780,7 @@ return SCPE_OK;
 
 /* Show device vector */
 
-t_stat show_vec (FILE *st, UNIT *uptr, int32 arg, CONST void *desc)
+t_stat show_vec (FILE *st, UNIT *uptr, int32 arg, const void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -1820,7 +1820,7 @@ return SCPE_OK;
 
 /* Show vector for terminal multiplexor */
 
-t_stat show_vec_mux (FILE *st, UNIT *uptr, int32 arg, CONST void *desc)
+t_stat show_vec_mux (FILE *st, UNIT *uptr, int32 arg, const void *desc)
 {
 const TMXR *mp = (const TMXR *) desc;
 
@@ -1907,7 +1907,7 @@ return SCPE_OK;
 
 /* Show dib_tab */
 
-t_stat show_iospace (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_iospace (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 i, j, done = 0;
 DEVICE *dptr;
@@ -2287,7 +2287,7 @@ return SCPE_OK;
 
 /* Set address floating */
 
-t_stat set_addr_flt (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_addr_flt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 DEVICE *dptr;
 

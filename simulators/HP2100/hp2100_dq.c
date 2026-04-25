@@ -204,9 +204,9 @@ static INTERFACE dqc_interface;
 static t_stat dqc_svc (UNIT *uptr);
 static t_stat dqd_svc (UNIT *uptr);
 static t_stat dqc_reset (DEVICE *dptr);
-static t_stat dqc_attach (UNIT *uptr, CONST char *cptr);
+static t_stat dqc_attach (UNIT *uptr, const char *cptr);
 static t_stat dqc_detach (UNIT* uptr);
-static t_stat dqc_load_unload (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat dqc_load_unload (UNIT *uptr, int32 value, const char *cptr, void *desc);
 static t_stat dqc_boot (int32 unitno, DEVICE *dptr);
 static void dq_god (int32 fnc, int32 drv, int32 time);
 static void dq_goc (int32 fnc, int32 drv, int32 time);
@@ -1082,7 +1082,7 @@ return SCPE_OK;
        offset from the start of the file to the last byte and seek there.
 */
 
-t_stat dqc_attach (UNIT *uptr, CONST char *cptr)
+t_stat dqc_attach (UNIT *uptr, const char *cptr)
 {
 t_stat      result;
 t_addr      offset;
@@ -1117,7 +1117,7 @@ return detach_unit (uptr);                              /* detach unit */
 
 /* Load and unload heads */
 
-t_stat dqc_load_unload (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat dqc_load_unload (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if ((uptr->flags & UNIT_ATT) == 0) return SCPE_UNATT;   /* must be attached to load */
 if (value == UNIT_UNLOAD)                               /* unload heads? */

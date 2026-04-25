@@ -93,8 +93,8 @@ t_stat sys_cfg(uint16 base, uint16 devnum, uint8 dummy);
 t_stat sys_clr(void);
 t_stat sys_reset(DEVICE *dptr);
 static const char* sys_desc(DEVICE *dptr);
-t_stat sys_set_model (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat sys_show_model (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat sys_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat sys_show_model (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 /* external function prototypes */
 
@@ -487,7 +487,7 @@ t_stat sys_reset(DEVICE *dptr)
 
 /* Set/show CPU model */
 
-t_stat sys_set_model (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat sys_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int i, j;
     DEVICE *dptr;
@@ -589,7 +589,7 @@ t_stat sys_set_model (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_ARG;
 }
 
-t_stat sys_show_model (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat sys_show_model (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int i, j;
     

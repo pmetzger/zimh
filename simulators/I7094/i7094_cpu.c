@@ -218,10 +218,10 @@ extern DEVICE ch_dev[NUM_CHAN];
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_reset (DEVICE *dptr);
-t_stat cpu_set_model (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_model (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_model (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_bool ReadI (uint32 va, t_uint64 *dat);
 t_bool Read (uint32 va, t_uint64 *dat);
 t_bool Write (uint32 va, t_uint64 dat);
@@ -2282,7 +2282,7 @@ return SCPE_OK;
 
 /* Set model */
 
-t_stat cpu_set_model (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 UNIT *chuptr = mt_dev[CHRONO_CH].units + CHRONO_UNIT;
 extern DEVICE clk_dev;
@@ -2305,7 +2305,7 @@ return SCPE_OK;
 
 /* Show CTSS */
 
-t_stat cpu_show_model (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_model (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if (cpu_model & I_CT)
     fputs ("CTSS", st);
@@ -2361,7 +2361,7 @@ return;
 
 /* Set history */
 
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i, lnt;
 t_stat r;
@@ -2448,10 +2448,10 @@ return SCPE_OK;
 
 /* Show history */
 
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 k, di, lnt;
-CONST char *cptr = (CONST char *) desc;
+const char *cptr = (const char *) desc;
 t_stat r;
 InstHistory *h;
 

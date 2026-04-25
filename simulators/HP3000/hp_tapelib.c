@@ -1297,7 +1297,7 @@ else                                                    /* otherwise */
        otherwise).
 */
 
-t_stat tl_attach (CVPTR cvptr, UNIT *uptr, CONST char *cptr)
+t_stat tl_attach (CVPTR cvptr, UNIT *uptr, const char *cptr)
 {
 const int32 unit = (int32) (uptr - cvptr->device->units);   /* the unit number */
 t_stat result;
@@ -1363,7 +1363,7 @@ return sim_tape_detach (uptr);                          /* detach the tape image
    tested in the "start_command" routine.
 */
 
-t_stat tl_set_timing (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat tl_set_timing (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 DEVICE *const dptr = ((CVPTR) desc)->device;            /* a pointer to the controlling device */
 
@@ -1384,7 +1384,7 @@ return SCPE_OK;
    verified before permitting the change.
 */
 
-t_stat tl_set_model (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat tl_set_model (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 const CVPTR cvptr = (CVPTR) desc;                       /* the controller state structure pointer */
 const DRIVE_TYPE new_drive = GET_MODEL (value);         /* the new model ID */
@@ -1402,7 +1402,7 @@ return validate_drive (cvptr, uptr, new_drive, 0);      /* verify the model chan
    density setting is verified before permitting the change.
 */
 
-t_stat tl_set_density (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat tl_set_density (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 const CVPTR cvptr = (CVPTR) desc;                       /* the controller state structure pointer */
 const DRIVE_TYPE model = GET_MODEL (uptr->flags);       /* the current drive model ID */
@@ -1447,7 +1447,7 @@ else                                                        /* otherwise a numer
    supplied.
 */
 
-t_stat tl_set_reelsize (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat tl_set_reelsize (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 const uint32 tape_bpi = drive_props [PROP_INDEX (uptr)].bpi;    /* the tape unit density */
 int32  reel;
@@ -1521,7 +1521,7 @@ else {                                                  /* otherwise a size is s
        pointer instead.
 */
 
-t_stat tl_show_timing (FILE *st, UNIT *uptr, int32 value, CONST void *desc)
+t_stat tl_show_timing (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
 DEVICE *const dptr = ((const CNTLR_VARS *) desc)->device;   /* a pointer to the controlling device */
 
@@ -1541,7 +1541,7 @@ return SCPE_OK;
    to the unit to be queried.
 */
 
-t_stat tl_show_density (FILE *st, UNIT *uptr, int32 value, CONST void *desc)
+t_stat tl_show_density (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
 fprintf (st, "%u bpi", drive_props [PROP_INDEX (uptr)].bpi);
 
@@ -1575,7 +1575,7 @@ return SCPE_OK;
        respectively, to provide multiplication by 2 ** <reel ID>.
 */
 
-t_stat tl_show_reelsize (FILE *st, UNIT *uptr, int32 value, CONST void *desc)
+t_stat tl_show_reelsize (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
 t_stat status = SCPE_OK;
 

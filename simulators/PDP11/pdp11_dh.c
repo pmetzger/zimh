@@ -32,7 +32,7 @@ t_stat dh_wr(int32 data, int32 PA, int32 access);
 t_stat dh_input_svc(UNIT *uptr);
 t_stat dh_output_svc(UNIT *uptr);
 t_stat dh_reset(DEVICE *dptr);
-t_stat dh_attach (UNIT *uptr, CONST char *cptr);
+t_stat dh_attach (UNIT *uptr, const char *cptr);
 t_stat dh_detach (UNIT *uptr);
 const char *dh_description (DEVICE *dptr);
 
@@ -259,7 +259,7 @@ dh_wr(int32 data, int32 PA, int32 access)
   return stat;
 }
 
-t_stat dh_attach (UNIT *uptr, CONST char *cptr)
+t_stat dh_attach (UNIT *uptr, const char *cptr)
 {
   return tmxr_attach (&dh_desc, uptr, cptr);
 }

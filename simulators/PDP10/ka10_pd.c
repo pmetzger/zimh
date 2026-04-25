@@ -51,9 +51,9 @@ int pd_tps =            60;
 t_stat         pd_devio(uint32 dev, uint64 *data);
 const char     *pd_description (DEVICE *dptr);
 t_stat         pd_srv(UNIT *uptr);
-t_stat         pd_set_on(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat         pd_set_off(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat         pd_show_on(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat         pd_set_on(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat         pd_set_off(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat         pd_show_on(FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 UNIT                pd_unit[] = {
     {UDATA(pd_srv, UNIT_IDLE|UNIT_DISABLE, 0)},  /* 0 */
@@ -138,21 +138,21 @@ const char *pd_description (DEVICE *dptr)
     return "Paul DeCoriolis clock";
 }
 
-t_stat pd_set_on(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat pd_set_on(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE *dptr = &pd_dev;
     dptr->flags &= ~PD_OFF;
     return SCPE_OK;
 }
 
-t_stat pd_set_off(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat pd_set_off(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE *dptr = &pd_dev;
     dptr->flags |= PD_OFF;
     return SCPE_OK;
 }
 
-t_stat pd_show_on(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat pd_show_on(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     DEVICE *dptr = &pd_dev;
     fprintf (st, "%s", (dptr->flags & PD_OFF) ? "off" : "on");

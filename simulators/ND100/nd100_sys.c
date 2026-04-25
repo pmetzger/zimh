@@ -94,7 +94,7 @@ gw(FILE *f)
  */
 
 t_stat
-sim_load(FILE *f, CONST char *buf, CONST char *fnam, t_bool flag)
+sim_load(FILE *f, const char *buf, const char *fnam, t_bool flag)
 {
         int B, C, E, F, H, I;
         int w, i, rv;
@@ -352,7 +352,7 @@ fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 }
 
 t_stat
-parse_sym(CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
         return SCPE_ARG;
 }

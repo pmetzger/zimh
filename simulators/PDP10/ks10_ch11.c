@@ -83,12 +83,12 @@ int    ch11_receive (struct pdp_dib *dibp);
 void   ch11_clear (struct pdp_dib *dibp);
 t_stat ch11_svc(UNIT *);
 t_stat ch11_reset (DEVICE *);
-t_stat ch11_attach (UNIT *, CONST char *);
+t_stat ch11_attach (UNIT *, const char *);
 t_stat ch11_detach (UNIT *);
-t_stat ch11_show_peer (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat ch11_set_peer (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat ch11_show_node (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat ch11_set_node (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
+t_stat ch11_show_peer (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat ch11_set_peer (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat ch11_show_node (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat ch11_set_node (UNIT* uptr, int32 val, const char* cptr, void* desc);
 t_stat ch11_help (FILE *, DEVICE *, UNIT *, int32, const char *);
 t_stat ch11_help_attach (FILE *, DEVICE *, UNIT *, int32, const char *);
 const char *ch11_description (DEVICE *);
@@ -438,7 +438,7 @@ ch11_svc(UNIT *uptr)
   return SCPE_OK;
 }
 
-t_stat ch11_attach (UNIT *uptr, CONST char *cptr)
+t_stat ch11_attach (UNIT *uptr, const char *cptr)
 {
   char linkinfo[256];
   t_stat r;
@@ -480,13 +480,13 @@ t_stat ch11_reset (DEVICE *dptr)
   return SCPE_OK;
 }
 
-t_stat ch11_show_peer (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat ch11_show_peer (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
   fprintf (st, "peer=%s", peer[0] ? peer : "unspecified");
   return SCPE_OK;
 }
 
-t_stat ch11_set_peer (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat ch11_set_peer (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
   char host[256], port[256];
 
@@ -503,7 +503,7 @@ t_stat ch11_set_peer (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
   return SCPE_OK;
 }
 
-t_stat ch11_show_node (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat ch11_show_node (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
   if (address == -1)
     fprintf (st, "node=unspecified");
@@ -512,7 +512,7 @@ t_stat ch11_show_node (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
   return SCPE_OK;
 }
 
-t_stat ch11_set_node (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat ch11_set_node (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
   t_stat r;
   int x;

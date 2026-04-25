@@ -44,11 +44,11 @@
 
 t_stat isbc464_cfg(uint16 base, uint16 size, uint8 dummy);
 t_stat isbc464_clr(void);
-t_stat isbc464_set_base(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat isbc464_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat isbc464_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat isbc464_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat isbc464_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat isbc464_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat isbc464_reset (DEVICE *dptr);
-t_stat isbc464_attach (UNIT *uptr, CONST char *cptr);
+t_stat isbc464_attach (UNIT *uptr, const char *cptr);
 uint8 isbc464_get_mbyte(uint16 addr);
 
 /* external function prototypes */
@@ -146,7 +146,7 @@ t_stat isbc464_clr(void)
 
 // set size parameter
 
-t_stat isbc464_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat isbc464_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result, i;
     
@@ -180,7 +180,7 @@ t_stat isbc464_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // set base address parameter
 
-t_stat isbc464_set_base(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat isbc464_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result, i;
     
@@ -214,7 +214,7 @@ t_stat isbc464_set_base(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // show configuration parameters
 
-t_stat isbc464_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat isbc464_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "%s, Size=%04X, Base=%04X ", 
         ((isbc464_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled", 
@@ -251,7 +251,7 @@ t_stat isbc464_reset (DEVICE *dptr)
 
 /* isbc464 attach  */
 
-t_stat isbc464_attach (UNIT *uptr, CONST char *cptr) 
+t_stat isbc464_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
 

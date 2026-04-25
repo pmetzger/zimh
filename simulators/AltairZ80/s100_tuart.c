@@ -99,8 +99,8 @@ typedef struct {
     uint8 intvector;     /* Interrupt Vector  */
 } TUART_CTX;
 
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 
@@ -111,7 +111,7 @@ static t_stat tuart_reset(DEVICE *dptr, int32 (*routine)(const int32, const int3
 static t_stat tuart0_reset(DEVICE *dptr);
 static t_stat tuart1_reset(DEVICE *dptr);
 static t_stat tuart2_reset(DEVICE *dptr);
-static t_stat tuart_attach(UNIT *uptr, CONST char *cptr);
+static t_stat tuart_attach(UNIT *uptr, const char *cptr);
 static t_stat tuart_detach(UNIT *uptr);
 static t_stat tuart_set_baud(UNIT *uptr, int32 value, const char *cptr, void *desc);
 static t_stat tuart_show_baud(FILE *st, UNIT *uptr, int32 value, const void *desc);
@@ -462,7 +462,7 @@ static t_stat tuart_svc(UNIT *uptr)
 }
 
 /* Attach routine */
-static t_stat tuart_attach(UNIT *uptr, CONST char *cptr)
+static t_stat tuart_attach(UNIT *uptr, const char *cptr)
 {
     TUART_CTX *xptr;
     t_stat r = SCPE_OK;

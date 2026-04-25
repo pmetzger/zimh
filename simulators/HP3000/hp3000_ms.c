@@ -466,8 +466,8 @@ static CNTLR_INTRF ms_interface;
 static t_stat      ms_service   (UNIT   *uptr);
 static t_stat      ms_reset     (DEVICE *dptr);
 static t_stat      ms_boot      (int32  unit_number, DEVICE *dptr);
-static t_stat      ms_attach    (UNIT   *uptr,       CONST char *cptr);
-static t_stat      ms_onoffline (UNIT   *uptr,       int32      value, CONST char *cptr, void *desc);
+static t_stat      ms_attach    (UNIT   *uptr,       const char *cptr);
+static t_stat      ms_onoffline (UNIT   *uptr,       int32      value, const char *cptr, void *desc);
 
 
 /* Interface local utility routines */
@@ -1096,7 +1096,7 @@ else {                                                  /* otherwise */
        changed by the controller, so the unit will not request attention.
 */
 
-static t_stat ms_attach (UNIT *uptr, CONST char *cptr)
+static t_stat ms_attach (UNIT *uptr, const char *cptr)
 {
 t_stat result;
 
@@ -1129,7 +1129,7 @@ else                                                    /* otherwise */
    becomes idle.
 */
 
-static t_stat ms_onoffline (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat ms_onoffline (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 const t_bool online = (value != UNIT_OFFLINE);          /* TRUE if the drive is being put online */
 t_stat result;

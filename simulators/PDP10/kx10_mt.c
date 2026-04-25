@@ -132,14 +132,14 @@
 t_stat         mt_devio(uint32 dev, uint64 *data);
 t_stat         mt_srv(UNIT *);
 t_stat         mt_boot(int32, DEVICE *);
-t_stat         mt_set_mta (UNIT *uptr, int32 val, CONST char *cptr, void *desc) ;
-t_stat         mt_show_mta (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat         mt_set_mta (UNIT *uptr, int32 val, const char *cptr, void *desc) ;
+t_stat         mt_show_mta (FILE *st, UNIT *uptr, int32 val, const void *desc);
 #if MPX_DEV
-t_stat         mt_set_mpx (UNIT *uptr, int32 val, CONST char *cptr, void *desc) ;
-t_stat         mt_show_mpx (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat         mt_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc) ;
+t_stat         mt_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc);
 #endif
 t_stat         mt_reset(DEVICE *);
-t_stat         mt_attach(UNIT *, CONST char *);
+t_stat         mt_attach(UNIT *, const char *);
 t_stat         mt_detach(UNIT *);
 t_stat         mt_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                   const char *cptr);
@@ -969,7 +969,7 @@ mt_boot(int32 unit_num, DEVICE * dptr)
     return SCPE_OK;
 }
 
-t_stat mt_set_mta (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat mt_set_mta (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE *dptr;
     dptr = find_dev_from_unit (uptr);
@@ -983,7 +983,7 @@ t_stat mt_set_mta (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat mt_show_mta (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat mt_show_mta (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    DEVICE *dptr;
 
@@ -1003,7 +1003,7 @@ t_stat mt_show_mta (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 
 #if MPX_DEV
 /* set MPX level number */
-t_stat mt_set_mpx (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat mt_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32 mpx;
     t_stat r;
@@ -1017,7 +1017,7 @@ t_stat mt_set_mpx (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat mt_show_mpx (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat mt_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    if (uptr == NULL)
       return SCPE_IERR;
@@ -1049,7 +1049,7 @@ mt_reset(DEVICE * dptr)
 }
 
 t_stat
-mt_attach(UNIT * uptr, CONST char *file)
+mt_attach(UNIT * uptr, const char *file)
 {
     return sim_tape_attach_ex(uptr, file, 0, 0);
 }

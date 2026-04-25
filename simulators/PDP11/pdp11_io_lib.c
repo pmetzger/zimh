@@ -64,7 +64,7 @@ static void build_vector_tab (void);
 
 /* Enable/disable autoconfiguration */
 
-t_stat set_autocon (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_autocon (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (cptr != NULL)
     return SCPE_ARG;
@@ -88,7 +88,7 @@ return auto_config (NULL, 0);
 
 /* Show autoconfiguration status */
 
-t_stat show_autocon (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_autocon (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "autoconfiguration ");
 fprintf (st, autcon_enb? "enabled": "disabled");
@@ -97,7 +97,7 @@ return SCPE_OK;
 
 /* Change device address */
 
-t_stat set_addr (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_addr (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -127,7 +127,7 @@ return SCPE_OK;
 
 /* Show device address */
 
-t_stat show_addr (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_addr (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -168,7 +168,7 @@ return SCPE_OK;
 
 /* Set address floating */
 
-t_stat set_addr_flt (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_addr_flt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 DEVICE *dptr;
 
@@ -184,7 +184,7 @@ return auto_config (NULL, 0);                           /* autoconfigure */
 
 /* Show device address */
 
-t_stat show_mapped_addr (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_mapped_addr (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "address=%p-%p", desc, ((const char *)desc) + uptr->capac - 1);
 return SCPE_OK;
@@ -192,7 +192,7 @@ return SCPE_OK;
 
 /* Change device vector */
 
-t_stat set_vec (UNIT *uptr, int32 arg, CONST char *cptr, void *desc)
+t_stat set_vec (UNIT *uptr, int32 arg, const char *cptr, void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -221,7 +221,7 @@ return SCPE_OK;
 
 /* Show device vector */
 
-t_stat show_vec (FILE *st, UNIT *uptr, int32 arg, CONST void *desc)
+t_stat show_vec (FILE *st, UNIT *uptr, int32 arg, const void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -279,7 +279,7 @@ return SCPE_OK;
 
 /* Show vector for terminal multiplexor */
 
-t_stat show_vec_mux (FILE *st, UNIT *uptr, int32 arg, CONST void *desc)
+t_stat show_vec_mux (FILE *st, UNIT *uptr, int32 arg, const void *desc)
 {
 const TMXR *mp = (const TMXR *) desc;
 
@@ -443,7 +443,7 @@ return SCPE_OK;
 
 /* Show IO space */
 
-t_stat show_iospace (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_iospace (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 uint32 i, j;
 DEVICE *dptr;

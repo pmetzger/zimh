@@ -20,21 +20,21 @@ const char *get_glyph_gen(const char *iptr, char *optr, char mchar, t_bool uc,
                           t_bool quote, char escape_char);
 
 /* Parse the next token and fold alphabetic characters to upper case. */
-CONST char *get_glyph(const char *iptr, char *optr, char mchar);
+const char *get_glyph(const char *iptr, char *optr, char mchar);
 
 /* Parse the next token without changing its case. */
-CONST char *get_glyph_nc(const char *iptr, char *optr, char mchar);
+const char *get_glyph_nc(const char *iptr, char *optr, char mchar);
 
 /* Parse one token, allowing it to be enclosed in quotes. */
-CONST char *get_glyph_quoted(const char *iptr, char *optr, char mchar);
+const char *get_glyph_quoted(const char *iptr, char *optr, char mchar);
 
 /* Parse the leading command token, handling SCP's special '!' form. */
-CONST char *get_glyph_cmd(const char *iptr, char *optr);
+const char *get_glyph_cmd(const char *iptr, char *optr);
 
 /* Decode either symbolic switches or a numeric switch argument. */
 SWITCH_PARSE get_switches(const char *cptr, int32 *sw, int32 *number);
 
 /* Consume leading simulator switches from an SCP command string. */
-CONST char *get_sim_sw(CONST char *cptr);
+const char *get_sim_sw(const char *cptr);
 
 #endif

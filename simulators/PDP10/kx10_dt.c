@@ -277,12 +277,12 @@ t_stat         dt_devio(uint32 dev, uint64 *data);
 t_stat         dt_svc (UNIT *uptr);
 t_stat         dt_boot(int32 unit_num, DEVICE * dptr);
 t_stat         dt_reset (DEVICE *dptr);
-t_stat         dt_attach (UNIT *uptr, CONST char *cptr);
+t_stat         dt_attach (UNIT *uptr, const char *cptr);
 void           dt_flush (UNIT *uptr);
 t_stat         dt_detach (UNIT *uptr);
 #if MPX_DEV
-t_stat         dt_set_mpx (UNIT *uptr, int32 val, CONST char *cptr, void *desc) ;
-t_stat         dt_show_mpx (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat         dt_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc) ;
+t_stat         dt_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc);
 #endif
 
 
@@ -1103,7 +1103,7 @@ dt_boot(int32 unit_num, DEVICE * dptr)
 
 #if MPX_DEV
 /* set MPX level number */
-t_stat dt_set_mpx (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dt_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32 mpx;
     t_stat r;
@@ -1117,7 +1117,7 @@ t_stat dt_set_mpx (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat dt_show_mpx (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dt_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    if (uptr == NULL)
       return SCPE_IERR;
@@ -1152,7 +1152,7 @@ t_stat dt_reset (DEVICE *dptr)
    If 18b/36b, read data into buffer
 */
 
-t_stat dt_attach (UNIT *uptr, CONST char *cptr)
+t_stat dt_attach (UNIT *uptr, const char *cptr)
 {
     uint16 pdp8b[D8_NBSIZE];
     uint16 pdp11b[D18_BSIZE];

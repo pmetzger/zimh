@@ -370,14 +370,14 @@ extern UNIT cpu_unit;
 
 static t_stat cr_svc      (UNIT *uptr);
 static t_stat cr_reset    (DEVICE *dptr);
-static t_stat cr_set_code (UNIT *uptr, int32 match, CONST char *cptr, void *desc);
-static t_stat cr_attach   (UNIT *uptr, CONST char *cptr);
+static t_stat cr_set_code (UNIT *uptr, int32 match, const char *cptr, void *desc);
+static t_stat cr_attach   (UNIT *uptr, const char *cptr);
 static int32  guess_cr_code (void);
 static void   feedcycle   (t_bool load, t_bool punching);
 
 static t_stat cp_reset    (DEVICE *dptr);
-static t_stat cp_set_code (UNIT *uptr, int32 match, CONST char *cptr, void *desc);
-static t_stat cp_attach   (UNIT *uptr, CONST char *cptr);
+static t_stat cp_set_code (UNIT *uptr, int32 match, const char *cptr, void *desc);
+static t_stat cp_attach   (UNIT *uptr, const char *cptr);
 static t_stat cp_detach   (UNIT *uptr);
 
 static int16 cr_dsw  = 0;                                   /* device status word */
@@ -747,7 +747,7 @@ static enum {STATION_EMPTY, STATION_LOADED, STATION_READ, STATION_PUNCHED} punch
 static t_bool nextdeck (void);
 static void checkdeck (void);
 
-static t_stat pcr_attach(UNIT *uptr, CONST char *devname);
+static t_stat pcr_attach(UNIT *uptr, const char *devname);
 static t_stat pcr_detach(UNIT *uptr);
 static t_stat pcr_svc(UNIT *uptr);
 static void   pcr_xio_sense(int modify);
@@ -812,7 +812,7 @@ t_stat set_active_cr_code (int match)
     return SCPE_OK;
 }
 
-static t_stat cr_set_code (UNIT *uptr, int32 match, CONST char *cptr, void *desc)
+static t_stat cr_set_code (UNIT *uptr, int32 match, const char *cptr, void *desc)
 {
     if (match == CODE_AUTO)
         match = guess_cr_code();
@@ -880,7 +880,7 @@ static int32 guess_cr_code (void)
     return guess;
 }
 
-static t_stat cp_set_code (UNIT *uptr, int32 match, CONST char *cptr, void *desc)
+static t_stat cp_set_code (UNIT *uptr, int32 match, const char *cptr, void *desc)
 {
     CPCODE *code;
     size_t ncode;
@@ -1567,7 +1567,7 @@ t_stat cr_rewind (void)
     return SCPE_OK;
 }
 
-static t_stat cr_attach (UNIT *uptr, CONST char *iptr)
+static t_stat cr_attach (UNIT *uptr, const char *iptr)
 {
     t_stat rval;
     t_bool use_decklist, old_quiet;
@@ -1721,7 +1721,7 @@ t_stat cr_detach (UNIT *uptr)
     return rval;
 }
 
-static t_stat cp_attach (UNIT *uptr, CONST char *cptr)
+static t_stat cp_attach (UNIT *uptr, const char *cptr)
 {
     char gbuf[2*CBUFSIZE];
                                                 /* if -d is specified turn on debugging (bit is in card reader UNIT) */
@@ -2116,7 +2116,7 @@ void xio_1442_card (int32 addr, int32 func, int32 modify)
 
     /* stub out the physical card reader routines */
 
-    static t_stat pcr_attach        (UNIT *uptr, CONST char *devname) {return SCPE_ARG;}
+    static t_stat pcr_attach        (UNIT *uptr, const char *devname) {return SCPE_ARG;}
     static t_stat pcr_detach        (UNIT *uptr)                {return detach_unit(uptr);}
     static t_stat pcr_svc           (UNIT *uptr)                {return SCPE_OK;}
     static void   pcr_xio_sense     (int modify) {}
@@ -2175,7 +2175,7 @@ static char      lastcmd = '?';
 
 /* pcr_attach - perform attach function to physical card reader */
 
-static t_stat pcr_attach (UNIT *uptr, CONST char *devname)
+static t_stat pcr_attach (UNIT *uptr, const char *devname)
 {
     DWORD thread_id;
     t_stat rval;

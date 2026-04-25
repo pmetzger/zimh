@@ -115,9 +115,9 @@ t_stat          rc_svc(UNIT *);
 t_stat          rc_boot(int32, DEVICE *);
 void            rc_ini(UNIT *, t_bool);
 t_stat          rc_reset(DEVICE *);
-t_stat          rc_attach(UNIT *, CONST char *);
+t_stat          rc_attach(UNIT *, const char *);
 t_stat          rc_detach(UNIT *);
-t_stat          rc_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat          rc_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat          rc_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                      const char *cptr);
 const char      *rc_description (DEVICE *dptr);
@@ -464,7 +464,7 @@ t_stat rc_svc (UNIT *uptr)
 
 
 t_stat
-rc_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+rc_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int         i;
     if (uptr == NULL) return SCPE_IERR;
@@ -526,7 +526,7 @@ rc_boot(int32 unit_num, DEVICE * dptr)
 
 /* Device attach */
 
-t_stat rc_attach (UNIT *uptr, CONST char *cptr)
+t_stat rc_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 

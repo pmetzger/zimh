@@ -86,7 +86,7 @@ t_stat petr_reset (DEVICE *dptr);
 t_stat ptp_reset (DEVICE *dptr);
 t_stat tty_reset (DEVICE *dptr);
 t_stat petr_boot (int32 unitno, DEVICE *dptr);
-t_stat petr_attach (UNIT *uptr, CONST char *cptr);
+t_stat petr_attach (UNIT *uptr, const char *cptr);
 
 /* Character translation tables */
 
@@ -391,14 +391,14 @@ t_stat petr_reset (DEVICE *dptr)
 
 /* Attach routine */
 
-t_stat petr_attach (UNIT *uptr, CONST char *cptr)
+t_stat petr_attach (UNIT *uptr, const char *cptr)
 {
     petr_leader = PETR_LEADER;                                /* set up leader */
     return attach_unit (uptr, cptr);
 }
 
 /* Bootstrap routine */
-extern t_stat cpu_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+extern t_stat cpu_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc);
 extern UNIT cpu_unit;
 
 //#define SANITY_CHECK_TAPE

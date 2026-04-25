@@ -196,10 +196,10 @@ static t_stat ds_service_drive      (UNIT   *uptr);
 static t_stat ds_service_controller (UNIT   *uptr);
 static t_stat ds_service_timer      (UNIT   *uptr);
 static t_stat ds_reset              (DEVICE *dptr);
-static t_stat ds_attach             (UNIT   *uptr,  CONST char *cptr);
+static t_stat ds_attach             (UNIT   *uptr,  const char *cptr);
 static t_stat ds_detach             (UNIT   *uptr);
 static t_stat ds_boot               (int32  unitno, DEVICE *dptr);
-static t_stat ds_load_unload        (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat ds_load_unload        (UNIT *uptr, int32 value, const char *cptr, void *desc);
 
 
 /* MAC disc local utility routines */
@@ -1083,7 +1083,7 @@ return SCPE_OK;
        offset from the start of the file to the last byte and seek there.
 */
 
-static t_stat ds_attach (UNIT *uptr, CONST char *cptr)
+static t_stat ds_attach (UNIT *uptr, const char *cptr)
 {
 t_stat      result;
 t_addr      offset;
@@ -1408,7 +1408,7 @@ else                                                    /* otherwise */
    status.
 */
 
-static t_stat ds_load_unload (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat ds_load_unload (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 const t_bool load = (value != UNIT_UNLOAD);             /* true if the heads are loading */
 

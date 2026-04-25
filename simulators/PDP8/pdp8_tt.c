@@ -54,8 +54,8 @@ t_stat tti_svc (UNIT *uptr);
 t_stat tto_svc (UNIT *uptr);
 t_stat tti_reset (DEVICE *dptr);
 t_stat tto_reset (DEVICE *dptr);
-t_stat tty_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat tty_set_parity (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat tty_set_parity (UNIT *uptr, int32 val, const char *cptr, void *desc);
 const char *tti_description (DEVICE *dptr);
 const char *tto_description (DEVICE *dptr);
 
@@ -294,14 +294,14 @@ sim_cancel (&tto_unit);                                 /* deactivate unit */
 return SCPE_OK;
 }
 
-t_stat tty_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 sim_tt_set_mode (&tti_unit, val, cptr, desc);
 sim_tt_set_mode (&tto_unit, val, cptr, desc);
 return SCPE_OK;
 }
 
-t_stat tty_set_parity (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tty_set_parity (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 sim_tt_set_parity (&tti_unit, val, cptr, desc);
 sim_tt_set_parity (&tto_unit, val, cptr, desc);

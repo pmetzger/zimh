@@ -18,14 +18,14 @@ extern DEVICE sim_expect_dev;
 t_bool sim_expect_is_unit(const UNIT *uptr);
 
 /* SCP command entry points for SEND/NOSEND and EXPECT/NOEXPECT. */
-t_stat send_cmd(int32 flag, CONST char *ptr);
-t_stat expect_cmd(int32 flag, CONST char *ptr);
+t_stat send_cmd(int32 flag, const char *ptr);
+t_stat expect_cmd(int32 flag, const char *ptr);
 
 /* SHOW command helpers for queued SEND and EXPECT state. */
 t_stat sim_show_send(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
-                     CONST char *cptr);
+                     const char *cptr);
 t_stat sim_show_expect(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
-                       CONST char *cptr);
+                       const char *cptr);
 
 /* Queue data for SEND processing on a console or multiplexer line. */
 t_stat sim_send_input(SEND *snd, uint8 *data, size_t size, uint32 after,
@@ -44,7 +44,7 @@ t_bool sim_send_poll_data(SEND *snd, t_stat *stat);
 t_stat sim_send_clear(SEND *snd);
 
 /* Parse an EXPECT command and install a rule in the target context. */
-t_stat sim_set_expect(EXPECT *exp, CONST char *cptr);
+t_stat sim_set_expect(EXPECT *exp, const char *cptr);
 
 /* Parse a NOEXPECT command and remove rules from the target context. */
 t_stat sim_set_noexpect(EXPECT *exp, const char *cptr);
@@ -60,7 +60,7 @@ t_stat sim_exp_clr(EXPECT *exp, const char *match);
 t_stat sim_exp_clrall(EXPECT *exp);
 
 /* Show expect state for one display-format pattern or all rules. */
-t_stat sim_exp_show(FILE *st, CONST EXPECT *exp, const char *match);
+t_stat sim_exp_show(FILE *st, const EXPECT *exp, const char *match);
 
 /* Show all expect rules for one context. */
 t_stat sim_exp_showall(FILE *st, const EXPECT *exp);

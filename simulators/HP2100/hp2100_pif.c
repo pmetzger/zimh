@@ -131,8 +131,8 @@ static INTERFACE pif_interface;
 /* Interface local SCP support routines */
 
 static t_stat pif_reset     (DEVICE *dptr);
-static t_stat pif_set_card  (UNIT   *uptr, int32  val,  CONST char *cptr, void *desc);
-static t_stat pif_show_card (FILE   *st,   UNIT  *uptr, int32 val,        CONST void *desc);
+static t_stat pif_set_card  (UNIT   *uptr, int32  val,  const char *cptr, void *desc);
+static t_stat pif_show_card (FILE   *st,   UNIT  *uptr, int32 val,        const void *desc);
 
 
 /* Interface SCP data structures */
@@ -412,7 +412,7 @@ return SCPE_OK;
    val == 1 --> set to 12620A (RTE PIF)
 */
 
-static t_stat pif_set_card (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat pif_set_card (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if ((val < 0) || (val > 1) || (cptr != NULL))           /* sanity check */
     return SCPE_ARG;                                    /* bad argument */
@@ -428,7 +428,7 @@ return SCPE_OK;
 
 /* Show card type */
 
-static t_stat pif_show_card (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat pif_show_card (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if (pif_dev.flags & DEV_12936)
     fputs ("12936A", st);

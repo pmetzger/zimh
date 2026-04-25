@@ -116,8 +116,8 @@ uint32  cont_chan(uint16 chsa);
 t_stat  set_inch(UNIT *uptr, uint32 inch_addr, uint32 num_inch);    /* set inch addr */
 t_stat  chan_boot(uint16 chsa, DEVICE *dptr);
 t_stat  chan_set_devs(void);
-t_stat  set_dev_addr(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat  show_dev_addr(FILE *st, UNIT *uptr, int32 v, CONST void *desc);
+t_stat  set_dev_addr(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat  show_dev_addr(FILE *st, UNIT *uptr, int32 v, const void *desc);
 DEVICE  *get_dev(UNIT *uptr);
 void    store_csw(CHANP *chp);
 void    push_csw(CHANP *chp);
@@ -2990,7 +2990,7 @@ t_stat chan_set_devs(void) {
 }
 
 /* Validate and set the device onto a given channel */
-t_stat set_dev_addr(UNIT *uptr, int32 val, CONST char *cptr, void *desc) {
+t_stat set_dev_addr(UNIT *uptr, int32 val, const char *cptr, void *desc) {
     DEVICE  *dptr;                              /* device pointer */
     DIB     *dibp;                              /* dib pointer */
     UNIT    *tuptr;                             /* temp unit pointer */
@@ -3046,7 +3046,7 @@ t_stat set_dev_addr(UNIT *uptr, int32 val, CONST char *cptr, void *desc) {
 }
 
 /* display channel/sub-address for device */
-t_stat show_dev_addr(FILE *st, UNIT *uptr, int32 v, CONST void *desc) {
+t_stat show_dev_addr(FILE *st, UNIT *uptr, int32 v, const void *desc) {
     DEVICE      *dptr;
     int         chsa;
 

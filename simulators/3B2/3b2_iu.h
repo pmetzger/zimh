@@ -203,13 +203,13 @@ typedef struct iu_timer_state {
 } IU_TIMER_STATE;
 
 /* Function prototypes */
-t_stat contty_attach(UNIT *uptr, CONST char *cptr);
+t_stat contty_attach(UNIT *uptr, const char *cptr);
 t_stat contty_detach(UNIT *uptr);
 t_stat tti_reset(DEVICE *dptr);
 t_stat contty_reset(DEVICE *dptr);
 t_stat iu_timer_reset(DEVICE *dptr);
-t_stat iu_timer_set_mult(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat iu_timer_show_mult(FILE *st, UNIT *uptr, int val, CONST void *desc);
+t_stat iu_timer_set_mult(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat iu_timer_show_mult(FILE *st, UNIT *uptr, int val, const void *desc);
 t_stat iu_svc_tti(UNIT *uptr);
 t_stat iu_svc_tto(UNIT *uptr);
 t_stat iu_svc_contty(UNIT *uptr);

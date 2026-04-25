@@ -39,9 +39,9 @@
 t_stat         pclk_devio(uint32 dev, uint64 *data);
 const char *pclk_description (DEVICE *dptr);
 t_stat         pclk_srv(UNIT *uptr);
-t_stat         pclk_set_on(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat         pclk_set_off(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat         pclk_show_on(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat         pclk_set_on(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat         pclk_set_off(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat         pclk_show_on(FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 UNIT pclk_unit[] = {
     {UDATA(pclk_srv, UNIT_IDLE|UNIT_DISABLE, 0)},  /* 0 */
@@ -113,21 +113,21 @@ const char *pclk_description (DEVICE *dptr)
     return "Stanford A.I.Lab Phil Petit calendar clock crock";
 }
 
-t_stat pclk_set_on(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat pclk_set_on(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE *dptr = &pclk_dev;
     dptr->flags &= ~PCLK_OFF;
     return SCPE_OK;
 }
 
-t_stat pclk_set_off(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat pclk_set_off(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE *dptr = &pclk_dev;
     dptr->flags |= PCLK_OFF;
     return SCPE_OK;
 }
 
-t_stat pclk_show_on(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat pclk_show_on(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     DEVICE *dptr = &pclk_dev;
     fprintf (st, "%s", (dptr->flags & PCLK_OFF) ? "off" : "on");

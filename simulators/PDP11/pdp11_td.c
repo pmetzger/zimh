@@ -636,8 +636,8 @@ static t_stat td_rd (int32 *data, int32 PA, int32 access);
 static t_stat td_wr (int32 data, int32 PA, int32 access);
 static t_stat td_svc (UNIT *uptr);
 static t_stat td_reset (DEVICE *dptr);
-static t_stat td_set_ctrls (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat td_show_ctlrs (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat td_set_ctrls (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat td_show_ctlrs (FILE *st, UNIT *uptr, int32 val, const void *desc);
 static t_stat td_boot (int32 unitno, DEVICE *dptr);
 static t_stat td_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 static void tdi_set_int (int32 ctlr, t_bool val);
@@ -1436,7 +1436,7 @@ return "TU58 cartridge";
 
 /* Change number of controllers */
 
-static t_stat td_set_ctrls (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat td_set_ctrls (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 newln, i;
 t_stat r;
@@ -1472,7 +1472,7 @@ return td_reset (&tdc_dev);
 
 /* Show number of controllers */
 
-t_stat td_show_ctlrs (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat td_show_ctlrs (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "controllers=%d", td_ctrls);
 return SCPE_OK;

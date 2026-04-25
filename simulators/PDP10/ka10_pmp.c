@@ -368,16 +368,16 @@ void                pmp_startcmd(void);
 void                pmp_adjpos(UNIT * uptr);
 t_stat              pmp_srv(UNIT *);
 t_stat              pmp_reset(DEVICE *);
-t_stat              pmp_attach(UNIT *, CONST char *);
+t_stat              pmp_attach(UNIT *, const char *);
 t_stat              pmp_detach(UNIT *);
-t_stat              pmp_set_type(UNIT * uptr, int32 val, CONST char *cptr,
+t_stat              pmp_set_type(UNIT * uptr, int32 val, const char *cptr,
                                  void *desc);
 t_stat              pmp_get_type(FILE * st, UNIT * uptr, int32 v,
-                                 CONST void *desc);
-t_stat              pmp_set_dev_addr(UNIT * uptr, int32 val, CONST char *cptr,
+                                 const void *desc);
+t_stat              pmp_set_dev_addr(UNIT * uptr, int32 val, const char *cptr,
                                  void *desc);
 t_stat              pmp_get_dev_addr(FILE * st, UNIT * uptr, int32 v,
-                                 CONST void *desc);
+                                 const void *desc);
 t_stat              pmp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                         const char *cptr);
 const char          *pmp_description (DEVICE *dptr);
@@ -2220,7 +2220,7 @@ pmp_format(UNIT * uptr, int flag) {
 }
 
 t_stat
-pmp_attach(UNIT * uptr, CONST char *file)
+pmp_attach(UNIT * uptr, const char *file)
 {
     uint16              addr = GET_UADDR(uptr->flags);
     int                 flag = (sim_switches & SWMASK ('I')) != 0;
@@ -2234,7 +2234,7 @@ pmp_attach(UNIT * uptr, CONST char *file)
        return r;
 
     if (sim_fread(&hdr, 1, sizeof(struct pmp_header), uptr->fileref) !=
-          sizeof(struct pmp_header) || strncmp((CONST char *)&hdr.devid[0],
+          sizeof(struct pmp_header) || strncmp((const char *)&hdr.devid[0],
                    "CKD_P370", 8) != 0 || flag) {
         if (pmp_format(uptr, flag)) {
             detach_unit(uptr);
@@ -2315,7 +2315,7 @@ pmp_detach(UNIT * uptr)
 /* Disk option setting commands */
 
 t_stat
-pmp_set_type(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+pmp_set_type(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     int                 i;
 
@@ -2337,7 +2337,7 @@ pmp_set_type(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-pmp_get_type(FILE * st, UNIT * uptr, int32 v, CONST void *desc)
+pmp_get_type(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_IERR;
@@ -2348,7 +2348,7 @@ pmp_get_type(FILE * st, UNIT * uptr, int32 v, CONST void *desc)
 
 /* Sets the device onto a given channel */
 t_stat
-pmp_set_dev_addr(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+pmp_set_dev_addr(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     t_value             newdev;
     t_stat              r;
@@ -2372,7 +2372,7 @@ pmp_set_dev_addr(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-pmp_get_dev_addr(FILE * st, UNIT * uptr, int32 v, CONST void *desc)
+pmp_get_dev_addr(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
     int                 addr;
 

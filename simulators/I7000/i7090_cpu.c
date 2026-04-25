@@ -208,11 +208,11 @@ t_stat              cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr,
 t_stat              cpu_dep(t_value val, t_addr addr, UNIT * uptr,
                             int32 sw);
 t_stat              cpu_reset(DEVICE * dptr);
-t_stat              cpu_set_size(UNIT * uptr, int32 val, CONST char *cptr,
+t_stat              cpu_set_size(UNIT * uptr, int32 val, const char *cptr,
                                  void *desc);
 t_stat              cpu_show_hist(FILE * st, UNIT * uptr, int32 val,
-                                  CONST void *desc);
-t_stat              cpu_set_hist(UNIT * uptr, int32 val, CONST char *cptr,
+                                  const void *desc);
+t_stat              cpu_set_hist(UNIT * uptr, int32 val, const char *cptr,
                                  void *desc);
 uint32              cpu_cmd(UNIT * uptr, uint16 cmd, uint16 dev);
 t_stat              cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
@@ -4246,7 +4246,7 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 }
 
 t_stat
-cpu_set_size(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     t_uint64            mc = 0;
     uint32              i;
@@ -4275,7 +4275,7 @@ cpu_set_size(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
 
 /* Set history */
 t_stat
-cpu_set_hist(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     int32               i, lnt;
     t_stat              r;
@@ -4308,7 +4308,7 @@ cpu_set_hist(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
 /* Show history */
 
 t_stat
-cpu_show_hist(FILE * st, UNIT * uptr, int32 val, CONST void *desc)
+cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
     int32               k, di, lnt;
     char               *cptr = (char *) desc;

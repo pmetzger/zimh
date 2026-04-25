@@ -471,7 +471,7 @@ typedef struct {
 #define WriteP(p,d)     M[p] = d
 
 void cpu_ent_hist (uint32 pc, uint32 ea, t_uint64 ir, t_uint64 opnd);
-t_stat ch_show_chan (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat ch_show_chan (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat ch6_end_nds (uint32 ch);
 uint32 ch6_set_flags (uint32 ch, uint32 unit, uint32 flags);
 t_stat ch6_err_disc (uint32 ch, uint32 unit, uint32 flags);

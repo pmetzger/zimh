@@ -170,10 +170,10 @@
 #define DBG_PRINT(args)
 #endif
 
-extern t_stat set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 
@@ -554,15 +554,15 @@ static uint8 wdata[ICOM_DD_SECTOR_LEN];
 /* Local function prototypes */
 static t_stat icom_reset(DEVICE *icom_dev);
 static t_stat icom_svc(UNIT *uptr);
-static t_stat icom_attach(UNIT *uptr, CONST char *cptr);
+static t_stat icom_attach(UNIT *uptr, const char *cptr);
 static t_stat icom_detach(UNIT *uptr);
 static t_stat icom_boot(int32 unitno, DEVICE *dptr);
-static t_stat icom_set_prom(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat icom_show_prom(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat icom_set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat icom_show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat icom_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat icom_show_type(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat icom_set_prom(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat icom_show_prom(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat icom_set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat icom_show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat icom_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat icom_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc);
 static uint32 calculate_icom_sec_offset(ICOM_REG *pICOM, uint8 track, uint8 sector);
 static void icom_set_busy(uint32 msec);
 static int icom_set_crc(uint8 drive);
@@ -749,7 +749,7 @@ static t_stat icom_svc(UNIT *uptr)
 }
 
 /* Attach routine */
-static t_stat icom_attach(UNIT *uptr, CONST char *cptr)
+static t_stat icom_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r;
     unsigned int i = 0;
@@ -826,7 +826,7 @@ static t_stat icom_detach(UNIT *uptr)
 /*
 ** If membase is 0, remove from system
 */
-static t_stat icom_set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat icom_set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 newba;
     t_stat r;
@@ -864,7 +864,7 @@ static t_stat icom_set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *de
 }
 
 /* Show Base Address routine */
-t_stat icom_show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat icom_show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (icom_info->mem_base) {
         fprintf(st, "MEM=0x%04X-0x%04X", icom_info->mem_base, icom_info->mem_base+icom_info->mem_size-1);
@@ -880,7 +880,7 @@ t_stat icom_show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
     return SCPE_OK;
 }
 
-static t_stat icom_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat icom_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (!cptr) return SCPE_IERR;
 
@@ -900,14 +900,14 @@ static t_stat icom_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-static t_stat icom_show_type(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat icom_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "TYPE=%s", (icom_info->boardType == ICOM_TYPE_3812) ? "3812" : "3712");
 
     return SCPE_OK;
 }
 
-static t_stat icom_set_prom(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat icom_set_prom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
@@ -929,7 +929,7 @@ static t_stat icom_set_prom(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-static t_stat icom_show_prom(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat icom_show_prom(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "%s", (icom_info->promEnabled) ? "PROM" : "NOPROM");
 

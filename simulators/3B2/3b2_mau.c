@@ -342,7 +342,7 @@ XFP GEN_NONTRAPPING_NAN = {
     0
 };
 
-CONST char *mau_op_names[32] = {
+const char *mau_op_names[32] = {
     "0x00",  "0x01",  "ADD",   "SUB",
     "DIV",   "REM",   "MUL",   "MOVE",
     "RDASR", "WRASR", "CMP",   "CMPE",
@@ -357,12 +357,12 @@ CONST char *mau_op_names[32] = {
 #endif
 };
 
-CONST char *src_op_names[8] = {
+const char *src_op_names[8] = {
     "F0", "F1", "F2", "F3",
     "MEM S", "MEM D", "MEM X", "N/A"
 };
 
-CONST char *dst_op_names[16] = {
+const char *dst_op_names[16] = {
     "F0 S", "F1 S", "F2 S", "F3 S",
     "F0 D", "F1 D", "F2 D", "F3 D",
     "F0 X", "F1 X", "F2 X", "F3 X",
@@ -3585,7 +3585,7 @@ t_stat mau_broadcast(uint32 cmd, uint32 src, uint32 dst)
     }
 }
 
-CONST char *mau_description(DEVICE *dptr)
+const char *mau_description(DEVICE *dptr)
 {
 #if defined(REV3)
     return "WE 32106 MAU";

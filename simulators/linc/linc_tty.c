@@ -27,7 +27,7 @@
 
 /* Function declaration. */
 static t_stat tty_svc(UNIT *uptr);
-static t_stat tty_attach(UNIT *uptr, CONST char *cptr);
+static t_stat tty_attach(UNIT *uptr, const char *cptr);
 static t_stat tty_detach(UNIT *uptr);
 
 static UNIT tty_unit = {
@@ -103,7 +103,7 @@ static t_stat tty_svc(UNIT *uptr)
   return SCPE_OK;
 }
 
-static t_stat tty_attach(UNIT *uptr, CONST char *cptr)
+static t_stat tty_attach(UNIT *uptr, const char *cptr)
 {
   t_stat stat = attach_unit(uptr, cptr);
   if (stat != SCPE_OK)

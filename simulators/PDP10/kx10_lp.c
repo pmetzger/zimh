@@ -71,12 +71,12 @@
 t_stat          lpt_devio(uint32 dev, uint64 *data);
 t_stat          lpt_svc (UNIT *uptr);
 t_stat          lpt_reset (DEVICE *dptr);
-t_stat          lpt_attach (UNIT *uptr, CONST char *cptr);
+t_stat          lpt_attach (UNIT *uptr, const char *cptr);
 t_stat          lpt_detach (UNIT *uptr);
-t_stat          lpt_setlpp(UNIT *, int32, CONST char *, void *);
-t_stat          lpt_getlpp(FILE *, UNIT *, int32, CONST void *);
-t_stat          lpt_setdev(UNIT *, int32, CONST char *, void *);
-t_stat          lpt_getdev(FILE *, UNIT *, int32, CONST void *);
+t_stat          lpt_setlpp(UNIT *, int32, const char *, void *);
+t_stat          lpt_getlpp(FILE *, UNIT *, int32, const void *);
+t_stat          lpt_setdev(UNIT *, int32, const char *, void *);
+t_stat          lpt_getdev(FILE *, UNIT *, int32, const void *);
 t_stat          lpt_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                          const char *cptr);
 const char     *lpt_description (DEVICE *dptr);
@@ -452,7 +452,7 @@ t_stat lpt_reset (DEVICE *dptr)
 
 /* Attach routine */
 
-t_stat lpt_attach (UNIT *uptr, CONST char *cptr)
+t_stat lpt_attach (UNIT *uptr, const char *cptr)
 {
     t_stat reason;
 
@@ -479,7 +479,7 @@ t_stat lpt_detach (UNIT *uptr)
  */
 
 t_stat
-lpt_setlpp(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+lpt_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_value   i;
     t_stat    r;
@@ -496,7 +496,7 @@ lpt_setlpp(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-lpt_getlpp(FILE *st, UNIT *uptr, int32 v, CONST void *desc)
+lpt_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_IERR;
@@ -505,7 +505,7 @@ lpt_getlpp(FILE *st, UNIT *uptr, int32 v, CONST void *desc)
 }
 
 t_stat
-lpt_setdev(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+lpt_setdev(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_value   i;
     t_stat    r;
@@ -523,7 +523,7 @@ lpt_setdev(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-lpt_getdev(FILE *st, UNIT *uptr, int32 v, CONST void *desc)
+lpt_getdev(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_IERR;

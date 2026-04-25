@@ -55,31 +55,31 @@ const char *get_glyph_gen(const char *iptr, char *optr, char mchar, t_bool uc,
 }
 
 /* Parse the next token and fold alphabetic characters to upper case. */
-CONST char *get_glyph(const char *iptr, char *optr, char mchar)
+const char *get_glyph(const char *iptr, char *optr, char mchar)
 {
-    return (CONST char *)get_glyph_gen(iptr, optr, mchar, TRUE, FALSE, 0);
+    return (const char *)get_glyph_gen(iptr, optr, mchar, TRUE, FALSE, 0);
 }
 
 /* Parse the next token without changing its case. */
-CONST char *get_glyph_nc(const char *iptr, char *optr, char mchar)
+const char *get_glyph_nc(const char *iptr, char *optr, char mchar)
 {
-    return (CONST char *)get_glyph_gen(iptr, optr, mchar, FALSE, FALSE, 0);
+    return (const char *)get_glyph_gen(iptr, optr, mchar, FALSE, FALSE, 0);
 }
 
 /* Parse one token, allowing it to be enclosed in quotes. */
-CONST char *get_glyph_quoted(const char *iptr, char *optr, char mchar)
+const char *get_glyph_quoted(const char *iptr, char *optr, char mchar)
 {
-    return (CONST char *)get_glyph_gen(iptr, optr, mchar, FALSE, TRUE, '\\');
+    return (const char *)get_glyph_gen(iptr, optr, mchar, FALSE, TRUE, '\\');
 }
 
 /* Parse the leading command token, handling SCP's special '!' form. */
-CONST char *get_glyph_cmd(const char *iptr, char *optr)
+const char *get_glyph_cmd(const char *iptr, char *optr)
 {
     if ((iptr[0] == '!') && (!sim_isspace(iptr[1]))) {
         strcpy(optr, "!");
-        return (CONST char *)(iptr + 1);
+        return (const char *)(iptr + 1);
     }
-    return (CONST char *)get_glyph_gen(iptr, optr, 0, TRUE, FALSE, 0);
+    return (const char *)get_glyph_gen(iptr, optr, 0, TRUE, FALSE, 0);
 }
 
 /* Decode either symbolic switches or a numeric switch argument. */
@@ -108,7 +108,7 @@ SWITCH_PARSE get_switches(const char *cptr, int32 *sw, int32 *number)
 }
 
 /* Consume leading SCP simulator switches from a command string. */
-CONST char *get_sim_sw(CONST char *cptr)
+const char *get_sim_sw(const char *cptr)
 {
     int32 lsw, lnum;
     char gbuf[CBUFSIZE];

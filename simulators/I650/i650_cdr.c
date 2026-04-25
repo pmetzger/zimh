@@ -46,12 +46,12 @@
 uint32              cdr_cmd(UNIT *, uint16, uint16);
 t_stat              cdr_srv(UNIT *);
 t_stat              cdr_reset(DEVICE *);
-t_stat              cdr_attach(UNIT *, CONST char *);
+t_stat              cdr_attach(UNIT *, const char *);
 t_stat              cdr_detach(UNIT *);
 t_stat              cdr_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 const char         *cdr_description(DEVICE *dptr);
-t_stat              cdr_set_wiring (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat              cdr_show_wiring (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat              cdr_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat              cdr_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 UNIT                cdr_unit[4] = {
    {UDATA(cdr_srv, UNIT_CDR, 0), 300},  // Unit 0 used internally for carddeck operations simulator specific command
@@ -1263,7 +1263,7 @@ cdr_srv(UNIT *uptr) {
 }
 
 /* Set card read/punch control panel wiring */
-t_stat cdr_set_wiring (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cdr_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int f;
 
@@ -1279,7 +1279,7 @@ t_stat cdr_set_wiring (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 /* Show card read/punch control panel wiring */
-t_stat cdr_show_wiring (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cdr_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int f;
 
@@ -1295,7 +1295,7 @@ t_stat cdr_show_wiring (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 
 
 t_stat
-cdr_attach(UNIT * uptr, CONST char *file)
+cdr_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
     int ncdr, ic1, ic2, i;

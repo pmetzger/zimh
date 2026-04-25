@@ -998,18 +998,18 @@ static const struct FEATURE_TABLE cpu_features [] = {   /* features indexed by C
 static t_stat cpu_service (UNIT    *uptr);
 static t_stat cpu_reset   (DEVICE  *dptr);
 
-static t_stat set_stops  (UNIT *uptr, int32 option,     CONST char *cptr, void *desc);
-static t_stat set_exec   (UNIT *uptr, int32 option,     CONST char *cptr, void *desc);
-static t_stat set_dump   (UNIT *uptr, int32 option,     CONST char *cptr, void *desc);
-static t_stat set_size   (UNIT *uptr, int32 new_size,   CONST char *cptr, void *desc);
-static t_stat set_model  (UNIT *uptr, int32 new_model,  CONST char *cptr, void *desc);
-static t_stat set_option (UNIT *uptr, int32 new_option, CONST char *cptr, void *desc);
-static t_stat set_pfars  (UNIT *uptr, int32 setting,    CONST char *cptr, void *desc);
+static t_stat set_stops  (UNIT *uptr, int32 option,     const char *cptr, void *desc);
+static t_stat set_exec   (UNIT *uptr, int32 option,     const char *cptr, void *desc);
+static t_stat set_dump   (UNIT *uptr, int32 option,     const char *cptr, void *desc);
+static t_stat set_size   (UNIT *uptr, int32 new_size,   const char *cptr, void *desc);
+static t_stat set_model  (UNIT *uptr, int32 new_model,  const char *cptr, void *desc);
+static t_stat set_option (UNIT *uptr, int32 new_option, const char *cptr, void *desc);
+static t_stat set_pfars  (UNIT *uptr, int32 setting,    const char *cptr, void *desc);
 
-static t_stat show_stops (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat show_exec  (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat show_dump  (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat show_speed (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat show_stops (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat show_exec  (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat show_dump  (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat show_speed (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 
 /* CPU local utility routine declarations */
@@ -1767,7 +1767,7 @@ return status;                                          /* return the reason for
        the CPU and all I/O devices, or just the I/O devices, respectively).
 */
 
-t_stat cpu_cold_cmd (int32 arg, CONST char *buf)
+t_stat cpu_cold_cmd (int32 arg, const char *buf)
 {
 const char *cptr;
 char       gbuf [CBUFSIZE];
@@ -1878,7 +1878,7 @@ return run_cmd (RU_CONT, buf);                          /* execute the halt-mode
        switch and stops simulation if auto-restart is disabled.
 */
 
-t_stat cpu_power_cmd (int32 arg, CONST char *cptr)
+t_stat cpu_power_cmd (int32 arg, const char *cptr)
 {
 static CTAB options [] = {
     { "FAIL",    NULL, power_failing   },
@@ -3500,7 +3500,7 @@ return SCPE_OK;                                         /* indicate that the res
        execution only.
 */
 
-static t_stat set_stops (UNIT *uptr, int32 option, CONST char *cptr, void *desc)
+static t_stat set_stops (UNIT *uptr, int32 option, const char *cptr, void *desc)
 {
 char gbuf [CBUFSIZE];
 uint32 stop;
@@ -3555,7 +3555,7 @@ return SCPE_OK;                                         /* the stops were succes
    unless an override switch is present on the command line.
 */
 
-static t_stat set_exec (UNIT *uptr, int32 option, CONST char *cptr, void *desc)
+static t_stat set_exec (UNIT *uptr, int32 option, const char *cptr, void *desc)
 {
 char   gbuf [CBUFSIZE];
 uint32 match, mask, radix;
@@ -3641,7 +3641,7 @@ else {                                                  /* otherwise at least on
    rejected.
 */
 
-static t_stat set_dump (UNIT *uptr, int32 option, CONST char *cptr, void *desc)
+static t_stat set_dump (UNIT *uptr, int32 option, const char *cptr, void *desc)
 {
 t_value value;
 t_stat  status = SCPE_OK;
@@ -3702,9 +3702,9 @@ return status;                                          /* return the operation 
        explicitly zeroed.
 */
 
-static t_stat set_size (UNIT *uptr, int32 new_size, CONST char *cptr, void *desc)
+static t_stat set_size (UNIT *uptr, int32 new_size, const char *cptr, void *desc)
 {
-static CONST char confirm [] = "Really truncate memory [N]?";
+static const char confirm [] = "Really truncate memory [N]?";
 
 const uint32 model = CPU_MODEL (uptr->flags);           /* the current CPU model index */
 
@@ -3745,7 +3745,7 @@ return SCPE_OK;                                         /* confirm that the chan
    initial CPU model.  The current memory size will be 0 when this call is made.
 */
 
-static t_stat set_model (UNIT *uptr, int32 new_model, CONST char *cptr, void *desc)
+static t_stat set_model (UNIT *uptr, int32 new_model, const char *cptr, void *desc)
 {
 const uint32 new_index = CPU_MODEL (new_model);         /* the new index into the CPU features table */
 uint32 new_memsize;
@@ -3782,7 +3782,7 @@ return status;                                          /* return the validation
    rejected.
 */
 
-static t_stat set_option (UNIT *uptr, int32 new_option, CONST char *cptr, void *desc)
+static t_stat set_option (UNIT *uptr, int32 new_option, const char *cptr, void *desc)
 {
 const uint32 model = CPU_MODEL (uptr->flags);           /* the current CPU model index */
 
@@ -3808,7 +3808,7 @@ else                                                    /* otherwise */
    of the CPX2 register.
 */
 
-static t_stat set_pfars (UNIT *uptr, int32 setting, CONST char *cptr, void *desc)
+static t_stat set_pfars (UNIT *uptr, int32 setting, const char *cptr, void *desc)
 {
 if (setting == UNIT_PFARS)                              /* if the option is ARS */
     CPX2 &= ~cpx2_INHPFARS;                             /*   then clear the auto-restart inhibit flag */
@@ -3832,7 +3832,7 @@ return SCPE_OK;                                         /* confirm the change */
    newline to the output before returning.
 */
 
-static t_stat show_stops (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_stops (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 uint32 stop;
 t_bool need_spacer = FALSE;
@@ -3870,7 +3870,7 @@ return SCPE_OK;                                         /* report the success of
    newline to the output before returning.
 */
 
-static t_stat show_exec (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_exec (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 uint32 radix;
 
@@ -3908,7 +3908,7 @@ return SCPE_OK;                                         /* report the success of
    are not used.
 */
 
-static t_stat show_dump (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_dump (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "Dump device = %u, dump control = %03o\n",
          LOWER_BYTE (dump_control), UPPER_BYTE (dump_control));
@@ -3928,7 +3928,7 @@ return SCPE_OK;
    (which suspends the normal fetch/execute instruction cycle).
 */
 
-static t_stat show_speed (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_speed (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "Simulation speed = %ux\n", cpu_speed);    /* display the current CPU speed */
 return SCPE_OK;                                         /*   and report success */

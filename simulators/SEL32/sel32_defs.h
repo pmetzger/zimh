@@ -578,8 +578,8 @@ extern DEBTAB dev_debug[];
 #define PC PC_Global
 
 /* Definitions for commonly used functions */
-extern  t_stat  set_dev_addr(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern  t_stat  show_dev_addr(FILE * st, UNIT *uptr, int32 v, CONST void *desc);
+extern  t_stat  set_dev_addr(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern  t_stat  show_dev_addr(FILE * st, UNIT *uptr, int32 v, const void *desc);
 extern  void    chan_end(uint16 chan, uint16 flags);
 extern  int     chan_read_byte(uint16 chsa, uint8 *data);
 extern  int     chan_write_byte(uint16 chsa, uint8 *data);

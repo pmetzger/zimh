@@ -211,14 +211,14 @@ extern void put_mbyte(uint16 addr, uint8 val);
 
 t_stat isbc202_cfg(uint16 base, uint16 size, uint8 devnum);
 t_stat isbc202_clr(void);
-t_stat isbc202_set_port(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat isbc202_set_int(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat isbc202_set_verb(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat isbc202_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat isbc202_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat isbc202_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat isbc202_set_verb(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat isbc202_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat isbc202_reset(DEVICE *dptr);
 void isbc202_reset_dev(void);
-t_stat isbc202_attach (UNIT *uptr, CONST char *cptr);
-t_stat isbc202_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat isbc202_attach (UNIT *uptr, const char *cptr);
+t_stat isbc202_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc);
 uint8 isbc202r0(t_bool io, uint8 data, uint8 devnum); /* isbc202 0 */
 uint8 isbc202r1(t_bool io, uint8 data, uint8 devnum); /* isbc202 1 */
 uint8 isbc202r2(t_bool io, uint8 data, uint8 devnum); /* isbc202 2 */
@@ -372,7 +372,7 @@ t_stat isbc202_clr(void)
 
 /* isbc202 set mode = Write protect */
 
-t_stat isbc202_set_mode(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat isbc202_set_mode(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
@@ -393,7 +393,7 @@ t_stat isbc202_set_mode(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // set base port address parameter
 
-t_stat isbc202_set_port(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat isbc202_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result;
     
@@ -413,7 +413,7 @@ t_stat isbc202_set_port(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // set interrupt parameter
 
-t_stat isbc202_set_int(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat isbc202_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result;
     
@@ -427,7 +427,7 @@ t_stat isbc202_set_int(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 // set verbose mode
 
-t_stat isbc202_set_verb(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat isbc202_set_verb(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
@@ -446,7 +446,7 @@ t_stat isbc202_set_verb(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // show configuration parameters
 
-t_stat isbc202_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat isbc202_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int i = 0;
     
@@ -509,7 +509,7 @@ void isbc202_reset_dev(void)
 
 /* isbc202 attach - attach an .IMG file to an FDD */
 
-t_stat isbc202_attach (UNIT *uptr, CONST char *cptr)
+t_stat isbc202_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
     uint8 fddnum;

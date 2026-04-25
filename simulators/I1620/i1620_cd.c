@@ -56,7 +56,7 @@ char cdr_buf[CD_LEN + 2];
 char cdp_buf[CD_LEN + 2];
 
 t_stat cdr_reset (DEVICE *dptr);
-t_stat cdr_attach (UNIT *uptr, CONST char *cptr);
+t_stat cdr_attach (UNIT *uptr, const char *cptr);
 t_stat cdr_boot (int32 unitno, DEVICE *dptr);
 t_stat cdr_read (void);
 t_stat cdp_reset (DEVICE *dptr);
@@ -381,7 +381,7 @@ return SCPE_OK;
 
 /* Card reader attach */
 
-t_stat cdr_attach (UNIT *uptr, CONST char *cptr)
+t_stat cdr_attach (UNIT *uptr, const char *cptr)
 {
 ind[IN_LAST] = 0;                                       /* clear last card */
 return attach_unit (uptr, cptr);

@@ -32,8 +32,8 @@ static t_stat sagecpu_reset(DEVICE* dptr);
 static t_stat sagecpu_boot(int unit,DEVICE* dptr);
 static t_stat sage_translateaddr(t_addr in,t_addr* out, IOHANDLER** ioh,int rw,int fc,int dma);
 static t_stat sage_mem(t_addr addr,uint8** mem);
-static t_stat sagecpu_set_bios(UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat sagecpu_show_bios(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat sagecpu_set_bios(UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat sagecpu_show_bios(FILE *st, UNIT *uptr, int32 val, const void *desc);
 static uint8* ROM = 0;
 static int rom_enable = TRUE; /* LS74 U51 in CPU schematic */
 
@@ -76,7 +76,7 @@ DEVICE sagecpu_dev = {
     sagecpu_dt, NULL, NULL
 };
 
-static t_stat sagecpu_set_bios(UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat sagecpu_set_bios(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
     FILE* fp;
     if (cptr==NULL) return SCPE_ARG;
@@ -92,7 +92,7 @@ static t_stat sagecpu_set_bios(UNIT *uptr, int32 value, CONST char *cptr, void *
     return SCPE_OK; 
 }
 
-static t_stat sagecpu_show_bios(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat sagecpu_show_bios(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "BIOS=%s", biosfile);
     return SCPE_OK; 

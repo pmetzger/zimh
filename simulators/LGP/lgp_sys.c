@@ -29,7 +29,7 @@
 #include "lgp_defs.h"
 #include <ctype.h>
 
-t_stat parse_sym_m (CONST char *cptr, t_value *val, int32 sw);
+t_stat parse_sym_m (const char *cptr, t_value *val, int32 sw);
 void lgp_init (void);
 
 extern DEVICE cpu_dev;
@@ -134,7 +134,7 @@ return SCPE_OK;
 
 /* Loader proper */
 
-t_stat sim_load (FILE *fi, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fi, const char *cptr, const char *fnam, int flag)
 {
 uint32 wd, origin, amod, csum, cnt, tr, sc, ad, cmd;
 
@@ -238,7 +238,7 @@ lgp_sprint_addr (buf, dptr, addr);
 fprintf (st, "%s", buf);
 }
 
-t_addr lgp_parse_addr (DEVICE *dptr, CONST char *cptr, CONST char **tptr)
+t_addr lgp_parse_addr (DEVICE *dptr, const char *cptr, const char **tptr)
 {
 t_addr ad, ea;
 
@@ -332,7 +332,7 @@ return SCPE_ARG;
         status  =       error status
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
 int32 i, c;
 const char *tptr;
@@ -378,10 +378,10 @@ return SCPE_ARG;
 
 /* Instruction parse */
 
-t_stat parse_sym_m (CONST char *cptr, t_value *val, int32 sw)
+t_stat parse_sym_m (const char *cptr, t_value *val, int32 sw)
 {
 uint32 ea, sgn;
-CONST char *tptr;
+const char *tptr;
 char gbuf[CBUFSIZE];
 
 if (*cptr == '-') {

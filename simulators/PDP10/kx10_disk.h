@@ -67,11 +67,11 @@
 t_stat disk_read(UNIT *uptr, uint64 *buffer, int sector, int wps);
 t_stat disk_write(UNIT *uptr, uint64 *buffer, int sector, int wps);
 /* Set disk format */
-t_stat disk_set_fmt (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat disk_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc);
 /* Show disk format */
-t_stat disk_show_fmt (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat disk_show_fmt (FILE *st, UNIT *uptr, int32 val, const void *desc);
 /* Device attach */
-t_stat disk_attach (UNIT *uptr, CONST char *cptr);
+t_stat disk_attach (UNIT *uptr, const char *cptr);
 /* Device detach */
 t_stat disk_detach (UNIT *uptr);
 /* Print attach help */

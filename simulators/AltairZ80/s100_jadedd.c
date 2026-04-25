@@ -190,10 +190,10 @@
 #endif
 
 extern uint32 PCX;
-extern t_stat set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 extern int32 find_unit_index(UNIT *uptr);
@@ -395,13 +395,13 @@ uint8 *fmt = jade_mem + JADE_BANK_SIZE + DD_FBF;
 /* Local function prototypes */
 static t_stat jade_reset(DEVICE *jade_dev);
 static t_stat jade_svc(UNIT *uptr);
-static t_stat jade_attach(UNIT *uptr, CONST char *cptr);
+static t_stat jade_attach(UNIT *uptr, const char *cptr);
 static t_stat jade_detach(UNIT *uptr);
 static t_stat jade_boot(int32 unitno, DEVICE *dptr);
-static t_stat jade_set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat jade_set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat jade_show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat jade_set_prom(UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat jade_set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat jade_set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat jade_show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat jade_set_prom(UNIT *uptr, int32 value, const char *cptr, void *desc);
 static uint32 calculate_jade_sec_offset(uint8 track, uint8 sector, uint8 flg);
 static void showsector(uint8 drive, uint8 isRead, uint8 *buf);
 static void showcb(void);
@@ -570,7 +570,7 @@ t_stat jade_reset(DEVICE *dptr)
 }
 
 /* Attach routine */
-t_stat jade_attach(UNIT *uptr, CONST char *cptr)
+t_stat jade_attach(UNIT *uptr, const char *cptr)
 {
     char header[4];
     t_stat r;
@@ -664,7 +664,7 @@ t_stat jade_detach(UNIT *uptr)
 ** Verify that iobase is within valid range
 ** before calling set_iobase
 */
-static t_stat jade_set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat jade_set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 newba;
     t_stat r;
@@ -688,7 +688,7 @@ static t_stat jade_set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *des
 ** Verify that membase is within valid range
 ** before calling set_membase
 */
-static t_stat jade_set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat jade_set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 newba;
     t_stat r;
@@ -709,7 +709,7 @@ static t_stat jade_set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *de
 }
 
 /* Show Base Address routine */
-t_stat jade_show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat jade_show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     DEVICE *dptr;
     JADE_INFO *pInfo;
@@ -730,7 +730,7 @@ t_stat jade_show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
     return SCPE_OK;
 }
 
-static t_stat jade_set_prom(UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat jade_set_prom(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
     JADE_INFO *pInfo = (JADE_INFO *)uptr->dptr->ctxt;
 

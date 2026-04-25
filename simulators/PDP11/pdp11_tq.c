@@ -349,15 +349,15 @@ t_stat tq_svc (UNIT *uptr);
 t_stat tq_tmrsvc (UNIT *uptr);
 t_stat tq_quesvc (UNIT *uptr);
 t_stat tq_reset (DEVICE *dptr);
-t_stat tq_attach (UNIT *uptr, CONST char *cptr);
+t_stat tq_attach (UNIT *uptr, const char *cptr);
 t_stat tq_detach (UNIT *uptr);
 t_stat tq_boot (int32 unitno, DEVICE *dptr);
-t_stat tq_show_ctrl (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat tq_show_unitq (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat tq_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat tq_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat tq_set_plug (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat tq_show_plug (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat tq_show_ctrl (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat tq_show_unitq (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat tq_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat tq_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat tq_set_plug (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat tq_show_plug (FILE *st, UNIT *uptr, int32 val, const void *desc);
 static t_stat tq_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *tq_description (DEVICE *dptr);
 
@@ -2043,7 +2043,7 @@ return ERR;
 
 /* Device attach */
 
-t_stat tq_attach (UNIT *uptr, CONST char *cptr)
+t_stat tq_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 
@@ -2315,7 +2315,7 @@ for (i = 0; i < TQ_SH_MAX; i = i + TQ_SH_PPL) {
 return;
 }
 
-t_stat tq_show_unitq (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat tq_show_unitq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 pkt, u = uptr - tq_dev.units;
 
@@ -2343,7 +2343,7 @@ else fprintf (st, "Unit %d queues are empty\n", u);
 return SCPE_OK;
 }
 
-t_stat tq_show_ctrl (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat tq_show_ctrl (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 i, pkt;
 
@@ -2391,7 +2391,7 @@ return SCPE_OK;
 
 /* Set controller type (and capacity for user-defined type) */
 
-t_stat tq_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tq_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 i, cap;
 uint32 max = sim_taddr_64? TQU_EMAXC: TQU_MAXC;
@@ -2417,7 +2417,7 @@ return SCPE_OK;
 
 /* Show controller type and capacity */
 
-t_stat tq_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat tq_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "%s (%dMB)", drv_tab[tq_typ].name, (uint32) (drv_tab[tq_typ].cap >> 20));
 return SCPE_OK;
@@ -2425,7 +2425,7 @@ return SCPE_OK;
 
 /* Show unit plug */
 
-t_stat tq_show_plug (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat tq_show_plug (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "UNIT=%d", uptr->unit_plug);
 return SCPE_OK;
@@ -2433,7 +2433,7 @@ return SCPE_OK;
 
 /* Set unit plug */
 
-t_stat tq_set_plug (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tq_set_plug (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 plug;
 uint32 i;

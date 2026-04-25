@@ -164,9 +164,9 @@ int32 rp64 (int32 dev, int32 pulse, int32 dat);
 int32 rp_iors (void);
 t_stat rp_svc (UNIT *uptr);
 void rp_updsta (int32 newa, int32 newb);
-t_stat rp_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat rp_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat rp_reset (DEVICE *dptr);
-t_stat rp_attach (UNIT *uptr, CONST char *cptr);
+t_stat rp_attach (UNIT *uptr, const char *cptr);
 t_stat rp_detach (UNIT *uptr);
 
 /* RP15 data structures
@@ -524,7 +524,7 @@ return ((rp_sta & (STA_ERR | STA_DON)) ||  (rp_stb & STB_ATTN))? IOS_RP: 0;
 
 /* Attach unit */
 
-t_stat rp_attach (UNIT *uptr, CONST char *cptr)
+t_stat rp_attach (UNIT *uptr, const char *cptr)
 {
 t_stat reason;
 
@@ -547,7 +547,7 @@ return reason;
 
 /* Set size routine */
 
-t_stat rp_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rp_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (uptr->flags & UNIT_ATT)
     return SCPE_ALATT;

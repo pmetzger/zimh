@@ -224,12 +224,12 @@ static INTERFACE lps_interface;
 
 static t_stat lps_svc (UNIT *uptr);
 static t_stat lps_reset (DEVICE *dptr);
-static t_stat lps_restart (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat lps_poweroff (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat lps_poweron (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat lps_attach (UNIT *uptr, CONST char *cptr);
-static t_stat lps_set_timing (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat lps_show_timing (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat lps_restart (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat lps_poweroff (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat lps_poweron (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat lps_attach (UNIT *uptr, const char *cptr);
+static t_stat lps_set_timing (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat lps_show_timing (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 /* LPS data structures
 
@@ -622,7 +622,7 @@ return SCPE_OK;
    original I/O request.
  */
 
-static t_stat lps_restart (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat lps_restart (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if (lps.control && !sim_is_active (uptr))
     sim_activate (uptr, 1);                             /* reschedule I/O */
@@ -631,7 +631,7 @@ return SCPE_OK;
 
 /* Printer power off */
 
-static t_stat lps_poweroff (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat lps_poweroff (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 lps_power = LPS_OFF;                                    /* change state */
 tprintf (lps_dev, TRACE_STATE, "Power state is OFF\n");
@@ -640,7 +640,7 @@ return SCPE_OK;
 
 /* Printer power on */
 
-static t_stat lps_poweron (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat lps_poweron (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if (lps_unit.flags & UNIT_DIAG) {                       /* diag mode? */
     lps_power = LPS_ON;                                 /* no delay */
@@ -678,7 +678,7 @@ return SCPE_OK;
        registers.
 */
 
-static t_stat lps_attach (UNIT *uptr, CONST char *cptr)
+static t_stat lps_attach (UNIT *uptr, const char *cptr)
 {
 t_stat result;
 
@@ -703,7 +703,7 @@ return result;
    E or F series machine.
 */
 
-static t_stat lps_set_timing (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat lps_set_timing (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 i, factor;
 
@@ -722,7 +722,7 @@ return SCPE_OK;
 
 /* Show printer timing */
 
-static t_stat lps_show_timing (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat lps_show_timing (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if (lps_fast_timing)
     fputs ("fast timing", st);

@@ -82,7 +82,7 @@ t_bool sim_expect_is_unit(const UNIT *uptr)
 }
 
 /* Search one expect context for a matching display-format pattern. */
-static CONST EXPTAB *sim_exp_fnd(CONST EXPECT *exp, const char *match,
+static const EXPTAB *sim_exp_fnd(const EXPECT *exp, const char *match,
                                  size_t start_rule)
 {
     size_t i;
@@ -385,9 +385,9 @@ static t_stat sim_exp_resolve_expect_target(const char **cptr, EXPECT **exp,
     return SCPE_OK;
 }
 
-t_stat send_cmd(int32 flag, CONST char *cptr)
+t_stat send_cmd(int32 flag, const char *cptr)
 {
-    CONST char *tptr;
+    const char *tptr;
     char gbuf[CBUFSIZE];
     uint8 dbuf[CBUFSIZE];
     uint32 dsize = 0;
@@ -453,7 +453,7 @@ t_stat send_cmd(int32 flag, CONST char *cptr)
 }
 
 t_stat sim_show_send(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
-                     CONST char *cptr)
+                     const char *cptr)
 {
     t_stat r;
     SEND *snd;
@@ -471,7 +471,7 @@ t_stat sim_show_send(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
     return sim_show_send_input(st, snd);
 }
 
-t_stat expect_cmd(int32 flag, CONST char *cptr)
+t_stat expect_cmd(int32 flag, const char *cptr)
 {
     t_stat r;
     EXPECT *exp;
@@ -486,7 +486,7 @@ t_stat expect_cmd(int32 flag, CONST char *cptr)
 }
 
 t_stat sim_show_expect(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
-                       CONST char *cptr)
+                       const char *cptr)
 {
     char gbuf[CBUFSIZE];
     t_stat r;
@@ -511,11 +511,11 @@ t_stat sim_show_expect(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
     return sim_exp_show(st, exp, gbuf);
 }
 
-t_stat sim_set_expect(EXPECT *exp, CONST char *cptr)
+t_stat sim_set_expect(EXPECT *exp, const char *cptr)
 {
     char gbuf[CBUFSIZE];
-    CONST char *tptr;
-    CONST char *c1ptr;
+    const char *tptr;
+    const char *c1ptr;
     uint32 after;
     t_bool after_set = FALSE;
     int32 cnt = 0;
@@ -714,9 +714,9 @@ t_stat sim_exp_set(EXPECT *exp, const char *match, int32 cnt, uint32 after,
     return SCPE_OK;
 }
 
-t_stat sim_exp_show(FILE *st, CONST EXPECT *exp, const char *match)
+t_stat sim_exp_show(FILE *st, const EXPECT *exp, const char *match)
 {
-    CONST EXPTAB *ep = (CONST EXPTAB *)sim_exp_fnd(exp, match, 0);
+    const EXPTAB *ep = (const EXPTAB *)sim_exp_fnd(exp, match, 0);
     uint32 default_haltafter = exp->default_haltafter;
 
     sim_exp_show_context_state(st, exp, default_haltafter);
@@ -728,7 +728,7 @@ t_stat sim_exp_show(FILE *st, CONST EXPECT *exp, const char *match)
     }
     do {
         sim_exp_show_tab(st, exp, ep);
-        ep = (CONST EXPTAB *)sim_exp_fnd(exp, match, 1 + (ep - exp->rules));
+        ep = (const EXPTAB *)sim_exp_fnd(exp, match, 1 + (ep - exp->rules));
     } while (ep);
     return SCPE_OK;
 }

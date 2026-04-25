@@ -37,7 +37,7 @@ uint32              dsk_cmd(int opcode, int32 addr, uint16 fast);
 t_stat              dsk_srv(UNIT *);
 void                dsk_ini(UNIT *, t_bool f);
 t_stat              dsk_reset(DEVICE *);
-t_stat              dsk_attach(UNIT *, CONST char *);
+t_stat              dsk_attach(UNIT *, const char *);
 t_stat              dsk_detach(UNIT *);
 t_stat              dsk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char          *dsk_description (DEVICE *dptr);
@@ -451,7 +451,7 @@ t_stat dsk_reset(DEVICE * dptr)
     return SCPE_OK;
 }
 
-t_stat dsk_attach(UNIT * uptr, CONST char *file)
+t_stat dsk_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
     int                    flen;

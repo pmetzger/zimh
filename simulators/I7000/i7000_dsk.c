@@ -107,14 +107,14 @@ t_stat              dsk_srv(UNIT *);
 t_stat              dsk_boot(int32, DEVICE *);
 void                dsk_ini(UNIT *, t_bool);
 t_stat              dsk_reset(DEVICE *);
-t_stat              dsk_set_module(UNIT * uptr, int32 val, CONST char *cptr,
+t_stat              dsk_set_module(UNIT * uptr, int32 val, const char *cptr,
                                    void *desc);
 t_stat              dsk_get_module(FILE * st, UNIT * uptr, int32 v,
-                                   CONST void *desc);
-t_stat              dsk_set_type(UNIT * uptr, int32 val, CONST char *cptr,
+                                   const void *desc);
+t_stat              dsk_set_type(UNIT * uptr, int32 val, const char *cptr,
                                  void *desc);
 t_stat              dsk_get_type(FILE * st, UNIT * uptr, int32 v,
-                                 CONST void *desc);
+                                 const void *desc);
 t_stat              dsk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                         const char *cptr);
 const char          *dsk_description (DEVICE *dptr);
@@ -1749,7 +1749,7 @@ dsk_reset(DEVICE * dptr)
 /* Disk option setting commands */
 
 t_stat
-dsk_set_type(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+dsk_set_type(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     int                 i, u;
 
@@ -1786,7 +1786,7 @@ dsk_set_type(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-dsk_get_type(FILE * st, UNIT * uptr, int32 v, CONST void *desc)
+dsk_get_type(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_IERR;
@@ -1795,7 +1795,7 @@ dsk_get_type(FILE * st, UNIT * uptr, int32 v, CONST void *desc)
 }
 
 t_stat
-dsk_set_module(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+dsk_set_module(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     int                 u;
 
@@ -1827,7 +1827,7 @@ dsk_set_module(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-dsk_get_module(FILE * st, UNIT * uptr, int32 v, CONST void *desc)
+dsk_get_module(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_IERR;

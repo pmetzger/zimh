@@ -51,7 +51,7 @@ int32 lpt_stopioe = 0;                                  /* stop on error flag */
 int32 lpt (int32 pulse, int32 code, int32 AC);
 t_stat lpt_svc (UNIT *uptr);
 t_stat lpt_reset (DEVICE *dptr);
-t_stat lpt_attach (UNIT *uptr, CONST char *ptr);
+t_stat lpt_attach (UNIT *uptr, const char *ptr);
 
 /* LPT data structures
 
@@ -156,7 +156,7 @@ sim_cancel (&lpt_unit);                                 /* deactivate unit */
 return SCPE_OK;
 }
 
-t_stat lpt_attach (UNIT *uptr, CONST char *cptr)
+t_stat lpt_attach (UNIT *uptr, const char *cptr)
 {
 sim_switches |= SWMASK('A');            /* position to EOF */
 return attach_unit (uptr, cptr);

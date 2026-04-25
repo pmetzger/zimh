@@ -44,8 +44,8 @@
 
 t_stat EPROM_cfg (uint16 base, uint16 size, uint8 devnum);
 t_stat EPROM_clr(void);
-t_stat EPROM_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat EPROM_attach (UNIT *uptr, CONST char *cptr);
+t_stat EPROM_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat EPROM_attach (UNIT *uptr, const char *cptr);
 t_stat EPROM_reset (DEVICE *dptr);
 uint8 EPROM_get_mbyte (uint16 addr, uint8 devnum);
 
@@ -157,7 +157,7 @@ t_stat EPROM_reset (DEVICE *dptr)
 
 // show configuration parameters
 
-t_stat EPROM_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat EPROM_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int i;
     
@@ -174,7 +174,7 @@ t_stat EPROM_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 
 /* EPROM attach  */
 
-t_stat EPROM_attach (UNIT *uptr, CONST char *cptr) 
+t_stat EPROM_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
 

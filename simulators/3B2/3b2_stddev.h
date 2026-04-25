@@ -38,7 +38,7 @@ t_stat nvram_ex(t_value *vptr, t_addr exta, UNIT *uptr, int32 sw);
 t_stat nvram_dep(t_value val, t_addr exta, UNIT *uptr, int32 sw);
 t_stat nvram_reset(DEVICE *dptr);
 uint32 nvram_read(uint32 pa, size_t size);
-t_stat nvram_attach(UNIT *uptr, CONST char *cptr);
+t_stat nvram_attach(UNIT *uptr, const char *cptr);
 t_stat nvram_detach(UNIT *uptr);
 const char *nvram_description(DEVICE *dptr);
 t_stat nvram_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
@@ -107,7 +107,7 @@ typedef struct tod_data {
 
 void tod_update_delta(void);
 t_stat tod_reset(DEVICE *dptr);
-t_stat tod_attach(UNIT *uptr, CONST char *cptr);
+t_stat tod_attach(UNIT *uptr, const char *cptr);
 t_stat tod_detach(UNIT *uptr);
 t_stat tod_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *tod_description(DEVICE *dptr);

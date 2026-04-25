@@ -377,13 +377,13 @@ static void   rr_set_done (int32 error);
 static void   rr_clr_done (void);
 static t_stat rr_boot (int32 unitno, DEVICE *dptr);
 static t_stat rr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
-static t_stat rr_attach (UNIT *uptr, CONST char *cptr);
+static t_stat rr_attach (UNIT *uptr, const char *cptr);
 static t_stat rr_detach (UNIT *uptr);
-static t_stat rr_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat rr_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat rr_set_wloa (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat rr_set_ctrl (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat rr_show_ctrl (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat rr_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat rr_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat rr_set_wloa (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat rr_set_ctrl (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat rr_show_ctrl (FILE *st, UNIT *uptr, int32 val, const void *desc);
 static const char *rr_description (DEVICE *dptr);
 
 /* RP11 data structures
@@ -1292,7 +1292,7 @@ static t_stat rr_reset (DEVICE *dptr)
 
 /* Attach/detach routines */
 
-static t_stat rr_attach (UNIT *uptr, CONST char *cptr)
+static t_stat rr_attach (UNIT *uptr, const char *cptr)
 {
     static const char* rr_types[] = { RP_RP03, RP_RP02, NULL };
     int32 type = GET_DTYPE(uptr->flags);
@@ -1332,7 +1332,7 @@ static t_stat rr_detach (UNIT *uptr)
 
 /* Set / show drive type */
 
-static t_stat rr_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat rr_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     assert(find_dev_from_unit(uptr) == &rr_dev);
     if ((val & ~UNIT_RP03)  ||  cptr)
@@ -1348,7 +1348,7 @@ static t_stat rr_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-static t_stat rr_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat rr_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fputs(drv_tab[GET_DTYPE(uptr->flags)].name, st);
     return SCPE_OK;
@@ -1356,7 +1356,7 @@ static t_stat rr_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 
 /* Set WLOA */
 
-static t_stat rr_set_wloa (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat rr_set_wloa (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     assert(find_dev_from_unit(uptr) == &rr_dev);
     if (!cptr  ||  !*cptr)
@@ -1516,7 +1516,7 @@ static const char *rr_description (DEVICE *dptr)
 
 /* Set / show controller type */
 
-static t_stat rr_set_ctrl (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat rr_set_ctrl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     size_t i;
     assert(find_dev_from_unit(uptr) == &rr_dev);
@@ -1541,7 +1541,7 @@ static t_stat rr_set_ctrl (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-static t_stat rr_show_ctrl (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat rr_show_ctrl (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     assert(find_dev_from_unit(uptr) == &rr_dev);
     fputs(rr_dev.flags & DEV_RP11CE ? RP_RP11CE : RP_RP11, st);

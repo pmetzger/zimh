@@ -144,7 +144,7 @@ typedef struct {
 
 t_stat ctc_reset(DEVICE *dptr);
 t_stat ctc_svc(UNIT *uptr);
-t_stat ctc_attach(UNIT *uptr, CONST char *cptr);
+t_stat ctc_attach(UNIT *uptr, const char *cptr);
 t_stat ctc_detach(UNIT *uptr);
 void ctc_sysgen(uint8 slot);
 void ctc_express(uint8 slot);

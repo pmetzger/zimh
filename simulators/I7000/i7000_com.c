@@ -268,10 +268,10 @@ t_stat              como_svc(UNIT * uptr);
 t_stat              comti_svc(UNIT * uptr);
 t_stat              comto_svc(UNIT * uptr);
 t_stat              com_reset(DEVICE * dptr);
-t_stat              com_attach(UNIT * uptr, CONST char *cptr);
+t_stat              com_attach(UNIT * uptr, const char *cptr);
 t_stat              com_detach(UNIT * uptr);
-t_stat              com_summ(FILE * st, UNIT * uptr, int32 val, CONST void *desc);
-t_stat              com_show(FILE * st, UNIT * uptr, int32 val, CONST void *desc);
+t_stat              com_summ(FILE * st, UNIT * uptr, int32 val, const void *desc);
+t_stat              com_show(FILE * st, UNIT * uptr, int32 val, const void *desc);
 void                com_reset_ln(uint32 i);
 t_stat              com_queue_in(uint32 ln, uint16 ch);
 uint32              com_queue_out(uint32 ln, uint16 * c1);
@@ -1194,7 +1194,7 @@ com_reset(DEVICE * dptr)
 /* Attach master unit */
 
 t_stat
-com_attach(UNIT * uptr, CONST char *cptr)
+com_attach(UNIT * uptr, const char *cptr)
 {
     t_stat              r;
 
@@ -1224,7 +1224,7 @@ com_detach(UNIT * uptr)
 /* Show summary processor */
 
 t_stat
-com_summ(FILE * st, UNIT * uptr, int32 val, CONST void *desc)
+com_summ(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
     uint32              i, t;
 
@@ -1241,7 +1241,7 @@ com_summ(FILE * st, UNIT * uptr, int32 val, CONST void *desc)
 /* SHOW CONN/STAT processor */
 
 t_stat
-com_show(FILE * st, UNIT * uptr, int32 val, CONST void *desc)
+com_show(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
     int32               i, cc;
 

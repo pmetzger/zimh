@@ -386,9 +386,9 @@ t_bool build_dev_tab (void);
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_reset (DEVICE *dptr);
-t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc);
 void cpu_caf (void);
 void cpu_inst_hist (int32 addr, int32 inst);
 void cpu_intr_hist (int32 flag, int32 lvl);
@@ -2177,7 +2177,7 @@ return SCPE_OK;
 
 /* Change memory size */
 
-t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 mc = 0;
 uint32 i;
@@ -2196,7 +2196,7 @@ return SCPE_OK;
 
 /* Change device number for a device */
 
-t_stat set_devno (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_devno (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -2222,7 +2222,7 @@ return SCPE_OK;
 
 /* Show device number for a device */
 
-t_stat show_devno (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_devno (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -2292,7 +2292,7 @@ return FALSE;
 
 /* Set in memory 3-cycle databreak register */
 
-t_stat set_3cyc_reg (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_3cyc_reg (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 t_stat r;
 int32 newv;
@@ -2308,7 +2308,7 @@ return SCPE_OK;
 
 /* Show in-memory 3-cycle databreak register */
 
-t_stat show_3cyc_reg (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_3cyc_reg (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "%s=", (const char *) desc);
 fprint_val (st, (t_value) M[val], 8, 18, PV_RZRO);
@@ -2317,7 +2317,7 @@ return SCPE_OK;
 
 /* Set history */
 
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i, lnt;
 t_stat r;
@@ -2348,11 +2348,11 @@ return SCPE_OK;
 
 /* Show history */
 
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 l, j, k, di, lnt;
 
-CONST char *cptr = (CONST char *) desc;
+const char *cptr = (const char *) desc;
 t_value sim_eval[2];
 t_stat r;
 InstHistory *h;

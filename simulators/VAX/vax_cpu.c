@@ -319,14 +319,14 @@ t_stat cpu_reset (DEVICE *dptr);
 t_bool cpu_is_pc_a_subroutine_call (t_addr **ret_addrs);
 t_stat cpu_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw);
 t_stat cpu_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw);
-t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat cpu_show_virt (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat cpu_set_idle (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_idle (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat cpu_set_instruction_set (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_instruction_set (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat cpu_show_virt (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat cpu_set_idle (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_idle (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat cpu_set_instruction_set (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_instruction_set (FILE *st, UNIT *uptr, int32 val, const void *desc);
 const char *cpu_description (DEVICE *dptr);
 int32 cpu_get_vsw (int32 sw);
 static inline int32 get_istr (int32 lnt, int32 acc);
@@ -465,7 +465,7 @@ DEVICE cpu_dev = {
     &cpu_description
     };
 
-t_stat cpu_show_model (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_model (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "model=");
 return cpu_print_model (st);
@@ -3448,7 +3448,7 @@ return SCPE_NXM;
 
 /* Memory allocation */
 
-t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 mc = 0;
 uint32 i, clim, uval = (uint32)val;
@@ -3475,7 +3475,7 @@ return SCPE_OK;
 
 /* Virtual address translation */
 
-t_stat cpu_show_virt (FILE *of, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_virt (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
 t_stat r;
 const char *cptr = (const char *) desc;
@@ -3527,7 +3527,7 @@ return ACC_MASK (md);
 
 /* Set history */
 
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i, lnt;
 char gbuf[CBUFSIZE];
@@ -3583,7 +3583,7 @@ return SCPE_OK;
 
 /* Show history */
 
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 di, lnt;
 const char *cptr = (const char *) desc;
@@ -3761,7 +3761,7 @@ static struct os_idle os_tab[] = {
 
 /* Set and show idle */
 
-t_stat cpu_set_idle (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_idle (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 i;
 char gbuf[CBUFSIZE];
@@ -3780,7 +3780,7 @@ if (cptr != NULL) {
 return sim_set_idle (uptr, val, cptr, desc);
 }
 
-t_stat cpu_show_idle (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_idle (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if (sim_idle_enab && (cpu_idle_type != 0))
     fprintf (st, "idle=%s, ", os_tab[cpu_idle_type - 1].name);
@@ -3804,7 +3804,7 @@ static struct {
         {0,          NULL,          NULL}
     };
 
-t_stat cpu_set_instruction_set (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_instruction_set (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (!cptr || !*cptr)
     return SCPE_ARG;
@@ -3866,7 +3866,7 @@ fprintf (st, "\n");
 return SCPE_OK;
 }
 
-t_stat cpu_show_instruction_set (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_instruction_set (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int i;
 

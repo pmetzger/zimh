@@ -91,10 +91,10 @@ typedef struct {
 
 extern WD179X_INFO_PUB *wd179x_infop;
 
-extern t_stat set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 extern void setBankSelect(const int32 b);
@@ -117,9 +117,9 @@ extern uint8 dataBus[MAX_INT_VECTORS];          /* IBC interrupt data bus values
 
 static t_stat ibc_reset(DEVICE *ibc_dev);
 static t_stat ibc_boot(int32 unitno, DEVICE *dptr);
-static t_stat ibc_attach(UNIT *uptr, CONST char *cptr);
+static t_stat ibc_attach(UNIT *uptr, const char *cptr);
 static t_stat ibc_detach(UNIT *uptr);
-static t_stat ibc_set_model(UNIT* uptr, int32 value, CONST char* cptr, void* desc);
+static t_stat ibc_set_model(UNIT* uptr, int32 value, const char* cptr, void* desc);
 
 static int32 ibc_sio(const int32 port, const int32 io, const int32 data);
 static int32 ibc_pio(const int32 port, const int32 io, const int32 data);
@@ -219,7 +219,7 @@ static const char* ibc_description(DEVICE *dptr) {
     return IBC_NAME;
 }
 
-static t_stat ibc_show_vectable(FILE* st, UNIT* uptr, int32 val, CONST void* desc);
+static t_stat ibc_show_vectable(FILE* st, UNIT* uptr, int32 val, const void* desc);
 
 #define UNIT_IBC_V_MCC          (UNIT_V_UF+1)               /* Set model to MCC */
 #define UNIT_IBC_MCC            (1 << UNIT_IBC_V_MCC)
@@ -464,7 +464,7 @@ static t_stat ibcrtctimer_svc(UNIT* uptr)
 }
 
 
-t_stat ibc_show_vectable(FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat ibc_show_vectable(FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
     uint8 i;
     int32 vectable = (IR_S & 0xFF00);
@@ -1567,7 +1567,7 @@ IO_RESOURCE_LIST IBC_SCC_RESOURCES[] = {
     { NULL }
 };
 
-static t_stat ibc_set_model(UNIT* uptr, int32 value, CONST char* cptr, void* desc) {
+static t_stat ibc_set_model(UNIT* uptr, int32 value, const char* cptr, void* desc) {
     IO_RESOURCE_LIST* resources;
 
     if (value == ibc_info->model) {
@@ -1666,7 +1666,7 @@ static t_stat ibc_boot(int32 unitno, DEVICE *dptr)
 }
 
 /* Attach routine */
-static t_stat ibc_attach(UNIT *uptr, CONST char *cptr)
+static t_stat ibc_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r = SCPE_IERR;
 

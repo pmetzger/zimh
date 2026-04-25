@@ -177,9 +177,9 @@ t_stat        rs_svc(UNIT *);
 t_stat        rs_boot(int32, DEVICE *);
 void          rs_ini(UNIT *, t_bool);
 t_stat        rs_reset(DEVICE *);
-t_stat        rs_attach(UNIT *, CONST char *);
+t_stat        rs_attach(UNIT *, const char *);
 t_stat        rs_detach(UNIT *);
-t_stat        rs_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat        rs_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat        rs_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                     const char *cptr);
 const char    *rs_description (DEVICE *dptr);
@@ -591,7 +591,7 @@ wr_end:
 
 
 t_stat
-rs_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+rs_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int         i;
 
@@ -659,7 +659,7 @@ rs_boot(int32 unit_num, DEVICE * rptr)
 
 /* Device attach */
 
-t_stat rs_attach (UNIT *uptr, CONST char *cptr)
+t_stat rs_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
     DEVICE *rstr;

@@ -315,7 +315,7 @@ else
 
 }
 
-t_stat cpu_show_leds (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_leds (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "leds=%d(%s,%s,%s)", tto_leds, tto_leds&4 ? "ON" : "OFF", 
                                             tto_leds&2 ? "ON" : "OFF", 

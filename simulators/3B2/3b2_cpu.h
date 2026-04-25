@@ -593,22 +593,22 @@ typedef struct {
 } instr;
 
 /* Function prototypes */
-t_stat sys_boot(int32 flag, CONST char *ptr);
+t_stat sys_boot(int32 flag, const char *ptr);
 t_stat cpu_svc(UNIT *uptr);
 t_stat cpu_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_dep(t_value val, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_reset(DEVICE *dptr);
-t_stat cpu_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_set_hist(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat cpu_show_virt(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat cpu_show_stack(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat cpu_show_cio(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat cpu_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat cpu_show_virt(FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat cpu_show_stack(FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat cpu_show_cio(FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat cpu_set_halt(UNIT *uptr, int32 val, char *cptr, void *desc);
 t_stat cpu_clear_halt(UNIT *uptr, int32 val, char *cptr, void *desc);
 t_stat cpu_boot(int32 unit_num, DEVICE *dptr);
 t_stat cpu_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
-CONST char *cpu_description(DEVICE *dptr);
+const char *cpu_description(DEVICE *dptr);
 
 t_bool cpu_is_pc_a_subroutine_call (t_addr **ret_addrs);
 

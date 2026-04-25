@@ -72,10 +72,10 @@ DSPT    cr_tplt[] = {{1,0},{0,0}};      /* template */
 t_stat  cr_svc(UNIT *);
 t_stat  cr_boot(int32, DEVICE *);
 t_stat  cr_reset(DEVICE *);
-t_stat  cr_attach(UNIT *, CONST char *);
+t_stat  cr_attach(UNIT *, const char *);
 t_stat  cr_detach(UNIT *);
 t_stat  cr_devio(uint32 fnc, uint32 inst, uint32 *dat);
-t_stat  cr_show_cap (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat  cr_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat  cr_readrec (UNIT *uptr);
 void    cr_set_err (UNIT *uptr);
 
@@ -350,7 +350,7 @@ t_stat cr_reset (DEVICE *dptr) {
     return SCPE_OK;
 }
 
-t_stat cr_attach (UNIT *uptr, CONST char *cptr) {
+t_stat cr_attach (UNIT *uptr, const char *cptr) {
     return sim_card_attach(uptr, cptr);
 }
 
@@ -368,7 +368,7 @@ t_stat cr_boot (int32 unitno, DEVICE *dptr) {
     return SCPE_OK;
 }
    
-t_stat cr_show_cap (FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
+t_stat cr_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc) {
     int n;
     
     if ((n = sim_card_input_hopper_count(uptr)) == 0)

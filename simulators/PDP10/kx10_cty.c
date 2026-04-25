@@ -33,8 +33,8 @@ extern int32 tmxr_poll;
 t_stat ctyi_svc (UNIT *uptr);
 t_stat ctyo_svc (UNIT *uptr);
 t_stat cty_reset (DEVICE *dptr);
-t_stat cty_stop_os (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat tty_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat cty_stop_os (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat cty_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *cty_description (DEVICE *dptr);
 
@@ -186,7 +186,7 @@ t_stat cty_reset (DEVICE *dptr)
 
 /* Stop operating system */
 
-t_stat cty_stop_os (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cty_stop_os (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 #if ITS
     if (cpu_unit[0].flags & UNIT_ITSPAGE)
@@ -197,7 +197,7 @@ t_stat cty_stop_os (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat tty_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     cty_unit[0].flags = (cty_unit[0].flags & ~TT_MODE) | val;
     cty_unit[1].flags = (cty_unit[1].flags & ~TT_MODE) | val;

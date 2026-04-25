@@ -55,7 +55,7 @@
 static t_stat       tk10_devio(uint32 dev, uint64 *data);
 static t_stat       tk10_svc (UNIT *uptr);
 static t_stat       tk10_reset (DEVICE *dptr);
-static t_stat       tk10_attach (UNIT *uptr, CONST char *cptr);
+static t_stat       tk10_attach (UNIT *uptr, const char *cptr);
 static t_stat       tk10_detach (UNIT *uptr);
 static const char   *tk10_description (DEVICE *dptr);
 static t_stat       tk10_help (FILE *st, DEVICE *dptr, UNIT *uptr,
@@ -253,7 +253,7 @@ static t_stat tk10_reset (DEVICE *dptr)
     return SCPE_OK;
 }
 
-static t_stat tk10_attach (UNIT *uptr, CONST char *cptr)
+static t_stat tk10_attach (UNIT *uptr, const char *cptr)
 {
     t_stat stat;
     int i;

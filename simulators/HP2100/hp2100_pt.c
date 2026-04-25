@@ -291,12 +291,12 @@ static INTERFACE pt_interface;
 
 /* Interface local utility routines */
 
-static t_stat set_mode (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat set_mode (UNIT *uptr, int32 value, const char *cptr, void *desc);
 
 
 /* PTR local SCP support routine declarations */
 
-static t_stat ptr_attach (UNIT *uptr, CONST char *cptr);
+static t_stat ptr_attach (UNIT *uptr, const char *cptr);
 static t_stat ptr_reset  (DEVICE *dptr);
 static t_stat ptr_boot   (int32 unitno, DEVICE *dptr);
 
@@ -696,7 +696,7 @@ return outbound;                                        /* return the outbound s
    set.  The character and descriptor pointers are not used.
 */
 
-static t_stat set_mode (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat set_mode (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if (uptr == &ptr_unit)                                  /* if the reader mode is being set */
     if (value == 0)                                     /*   then if optimized timing is desired */
@@ -753,7 +753,7 @@ return SCPE_OK;                                         /* device reset always s
    detection.
 */
 
-static t_stat ptr_attach (UNIT *uptr, CONST char *cptr)
+static t_stat ptr_attach (UNIT *uptr, const char *cptr)
 {
 ptr_trlcnt = 0;                                         /* clear the trailing NUL counter */
 return attach_unit (uptr, cptr);                        /*   and attached the indicated file */

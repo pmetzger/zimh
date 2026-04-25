@@ -341,9 +341,9 @@ t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_reset (DEVICE *dptr);
 t_stat cpu_boot (int32 unitno, DEVICE *dptr);
 t_bool cpu_is_pc_a_subroutine_call (t_addr **ret_addrs);
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat cpu_show_virt (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat cpu_show_virt (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *cpu_description (DEVICE *dptr);
 int32 GeteaB (int32 spec);
@@ -3388,7 +3388,7 @@ static const char *pdp11_clock_precalibrate_commands[] = {
 
 */
 
-t_stat pdp11_boot (int32 flag, CONST char *ptr)
+t_stat pdp11_boot (int32 flag, const char *ptr)
 {
 char gbuf[CBUFSIZE];
 
@@ -3588,7 +3588,7 @@ return;
 
 /* Set history */
 
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i, lnt;
 t_stat r;
@@ -3619,7 +3619,7 @@ return SCPE_OK;
 
 /* Show history */
 
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 j, k, di, lnt, ir;
 const char *cptr = (const char *) desc;
@@ -3664,7 +3664,7 @@ return SCPE_OK;
 
 /* Virtual address translation */
 
-t_stat cpu_show_virt (FILE *of, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_virt (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
 t_stat r;
 const char *cptr = (const char *) desc;

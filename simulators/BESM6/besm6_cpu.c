@@ -84,9 +84,9 @@ jmp_buf cpu_halt;
 t_stat cpu_examine (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_deposit (t_value val, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_reset (DEVICE *dptr);
-t_stat cpu_req (UNIT *u, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_set_pult (UNIT *u, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_pult (FILE *st, UNIT *up, int32 v, CONST void *dp);
+t_stat cpu_req (UNIT *u, int32 val, const char *cptr, void *desc);
+t_stat cpu_set_pult (UNIT *u, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_pult (FILE *st, UNIT *up, int32 v, const void *dp);
 
 
 /*
@@ -390,7 +390,7 @@ t_stat cpu_reset (DEVICE *dptr)
 /*
  * Request routine
  */
-t_stat cpu_req (UNIT *u, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_req (UNIT *u, int32 val, const char *cptr, void *desc)
 {
     GRP |= GRP_PANEL_REQ;
     return SCPE_OK;
@@ -399,7 +399,7 @@ t_stat cpu_req (UNIT *u, int32 val, CONST char *cptr, void *desc)
 /*
  * Hardwired program selector validation
  */
-t_stat cpu_set_pult (UNIT *u, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_pult (UNIT *u, int32 val, const char *cptr, void *desc)
 {
     int sw;
     if (cptr) sw = atoi(cptr); else sw = 0;
@@ -415,7 +415,7 @@ t_stat cpu_set_pult (UNIT *u, int32 val, CONST char *cptr, void *desc)
     return SCPE_ARG;
 }
 
-t_stat cpu_show_pult (FILE *st, UNIT *up, int32 v, CONST void *dp)
+t_stat cpu_show_pult (FILE *st, UNIT *up, int32 v, const void *dp)
 {
     fprintf(st, "Pult packet switch position is %d", pult_packet_switch);
     return SCPE_OK;

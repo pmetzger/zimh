@@ -34,11 +34,11 @@ extern REG cpu_reg[];
 extern uint32 pal_type;
 
 t_stat fprint_sym_m (FILE *of, t_addr addr, uint32 inst);
-t_stat parse_sym_m (CONST char *cptr, t_addr addr, t_value *inst);
-int32 parse_reg (CONST char *cptr);
+t_stat parse_sym_m (const char *cptr, t_addr addr, t_value *inst);
+int32 parse_reg (const char *cptr);
 
 extern t_stat fprint_pal_hwre (FILE *of, uint32 inst);
-extern t_stat parse_pal_hwre (CONST char *cptr, t_value *inst);
+extern t_stat parse_pal_hwre (const char *cptr, t_value *inst);
 extern t_bool rom_wr (t_uint64 pa, t_uint64 val, uint32 lnt);
 
 /* SCP data structures and interface routines
@@ -73,7 +73,7 @@ const char *sim_stop_messages[SCPE_BASE] = {
    -o           specify origin
 */
 
-t_stat sim_load (FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
 t_stat r;
 int32 i;
@@ -628,7 +628,7 @@ return SCPE_ARG;
                         <= 0  -number of extra words
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
 t_value num;
 uint32 i, sc, rdx;
@@ -712,13 +712,13 @@ return -7;
                         <= 0  -number of extra words
 */
 
-t_stat parse_sym_m (CONST char *cptr, t_addr addr, t_value *inst)
+t_stat parse_sym_m (const char *cptr, t_addr addr, t_value *inst)
 {
 t_uint64 bra, df, db;
 uint32 i, k, lit8, fl;
 int32 reg;
 t_stat r;
-CONST char *tptr;
+const char *tptr;
 char gbuf[CBUFSIZE];
 
 if ((r = parse_pal_hwre (cptr, inst)) < 0) return r;    /* PAL hardware? */
@@ -802,7 +802,7 @@ return -3;
 
 /* Parse a register */
 
-int32 parse_reg (CONST char *cptr)
+int32 parse_reg (const char *cptr)
 {
 t_stat r;
 int32 reg;

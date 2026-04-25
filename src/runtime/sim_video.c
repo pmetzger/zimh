@@ -65,7 +65,7 @@ t_stat vid_register_gamepad_button_callback (VID_GAMEPAD_CALLBACK callback)
     return register_callback ((void **)button_callback, n, (void *)callback);
 }
 
-t_stat vid_show (FILE* st, DEVICE *dptr,  UNIT* uptr, int32 val, CONST char* desc)
+t_stat vid_show (FILE* st, DEVICE *dptr,  UNIT* uptr, int32 val, const char* desc)
 {
 return vid_show_video (st, uptr, val, desc);
 }
@@ -2296,12 +2296,12 @@ if (1) {
 return (const char *)SDLVersion;
 }
 
-t_stat vid_set_release_key (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat vid_set_release_key (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 return SCPE_NOFNC;
 }
 
-t_stat vid_show_release_key (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat vid_show_release_key (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 VID_DISPLAY *vptr;
 for (vptr = &vid_first; vptr != NULL; vptr = vptr->next) {
@@ -2313,7 +2313,7 @@ for (vptr = &vid_first; vptr != NULL; vptr = vptr->next) {
 return SCPE_OK;
 }
 
-static t_stat _vid_show_video (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+static t_stat _vid_show_video (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 int i;
 VID_DISPLAY *vptr;
@@ -2549,14 +2549,14 @@ static t_stat _show_stat;
 static FILE *_show_st;
 static UNIT *_show_uptr;
 static int32 _show_val;
-static CONST void *_show_desc;
+static const void *_show_desc;
 
 void vid_show_video_event (void)
 {
 _show_stat = _vid_show_video (_show_st, _show_uptr, _show_val, _show_desc);
 }
 
-t_stat vid_show_video (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat vid_show_video (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 SDL_Event user_event;
 
@@ -2827,18 +2827,18 @@ const char *vid_version (void)
 return "No Video Support";
 }
 
-t_stat vid_set_release_key (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat vid_set_release_key (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 return SCPE_NOFNC;
 }
 
-t_stat vid_show_release_key (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat vid_show_release_key (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 fprintf (st, "no release key");
 return SCPE_OK;
 }
 
-t_stat vid_show_video (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat vid_show_video (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 fprintf (st, "video support unavailable\n");
 return SCPE_OK;

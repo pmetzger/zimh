@@ -809,7 +809,7 @@ const uint32 shift_32_table[65] =
     0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff
 };
 
-t_stat cpu_show_stack(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_stack(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     uint32 i, j;
     uint32 addr, v, count;
@@ -844,7 +844,7 @@ t_stat cpu_show_stack(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
     return SCPE_OK;
 }
 
-t_stat cpu_show_cio(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_cio(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     uint32 slot;
 
@@ -862,7 +862,7 @@ t_stat cpu_show_cio(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 
 #if defined(REV3)
-t_stat sys_boot(int32 flag, CONST char *ptr)
+t_stat sys_boot(int32 flag, const char *ptr)
 {
     char gbuf[CBUFSIZE];
 
@@ -878,7 +878,7 @@ t_stat sys_boot(int32 flag, CONST char *ptr)
     return run_cmd(flag, "CPU");
 }
 #else
-t_stat sys_boot(int32 flag, CONST char *ptr)
+t_stat sys_boot(int32 flag, const char *ptr)
 {
     char gbuf[CBUFSIZE];
     size_t len = ROM_SIZE;
@@ -1429,7 +1429,7 @@ void fprint_sym_hist(FILE *st, instr *ip)
     }
 }
 
-t_stat cpu_show_virt(FILE *of, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_virt(FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
     uint32 va, pa;
     t_stat r;
@@ -1456,7 +1456,7 @@ t_stat cpu_show_virt(FILE *of, UNIT *uptr, int32 val, CONST void *desc)
     return SCPE_ARG;
 }
 
-t_stat cpu_set_hist(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 i, size;
     t_stat result;
@@ -1506,7 +1506,7 @@ t_stat cpu_set_hist(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     uint32 i;
     size_t j, count;
@@ -1732,7 +1732,7 @@ void cpu_show_operand(FILE *st, operand *op)
     }
 }
 
-t_stat cpu_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 uval = (uint32) val;
     uint8 *nRAM = NULL;
@@ -4848,7 +4848,7 @@ void cpu_abort(uint8 et, uint8 isc)
     longjmp(save_env, ABORT_EXC);
 }
 
-CONST char *cpu_description(DEVICE *dptr)
+const char *cpu_description(DEVICE *dptr)
 {
 #if defined(REV3)
     return "3B2/700 CPU (WE 32200)";

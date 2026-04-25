@@ -38,8 +38,8 @@ t_stat nar_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw);
 t_stat nar_reset (DEVICE *dptr);
 t_stat nar_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *nar_description (DEVICE *dptr);
-t_stat nar_showmac (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat nar_setmac (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
+t_stat nar_showmac (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat nar_setmac (UNIT* uptr, int32 val, const char* cptr, void* desc);
 
 /* NAR data structures
 
@@ -77,7 +77,7 @@ int32 rg = (pa >> 2) & 0x1F;
 return nar[rg];
 }
 
-t_stat nar_showmac (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat nar_showmac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 char buffer[20];
 
@@ -86,7 +86,7 @@ fprintf (st, "MAC=%s", buffer);
 return SCPE_OK;
 }
 
-t_stat nar_setmac (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat nar_setmac (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
 t_stat status;
 

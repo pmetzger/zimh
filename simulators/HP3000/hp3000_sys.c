@@ -977,11 +977,11 @@ static const char *const edit_ops [] = {        /* EDIT operation names */
 void   hp_one_time_init  (void);
 static t_bool fprint_stopped (FILE   *st,   t_stat     reason);
 static void   fprint_addr    (FILE   *st,   DEVICE     *dptr, t_addr     addr);
-static t_addr parse_addr     (DEVICE *dptr, CONST char *cptr, CONST char **tptr);
+static t_addr parse_addr     (DEVICE *dptr, const char *cptr, const char **tptr);
 
-static t_stat hp_exdep_cmd (int32 arg, CONST char *buf);
-static t_stat hp_run_cmd   (int32 arg, CONST char *buf);
-static t_stat hp_brk_cmd   (int32 arg, CONST char *buf);
+static t_stat hp_exdep_cmd (int32 arg, const char *buf);
+static t_stat hp_run_cmd   (int32 arg, const char *buf);
+static t_stat hp_brk_cmd   (int32 arg, const char *buf);
 
 /* System interface local utility routines */
 
@@ -991,7 +991,7 @@ static t_stat fprint_subop       (FILE *ofile, t_value *val, uint32 radix, t_add
 static t_stat fprint_instruction (FILE *ofile, const OP_TABLE ops, t_value *val,
                                   uint32 mask, uint32 shift, uint32 radix);
 
-static t_stat parse_cpu          (CONST char *cptr, t_addr address, UNIT *uptr, t_value *value, int32 switches);
+static t_stat parse_cpu          (const char *cptr, t_addr address, UNIT *uptr, t_value *value, int32 switches);
 
 
 /* System interface state */
@@ -1200,7 +1200,7 @@ static CTAB aux_cmds [] = {
    the SCP module.
 */
 
-t_stat sim_load (FILE *fptr, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fptr, const char *cptr, const char *fnam, int flag)
 {
 return SCPE_ARG;                                        /* return an error if called inadvertently */
 }
@@ -1479,7 +1479,7 @@ else                                                    /* otherwise the modes c
        themselves always succeed, so they don't affect the outcome of the tests.
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
 while (isspace ((int) *cptr))                           /* skip over any leading spaces */
     cptr++;                                             /*   that are present in the line */
@@ -1539,7 +1539,7 @@ else                                                    /* otherwise */
        it may be changed.
 */
 
-t_stat hp_set_dib (UNIT *uptr, int32 code, CONST char *cptr, void *desc)
+t_stat hp_set_dib (UNIT *uptr, int32 code, const char *cptr, void *desc)
 {
 DIB *const dibptr = (DIB *) desc;                       /* a pointer to the associated DIB */
 t_stat     status = SCPE_OK;
@@ -1630,7 +1630,7 @@ return status;                                          /* return the validation
        values "D" and "E", the stored values are 0 and 0177777, respectively.
 */
 
-t_stat hp_show_dib (FILE *st, UNIT *uptr, int32 code, CONST void *desc)
+t_stat hp_show_dib (FILE *st, UNIT *uptr, int32 code, const void *desc)
 {
 const DIB *const dibptr = (const DIB *) desc;           /* a pointer to the associated DIB */
 uint32           mask, value;
@@ -2858,9 +2858,9 @@ return;
    only allows an implied offset from PBANK.
 */
 
-static t_addr parse_addr (DEVICE *dptr, CONST char *cptr, CONST char **tptr)
+static t_addr parse_addr (DEVICE *dptr, const char *cptr, const char **tptr)
 {
-CONST char *sptr;
+const char *sptr;
 uint32     overrides;
 t_addr     bank;
 t_addr     address = 0;
@@ -2930,7 +2930,7 @@ return address;                                         /* return the linear add
    handler.
 */
 
-static t_stat hp_exdep_cmd (int32 arg, CONST char *buf)
+static t_stat hp_exdep_cmd (int32 arg, const char *buf)
 {
 parse_config = apcBank_Offset |                         /* allow the <bank>.<offset> address form */
                apcBank_Override |                       /* allow bank override switches */
@@ -2963,7 +2963,7 @@ return exdep_cmd (arg, buf);                            /* return the result of 
        resident in memory.
 */
 
-static t_stat hp_run_cmd (int32 arg, CONST char *buf)
+static t_stat hp_run_cmd (int32 arg, const char *buf)
 {
 parse_config = apcDefault_PBANK;                        /* set the default bank register to PBANK */
 
@@ -2994,7 +2994,7 @@ return run_cmd (RU_GO, buf);                            /* return the result of 
    routine to parse the offset.
 */
 
-static t_stat hp_brk_cmd (int32 arg, CONST char *buf)
+static t_stat hp_brk_cmd (int32 arg, const char *buf)
 {
 static uint32 PC;
 static REG PR = { ORDATA (PP, PC, 32) };
@@ -3758,7 +3758,7 @@ return status;                                          /* return the applicable
 
 /* Parse a CPU instruction */
 
-static t_stat parse_cpu (CONST char *cptr, t_addr address, UNIT *uptr, t_value *value, int32 switches)
+static t_stat parse_cpu (const char *cptr, t_addr address, UNIT *uptr, t_value *value, int32 switches)
 {
 return SCPE_ARG;                                        /* mnemonic support is not present in this release */
 }

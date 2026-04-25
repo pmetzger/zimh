@@ -51,7 +51,7 @@
 t_stat floppy_svc(UNIT *uptr);
 t_stat floppy_reset (DEVICE *dptr);
 t_stat floppy_boot (int32 unitno, DEVICE *dptr);
-t_stat floppy_attach (UNIT *uptr, CONST char *cptr);
+t_stat floppy_attach (UNIT *uptr, const char *cptr);
 static int floppy_excmd(void);
 static int floppy_test(UNIT *up);
 static int dtomem(FILE *fp, int daddr, int maddr, int wcnt, int how);

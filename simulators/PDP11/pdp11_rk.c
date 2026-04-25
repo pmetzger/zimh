@@ -356,8 +356,8 @@ void rk_set_done (int32 error);
 void rk_clr_done (void);
 t_stat rk_boot (int32 unitno, DEVICE *dptr);
 t_stat rk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
-t_stat rk_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat rk_attach (UNIT *uptr, CONST char *cptr);
+t_stat rk_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat rk_attach (UNIT *uptr, const char *cptr);
 t_stat rk_detach (UNIT *uptr);
 const char *rk_description (DEVICE *dptr);
 
@@ -917,7 +917,7 @@ return auto_config (0, 0);
 
 /* Attach routine */
 
-t_stat rk_attach (UNIT *uptr, CONST char *cptr)
+t_stat rk_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 r = sim_disk_attach_ex2 (uptr, cptr, RK_NUMWD * sizeof (uint16), 
@@ -936,7 +936,7 @@ return sim_disk_detach (uptr);
 
 /* Show unit type */
 
-t_stat rk_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat rk_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "%s", drv_tab[GET_DTYPE (uptr->flags)].name);
 return SCPE_OK;

@@ -73,9 +73,9 @@ extern REG cpu_reg[];
 extern uint16 M[];
 
 t_stat fprint_sym_fpp (FILE *of, t_value *val);
-t_stat parse_sym_fpp (CONST char *cptr, t_value *val);
-CONST char *parse_field (CONST char *cptr, uint32 max, uint32 *val, uint32 c);
-CONST char *parse_fpp_xr (CONST char *cptr, uint32 *xr, t_bool inc);
+t_stat parse_sym_fpp (const char *cptr, t_value *val);
+const char *parse_field (const char *cptr, uint32 max, uint32 *val, uint32 c);
+const char *parse_fpp_xr (const char *cptr, uint32 *xr, t_bool inc);
 int32 test_fpp_addr (uint32 ad, uint32 max);
 
 /* SCP data structures and interface routines
@@ -289,7 +289,7 @@ return SCPE_IERR;
 /* Binary loader
    Two loader formats are supported: RIM loader (-r) and BIN (-b) loader. */
 
-t_stat sim_load (FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
 if (*cptr != 0)
     return SCPE_ARG;
@@ -729,7 +729,7 @@ return SCPE_ARG;
         status  =       error status
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
 uint32 cflag, d, i, j, k;
 t_stat r;
@@ -919,7 +919,7 @@ return SCPE_ARG;
 
 /* FPP8 instruction parse */
 
-t_stat parse_sym_fpp (CONST char *cptr, t_value *val)
+t_stat parse_sym_fpp (const char *cptr, t_value *val)
 {
 uint32 i, j, ad, xr;
 int32 broff, nwd;
@@ -1020,7 +1020,7 @@ return -nwd;
 
 /* Parse field */
 
-CONST char *parse_field (CONST char *cptr, uint32 max, uint32 *val, uint32 c)
+const char *parse_field (const char *cptr, uint32 max, uint32 *val, uint32 c)
 {
 char gbuf[CBUFSIZE];
 t_stat r;
@@ -1034,7 +1034,7 @@ return cptr;
 
 /* Parse index register */
 
-CONST char *parse_fpp_xr (CONST char *cptr, uint32 *xr, t_bool inc)
+const char *parse_fpp_xr (const char *cptr, uint32 *xr, t_bool inc)
 {
 char gbuf[CBUFSIZE];
 uint32 len;

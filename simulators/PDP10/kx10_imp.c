@@ -486,9 +486,9 @@ struct imp_device {
 
 extern int32 tmxr_poll;
 
-static CONST ETH_MAC broadcast_ethaddr = {0xff,0xff,0xff,0xff,0xff,0xff};
+static const ETH_MAC broadcast_ethaddr = {0xff,0xff,0xff,0xff,0xff,0xff};
 
-static CONST in_addr_T broadcast_ipaddr = {0xffffffff};
+static const in_addr_T broadcast_ipaddr = {0xffffffff};
 
 #if KS
 int            imp_wr(DEVICE *dptr, t_addr addr, uint16 data, int32 access);
@@ -502,19 +502,19 @@ t_stat         imp_srv(UNIT *);
 t_stat         imp_eth_srv(UNIT *);
 t_stat         imp_tim_srv(UNIT *);
 t_stat         imp_reset (DEVICE *dptr);
-t_stat         imp_set_mpx (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat         imp_show_mpx (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat         imp_show_mac (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat         imp_set_mac (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat         imp_show_ip (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat         imp_set_ip (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat         imp_show_gwip (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat         imp_set_gwip (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat         imp_show_hostip (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat         imp_set_hostip (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat         imp_show_dhcpip (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat         imp_show_arp (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat         imp_set_arp (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat         imp_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat         imp_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat         imp_show_mac (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat         imp_set_mac (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat         imp_show_ip (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat         imp_set_ip (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat         imp_show_gwip (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat         imp_set_gwip (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat         imp_show_hostip (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat         imp_set_hostip (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat         imp_show_dhcpip (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat         imp_show_arp (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat         imp_set_arp (UNIT *uptr, int32 val, const char *cptr, void *desc);
 void           imp_timer_task(struct imp_device *imp);
 void           imp_send_rfmn(struct imp_device *imp);
 void           imp_packet_in(struct imp_device *imp);
@@ -534,9 +534,9 @@ void           imp_dhcp_discover(struct imp_device *imp);
 void           imp_dhcp_request(struct imp_device *imp, in_addr_T dhcpip);
 void           imp_dhcp_release(struct imp_device *imp);
 void           imp_arp_age(struct imp_device *imp);
-t_stat         imp_attach (UNIT * uptr, CONST char * cptr);
+t_stat         imp_attach (UNIT * uptr, const char * cptr);
 t_stat         imp_detach (UNIT * uptr);
-t_stat         imp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
+t_stat         imp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char     *imp_description (DEVICE *dptr);
 static char    *ipv4_inet_ntoa(struct in_addr ip);
 static int     ipv4_inet_aton(const char *str, struct in_addr *inp);
@@ -1501,7 +1501,7 @@ imp_packet_in(struct imp_device *imp)
                        }
                     }
                     /* Check if receiving to FTP */
-                    if (sport == 21 && strncmp((CONST char *)&tcp_payload[0], "PORT ", 5) == 0) {
+                    if (sport == 21 && strncmp((const char *)&tcp_payload[0], "PORT ", 5) == 0) {
                         /* We need to translate the IP address to new port number. */
                         int     l = ntohs(ip_hdr->ip_len) - thl - hl;
                         uint32  nip = ntohl(imp->hostip);
@@ -1753,7 +1753,7 @@ imp_packet_out(struct imp_device *imp, ETH_PACK *packet) {
                }
            }
            /* Check if sending to FTP */
-           if (dport == 21 && strncmp((CONST char *)&tcp_payload[0], "PORT ", 5) == 0) {
+           if (dport == 21 && strncmp((const char *)&tcp_payload[0], "PORT ", 5) == 0) {
                /* We need to translate the IP address to new port number. */
                int     l = ntohs(pkt->iphdr.ip_len) - thl - hl;
                uint32  nip = ntohl(imp->ip);
@@ -2341,7 +2341,7 @@ struct arp_entry *imp_arp_lookup(struct imp_device *imp, in_addr_T ipaddr)
     return NULL;
 }
 
-t_stat imp_set_arp (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat imp_set_arp (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
     char abuf[CBUFSIZE];
     in_addr_T ip;
@@ -2362,7 +2362,7 @@ t_stat imp_set_arp (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
     return sim_messagef(SCPE_ARG, "Invalid IP Address: %s\n", abuf);
 }
 
-t_stat imp_show_arp (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat imp_show_arp (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     struct arp_entry  *tabptr;
     int                i;
@@ -2921,7 +2921,7 @@ int ipv4_inet_aton(const char *str, struct in_addr *inp)
 }
 
 #if MPX_DEV
-t_stat imp_set_mpx (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat imp_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32 mpx;
     t_stat r;
@@ -2935,7 +2935,7 @@ t_stat imp_set_mpx (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat imp_show_mpx (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat imp_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    if (uptr == NULL)
       return SCPE_IERR;
@@ -2945,7 +2945,7 @@ t_stat imp_show_mpx (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 #endif
 
-t_stat imp_show_mac (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat imp_show_mac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
     char buffer[20];
     eth_mac_fmt(imp_data.mac, buffer);
@@ -2953,7 +2953,7 @@ t_stat imp_show_mac (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
     return SCPE_OK;
 }
 
-t_stat imp_set_mac (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat imp_set_mac (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
     t_stat status;
 
@@ -2968,7 +2968,7 @@ t_stat imp_set_mac (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
     return SCPE_OK;
 }
 
-t_stat imp_show_ip (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat imp_show_ip (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    struct in_addr ip;
    ip.s_addr = imp_data.ip;
@@ -2976,7 +2976,7 @@ t_stat imp_show_ip (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
    return SCPE_OK;
 }
 
-t_stat imp_set_ip (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat imp_set_ip (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
     char abuf[CBUFSIZE];
     struct in_addr  ip;
@@ -3005,7 +3005,7 @@ t_stat imp_set_ip (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
     return SCPE_ARG;
 }
 
-t_stat imp_show_gwip (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat imp_show_gwip (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    struct in_addr ip;
 
@@ -3014,7 +3014,7 @@ t_stat imp_show_gwip (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
    return SCPE_OK;
 }
 
-t_stat imp_set_gwip (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat imp_set_gwip (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
     struct in_addr  ip;
     if (!cptr) return SCPE_IERR;
@@ -3031,7 +3031,7 @@ t_stat imp_set_gwip (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
     return SCPE_ARG;
 }
 
-t_stat imp_show_dhcpip (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat imp_show_dhcpip (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (!(uptr->flags & UNIT_DHCP)) {
         fprintf (st, "DHCP disabled");
@@ -3049,7 +3049,7 @@ t_stat imp_show_dhcpip (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
    return SCPE_OK;
 }
 
-t_stat imp_show_hostip (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat imp_show_hostip (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    struct in_addr ip;
 
@@ -3058,7 +3058,7 @@ t_stat imp_show_hostip (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
    return SCPE_OK;
 }
 
-t_stat imp_set_hostip (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat imp_set_hostip (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
    struct in_addr ip;
     if (!cptr) return SCPE_IERR;
@@ -3126,7 +3126,7 @@ t_stat imp_reset (DEVICE *dptr)
 }
 
 /* attach device: */
-t_stat imp_attach(UNIT* uptr, CONST char* cptr)
+t_stat imp_attach(UNIT* uptr, const char* cptr)
 {
     t_stat status;
     char* tptr;

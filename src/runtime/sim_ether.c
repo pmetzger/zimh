@@ -386,7 +386,7 @@ t_stat eth_mac_scan_ex (ETH_MAC mac, const char* strmac, UNIT *uptr)
       char uname[64];
       char sim[128];
       } state;
-  CONST char *cptr, *tptr;
+  const char *cptr, *tptr;
   uint32 data;
 
   /* Allow generated MAC address */
@@ -748,7 +748,7 @@ void ethq_insert(ETH_QUE* que, int32 type, ETH_PACK* pack, int32 status)
 ethq_insert_data(que, type, pack->oversize ? pack->oversize : pack->msg, pack->used, pack->len, pack->crc_len, NULL, status);
 }
 
-t_stat eth_show_devices (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, CONST char *desc)
+t_stat eth_show_devices (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, const char *desc)
 {
 (void) dptr;
 (void) desc;
@@ -866,7 +866,7 @@ for (i=0; i<eth_open_device_count; ++i)
         }
 }
 
-t_stat eth_show (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat eth_show (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
   ETH_LIST  list[ETH_MAX_DEVICE];
   int number;
@@ -954,7 +954,7 @@ int eth_devices(int max, ETH_LIST* list, ETH_BOOL framers)
   {return 0;}
 void eth_show_dev (FILE* st, ETH_DEV* dev)
   {}
-t_stat eth_show (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat eth_show (FILE* st, UNIT* uptr, int32 val, const void* desc)
   {
   fprintf(st, "ETH devices:\n");
   fprintf(st, "  network support not available in simulator\n");

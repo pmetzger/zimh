@@ -56,7 +56,7 @@ t_stat nvr_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw);
 t_stat nvr_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw);
 t_stat nvr_reset (DEVICE *dptr);
 t_stat nvr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
-t_stat nvr_attach (UNIT *uptr, CONST char *cptr);
+t_stat nvr_attach (UNIT *uptr, const char *cptr);
 t_stat nvr_detach (UNIT *uptr);
 const char *nvr_description (DEVICE *dptr);
 t_stat clk_svc (UNIT *uptr);
@@ -323,7 +323,7 @@ return SCPE_OK;
 
 /* NVR attach */
 
-t_stat nvr_attach (UNIT *uptr, CONST char *cptr)
+t_stat nvr_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 

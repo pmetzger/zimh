@@ -39,9 +39,9 @@
 void rtc_setup (uint32 ss, uint32 level);
 t_stat rtc_srv (UNIT *uptr);
 t_stat rtc_reset (DEVICE *dptr);
-t_stat rtc_set_freq (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat rtc_show_freq (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat rtc_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
+t_stat rtc_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat rtc_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat rtc_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *rtc_desc(DEVICE *dptr);
 
 extern  int      irq_pend;                  /* go scan for pending int or I/O */
@@ -182,7 +182,7 @@ t_stat rtc_reset(DEVICE *dptr)
 }
 
 /* Set frequency */
-t_stat rtc_set_freq(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rtc_set_freq(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (cptr)                               /* if chars, bad */
         return SCPE_ARG;                    /* ARG error */
@@ -193,7 +193,7 @@ t_stat rtc_set_freq(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 /* Show frequency */
-t_stat rtc_show_freq (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat rtc_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     /* print the current frequency setting */
     if (rtc_tps < 100)
@@ -204,7 +204,7 @@ t_stat rtc_show_freq (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 
 /* sho help rtc */
-t_stat rtc_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat rtc_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
     fprintf(st, "SEL 32 IOP/MFP realtime clock at 0x7F06\r\n");
     fprintf(st, "Use:\r\n");
@@ -235,10 +235,10 @@ int32 itm_strt = 0;                         /* clock start time in usec */
 int32 itm_load = 0;                         /* clock loaded */
 int32 itm_big = 26042 * 6000;               /* about 100 minutes */
 t_stat itm_srv (UNIT *uptr);
-t_stat itm_set_freq (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat itm_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat itm_reset (DEVICE *dptr);
-t_stat itm_show_freq (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat itm_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
+t_stat itm_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat itm_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 void itm_setup(uint32 ss, uint32 level);
 const char *itm_desc(DEVICE *dptr);
 
@@ -664,7 +664,7 @@ t_stat itm_reset (DEVICE *dptr)
 }
 
 /* Set frequency */
-t_stat itm_set_freq (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat itm_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (cptr)                               /* if chars, bad */
         return SCPE_ARG;                    /* ARG error */
@@ -675,7 +675,7 @@ t_stat itm_set_freq (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 /* Show frequency */
-t_stat itm_show_freq (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat itm_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     /* print the current interval count setting */
     fprintf (st, "%0.2fus", (itm_tick_size_x_100 / 100.0));
@@ -683,7 +683,7 @@ t_stat itm_show_freq (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 
 /* sho help rtc */
-t_stat itm_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat itm_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
     fprintf(st, "SEL 32 IOP/MFP interval timer at 0x7F04\r\n");
     fprintf(st, "Use:\r\n");

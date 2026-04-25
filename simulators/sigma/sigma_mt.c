@@ -146,7 +146,7 @@ t_stat mt_chan_err (uint32 dva, uint32 st);
 t_stat mtu_svc (UNIT *uptr);
 t_stat mtr_svc (UNIT *uptr);
 t_stat mt_reset (DEVICE *dptr);
-t_stat mt_attach (UNIT *uptr, CONST char *cptr);
+t_stat mt_attach (UNIT *uptr, const char *cptr);
 t_stat mt_detach (UNIT *uptr);
 t_stat mt_flush_buf (UNIT *uptr);
 t_stat mt_map_err (UNIT *uptr, t_stat r);
@@ -707,7 +707,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat mt_attach (UNIT *uptr, CONST char *cptr)
+t_stat mt_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 uint32 un = uptr - mt_unit;

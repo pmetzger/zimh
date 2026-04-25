@@ -321,7 +321,7 @@ typedef struct _mmu_state {
 t_stat mmu_init(DEVICE *dptr);
 uint32 mmu_read(uint32 pa, size_t size);
 void mmu_write(uint32 pa, uint32 val, size_t size);
-CONST char *mmu_description(DEVICE *dptr);
+const char *mmu_description(DEVICE *dptr);
 
 /* Virtual memory translation */
 uint32 mmu_xlate_addr(uint32 va, uint8 r_acc);

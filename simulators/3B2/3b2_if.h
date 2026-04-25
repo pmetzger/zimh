@@ -113,7 +113,7 @@ typedef struct {
 
 t_stat if_svc(UNIT *uptr);
 t_stat if_reset(DEVICE *dptr);
-t_stat if_attach(UNIT *uptr, CONST char *cptr);
+t_stat if_attach(UNIT *uptr, const char *cptr);
 t_stat if_detach(UNIT *uptr);
 uint32 if_read(uint32 pa, size_t size);
 void if_write(uint32 pa, uint32 val, size_t size);
@@ -123,7 +123,7 @@ void if_csr_write(uint32 pa, uint32 val, size_t size);
 #endif
 void if_handle_command(void);
 void if_after_dma(void);
-CONST char *if_description(DEVICE *dptr);
+const char *if_description(DEVICE *dptr);
 t_stat if_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 
 extern IF_STATE if_state;

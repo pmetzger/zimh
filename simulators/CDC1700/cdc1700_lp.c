@@ -78,22 +78,22 @@ extern t_bool doDirectorFunc(DEVICE *, t_bool);
 
 extern t_stat checkReset(DEVICE *, uint8);
 
-extern t_stat show_addr(FILE *, UNIT *, int32, CONST void *);
+extern t_stat show_addr(FILE *, UNIT *, int32, const void *);
 
-extern t_stat set_stoponrej(UNIT *, int32, CONST char *, void *);
-extern t_stat clr_stoponrej(UNIT *, int32, CONST char *, void *);
+extern t_stat set_stoponrej(UNIT *, int32, const char *, void *);
+extern t_stat clr_stoponrej(UNIT *, int32, const char *, void *);
 
-extern t_stat set_protected(UNIT *, int32, CONST char *, void *);
-extern t_stat clear_protected(UNIT *, int32, CONST char *, void *);
+extern t_stat set_protected(UNIT *, int32, const char *, void *);
+extern t_stat clear_protected(UNIT *, int32, const char *, void *);
 
-extern t_stat set_equipment(UNIT *, int32, CONST char *, void *);
+extern t_stat set_equipment(UNIT *, int32, const char *, void *);
 
 extern uint16 Areg, IOAreg;
 
 extern t_bool IOFWinitialized;
 
-t_stat lp_show_type(FILE *, UNIT *, int32, CONST void *);
-t_stat lp_set_type(UNIT *, int32, CONST char *, void *);
+t_stat lp_show_type(FILE *, UNIT *, int32, const void *);
+t_stat lp_set_type(UNIT *, int32, const char *, void *);
 
 t_stat lp_svc(UNIT *);
 t_stat lp_reset(DEVICE *);
@@ -277,7 +277,7 @@ DEVICE lp_dev = {
   NULL, NULL, &lp_help, NULL, NULL, NULL
 };
 
-t_stat lp_show_type(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat lp_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   switch (LPdev.iod_type) {
     case DEVTYPE_1740:
@@ -294,7 +294,7 @@ t_stat lp_show_type(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
   return SCPE_OK;
 }
 
-t_stat lp_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat lp_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (!cptr)
     return SCPE_IERR;

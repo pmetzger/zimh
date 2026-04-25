@@ -129,8 +129,8 @@ uint32 rad_tdv_status (uint32 un);
 t_stat rad_chan_err (uint32 dva, uint32 st);
 t_stat rad_svc (UNIT *uptr);
 t_stat rad_reset (DEVICE *dptr);
-t_stat rad_settype (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat rad_showtype (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat rad_settype (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat rad_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_bool rad_inv_ad (uint32 *da);
 t_bool rad_inc_ad (void);
 t_bool rad_end_sec (UNIT *uptr, uint32 lnt, uint32 exp, uint32 st);
@@ -545,7 +545,7 @@ return SCPE_OK;
 
 /* Set controller type */
 
-t_stat rad_settype (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rad_settype (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 i;
 
@@ -562,7 +562,7 @@ return SCPE_OK;
 
 /* Show controller type */
 
-t_stat rad_showtype (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat rad_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, (rad_model == RAD_7212)? "7211/7212": "7231/7232");
 return SCPE_OK;

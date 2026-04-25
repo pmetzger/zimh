@@ -398,14 +398,14 @@ static INTERFACE dpc_interface;
 static t_stat dpc_svc (UNIT *uptr);
 static t_stat dpd_svc (UNIT *uptr);
 static t_stat dpc_reset (DEVICE *dptr);
-static t_stat dpc_attach (UNIT *uptr, CONST char *cptr);
+static t_stat dpc_attach (UNIT *uptr, const char *cptr);
 static t_stat dpc_detach (UNIT* uptr);
 static t_stat dpc_boot (int32 unitno, DEVICE *dptr);
 static void dp_god (int32 fnc, int32 drv, int32 time);
 static void dp_goc (int32 fnc, int32 drv, int32 time);
-static t_stat dpc_load_unload (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat dp_settype (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat dp_showtype (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat dpc_load_unload (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat dp_settype (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat dp_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 
 /* Device information blocks */
@@ -1391,7 +1391,7 @@ return SCPE_OK;
        offset from the start of the file to the last byte and seek there.
 */
 
-t_stat dpc_attach (UNIT *uptr, CONST char *cptr)
+t_stat dpc_attach (UNIT *uptr, const char *cptr)
 {
 t_stat      result;
 t_addr      offset;
@@ -1428,7 +1428,7 @@ return detach_unit (uptr);                              /* detach unit */
 
 /* Load and unload heads */
 
-t_stat dpc_load_unload (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat dpc_load_unload (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 int32 drv;
 
@@ -1451,7 +1451,7 @@ return SCPE_OK;
 
 /* Set controller type */
 
-t_stat dp_settype (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dp_settype (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i;
 
@@ -1473,7 +1473,7 @@ return SCPE_OK;
 
 /* Show controller type */
 
-t_stat dp_showtype (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dp_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if (dp_ctype == A13210)
     fprintf (st, "13210A");

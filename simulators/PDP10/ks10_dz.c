@@ -113,13 +113,13 @@ t_stat dz_svc (UNIT *uptr);
 t_stat dz_reset (DEVICE *dptr);
 void   dz_checkirq(struct pdp_dib   *dibp);
 uint16 dz_vect(struct pdp_dib *dibp);
-t_stat dz_set_modem (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dz_show_modem (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat dz_setnl (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dz_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dz_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat dz_attach (UNIT *uptr, CONST char *cptr);
+t_stat dz_set_modem (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dz_show_modem (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat dz_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dz_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dz_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat dz_attach (UNIT *uptr, const char *cptr);
 t_stat dz_detach (UNIT *uptr);
 t_stat dz_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
         const char *cptr);
@@ -502,7 +502,7 @@ dz_reset (DEVICE *dptr)
 /* SET LINES processor */
 
 t_stat
-dz_setnl (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+dz_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32 newln, i, t;
     t_stat r;
@@ -536,7 +536,7 @@ dz_setnl (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 /* SET LOG processor */
 
 t_stat
-dz_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+dz_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_stat r;
     char gbuf[CBUFSIZE];
@@ -556,7 +556,7 @@ dz_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 /* SET NOLOG processor */
 
 t_stat
-dz_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+dz_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_stat r;
     int32 ln;
@@ -571,7 +571,7 @@ dz_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* SHOW LOG processor */
 
-t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int32 i;
 
@@ -587,7 +587,7 @@ t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 /* Attach routine */
 
 t_stat
-dz_attach (UNIT *uptr, CONST char *cptr)
+dz_attach (UNIT *uptr, const char *cptr)
 {
     t_stat reason;
 

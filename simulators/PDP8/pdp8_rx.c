@@ -138,12 +138,12 @@ int32 rx (int32 IR, int32 AC);
 t_stat rx_svc (UNIT *uptr);
 t_stat rx_reset (DEVICE *dptr);
 t_stat rx_boot (int32 unitno, DEVICE *dptr);
-t_stat rx_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat rx_attach (UNIT *uptr, CONST char *cptr);
+t_stat rx_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat rx_attach (UNIT *uptr, const char *cptr);
 void rx_cmd (void);
 void rx_done (int32 esr_flags, int32 new_ecode);
-t_stat rx_settype (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat rx_showtype (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat rx_settype (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat rx_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc);
 const char *rx_description (DEVICE *dptr);
 
 /* RX8E data structures
@@ -594,7 +594,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat rx_attach (UNIT *uptr, CONST char *cptr)
+t_stat rx_attach (UNIT *uptr, const char *cptr)
 {
 uint32 sz;
 
@@ -609,7 +609,7 @@ return attach_unit (uptr, cptr);
 
 /* Set size routine */
 
-t_stat rx_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rx_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (uptr->flags & UNIT_ATT)
     return SCPE_ALATT;
@@ -621,7 +621,7 @@ return SCPE_OK;
 
 /* Set controller type */
 
-t_stat rx_settype (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rx_settype (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i;
 
@@ -645,7 +645,7 @@ return SCPE_OK;
 
 /* Show controller type */
 
-t_stat rx_showtype (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat rx_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if (rx_28) fprintf (st, "RX28");
 else fprintf (st, "RX8E");

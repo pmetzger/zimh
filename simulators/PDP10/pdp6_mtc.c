@@ -154,9 +154,9 @@ void           mtc_checkirq(UNIT * uptr);
 t_stat         mtc_srv(UNIT *);
 t_stat         mtc_boot(int32, DEVICE *);
 t_stat         mtc_reset(DEVICE *);
-t_stat         mtc_set_dct (UNIT *, int32, CONST char *, void *);
-t_stat         mtc_show_dct (FILE *, UNIT *, int32, CONST void *);
-t_stat         mtc_attach(UNIT *, CONST char *);
+t_stat         mtc_set_dct (UNIT *, int32, const char *, void *);
+t_stat         mtc_show_dct (FILE *, UNIT *, int32, const void *);
+t_stat         mtc_attach(UNIT *, const char *);
 t_stat         mtc_detach(UNIT *);
 t_stat         mtc_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                   const char *cptr);
@@ -883,7 +883,7 @@ mtc_reset(DEVICE * dptr)
 
 /* set DCT channel and unit. */
 t_stat
-mtc_set_dct (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+mtc_set_dct (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32 dct;
     t_stat r;
@@ -898,7 +898,7 @@ mtc_set_dct (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-mtc_show_dct (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+mtc_show_dct (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    if (uptr == NULL)
       return SCPE_IERR;
@@ -908,7 +908,7 @@ mtc_show_dct (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 
 t_stat
-mtc_attach(UNIT * uptr, CONST char *file)
+mtc_attach(UNIT * uptr, const char *file)
 {
     uptr->CNTRL = 0;
     uptr->STATUS = 0;

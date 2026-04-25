@@ -278,7 +278,7 @@
 /* function prototypes */
 
 t_stat  dsk_reset (DEVICE *dptr);
-t_stat  dsk_attach (UNIT *uptr, CONST char *cptr);
+t_stat  dsk_attach (UNIT *uptr, const char *cptr);
 
 /* SS-50 I/O address space functions */
 
@@ -400,7 +400,7 @@ t_stat dsk_reset (DEVICE *dptr)
 
 /* dsk attach - attach an .IMG file to an FDD */
 
-t_stat dsk_attach (UNIT *uptr, CONST char *cptr)
+t_stat dsk_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
 

@@ -122,10 +122,10 @@ void            lp20_update_ready(UNIT *uptr, uint16 setrdy, uint16 clrrdy);
 t_stat          lp20_svc (UNIT *uptr);
 t_stat          lp20_init (UNIT *uptr);
 t_stat          lp20_reset (DEVICE *dptr);
-t_stat          lp20_attach (UNIT *uptr, CONST char *cptr);
+t_stat          lp20_attach (UNIT *uptr, const char *cptr);
 t_stat          lp20_detach (UNIT *uptr);
-t_stat          lp20_setlpp(UNIT *, int32, CONST char *, void *);
-t_stat          lp20_getlpp(FILE *, UNIT *, int32, CONST void *);
+t_stat          lp20_setlpp(UNIT *, int32, const char *, void *);
+t_stat          lp20_getlpp(FILE *, UNIT *, int32, const void *);
 t_stat          lp20_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                          const char *cptr);
 const char     *lp20_description (DEVICE *dptr);
@@ -812,7 +812,7 @@ t_stat lp20_reset (DEVICE *dptr)
 
 /* Attach routine */
 
-t_stat lp20_attach (UNIT *uptr, CONST char *cptr)
+t_stat lp20_attach (UNIT *uptr, const char *cptr)
 {
     t_stat  r;
     sim_switches |= SWMASK ('A');   /* Position to EOF */
@@ -839,7 +839,7 @@ t_stat lp20_detach (UNIT *uptr)
  */
 
 t_stat
-lp20_setlpp(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+lp20_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_value   i;
     t_stat    r;
@@ -856,7 +856,7 @@ lp20_setlpp(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-lp20_getlpp(FILE *st, UNIT *uptr, int32 v, CONST void *desc)
+lp20_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_IERR;

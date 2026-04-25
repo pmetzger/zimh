@@ -763,7 +763,7 @@ t_stat load_icl(FILE *fileref)
 #define FMT_TAP 2
 #endif
 #define FMT_ICL 3
-t_stat sim_load (FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
     int32 fmt;
 
@@ -1340,7 +1340,7 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 /* 
  * Collect offset in radix.
  */
-t_stat get_off (CONST char *cptr, CONST char **tptr, uint32 radix, t_value *val, char *m)
+t_stat get_off (const char *cptr, const char **tptr, uint32 radix, t_value *val, char *m)
 {
     t_stat r = SCPE_OK;                     /* assume OK return */
 
@@ -1365,7 +1365,7 @@ t_stat get_off (CONST char *cptr, CONST char **tptr, uint32 radix, t_value *val,
 /* 
  * Collect immediate in radix.
  */
-t_stat get_imm (CONST char *cptr, CONST char **tptr, uint32 radix, t_value *val)
+t_stat get_imm (const char *cptr, const char **tptr, uint32 radix, t_value *val)
 {
     t_stat r;
 
@@ -1392,7 +1392,7 @@ t_stat get_imm (CONST char *cptr, CONST char **tptr, uint32 radix, t_value *val)
        status     =       error status
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
     int        i;
     int        x;
@@ -1403,7 +1403,7 @@ t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
     t_stat     r;
     uint32     num;
     uint32     max[5] = {0, 0xff, 0xffff, 0, 0xffffffff};
-    CONST char *tptr;
+    const char *tptr;
     char       gbuf[CBUFSIZE];
 
     /* determine base for numbers */

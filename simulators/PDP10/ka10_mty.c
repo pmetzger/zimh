@@ -53,7 +53,7 @@ static t_stat       mty_devio(uint32 dev, uint64 *data);
 static t_stat       mty_input_svc (UNIT *uptr);
 static t_stat       mty_output_svc (UNIT *uptr);
 static t_stat       mty_reset (DEVICE *dptr);
-static t_stat       mty_attach (UNIT *uptr, CONST char *cptr);
+static t_stat       mty_attach (UNIT *uptr, const char *cptr);
 static t_stat       mty_detach (UNIT *uptr);
 static const char   *mty_description (DEVICE *dptr);
 static t_stat       mty_help (FILE *st, DEVICE *dptr, UNIT *uptr,
@@ -272,7 +272,7 @@ static t_stat mty_reset (DEVICE *dptr)
     return SCPE_OK;
 }
 
-static t_stat mty_attach (UNIT *uptr, CONST char *cptr)
+static t_stat mty_attach (UNIT *uptr, const char *cptr)
 {
     t_stat stat;
     int i;

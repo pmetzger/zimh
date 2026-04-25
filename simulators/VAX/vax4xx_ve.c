@@ -171,9 +171,9 @@ t_stat ve_svc (UNIT *uptr);
 t_stat ve_micro_svc (UNIT *uptr);
 t_stat ve_reset (DEVICE *dptr);
 t_stat ve_detach (UNIT *dptr);
-t_stat ve_set_enable (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat ve_set_capture (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat ve_show_capture (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
+t_stat ve_set_enable (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat ve_set_capture (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat ve_show_capture (FILE* st, UNIT* uptr, int32 val, const void* desc);
 t_stat ve_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *ve_description (DEVICE *dptr);
 int32 tbc_rd (int32 rg);
@@ -1484,12 +1484,12 @@ if ((ve_dev.flags & DEV_DIS) == 0) {
 return SCPE_OK;
 }
 
-t_stat ve_set_enable (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat ve_set_enable (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 return cpu_set_model (NULL, 0, (val ? "VAXSTATIONSPX" : "MICROVAX"), NULL);
 }
 
-t_stat ve_set_capture (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat ve_set_capture (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (vid_active)
     return sim_messagef (SCPE_ALATT, "Capture Mode Can't be changed with device enabled\n");
@@ -1497,7 +1497,7 @@ ve_input_captured = val;
 return SCPE_OK;
 }
 
-t_stat ve_show_capture (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat ve_show_capture (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 if (ve_input_captured) {
     fprintf (st, "Captured Input Mode, ");

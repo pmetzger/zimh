@@ -138,12 +138,12 @@ static t_stat emit_conout_character(int ch);
 static t_stat map_conout_character(int ch);
 static void   reset_mapping (void);
 static void   set_conout_mapping(int32 flags);
-static t_stat validate_conout_mapping(UNIT *uptr, int32 match, CONST char *cvptr, void *desc);
+static t_stat validate_conout_mapping(UNIT *uptr, int32 match, const char *cvptr, void *desc);
 static void   set_default_mapping(int32 flags);
 static void   finish_conout_mapping(int32 flags);
 static void   strsort (int n, unsigned char *s);        /* sorts an array of n characters */
 static int    os_map_comp (OS_MAP *a, OS_MAP *b);       /* compares two mapping entries */
-static t_stat font_cmd(int32 flag, CONST char *cptr);           /* handles font command */
+static t_stat font_cmd(int32 flag, const char *cptr);           /* handles font command */
 static void   read_map_file(FILE *fd);                  /* reads a font map file */
 static t_bool str_match(const char *str, const char *keyword);/* keyword/string comparison */
 static const char * handle_map_ansi_definition(char **pc);  /* input line parsers for map file sections */
@@ -441,7 +441,7 @@ static t_stat tti_reset (DEVICE *dptr)
 
 /* basic_attach - fix quotes in filename, then call standard unit attach routine */
 
-t_stat basic_attach (UNIT *uptr, CONST char *cptr)
+t_stat basic_attach (UNIT *uptr, const char *cptr)
 {
     char gbuf[2*CBUFSIZE];
 
@@ -450,7 +450,7 @@ t_stat basic_attach (UNIT *uptr, CONST char *cptr)
 
 /* quotefix - strip off quotes around filename, if present */
 
-CONST char * quotefix (CONST char *cptr, char * buf)
+const char * quotefix (const char *cptr, char * buf)
 {
     const char *c;
     int quote;
@@ -763,7 +763,7 @@ static void finish_conout_mapping (int32 flags)
 
 /* validate_conout_mapping - called when set command gets a new value */
 
-static t_stat validate_conout_mapping (UNIT *uptr, int32 match, CONST char *cvptr, void *desc)
+static t_stat validate_conout_mapping (UNIT *uptr, int32 match, const char *cvptr, void *desc)
 {
     set_conout_mapping(match);
     return SCPE_OK;
@@ -930,7 +930,7 @@ static t_stat map_conout_character (int ch)
 
 /* font_cmd - parse a font mapping file. Sets input and output translations */
 
-static t_stat font_cmd (int32 flag, CONST char *iptr)
+static t_stat font_cmd (int32 flag, const char *iptr)
 {
     char *fname, quote;
         char gbuf[4*CBUFSIZE], *cptr = gbuf;

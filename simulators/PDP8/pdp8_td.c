@@ -193,7 +193,7 @@ static uint8 tdb_mtk[DT_NUMDR][D18_LPERB];              /* mark track bits */
 int32 td77 (int32 IR, int32 AC);
 t_stat td_svc (UNIT *uptr);
 t_stat td_reset (DEVICE *dptr);
-t_stat td_attach (UNIT *uptr, CONST char *cptr);
+t_stat td_attach (UNIT *uptr, const char *cptr);
 void td_flush (UNIT *uptr);
 t_stat td_detach (UNIT *uptr);
 t_stat td_boot (int32 unitno, DEVICE *dptr);
@@ -204,7 +204,7 @@ int32 td_trailer (UNIT *uptr, int32 blk, int32 line);
 int32 td_read (UNIT *uptr, int32 blk, int32 line);
 void td_write (UNIT *uptr, int32 blk, int32 line, int32 datb);
 int32 td_set_mtk (int32 code, int32 u, int32 k);
-t_stat td_show_pos (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat td_show_pos (FILE *st, UNIT *uptr, int32 val, const void *desc);
 const char *td_description (DEVICE *dptr);
 
 extern uint16 M[];
@@ -767,7 +767,7 @@ return SCPE_OK;
    Set up mark track bit array
 */
 
-t_stat td_attach (UNIT *uptr, CONST char *cptr)
+t_stat td_attach (UNIT *uptr, const char *cptr)
 {
 uint32 pdp18b[D18_NBSIZE];
 uint16 pdp11b[D18_NBSIZE], *fbuf;
@@ -931,7 +931,7 @@ return k;
 
 /* Show position */
 
-t_stat td_show_pos (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat td_show_pos (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if ((uptr->flags & UNIT_ATT) == 0) return SCPE_UNATT;
 if (uptr->pos < DT_EZLIN)                               /* rev end zone? */

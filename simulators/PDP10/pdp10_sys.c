@@ -395,7 +395,7 @@ return SCPE_OK;
 
 /* Master loader */
 
-t_stat sim_load (FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
 d10 data;
 int32 wc, fmt;
@@ -832,11 +832,11 @@ return SCPE_ARG;
         val     =       output value
 */
 
-t_value get_opnd (CONST char *cptr, t_stat *status)
+t_value get_opnd (const char *cptr, t_stat *status)
 {
 int32 sign = 0;
 t_value val, xr = 0, ind = 0;
-CONST char *tptr;
+const char *tptr;
 
 *status = SCPE_ARG;                                     /* assume fail */
 if (*cptr == '@') {
@@ -880,7 +880,7 @@ return (ind | (xr << 18) | val);
         status  =       error status
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
 int32 i, j;
 t_value ac, dev;

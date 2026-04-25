@@ -132,7 +132,7 @@ void                ht_tape_cmd(DEVICE *, UNIT *);
 t_stat              ht_error(UNIT *, int, t_stat);
 t_stat              ht_boot(int32, DEVICE *);
 t_stat              ht_reset(DEVICE *);
-t_stat              ht_attach(UNIT *, CONST char *);
+t_stat              ht_attach(UNIT *, const char *);
 t_stat              ht_detach(UNIT *);
 t_stat              ht_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                         const char *cptr);
@@ -955,7 +955,7 @@ ht_reset(DEVICE * dptr)
 
 
 t_stat
-ht_attach(UNIT * uptr, CONST char *file)
+ht_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
 

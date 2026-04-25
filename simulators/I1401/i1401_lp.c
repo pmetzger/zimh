@@ -45,7 +45,7 @@ int32 cct[CCT_LNT] = { 03 };
 int32 cctlnt = 66, cctptr = 0, lines = 0, lflag = 0;
 
 t_stat lpt_reset (DEVICE *dptr);
-t_stat lpt_attach (UNIT *uptr, CONST char *cptr);
+t_stat lpt_attach (UNIT *uptr, const char *cptr);
 t_stat space (int32 lines, int32 lflag);
 t_stat lpt_puts (const char *buf);
 
@@ -276,7 +276,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat lpt_attach (UNIT *uptr, CONST char *cptr)
+t_stat lpt_attach (UNIT *uptr, const char *cptr)
 {
 cctptr = 0;                                             /* clear cct ptr */
 lines = 0;                                              /* no cc action */

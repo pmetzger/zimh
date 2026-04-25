@@ -72,7 +72,7 @@ void timer_gate(uint8 ctrnum, t_bool inhibit);
 
 t_stat tmr_svc(UNIT *uptr);
 t_stat tmr_int_svc(UNIT *uptr);
-CONST char *tmr_description(DEVICE *dptr);
+const char *tmr_description(DEVICE *dptr);
 t_stat tmr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 
 #endif /* _3B2_TIMER_H_ */

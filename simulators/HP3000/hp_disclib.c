@@ -2714,7 +2714,7 @@ else                                                    /* otherwise the status 
        otherwise).
 */
 
-t_stat dl_attach (CVPTR cvptr, UNIT *uptr, CONST char *cptr)
+t_stat dl_attach (CVPTR cvptr, UNIT *uptr, const char *cptr)
 {
 t_stat result;
 
@@ -2839,7 +2839,7 @@ return SCPE_OK;                                         /* return normal complet
        ensure that both protect bits are set so that all heads are protected.
 */
 
-t_stat dl_set_model (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat dl_set_model (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if (uptr->flags & UNIT_ATT)                             /* if the unit is currently attached */
     return SCPE_ALATT;                                  /*   then the disc model cannot be changed */
@@ -2880,7 +2880,7 @@ return SCPE_OK;
    PROTECT, then both upper and lower heads are (un)protected.
 */
 
-t_stat dl_set_protect (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat dl_set_protect (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 const uint32 model = uptr->flags & UNIT_MODEL;
 char gbuf [CBUFSIZE];
@@ -2933,7 +2933,7 @@ return SCPE_OK;
    bits set, indicating that the entire drive is protected.
 */
 
-t_stat dl_show_protect (FILE *st, UNIT *uptr, int32 value, CONST void *desc)
+t_stat dl_show_protect (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
 const uint32 model = uptr->flags & UNIT_MODEL;
 
@@ -3022,7 +3022,7 @@ return SCPE_OK;
        number of configurable entries is one less than the defined table size.
 */
 
-t_stat dl_set_diag (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat dl_set_diag (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 typedef struct {
     t_value  max;                               /* maximum allowed value */
@@ -3200,7 +3200,7 @@ return SCPE_OK;
        pointer instead.
 */
 
-t_stat dl_show_diag (FILE *st, UNIT *uptr, int32 value, CONST void *desc)
+t_stat dl_show_diag (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
 const CNTLR_VARS *cvptr = (const CNTLR_VARS *) desc;    /* the controller pointer is supplied */
 DIAG_ENTRY *entry;
@@ -3270,7 +3270,7 @@ return SCPE_OK;
    is common to every controller in the array.
 */
 
-t_stat dl_set_timing (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat dl_set_timing (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 CVPTR  cvptr = (CVPTR) desc;                            /* the controller pointer is supplied */
 const  DELAY_PROPS *dpptr;
@@ -3330,7 +3330,7 @@ return SCPE_OK;
        pointer instead.
 */
 
-t_stat dl_show_timing (FILE *st, UNIT *uptr, int32 value, CONST void *desc)
+t_stat dl_show_timing (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
 const CNTLR_VARS *cvptr = (const CNTLR_VARS *) desc;    /* the controller pointer is supplied */
 

@@ -87,7 +87,7 @@ uint32 rtfile_find (uint32 block, uint32 sector);
 
 /* FLOAD file_name {file_origin} */
 
-t_stat vax780_fload (int32 flag, CONST char *cptr)
+t_stat vax780_fload (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
 uint16 file_name[3], blkbuf[BLK_SIZE];

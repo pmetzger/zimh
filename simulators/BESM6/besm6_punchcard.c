@@ -110,7 +110,7 @@ MTAB pi_mod[] = {
 };
 
 t_stat pi_reset (DEVICE *dptr);
-t_stat pi_attach (UNIT *uptr, CONST char *cptr);
+t_stat pi_attach (UNIT *uptr, const char *cptr);
 t_stat pi_detach (UNIT *uptr);
 
 DEVICE pi_dev = {
@@ -303,7 +303,7 @@ t_stat pi_reset (DEVICE *dptr)
  * -g or -u - attempts to interpret the card as GOST/UPP text.
  * The default is -v.
  */
-t_stat pi_attach (UNIT *u, CONST char *cptr)
+t_stat pi_attach (UNIT *u, const char *cptr)
 {
     t_stat s;
     int unit = u - pi_unit;

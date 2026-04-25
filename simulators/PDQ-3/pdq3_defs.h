@@ -399,11 +399,11 @@ typedef struct _devctxt {
 extern t_stat pdq3_ioinit(void);
 extern t_stat add_ioh(IOINFO* ioi);
 extern t_stat del_ioh(IOINFO* ioi);
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat set_iovec(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iovec(FILE *st, UNIT *uptr, int value, CONST void *desc);
-extern t_stat set_ioprio(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_ioprio(FILE *st, UNIT *uptr, int value, CONST void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat set_iovec(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iovec(FILE *st, UNIT *uptr, int value, const void *desc);
+extern t_stat set_ioprio(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_ioprio(FILE *st, UNIT *uptr, int value, const void *desc);
 
 #endif

@@ -179,8 +179,8 @@ t_stat pclk_rd (int32 *data, int32 PA, int32 access);
 t_stat pclk_wr (int32 data, int32 PA, int32 access);
 t_stat pclk_svc (UNIT *uptr);
 t_stat pclk_reset (DEVICE *dptr);
-t_stat pclk_set_line (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat pclk_show_freq (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat pclk_set_line (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat pclk_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc);
 const char *pclk_description (DEVICE *dptr);
 
 /* PCLK data structures
@@ -404,7 +404,7 @@ return auto_config (0, 0);
 
 /* Set line frequency */
 
-t_stat pclk_set_line (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat pclk_set_line (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (val == UNIT_LINE50HZ) {
     rate[2] = 50;
@@ -417,7 +417,7 @@ else {
 return SCPE_OK;
 }
 
-t_stat pclk_show_freq (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat pclk_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 static const char *freqs[] = {"100K Hz", "10K Hz", "Line Freq", "External (10Hz)"};
 

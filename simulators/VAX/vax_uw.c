@@ -47,7 +47,7 @@ t_stat uw_wr (int32 data, int32 PA, int32 access);
 t_stat uw_rd (int32 *data, int32 PA, int32 access);
 int32 uw_inta (void);
 t_stat uw_reset (DEVICE *dptr);
-t_stat uw_attach (UNIT *uptr, CONST char *cptr);
+t_stat uw_attach (UNIT *uptr, const char *cptr);
 t_stat uw_detach (UNIT *uptr);
 const char *uw_description (DEVICE *dptr);
 
@@ -393,7 +393,7 @@ IRR = 1;
 return auto_config (dptr->name, (dptr->flags & DEV_DIS) ? 0 : 1);
 }
 
-t_stat uw_attach (UNIT *uptr, CONST char *cptr)
+t_stat uw_attach (UNIT *uptr, const char *cptr)
 {
 t_stat stat;
 tmxr_set_notelnet (&uw_desc);

@@ -69,7 +69,7 @@ uint8 i3214_verb = 0;                   //verbose flag
 
 t_stat i3214_cfg(uint16 base, uint16 devnum, uint8 dummy);
 t_stat i3214_clr(void);
-t_stat i3214_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat i3214_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat i3214_reset (DEVICE *dptr);
 t_stat i3214_reset_dev (uint8 devnum);
 t_stat i3214_svc (UNIT *uptr);
@@ -168,7 +168,7 @@ t_stat i3214_clr(void)
 
 // show configuration parameters
 
-t_stat i3214_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat i3214_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;

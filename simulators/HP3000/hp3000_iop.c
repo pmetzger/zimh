@@ -278,8 +278,8 @@ static uint32 filter [4] = {                    /* filter bitmap for device numb
 /* IOP local SCP support routines */
 
 static t_stat iop_reset       (DEVICE *dptr);
-static t_stat iop_set_filter  (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat iop_show_filter (FILE *st,   UNIT  *uptr, int32 value, CONST void *desc);
+static t_stat iop_set_filter  (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat iop_show_filter (FILE *st,   UNIT  *uptr, int32 value, const void *desc);
 
 
 /* IOP SCP data structures */
@@ -826,9 +826,9 @@ return SCPE_OK;
    disturbed.
 */
 
-static t_stat iop_set_filter (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat iop_set_filter (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
-CONST char *tptr;
+const char *tptr;
 char       *mptr;
 t_addr     dev, low, high;
 t_stat     result = SCPE_OK;
@@ -888,7 +888,7 @@ return result;                                          /* return the result of 
    in the filter is encountered.
 */
 
-static t_stat iop_show_filter (FILE *st, UNIT *uptr, int32 value, CONST void *desc)
+static t_stat iop_show_filter (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
 int32  group, low, high;
 uint32 test_filter;

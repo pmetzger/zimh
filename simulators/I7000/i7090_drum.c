@@ -47,12 +47,12 @@ void                drm_ini(UNIT *, t_bool);
 t_stat              drm_reset(DEVICE *);
 extern t_stat       chan_boot(int32, DEVICE *);
 uint32              drum_addr;  /* Read/write drum address */
-t_stat              set_units(UNIT * uptr, int32 val, CONST char *cptr,
+t_stat              set_units(UNIT * uptr, int32 val, const char *cptr,
                               void *desc);
-t_stat              drm_attach(UNIT * uptr, CONST char *file);
+t_stat              drm_attach(UNIT * uptr, const char *file);
 t_stat              drm_detach(UNIT * uptr);
 
-t_stat              get_units(FILE * st, UNIT * uptr, int32 v, CONST void *desc);
+t_stat              get_units(FILE * st, UNIT * uptr, int32 v, const void *desc);
 t_stat              drm_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                         const char *cptr);
 const char          *drm_description (DEVICE *dptr);
@@ -210,7 +210,7 @@ drm_reset(DEVICE * dptr)
 
 /* Sets the number of drum units */
 t_stat
-set_units(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+set_units(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     int                 i;
 
@@ -234,7 +234,7 @@ set_units(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-get_units(FILE * st, UNIT * uptr, int32 v, CONST void *desc)
+get_units(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_IERR;
@@ -243,7 +243,7 @@ get_units(FILE * st, UNIT * uptr, int32 v, CONST void *desc)
 }
 
 t_stat
-drm_attach(UNIT * uptr, CONST char *file)
+drm_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
 

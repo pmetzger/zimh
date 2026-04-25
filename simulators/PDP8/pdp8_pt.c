@@ -46,7 +46,7 @@ t_stat ptr_svc (UNIT *uptr);
 t_stat ptp_svc (UNIT *uptr);
 t_stat ptr_reset (DEVICE *dptr);
 t_stat ptp_reset (DEVICE *dptr);
-t_stat ptp_attach (UNIT *uptr, CONST char *cptr);
+t_stat ptp_attach (UNIT *uptr, const char *cptr);
 t_stat ptr_boot (int32 unitno, DEVICE *dptr);
 const char *ptr_description (DEVICE *dptr);
 const char *ptp_description (DEVICE *dptr);
@@ -263,7 +263,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat ptp_attach (UNIT *uptr, CONST char *cptr)
+t_stat ptp_attach (UNIT *uptr, const char *cptr)
 {
 sim_switches |= SWMASK ('A');   /* Default to Append to existing file */
 return attach_unit (uptr, cptr);

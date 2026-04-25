@@ -286,7 +286,7 @@ t_stat iop_reset(DEVICE *dptr)
 }
 
 /* sho help iop */
-t_stat iop_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat iop_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
     fprintf(st, "SEL-32 IOP Model 8000 Channel Controller at 0x7E00\r\n");
     fprintf(st, "The IOP fields all interrupts and status posting\r\n");

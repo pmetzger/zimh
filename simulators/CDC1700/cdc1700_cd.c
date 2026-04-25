@@ -51,15 +51,15 @@ extern void rebuildPending(void);
 
 extern t_stat checkReset(DEVICE *, uint8);
 
-extern t_stat show_addr(FILE *, UNIT *, int32, CONST void *);
+extern t_stat show_addr(FILE *, UNIT *, int32, const void *);
 
-extern t_stat set_protected(UNIT *, int32, CONST char *, void *);
-extern t_stat clear_protected(UNIT *, int32, CONST char *, void *);
+extern t_stat set_protected(UNIT *, int32, const char *, void *);
+extern t_stat clear_protected(UNIT *, int32, const char *, void *);
 
-extern t_stat set_equipment(UNIT *, int32, CONST char *, void *);
+extern t_stat set_equipment(UNIT *, int32, const char *, void *);
 
-extern t_stat set_stoponrej(UNIT *, int32, CONST char *, void *);
-extern t_stat clr_stoponrej(UNIT *, int32, CONST char *, void *);
+extern t_stat set_stoponrej(UNIT *, int32, const char *, void *);
+extern t_stat clr_stoponrej(UNIT *, int32, const char *, void *);
 
 extern uint16 LoadFromMem(uint16);
 extern t_bool IOStoreToMem(uint16, uint16, t_bool);
@@ -72,15 +72,15 @@ extern t_bool ExecutionStarted;
 
 extern UNIT cpu_unit;
 
-static t_stat show_drive(FILE *, UNIT *, int32, CONST void *);
+static t_stat show_drive(FILE *, UNIT *, int32, const void *);
 
-t_stat set_cd856_2(UNIT *, int32, CONST char *, void *);
-t_stat set_cd856_4(UNIT *, int32, CONST char *, void *);
+t_stat set_cd856_2(UNIT *, int32, const char *, void *);
+t_stat set_cd856_4(UNIT *, int32, const char *, void *);
 
-static t_stat show_addressing(FILE *, UNIT *, int32, CONST void *);
+static t_stat show_addressing(FILE *, UNIT *, int32, const void *);
 
-t_stat set_cartfirst(UNIT *, int32, CONST char *, void *);
-t_stat set_fixedfirst(UNIT *, int32, CONST char *, void *);
+t_stat set_cartfirst(UNIT *, int32, const char *, void *);
+t_stat set_fixedfirst(UNIT *, int32, const char *, void *);
 
 t_stat cd_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 
@@ -157,7 +157,7 @@ enum cdio_status {
 
 t_stat cd_svc(UNIT *);
 t_stat cd_reset(DEVICE *);
-t_stat cd_attach(UNIT *, CONST char *);
+t_stat cd_attach(UNIT *, const char *);
 t_stat cd_detach(UNIT *);
 
 void CDstate(const char *, DEVICE *, IO_DEVICE *);
@@ -412,7 +412,7 @@ DEVICE cd_dev = {
 /*
  * Display cartridge drive type
  */
-static t_stat show_drive(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_drive(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   int32 fixed, u;
   
@@ -435,7 +435,7 @@ static t_stat show_drive(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
  * changes. Note that the drive contains 2 physical disks and they must
  * both be changed together.
  */
-t_stat set_cd856_2(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_cd856_2(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   UNIT *uptr2;
 
@@ -464,7 +464,7 @@ t_stat set_cd856_2(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
  * changes. Note that the drive contains 2 physical disks and they must
  * both be changed together.
  */
-t_stat set_cd856_4(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_cd856_4(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   UNIT *uptr2;
 
@@ -491,7 +491,7 @@ t_stat set_cd856_4(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 /*
  * Display the device addressing mode
  */
-static t_stat show_addressing(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_addressing(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   if (uptr == NULL)
     return SCPE_IERR;
@@ -505,7 +505,7 @@ static t_stat show_addressing(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 /*
  * Set device to "Cartridge first" addressing
  */
-t_stat set_cartfirst(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_cartfirst(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (uptr == NULL)
     return SCPE_IERR;
@@ -517,7 +517,7 @@ t_stat set_cartfirst(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 /*
  * Set device to "Fixed first" addressing
  */
-t_stat set_fixedfirst(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_fixedfirst(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (uptr == NULL)
     return SCPE_IERR;
@@ -1075,7 +1075,7 @@ t_stat cd_reset(DEVICE *dptr)
 
 /* Attach routine */
 
-t_stat cd_attach(UNIT *uptr, CONST char *cptr)
+t_stat cd_attach(UNIT *uptr, const char *cptr)
 {
   struct cdio_unit *iou = (struct cdio_unit *)uptr->up7;
   t_addr capac = ((uptr->flags & UNIT_856_4) != 0) ? CD856_4_SIZE : CD856_2_SIZE;

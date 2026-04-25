@@ -87,7 +87,7 @@ DEBTAB              cdr_debug[] = {
 t_stat              cdr_boot(int32, DEVICE *);
 t_stat              cdr_ini(DEVICE *);
 t_stat              cdr_srv(UNIT *);
-t_stat              cdr_attach(UNIT *, CONST char *);
+t_stat              cdr_attach(UNIT *, const char *);
 t_stat              cdr_detach(UNIT *);
 t_stat              cdr_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 const char         *cdr_description(DEVICE *dptr);
@@ -97,7 +97,7 @@ uint16              cdr_buffer[NUM_DEVS_CDR][80];
 #if NUM_DEVS_CDP > 0
 t_stat              cdp_ini(DEVICE *);
 t_stat              cdp_srv(UNIT *);
-t_stat              cdp_attach(UNIT *, CONST char *);
+t_stat              cdp_attach(UNIT *, const char *);
 t_stat              cdp_detach(UNIT *);
 t_stat              cdp_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 const char         *cdp_description(DEVICE *dptr);
@@ -107,10 +107,10 @@ uint16              cdp_buffer[NUM_DEVS_CDP][80];
 #if NUM_DEVS_LPR  > 0
 t_stat              lpr_ini(DEVICE *);
 t_stat              lpr_srv(UNIT *);
-t_stat              lpr_attach(UNIT *, CONST char *);
+t_stat              lpr_attach(UNIT *, const char *);
 t_stat              lpr_detach(UNIT *);
-t_stat              lpr_setlpp(UNIT *, int32, CONST char *, void *);
-t_stat              lpr_getlpp(FILE *, UNIT *, int32, CONST void *);
+t_stat              lpr_setlpp(UNIT *, int32, const char *, void *);
+t_stat              lpr_getlpp(FILE *, UNIT *, int32, const void *);
 t_stat              lpr_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 const char         *lpr_description(DEVICE *dptr);
 uint8               lpr_buffer[NUM_DEVS_LPR][145];   /* Output line buffer */
@@ -127,7 +127,7 @@ con_data[NUM_DEVS_CON];
 
 t_stat              con_ini(DEVICE *);
 t_stat              con_srv(UNIT *);
-t_stat              con_attach(UNIT *, CONST char *);
+t_stat              con_attach(UNIT *, const char *);
 t_stat              con_detach(UNIT *);
 t_stat              con_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 const char         *con_description(DEVICE *dptr);
@@ -482,7 +482,7 @@ cdr_boot(int32 unit_num, DEVICE * dptr)
 }
 
 t_stat
-cdr_attach(UNIT * uptr, CONST char *file)
+cdr_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
     int                 u = uptr-cdr_unit;
@@ -612,7 +612,7 @@ cdp_srv(UNIT *uptr) {
 
 
 t_stat
-cdp_attach(UNIT * uptr, CONST char *file)
+cdp_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
 
@@ -672,7 +672,7 @@ lpr_ini(DEVICE *dptr) {
 
 #if NUM_DEVS_LPR > 0
 t_stat
-lpr_setlpp(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+lpr_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int i;
     if (cptr == NULL)
@@ -693,7 +693,7 @@ lpr_setlpp(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-lpr_getlpp(FILE *st, UNIT *uptr, int32 v, CONST void *desc)
+lpr_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_IERR;
@@ -901,7 +901,7 @@ lpr_srv(UNIT *uptr) {
 }
 
 t_stat
-lpr_attach(UNIT * uptr, CONST char *file)
+lpr_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
     int                 u = (uptr - lpr_unit);

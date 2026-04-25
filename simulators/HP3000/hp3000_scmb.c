@@ -387,7 +387,7 @@ static SCMB_STATE scmb [2];                     /* per-card state variables */
 static CNTLR_INTRF scmb_interface;
 static t_stat      scmb_service   (UNIT   *uptr);
 static t_stat      scmb_reset     (DEVICE *dptr);
-static t_stat      scmb_set_bus   (UNIT   *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat      scmb_set_bus   (UNIT   *uptr, int32 value, const char *cptr, void *desc);
 
 
 /* SCMB local utility routines */
@@ -1139,7 +1139,7 @@ return SCPE_OK;
    multiplexer initialization won't pick it up by mistake.
 */
 
-static t_stat scmb_set_bus (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat scmb_set_bus (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 const CARD_ID card = (CARD_ID) (uptr == &scmb_unit [card2]);
 

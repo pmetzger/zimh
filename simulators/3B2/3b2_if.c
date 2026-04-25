@@ -157,7 +157,7 @@ t_stat if_reset(DEVICE *dptr)
     return SCPE_OK;
 }
 
-t_stat if_attach(UNIT *uptr, CONST char *cptr)
+t_stat if_attach(UNIT *uptr, const char *cptr)
 {
     return sim_disk_attach(uptr, cptr, 512, 1, TRUE, 0, NULL, 0, 0);
 }
@@ -603,7 +603,7 @@ void if_csr_write(uint32 pa, uint32 val, size_t size)
 }
 #endif
 
-CONST char *if_description(DEVICE *dptr)
+const char *if_description(DEVICE *dptr)
 {
     return "Integrated Floppy Disk";
 }

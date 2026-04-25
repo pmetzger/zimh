@@ -131,8 +131,8 @@ static const char* vfdhd_description(DEVICE *dptr);
 
 static SECTOR_FORMAT sdata;
 extern uint32 PCX;
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 
@@ -141,7 +141,7 @@ extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_typ
 #define VFDHD_CAPACITY          (77*2*16*256)   /* Default Micropolis Disk Capacity         */
 
 static t_stat vfdhd_reset(DEVICE *vfdhd_dev);
-static t_stat vfdhd_attach(UNIT *uptr, CONST char *cptr);
+static t_stat vfdhd_attach(UNIT *uptr, const char *cptr);
 static t_stat vfdhd_detach(UNIT *uptr);
 
 static int32 vfdhddev(const int32 port, const int32 io, const int32 data);
@@ -221,7 +221,7 @@ static t_stat vfdhd_reset(DEVICE *dptr)
 
 
 /* Attach routine */
-static t_stat vfdhd_attach(UNIT *uptr, CONST char *cptr)
+static t_stat vfdhd_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r;
     unsigned int i = 0;

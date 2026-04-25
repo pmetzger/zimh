@@ -12,7 +12,7 @@
 
 /* Implement SET ENVIRONMENT, including prompt-driven and decoded-string
    forms. */
-t_stat sim_set_environment(int32 flag, CONST char *cptr);
+t_stat sim_set_environment(int32 flag, const char *cptr);
 
 /* Expand one command line in place using SCP command-variable rules. */
 void sim_sub_args(char *in_str, size_t in_str_size, char *do_arg[]);

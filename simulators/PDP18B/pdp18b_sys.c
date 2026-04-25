@@ -277,7 +277,7 @@ return SCPE_OK;                                         /* done */
         word to execute (bit 1 of last character set)
 */
 
-t_stat hri_load_7915 (FILE *fileref, CONST char *cptr)
+t_stat hri_load_7915 (FILE *fileref, const char *cptr)
 {
 int32 bits, origin, val;
 char gbuf[CBUFSIZE];
@@ -365,7 +365,7 @@ return SCPE_OK;
 
 /* Binary loader, all formats */
 
-t_stat sim_load (FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
 if (flag != 0)
     return SCPE_NOFNC;
@@ -1158,7 +1158,7 @@ return get_uint (cptr, 8, 0777777, status);
    Outputs:
         status  =       error status
 */
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
 int32 d, i, j, k, sign, damask, epcmask;
 t_stat r, sta = SCPE_OK;

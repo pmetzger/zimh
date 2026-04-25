@@ -63,9 +63,9 @@ t_stat parse_char (const char *cptr, t_value *val, int32 lnt);
 t_stat parse_sym_m (const char *cptr, uint32 addr, t_value *val);
 int32 parse_brdisp (const char *cptr, uint32 addr, t_value *val,
     int32 vp, int32 lnt, t_stat *r);
-int32 parse_spec (CONST char *cptr, uint32 addr, t_value *val,
+int32 parse_spec (const char *cptr, uint32 addr, t_value *val,
     int32 vp, int32 disp, t_stat *r);
-CONST char *parse_rnum (CONST char *cptr, int32 *rn);
+const char *parse_rnum (const char *cptr, int32 *rn);
 int32 parse_sym_qoimm (int32 *lit, t_value *val, int32 vp,
     int lnt, int32 minus);
 
@@ -976,7 +976,7 @@ return vp;
                         <= 0  -number of extra words
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr exta, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr exta, UNIT *uptr, t_value *val, int32 sw)
 {
 uint32 addr = (uint32) exta;
 int32 k, rdx, lnt, num, vp;
@@ -1179,7 +1179,7 @@ return vp;
                             }
 #define SEL_LIM(p,m,u)  ((fl & SP_PLUS)? (p): ((fl & SP_MINUS)? (m): (u)))
 
-int32 parse_spec (CONST char *cptr, uint32 addr, t_value *val, int32 vp, int32 disp, t_stat *r)
+int32 parse_spec (const char *cptr, uint32 addr, t_value *val, int32 vp, int32 disp, t_stat *r)
 {
 int32 i, k, litsize, rn, index;
 int32 num, dispsize, mode;
@@ -1437,11 +1437,11 @@ if (*cptr != 0)                                         /* must be done */
 return vp;
 }
 
-CONST char *parse_rnum (CONST char *cptr, int32 *rn)
+const char *parse_rnum (const char *cptr, int32 *rn)
 {
 int32 i, lnt;
 t_value regnum;
-CONST char *tptr;
+const char *tptr;
 
 *rn = 0;
 for (i = 15; i >= 0; i--) {                             /* chk named reg */

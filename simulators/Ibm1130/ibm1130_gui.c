@@ -1490,7 +1490,7 @@ static BOOL is_scp_file(const char *filename)
     if (!f)
         return FALSE;
     while (result) {
-        CONST char *cptr;
+        const char *cptr;
 
         cptr = fgets(cbuf, sizeof(cbuf), f);
         if (cptr == NULL)

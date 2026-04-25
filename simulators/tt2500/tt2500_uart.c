@@ -42,7 +42,7 @@ static uint16 RBUF, TBUF;
 static t_stat uart_r_svc (UNIT *uptr);
 static t_stat uart_t_svc (UNIT *uptr);
 static t_stat uart_reset (DEVICE *dptr);
-static t_stat uart_attach (UNIT *uptr, CONST char *cptr);
+static t_stat uart_attach (UNIT *uptr, const char *cptr);
 static t_stat uart_detach (UNIT *uptr);
 static uint16 uart_read (uint16);
 static void uart_write (uint16, uint16);
@@ -172,7 +172,7 @@ uart_reset (DEVICE *dptr)
 }
 
 static t_stat
-uart_attach (UNIT *uptr, CONST char *cptr)
+uart_attach (UNIT *uptr, const char *cptr)
 {
   t_stat r;
 

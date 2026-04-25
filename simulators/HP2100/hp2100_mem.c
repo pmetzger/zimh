@@ -590,7 +590,7 @@ static INTERFACE mp_interface;
 
 /* Memory Protect local SCP support routine declarations */
 
-static t_stat mp_set_jsb (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat mp_set_jsb (UNIT *uptr, int32 value, const char *cptr, void *desc);
 static t_stat mp_reset   (DEVICE *dptr);
 
 
@@ -2351,7 +2351,7 @@ return SCPE_OK;
    with JMP.
 */
 
-static t_stat mp_set_jsb (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat mp_set_jsb (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if (value == UNIT_MP_JSB)                               /* if jumper W5 is out */
     jsb_bound = 0;                                      /*   then the protected lower bound is address 0 */

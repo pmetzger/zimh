@@ -902,12 +902,12 @@ static t_stat line_service  (UNIT   *uptr);
 static t_stat poll_service  (UNIT   *uptr);
 
 static t_stat mpx_reset     (DEVICE *dptr);
-static t_stat mpx_attach    (UNIT   *uptr, CONST char *cptr);
+static t_stat mpx_attach    (UNIT   *uptr, const char *cptr);
 static t_stat mpx_detach    (UNIT   *uptr);
 
-static t_stat set_revision  (UNIT   *uptr, int32  val,  CONST char *cptr, void *desc);
-static t_stat show_revision (FILE   *st,   UNIT  *uptr, int32 val,        CONST void *desc);
-static t_stat show_status   (FILE   *st,   UNIT  *uptr, int32 val,        CONST void *desc);
+static t_stat set_revision  (UNIT   *uptr, int32  val,  const char *cptr, void *desc);
+static t_stat show_revision (FILE   *st,   UNIT  *uptr, int32 val,        const void *desc);
+static t_stat show_status   (FILE   *st,   UNIT  *uptr, int32 val,        const void *desc);
 
 
 /* Multiplexer local utility routines */
@@ -2237,7 +2237,7 @@ return SCPE_OK;
        remains hidden.
 */
 
-static t_stat mpx_attach (UNIT *uptr, CONST char *cptr)
+static t_stat mpx_attach (UNIT *uptr, const char *cptr)
 {
 t_stat status = SCPE_OK;
 
@@ -2303,7 +2303,7 @@ return status;
    will enable changing the firmware revision.
 */
 
-static t_stat set_revision (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat set_revision (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if ((cptr == NULL) ||                                   /* no parameter? */
     (*cptr < 'C') || (*cptr > 'D') ||                   /*   or not C or D? */
@@ -2323,7 +2323,7 @@ else {
 
 /* Show firmware revision */
 
-static t_stat show_revision (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_revision (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if (mpx_dev.flags & DEV_REV_D)
     fputs ("12792D", st);
@@ -2336,7 +2336,7 @@ return SCPE_OK;
 
 /* Show multiplexer status */
 
-static t_stat show_status (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_status (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if (mpx_poll.flags & UNIT_ATT)                          /* attached to socket? */
     fprintf (st, "attached to port %s, ", mpx_poll.filename);

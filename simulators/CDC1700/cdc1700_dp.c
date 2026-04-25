@@ -45,15 +45,15 @@ extern void fw_IOintr(t_bool, DEVICE *, IO_DEVICE *, uint16, uint16, uint16, con
 
 extern t_stat checkReset(DEVICE *, uint8);
 
-extern t_stat show_addr(FILE *, UNIT *, int32, CONST void *);
+extern t_stat show_addr(FILE *, UNIT *, int32, const void *);
 
-extern t_stat set_protected(UNIT *, int32, CONST char *, void *);
-extern t_stat clear_protected(UNIT *, int32, CONST char *, void *);
+extern t_stat set_protected(UNIT *, int32, const char *, void *);
+extern t_stat clear_protected(UNIT *, int32, const char *, void *);
 
-extern t_stat set_equipment(UNIT *, int32, CONST char *, void *);
+extern t_stat set_equipment(UNIT *, int32, const char *, void *);
 
-extern t_stat set_stoponrej(UNIT *, int32, CONST char *, void *);
-extern t_stat clr_stoponrej(UNIT *, int32, CONST char *, void *);
+extern t_stat set_stoponrej(UNIT *, int32, const char *, void *);
+extern t_stat clr_stoponrej(UNIT *, int32, const char *, void *);
 
 extern uint16 LoadFromMem(uint16);
 extern t_bool IOStoreToMem(uint16, uint16, t_bool);
@@ -66,15 +66,15 @@ extern t_bool ExecutionStarted;
 
 extern UNIT cpu_unit;
 
-static t_stat show_drive(FILE *, UNIT *, int32, CONST void *);
+static t_stat show_drive(FILE *, UNIT *, int32, const void *);
 
-t_stat set_dp853(UNIT *, int32, CONST char *, void *);
-t_stat set_dp854(UNIT *, int32, CONST char *, void *);
+t_stat set_dp853(UNIT *, int32, const char *, void *);
+t_stat set_dp854(UNIT *, int32, const char *, void *);
 
-static t_stat show_addressing(FILE *, UNIT *, int32, CONST void *);
+static t_stat show_addressing(FILE *, UNIT *, int32, const void *);
 
-t_stat set_normal(UNIT *, int32, CONST char *, void *);
-t_stat set_reverse(UNIT *, int32, CONST char *, void *);
+t_stat set_normal(UNIT *, int32, const char *, void *);
+t_stat set_reverse(UNIT *, int32, const char *, void *);
 
 /* Constants */
 
@@ -124,7 +124,7 @@ enum dpio_status {
 
 t_stat dp_svc(UNIT *);
 t_stat dp_reset(DEVICE *);
-t_stat dp_attach(UNIT *, CONST char *);
+t_stat dp_attach(UNIT *, const char *);
 t_stat dp_detach(UNIT *);
 
 void DPstate(const char *, DEVICE *, IO_DEVICE *);
@@ -318,7 +318,7 @@ DEVICE dp_dev = {
 /*
  * Display disk pack drive type
  */
-static t_stat show_drive(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_drive(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   if (uptr == NULL)
     return SCPE_IERR;
@@ -333,7 +333,7 @@ static t_stat show_drive(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
  * Set drive type to 853. If execution has started, disallow device type
  * changes.
  */
-t_stat set_dp853(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_dp853(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (uptr == NULL)
     return SCPE_IERR;
@@ -355,7 +355,7 @@ t_stat set_dp853(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
  * Set drive type to 854. If execution has started, disallow device type
  * changes.
  */
-t_stat set_dp854(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_dp854(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (uptr == NULL)
     return SCPE_IERR;
@@ -376,7 +376,7 @@ t_stat set_dp854(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 /*
  * Display the device addressing mode
  */
-static t_stat show_addressing(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_addressing(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   if (uptr == NULL)
     return SCPE_IERR;
@@ -390,7 +390,7 @@ static t_stat show_addressing(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 /*
  * Set device to normal addressing.
  */
-t_stat set_normal(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_normal(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (uptr == NULL)
     return SCPE_IERR;
@@ -402,7 +402,7 @@ t_stat set_normal(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 /*
  * Set device to reverse addressing.
  */
-t_stat set_reverse(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_reverse(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (uptr == NULL)
     return SCPE_IERR;
@@ -834,7 +834,7 @@ t_stat dp_reset(DEVICE *dptr)
 
 /* Attach routine */
 
-t_stat dp_attach(UNIT *uptr, CONST char *cptr)
+t_stat dp_attach(UNIT *uptr, const char *cptr)
 {
   struct dpio_unit *iou = (struct dpio_unit *)uptr->up7;
   t_addr capac = ((uptr->flags & UNIT_854) != 0) ? DP854_SIZE : DP853_SIZE;

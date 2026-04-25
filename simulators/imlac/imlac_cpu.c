@@ -75,15 +75,15 @@ static HISTORY *history = NULL;
 static uint32 history_i, history_m, history_n;
 
 /* Function declaration. */
-static t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc);
 static t_stat cpu_ex (t_value *vptr, t_addr ea, UNIT *uptr, int32 sw);
 static t_stat cpu_dep (t_value val, t_addr ea, UNIT *uptr, int32 sw);
 static t_stat cpu_reset (DEVICE *dptr);
-static t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+static t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
 static uint16 irq_iot (uint16, uint16);
-static t_stat rom_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat rom_show_type (FILE *st, UNIT *up, int32 v, CONST void *dp);
+static t_stat rom_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat rom_show_type (FILE *st, UNIT *up, int32 v, const void *dp);
 
 static UNIT cpu_unit = { UDATA (NULL, UNIT_FIX + UNIT_BINK, 020000) };
 
@@ -499,7 +499,7 @@ t_stat sim_instr (void)
 }
 
 static t_stat
-cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   t_stat r;
   uint32 x;
@@ -522,7 +522,7 @@ cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 static t_stat
-cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   t_value insn;
   uint32 i, j;
@@ -640,7 +640,7 @@ rom_data (uint16 *data)
 }
 
 static t_stat
-rom_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+rom_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   t_stat r = SCPE_OK;
   if (strcmp (cptr, "NONE") == 0) {
@@ -660,7 +660,7 @@ rom_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 static t_stat
-rom_show_type (FILE *st, UNIT *up, int32 v, CONST void *dp)
+rom_show_type (FILE *st, UNIT *up, int32 v, const void *dp)
 {
   switch (rom_type) {
   case ROM_NONE:
@@ -697,7 +697,7 @@ cpu_set_switches (unsigned long p1, unsigned long p2)
   DS = p1 & 0177777;
 }
 
-static t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   cpu_unit.capac = (uint32)val * 4096;
   memmask = cpu_unit.capac - 1;

@@ -79,8 +79,8 @@ t_stat tto_write (uint32 c);
 t_stat tti_svc (UNIT *uptr);
 t_stat tto_svc (UNIT *uptr);
 t_stat tty_reset (DEVICE *dptr);
-t_stat tty_set_fixtabs (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat tty_set_12digit (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat tty_set_fixtabs (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat tty_set_12digit (UNIT *uptr, int32 val, const char *cptr, void *desc);
 
 /* TTY data structures
 
@@ -509,7 +509,7 @@ return SCPE_OK;
 
 /* Set tab stops at fixed modulus */
 
-t_stat tty_set_fixtabs (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tty_set_fixtabs (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i;
 
@@ -523,7 +523,7 @@ return SCPE_OK;
 
 /* Assure consistency of 1DIG/2DIG setting */
 
-t_stat tty_set_12digit (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tty_set_12digit (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 tty_unit[UTTI].flags = (tty_unit[UTTI].flags & ~UF_1DIG) | val;
 tty_unit[UTTO].flags = (tty_unit[UTTO].flags & ~UF_1DIG) | val;

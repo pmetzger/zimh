@@ -33,7 +33,7 @@
 
 #include "m68k_cpu.h"
 
-t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE* dptr;
     PNP_INFO* pnp;
@@ -61,7 +61,7 @@ t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     DEVICE *dptr;
     PNP_INFO *pnp;
@@ -74,7 +74,7 @@ t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
     return SCPE_OK;
 }
 
-t_stat m68k_set_cpu(UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat m68k_set_cpu(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
     if (value < 0 || value > CPU_TYPE_68030)
         return SCPE_ARG;
@@ -85,7 +85,7 @@ t_stat m68k_set_cpu(UNIT *uptr, int32 value, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat m68k_show_cpu(FILE* st,UNIT *uptr, int32 value, CONST void *desc)
+t_stat m68k_show_cpu(FILE* st,UNIT *uptr, int32 value, const void *desc)
 {
     fprintf(st,"TYPE=%s",(const char *)desc);
     return SCPE_OK;
@@ -100,7 +100,7 @@ t_stat m68k_alloc_mem(void)
     return M == NULL ? SCPE_MEM : SCPE_OK;
 }
 
-t_stat m68k_set_size(UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat m68k_set_size(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
     t_stat rc;
     uptr->capac = value;
@@ -108,24 +108,24 @@ t_stat m68k_set_size(UNIT *uptr, int32 value, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat m68k_set_fpu(UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat m68k_set_fpu(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
     uptr->flags |= value;
     return SCPE_OK;
 }
-t_stat m68k_set_nofpu(UNIT *uptr, int32 value, CONST char *cptr, void *desc)
-{
-    uptr->flags |= value;
-    return SCPE_OK;
-}
-
-t_stat m68kcpu_set_flag(UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat m68k_set_nofpu(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
     uptr->flags |= value;
     return SCPE_OK;
 }
 
-t_stat m68kcpu_set_noflag(UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat m68kcpu_set_flag(UNIT *uptr, int32 value, const char *cptr, void *desc)
+{
+    uptr->flags |= value;
+    return SCPE_OK;
+}
+
+t_stat m68kcpu_set_noflag(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
     uptr->flags &= ~value;
     return SCPE_OK;
@@ -231,7 +231,7 @@ error:
     return SCPE_FMT;
 }
 
-t_stat sim_load(FILE* fptr, CONST char* cptr, CONST char* fnam, t_bool flag)
+t_stat sim_load(FILE* fptr, const char* cptr, const char* fnam, t_bool flag)
 {
     int i,len,rc;
     uint16 data;

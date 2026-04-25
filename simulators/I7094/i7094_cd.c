@@ -86,8 +86,8 @@ t_stat cdp_chwr (uint32 ch, t_uint64 val, uint32 flags);
 t_stat cdp_reset (DEVICE *dptr);
 t_stat cdp_svc (UNIT *uptr);
 t_stat cdp_card_end (UNIT *uptr);
-t_stat cd_attach (UNIT *uptr, CONST char *cptr);
-t_stat cd_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat cd_attach (UNIT *uptr, const char *cptr);
+t_stat cd_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc);
 char colbin_to_bcd (uint32 cb);
 
 
@@ -305,7 +305,7 @@ return SCPE_OK;
 
 /* Reader/punch attach */
 
-t_stat cd_attach (UNIT *uptr, CONST char *cptr)
+t_stat cd_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 
@@ -325,7 +325,7 @@ return SCPE_OK;
 
 /* Reader/punch set mode - valid only if not attached */
 
-t_stat cd_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cd_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 return (uptr->flags & UNIT_ATT)? SCPE_NOFNC: SCPE_OK;
 }

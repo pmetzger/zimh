@@ -149,8 +149,8 @@ typedef enum {
    cpu_power_cmd    : process the POWER commands
 */
 
-extern t_stat cpu_cold_cmd  (int32 arg, CONST char *buf);
-extern t_stat cpu_power_cmd (int32 arg, CONST char *buf);
+extern t_stat cpu_cold_cmd  (int32 arg, const char *buf);
+extern t_stat cpu_power_cmd (int32 arg, const char *buf);
 
 
 /* Global SIO order structures.

@@ -131,8 +131,8 @@ int32 rf_iors (void);
 t_stat rf_svc (UNIT *uptr);
 t_stat rf_reset (DEVICE *dptr);
 int32 rf_updsta (int32 newst);
-t_stat rf_attach (UNIT *uptr, CONST char *cptr);
-t_stat rf_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat rf_attach (UNIT *uptr, const char *cptr);
+t_stat rf_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
 
 /* RF data structures
 
@@ -347,7 +347,7 @@ return ((rf_sta & (RFS_ERR | RFS_DON))? IOS_RF: 0);
 
 /* Attach routine */
 
-t_stat rf_attach (UNIT *uptr, CONST char *cptr)
+t_stat rf_attach (UNIT *uptr, const char *cptr)
 {
 uint32 p, sz;
 uint32 ds_bytes = RF_DKSIZE * sizeof (int32);
@@ -365,7 +365,7 @@ return attach_unit (uptr, cptr);
 
 /* Change disk size */
 
-t_stat rf_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rf_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (val < 0)
     return SCPE_IERR;

@@ -98,7 +98,7 @@ int32 lpt_stopioe = 0;                                  /* stop on error */
 int32 lptio (int32 inst, int32 fnc, int32 dat, int32 dev);
 t_stat lpt_svc (UNIT *uptr);
 t_stat lpt_reset (DEVICE *dptr);
-t_stat lpt_attach (UNIT *uptr, CONST char *cptr);
+t_stat lpt_attach (UNIT *uptr, const char *cptr);
 
 /* LPT data structures
 
@@ -370,7 +370,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat lpt_attach (UNIT *uptr, CONST char *cptr)
+t_stat lpt_attach (UNIT *uptr, const char *cptr)
 {
 sim_switches |= SWMASK ('A');   /* Default to Append to existing file */
 return attach_unit (uptr, cptr);

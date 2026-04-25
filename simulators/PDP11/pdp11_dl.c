@@ -96,9 +96,9 @@ t_stat dlx_wr (int32 data, int32 PA, int32 access);
 t_stat dlx_reset (DEVICE *dptr);
 t_stat dli_svc (UNIT *uptr);
 t_stat dlo_svc (UNIT *uptr);
-t_stat dlx_attach (UNIT *uptr, CONST char *cptr);
+t_stat dlx_attach (UNIT *uptr, const char *cptr);
 t_stat dlx_detach (UNIT *uptr);
-t_stat dlx_set_lines (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat dlx_set_lines (UNIT *uptr, int32 val, const char *cptr, void *desc);
 void dlx_enbdis (int32 dis);
 void dli_clr_int (int32 ln, uint32 wd);
 void dli_set_int (int32 ln, uint32 wd);
@@ -107,8 +107,8 @@ void dlo_clr_int (int32 ln);
 void dlo_set_int (int32 ln);
 int32 dlo_iack (void);
 void dlx_reset_ln (int32 ln);
-t_stat dl_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dl_show_mode (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat dl_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dl_show_mode (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat dlx_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *dlx_description (DEVICE *dptr);
 
@@ -562,7 +562,7 @@ return;
 
 /* Attach master unit */
 
-t_stat dlx_attach (UNIT *uptr, CONST char *cptr)
+t_stat dlx_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 
@@ -635,7 +635,7 @@ return;
 
 /* Change number of lines */
 
-t_stat dlx_set_lines (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dlx_set_lines (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 newln, i, t;
 t_stat r;
@@ -674,7 +674,7 @@ return auto_config (dli_dev.name, newln);              /* auto config */
 
 /* SET character MODE processor */
 
-t_stat dl_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dl_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uptr->flags &= ~TT_MODE;
 uptr->flags |= val;
@@ -683,7 +683,7 @@ return SCPE_OK;
 
 /* SHOW character MODE processor */
 
-t_stat dl_show_mode (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dl_show_mode (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 static const char *modes[] = {"7B", "8B", "UC", "7P"};
 

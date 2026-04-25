@@ -1044,28 +1044,28 @@ t_stat dmc_svc (UNIT * uptr);
 t_stat dmc_poll_svc (UNIT * uptr);
 t_stat dmc_timer_svc (UNIT * uptr);
 t_stat dmc_reset (DEVICE * dptr);
-t_stat dmc_attach (UNIT * uptr, CONST char * cptr);
+t_stat dmc_attach (UNIT * uptr, const char * cptr);
 t_stat dmc_detach (UNIT * uptr);
 int32 dmc_ininta   (void);
 int32 dmc_outinta (void);
-t_stat dmc_setnumdevices (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dmc_shownumdevices (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat dmc_setpeer (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat dmc_showpeer (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat dmc_setspeed (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat dmc_showspeed (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat dmc_setcorrupt (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dmc_showcorrupt (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat dmc_set_microdiag (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat dmc_show_microdiag (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat dmc_settype (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat dmc_showtype (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat dmc_setstats (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat dmc_showstats (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat dmc_showqueues (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat dmc_setconnectpoll (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat dmc_showconnectpoll (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat dmc_showddcmp (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
+t_stat dmc_setnumdevices (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dmc_shownumdevices (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat dmc_setpeer (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat dmc_showpeer (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat dmc_setspeed (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat dmc_showspeed (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat dmc_setcorrupt (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dmc_showcorrupt (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat dmc_set_microdiag (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat dmc_show_microdiag (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat dmc_settype (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat dmc_showtype (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat dmc_setstats (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat dmc_showstats (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat dmc_showqueues (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat dmc_setconnectpoll (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat dmc_showconnectpoll (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat dmc_showddcmp (FILE* st, UNIT* uptr, int32 val, const void* desc);
 t_stat dmc_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 t_stat dmc_help_attach (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *dmc_description (DEVICE *dptr);
@@ -1381,7 +1381,7 @@ for (i=0; i<DMC_NUMDEVICE + DMP_NUMDEVICE; i++) {
 return 0;
 }
 
-t_stat dmc_showpeer (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat dmc_showpeer (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 DEVICE *dptr = (UNIBUS) ? ((&dmc_dev == find_dev_from_unit(uptr)) ? &dmc_dev : &dmp_dev) : &dmv_dev;
 int32 dmc = (int32)(uptr-dptr->units);
@@ -1394,7 +1394,7 @@ else
 return SCPE_OK;
 }
 
-t_stat dmc_setpeer (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat dmc_setpeer (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
 DEVICE *dptr = (UNIBUS) ? ((&dmc_dev == find_dev_from_unit(uptr)) ? &dmc_dev : &dmp_dev) : &dmv_dev;
 int32 dmc = (int32)(uptr-dptr->units);
@@ -1413,7 +1413,7 @@ strncpy(peer, cptr, PEERSIZE-1);
 return SCPE_OK;
 }
 
-t_stat dmc_showspeed (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat dmc_showspeed (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 DEVICE *dptr = (UNIBUS) ? ((&dmc_dev == find_dev_from_unit(uptr)) ? &dmc_dev : &dmp_dev) : &dmv_dev;
 int32 dmc = (int32)(uptr-dptr->units);
@@ -1427,7 +1427,7 @@ return SCPE_OK;
 }
 
 
-t_stat dmc_setspeed (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat dmc_setspeed (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
 DEVICE *dptr = (UNIBUS) ? ((&dmc_dev == find_dev_from_unit(uptr)) ? &dmc_dev : &dmp_dev) : &dmv_dev;
 int32 dmc = (int32)(uptr-dptr->units);
@@ -1444,7 +1444,7 @@ speeds[dmc] = newspeed;
 return SCPE_OK;
 }
 
-t_stat dmc_show_microdiag (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat dmc_show_microdiag (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 int32 dmc = (int32)(uptr-dmc_dev.units);
 
@@ -1456,7 +1456,7 @@ return SCPE_OK;
  *
  * See ddcmp_feedCorruptionTroll for usage.
  */
-t_stat dmc_setcorrupt (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dmc_setcorrupt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 DEVICE *dptr = (UNIBUS) ? ((&dmc_dev == find_dev_from_unit(uptr)) ? &dmc_dev : &dmp_dev) : &dmv_dev;
 int32 dmc = (int32)(uptr-dptr->units);
@@ -1478,7 +1478,7 @@ return SCPE_OK;
 
 /* Display the corruption troll's appetite */
 
-t_stat dmc_showcorrupt (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dmc_showcorrupt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 DEVICE *dptr = (UNIBUS) ? ((&dmc_dev == find_dev_from_unit(uptr)) ? &dmc_dev : &dmp_dev) : &dmv_dev;
 int32 dmc = (int32)(uptr-dptr->units);
@@ -1493,7 +1493,7 @@ else
 return SCPE_OK;
 }
 
-t_stat dmc_set_microdiag(UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat dmc_set_microdiag(UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
 int32 dmc = (int32)(uptr-dmc_dev.units);
 char gbuf[CBUFSIZE];
@@ -1511,7 +1511,7 @@ else
 return SCPE_OK;
 }
 
-t_stat dmc_showtype (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat dmc_showtype (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 CTLR *controller = dmc_get_controller_from_unit(uptr);
 
@@ -1532,7 +1532,7 @@ switch (controller->dev_type) {
 return SCPE_OK;
 }
 
-t_stat dmc_settype (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat dmc_settype (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
 char gbuf[80];
 t_stat status = SCPE_OK;
@@ -1554,7 +1554,7 @@ else
 return status;
 }
 
-t_stat dmc_showstats (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat dmc_showstats (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 CTLR *controller = dmc_get_controller_from_unit(uptr);
     
@@ -1650,7 +1650,7 @@ if (detail) {
     }
 }
 
-t_stat dmc_showqueues (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat dmc_showqueues (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 CTLR *controller     = dmc_get_controller_from_unit(uptr);
 static const char *states[] = {"Uninitialised", "Initialised", "Running", "Halted"};
@@ -1674,7 +1674,7 @@ if (controller->control_out) {
 return SCPE_OK;
 }
 
-t_stat dmc_setstats (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat dmc_setstats (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
 CTLR *controller = dmc_get_controller_from_unit(uptr);
 
@@ -1691,7 +1691,7 @@ sim_printf("Statistics reset\n");
 return SCPE_OK;
 }
 
-t_stat dmc_showconnectpoll (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat dmc_showconnectpoll (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 uint32 poll_interval = *((const uint32 *)desc);
 
@@ -1699,7 +1699,7 @@ fprintf(st, "connectpoll=%u", poll_interval);
 return SCPE_OK;
 }
 
-t_stat dmc_setconnectpoll (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat dmc_setconnectpoll (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
 t_stat status = SCPE_OK;
 uint32 *poll_interval = ((uint32 *)desc);
@@ -1716,7 +1716,7 @@ return tmxr_connection_poll_interval ((poll_interval == &dmc_connect_poll) ? &dm
 
 /* SET LINES processor */
 
-t_stat dmc_setnumdevices (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dmc_setnumdevices (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 newln;
 uint32 i, j;
@@ -1761,7 +1761,7 @@ mp->uptr = dptr->units + newln;                     /* Identify polling unit */
 return dmc_reset ((DEVICE *)desc);                  /* setup devices and auto config */
 }
 
-t_stat dmc_shownumdevices (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dmc_shownumdevices (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 DEVICE *dptr = (UNIBUS) ? find_dev_from_unit (uptr) : &dmv_dev;
 
@@ -1769,7 +1769,7 @@ fprintf (st, "lines=%d", dptr->numunits-2);
 return SCPE_OK;
 }
 
-t_stat dmc_showddcmp (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat dmc_showddcmp (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 CTLR *controller = dmc_get_controller_from_unit(uptr);
 static const char *states[] = {"Halt", "IStart", "AStart", "Run", "Maintenance"};
@@ -3974,7 +3974,7 @@ if (!(dptr->flags & DEV_DIS)) {
 return ans;
 }
 
-t_stat dmc_attach (UNIT *uptr, CONST char *cptr)
+t_stat dmc_attach (UNIT *uptr, const char *cptr)
 {
 DEVICE *dptr = (UNIBUS) ? ((&dmc_dev == find_dev_from_unit(uptr)) ? &dmc_dev : &dmp_dev) : &dmv_dev;
 int32 dmc = (int32)(uptr-dptr->units);

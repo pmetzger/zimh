@@ -136,8 +136,8 @@ t_stat i8272_svc (UNIT *uptr);
 t_stat i8272_reset (DEVICE *dptr, uint16 base);
 void i8272_reset1(uint8 devnum);
 uint8 i8272_get_dn(void);
-t_stat i8272_attach (UNIT *uptr, CONST char *cptr);
-t_stat i8272_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat i8272_attach (UNIT *uptr, const char *cptr);
+t_stat i8272_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc);
 uint8 i8272_r00(t_bool io, uint8 data);
 uint8 i8272_r01(t_bool io, uint8 data);
 
@@ -685,7 +685,7 @@ uint8 i8272_get_dn(void)
 
 /* i8272 attach - attach an .IMG file to an FDD on a FDC */
 
-t_stat i8272_attach (UNIT *uptr, CONST char *cptr)
+t_stat i8272_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
     uint8 fdcnum, fddnum, devnum;
@@ -728,7 +728,7 @@ t_stat i8272_attach (UNIT *uptr, CONST char *cptr)
 /* i8272 set mode */
 /* Handle write protect */
 
-t_stat i8272_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat i8272_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint8 devnum;
 

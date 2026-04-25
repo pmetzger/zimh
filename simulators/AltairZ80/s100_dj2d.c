@@ -52,8 +52,8 @@
 #endif
 
 extern uint32 PCX;
-extern t_stat set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 extern DEVICE *find_dev (const char *cptr);
@@ -845,17 +845,17 @@ static uint8 sdata[1024];       /* Sector data buffer */
 static t_stat dj2d_reset(DEVICE *dj2d_dev);
 static t_stat dj2d_svc(UNIT *uptr);
 static t_stat dj2d_sio_svc(UNIT *uptr);
-static t_stat dj2d_attach(UNIT *uptr, CONST char *cptr);
+static t_stat dj2d_attach(UNIT *uptr, const char *cptr);
 static t_stat dj2d_detach(UNIT *uptr);
 static t_stat dj2d_boot(int32 unitno, DEVICE *dptr);
-static t_stat dj2d_set_prombase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat dj2d_show_prombase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat dj2d_set_model(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat dj2d_show_model(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat dj2d_set_prom(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat dj2d_show_prom(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat dj2d_set_sides(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat dj2d_show_sides(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat dj2d_set_prombase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat dj2d_show_prombase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat dj2d_set_model(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat dj2d_show_model(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat dj2d_set_prom(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat dj2d_show_prom(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat dj2d_set_sides(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat dj2d_show_sides(FILE *st, UNIT *uptr, int32 val, const void *desc);
 static t_stat dj2d_set_baud(UNIT *uptr, int32 value, const char *cptr, void *desc);
 static t_stat dj2d_show_baud(FILE *st, UNIT *uptr, int32 value, const void *desc);
 static t_stat dj2d_config_line(void);
@@ -1198,7 +1198,7 @@ static t_stat dj2d_svc(UNIT *uptr)
 ** Verify that prombase is within valid range
 ** before calling set_membase
 */
-static t_stat dj2d_set_prombase(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat dj2d_set_prombase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 newba;
     t_stat r;
@@ -1251,7 +1251,7 @@ static t_stat dj2d_set_prombase(UNIT *uptr, int32 val, CONST char *cptr, void *d
 }
 
 /* Show Base Address routine */
-t_stat dj2d_show_prombase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dj2d_show_prombase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     DEVICE *dptr;
     DJ2D_INFO *pInfo;
@@ -1273,7 +1273,7 @@ t_stat dj2d_show_prombase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
     return SCPE_OK;
 }
 
-static t_stat dj2d_set_model(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat dj2d_set_model(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     char base[5];
 
@@ -1295,14 +1295,14 @@ static t_stat dj2d_set_model(UNIT *uptr, int32 val, CONST char *cptr, void *desc
     return SCPE_OK;
 }
 
-static t_stat dj2d_show_model(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat dj2d_show_model(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "MODEL=%s", (dj2d_info->modelB) ? "B" : "A");
 
     return SCPE_OK;
 }
 
-static t_stat dj2d_set_sides(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat dj2d_set_sides(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int i;
 
@@ -1330,7 +1330,7 @@ static t_stat dj2d_set_sides(UNIT *uptr, int32 val, CONST char *cptr, void *desc
     return SCPE_ARG;
 }
 
-static t_stat dj2d_show_sides(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat dj2d_show_sides(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int i;
 
@@ -1345,7 +1345,7 @@ static t_stat dj2d_show_sides(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 
 /* Attach routine */
-static t_stat dj2d_attach(UNIT *uptr, CONST char *cptr)
+static t_stat dj2d_attach(UNIT *uptr, const char *cptr)
 {
     char header[4];
     t_stat r;
@@ -1511,7 +1511,7 @@ static t_stat dj2d_config_line(void)
     return r;
 }
 
-static t_stat dj2d_set_prom(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat dj2d_set_prom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
@@ -1532,7 +1532,7 @@ static t_stat dj2d_set_prom(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-static t_stat dj2d_show_prom(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat dj2d_show_prom(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (dj2d_info->promEnabled) {
         fprintf(st, "PROM");

@@ -112,8 +112,8 @@ static IBC_SMD_INFO *ibc_smd_info = &ibc_smd_info_data;
 extern uint32 PCX;
 extern int32 vectorInterrupt;     /* Interrupt pending */
 
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 extern int32 find_unit_index(UNIT *uptr);
@@ -123,10 +123,10 @@ extern int32 find_unit_index(UNIT *uptr);
 #define IBC_SMD_CAPACITY          (512*4*16*512)   /* Default Disk Capacity Quantum 2020 */
 
 static t_stat ibc_smd_reset(DEVICE *ibc_smd_dev);
-static t_stat ibc_smd_attach(UNIT *uptr, CONST char *cptr);
+static t_stat ibc_smd_attach(UNIT *uptr, const char *cptr);
 static t_stat ibc_smd_detach(UNIT *uptr);
-static t_stat ibc_smd_unit_set_geometry(UNIT* uptr, int32 value, CONST char* cptr, void* desc);
-static t_stat ibc_smd_unit_show_geometry(FILE* st, UNIT* uptr, int32 value, CONST void* desc);
+static t_stat ibc_smd_unit_set_geometry(UNIT* uptr, int32 value, const char* cptr, void* desc);
+static t_stat ibc_smd_unit_show_geometry(FILE* st, UNIT* uptr, int32 value, const void* desc);
 static int32 ibcsmddev(const int32 port, const int32 io, const int32 data);
 
 static uint8 IBC_SMD_Read(const uint32 Addr);
@@ -217,7 +217,7 @@ static t_stat ibc_smd_reset(DEVICE *dptr)
 
 
 /* Attach routine */
-static t_stat ibc_smd_attach(UNIT *uptr, CONST char *cptr)
+static t_stat ibc_smd_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r = SCPE_OK;
     IBC_SMD_DRIVE_INFO *pDrive;
@@ -303,7 +303,7 @@ static t_stat ibc_smd_detach(UNIT *uptr)
 }
 
 /* Set geometry of the disk drive */
-static t_stat ibc_smd_unit_set_geometry(UNIT* uptr, int32 value, CONST char* cptr, void* desc)
+static t_stat ibc_smd_unit_set_geometry(UNIT* uptr, int32 value, const char* cptr, void* desc)
 {
     IBC_SMD_DRIVE_INFO* pDrive;
     int32 i;
@@ -356,7 +356,7 @@ static t_stat ibc_smd_unit_set_geometry(UNIT* uptr, int32 value, CONST char* cpt
 }
 
 /* Show geometry of the disk drive */
-static t_stat ibc_smd_unit_show_geometry(FILE* st, UNIT* uptr, int32 value, CONST void* desc)
+static t_stat ibc_smd_unit_show_geometry(FILE* st, UNIT* uptr, int32 value, const void* desc)
 {
     IBC_SMD_DRIVE_INFO* pDrive;
     int32 i;

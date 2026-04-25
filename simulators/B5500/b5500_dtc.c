@@ -144,15 +144,15 @@
 
 t_stat              dtc_srv(UNIT *);
 t_stat              dtco_srv(UNIT *);
-t_stat              dtc_attach(UNIT *, CONST char *);
+t_stat              dtc_attach(UNIT *, const char *);
 t_stat              dtc_detach(UNIT *);
 t_stat              dtc_reset(DEVICE *);
-t_stat              dtc_setnl (UNIT *, int32, CONST char *, void *);
-t_stat              dtc_set_log (UNIT *, int32, CONST char *, void *);
-t_stat              dtc_set_nolog (UNIT *, int32, CONST char *, void *);
-t_stat              dtc_show_log (FILE *, UNIT *, int32, CONST void *);
-t_stat              dtc_set_buf (UNIT *, int32, CONST char *, void *);
-t_stat              dtc_show_buf (FILE *, UNIT *, int32, CONST void *);
+t_stat              dtc_setnl (UNIT *, int32, const char *, void *);
+t_stat              dtc_set_log (UNIT *, int32, const char *, void *);
+t_stat              dtc_set_nolog (UNIT *, int32, const char *, void *);
+t_stat              dtc_show_log (FILE *, UNIT *, int32, const void *);
+t_stat              dtc_set_buf (UNIT *, int32, const char *, void *);
+t_stat              dtc_show_buf (FILE *, UNIT *, int32, const void *);
 t_stat              dtc_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 t_stat              dtc_help_attach (FILE *, DEVICE *, UNIT *, int32, const char *);
 const char         *dtc_description(DEVICE *);
@@ -773,7 +773,7 @@ dtc_reset(DEVICE *dptr) {
 
 /* Attach master unit */
 t_stat
-dtc_attach(UNIT * uptr, CONST char *cptr)
+dtc_attach(UNIT * uptr, const char *cptr)
 {
     int                 i;
     t_stat              r;
@@ -809,7 +809,7 @@ dtc_detach(UNIT * uptr)
 
 /* SET LINES processor */
 
-t_stat dtc_setnl (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dtc_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32 newln, i, t;
     t_stat r;
@@ -842,7 +842,7 @@ t_stat dtc_setnl (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* SET LOG processor */
 
-t_stat dtc_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dtc_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_stat r;
     char gbuf[CBUFSIZE];
@@ -861,7 +861,7 @@ t_stat dtc_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* SET NOLOG processor */
 
-t_stat dtc_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dtc_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_stat r;
     int32 ln;
@@ -876,7 +876,7 @@ t_stat dtc_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* SHOW LOG processor */
 
-t_stat dtc_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dtc_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int32 i;
 
@@ -890,7 +890,7 @@ t_stat dtc_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 
 /* SET BUFFER processor */
 
-t_stat dtc_set_buf (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dtc_set_buf (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_stat r;
     int32 bufsiz;
@@ -909,7 +909,7 @@ t_stat dtc_set_buf (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* SHOW BUFFER processor */
 
-t_stat dtc_show_buf (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dtc_show_buf (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf (st, "bufsize=%d ", dtc_bufsize);
     return SCPE_OK;
@@ -918,7 +918,7 @@ t_stat dtc_show_buf (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 /* Show summary processor */
 
 t_stat
-dtc_summ(FILE * st, UNIT * uptr, int32 val, CONST void *desc)
+dtc_summ(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
     uint32              i, t;
 
@@ -935,7 +935,7 @@ dtc_summ(FILE * st, UNIT * uptr, int32 val, CONST void *desc)
 /* SHOW CONN/STAT processor */
 
 t_stat
-dtc_show(FILE * st, UNIT * uptr, int32 val, CONST void *desc)
+dtc_show(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
     int32               i, cc;
 

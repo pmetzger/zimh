@@ -380,10 +380,10 @@ typedef struct {
 } MAU_STATE;
 
 t_stat mau_reset(DEVICE *dptr);
-t_stat mau_attach(UNIT *uptr, CONST char *cptr);
+t_stat mau_attach(UNIT *uptr, const char *cptr);
 t_stat mau_detach(UNIT *uptr);
 t_stat mau_broadcast(uint32 cmd, uint32 src, uint32 dst);
-CONST char *mau_description(DEVICE *dptr);
+const char *mau_description(DEVICE *dptr);
 t_stat mau_broadcast(uint32 cmd, uint32 src, uint32 dst);
 
 #endif /* _3B2_REV2_MAU_H_ */

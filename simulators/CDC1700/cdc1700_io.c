@@ -86,7 +86,7 @@ devINTR *IOintr[16];
  *      Stop on Reject status
  *      Protected status
  */
-t_stat show_addr(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_addr(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   DEVICE *dptr;
   IO_DEVICE *iod;
@@ -118,7 +118,7 @@ t_stat show_addr(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 /*
  * Device stop on reject handling.
  */
-t_stat set_stoponrej(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_stoponrej(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   DEVICE *dptr;
 
@@ -133,7 +133,7 @@ t_stat set_stoponrej(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
   return SCPE_OK;
 }
 
-t_stat clr_stoponrej(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat clr_stoponrej(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   DEVICE *dptr;
 
@@ -151,7 +151,7 @@ t_stat clr_stoponrej(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 /*
  * Protected device.
  */
-t_stat set_protected(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_protected(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   DEVICE *dptr;
 
@@ -166,7 +166,7 @@ t_stat set_protected(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
   return SCPE_OK;
 }
 
-t_stat clear_protected(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat clear_protected(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   DEVICE *dptr;
 

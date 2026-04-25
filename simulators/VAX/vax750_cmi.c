@@ -89,10 +89,10 @@ extern int32 tmr_int, tti_int, tto_int, csi_int, cso_int;
 t_stat cmi_reset (DEVICE *dptr);
 const char *cmi_description (DEVICE *dptr);
 void cmi_set_tmo (void);
-t_stat vax750_boot (int32 flag, CONST char *ptr);
+t_stat vax750_boot (int32 flag, const char *ptr);
 t_stat vax750_boot_parse (int32 flag, const char *ptr);
-t_stat vax750_set_bootdev (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat vax750_show_bootdev (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat vax750_set_bootdev (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat vax750_show_bootdev (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 extern int32 iccs_rd (void);
 extern int32 nicr_rd (void);
@@ -605,7 +605,7 @@ static struct boot_dev boot_tab[] = {
    Sets up R0-R5, calls SCP boot processor with effective BOOT CPU
 */
 
-t_stat vax750_boot (int32 flag, CONST char *ptr)
+t_stat vax750_boot (int32 flag, const char *ptr)
 {
 t_stat r;
 
@@ -766,7 +766,7 @@ else                    /* Boot ROM boot */
 return SCPE_OK;
 }
 
-t_stat vax750_set_bootdev (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat vax750_set_bootdev (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if ((!cptr) || (!*cptr || (*cptr < 'A') || (*cptr > 'D')))
     return SCPE_ARG;
@@ -774,7 +774,7 @@ vax750_bootdev = *cptr - 'A';
 return SCPE_OK;
 }
 
-t_stat vax750_show_bootdev (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat vax750_show_bootdev (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int i;
 
@@ -807,7 +807,7 @@ return "CPU/Memory interconnect";
 
 /* Show nexus */
 
-t_stat show_nexus (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_nexus (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "nexus=%d, address=%X", val, NEXUSBASE + ((1 << REG_V_NEXUS) * val));
 return SCPE_OK;

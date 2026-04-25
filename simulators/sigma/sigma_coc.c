@@ -104,9 +104,9 @@ t_stat muxc_svc (UNIT *uptr);
 t_stat muxo_svc (UNIT *uptr);
 t_stat muxi_rtc_svc (UNIT *uptr);
 t_stat mux_reset (DEVICE *dptr);
-t_stat mux_attach (UNIT *uptr, CONST char *cptr);
+t_stat mux_attach (UNIT *uptr, const char *cptr);
 t_stat mux_detach (UNIT *uptr);
-t_stat mux_vlines (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat mux_vlines (UNIT *uptr, int32 val, const char *cptr, void *desc);
 void mux_reset_ln (int32 ln);
 void mux_scan_next (t_bool clr);
 t_stat muxi_put_char (uint32 c, uint32 ln);
@@ -595,7 +595,7 @@ return SCPE_OK;
 
 /* Attach master unit */
 
-t_stat mux_attach (UNIT *uptr, CONST char *cptr)
+t_stat mux_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 
@@ -623,7 +623,7 @@ return r;
 
 /* Change number of lines */
 
-t_stat mux_vlines (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat mux_vlines (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 newln, i, t;
 t_stat r;

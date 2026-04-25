@@ -153,7 +153,7 @@ MTAB mg_mod[] = {
 };
 
 t_stat mg_reset (DEVICE *dptr);
-t_stat mg_attach (UNIT *uptr, CONST char *cptr);
+t_stat mg_attach (UNIT *uptr, const char *cptr);
 t_stat mg_detach (UNIT *uptr);
 
 DEVICE mg_dev[4] = {
@@ -242,7 +242,7 @@ t_stat mg_reset (DEVICE *dptr)
     return SCPE_OK;
 }
 
-t_stat mg_attach (UNIT *u, CONST char *cptr)
+t_stat mg_attach (UNIT *u, const char *cptr)
 {
     t_stat s;
     int32 saved_switches = sim_switches;

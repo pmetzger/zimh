@@ -294,7 +294,7 @@ t_stat vt_clk (UNIT * this)
     }
 }
 
-t_stat tty_setmode (UNIT *u, int32 val, CONST char *cptr, void *desc)
+t_stat tty_setmode (UNIT *u, int32 val, const char *cptr, void *desc)
 {
     int num = u - tty_unit;
     TMLN *t = &tty_line [num];
@@ -349,7 +349,7 @@ t_stat tty_setmode (UNIT *u, int32 val, CONST char *cptr, void *desc)
  *      attach tty <port>
  * Where <port> is the port number for telnet, e.g. 4199.
  */
-t_stat tty_attach (UNIT *u, CONST char *cptr)
+t_stat tty_attach (UNIT *u, const char *cptr)
 {
     int num = u - tty_unit;
     char gbuf[CBUFSIZE];
@@ -403,17 +403,17 @@ t_stat tty_detach (UNIT *u)
     return tmxr_detach (&tty_desc, &tty_unit[0]);
 }
 
-t_stat tty_showrate (FILE *f, UNIT *up, int32 v, CONST void *dp) {
+t_stat tty_showrate (FILE *f, UNIT *up, int32 v, const void *dp) {
     fprintf(f, "%d Baud", tty_rate);
     return SCPE_OK;
 }
 
-t_stat tty_showturbo (FILE *f, UNIT *up, int32 v, CONST void *dp) {
+t_stat tty_showturbo (FILE *f, UNIT *up, int32 v, const void *dp) {
     fprintf(f, tty_turbo ? "Turbo" : "Authentic feel");
     return SCPE_OK;
 }
 
-t_stat tty_setrate (UNIT *up, int32 v, CONST char *cp, void *dp) {
+t_stat tty_setrate (UNIT *up, int32 v, const char *cp, void *dp) {
     int rate;
     if (cp)
         rate = atoi(cp);
@@ -428,7 +428,7 @@ t_stat tty_setrate (UNIT *up, int32 v, CONST char *cp, void *dp) {
     return SCPE_OK;
 }
 
-t_stat tty_setturbo (UNIT *up, int32 v, CONST char *cp, void *dp) {
+t_stat tty_setturbo (UNIT *up, int32 v, const char *cp, void *dp) {
     if (!cp)
         return SCPE_MISVAL;
     if (!MATCH_CMD("ON", cp))
@@ -770,12 +770,12 @@ static int unicode_to_koi7 (unsigned val)
 /*
  * Set command
  */
-static t_stat cmd_set (int32 num, CONST char *cptr)
+static t_stat cmd_set (int32 num, const char *cptr)
 {
     char gbuf [CBUFSIZE];
     int len;
 
-    cptr = (CONST char *)get_sim_sw (cptr);
+    cptr = (const char *)get_sim_sw (cptr);
     if (! cptr)
         return SCPE_INVSW;
     if (! *cptr)
@@ -821,14 +821,14 @@ static t_stat cmd_set (int32 num, CONST char *cptr)
 /*
  * Show command
  */
-static t_stat cmd_show (int32 num, CONST char *cptr)
+static t_stat cmd_show (int32 num, const char *cptr)
 {
     TMLN *t = &tty_line [num];
     char gbuf [CBUFSIZE];
     MTAB *m;
     int len;
 
-    cptr = (CONST char *)get_sim_sw (cptr);
+    cptr = (const char *)get_sim_sw (cptr);
     if (! cptr)
         return SCPE_INVSW;
     if (! *cptr) {
@@ -866,12 +866,12 @@ static t_stat cmd_show (int32 num, CONST char *cptr)
 /*
  * Exit command
  */
-static t_stat cmd_exit (int32 num, CONST char *cptr)
+static t_stat cmd_exit (int32 num, const char *cptr)
 {
     return SCPE_EXIT;
 }
 
-static t_stat cmd_help (int32 num, CONST char *cptr);
+static t_stat cmd_help (int32 num, const char *cptr);
 
 static CTAB cmd_table[] = {
     { "SET", &cmd_set, 0,
@@ -922,13 +922,13 @@ static CTAB *lookup_cmd (char *command)
 /*
  * Help command
  */
-static t_stat cmd_help (int32 num, CONST char *cptr)
+static t_stat cmd_help (int32 num, const char *cptr)
 {
     TMLN *t = &tty_line [num];
     char gbuf [CBUFSIZE];
     CTAB *c;
 
-    cptr = (CONST char *)get_sim_sw (cptr);
+    cptr = (const char *)get_sim_sw (cptr);
     if (! cptr)
         return SCPE_INVSW;
     if (! *cptr) {
@@ -957,7 +957,7 @@ void vt_cmd_exec (int num)
 {
     TMLN *t = &tty_line [num];
     char gbuf [CBUFSIZE];
-    CONST char *cptr;
+    const char *cptr;
     CTAB *cmdp;
     t_stat err;
 

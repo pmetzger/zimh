@@ -46,13 +46,13 @@ extern void RaiseExternalInterrupt(DEVICE *);
 
 extern t_bool doDirectorFunc(DEVICE *, t_bool);
 
-extern t_stat show_addr(FILE *, UNIT *, int32, CONST void *);
+extern t_stat show_addr(FILE *, UNIT *, int32, const void *);
 
-extern t_stat set_stoponrej(UNIT *, int32, CONST char *, void *);
-extern t_stat clr_stoponrej(UNIT *, int32, CONST char *, void *);
+extern t_stat set_stoponrej(UNIT *, int32, const char *, void *);
+extern t_stat clr_stoponrej(UNIT *, int32, const char *, void *);
 
-extern t_stat set_protected(UNIT *, int32, CONST char *, void *);
-extern t_stat clear_protected(UNIT *, int32, CONST char *, void *);
+extern t_stat set_protected(UNIT *, int32, const char *, void *);
+extern t_stat clear_protected(UNIT *, int32, const char *, void *);
 
 extern uint16 Areg, IOAreg;
 
@@ -784,7 +784,7 @@ t_stat tt_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 
 t_stat ptr_svc(UNIT *);
 t_stat ptr_reset(DEVICE *);
-t_stat ptr_attach(UNIT *, CONST char *);
+t_stat ptr_attach(UNIT *, const char *);
 t_stat ptr_detach(UNIT *);
 
 enum IOstatus PTRin(IO_DEVICE *, uint8);
@@ -993,7 +993,7 @@ t_stat ptr_reset(DEVICE *dptr)
 
 /* Attach routine */
 
-t_stat ptr_attach(UNIT *uptr, CONST char *cptr)
+t_stat ptr_attach(UNIT *uptr, const char *cptr)
 {
   t_stat r;
 

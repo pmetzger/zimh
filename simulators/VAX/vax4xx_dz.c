@@ -236,16 +236,16 @@ DEBTAB dz_debug[] = {
 t_stat dz_svc (UNIT *uptr);
 t_stat dz_xmt_svc (UNIT *uptr);
 t_stat dz_reset (DEVICE *dptr);
-t_stat dz_attach (UNIT *uptr, CONST char *cptr);
+t_stat dz_attach (UNIT *uptr, const char *cptr);
 t_stat dz_detach (UNIT *uptr);
 t_stat dz_clear (t_bool flag);
 uint16 dz_getc (void);
 t_stat dz_putc (int32 line, uint16 data);
 void dz_update_rcvi (void);
 void dz_update_xmti (void);
-t_stat dz_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dz_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat dz_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dz_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat dz_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 t_stat dz_help_attach (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *dz_description (DEVICE *dptr);
@@ -751,7 +751,7 @@ return SCPE_OK;
 
 /* Attach */
 
-t_stat dz_attach (UNIT *uptr, CONST char *cptr)
+t_stat dz_attach (UNIT *uptr, const char *cptr)
 {
 int32 muxln;
 t_stat r;
@@ -794,7 +794,7 @@ return tmxr_detach (&dz_desc, uptr);
 
 /* SET LOG processor */
 
-t_stat dz_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dz_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 t_stat r;
 char gbuf[CBUFSIZE];
@@ -813,7 +813,7 @@ return tmxr_set_log (NULL, ln, cptr, desc);
 
 /* SET NOLOG processor */
 
-t_stat dz_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dz_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 t_stat r;
 int32 ln;
@@ -828,7 +828,7 @@ return tmxr_set_nolog (NULL, ln, NULL, desc);
 
 /* SHOW LOG processor */
 
-t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 i;
 

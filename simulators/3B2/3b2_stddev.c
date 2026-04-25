@@ -141,7 +141,7 @@ t_stat nvram_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cp
     return SCPE_OK;
 }
 
-t_stat nvram_attach(UNIT *uptr, CONST char *cptr)
+t_stat nvram_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r;
 
@@ -340,7 +340,7 @@ t_stat tod_reset(DEVICE *dptr)
     return SCPE_OK;
 }
 
-t_stat tod_attach(UNIT *uptr, CONST char *cptr)
+t_stat tod_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r;
 

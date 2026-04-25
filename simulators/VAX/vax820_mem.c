@@ -203,7 +203,7 @@ const char *mctl_description (DEVICE *dptr)
 return "memory controller";
 }
 
-t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 // TODO
 return SCPE_OK;

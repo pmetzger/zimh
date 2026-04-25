@@ -34,8 +34,8 @@
 #include "3b2_defs.h"
 
 void full_reset(void);
-t_stat sim_load(FILE *fileref, CONST char *cptr, CONST char *fnam, int flag);
-t_stat parse_sym(CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val,
+t_stat sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag);
+t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val,
                   int32 sw);
 t_stat fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw);
 

@@ -1231,21 +1231,21 @@ static t_stat cpu_deposit (t_value value, t_addr address, UNIT *uptr, int32 swit
 static t_stat cpu_reset (DEVICE *dptr);
 static t_stat cpu_boot  (int32  unitno, DEVICE *dptr);
 
-static t_stat set_stops    (UNIT *uptr, int32 option,    CONST char *cptr, void *desc);
-static t_stat set_size     (UNIT *uptr, int32 new_size,  CONST char *cptr, void *desc);
-static t_stat set_model    (UNIT *uptr, int32 new_model, CONST char *cptr, void *desc);
-static t_stat set_option   (UNIT *uptr, int32 option,    CONST char *cptr, void *desc);
-static t_stat clear_option (UNIT *uptr, int32 option,    CONST char *cptr, void *desc);
-static t_stat set_loader   (UNIT *uptr, int32 enable,    CONST char *cptr, void *desc);
-static t_stat set_roms     (UNIT *uptr, int32 option,    CONST char *cptr, void *desc);
-static t_stat set_exec     (UNIT *uptr, int32 option,    CONST char *cptr, void *desc);
+static t_stat set_stops    (UNIT *uptr, int32 option,    const char *cptr, void *desc);
+static t_stat set_size     (UNIT *uptr, int32 new_size,  const char *cptr, void *desc);
+static t_stat set_model    (UNIT *uptr, int32 new_model, const char *cptr, void *desc);
+static t_stat set_option   (UNIT *uptr, int32 option,    const char *cptr, void *desc);
+static t_stat clear_option (UNIT *uptr, int32 option,    const char *cptr, void *desc);
+static t_stat set_loader   (UNIT *uptr, int32 enable,    const char *cptr, void *desc);
+static t_stat set_roms     (UNIT *uptr, int32 option,    const char *cptr, void *desc);
+static t_stat set_exec     (UNIT *uptr, int32 option,    const char *cptr, void *desc);
 
-static t_stat show_stops (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat show_model (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat show_roms  (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat show_cage  (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat show_exec  (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat show_speed (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat show_stops (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat show_model (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat show_roms  (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat show_cage  (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat show_exec  (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat show_speed (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 
 /* CPU local utility routine declarations */
@@ -3640,7 +3640,7 @@ else                                                    /* otherwise this is a 2
        exceed the logical memory size without being in a loop.
 */
 
-static t_stat set_stops (UNIT *uptr, int32 option, CONST char *cptr, void *desc)
+static t_stat set_stops (UNIT *uptr, int32 option, const char *cptr, void *desc)
 {
 char gbuf [CBUFSIZE];
 t_stat status;
@@ -3733,9 +3733,9 @@ return SCPE_OK;                                         /* the stops were succes
        memory size by 64 words.
 */
 
-static t_stat set_size (UNIT *uptr, int32 new_size, CONST char *cptr, void *desc)
+static t_stat set_size (UNIT *uptr, int32 new_size, const char *cptr, void *desc)
 {
-static CONST char confirm [] = "Really truncate memory [N]?";
+static const char confirm [] = "Really truncate memory [N]?";
 const uint32 model = UNIT_MODEL (cpu_unit [0].flags);   /* the current CPU model index */
 int32 old_size = (int32) mem_size;                      /* current memory size */
 
@@ -3805,7 +3805,7 @@ return SCPE_OK;
        one of the three 1000 model flags.
 */
 
-static t_stat set_model (UNIT *uptr, int32 new_model, CONST char *cptr, void *desc)
+static t_stat set_model (UNIT *uptr, int32 new_model, const char *cptr, void *desc)
 {
 const FEATURE_TABLE new_cpu = cpu_features [UNIT_MODEL (new_model)];    /* get the features describing the new model */
 uint32 new_memsize;
@@ -3877,7 +3877,7 @@ return result;
        otherwise be required.
 */
 
-static t_stat set_option (UNIT *uptr, int32 option, CONST char *cptr, void *desc)
+static t_stat set_option (UNIT *uptr, int32 option, const char *cptr, void *desc)
 {
 const uint32 model = UNIT_MODEL (uptr->flags);          /* the current CPU model index */
 
@@ -3925,7 +3925,7 @@ return SCPE_OK;
    rejected.
 */
 
-static t_stat clear_option (UNIT *uptr, int32 option, CONST char *cptr, void *desc)
+static t_stat clear_option (UNIT *uptr, int32 option, const char *cptr, void *desc)
 {
 const uint32 model = UNIT_MODEL (uptr->flags);          /* the current CPU model index */
 
@@ -3986,7 +3986,7 @@ return SCPE_OK;
        when the loader is disabled.
 */
 
-static t_stat set_loader (UNIT *uptr, int32 enable, CONST char *cptr, void *desc)
+static t_stat set_loader (UNIT *uptr, int32 enable, const char *cptr, void *desc)
 {
 static MEMORY_WORD loader [IBL_SIZE];                       /* the shadow memory for the currently disabled loader */
 const  t_bool currently_enabled = (mem_end == mem_size);    /* TRUE if the loader is currently enabled */
@@ -4048,7 +4048,7 @@ return SCPE_OK;
        when "SHOW CPU ROMS" was intended.
 */
 
-static t_stat set_roms (UNIT *uptr, int32 option, CONST char *cptr, void *desc)
+static t_stat set_roms (UNIT *uptr, int32 option, const char *cptr, void *desc)
 {
 DEVICE *dptr;
 char   gbuf [CBUFSIZE];
@@ -4119,7 +4119,7 @@ return SCPE_OK;                                         /* report that the comma
    unless an override switch is present on the command line.
 */
 
-static t_stat set_exec (UNIT *uptr, int32 option, CONST char *cptr, void *desc)
+static t_stat set_exec (UNIT *uptr, int32 option, const char *cptr, void *desc)
 {
 char   gbuf [CBUFSIZE];
 uint32 match, mask, radix;
@@ -4202,7 +4202,7 @@ else {                                                  /* otherwise at least on
    newline to the output before returning.
 */
 
-static t_stat show_stops (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_stops (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 uint32 stop;
 t_bool need_spacer = FALSE;
@@ -4238,7 +4238,7 @@ return SCPE_OK;                                         /* report the success of
    Loader status is displayed for 21xx models and suppressed for 1000 models.
 */
 
-static t_stat show_model (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_model (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fputs ((const char *) desc, st);                        /* output the CPU model name */
 
@@ -4286,7 +4286,7 @@ return SCPE_OK;
        we pick up assigned logical device names.
 */
 
-static t_stat show_roms (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_roms (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 const char *cname, *dname;
 DIB    *dibptr;
@@ -4368,7 +4368,7 @@ return SCPE_OK;                                         /* return success status
    newline to the output before returning.
 */
 
-static t_stat show_cage (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_cage (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 const char *cname, *dname;
 uint32 sc, last_sc;
@@ -4418,7 +4418,7 @@ return SCPE_OK;                                         /* return success status
    newline to the output before returning.
 */
 
-static t_stat show_exec (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_exec (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 uint32 radix;
 
@@ -4458,7 +4458,7 @@ return SCPE_OK;                                         /* report the success of
    is not idling.
 */
 
-static t_stat show_speed (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat show_speed (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "Simulation speed = %ux\n", cpu_speed);    /* display the current CPU speed */
 return SCPE_OK;                                         /*   and report success */

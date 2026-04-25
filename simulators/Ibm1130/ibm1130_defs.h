@@ -277,9 +277,9 @@ long   stuff_cmd (char *cmd);
 t_bool stuff_and_wait (char *cmd, int timeout, int delay);
 void   update_gui (t_bool force);
 void   sim_init (void);
-t_stat register_cmd (const char *name, t_stat (*action)(int32 flag, CONST char *ptr), int arg, const char *help);
-t_stat basic_attach (UNIT *uptr, CONST char *cptr);
-CONST char * quotefix (CONST char *cptr, char * buf);
+t_stat register_cmd (const char *name, t_stat (*action)(int32 flag, const char *ptr), int arg, const char *help);
+t_stat basic_attach (UNIT *uptr, const char *cptr);
+const char * quotefix (const char *cptr, char * buf);
 
 /* GUI interface routines */
 t_bool keyboard_is_busy (void);

@@ -130,7 +130,7 @@ static uint16 instInter[] = {
   for (j = 0; (regname[j] != NULL) && (strcmp(regname[j], gbuf) != 0); j++); \
   if (regname[j] == NULL) return SCPE_ARG
 
-t_stat parse_sym(CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
   int32 i, j, l, rdx;
   t_bool neg;

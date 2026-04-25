@@ -71,7 +71,7 @@ extern uint32 int_req[INTSZ], int_enb[INTSZ];
 uint32 lpt (uint32 dev, uint32 op, uint32 dat);
 t_stat lpt_svc (UNIT *uptr);
 t_stat lpt_reset (DEVICE *dptr);
-t_stat lpt_attach (UNIT *uptr, CONST char *cptr);
+t_stat lpt_attach (UNIT *uptr, const char *cptr);
 t_stat lpt_bufout (UNIT *uptr);
 int32 lpt_vfu (UNIT *uptr, int32 ch);
 int32 lpt_spc (UNIT *uptr, int32 cnt);
@@ -287,7 +287,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat lpt_attach (UNIT *uptr, CONST char *cptr)
+t_stat lpt_attach (UNIT *uptr, const char *cptr)
 {
 lpt_vfup = 0;                                           /* top of form */
 sim_switches |= SWMASK ('A');                           /* position to EOF */
@@ -296,7 +296,7 @@ return attach_unit (uptr, cptr);
 
 /* Carriage control load routine */
 
-t_stat lp_load (FILE *fileref, CONST char *cptr, CONST char *fnam)
+t_stat lp_load (FILE *fileref, const char *cptr, const char *fnam)
 {
 int32 col, ptr, mask, vfubuf[VFU_LNT];
 uint32 rpt;

@@ -45,14 +45,14 @@
 uint32              cdp_cmd(UNIT *, uint16, uint16);
 t_stat              cdp_srv(UNIT *);
 t_stat              cdp_reset(DEVICE *);
-t_stat              cdp_attach(UNIT *, CONST char *);
+t_stat              cdp_attach(UNIT *, const char *);
 t_stat              cdp_detach(UNIT *);
 t_stat              cdp_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 const char         *cdp_description(DEVICE *dptr);
-t_stat              cdp_set_wiring (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat              cdp_show_wiring (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat              cdp_set_echo (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat              cdp_show_echo (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat              cdp_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat              cdp_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat              cdp_set_echo (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat              cdp_show_echo (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 UNIT                cdp_unit[4] = {
     {UDATA(cdp_srv, UNIT_CDP, 0), 600},      // unit 0 is the printing mechanism of 407
@@ -1428,7 +1428,7 @@ cdp_srv(UNIT *uptr) {
 
 
 /* Set card read/punch control panel wiring */
-t_stat cdp_set_wiring (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cdp_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int f;
 
@@ -1444,7 +1444,7 @@ t_stat cdp_set_wiring (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 /* Show card read/punch control panel wiring */
-t_stat cdp_show_wiring (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cdp_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int f;
 
@@ -1459,7 +1459,7 @@ t_stat cdp_show_wiring (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 
 /* Set card read/punch echo to console */
-t_stat cdp_set_echo (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cdp_set_echo (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int                 u = (uptr - cdp_unit);
     t_stat              r;
@@ -1496,7 +1496,7 @@ t_stat cdp_set_echo (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 /* Show card read/punch control panel wiring */
-t_stat cdp_show_echo (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cdp_show_echo (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     switch(val) {
         case 0:
@@ -1510,7 +1510,7 @@ t_stat cdp_show_echo (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 
 t_stat
-cdp_attach(UNIT * uptr, CONST char *file)
+cdp_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
 

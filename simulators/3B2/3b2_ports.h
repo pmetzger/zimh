@@ -215,14 +215,14 @@ typedef struct {
 } PORTS_OPTIONS;
 
 t_stat ports_reset(DEVICE *dptr);
-t_stat ports_setnl(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat ports_setnl(UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat ports_rcv_svc(UNIT *uptr);
 t_stat ports_xmt_svc(UNIT *uptr);
 t_stat ports_cio_svc(UNIT *uptr);
-t_stat ports_attach(UNIT *uptr, CONST char *cptr);
+t_stat ports_attach(UNIT *uptr, const char *cptr);
 t_stat ports_detach(UNIT *uptr);
 t_stat lpt_reset (DEVICE *dptr);
-t_stat lpt_attach (UNIT *uptr, CONST char *ptr);
+t_stat lpt_attach (UNIT *uptr, const char *ptr);
 t_stat lpt_detach (UNIT *uptr);
 t_stat lpt_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *lpt_description (DEVICE *dptr);

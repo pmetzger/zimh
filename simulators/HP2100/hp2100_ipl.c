@@ -115,23 +115,19 @@
 
    Implementation notes:
 
-    1. SIMH and the HP2100 simulator define the CONST and INTERFACE macros,
-       respectively.  Including "windows.h" here redefines these two symbols, so
-       we save and then restore their simulator definitions when including the
-       Windows header file.
+    1. The HP2100 simulator defines the INTERFACE macro.  Including "windows.h"
+       here redefines this symbol, so we save and then restore the simulator
+       definition when including the Windows header file.
 */
 
 #if defined (_WIN32)
 
-#pragma push_macro("CONST")
 #pragma push_macro("INTERFACE")
 
-#undef CONST
 #undef INTERFACE
 
 #include <windows.h>
 
-#pragma pop_macro("CONST")
 #pragma pop_macro("INTERFACE")
 
 
@@ -398,13 +394,13 @@ static INTERFACE ipl_interface;
 
 /* IPL local SCP support routines */
 
-static t_stat ipl_set_diag (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat ipl_set_sync (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat ipl_set_diag (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat ipl_set_sync (UNIT *uptr, int32 value, const char *cptr, void *desc);
 
 static t_stat ipl_reset  (DEVICE *dptr);
 static t_stat ipl_boot   (int32 unitno, DEVICE *dptr);
 
-static t_stat ipl_attach (UNIT *uptr, CONST char *cptr);
+static t_stat ipl_attach (UNIT *uptr, const char *cptr);
 static t_stat ipl_detach (UNIT *uptr);
 
 
@@ -958,12 +954,12 @@ return SCPE_OK;
        POSIX systems.
 */
 
-static t_stat ipl_attach (UNIT *uptr, CONST char *cptr)
+static t_stat ipl_attach (UNIT *uptr, const char *cptr)
 {
 t_stat       status;
 int32        id_number;
 char         object_name [PATH_MAX];
-CONST        char *zptr;
+const        char *zptr;
 char         *tptr;
 IO_STATE_PTR isp;
 UNIT         *optr;
@@ -1172,7 +1168,7 @@ else                                                    /* otherwise */
    first.
 */
 
-static t_stat ipl_set_diag (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat ipl_set_diag (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if (value) {                                            /* if this is an entry into diagnostic mode */
     ipl_detach (uptr);                                  /*   then detach it first */
@@ -1250,7 +1246,7 @@ return SCPE_OK;
        if it times out while waiting.
 */
 
-static t_stat ipl_set_sync (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat ipl_set_sync (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 const uint32 wait_time = 1000;                          /* the wait time in milliseconds */
 t_bool signaled;

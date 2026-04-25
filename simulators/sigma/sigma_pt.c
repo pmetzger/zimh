@@ -65,7 +65,7 @@ uint32 pt_tdv_status (void);
 t_stat pt_chan_err (uint32 st);
 t_stat pt_svc (UNIT *uptr);
 t_stat pt_reset (DEVICE *dptr);
-t_stat pt_attach (UNIT *uptr, CONST char *cptr);
+t_stat pt_attach (UNIT *uptr, const char *cptr);
 
 /* PT data structures
 
@@ -292,7 +292,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat pt_attach (UNIT *uptr, CONST char *cptr)
+t_stat pt_attach (UNIT *uptr, const char *cptr)
 {
 t_stat st;
 

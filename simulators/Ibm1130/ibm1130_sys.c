@@ -205,7 +205,7 @@ t_stat my_save (FILE *fileref, const char *cptr, const char *fnam)
     return SCPE_OK;
 }
 
-t_stat sim_load (FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
     if (flag)
         return my_save(fileref, cptr, fnam);
@@ -455,7 +455,7 @@ t_stat get_spec (char *cptr, t_addr addr, int32 n1, int32 *sptr, t_value *dptr,
             <= 0  -number of extra words
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
     return SCPE_ARG;
 }

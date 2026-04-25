@@ -35,13 +35,13 @@
 #define VERBOSE_MSG (1 << 2)
 
 /* The following routines are based on work from Howard M. Harte */
-static t_stat set_geom(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat show_geom(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat set_format(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat show_format(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat set_geom(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat show_geom(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat set_format(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat show_format(FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 static t_stat hdsk_reset(DEVICE *dptr);
-static t_stat hdsk_attach(UNIT *uptr, CONST char *cptr);
+static t_stat hdsk_attach(UNIT *uptr, const char *cptr);
 static t_stat hdsk_detach(UNIT *uptr);
 static uint32 is_imd(const UNIT *uptr);
 static void assignFormat(UNIT *uptr);
@@ -78,8 +78,8 @@ extern void PutBYTEWrapper(const uint32 Addr, const uint32 Value);
 extern uint8 GetBYTEWrapper(const uint32 Addr);
 extern t_stat install_bootrom(const int32 bootrom[], const int32 size, const int32 addr, const int32 makeROM);
 extern int32 bootrom_dsk[];
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 extern int32 find_unit_index(UNIT *uptr);
@@ -529,7 +529,7 @@ static void verifyDiskInfo(const DISK_INFO *info, const char unitChar) {
 }
 
 /* Attach routine */
-static t_stat hdsk_attach(UNIT *uptr, CONST char *cptr) {
+static t_stat hdsk_attach(UNIT *uptr, const char *cptr) {
     int32 thisUnitIndex;
     char unitChar;
     const t_stat r = attach_unit(uptr, cptr);   /* attach unit  */
@@ -644,7 +644,7 @@ static t_stat hdsk_detach(UNIT *uptr) {
 }
 
 /* Set disk geometry routine */
-static t_stat set_geom(UNIT *uptr, int32 val, CONST char *cptr, void *desc) {
+static t_stat set_geom(UNIT *uptr, int32 val, const char *cptr, void *desc) {
     uint32 numberOfTracks, numberOfSectors, sectorSize;
     int result, n;
 
@@ -670,7 +670,7 @@ static t_stat set_geom(UNIT *uptr, int32 val, CONST char *cptr, void *desc) {
 }
 
 /* Show disk geometry routine */
-static t_stat show_geom(FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
+static t_stat show_geom(FILE *st, UNIT *uptr, int32 val, const void *desc) {
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "T:%d/N:%d/S:%d", uptr -> HDSK_NUMBER_OF_TRACKS,
@@ -681,7 +681,7 @@ static t_stat show_geom(FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
 #define QUOTE1(text) #text
 #define QUOTE2(text) QUOTE1(text)
 /* Set disk format routine */
-static t_stat set_format(UNIT *uptr, int32 val, CONST char *cptr, void *desc) {
+static t_stat set_format(UNIT *uptr, int32 val, const char *cptr, void *desc) {
     char fmtname[DPB_NAME_LENGTH + 1];
     int32 i;
 
@@ -717,7 +717,7 @@ static t_stat set_format(UNIT *uptr, int32 val, CONST char *cptr, void *desc) {
 }
 
 /* Show disk format routine */
-static t_stat show_format(FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
+static t_stat show_format(FILE *st, UNIT *uptr, int32 val, const void *desc) {
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "%s", dpb[uptr -> HDSK_FORMAT_TYPE].name);

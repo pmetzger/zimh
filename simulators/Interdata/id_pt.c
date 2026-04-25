@@ -338,7 +338,7 @@ static uint8 load_rom[] = {
     0x22, 0x03                                          /*      BS .-6 */
     };
 
-t_stat pt_dump (FILE *of, CONST char *cptr, CONST char *fnam)
+t_stat pt_dump (FILE *of, const char *cptr, const char *fnam)
 {
 uint32 i, lo, hi, cs;
 const char *tptr;

@@ -481,13 +481,13 @@ static CNTLR_VARS icd_cntlr [DA_UNITS] =        /* ICD controllers: */
 
 static t_stat da_reset   (DEVICE *dptr);
 static t_stat da_boot    (int32  unitno, DEVICE *dptr);
-static t_stat da_attach  (UNIT   *uptr, CONST char *cptr);
+static t_stat da_attach  (UNIT   *uptr, const char *cptr);
 static t_stat da_detach  (UNIT   *uptr);
 
 /* Amigo disc local SCP routines */
 
 static t_stat da_service     (UNIT *uptr);
-static t_stat da_load_unload (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat da_load_unload (UNIT *uptr, int32 value, const char *cptr, void *desc);
 
 /* Amigo disc local utility routines */
 
@@ -1110,7 +1110,7 @@ return status;
        offset from the start of the file to the last byte and seek there.
 */
 
-static t_stat da_attach (UNIT *uptr, CONST char *cptr)
+static t_stat da_attach (UNIT *uptr, const char *cptr)
 {
 t_stat      result;
 t_addr      offset;
@@ -1350,7 +1350,7 @@ else                                                    /* otherwise */
        we match the diagnostic expectation below.
 */
 
-static t_stat da_load_unload (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat da_load_unload (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 const int32 unit = uptr - da_unit;                          /* calculate the unit number */
 const t_bool load = (value != UNIT_UNLOAD);                 /* true if the heads are loading */

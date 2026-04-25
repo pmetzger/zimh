@@ -42,7 +42,7 @@ static TMXR t2741_tmxr = { 1, 0, 0, &t2741_ldsc };      /* line mux for telnet a
 
 static t_stat t2741_svc      (UNIT *uptr);
 static t_stat t2741_reset    (DEVICE *dptr);
-static t_stat t2741_attach   (UNIT *uptr, CONST char *cptr);
+static t_stat t2741_attach   (UNIT *uptr, const char *cptr);
 static t_stat t2741_detach   (UNIT *uptr);
 static uint16 ascii_to_t2741 (int ascii);
 static const char * t2741_to_ascii (uint16 code);
@@ -210,7 +210,7 @@ static t_stat t2741_svc (UNIT *uptr)
     return SCPE_OK;
 }
 
-static t_stat t2741_attach (UNIT *uptr, CONST char *cptr)
+static t_stat t2741_attach (UNIT *uptr, const char *cptr)
 {
     int rval;
 

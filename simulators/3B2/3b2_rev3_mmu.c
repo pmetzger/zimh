@@ -1071,7 +1071,7 @@ void mmu_disable(void)
     mmu_state.enabled = FALSE;
 }
 
-CONST char *mmu_description(DEVICE *dptr)
+const char *mmu_description(DEVICE *dptr)
 {
     return "WE32201 MMU";
 }
@@ -1079,7 +1079,7 @@ CONST char *mmu_description(DEVICE *dptr)
 /*
  * Display the segment descriptor cache
  */
-t_stat mmu_show_sdc(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat mmu_show_sdc(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     uint32 sd_lo, sd_hi, base, pages, i;
 
@@ -1108,7 +1108,7 @@ t_stat mmu_show_sdc(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
     return SCPE_OK;
 }
 
-t_stat mmu_show_pdc(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat mmu_show_pdc(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     uint32 i, pdc_hi, pdc_lo;
 
@@ -1137,7 +1137,7 @@ t_stat mmu_show_pdc(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 /*
  * Display the segment table for a section.
  */
-t_stat mmu_show_sdt(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat mmu_show_sdt(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     uint32 addr, len, sd_lo, sd_hi, base, pages, i;
     uint8 sec;

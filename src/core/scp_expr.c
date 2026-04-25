@@ -12,7 +12,7 @@
 #include "scp.h"
 
 extern DEVICE sim_scp_dev;
-REG *find_reg_glob(CONST char *ptr, CONST char **optr, DEVICE **gdptr);
+REG *find_reg_glob(const char *ptr, const char **optr, DEVICE **gdptr);
 
 typedef t_svalue (*Operator_Function)(t_svalue, t_svalue);
 typedef t_svalue (*Operator_String_Function)(const char *, const char *);
@@ -398,7 +398,7 @@ static const char *get_glyph_exp(const char *cptr, char *buf, Operator **oper,
         }
     } else {
         if ((*cptr == '"') || (*cptr == '\'')) {
-            cptr = (CONST char *)get_glyph_gen(
+            cptr = (const char *)get_glyph_gen(
                 cptr, buf, 0, (sim_switches & SWMASK('I')), TRUE, '\\');
         } else {
             Operator *op;
@@ -519,7 +519,7 @@ static const char *sim_into_postfix(Stack *stack1, const char *cptr,
 static t_bool _value_of(const char *data, t_svalue *svalue, char *string,
                         size_t string_size)
 {
-    CONST char *gptr;
+    const char *gptr;
     size_t data_size = strlen(data);
 
     if (sim_isalpha(*data) || (*data == '_')) {

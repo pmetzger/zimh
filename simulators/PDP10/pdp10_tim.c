@@ -452,7 +452,7 @@ return SCPE_OK;
 
 /* Set timer parameters from CPU model */
 
-t_stat tim_set_mod (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tim_set_mod (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (val & (UNIT_T20|UNIT_KLAD)) {
     clk_tps = TIM_TPS_T20;

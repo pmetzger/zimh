@@ -219,7 +219,7 @@ extern  int32 tmxr_poll;
 extern  uint32  readfull(CHANP *chp, uint32 maddr, uint32 *word);
 extern  uint32  cont_chan(uint16 chsa);
 
-static CONST ETH_MAC broadcast_ethaddr = {0xff,0xff,0xff,0xff,0xff,0xff};
+static const ETH_MAC broadcast_ethaddr = {0xff,0xff,0xff,0xff,0xff,0xff};
 
 /* channel program information */
 CHANP       ec_chp[NUM_UNITS_ETHER] = {0};
@@ -236,13 +236,13 @@ t_stat      ec_reset (DEVICE *dptr);
 void        ec_ini(UNIT *, t_bool);
 t_stat      ec_rsctrl(UNIT *uptr);
 t_stat      ec_rschnlio(UNIT *uptr);
-t_stat      ec_show_mac (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat      ec_set_mac (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat      ec_show_mode (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat      ec_set_mode (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat      ec_attach (UNIT * uptr, CONST char * cptr);
+t_stat      ec_show_mac (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat      ec_set_mac (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat      ec_show_mode (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat      ec_set_mode (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat      ec_attach (UNIT * uptr, const char * cptr);
 t_stat      ec_detach (UNIT * uptr);
-t_stat      ec_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
+t_stat      ec_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char  *ec_description (DEVICE *dptr);
 
 #define ec_master_uptr (&ec_unit[0])    /* Unit doing receive digestion */
@@ -1776,13 +1776,13 @@ void ec_packet_debug(struct ec_device *ec, const char *action,
     }
 }
 
-t_stat ec_show_mode (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat ec_show_mode (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
     fprintf(st, "MODE=%d", GET_MODE(uptr->flags));
     return SCPE_OK;
 }
 
-t_stat ec_set_mode (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat ec_set_mode (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
     t_stat r;
     int    newmode;
@@ -1803,7 +1803,7 @@ t_stat ec_set_mode (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
 }
 
 
-t_stat ec_show_mac (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat ec_show_mac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
     char buffer[20];
     eth_mac_fmt(ec_data.mac, buffer);
@@ -1811,7 +1811,7 @@ t_stat ec_show_mac (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
     return SCPE_OK;
 }
 
-t_stat ec_set_mac (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat ec_set_mac (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
     t_stat status;
 
@@ -1856,7 +1856,7 @@ t_stat ec_reset (DEVICE *dptr)
 }
 
 /* attach device: */
-t_stat ec_attach(UNIT* uptr, CONST char* cptr)
+t_stat ec_attach(UNIT* uptr, const char* cptr)
 {
     t_stat status;
     char* tptr;

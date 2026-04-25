@@ -174,11 +174,11 @@ t_stat        dp_svc(UNIT *);
 t_stat        dp_boot(int32, DEVICE *);
 void          dp_ini(UNIT *, t_bool);
 t_stat        dp_reset(DEVICE *);
-t_stat        dp_attach(UNIT *, CONST char *);
+t_stat        dp_attach(UNIT *, const char *);
 t_stat        dp_detach(UNIT *);
-t_stat        dp_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat        dp_set_hdr(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat        dp_show_hdr(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat        dp_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat        dp_set_hdr(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat        dp_show_hdr(FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat        dp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                  const char *cptr);
 const char    *dp_description (DEVICE *dptr);
@@ -869,7 +869,7 @@ t_stat dp_svc (UNIT *uptr)
 
 
 t_stat
-dp_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+dp_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int         i;
     if (uptr == NULL) return SCPE_IERR;
@@ -885,7 +885,7 @@ dp_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-dp_set_hdr(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+dp_set_hdr(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE *dptr;
     dptr = find_dev_from_unit (uptr);
@@ -896,7 +896,7 @@ dp_set_hdr(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat dp_show_hdr (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dp_show_hdr (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    DEVICE *dptr;
 
@@ -952,7 +952,7 @@ dp_boot(int32 unit_num, DEVICE * dptr)
 
 /* Device attach */
 
-t_stat dp_attach (UNIT *uptr, CONST char *cptr)
+t_stat dp_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
     DEVICE *dptr;

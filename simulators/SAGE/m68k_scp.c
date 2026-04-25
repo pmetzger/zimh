@@ -31,11 +31,11 @@
 #include <ctype.h>
 
 static t_bool symtrace = TRUE;
-static t_stat hdump_cmd(int32 arg, CONST char* buf);
-static t_stat symset_cmd(int32 arg, CONST char* buf);
-static t_stat symclr_cmd(int32 arg, CONST char* buf);
-static t_stat symlist_cmd(int32 arg, CONST char* buf);
-static t_stat symtrace_cmd(int32 arg, CONST char* buf);
+static t_stat hdump_cmd(int32 arg, const char* buf);
+static t_stat symset_cmd(int32 arg, const char* buf);
+static t_stat symclr_cmd(int32 arg, const char* buf);
+static t_stat symlist_cmd(int32 arg, const char* buf);
+static t_stat symtrace_cmd(int32 arg, const char* buf);
 
 static CTAB m68k_sim_cmds[] = {
         {"STEP", &run_cmd, RU_STEP,
@@ -174,7 +174,7 @@ static t_bool sym_delete(const char* name)
     return FALSE;
 }
 
-static t_stat symset_cmd(int32 arg, CONST char* buf)
+static t_stat symset_cmd(int32 arg, const char* buf)
 {
     const char *name,*vstr;
     char gbuf[2*CBUFSIZE];
@@ -190,7 +190,7 @@ static t_stat symset_cmd(int32 arg, CONST char* buf)
     return SCPE_OK;
 }
 
-static t_stat symclr_cmd(int32 arg, CONST char* buf)
+static t_stat symclr_cmd(int32 arg, const char* buf)
 {
     char* token;
     if (buf[0] == '-' && buf[1]=='a') {
@@ -207,7 +207,7 @@ static t_stat symclr_cmd(int32 arg, CONST char* buf)
     }
 }
 
-static t_stat symlist_cmd(int32 arg, CONST char* buf)
+static t_stat symlist_cmd(int32 arg, const char* buf)
 {
     int i;
     SYMHASH* n;
@@ -237,7 +237,7 @@ static t_stat symlist_cmd(int32 arg, CONST char* buf)
     return SCPE_OK;
 }
 
-static t_stat symtrace_cmd(int32 arg, CONST char* buf)
+static t_stat symtrace_cmd(int32 arg, const char* buf)
 {
     if (!*buf)
         symtrace = arg ? TRUE : FALSE;
@@ -257,7 +257,7 @@ static void putascii(uint32* buf)
     putchar('|');
 }
 
-static t_stat hdump_cmd(int32 arg, CONST char* buf)
+static t_stat hdump_cmd(int32 arg, const char* buf)
 {
     int i;
     t_addr low, high, base, top;

@@ -153,18 +153,6 @@
 #define FALSE           0
 #endif
 
-/* SCP API shim.
-
-   The SCP API for version 4.0 introduces a number of "pointer-to-const"
-   parameter qualifiers that were not present in the 3.x versions.  To maintain
-   compatibility with the earlier versions, the new qualifiers are expressed as
-   "CONST" rather than "const".  This allows macro removal of the qualifiers
-   when compiling for SIMH 3.x.
-*/
-#ifndef CONST
-#define CONST const
-#endif
-
 /* Prefer the C23 fallthrough attribute when available. This compatibility
    macro can be removed once all supported compilers accept [[fallthrough]]. */
 #ifndef FALLTHROUGH
@@ -447,14 +435,14 @@ struct DEVICE {
     t_stat              (*reset)(DEVICE *dp);           /* reset routine */
     t_stat              (*boot)(int32 u, DEVICE *dp);
                                                         /* boot routine */
-    t_stat              (*attach)(UNIT *up, CONST char *cp);
+    t_stat              (*attach)(UNIT *up, const char *cp);
                                                         /* attach routine */
     t_stat              (*detach)(UNIT *up);            /* detach routine */
     void                *ctxt;                          /* context */
     uint32              flags;                          /* flags */
     uint32              dctrl;                          /* debug control */
     DEBTAB              *debflags;                      /* debug flags */
-    t_stat              (*msize)(UNIT *up, int32 v, CONST char *cp, void *dp);
+    t_stat              (*msize)(UNIT *up, int32 v, const char *cp, void *dp);
                                                         /* mem size routine */
     char                *lname;                         /* logical name */
     t_stat              (*help)(FILE *st, DEVICE *dptr,
@@ -632,7 +620,7 @@ struct BITFIELD {
 /* Register data structure */
 
 struct REG {
-    CONST char          *name;                          /* name */
+    const char          *name;                          /* name */
     void                *loc;                           /* location */
     uint32              radix;                          /* radix */
     uint32              width;                          /* width */
@@ -671,7 +659,7 @@ struct REG {
 
 struct CTAB {
     const char          *name;                          /* name */
-    t_stat              (*action)(int32 flag, CONST char *cptr);
+    t_stat              (*action)(int32 flag, const char *cptr);
                                                         /* action routine */
     int32               arg;                            /* argument */
     const char          *help;                          /* help string/structured locator */
@@ -683,7 +671,7 @@ struct CTAB {
 struct C1TAB {
     const char          *name;                          /* name */
     t_stat              (*action)(DEVICE *dptr, UNIT *uptr,
-                            int32 flag, CONST char *cptr);/* action routine */
+                            int32 flag, const char *cptr);/* action routine */
     int32               arg;                            /* argument */
     const char          *help;                          /* help string */
     };
@@ -691,7 +679,7 @@ struct C1TAB {
 struct SHTAB {
     const char          *name;                          /* name */
     t_stat              (*action)(FILE *st, DEVICE *dptr,
-                            UNIT *uptr, int32 flag, CONST char *cptr);
+                            UNIT *uptr, int32 flag, const char *cptr);
     int32               arg;                            /* argument */
     const char          *help;                          /* help string */
     };
@@ -703,9 +691,9 @@ struct MTAB {
     uint32              match;                          /* match */
     const char          *pstring;                       /* print string */
     const char          *mstring;                       /* match string */
-    t_stat              (*valid)(UNIT *up, int32 v, CONST char *cp, void *dp);
+    t_stat              (*valid)(UNIT *up, int32 v, const char *cp, void *dp);
                                                         /* validation routine */
-    t_stat              (*disp)(FILE *st, UNIT *up, int32 v, CONST void *dp);
+    t_stat              (*disp)(FILE *st, UNIT *up, int32 v, const void *dp);
                                                         /* display routine */
     void                *desc;                          /* value descriptor */
                                                         /* pointer to something needed by */

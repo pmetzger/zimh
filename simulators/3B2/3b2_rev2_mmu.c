@@ -816,7 +816,7 @@ void mmu_disable(void)
     mmu_state.enabled = FALSE;
 }
 
-CONST char *mmu_description(DEVICE *dptr)
+const char *mmu_description(DEVICE *dptr)
 {
     return "WE32101";
 }

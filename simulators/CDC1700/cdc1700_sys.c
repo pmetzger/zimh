@@ -43,7 +43,7 @@ extern DEVICE cpu_dev, dca_dev, dcb_dev, dcc_dev,
   cd_dev, drm_dev, rtc_dev;
 extern UNIT cpu_unit;
 
-t_stat autoload(int32, CONST char *);
+t_stat autoload(int32, const char *);
 t_stat CDautoload(void);
 t_stat DPautoload(void);
 t_stat DRMautoload(void);
@@ -178,7 +178,7 @@ static t_bool checkDuplicate(DEVICE *dptr, uint8 equipment)
  * Common routine to change the equipment address of a peripheral. Some
  * devices (e.g. TT, PTR etc) cannot have their equipment address changed.
  */
-t_stat set_equipment(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_equipment(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   DEVICE *dptr;
   IO_DEVICE *iod;
@@ -222,7 +222,7 @@ t_stat checkReset(DEVICE *dptr, uint8 equipment)
   return SCPE_OK;
 }
 
-t_stat sim_load(FILE *fileref, CONST char *cptr, CONST char *fname, int flag)
+t_stat sim_load(FILE *fileref, const char *cptr, const char *fname, int flag)
 {
   t_addr lo, hi;
 
@@ -322,7 +322,7 @@ t_stat fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 /*
  * Autoload top-level command routine
  */
-t_stat autoload(int32 flag, CONST char *ptr)
+t_stat autoload(int32 flag, const char *ptr)
 {
   char gbuf[CBUFSIZE];
   DEVICE *dptr;

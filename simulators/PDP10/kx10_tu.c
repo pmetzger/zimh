@@ -169,7 +169,7 @@ t_stat        tu_srv(UNIT *);
 t_stat        tu_boot(int32, DEVICE *);
 void          tu_ini(UNIT *, t_bool);
 t_stat        tu_reset(DEVICE *);
-t_stat        tu_attach(UNIT *, CONST char *);
+t_stat        tu_attach(UNIT *, const char *);
 t_stat        tu_detach(UNIT *);
 t_stat        tu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                     const char *cptr);
@@ -957,7 +957,7 @@ tu_boot(int32 unit_num, DEVICE * dptr)
 
 
 t_stat
-tu_attach(UNIT * uptr, CONST char *file)
+tu_attach(UNIT * uptr, const char *file)
 {   t_stat   r;
     int          ctlr = GET_CNTRL_RH(uptr->flags);
     struct rh_if *rhc = &tu_rh[ctlr];

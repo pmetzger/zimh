@@ -417,7 +417,7 @@ void (*sim_vm_post) (t_bool from_scp) = NULL;
 CTAB *sim_vm_cmd = NULL;
 void (*sim_vm_sprint_addr) (char *buf, DEVICE *dptr, t_addr addr) = NULL;
 void (*sim_vm_fprint_addr) (FILE *st, DEVICE *dptr, t_addr addr) = NULL;
-t_addr (*sim_vm_parse_addr) (DEVICE *dptr, CONST char *cptr, CONST char **tptr) = NULL;
+t_addr (*sim_vm_parse_addr) (DEVICE *dptr, const char *cptr, const char **tptr) = NULL;
 t_value (*sim_vm_pc_value) (void) = NULL;
 t_bool (*sim_vm_is_subroutine_call) (t_addr **ret_addrs) = NULL;
 void (*sim_vm_reg_update) (REG *rptr, uint32 idx, t_value prev_val, t_value new_val) = NULL;
@@ -431,34 +431,34 @@ const char **sim_clock_precalibrate_commands = NULL;
 
 /* Set and show command processors */
 
-t_stat set_dev_radix (DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat set_dev_enbdis (DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat set_dev_debug (DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat set_unit_enbdis (DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat set_unit_append (DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
+t_stat set_dev_radix (DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat set_dev_enbdis (DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat set_dev_debug (DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat set_unit_enbdis (DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat set_unit_append (DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 t_stat ssh_break (FILE *st, const char *cptr, int32 flg);
-t_stat show_cmd_fi (FILE *ofile, int32 flag, CONST char *cptr);
-t_stat show_config (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_queue (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_time (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_mod_names (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_show_commands (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_log_names (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_dev_radix (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_dev_debug (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_dev_logicals (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_dev_modifiers (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_dev_show_commands (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_version (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_default (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_break (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_on (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_do (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat show_runlimit (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
+t_stat show_cmd_fi (FILE *ofile, int32 flag, const char *cptr);
+t_stat show_config (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_queue (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_time (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_mod_names (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_show_commands (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_log_names (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_dev_radix (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_dev_debug (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_dev_logicals (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_dev_modifiers (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_dev_show_commands (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_version (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_default (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_break (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_on (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_do (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat show_runlimit (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 t_stat show_device (FILE *st, DEVICE *dptr, int32 flag);
 t_stat show_unit (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag);
 t_stat show_all_mods (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flg, int32 *toks);
-t_stat show_one_mod (FILE *st, DEVICE *dptr, UNIT *uptr, MTAB *mptr, CONST char *cptr, int32 flag);
+t_stat show_one_mod (FILE *st, DEVICE *dptr, UNIT *uptr, MTAB *mptr, const char *cptr, int32 flag);
 t_stat sim_save (FILE *sfile);
 t_stat sim_rest (FILE *rfile);
 
@@ -466,15 +466,15 @@ FILE *stdnul;
 
 /* Command support routines */
 
-SCHTAB *get_rsearch (CONST char *cptr, int32 radix, SCHTAB *schptr);
-SCHTAB *get_asearch (CONST char *cptr, int32 radix, SCHTAB *schptr);
+SCHTAB *get_rsearch (const char *cptr, int32 radix, SCHTAB *schptr);
+SCHTAB *get_asearch (const char *cptr, int32 radix, SCHTAB *schptr);
 int32 test_search (t_value *val, SCHTAB *schptr);
 void put_rval_pcchk (REG *rptr, uint32 idx, t_value val, t_bool pc_chk);
 void put_rval (REG *rptr, uint32 idx, t_value val);
 void fprint_stopped (FILE *st, t_stat r);
 void fprint_capac (FILE *st, DEVICE *dptr, UNIT *uptr);
 void fprint_sep (FILE *st, int32 *tokens);
-REG *find_reg_glob_reason (CONST char *cptr, CONST char **optr, DEVICE **gdptr, t_stat *stat);
+REG *find_reg_glob_reason (const char *cptr, const char **optr, DEVICE **gdptr, t_stat *stat);
 
 /* Forward references */
 
@@ -483,11 +483,11 @@ t_stat scp_detach_unit (DEVICE *dptr, UNIT *uptr);
 t_stat detach_all (int32 start_device, t_bool shutdown);
 t_stat assign_device (DEVICE *dptr, const char *cptr);
 t_stat deassign_device (DEVICE *dptr);
-t_stat ssh_break_one (FILE *st, int32 flg, t_addr lo, int32 cnt, CONST char *aptr);
-t_stat exdep_reg_loop (FILE *ofile, SCHTAB *schptr, int32 flag, CONST char *cptr,
+t_stat ssh_break_one (FILE *st, int32 flg, t_addr lo, int32 cnt, const char *aptr);
+t_stat exdep_reg_loop (FILE *ofile, SCHTAB *schptr, int32 flag, const char *cptr,
     REG *lowr, REG *highr, uint32 lows, uint32 highs);
 t_stat ex_reg (FILE *ofile, t_value val, int32 flag, REG *rptr, uint32 idx);
-t_stat dep_reg (int32 flag, CONST char *cptr, REG *rptr, uint32 idx);
+t_stat dep_reg (int32 flag, const char *cptr, REG *rptr, uint32 idx);
 t_stat exdep_addr_loop (FILE *ofile, SCHTAB *schptr, int32 flag, const char *cptr,
     t_addr low, t_addr high, DEVICE *dptr, UNIT *uptr);
 t_stat ex_addr (FILE *ofile, int32 flag, t_addr addr, DEVICE *dptr, UNIT *uptr, int32 dfltinc);
@@ -498,17 +498,17 @@ t_stat step_svc (UNIT *ptr);
 t_stat runlimit_svc (UNIT *ptr);
 t_stat flush_svc (UNIT *ptr);
 t_stat shift_args (char *do_arg[], size_t arg_count);
-t_stat set_on (int32 flag, CONST char *cptr);
-t_stat set_verify (int32 flag, CONST char *cptr);
-t_stat set_message (int32 flag, CONST char *cptr);
-t_stat set_quiet (int32 flag, CONST char *cptr);
-t_stat set_asynch (int32 flag, CONST char *cptr);
-t_stat sim_show_asynch (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-t_stat do_cmd_label (int32 flag, CONST char *cptr, CONST char *label);
+t_stat set_on (int32 flag, const char *cptr);
+t_stat set_verify (int32 flag, const char *cptr);
+t_stat set_message (int32 flag, const char *cptr);
+t_stat set_quiet (int32 flag, const char *cptr);
+t_stat set_asynch (int32 flag, const char *cptr);
+t_stat sim_show_asynch (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+t_stat do_cmd_label (int32 flag, const char *cptr, const char *label);
 void int_handler (int signal);
-t_stat set_prompt (int32 flag, CONST char *cptr);
-t_stat set_runlimit (int32 flag, CONST char *cptr);
-t_stat sim_set_asynch (int32 flag, CONST char *cptr);
+t_stat set_prompt (int32 flag, const char *cptr);
+t_stat set_runlimit (int32 flag, const char *cptr);
+t_stat sim_set_asynch (int32 flag, const char *cptr);
 static t_stat sim_sanity_check_register_declarations (DEVICE **devices);
 static void fix_writelock_mtab (DEVICE *dptr);
 static t_stat _sim_debug_flush (void);
@@ -2840,7 +2840,7 @@ return sim_exit_status;
 t_stat process_stdin_commands (t_stat stat, char *argv[], t_bool do_called)
 {
 char cbuf[4*CBUFSIZE], gbuf[CBUFSIZE];
-CONST char *cptr = NULL;
+const char *cptr = NULL;
 t_stat stat_nomessage;
 CTAB *cmdp = NULL;
 
@@ -2936,7 +2936,7 @@ return stat;
 
 /* Set prompt routine */
 
-t_stat set_prompt (int32 flag, CONST char *cptr)
+t_stat set_prompt (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE], *gptr;
 
@@ -2986,7 +2986,7 @@ return sim_oline != NULL;
 
 /* Exit command */
 
-t_stat exit_cmd (int32 flag, CONST char *cptr)
+t_stat exit_cmd (int32 flag, const char *cptr)
 {
 t_stat r = SCPE_EXIT;
 
@@ -3014,7 +3014,7 @@ switch (help[0]) {
 return SCPE_OK;
 }
 
-t_stat help_cmd (int32 flag, CONST char *cptr)
+t_stat help_cmd (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE], gbuf2[CBUFSIZE];
 CTAB *cmdp;
@@ -3169,7 +3169,7 @@ return SCPE_OK;
 
 /* Spawn command */
 
-t_stat spawn_cmd (int32 flag, CONST char *cptr)
+t_stat spawn_cmd (int32 flag, const char *cptr)
 {
 t_stat status;
 
@@ -3188,7 +3188,7 @@ return status;
 
 /* Screenshot command */
 
-t_stat screenshot_cmd (int32 flag, CONST char *cptr)
+t_stat screenshot_cmd (int32 flag, const char *cptr)
 {
 if ((cptr == NULL) || (strlen (cptr) == 0))
     return sim_messagef (SCPE_ARG, "Missing screen shot filename\n");
@@ -3197,7 +3197,7 @@ return vid_screenshot (cptr);
 
 /* Echo command */
 
-t_stat echo_cmd (int32 flag, CONST char *cptr)
+t_stat echo_cmd (int32 flag, const char *cptr)
 {
 sim_printf ("%s\n", cptr);
 return SCPE_OK;
@@ -3205,10 +3205,10 @@ return SCPE_OK;
 
 /* EchoF command */
 
-t_stat echof_cmd (int32 flag, CONST char *cptr)
+t_stat echof_cmd (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
-CONST char *tptr;
+const char *tptr;
 TMLN *lp = NULL;
 uint8 dbuf[4*CBUFSIZE];
 uint32 dsize = 0;
@@ -3267,7 +3267,7 @@ return SCPE_OK;
         >1      =   nested "DO" command
 */
 
-t_stat do_cmd (int32 flag, CONST char *fcptr)
+t_stat do_cmd (int32 flag, const char *fcptr)
 {
 return do_cmd_label (flag, fcptr, NULL);
 }
@@ -3280,10 +3280,10 @@ snprintf (cbuf, sizeof (cbuf), "%s%s%s-%d", sim_do_filename[sim_do_depth], sim_d
 return cbuf;
 }
 
-t_stat do_cmd_label (int32 flag, CONST char *fcptr, CONST char *label)
+t_stat do_cmd_label (int32 flag, const char *fcptr, const char *label)
 {
 char cbuf[4*CBUFSIZE], gbuf[CBUFSIZE], abuf[4*CBUFSIZE], quote, *c, *do_arg[11];
-CONST char *cptr;
+const char *cptr;
 FILE *fpin = NULL;
 CTAB *cmdp = NULL;
 int32 echo, nargs, errabort, i;
@@ -3795,13 +3795,13 @@ return 1;
             >=  - greater than or equal
             GEQ - greater than or equal
 */
-static CONST char *_get_string (CONST char *iptr, char *optr, char mchar)
+static const char *_get_string (const char *iptr, char *optr, char mchar)
 {
 const char *ap;
-CONST char *tptr, *gptr;
+const char *tptr, *gptr;
 REG *rptr;
 
-tptr = (CONST char *)get_glyph_gen (iptr, optr, mchar, (sim_switches & SWMASK ('I')), TRUE, '\\');
+tptr = (const char *)get_glyph_gen (iptr, optr, mchar, (sim_switches & SWMASK ('I')), TRUE, '\\');
 if ((*optr != '"') && (*optr != '\'')) {
     ap = getenv (optr);
     if (!ap)
@@ -3817,10 +3817,10 @@ if ((*optr != '"') && (*optr != '\'')) {
 return tptr;
 }
 
-t_stat assert_cmd (int32 flag, CONST char *cptr)
+t_stat assert_cmd (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE], gbuf2[CBUFSIZE];
-CONST char *tptr, *gptr;
+const char *tptr, *gptr;
 REG *rptr;
 uint32 idx = 0;
 t_stat r;
@@ -3830,7 +3830,7 @@ t_bool result;
 t_addr addr = 0;
 t_stat reason;
 
-cptr = (CONST char *)get_sim_opt (CMD_OPT_SW|CMD_OPT_DFT, (CONST char *)cptr, &r);
+cptr = (const char *)get_sim_opt (CMD_OPT_SW|CMD_OPT_DFT, (const char *)cptr, &r);
                                                         /* get sw, default */
 sim_stabr.boolop = sim_staba.boolop = -1;               /* no relational op dflt */
 if (*cptr == 0)                                         /* must be more */
@@ -3849,12 +3849,12 @@ if (flag == 2) {                                        /* ELSE command? */
 tptr = get_glyph (cptr, gbuf, 0);                       /* get token */
 if (!strcmp (gbuf, "NOT")) {                            /* Conditional Inversion? */
     Not = TRUE;                                         /* remember that, and */
-    cptr = (CONST char *)tptr;
+    cptr = (const char *)tptr;
     tptr = get_glyph (cptr, gbuf, 0);                   /* get next token */
     }
 if (!strcmp (gbuf, "EXIST")) {                          /* File Exist Test? */
     Exist = TRUE;                                       /* remember that, and */
-    cptr = (CONST char *)tptr;
+    cptr = (const char *)tptr;
     }
 tptr = _get_string (cptr, gbuf, ' ');                   /* get first string */
 if (Exist || (*gbuf == '"') || (*gbuf == '\'')) {       /* quoted string comparison? */
@@ -4016,7 +4016,7 @@ return SCPE_OK;
 
 /* Sleep command */
 
-t_stat sleep_cmd (int32 flag, CONST char *cptr)
+t_stat sleep_cmd (int32 flag, const char *cptr)
 {
 char *tptr;
 double wait;
@@ -4063,7 +4063,7 @@ return SCPE_OK;
 
 /* Goto command */
 
-t_stat goto_cmd (int32 flag, CONST char *fcptr)
+t_stat goto_cmd (int32 flag, const char *fcptr)
 {
 char cbuf[CBUFSIZE], gbuf[CBUFSIZE], gbuf1[CBUFSIZE];
 const char *cptr;
@@ -4121,7 +4121,7 @@ return sim_messagef (SCPE_ARG, "goto target '%s' not found\n", gbuf1);
 /* and not dispatched here, so if we get here a return has been issued from */
 /* interactive input */
 
-t_stat return_cmd (int32 flag, CONST char *fcptr)
+t_stat return_cmd (int32 flag, const char *fcptr)
 {
 return sim_messagef (SCPE_UNK, "Invalid Command\n"); /* only valid inside of do_cmd */
 }
@@ -4133,7 +4133,7 @@ return sim_messagef (SCPE_UNK, "Invalid Command\n"); /* only valid inside of do_
 /* interactive input (it is not valid interactively since it would have to */
 /* mess with the program's argv which is owned by the C runtime library */
 
-t_stat shift_cmd (int32 flag, CONST char *fcptr)
+t_stat shift_cmd (int32 flag, const char *fcptr)
 {
 return SCPE_UNK;                                        /* only valid inside of do_cmd */
 }
@@ -4144,7 +4144,7 @@ return SCPE_UNK;                                        /* only valid inside of 
 /* and not dispatched here, so if we get here a call has been issued from */
 /* interactive input */
 
-t_stat call_cmd (int32 flag, CONST char *fcptr)
+t_stat call_cmd (int32 flag, const char *fcptr)
 {
 char cbuf[2*CBUFSIZE], gbuf[CBUFSIZE];
 const char *cptr;
@@ -4162,7 +4162,7 @@ return do_cmd_label (flag, cbuf, gbuf);
 
 /* On command */
 
-t_stat on_cmd (int32 flag, CONST char *cptr)
+t_stat on_cmd (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
 t_stat cond;
@@ -4195,7 +4195,7 @@ return SCPE_OK;
 /* noop command */
 /* The noop command (IGNORE, PROCEED) does nothing */
 
-t_stat noop_cmd (int32 flag, CONST char *cptr)
+t_stat noop_cmd (int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))                               /* now eol? */
     return SCPE_2MARG;
@@ -4204,7 +4204,7 @@ return SCPE_OK;                                         /* we're happy doing not
 
 /* Set on/noon routine */
 
-t_stat set_on (int32 flag, CONST char *cptr)
+t_stat set_on (int32 flag, const char *cptr)
 {
 if ((flag) && (cptr) && (*cptr)) {                      /* Set ON with arg */
     char gbuf[CBUFSIZE];
@@ -4240,7 +4240,7 @@ return SCPE_OK;
 
 /* Set verify/noverify routine */
 
-t_stat set_verify (int32 flag, CONST char *cptr)
+t_stat set_verify (int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))                               /* now eol? */
     return SCPE_2MARG;
@@ -4252,7 +4252,7 @@ return SCPE_OK;
 
 /* Set message/nomessage routine */
 
-t_stat set_message (int32 flag, CONST char *cptr)
+t_stat set_message (int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))                               /* now eol? */
     return SCPE_2MARG;
@@ -4264,7 +4264,7 @@ return SCPE_OK;
 
 /* Set quiet/noquiet routine */
 
-t_stat set_quiet (int32 flag, CONST char *cptr)
+t_stat set_quiet (int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))                               /* now eol? */
     return SCPE_2MARG;
@@ -4276,7 +4276,7 @@ return SCPE_OK;
 
 /* Set asynch/noasynch routine */
 
-t_stat sim_set_asynch (int32 flag, CONST char *cptr)
+t_stat sim_set_asynch (int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))                               /* now eol? */
     return SCPE_2MARG;
@@ -4327,7 +4327,7 @@ return SCPE_NOFNC;
 
 /* Show asynch routine */
 
-t_stat sim_show_asynch (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat sim_show_asynch (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
@@ -4347,12 +4347,12 @@ return SCPE_OK;
 
 /* Set command */
 
-t_stat set_cmd (int32 flag, CONST char *cptr)
+t_stat set_cmd (int32 flag, const char *cptr)
 {
 uint32 lvl = 0;
 t_stat r;
 char gbuf[CBUFSIZE], *cvptr;
-CONST char *svptr;
+const char *svptr;
 DEVICE *dptr;
 UNIT *uptr;
 MTAB *mptr;
@@ -4503,7 +4503,7 @@ return NULL;
 
 /* Set device data radix routine */
 
-t_stat set_dev_radix (DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat set_dev_radix (DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 if (cptr)
     return SCPE_ARG;
@@ -4513,7 +4513,7 @@ return SCPE_OK;
 
 /* Set device enabled/disabled routine */
 
-t_stat set_dev_enbdis (DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat set_dev_enbdis (DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 UNIT *up;
 uint32 i;
@@ -4544,7 +4544,7 @@ else return SCPE_OK;
 
 /* Set unit enabled/disabled routine */
 
-t_stat set_unit_enbdis (DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat set_unit_enbdis (DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 if (cptr)
     return SCPE_ARG;
@@ -4563,7 +4563,7 @@ return SCPE_OK;
 
 /* Set device/unit debug enabled/disabled routine */
 
-t_stat set_dev_debug (DEVICE *dptr, UNIT *uptr, int32 flags, CONST char *cptr)
+t_stat set_dev_debug (DEVICE *dptr, UNIT *uptr, int32 flags, const char *cptr)
 {
 int32 flag = flags & 1;
 t_bool uflag = ((flags & 2) != 0);
@@ -4614,7 +4614,7 @@ return r;
 
 /* Set sequential unit position to EOF */
 
-t_stat set_unit_append (DEVICE *dptr, UNIT *uptr, int32 flags, CONST char *cptr)
+t_stat set_unit_append (DEVICE *dptr, UNIT *uptr, int32 flags, const char *cptr)
 {
 if (!(uptr->flags & UNIT_SEQ))
     return sim_messagef (SCPE_NOFNC, "%s is not a sequential device.\n", sim_uname (uptr));
@@ -4633,7 +4633,7 @@ return sim_messagef (SCPE_IERR, "%s Can't seek to end of file: %s - %s\n", sim_u
 
 /* Show command */
 
-t_stat show_cmd (int32 flag, CONST char *cptr)
+t_stat show_cmd (int32 flag, const char *cptr)
 {
 t_stat r;
 
@@ -4655,11 +4655,11 @@ else {
 return r;
 }
 
-t_stat show_cmd_fi (FILE *ofile, int32 flag, CONST char *cptr)
+t_stat show_cmd_fi (FILE *ofile, int32 flag, const char *cptr)
 {
 uint32 lvl = 0xFFFFFFFF;
 char gbuf[CBUFSIZE], *cvptr;
-CONST char *svptr;
+const char *svptr;
 DEVICE *dptr;
 UNIT *uptr;
 MTAB *mptr;
@@ -5084,7 +5084,7 @@ void sim_fprint_regex_support (FILE *st)
 
 /* Show <global name> processors  */
 
-t_stat show_version (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat show_version (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 const char *build = "";
 const char *arch = "";
@@ -5311,7 +5311,7 @@ if (sim_vm_release_message != NULL)                    /* if a release message s
 return SCPE_OK;
 }
 
-t_stat show_config (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, CONST char *cptr)
+t_stat show_config (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, const char *cptr)
 {
 size_t i;
 DEVICE *dptr;
@@ -5339,7 +5339,7 @@ dev_name_len = unit_name_len = 0;
 return SCPE_OK;
 }
 
-t_stat show_log_names (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, CONST char *cptr)
+t_stat show_log_names (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, const char *cptr)
 {
 int32 i;
 DEVICE *dptr;
@@ -5351,7 +5351,7 @@ for (i = 0; (dptr = sim_devices[i]) != NULL; i++)
 return SCPE_OK;
 }
 
-t_stat show_dev_logicals (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat show_dev_logicals (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 if (dptr->lname)
     fprintf (st, "%s -> %s\n", dptr->lname, dptr->name);
@@ -5360,7 +5360,7 @@ else if (!flag)
 return SCPE_OK;
 }
 
-t_stat show_queue (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, CONST char *cptr)
+t_stat show_queue (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, const char *cptr)
 {
 DEVICE *dptr;
 UNIT *uptr;
@@ -5432,7 +5432,7 @@ free (buf.buf);
 return SCPE_OK;
 }
 
-t_stat show_time (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat show_time (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
@@ -5440,7 +5440,7 @@ fprintf (st, "Time:\t%.0f\n", sim_gtime());
 return SCPE_OK;
 }
 
-t_stat show_break (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat show_break (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 t_stat r;
 
@@ -5451,13 +5451,13 @@ else
 return r;
 }
 
-t_stat show_dev_radix (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat show_dev_radix (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 fprintf (st, "Radix=%d\n", dptr->dradix);
 return SCPE_OK;
 }
 
-t_stat show_dev_debug (FILE *st, DEVICE *dptr, UNIT *uptr, int32 uflag, CONST char *cptr)
+t_stat show_dev_debug (FILE *st, DEVICE *dptr, UNIT *uptr, int32 uflag, const char *cptr)
 {
 DEBTAB *dep;
 uint32 unit;
@@ -5518,7 +5518,7 @@ else return SCPE_NOFNC;
 
 /* Show On actions for one level (default current level) */
 
-t_stat show_on (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat show_on (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 int32 lvl, i;
 
@@ -5557,7 +5557,7 @@ if ((flag < 0) && sim_on_inherit)
 return SCPE_OK;
 }
 
-t_stat show_do (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat show_do (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 int32 lvl;
 
@@ -5596,7 +5596,7 @@ return SCPE_OK;
 
 /* Show modifiers */
 
-t_stat show_mod_names (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, CONST char *cptr)
+t_stat show_mod_names (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, const char *cptr)
 {
 int32 i;
 DEVICE *dptr;
@@ -5610,7 +5610,7 @@ for (i = 0; sim_internal_device_count && (dptr = sim_internal_devices[i]); ++i)
 return SCPE_OK;
 }
 
-t_stat show_dev_modifiers (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat show_dev_modifiers (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 fprint_set_help (st, dptr);
 return SCPE_OK;
@@ -5641,12 +5641,12 @@ return SCPE_OK;
 }
 
 t_stat show_one_mod (FILE *st, DEVICE *dptr, UNIT *uptr, MTAB *mptr,
-    CONST char *cptr, int32 flag)
+    const char *cptr, int32 flag)
 {
 t_stat r = SCPE_OK;
 
 if (mptr->disp)
-    r = mptr->disp (st, uptr, mptr->match, (CONST void *)(cptr? cptr: mptr->desc));
+    r = mptr->disp (st, uptr, mptr->match, (const void *)(cptr? cptr: mptr->desc));
 else
     fputs (mptr->pstring, st);
 if ((r == SCPE_OK) && (flag && !((mptr->mask & MTAB_XTD) && MODMASK(mptr,MTAB_NMO))))
@@ -5656,7 +5656,7 @@ return r;
 
 /* Show show commands */
 
-t_stat show_show_commands (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, CONST char *cptr)
+t_stat show_show_commands (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, const char *cptr)
 {
 int32 i;
 DEVICE *dptr;
@@ -5670,7 +5670,7 @@ for (i = 0; sim_internal_device_count && (dptr = sim_internal_devices[i]); ++i)
 return SCPE_OK;
 }
 
-t_stat show_dev_show_commands (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat show_dev_show_commands (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 fprint_show_help (st, dptr);
 return SCPE_OK;
@@ -5678,7 +5678,7 @@ return SCPE_OK;
 
 /* Show/change the current working directory commands */
 
-t_stat show_default (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat show_default (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 char buffer[PATH_MAX];
 char *wd = sim_getcwd(buffer, PATH_MAX);
@@ -5687,7 +5687,7 @@ fprintf (st, "%s\n", wd);
 return SCPE_OK;
 }
 
-t_stat set_default_cmd (int32 flg, CONST char *cptr)
+t_stat set_default_cmd (int32 flg, const char *cptr)
 {
 char gbuf[4*CBUFSIZE];
 
@@ -5704,7 +5704,7 @@ if (sim_chdir(gbuf) != 0)
 return SCPE_OK;
 }
 
-t_stat pwd_cmd (int32 flg, CONST char *cptr)
+t_stat pwd_cmd (int32 flg, const char *cptr)
 {
 return show_cmd (0, "DEFAULT");
 }
@@ -5775,7 +5775,7 @@ else {
 sim_printf (" %s\n", filename);
 }
 
-t_stat dir_cmd (int32 flg, CONST char *cptr)
+t_stat dir_cmd (int32 flg, const char *cptr)
 {
 DIR_CTX dir_state;
 t_stat r;
@@ -5847,7 +5847,7 @@ fclose (file);
 }
 
 
-t_stat type_cmd (int32 flg, CONST char *cptr)
+t_stat type_cmd (int32 flg, const char *cptr)
 {
 FILE *file;
 long lines = 0;
@@ -5924,7 +5924,7 @@ if (!unlink (FullPath))
 ctx->stat = sim_messagef (SCPE_ARG, "%s\n", strerror (errno));
 }
 
-t_stat delete_cmd (int32 flg, CONST char *cptr)
+t_stat delete_cmd (int32 flg, const char *cptr)
 {
 DEL_CTX del_state;
 t_stat stat;
@@ -5976,7 +5976,7 @@ else
     ctx->stat = st;
 }
 
-t_stat copy_cmd (int32 flg, CONST char *cptr)
+t_stat copy_cmd (int32 flg, const char *cptr)
 {
 char sname[CBUFSIZE];
 COPY_CTX copy_state;
@@ -5996,7 +5996,7 @@ if ((stat == SCPE_OK) && (copy_state.count))
 return copy_state.stat;
 }
 
-t_stat rename_cmd (int32 flg, CONST char *cptr)
+t_stat rename_cmd (int32 flg, const char *cptr)
 {
 char sname[CBUFSIZE], dname[CBUFSIZE];
 
@@ -6012,7 +6012,7 @@ if (0 == rename (sname, dname))
 return sim_messagef (SCPE_ARG, "Can't rename '%s' to '%s': %s\n\n", sname, dname, strerror (errno));
 }
 
-t_stat mkdir_cmd (int32 flg, CONST char *cptr)
+t_stat mkdir_cmd (int32 flg, const char *cptr)
 {
 char path[CBUFSIZE];
 char *c;
@@ -6051,7 +6051,7 @@ if (sim_mkdir (path))
 return SCPE_OK;
 }
 
-t_stat rmdir_cmd (int32 flg, CONST char *cptr)
+t_stat rmdir_cmd (int32 flg, const char *cptr)
 {
 GET_SWITCHES (cptr);                                    /* get switches */
 if ((!cptr) || (*cptr == '\0'))
@@ -6063,10 +6063,10 @@ return SCPE_OK;
 
 /* Debug command */
 
-t_stat debug_cmd (int32 flg, CONST char *cptr)
+t_stat debug_cmd (int32 flg, const char *cptr)
 {
 char gbuf[CBUFSIZE];
-CONST char *svptr;
+const char *svptr;
 DEVICE *dptr;
 
 GET_SWITCHES (cptr);                                    /* get switches */
@@ -6082,7 +6082,7 @@ else
 
 /* Breakpoint commands */
 
-t_stat brk_cmd (int32 flg, CONST char *cptr)
+t_stat brk_cmd (int32 flg, const char *cptr)
 {
 GET_SWITCHES (cptr);                                    /* get switches */
 return ssh_break (NULL, cptr, flg);                     /* call common code */
@@ -6092,7 +6092,7 @@ t_stat ssh_break (FILE *st, const char *cptr, int32 flg)
 {
 char gbuf[CBUFSIZE], *tptr_mut, abuf[4*CBUFSIZE];
 const char *aptr = NULL;
-CONST char *tptr, *t1ptr;
+const char *tptr, *t1ptr;
 DEVICE *dptr = sim_dflt_dev;
 UNIT *uptr;
 t_stat r;
@@ -6156,7 +6156,7 @@ while (*cptr) {
 return SCPE_OK;
 }
 
-t_stat ssh_break_one (FILE *st, int32 flg, t_addr lo, int32 cnt, CONST char *aptr)
+t_stat ssh_break_one (FILE *st, int32 flg, t_addr lo, int32 cnt, const char *aptr)
 {
 if (!sim_brk_types)
     return sim_messagef (SCPE_NOFNC, "No breakpoint support in this simulator\n");
@@ -6188,7 +6188,7 @@ switch (flg) {
 
 static t_bool run_cmd_did_reset = FALSE;
 
-t_stat reset_cmd (int32 flag, CONST char *cptr)
+t_stat reset_cmd (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
 DEVICE *dptr;
@@ -6210,7 +6210,7 @@ if (dptr->reset != NULL)
 else return SCPE_OK;
 }
 
-t_stat runlimit_cmd (int32 flag, CONST char *cptr)
+t_stat runlimit_cmd (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
 int32 num;
@@ -6284,12 +6284,12 @@ else {
     }
 }
 
-t_stat set_runlimit (int32 flag, CONST char *cptr)
+t_stat set_runlimit (int32 flag, const char *cptr)
 {
 return runlimit_cmd (flag, cptr);
 }
 
-t_stat show_runlimit (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat show_runlimit (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 if (sim_runlimit_enabled) {
     if (sim_runlimit_switches & SWMASK ('T')) {
@@ -6431,7 +6431,7 @@ return r;
 
 /* Set Hardware Write Lock */
 
-t_stat set_writelock (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_writelock (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (((uptr->flags & UNIT_WPRT) != 0) == val)        /* Already set as desired? */
     return SCPE_OK;                                 /* Do nothing */
@@ -6451,7 +6451,7 @@ return SCPE_OK;
 
 /* Show Write Lock */
 
-t_stat show_writelock (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_writelock (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "write %s", (uptr->flags & UNIT_WPRT) ? "locked" : "enabled");
 return SCPE_OK;
@@ -6503,7 +6503,7 @@ else
 }
 
 
-t_stat load_cmd (int32 flag, CONST char *cptr)
+t_stat load_cmd (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
 FILE *loadfile = NULL;
@@ -6519,7 +6519,7 @@ if (!mem_data) {
         return SCPE_OPENERR;
     }
 GET_SWITCHES (cptr);                                    /* get switches */
-reason = sim_load (loadfile, (CONST char *)cptr, gbuf, flag);/* load or dump */
+reason = sim_load (loadfile, (const char *)cptr, gbuf, flag);/* load or dump */
 if (loadfile)
     fclose (loadfile);
 return reason;
@@ -6530,7 +6530,7 @@ return reason;
    at[tach] unit file   attach specified unit to file
 */
 
-t_stat attach_cmd (int32 flag, CONST char *cptr)
+t_stat attach_cmd (int32 flag, const char *cptr)
 {
 char gbuf[4*CBUFSIZE];
 DEVICE *dptr;
@@ -6574,8 +6574,8 @@ t_stat scp_attach_unit (DEVICE *dptr, UNIT *uptr, const char *cptr)
 if (uptr->flags & UNIT_DIS)                             /* disabled? */
     return sim_messagef (SCPE_UDIS, "Unit disabled: %s\n", sim_uname (uptr));
 if (dptr->attach != NULL)                               /* device routine? */
-    return dptr->attach (uptr, (CONST char *)cptr);     /* call it */
-return attach_unit (uptr, (CONST char *)cptr);          /* no, std routine */
+    return dptr->attach (uptr, (const char *)cptr);     /* call it */
+return attach_unit (uptr, (const char *)cptr);          /* no, std routine */
 }
 
 /* Detach command
@@ -6584,7 +6584,7 @@ return attach_unit (uptr, (CONST char *)cptr);          /* no, std routine */
    det[ach] unit        detach specified unit
 */
 
-t_stat detach_cmd (int32 flag, CONST char *cptr)
+t_stat detach_cmd (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
 DEVICE *dptr;
@@ -6661,7 +6661,7 @@ return detach_unit (uptr);                              /* no, standard */
    as[sign] device name assign logical name to device
 */
 
-t_stat assign_cmd (int32 flag, CONST char *cptr)
+t_stat assign_cmd (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
 DEVICE *dptr;
@@ -6699,7 +6699,7 @@ return SCPE_OK;
    dea[ssign] device    deassign logical name
 */
 
-t_stat deassign_cmd (int32 flag, CONST char *cptr)
+t_stat deassign_cmd (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
 DEVICE *dptr;
@@ -6728,7 +6728,7 @@ return SCPE_OK;
    sa[ve] filename              save state to specified file
 */
 
-t_stat save_cmd (int32 flag, CONST char *cptr)
+t_stat save_cmd (int32 flag, const char *cptr)
 {
 FILE *sfile;
 t_stat r;
@@ -6891,7 +6891,7 @@ return (ferror (sfile))? SCPE_IOERR: SCPE_OK;           /* error during save? */
    re[store] filename           restore state from specified file
 */
 
-t_stat restore_cmd (int32 flag, CONST char *cptr)
+t_stat restore_cmd (int32 flag, const char *cptr)
 {
 FILE *rfile;
 t_stat r;
@@ -7304,10 +7304,10 @@ return SCPE_OK;
                         be a number of microseconds to run for
 */
 
-t_stat run_cmd (int32 flag, CONST char *cptr)
+t_stat run_cmd (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE] = "";
-CONST char *tptr;
+const char *tptr;
 uint32 i, j;
 int32 sim_next = 0;
 int32 unitno;
@@ -7734,11 +7734,11 @@ sim_interval = 0;               /* Minimize when stop_cpu gets noticed */
         STATE                           all registers
 */
 
-t_stat exdep_cmd (int32 flag, CONST char *cptr)
+t_stat exdep_cmd (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
-CONST char *gptr;
-CONST char *tptr = NULL;
+const char *gptr;
+const char *tptr = NULL;
 const char *ap;
 int32 opt;
 t_addr low, high;
@@ -7844,7 +7844,7 @@ return reason;
    exdep_addr_loop      examine/deposit range of addresses
 */
 
-t_stat exdep_reg_loop (FILE *ofile, SCHTAB *schptr, int32 flag, CONST char *cptr,
+t_stat exdep_reg_loop (FILE *ofile, SCHTAB *schptr, int32 flag, const char *cptr,
     REG *lowr, REG *highr, uint32 lows, uint32 highs)
 {
 t_stat reason;
@@ -8073,12 +8073,12 @@ return val;
         return  =       error status
 */
 
-t_stat dep_reg (int32 flag, CONST char *cptr, REG *rptr, uint32 idx)
+t_stat dep_reg (int32 flag, const char *cptr, REG *rptr, uint32 idx)
 {
 t_stat r;
 t_value val, max;
 int32 rdx;
-CONST char *tptr;
+const char *tptr;
 char gbuf[CBUFSIZE];
 
 if ((cptr == NULL) || (rptr == NULL))
@@ -8106,7 +8106,7 @@ if ((rptr->flags & REG_VMAD) && sim_vm_parse_addr) {    /* address form? */
     }
 else
     if (!(rptr->flags & REG_VMFLAGS) ||                 /* dont use sym? */
-        (parse_sym ((CONST char *)cptr, (rptr->flags & REG_UFMASK) | rdx, NULL,
+        (parse_sym ((const char *)cptr, (rptr->flags & REG_UFMASK) | rdx, NULL,
                     &val, sim_switches | SIM_SW_REG) > SCPE_OK)) {
     val = get_uint (cptr, rdx, max, &r);
     if (r != SCPE_OK)
@@ -8343,7 +8343,7 @@ if (uptr->flags & UNIT_RO)                              /* read only? */
 mask = width_mask[dptr->dwidth];
 
 GET_RADIX (rdx, dptr->dradix);
-if ((reason = parse_sym ((CONST char *)cptr, addr, uptr, sim_eval, sim_switches)) > 0) {
+if ((reason = parse_sym ((const char *)cptr, addr, uptr, sim_eval, sim_switches)) > 0) {
     sim_eval[0] = get_uint (cptr, rdx, mask, &reason);
     if (reason != SCPE_OK)
         return reason;
@@ -8390,7 +8390,7 @@ return reason;
 
 /* Evaluate command */
 
-t_stat eval_cmd (int32 flg, CONST char *cptr)
+t_stat eval_cmd (int32 flg, const char *cptr)
 {
 DEVICE *dptr = sim_dflt_dev;
 int32 i, rdx, a, lim;
@@ -8402,7 +8402,7 @@ for (i = 0; i < sim_emax; i++)
     sim_eval[i] = 0;
 if (*cptr == 0)
     return SCPE_2FARG;
-if ((r = parse_sym ((CONST char *)cptr, 0, dptr->units, sim_eval, sim_switches)) > 0) {
+if ((r = parse_sym ((const char *)cptr, 0, dptr->units, sim_eval, sim_switches)) > 0) {
     sim_eval[0] = get_uint (cptr, rdx, width_mask[dptr->dwidth], &r);
     if (r != SCPE_OK)
         return sim_messagef (r, "%s\nCan't be parsed as an instruction or data\n", cptr);
@@ -8549,10 +8549,10 @@ return FALSE;
 t_value get_uint (const char *cptr, uint32 radix, t_value max, t_stat *status)
 {
 t_value val;
-CONST char *tptr;
+const char *tptr;
 
 *status = SCPE_OK;
-val = strtotv ((CONST char *)cptr, &tptr, radix);
+val = strtotv ((const char *)cptr, &tptr, radix);
 if ((cptr == tptr) || (val > max))
     *status = SCPE_ARG;
 else {
@@ -8588,10 +8588,10 @@ return val;
                         NULL if error
 */
 
-CONST char *get_range (DEVICE *dptr, CONST char *cptr, t_addr *lo, t_addr *hi,
+const char *get_range (DEVICE *dptr, const char *cptr, t_addr *lo, t_addr *hi,
     uint32 rdx, t_addr max, char term)
 {
-CONST char *tptr;
+const char *tptr;
 
 if (max && strncmp (cptr, "ALL", strlen ("ALL")) == 0) {    /* ALL? */
     tptr = cptr + strlen ("ALL");
@@ -8889,7 +8889,7 @@ free (string);
         *stat   =       pointer to stat for reason
 */
 
-REG *find_reg_glob_reason (CONST char *cptr, CONST char **optr, DEVICE **gdptr, t_stat *stat)
+REG *find_reg_glob_reason (const char *cptr, const char **optr, DEVICE **gdptr, t_stat *stat)
 {
 int32 i, j;
 DEVICE *dptr, **devs, **dptrptr[] = {sim_devices, sim_internal_devices, NULL};
@@ -8929,7 +8929,7 @@ if (stat && (*stat != SCPE_OK)) {
 return srptr;
 }
 
-REG *find_reg_glob (CONST char *cptr, CONST char **optr, DEVICE **gdptr)
+REG *find_reg_glob (const char *cptr, const char **optr, DEVICE **gdptr)
 {
 return find_reg_glob_reason (cptr, optr, gdptr, NULL);
 }
@@ -8945,9 +8945,9 @@ return find_reg_glob_reason (cptr, optr, gdptr, NULL);
         *optr   =       pointer to next character in input string
 */
 
-REG *find_reg (CONST char *cptr, CONST char **optr, DEVICE *dptr)
+REG *find_reg (const char *cptr, const char **optr, DEVICE *dptr)
 {
-CONST char *tptr;
+const char *tptr;
 REG *rptr;
 size_t slnt;
 
@@ -8992,11 +8992,11 @@ return NULL;
         *stat   =       error status
 */
 
-CONST char *get_sim_opt (int32 opt, CONST char *cptr, t_stat *st)
+const char *get_sim_opt (int32 opt, const char *cptr, t_stat *st)
 {
 int32 t, n;
 char gbuf[CBUFSIZE];
-CONST char *svptr;
+const char *svptr;
 DEVICE *tdptr;
 UNIT *tuptr;
 
@@ -9109,9 +9109,9 @@ return buf;
         cp      =       pointer to final '.' if match, NULL if not
 */
 
-CONST char *match_ext (CONST char *fnam, const char *ext)
+const char *match_ext (const char *fnam, const char *ext)
 {
-CONST char *pptr, *fptr;
+const char *pptr, *fptr;
 const char *eptr;
 
 if ((fnam == NULL) || (ext == NULL))                    /* bad arguments? */
@@ -9141,13 +9141,13 @@ return pptr;
                         schptr if valid search specification
 */
 
-SCHTAB *get_rsearch (CONST char *cptr, int32 radix, SCHTAB *schptr)
+SCHTAB *get_rsearch (const char *cptr, int32 radix, SCHTAB *schptr)
 {
 int32 c;
 size_t logop, cmpop;
 t_value logval, cmpval;
 const char *sptr;
-CONST char *tptr;
+const char *tptr;
 const char logstr[] = "|&^", cmpstr[] = "=!><";
 /* Using a const instead of a #define. */
 const size_t invalid_op = (size_t) -1;
@@ -9205,13 +9205,13 @@ return schptr;
                         schptr if valid search specification
 */
 
-SCHTAB *get_asearch (CONST char *cptr, int32 radix, SCHTAB *schptr)
+SCHTAB *get_asearch (const char *cptr, int32 radix, SCHTAB *schptr)
 {
 int32 c;
 size_t logop, cmpop;
 t_value *logval, *cmpval;
 t_stat reason = SCPE_OK;
-CONST char *ocptr = cptr;
+const char *ocptr = cptr;
 const char *sptr;
 char gbuf[CBUFSIZE];
 const char logstr[] = "|&^", cmpstr[] = "=!><";
@@ -9400,7 +9400,7 @@ return ret;
 
 */
 
-t_value strtotv (CONST char *inptr, CONST char **endptr, uint32 radix)
+t_value strtotv (const char *inptr, const char **endptr, uint32 radix)
 {
 t_bool nodigits;
 t_value val;
@@ -9450,7 +9450,7 @@ if (endptr)
 return val;
 }
 
-t_svalue strtotsv (CONST char *inptr, CONST char **endptr, uint32 radix)
+t_svalue strtotsv (const char *inptr, const char **endptr, uint32 radix)
 {
 t_bool nodigits;
 t_svalue val;
@@ -11002,7 +11002,7 @@ return ret;
  */
 
 
-static t_stat _process_cmd (const char *cmd, CONST char *cptr)
+static t_stat _process_cmd (const char *cmd, const char *cptr)
 {
 char gbuf[CBUFSIZE*2];
 
@@ -11014,12 +11014,12 @@ else
     return SCPE_NOFNC;
 }
 
-t_stat tar_cmd (int32 flag, CONST char *cptr)
+t_stat tar_cmd (int32 flag, const char *cptr)
 {
 return _process_cmd ("tar", cptr);
 }
 
-t_stat curl_cmd (int32 flag, CONST char *cptr)
+t_stat curl_cmd (int32 flag, const char *cptr)
 {
 return _process_cmd ("curl", cptr);
 }
@@ -11560,7 +11560,7 @@ return SCPE_OK;
  * modules: sim_card, sim_disk, sim_tape, sim_ether, sim_tmxr, etc.
  */
 
-t_stat test_lib_cmd (int32 flag, CONST char *cptr)
+t_stat test_lib_cmd (int32 flag, const char *cptr)
 {
 int i;
 DEVICE *dptr;

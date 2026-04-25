@@ -188,14 +188,14 @@ t_stat dni_svc (UNIT *uptr);
 t_stat dn_svc (UNIT *uptr);
 t_stat dno_svc (UNIT *uptr);
 t_stat dnrtc_srv(UNIT * uptr);
-t_stat dn_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dn_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat dn_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dn_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat dn_reset (DEVICE *dptr);
 t_stat dn_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *dn_description (DEVICE *dptr);
 extern uint64  SW;                                   /* Switch register */
 
-extern CONST char *pri_name[];
+extern const char *pri_name[];
 
 #define STATUS            u3
 #define CNT               u4
@@ -1145,7 +1145,7 @@ t_stat dn_reset (DEVICE *dptr)
 
 
 t_stat
-dn_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+dn_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE *dptr;
     dptr = find_dev_from_unit (uptr);
@@ -1157,7 +1157,7 @@ dn_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-dn_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+dn_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    DEVICE *dptr;
 

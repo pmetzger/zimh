@@ -342,7 +342,7 @@ t_stat mfp_reset(DEVICE *dptr)
 }
 
 /* sho help mfp */
-t_stat mfp_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat mfp_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
     fprintf(st, "SEL-32 MFP Model 8002 Channel Controller at 0x7600\r\n");
     fprintf(st, "The MFP fields all interrupts and status posting\r\n");

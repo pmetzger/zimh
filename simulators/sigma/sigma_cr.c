@@ -110,9 +110,9 @@ uint32 cr_tdv_status (void);
 t_stat cr_chan_err (uint32 st);
 t_stat cr_svc (UNIT *uptr);
 t_stat cr_reset (DEVICE *dptr);
-t_stat cr_attach (UNIT *uptr, CONST char *cptr);
+t_stat cr_attach (UNIT *uptr, const char *cptr);
 t_stat cr_detach (UNIT *uptr);
-t_stat cr_show_cap (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat cr_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 
 dib_t   cr_dib = { DVA_CR, cr_disp, 0, NULL };
@@ -390,7 +390,7 @@ t_stat cr_reset (DEVICE *dptr)
 
 /* Attach routine */
 
-t_stat cr_attach (UNIT *uptr, CONST char *cptr)
+t_stat cr_attach (UNIT *uptr, const char *cptr)
 {
     char *saved_filename;
     int r;
@@ -419,7 +419,7 @@ t_stat cr_detach (UNIT *uptr)
     return  detach_unit(uptr);
 }
 
-t_stat cr_show_cap (FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
+t_stat cr_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc) {
     
     if (cr_hopper == 0)
         fprintf(st,"hopper empty");

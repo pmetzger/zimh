@@ -181,7 +181,7 @@ void fprint_reg_help_ex(FILE *st, DEVICE *dptr, t_bool silent)
     t_bool all_unique = TRUE;
     size_t max_namelen = 0;
     DEVICE *tdptr;
-    CONST char *tptr;
+    const char *tptr;
     char *namebuf;
     char rangebuf[32];
     int side_effects = 0;

@@ -282,13 +282,13 @@ int32 addr_mask = YMASK;
 static t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 static t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw);
 static t_stat cpu_reset (DEVICE *dptr);
-static t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+static t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc);
 int32 cpu_get_mode (void);
-static t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat cpu_set_ext (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat cpu_set_noext (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat cpu_set_ext (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat cpu_set_noext (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat Read (void);
 t_stat Write (void);
 
@@ -1070,7 +1070,7 @@ static t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 
 /* Change memory size */
 
-static t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32 mc = 0;
     uint32 i;
@@ -1087,7 +1087,7 @@ static t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* Change CPU Mode (Normal, Test, Readin) */
 
-t_stat cpu_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (val == UNIT_MODE_TEST) {
         mode_tst = 1;
@@ -1106,13 +1106,13 @@ t_stat cpu_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* Set TX-0 with Extended Instruction Set */
 
-static t_stat cpu_set_ext (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat cpu_set_ext (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     sim_printf("Set CPU Extended Mode\n");
     return SCPE_OK;
 }
 
-static t_stat cpu_set_noext (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat cpu_set_noext (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     sim_printf("Set CPU Non-Extended Mode\n");
     return SCPE_OK;
@@ -1127,7 +1127,7 @@ int32 cpu_get_mode (void)
 
 /* Set history */
 
-static t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i, lnt;
 t_stat r;
@@ -1155,7 +1155,7 @@ return SCPE_OK;
 
 /* Show history */
 
-static t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 ov, pf, op, k, di, lnt;
 const char *cptr = (const char *) desc;
@@ -1212,10 +1212,10 @@ cpu_get_switches(unsigned long *p1, unsigned long *p2)
 }
 #endif
 
-t_stat sim_load(FILE *fileref, CONST char *cptr, CONST char *fnam, int flag) {
+t_stat sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag) {
     uint32 word;
     t_addr j, lo, hi, sz, sz_words;
-    CONST char *result;
+    const char *result;
 
     if (flag) { /* Dump to file. */
         result = get_range(NULL, cptr, &lo, &hi, 8, 0xFFFF, 0);

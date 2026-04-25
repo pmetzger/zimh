@@ -60,7 +60,7 @@ const char *sim_stop_messages[SCPE_BASE] = {
  * -o     for memory, specify origin
  *
  */
-t_stat sim_load(FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
     t_stat r;
     int32 i;
@@ -111,7 +111,7 @@ t_stat sim_load(FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
     }
 }
 
-t_stat parse_sym(CONST char *cptr, t_addr exta, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym(const char *cptr, t_addr exta, UNIT *uptr, t_value *val, int32 sw)
 {
     DEVICE *dptr;
     t_stat r;

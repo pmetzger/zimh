@@ -296,7 +296,7 @@ t_stat dt_wr (int32 data, int32 PA, int32 access);
 t_stat dt_svc (UNIT *uptr);
 t_stat dt_svcdone (UNIT *uptr);
 t_stat dt_reset (DEVICE *dptr);
-t_stat dt_attach (UNIT *uptr, CONST char *cptr);
+t_stat dt_attach (UNIT *uptr, const char *cptr);
 void dt_flush (UNIT *uptr);
 t_stat dt_detach (UNIT *uptr);
 t_stat dt_boot (int32 unitno, DEVICE *dptr);
@@ -310,8 +310,8 @@ void dt_stopunit (UNIT *uptr);
 int32 dt_comobv (int32 val);
 int32 dt_csum (UNIT *uptr, int32 blk);
 int32 dt_gethdr (UNIT *uptr, int32 blk, int32 relpos);
-t_stat dt_set_writelock (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dt_show_writelock (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat dt_set_writelock (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dt_show_writelock (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat dt_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *dt_description (DEVICE *dptr);
 
@@ -1260,7 +1260,7 @@ return SCPE_NOFNC;
    If 18b/36b, read data into buffer
 */
 
-t_stat dt_attach (UNIT *uptr, CONST char *cptr)
+t_stat dt_attach (UNIT *uptr, const char *cptr)
 {
 uint16 pdp8b[D8_NBSIZE];
 uint16 pdp11b[D18_BSIZE];

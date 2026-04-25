@@ -130,8 +130,8 @@ typedef struct {
     uint32 flags;        /* Original Flags   */
 } PMMI_CTX;
 
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 
@@ -139,7 +139,7 @@ extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_typ
 static const char* pmmi_description(DEVICE *dptr);
 static t_stat pmmi_svc(UNIT *uptr);
 static t_stat pmmi_reset(DEVICE *dptr);
-static t_stat pmmi_attach(UNIT *uptr, CONST char *cptr);
+static t_stat pmmi_attach(UNIT *uptr, const char *cptr);
 static t_stat pmmi_detach(UNIT *uptr);
 static t_stat pmmi_set_baud(UNIT *uptr, int32 value, const char *cptr, void *desc);
 static t_stat pmmi_show_baud(FILE *st, UNIT *uptr, int32 value, const void *desc);
@@ -437,7 +437,7 @@ static t_stat pmmi_svc(UNIT *uptr)
 
 
 /* Attach routine */
-static t_stat pmmi_attach(UNIT *uptr, CONST char *cptr)
+static t_stat pmmi_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r;
 

@@ -112,9 +112,9 @@ uint8   command = 0;
 t_stat IO_cfg(uint8 base, uint8 devnum);
 t_stat IO_svc (UNIT *uptr);
 t_stat IO_reset (DEVICE *dptr);
-t_stat IO_attach (UNIT *uptr, CONST char *cptr);
+t_stat IO_attach (UNIT *uptr, const char *cptr);
 t_stat PTR_reset(DEVICE *dptr);
-t_stat PTR_attach (UNIT *uptr, CONST char *cptr);
+t_stat PTR_attach (UNIT *uptr, const char *cptr);
 uint8 IO_is(t_bool io, uint8 data, uint8 devnum);
 uint8 IO_id(t_bool io, uint8 data, uint8 devnum);
 uint8 IO_oc(t_bool io, uint8 data, uint8 devnum);
@@ -303,7 +303,7 @@ void IO_reset_dev(uint8 devnum)
     IO_unit[devnum].pos = 0;
 }
 
-t_stat IO_attach (UNIT *uptr, CONST char *cptr)
+t_stat IO_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
 
@@ -319,7 +319,7 @@ t_stat PTR_reset(DEVICE *dptr)
     return SCPE_OK;
 }
 
-t_stat PTR_attach (UNIT *uptr, CONST char *cptr)
+t_stat PTR_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
 

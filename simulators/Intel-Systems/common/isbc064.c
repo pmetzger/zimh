@@ -43,9 +43,9 @@
 
 t_stat isbc064_cfg(uint16 base, uint16 size, uint8 dummy);
 t_stat isbc064_clr(void);
-t_stat isbc064_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat isbc064_set_base(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat isbc064_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat isbc064_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat isbc064_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat isbc064_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat isbc064_reset(DEVICE *dptr);
 uint8 isbc064_get_mbyte(uint16 addr);
 void isbc064_put_mbyte(uint16 addr, uint8 val);
@@ -165,7 +165,7 @@ t_stat isbc064_clr(void)
 
 // set size parameter
 
-t_stat isbc064_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat isbc064_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result, i;
     
@@ -188,7 +188,7 @@ t_stat isbc064_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // set base address parameter
 
-t_stat isbc064_set_base(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat isbc064_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result, i;
     
@@ -211,7 +211,7 @@ t_stat isbc064_set_base(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // show configuration parameters
 
-t_stat isbc064_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat isbc064_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "Device %s, Base address=0%04XH, Size=0%04XH  ", 
         ((isbc064_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled", 

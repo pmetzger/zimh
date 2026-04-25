@@ -239,7 +239,7 @@ double besm6_to_ieee (t_value word)
 /*
  * Пропуск пробелов.
  */
-CONST char *skip_spaces (CONST char *p)
+const char *skip_spaces (const char *p)
 {
     for (;;) {
         if (*p == (char) 0xEF && p[1] == (char) 0xBB && p[2] == (char) 0xBF) {
@@ -259,7 +259,7 @@ CONST char *skip_spaces (CONST char *p)
  * Fetch Unicode symbol from UTF-8 string.
  * Advance string pointer.
  */
-int utf8_to_unicode (CONST char **p)
+int utf8_to_unicode (const char **p)
 {
     int c1, c2, c3;
 
@@ -283,7 +283,7 @@ char *besm6_parse_octal (const char *cptr, int *offset)
     return eptr;
 }
 
-static CONST char *get_alnum (CONST char *iptr, char *optr)
+static const char *get_alnum (const char *iptr, char *optr)
 {
     while ((*iptr >= 'a' && *iptr<='z') ||
            (*iptr >= 'A' && *iptr<='Z') ||
@@ -298,7 +298,7 @@ static CONST char *get_alnum (CONST char *iptr, char *optr)
  * Parse single instruction (half word).
  * Allow mnemonics or octal code.
  */
-CONST char *parse_instruction (CONST char *cptr, uint32 *val)
+const char *parse_instruction (const char *cptr, uint32 *val)
 {
     int opcode, reg, addr, negate;
     char gbuf[CBUFSIZE];
@@ -391,7 +391,7 @@ CONST char *parse_instruction (CONST char *cptr, uint32 *val)
 /*
  * Instruction parse: two commands per word.
  */
-t_stat parse_instruction_word (CONST char *cptr, t_value *val)
+t_stat parse_instruction_word (const char *cptr, t_value *val)
 {
     uint32 left, right;
 
@@ -531,7 +531,7 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
  * Outputs:
  *      status  = error status
  */
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
     int32 i;
 
@@ -566,7 +566,7 @@ t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
 t_stat besm6_read_line (FILE *input, int *type, t_value *val)
 {
     char buf [512];
-    CONST char *p;
+    const char *p;
     int i, c;
   again:
     if (! fgets (buf, sizeof (buf), input)) {
@@ -725,7 +725,7 @@ t_stat besm6_dump (FILE *of, const char *fnam)
 /*
  * Loader/dumper
  */
-t_stat sim_load (FILE *fi, CONST char *cptr, CONST char *fnam, int dump_flag)
+t_stat sim_load (FILE *fi, const char *cptr, const char *fnam, int dump_flag)
 {
     if (dump_flag)
         return besm6_dump (fi, fnam);

@@ -123,7 +123,7 @@ void rom_wr_B (int32 pa, int32 val)
 return;
 }
 
-t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 uint32 memsize = (uint32)(MEMSIZE>>10);
 uint32 baseaddr = 0;

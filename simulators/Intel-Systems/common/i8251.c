@@ -144,7 +144,7 @@ uint8   i8251_verb[4] = { 0, 0, 0, 0 }; //verbose flag
 
 t_stat i8251_cfg(uint16 base, uint16 devnum, uint8 dummy);
 t_stat i8251_clr(void);
-t_stat i8251_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat i8251_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat i8251_svc (UNIT *uptr);
 t_stat i8251_reset (DEVICE *dptr);
 uint8 i8251s(t_bool io, uint8 data, uint8 devnum);
@@ -262,7 +262,7 @@ t_stat i8251_clr(void)
 
 // show configuration parameters
 
-t_stat i8251_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat i8251_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int i;
     

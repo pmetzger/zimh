@@ -214,11 +214,11 @@ static const uint8 vdm1_charset[128][VDM1_CHAR_YSIZE] =
 
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
-extern t_stat set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat exdep_cmd(int32 flag, CONST char *cptr);
+extern t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat exdep_cmd(int32 flag, const char *cptr);
 
 static t_stat vdm1_svc(UNIT *uptr);
 static t_stat vdm1_reset(DEVICE *dptr);
@@ -230,12 +230,12 @@ static const char *vdm1_description(DEVICE *dptr);
 static void vdm1_refresh(void);
 static void vdm1_render(void);
 static void vdm1_render_char(uint8 byte, uint8 x, uint8 y);
-static t_stat vdm1_set_ctrl(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat vdm1_show_ctrl(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat vdm1_set_cursor(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat vdm1_show_cursor(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat vdm1_set_display(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat vdm1_show_display(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat vdm1_set_ctrl(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat vdm1_show_ctrl(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat vdm1_set_cursor(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat vdm1_show_cursor(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat vdm1_set_display(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat vdm1_show_display(FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 /* VDM1 data structures
 
@@ -549,7 +549,7 @@ static void vdm1_render_char(uint8 byte, uint8 x, uint8 y)
     }
 }
 
-static t_stat vdm1_set_ctrl(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat vdm1_set_ctrl(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
@@ -572,7 +572,7 @@ static t_stat vdm1_set_ctrl(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-static t_stat vdm1_show_ctrl(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat vdm1_show_ctrl(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (!st) return SCPE_IERR;
 
@@ -603,7 +603,7 @@ static t_stat vdm1_show_ctrl(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
     return SCPE_OK;
 }
 
-static t_stat vdm1_set_cursor(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat vdm1_set_cursor(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
@@ -625,7 +625,7 @@ static t_stat vdm1_set_cursor(UNIT *uptr, int32 val, CONST char *cptr, void *des
     return SCPE_OK;
 }
 
-static t_stat vdm1_show_cursor(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat vdm1_show_cursor(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (!st) return SCPE_IERR;
 
@@ -652,7 +652,7 @@ static t_stat vdm1_show_cursor(FILE *st, UNIT *uptr, int32 val, CONST void *desc
     return SCPE_OK;
 }
 
-static t_stat vdm1_set_display(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat vdm1_set_display(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
@@ -673,7 +673,7 @@ static t_stat vdm1_set_display(UNIT *uptr, int32 val, CONST char *cptr, void *de
     return SCPE_OK;
 }
 
-static t_stat vdm1_show_display(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat vdm1_show_display(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (!st) return SCPE_IERR;
 

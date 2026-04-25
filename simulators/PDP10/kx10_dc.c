@@ -93,13 +93,13 @@ t_stat dc_devio(uint32 dev, uint64 *data);
 t_stat dc_svc (UNIT *uptr);
 t_stat dc_doscan (UNIT *uptr);
 t_stat dc_reset (DEVICE *dptr);
-t_stat dc_set_modem (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dc_show_modem (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat dc_setnl (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dc_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dc_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dc_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat dc_attach (UNIT *uptr, CONST char *cptr);
+t_stat dc_set_modem (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dc_show_modem (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat dc_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dc_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dc_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dc_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat dc_attach (UNIT *uptr, const char *cptr);
 t_stat dc_detach (UNIT *uptr);
 t_stat dc_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
         const char *cptr);
@@ -398,7 +398,7 @@ t_stat dc_reset (DEVICE *dptr)
 
 /* SET BUFFER processor */
 
-t_stat dc_set_modem (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dc_set_modem (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_stat r;
     int32 modem;
@@ -421,7 +421,7 @@ t_stat dc_set_modem (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* SHOW BUFFER processor */
 
-t_stat dc_show_modem (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dc_show_modem (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf (st, "modem=%d ", dc_modem);
     return SCPE_OK;
@@ -429,7 +429,7 @@ t_stat dc_show_modem (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 
 /* SET LINES processor */
 
-t_stat dc_setnl (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dc_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32 newln, i, t;
     t_stat r;
@@ -464,7 +464,7 @@ t_stat dc_setnl (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* SET LOG processor */
 
-t_stat dc_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dc_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_stat r;
     char gbuf[CBUFSIZE];
@@ -483,7 +483,7 @@ t_stat dc_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* SET NOLOG processor */
 
-t_stat dc_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dc_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_stat r;
     int32 ln;
@@ -498,7 +498,7 @@ t_stat dc_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* SHOW LOG processor */
 
-t_stat dc_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dc_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int32 i;
 
@@ -513,7 +513,7 @@ t_stat dc_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 
 /* Attach routine */
 
-t_stat dc_attach (UNIT *uptr, CONST char *cptr)
+t_stat dc_attach (UNIT *uptr, const char *cptr)
 {
 t_stat reason;
 

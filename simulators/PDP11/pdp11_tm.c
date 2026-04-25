@@ -168,14 +168,14 @@ t_stat tm_rd (int32 *data, int32 PA, int32 access);
 t_stat tm_wr (int32 data, int32 PA, int32 access);
 t_stat tm_svc (UNIT *uptr);
 t_stat tm_reset (DEVICE *dptr);
-t_stat tm_attach (UNIT *uptr, CONST char *cptr);
+t_stat tm_attach (UNIT *uptr, const char *cptr);
 t_stat tm_detach (UNIT *uptr);
 t_stat tm_boot (int32 unitno, DEVICE *dptr);
 void tm_go (UNIT *uptr);
 int32 tm_updcsta (UNIT *uptr);
 void tm_set_done (void);
 t_stat tm_map_err (UNIT *uptr, t_stat st);
-t_stat tm_vlock (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat tm_vlock (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat tm_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *tm_description (DEVICE *dptr);
 
@@ -607,7 +607,7 @@ return auto_config (0, 0);
 
 /* Attach routine */
 
-t_stat tm_attach (UNIT *uptr, CONST char *cptr)
+t_stat tm_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 int32 u = uptr - tm_dev.units;
@@ -638,7 +638,7 @@ return sim_tape_detach (uptr);
 
 /* Write lock/enable routine */
 
-t_stat tm_vlock (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tm_vlock (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 u = uptr - tm_dev.units;
 

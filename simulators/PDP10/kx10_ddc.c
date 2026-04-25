@@ -110,7 +110,7 @@ t_stat          ddc_devio(uint32 dev, uint64 *data);
 t_stat          ddc_svc(UNIT *);
 void            ddc_ini(UNIT *, t_bool);
 t_stat          ddc_reset(DEVICE *);
-t_stat          ddc_attach(UNIT *, CONST char *);
+t_stat          ddc_attach(UNIT *, const char *);
 t_stat          ddc_detach(UNIT *);
 t_stat          ddc_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                      const char *cptr);
@@ -359,7 +359,7 @@ ddc_reset(DEVICE * dptr)
 
 /* Device attach */
 
-t_stat ddc_attach (UNIT *uptr, CONST char *cptr)
+t_stat ddc_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
 

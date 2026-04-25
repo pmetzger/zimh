@@ -176,11 +176,11 @@ extern void rebuildPending(void);
 
 extern void dev1Interrupts(char *);
 
-t_stat cpu_set_instr(UNIT *, int32, CONST char *, void *);
-t_stat cpu_show_instr(FILE *, UNIT *, int32, CONST void *);
+t_stat cpu_set_instr(UNIT *, int32, const char *, void *);
+t_stat cpu_show_instr(FILE *, UNIT *, int32, const void *);
 
 t_stat cpu_reset(DEVICE *);
-t_stat cpu_set_size(UNIT *, int32, CONST char *, void *);
+t_stat cpu_set_size(UNIT *, int32, const char *, void *);
 t_stat cpu_ex(t_value *, t_addr, UNIT *, int32);
 t_stat cpu_dep(t_value, t_addr, UNIT *uptr, int32 sw);
 
@@ -337,7 +337,7 @@ static uint16 interruptBit[] = {
   0x0100, 0x0200, 0x0400, 0x0800, 0x1000, 0x2000, 0x4000, 0x8000
 };
 
-t_stat cpu_set_instr(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_instr(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (!cptr)
     return SCPE_IERR;
@@ -353,7 +353,7 @@ t_stat cpu_set_instr(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
   return SCPE_OK;
 }
 
-t_stat cpu_show_instr(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_instr(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   switch (INSTR_SET) {
     case INSTR_ORIGINAL:
@@ -410,7 +410,7 @@ t_stat cpu_reset(DEVICE *dptr)
 /*
  * Memory size change
  */
-t_stat cpu_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   uint16 mc = 0;
   uint32 i;

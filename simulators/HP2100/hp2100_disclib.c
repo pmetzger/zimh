@@ -1665,7 +1665,7 @@ else                                                    /* the phase is illegal,
    retained.
 */
 
-t_stat dl_attach (CVPTR cvptr, UNIT *uptr, CONST char *cptr)
+t_stat dl_attach (CVPTR cvptr, UNIT *uptr, const char *cptr)
 {
 uint32 id, size;
 t_stat result;
@@ -1715,7 +1715,7 @@ return detach_unit (uptr);                              /*   and detach the unit
    the unit capacity is set to the size indicated.
 */
 
-t_stat dl_set_model (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat dl_set_model (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if (uptr->flags & UNIT_ATT)                                 /* we cannot alter the disc model */
     return SCPE_ALATT;                                      /*   if the unit is attached */

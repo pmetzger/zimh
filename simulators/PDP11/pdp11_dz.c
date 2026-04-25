@@ -269,7 +269,7 @@ int32 dz_txinta (void);
 t_stat dz_svc (UNIT *uptr);
 t_stat dz_xmt_svc (UNIT *uptr);
 t_stat dz_reset (DEVICE *dptr);
-t_stat dz_attach (UNIT *uptr, CONST char *cptr);
+t_stat dz_attach (UNIT *uptr, const char *cptr);
 t_stat dz_detach (UNIT *uptr);
 t_stat dz_clear (int32 dz, t_bool flag);
 uint16 dz_getc (int32 dz);
@@ -279,11 +279,11 @@ void dz_clr_rxint (int32 dz);
 void dz_set_rxint (int32 dz);
 void dz_clr_txint (int32 dz);
 void dz_set_txint (int32 dz);
-t_stat dz_show_vec (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat dz_setnl (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dz_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dz_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat dz_show_vec (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat dz_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dz_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dz_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat dz_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 t_stat dz_help_attach (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *dz_description (DEVICE *dptr);
@@ -817,7 +817,7 @@ return auto_config (dptr->name, ndev);                  /* auto config */
 
 /* Attach */
 
-t_stat dz_attach (UNIT *uptr, CONST char *cptr)
+t_stat dz_attach (UNIT *uptr, const char *cptr)
 {
 int32 dz, muxln, ln;
 t_stat r;
@@ -880,7 +880,7 @@ for (dz = 0; dz < dz_desc.lines/DZ_LINES; dz++) {
 return r;
 }
 
-t_stat dz_show_vec (FILE *st, UNIT *uptr, int32 arg, CONST void *desc)
+t_stat dz_show_vec (FILE *st, UNIT *uptr, int32 arg, const void *desc)
 {
 const TMXR *mp = (const TMXR *) desc;
 
@@ -890,7 +890,7 @@ return show_vec (st, uptr, ((mp->lines * 2) / DZ_LINES), desc);
 
 /* SET LINES processor */
 
-t_stat dz_setnl (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dz_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 newln, i, t;
 t_stat r;
@@ -927,7 +927,7 @@ return dz_reset (&dz_dev);                              /* setup lines and auto 
 
 /* SET LOG processor */
 
-t_stat dz_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dz_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 t_stat r;
 char gbuf[CBUFSIZE];
@@ -946,7 +946,7 @@ return tmxr_set_log (NULL, ln, cptr, desc);
 
 /* SET NOLOG processor */
 
-t_stat dz_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dz_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 t_stat r;
 int32 ln;
@@ -961,7 +961,7 @@ return tmxr_set_nolog (NULL, ln, NULL, desc);
 
 /* SHOW LOG processor */
 
-t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 i;
 

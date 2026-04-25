@@ -44,7 +44,7 @@
 
 t_stat              cdp_srv(UNIT *);
 t_stat              cdp_reset(DEVICE *);
-t_stat              cdp_attach(UNIT *, CONST char *);
+t_stat              cdp_attach(UNIT *, const char *);
 t_stat              cdp_detach(UNIT *);
 t_stat              cdp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                         const char *cptr);
@@ -251,7 +251,7 @@ cdp_reset(DEVICE * dptr)
 }
 
 t_stat
-cdp_attach(UNIT * uptr, CONST char *file)
+cdp_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
 

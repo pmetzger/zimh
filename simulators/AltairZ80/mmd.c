@@ -169,17 +169,17 @@ static t_stat mmdm_reset(DEVICE *dptr);
 static t_stat mmd_svc(UNIT *uptr);
 static t_stat mmdm_svc(UNIT *uptr);
 static t_stat mmd_sio1_svc(UNIT *uptr);
-static t_stat mmd_attach(UNIT *uptr, CONST char *cptr);
-static t_stat mmdm_attach(UNIT *uptr, CONST char *cptr);
+static t_stat mmd_attach(UNIT *uptr, const char *cptr);
+static t_stat mmdm_attach(UNIT *uptr, const char *cptr);
 static t_stat mmd_detach(UNIT *uptr);
 static t_stat mmdm_detach(UNIT *uptr);
 static t_stat mmd_config_line(DEVICE *dev, TMLN *tmln, int baud);
 static t_stat mmd_boot(int32 unitno, DEVICE *dptr);
 static const char* mmd_description(DEVICE *dptr);
-static t_stat mmd_set_diag(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat mmd_show_diag(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat mmd_set_rom(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat mmd_show_rom(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat mmd_set_diag(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat mmd_show_diag(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat mmd_set_rom(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat mmd_show_rom(FILE *st, UNIT *uptr, int32 val, const void *desc);
 static int32 mmddev(int32 Addr, int32 rw, int32 data);
 static int32 mmdrom(int32 Addr, int32 rw, int32 data);
 static int32 mmdmem(int32 Addr, int32 rw, int32 data);
@@ -3133,7 +3133,7 @@ static t_stat mmd_sio1_svc(UNIT *uptr)
 }
 
 /* Attach routines */
-static t_stat mmd_attach(UNIT *uptr, CONST char *cptr)
+static t_stat mmd_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r;
     unsigned int i = 0;
@@ -3193,7 +3193,7 @@ static t_stat mmd_attach(UNIT *uptr, CONST char *cptr)
     return SCPE_OK;
 }
 
-static t_stat mmdm_attach(UNIT *uptr, CONST char *cptr)
+static t_stat mmdm_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r;
 
@@ -3324,7 +3324,7 @@ static t_stat mmd_boot(int32 unitno, DEVICE *dptr)
     return SCPE_OK;
 }
 
-static t_stat mmd_set_diag(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat mmd_set_diag(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int i;
 
@@ -3350,7 +3350,7 @@ static t_stat mmd_set_diag(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-static t_stat mmd_show_diag(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat mmd_show_diag(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (mmd_ctx->diagEnabled) {
         fprintf(st, "DIAG");
@@ -3361,7 +3361,7 @@ static t_stat mmd_show_diag(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
     return SCPE_OK;
 }
 
-static t_stat mmd_set_rom(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat mmd_set_rom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
@@ -3384,7 +3384,7 @@ static t_stat mmd_set_rom(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-static t_stat mmd_show_rom(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat mmd_show_rom(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (mmd_rom == mmd_rom_13) {
         fprintf(st, "ROM=v1.3");

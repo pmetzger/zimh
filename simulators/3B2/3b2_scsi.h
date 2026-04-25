@@ -268,12 +268,12 @@ typedef struct {
     ha_ts   ts[8];            /* Target state */
 } HA_STATE;
 
-t_stat ha_show_type(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat ha_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat ha_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat ha_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat ha_reset(DEVICE *dptr);
 t_stat ha_svc(UNIT *uptr);
 t_stat ha_rq_svc(UNIT *uptr);
-t_stat ha_attach(UNIT *uptr, CONST char *cptr);
+t_stat ha_attach(UNIT *uptr, const char *cptr);
 t_stat ha_detach(UNIT *uptr);
 
 void ha_fast_queue_check(void);

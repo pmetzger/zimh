@@ -108,18 +108,18 @@ uint8 *URLContents(const char *URL, uint32 *length) {
 #define CPM_COMMAND_LINE_LENGTH     128
 #define CPM_FCB_ADDRESS             0x0080      /* Default FCB address for CP/M.                */
 
-static t_stat simh_dev_set_timeron  (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat simh_dev_set_timeroff (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat simh_dev_set_timeron  (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat simh_dev_set_timeroff (UNIT *uptr, int32 value, const char *cptr, void *desc);
 static t_stat sio_reset(DEVICE *dptr);
-static t_stat sio_attach(UNIT *uptr, CONST char *cptr);
+static t_stat sio_attach(UNIT *uptr, const char *cptr);
 static t_stat sio_detach(UNIT *uptr);
 static t_stat ptr_reset(DEVICE *dptr);
 static t_stat ptp_reset(DEVICE *dptr);
 static t_stat toBool(char tf, int32 *result);
-static t_stat sio_dev_set_port(UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat sio_dev_show_port(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat sio_dev_set_interrupton(UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat sio_dev_set_interruptoff(UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat sio_dev_set_port(UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat sio_dev_show_port(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat sio_dev_set_interrupton(UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat sio_dev_set_interruptoff(UNIT *uptr, int32 value, const char *cptr, void *desc);
 static t_stat sio_svc(UNIT *uptr);
 static t_stat simh_dev_reset(DEVICE *dptr);
 static t_stat simh_svc(UNIT *uptr);
@@ -127,8 +127,8 @@ static const char* sio_description(DEVICE *dptr);
 static const char* simh_description(DEVICE *dptr);
 static const char* ptr_description(DEVICE *dptr);
 static const char* ptp_description(DEVICE *dptr);
-static t_stat ptpptr_dev_set_port(UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat ptpptr_dev_show_port(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat ptpptr_dev_set_port(UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat ptpptr_dev_show_port(FILE *st, UNIT *uptr, int32 val, const void *desc);
 static void mapAltairPorts(void);
 int32 nulldev   (const int32 port, const int32 io, const int32 data);
 int32 sr_dev    (const int32 port, const int32 io, const int32 data);
@@ -536,7 +536,7 @@ static void resetSIOWarningFlags(void) {
     warnUnattachedPTP = warnUnattachedPTR = warnPTREOF = warnUnassignedPort = 0;
 }
 
-static t_stat sio_attach(UNIT *uptr, CONST char *cptr) {
+static t_stat sio_attach(UNIT *uptr, const char *cptr) {
     t_stat r = SCPE_IERR;
     sio_unit.u3 = FALSE;                                    /* no character in terminal input buffer    */
     get_uint(cptr, 10, 65535, &r);                          /* attempt to get port, discard result      */
@@ -1013,7 +1013,7 @@ static uint32 equalSIP(SIO_PORT_INFO x, SIO_PORT_INFO y) {
     (x.sio_reset == y.sio_reset) && (x.hasOUT == y.hasOUT);
 }
 
-static t_stat ptpptr_dev_set_port(UNIT *uptr, int32 value, CONST char *cptr, void *desc) {
+static t_stat ptpptr_dev_set_port(UNIT *uptr, int32 value, const char *cptr, void *desc) {
     int32 result, n, statusPort, dataPort;
     if (cptr == NULL)
         return SCPE_ARG;
@@ -1035,12 +1035,12 @@ static t_stat ptpptr_dev_set_port(UNIT *uptr, int32 value, CONST char *cptr, voi
     return SCPE_OK;
 }
 
-static t_stat ptpptr_dev_show_port(FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
+static t_stat ptpptr_dev_show_port(FILE *st, UNIT *uptr, int32 val, const void *desc) {
     fprintf(st, "\n\tStatus port = 0x%02x\n\t  Data port = 0x%02x\n", ptpptrStatusPort, ptpptrDataPort);
     return SCPE_OK;
 }
 
-static t_stat sio_dev_set_port(UNIT *uptr, int32 value, CONST char *cptr, void *desc) {
+static t_stat sio_dev_set_port(UNIT *uptr, int32 value, const char *cptr, void *desc) {
     int32 result, n, position, isDataPort;
     SIO_PORT_INFO sip = { 0 }, old;
     char hasReset, hasOUT;
@@ -1106,7 +1106,7 @@ static t_stat sio_dev_set_port(UNIT *uptr, int32 value, CONST char *cptr, void *
     return SCPE_OK;
 }
 
-static t_stat sio_dev_show_port(FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
+static t_stat sio_dev_show_port(FILE *st, UNIT *uptr, int32 val, const void *desc) {
     int32 i, first = TRUE;
     for (i = 0; port_table[i].port != -1; i++)
         if (!port_table[i].isBuiltin) {
@@ -1121,12 +1121,12 @@ static t_stat sio_dev_show_port(FILE *st, UNIT *uptr, int32 val, CONST void *des
     return SCPE_OK;
 }
 
-static t_stat sio_dev_set_interrupton(UNIT *uptr, int32 value, CONST char *cptr, void *desc) {
+static t_stat sio_dev_set_interrupton(UNIT *uptr, int32 value, const char *cptr, void *desc) {
     keyboardInterrupt = FALSE;
     return sim_activate(&sio_unit, sio_unit.wait);          /* activate unit */
 }
 
-static t_stat sio_dev_set_interruptoff(UNIT *uptr, int32 value, CONST char *cptr, void *desc) {
+static t_stat sio_dev_set_interruptoff(UNIT *uptr, int32 value, const char *cptr, void *desc) {
     keyboardInterrupt = FALSE;
     sim_cancel(&sio_unit);
     return SCPE_OK;
@@ -1362,12 +1362,12 @@ static void warnNoRealTimeClock(void) {
               " Sorry - no real time clock available.\n", PCX);
 }
 
-static t_stat simh_dev_set_timeron(UNIT *uptr, int32 value, CONST char *cptr, void *desc) {
+static t_stat simh_dev_set_timeron(UNIT *uptr, int32 value, const char *cptr, void *desc) {
     timeOfNextInterrupt = sim_os_msec() + timerDelta;
     return sim_activate(&simh_unit, simh_unit.wait);    /* activate unit */
 }
 
-static t_stat simh_dev_set_timeroff(UNIT *uptr, int32 value, CONST char *cptr, void *desc) {
+static t_stat simh_dev_set_timeroff(UNIT *uptr, int32 value, const char *cptr, void *desc) {
     timerInterrupt = FALSE;
     return SCPE_OK;
 }

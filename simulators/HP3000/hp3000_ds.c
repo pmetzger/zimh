@@ -369,9 +369,9 @@ static CNTLR_INTRF ds_interface;
 static t_stat      ds_service     (UNIT   *uptr);
 static t_stat      ds_reset       (DEVICE *dptr);
 static t_stat      ds_boot        (int32  unit_number, DEVICE *dptr);
-static t_stat      ds_attach      (UNIT   *uptr, CONST char *cptr);
+static t_stat      ds_attach      (UNIT   *uptr, const char *cptr);
 static t_stat      ds_detach      (UNIT   *uptr);
-static t_stat      ds_load_unload (UNIT   *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat      ds_load_unload (UNIT   *uptr, int32 value, const char *cptr, void *desc);
 
 
 /* Interface local utility routines */
@@ -954,7 +954,7 @@ else {                                                  /* otherwise */
        changed by the controller, so the unit will not request attention.
 */
 
-static t_stat ds_attach (UNIT *uptr, CONST char *cptr)
+static t_stat ds_attach (UNIT *uptr, const char *cptr)
 {
 t_stat result;
 
@@ -1020,7 +1020,7 @@ else                                                    /* otherwise */
    becomes idle.
 */
 
-static t_stat ds_load_unload (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat ds_load_unload (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 const t_bool load = (value != UNIT_UNLOAD);             /* TRUE if the heads are loading */
 t_stat result;

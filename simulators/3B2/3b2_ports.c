@@ -133,7 +133,7 @@ PORTS_LINE_STATE *ports_state = NULL;
 PORTS_LINE_STATE lpt_state;
 
 /* Baud rates determined by the low nybble of the PORT_OPTIONS cflag */
-CONST char *ports_baud[16] = {
+const char *ports_baud[16] = {
     "75",    "110",  "134",  "150",
     "300",   "600",  "1200", "2000",
     "2400",  "4800", "1800", "9600",
@@ -263,7 +263,7 @@ static void lpt_out(uint8 c)
  * Set the number of lines for the PORTS mux. This will add or remove
  * cards as necessary. The number of lines must be a multiple of 4.
  */
-t_stat ports_setnl(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat ports_setnl(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32 newln, i, t;
     t_stat r = SCPE_OK;
@@ -886,7 +886,7 @@ t_stat ports_xmt_svc(UNIT *uptr)
     return SCPE_OK;
 }
 
-t_stat ports_attach(UNIT *uptr, CONST char *cptr)
+t_stat ports_attach(UNIT *uptr, const char *cptr)
 {
     TMLN *lp;
     t_stat r;

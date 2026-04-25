@@ -343,12 +343,12 @@ t_stat chan_boot(int32 unit_num, DEVICE *dptr);
 
 /* Sets the device onto a given channel */
 t_stat chan_set_devs(DEVICE *dptr);
-t_stat set_chan(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat set_cchan(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat print_chan(FILE *st, UNIT *uptr, int32 v, CONST void *desc);
-t_stat get_chan(FILE *st, UNIT *uptr, int32 v, CONST void *desc);
-t_stat chan9_set_select(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat chan9_get_select(FILE *st, UNIT *uptr, int32 v, CONST void *desc);
+t_stat set_chan(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat set_cchan(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat print_chan(FILE *st, UNIT *uptr, int32 v, const void *desc);
+t_stat get_chan(FILE *st, UNIT *uptr, int32 v, const void *desc);
+t_stat chan9_set_select(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat chan9_get_select(FILE *st, UNIT *uptr, int32 v, const void *desc);
 
 /* Check channel for error */
 int chan_error(int chan);
@@ -395,8 +395,8 @@ void chan_proc(void);
 
 #ifdef I7010
 /* Sets the device that will interrupt on the channel. */
-t_stat set_urec(UNIT * uptr, int32 val, CONST char *cptr, void *desc);
-t_stat get_urec(FILE * st, UNIT * uptr, int32 v, CONST void *desc);
+t_stat set_urec(UNIT * uptr, int32 val, const char *cptr, void *desc);
+t_stat get_urec(FILE * st, UNIT * uptr, int32 v, const void *desc);
 /* Execute the next channel instruction. */
 void chan_set_attn_urec(int chan, uint16 addr);
 void chan_set_attn_inq(int chan);

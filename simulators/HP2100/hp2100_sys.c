@@ -1871,12 +1871,12 @@ static DEVICE poll_dev = {
 void   hp_one_time_init  (void);
 static t_bool fprint_stopped (FILE *st, t_stat reason);
 static void   fprint_addr    (FILE *st, DEVICE *dptr, t_addr addr);
-static t_addr parse_addr     (DEVICE *dptr, CONST char *cptr, CONST char **tptr);
+static t_addr parse_addr     (DEVICE *dptr, const char *cptr, const char **tptr);
 
-static t_stat hp_exdep_cmd (int32 arg, CONST char *buf);
-static t_stat hp_run_cmd   (int32 arg, CONST char *buf);
-static t_stat hp_brk_cmd   (int32 arg, CONST char *buf);
-static t_stat hp_load_cmd  (int32 arg, CONST char *buf);
+static t_stat hp_exdep_cmd (int32 arg, const char *buf);
+static t_stat hp_run_cmd   (int32 arg, const char *buf);
+static t_stat hp_brk_cmd   (int32 arg, const char *buf);
+static t_stat hp_load_cmd  (int32 arg, const char *buf);
 
 
 /* System interface local utility routines */
@@ -1885,12 +1885,12 @@ static t_stat  fprint_value       (FILE *ofile, t_value val,  uint32 radix, uint
 static t_stat  fprint_instruction (FILE *ofile, t_addr addr, t_value *val, uint32 radix,
                                    const OP_DESC op_desc, const OP_TABLE ops);
 
-static t_value parse_address     (CONST char *cptr, t_stat *status);
-static t_value parse_value       (CONST char *cptr, uint32 radix, t_value max, t_stat *status);
-static t_stat  parse_cpu         (CONST char *cptr, t_addr addr, t_value *val, uint32 radix, SYMBOL_SOURCE target);
-static t_stat  parse_instruction (CONST char *cptr, t_addr addr, t_value *val, uint32 radix, const OP_ENTRY *optr);
+static t_value parse_address     (const char *cptr, t_stat *status);
+static t_value parse_value       (const char *cptr, uint32 radix, t_value max, t_stat *status);
+static t_stat  parse_cpu         (const char *cptr, t_addr addr, t_value *val, uint32 radix, SYMBOL_SOURCE target);
+static t_stat  parse_instruction (const char *cptr, t_addr addr, t_value *val, uint32 radix, const OP_ENTRY *optr);
 static t_stat  parse_micro_ops   (const OP_ENTRY *optr, char *gbuf, t_value *val,
-                                  CONST char **gptr, uint32 *accumulator);
+                                  const char **gptr, uint32 *accumulator);
 
 static int fgetword (FILE *fileref);
 static int fputword (int data, FILE *fileref);
@@ -2111,7 +2111,7 @@ static CTAB aux_cmds [] = {
        Assembler.
 */
 
-t_stat sim_load (FILE *fptr, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fptr, const char *cptr, const char *fnam, int flag)
 {
 const int    reclen [2] = { TO_WORD (57, 0),            /* the two DUMP record length words */
                             TO_WORD (7, 0) };
@@ -2547,7 +2547,7 @@ else                                                    /* otherwise the modes c
        implemented.
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
 int32         formats, modes;
 uint32        radix;
@@ -2676,7 +2676,7 @@ else                                                    /* otherwise the modes c
        the unit to attach.
 */
 
-t_stat hp_attach (UNIT *uptr, CONST char *cptr)
+t_stat hp_attach (UNIT *uptr, const char *cptr)
 {
 t_stat result;
 
@@ -2726,7 +2726,7 @@ return result;
        "count" parameter to this routine is unsigned).
 */
 
-t_stat hp_set_dib (UNIT *uptr, int32 count, CONST char *cptr, void *desc)
+t_stat hp_set_dib (UNIT *uptr, int32 count, const char *cptr, void *desc)
 {
 DIB    *dibptr = (DIB *) desc;                          /* a pointer to the associated DIB array */
 t_stat status = SCPE_OK;
@@ -2782,7 +2782,7 @@ return status;                                          /* return the validation
        that supplies the "count" parameter to this routine is unsigned).
 */
 
-t_stat hp_show_dib (FILE *st, UNIT *uptr, int32 count, CONST void *desc)
+t_stat hp_show_dib (FILE *st, UNIT *uptr, int32 count, const void *desc)
 {
 const DIB *dibptr = (const DIB *) desc;                 /* a pointer to the associated DIB array */
 int32     index, limit;
@@ -3713,9 +3713,9 @@ return;
    physical and logical address specifications.
 */
 
-static t_addr parse_addr (DEVICE *dptr, CONST char *cptr, CONST char **tptr)
+static t_addr parse_addr (DEVICE *dptr, const char *cptr, const char **tptr)
 {
-CONST char *sptr;
+const char *sptr;
 t_addr     page;
 t_addr     address = 0;
 
@@ -3763,7 +3763,7 @@ return address;                                         /* return the linear add
    handler.
 */
 
-static t_stat hp_exdep_cmd (int32 arg, CONST char *buf)
+static t_stat hp_exdep_cmd (int32 arg, const char *buf)
 {
 parse_physical = TRUE;                                  /* allow the <page.<offset> address form */
 
@@ -3784,7 +3784,7 @@ return exdep_cmd (arg, buf);                            /* return the result of 
    standard command handler.
 */
 
-static t_stat hp_run_cmd (int32 arg, CONST char *buf)
+static t_stat hp_run_cmd (int32 arg, const char *buf)
 {
 parse_physical = FALSE;                                 /* allow the <logical-address> address form only */
 
@@ -3805,7 +3805,7 @@ return run_cmd (arg, buf);                              /* return the result of 
    standard command handler.
 */
 
-static t_stat hp_brk_cmd (int32 arg, CONST char *buf)
+static t_stat hp_brk_cmd (int32 arg, const char *buf)
 {
 parse_physical = FALSE;                                 /* allow the <logical-address> address form only */
 
@@ -3843,9 +3843,9 @@ return brk_cmd (arg, buf);                              /* return the result of 
        buffer.
 */
 
-static t_stat hp_load_cmd (int32 arg, CONST char *buf)
+static t_stat hp_load_cmd (int32 arg, const char *buf)
 {
-CONST char *cptr;
+const char *cptr;
 char cbuf [CBUFSIZE];
 DEVICE *dptr = NULL;
 
@@ -4319,9 +4319,9 @@ return status;                                          /* return the number of 
 */
 
 
-static t_value parse_address (CONST char *cptr, t_stat *status)
+static t_value parse_address (const char *cptr, t_stat *status)
 {
-CONST char *iptr;
+const char *iptr;
 t_value address;
 
 address = strtotv (cptr, &iptr, cpu_dev.aradix);        /* parse the address */
@@ -4358,7 +4358,7 @@ else {                                                  /* otherwise there are e
    Otherwise, a numeric parse is attempted.
 */
 
-static t_value parse_value (CONST char *cptr, uint32 radix, t_value max, t_stat *status)
+static t_value parse_value (const char *cptr, uint32 radix, t_value max, t_stat *status)
 {
 if (radix == 256)                                       /* if ASCII character parsing is requested */
     if (cptr [0] != '\0' && (t_value) cptr [0] < max) { /*   then if a character is present and within range */
@@ -4419,9 +4419,9 @@ else                                                    /* otherwise parse as a 
        is used to separate the multiple mnemonics of SRG and ASG instructions.
 */
 
-static t_stat parse_cpu (CONST char *cptr, t_addr addr, t_value *val, uint32 radix, SYMBOL_SOURCE target)
+static t_stat parse_cpu (const char *cptr, t_addr addr, t_value *val, uint32 radix, SYMBOL_SOURCE target)
 {
-CONST char *gptr;
+const char *gptr;
 const PARSER_ENTRY *pptr;
 const OP_ENTRY     *eptr;
 char  gbuf [CBUFSIZE];
@@ -4568,9 +4568,9 @@ return SCPE_ARG;                                        /* no match was found, s
        0 => 16, and +15 => 31).
 */
 
-static t_stat parse_instruction (CONST char *cptr, t_addr addr, t_value *val, uint32 radix, const OP_ENTRY *optr)
+static t_stat parse_instruction (const char *cptr, t_addr addr, t_value *val, uint32 radix, const OP_ENTRY *optr)
 {
-CONST char *gptr;
+const char *gptr;
 const char *mptr;
 char       gbuf [CBUFSIZE];
 OP_TYPE    op_type;
@@ -4945,7 +4945,7 @@ return SCPE_ARG;                                        /* return an error for e
        micro-op.
 */
 
-static t_stat parse_micro_ops (const OP_ENTRY *optr, char *gbuf, t_value *val, CONST char **gptr, uint32 *accumulator)
+static t_stat parse_micro_ops (const OP_ENTRY *optr, char *gbuf, t_value *val, const char **gptr, uint32 *accumulator)
 {
 while (optr->mnemonic != NULL)                                  /* search the table until the NULL entry at the end */
     if (strcmp (optr->mnemonic, gbuf) == 0) {                   /* if the mnemonic matches this entry */

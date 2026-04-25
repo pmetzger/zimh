@@ -1674,7 +1674,7 @@ return SCPE_OK;
 
 /* Set device file format */
 
-t_stat scsi_set_fmt (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat scsi_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
 
@@ -1695,7 +1695,7 @@ switch (dev->devtype) {
 
 /* Show device file format */
 
-t_stat scsi_show_fmt (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat scsi_show_fmt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
 
@@ -1716,7 +1716,7 @@ switch (dev->devtype) {
 
 /* Set/clear hardware write lock */
 
-t_stat scsi_set_wlk (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat scsi_set_wlk (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
 
@@ -1727,14 +1727,14 @@ return set_writelock (uptr, val, cptr, desc);
 
 /* Show write lock status */
 
-t_stat scsi_show_wlk (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat scsi_show_wlk (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 return show_writelock (st, uptr, val, desc);
 }
 
 /* Attach device */
 
-t_stat scsi_attach_ex (UNIT *uptr, CONST char *cptr, const char **drivetypes)
+t_stat scsi_attach_ex (UNIT *uptr, const char *cptr, const char **drivetypes)
 {
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
 
@@ -1755,7 +1755,7 @@ switch (dev->devtype) {
         }
 }
 
-t_stat scsi_attach (UNIT *uptr, CONST char *cptr)
+t_stat scsi_attach (UNIT *uptr, const char *cptr)
 {
 return scsi_attach_ex (uptr, cptr, NULL);
 }

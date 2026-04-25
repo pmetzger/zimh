@@ -474,12 +474,12 @@ static t_stat kmc_txService(UNIT * txup);
 static t_stat kmc_rxService(UNIT * rxup);
 
 #if KMC_UNITS > 1
-static t_stat kmc_setDeviceCount (UNIT *txup, int32 val, CONST char *cptr, void *desc);
-static t_stat kmc_showDeviceCount (FILE *st, UNIT *txup, int32 val, CONST void *desc);
+static t_stat kmc_setDeviceCount (UNIT *txup, int32 val, const char *cptr, void *desc);
+static t_stat kmc_showDeviceCount (FILE *st, UNIT *txup, int32 val, const void *desc);
 #endif
-static t_stat kmc_setLineSpeed (UNIT *txup, int32 val, CONST char *cptr, void *desc);
-static t_stat kmc_showLineSpeed (FILE *st, UNIT *txup, int32 val, CONST void *desc);
-static t_stat kmc_showStatus (FILE *st, UNIT *up, int32 v, CONST void *dp);
+static t_stat kmc_setLineSpeed (UNIT *txup, int32 val, const char *cptr, void *desc);
+static t_stat kmc_showLineSpeed (FILE *st, UNIT *txup, int32 val, const void *desc);
+static t_stat kmc_showStatus (FILE *st, UNIT *up, int32 v, const void *dp);
 
 static t_stat kmc_help (FILE *st, DEVICE *dptr,
                         UNIT *uptr, int32 flag, const char *cptr);
@@ -2764,7 +2764,7 @@ static void *remqueue (QH *entry, int32 *count) {
  */
 
 #if KMC_UNITS > 1
-static t_stat kmc_setDeviceCount (UNIT *txup, int32 val, CONST char *cptr, void *desc) {
+static t_stat kmc_setDeviceCount (UNIT *txup, int32 val, const char *cptr, void *desc) {
     int32 newln;
     uint32 dupidx;
     t_stat r;
@@ -2794,7 +2794,7 @@ static t_stat kmc_setDeviceCount (UNIT *txup, int32 val, CONST char *cptr, void 
 /* Report number of configured KMCs */
 
 #if KMC_UNITS > 1
-static t_stat kmc_showDeviceCount (FILE *st, UNIT *txup, int32 val, CONST void *desc) {
+static t_stat kmc_showDeviceCount (FILE *st, UNIT *txup, int32 val, const void *desc) {
     DEVICE *dev = find_dev_from_unit(txup);
 
     if (dev->flags & DEV_DIS) {
@@ -2828,7 +2828,7 @@ static t_stat kmc_showDeviceCount (FILE *st, UNIT *txup, int32 val, CONST void *
  * potential use of that DUP by a KMC.
  */
 
-static t_stat kmc_setLineSpeed (UNIT *txup, int32 val, CONST char *cptr, void *desc) {
+static t_stat kmc_setLineSpeed (UNIT *txup, int32 val, const char *cptr, void *desc) {
     dupstate *d;
     int32 dupidx, newspeed;
     char gbuf[CBUFSIZE];
@@ -2859,7 +2859,7 @@ static t_stat kmc_setLineSpeed (UNIT *txup, int32 val, CONST char *cptr, void *d
     return SCPE_OK;
 }
 
-static t_stat kmc_showLineSpeed (FILE *st, UNIT *txup, int32 val, CONST void *desc) {
+static t_stat kmc_showLineSpeed (FILE *st, UNIT *txup, int32 val, const void *desc) {
     int dupidx;
 
     fprintf (st, "DUP KMC Line   Speed\n"
@@ -2883,7 +2883,7 @@ static t_stat kmc_showLineSpeed (FILE *st, UNIT *txup, int32 val, CONST void *de
 
 /* Show KMC status */
 
-t_stat kmc_showStatus (FILE *st, UNIT *up, int32 v,  CONST void *dp) {
+t_stat kmc_showStatus (FILE *st, UNIT *up, int32 v,  const void *dp) {
     int32 k = up->unit_kmc;
     int32 line;
     t_bool first = TRUE;

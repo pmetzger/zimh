@@ -158,7 +158,7 @@
 /* function prototypes */
 
 t_stat fd400_dsk_reset (DEVICE *dptr);
-t_stat fd400_attach (UNIT *, CONST char *);
+t_stat fd400_attach (UNIT *, const char *);
 
 /* SS-50 I/O address space functions */
 
@@ -505,7 +505,7 @@ int32 fd400_startrw(int32 io, int32 data)
     return 0;
 }
 
-t_stat fd400_attach (UNIT * uptr, CONST char * file)
+t_stat fd400_attach (UNIT * uptr, const char * file)
 {
     t_stat r; 
 

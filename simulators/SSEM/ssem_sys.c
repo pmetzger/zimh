@@ -106,7 +106,7 @@ return SCPE_OK;
         return  =       status code
 */
 
-t_stat sim_load (FILE *fi, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fi, const char *cptr, const char *fnam, int flag)
 {
 size_t len;
 
@@ -394,7 +394,7 @@ return SCPE_OK;
         status  =       error status
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
 
 if (sw & SWMASK ('H')) return SCPE_ARG;    /* hexadecimal? */

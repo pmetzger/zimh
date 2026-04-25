@@ -41,7 +41,7 @@
 
 t_stat i8259_cfg(uint16 base, uint16 devnum, uint8 dummy);
 t_stat i8259_clr(void);
-t_stat i8259_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat i8259_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc);
 uint8 i8259a(t_bool io, uint8 data, uint8 devnum);
 uint8 i8259b(t_bool io, uint8 data, uint8 devnum);
 void i8259_dump(uint8 devnum);
@@ -178,7 +178,7 @@ t_stat i8259_clr(void)
 
 // show configuration parameters
 
-t_stat i8259_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat i8259_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int i;
     

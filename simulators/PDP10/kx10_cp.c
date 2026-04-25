@@ -91,7 +91,7 @@
 t_stat              cp_devio(uint32 dev, uint64 *data);
 t_stat              cp_srv(UNIT *);
 t_stat              cp_reset(DEVICE *);
-t_stat              cp_attach(UNIT *, CONST char *);
+t_stat              cp_attach(UNIT *, const char *);
 t_stat              cp_detach(UNIT *);
 t_stat              cp_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 const char         *cp_description(DEVICE *dptr);
@@ -242,7 +242,7 @@ cp_srv(UNIT *uptr) {
 
 
 t_stat
-cp_attach(UNIT * uptr, CONST char *file)
+cp_attach(UNIT * uptr, const char *file)
 {
     sim_switches |= SWMASK ('A');   /* Position to EOF */
     return sim_card_attach(uptr, file);

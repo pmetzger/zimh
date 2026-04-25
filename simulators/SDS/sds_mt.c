@@ -81,7 +81,7 @@ DSPT mt_tplt[] = {                                      /* template */
 t_stat mt_svc (UNIT *uptr);
 t_stat mt_reset (DEVICE *dptr);
 t_stat mt_boot (int32 unitno, DEVICE *dptr);
-t_stat mt_attach (UNIT *uptr, CONST char *cptr);
+t_stat mt_attach (UNIT *uptr, const char *cptr);
 t_stat mt_detach (UNIT *uptr);
 t_stat mt_readrec (UNIT *uptr);
 t_mtrlnt mt_readbc (UNIT *uptr);
@@ -479,7 +479,7 @@ return SCPE_OK;
 
 /* Attach and detach routines */
 
-t_stat mt_attach (UNIT *uptr, CONST char *cptr)
+t_stat mt_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 

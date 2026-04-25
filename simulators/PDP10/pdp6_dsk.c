@@ -132,11 +132,11 @@ int             dsk_dct = 0;
 t_stat          dsk_devio(uint32 dev, uint64 *data);
 t_stat          dsk_svc(UNIT *);
 t_stat          dsk_boot(int32, DEVICE *);
-t_stat          dsk_set_dct (UNIT *, int32, CONST char *, void *);
-t_stat          dsk_show_dct (FILE *, UNIT *, int32, CONST void *);
+t_stat          dsk_set_dct (UNIT *, int32, const char *, void *);
+t_stat          dsk_show_dct (FILE *, UNIT *, int32, const void *);
 void            dsk_ini(UNIT *, t_bool);
 t_stat          dsk_reset(DEVICE *);
-t_stat          dsk_attach(UNIT *, CONST char *);
+t_stat          dsk_attach(UNIT *, const char *);
 t_stat          dsk_detach(UNIT *);
 t_stat          dsk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                      const char *cptr);
@@ -417,7 +417,7 @@ dsk_svc (UNIT *uptr)
 
 /* set DCT channel and unit. */
 t_stat
-dsk_set_dct (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+dsk_set_dct (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32 dct;
     t_stat r;
@@ -432,7 +432,7 @@ dsk_set_dct (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-dsk_show_dct (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+dsk_show_dct (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    if (uptr == NULL)
       return SCPE_IERR;
@@ -466,7 +466,7 @@ dsk_boot(int32 unit_num, DEVICE * dptr)
 
 /* Device attach */
 t_stat
-dsk_attach (UNIT *uptr, CONST char *cptr)
+dsk_attach (UNIT *uptr, const char *cptr)
 {
      t_stat r;
 

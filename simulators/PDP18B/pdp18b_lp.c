@@ -92,7 +92,7 @@ int32 lp62_66 (int32 dev, int32 pulse, int32 dat);
 int32 lp62_iors (void);
 t_stat lp62_svc (UNIT *uptr);
 t_stat lp62_reset (DEVICE *dptr);
-t_stat lp62_attach (UNIT *uptr, CONST char *cptr);
+t_stat lp62_attach (UNIT *uptr, const char *cptr);
 
 /* Type 62 LPT data structures
 
@@ -240,7 +240,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat lp62_attach (UNIT *uptr, CONST char *cptr)
+t_stat lp62_attach (UNIT *uptr, const char *cptr)
 {
 sim_switches |= SWMASK ('A');
 return attach_unit (uptr, cptr);
@@ -285,7 +285,7 @@ int32 lp647_66 (int32 dev, int32 pulse, int32 dat);
 int32 lp647_iors (void);
 t_stat lp647_svc (UNIT *uptr);
 t_stat lp647_reset (DEVICE *dptr);
-t_stat lp647_attach (UNIT *uptr, CONST char *cptr);
+t_stat lp647_attach (UNIT *uptr, const char *cptr);
 t_stat lp647_detach (UNIT *uptr);
 
 /* Type 647 LPT data structures
@@ -489,7 +489,7 @@ return (lp647_don? IOS_LPT: 0) | (lp647_err? IOS_LPT1: 0);
 
 /* Attach routine */
 
-t_stat lp647_attach (UNIT *uptr, CONST char *cptr)
+t_stat lp647_attach (UNIT *uptr, const char *cptr)
 {
 t_stat reason;
 
@@ -524,7 +524,7 @@ int32 lp09_66 (int32 dev, int32 pulse, int32 dat);
 int32 lp09_iors (void);
 t_stat lp09_svc (UNIT *uptr);
 t_stat lp09_reset (DEVICE *dptr);
-t_stat lp09_attach (UNIT *uptr, CONST char *cptr);
+t_stat lp09_attach (UNIT *uptr, const char *cptr);
 t_stat lp09_detach (UNIT *uptr);
 
 /* LP09 LPT data structures
@@ -654,7 +654,7 @@ return (lp09_don? IOS_LPT: 0);
 
 /* Attach routine */
 
-t_stat lp09_attach (UNIT *uptr, CONST char *cptr)
+t_stat lp09_attach (UNIT *uptr, const char *cptr)
 {
 t_stat reason;
 
@@ -707,7 +707,7 @@ int32 lp15_66 (int32 dev, int32 pulse, int32 dat);
 int32 lp15_iors (void);
 t_stat lp15_svc (UNIT *uptr);
 t_stat lp15_reset (DEVICE *dptr);
-t_stat lp15_attach (UNIT *uptr, CONST char *cptr);
+t_stat lp15_attach (UNIT *uptr, const char *cptr);
 
 int32 lp15_updsta (int32 New);
 
@@ -895,7 +895,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat lp15_attach (UNIT *uptr, CONST char *cptr)
+t_stat lp15_attach (UNIT *uptr, const char *cptr)
 {
 sim_switches |= SWMASK ('A');
 return attach_unit (uptr, cptr);

@@ -109,8 +109,8 @@ static int32 nsectors     = C20MB_NSECTORS;
 static int32 sectsize     = C20MB_SECTSIZE;
 
 extern uint32 PCX;
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 extern int32 selchan_dma(uint8 *buf, uint32 len);
@@ -122,7 +122,7 @@ extern void raise_ss1_interrupt(uint8 intnum);
 #define DISK2_CAPACITY          (C20MB_NTRACKS*C20MB_NHEADS*C20MB_NSECTORS*C20MB_SECTSIZE)   /* Default Disk Capacity */
 
 static t_stat disk2_reset(DEVICE *disk2_dev);
-static t_stat disk2_attach(UNIT *uptr, CONST char *cptr);
+static t_stat disk2_attach(UNIT *uptr, const char *cptr);
 static t_stat disk2_detach(UNIT *uptr);
 static const char* disk2_description(DEVICE *dptr);
 
@@ -220,7 +220,7 @@ static t_stat disk2_reset(DEVICE *dptr)
 
 
 /* Attach routine */
-static t_stat disk2_attach(UNIT *uptr, CONST char *cptr)
+static t_stat disk2_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r = SCPE_OK;
     DISK2_DRIVE_INFO *pDrive;

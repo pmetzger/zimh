@@ -103,10 +103,10 @@ int32 hi4_io (int32 inst, int32 fnc, int32 dat, int32 dev);
 t_stat hi_rx_service (UNIT *uptr);
 void hi_rx_local (uint16 line, uint16 txnext, uint16 txcount);
 t_stat hi_reset (DEVICE *dptr);
-t_stat hi_attach (UNIT *uptr, CONST char *cptr);
+t_stat hi_attach (UNIT *uptr, const char *cptr);
 t_stat hi_detach (UNIT *uptr);
-t_stat hi_set_convert (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat hi_show_convert (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat hi_set_convert (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat hi_show_convert (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 
 
@@ -775,7 +775,7 @@ t_stat hi_reset (DEVICE *dptr)
 }
 
 // Attach (connect) ...
-t_stat hi_attach (UNIT *uptr, CONST char *cptr)
+t_stat hi_attach (UNIT *uptr, const char *cptr)
 {
   //   simh calls this routine for (what else?) the ATTACH command.  There are
   // three distinct formats for ATTACH -
@@ -826,13 +826,13 @@ t_stat hi_detach (UNIT *uptr)
 }
 
 
-t_stat hi_set_convert (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat hi_set_convert (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   PHIDB(uptr->hline)->convert = !val;
   return SCPE_OK;
 }
 
-t_stat hi_show_convert (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat hi_show_convert (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   if (PHIDB(uptr->hline)->convert)
     fprintf (st, "Convert short leaders");

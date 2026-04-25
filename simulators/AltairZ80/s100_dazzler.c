@@ -90,9 +90,9 @@ static uint8 js1_joyy[JS1_NUM_STICKS];
 
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat exdep_cmd(int32 flag, CONST char *cptr);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat exdep_cmd(int32 flag, const char *cptr);
 extern uint8 GetBYTEWrapper(const uint32 Addr);
 
 static const char *daz_description(DEVICE *dptr);
@@ -100,14 +100,14 @@ static t_stat daz_svc(UNIT *uptr);
 static t_stat daz_reset(DEVICE *dptr);
 static t_stat daz_boot(int32 unitno, DEVICE *dptr);
 static void daz_set_0f(uint8 val);
-static t_stat daz_set_video(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat daz_show_video(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat daz_set_resolution(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat daz_show_resolution(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat daz_set_memsize(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat daz_show_memsize(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat daz_set_color(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat daz_show_color(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat daz_set_video(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat daz_show_video(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat daz_set_resolution(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat daz_show_resolution(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat daz_set_memsize(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat daz_show_memsize(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat daz_set_color(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat daz_show_color(FILE *st, UNIT *uptr, int32 val, const void *desc);
 static int32 daz_io(const int32 port, const int32 io, const int32 data);
 static t_stat daz_open_video(void);
 static t_stat daz_close_video(void);
@@ -565,7 +565,7 @@ static void daz_set_0f(uint8 val) {
     }
 }
 
-static t_stat daz_set_video(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat daz_set_video(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
@@ -586,7 +586,7 @@ static t_stat daz_set_video(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-static t_stat daz_show_video(FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
+static t_stat daz_show_video(FILE *st, UNIT *uptr, int32 val, const void *desc) {
     if (!st) return SCPE_IERR;
 
     fprintf(st, "VIDEO=%s", DAZ_SHOW_VIDEO(daz_0e));
@@ -594,7 +594,7 @@ static t_stat daz_show_video(FILE *st, UNIT *uptr, int32 val, CONST void *desc) 
     return SCPE_OK;
 }
 
-static t_stat daz_set_resolution(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat daz_set_resolution(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint8 old = daz_0f;
 
@@ -615,7 +615,7 @@ static t_stat daz_set_resolution(UNIT *uptr, int32 val, CONST char *cptr, void *
     return SCPE_OK;
 }
 
-static t_stat daz_show_resolution(FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
+static t_stat daz_show_resolution(FILE *st, UNIT *uptr, int32 val, const void *desc) {
     if (!st) return SCPE_IERR;
 
     fprintf(st, "RES=%s", DAZ_SHOW_RES(daz_0f));
@@ -623,7 +623,7 @@ static t_stat daz_show_resolution(FILE *st, UNIT *uptr, int32 val, CONST void *d
     return SCPE_OK;
 }
 
-static t_stat daz_set_memsize(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat daz_set_memsize(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint8 old = daz_0f;
 
@@ -644,7 +644,7 @@ static t_stat daz_set_memsize(UNIT *uptr, int32 val, CONST char *cptr, void *des
     return SCPE_OK;
 }
 
-static t_stat daz_show_memsize(FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
+static t_stat daz_show_memsize(FILE *st, UNIT *uptr, int32 val, const void *desc) {
     if (!st) return SCPE_IERR;
 
     fprintf(st, "MEMSIZE=%s @ %04X", DAZ_SHOW_MEMSIZE(daz_0f), daz_addr);
@@ -652,7 +652,7 @@ static t_stat daz_show_memsize(FILE *st, UNIT *uptr, int32 val, CONST void *desc
     return SCPE_OK;
 }
 
-static t_stat daz_set_color(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat daz_set_color(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint8 old = daz_0f;
 
@@ -673,7 +673,7 @@ static t_stat daz_set_color(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-static t_stat daz_show_color(FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
+static t_stat daz_show_color(FILE *st, UNIT *uptr, int32 val, const void *desc) {
     if (!st) return SCPE_IERR;
 
     fprintf(st, "%s", DAZ_SHOW_COLOR(daz_0f));

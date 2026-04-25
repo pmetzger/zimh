@@ -896,7 +896,7 @@ return buf;
 
 /* Show Massbus adapter number */
 
-t_stat mba_show_num (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat mba_show_num (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 DEVICE *dptr = find_dev_from_unit (uptr);
 DIB *dibp;

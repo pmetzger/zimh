@@ -550,14 +550,14 @@ extern const char *dl_status_name (CNTLR_STATUS status);
 
 /* Disc library global SCP support routines */
 
-extern t_stat dl_attach (CVPTR cvptr, UNIT *uptr, CONST char *cptr);
+extern t_stat dl_attach (CVPTR cvptr, UNIT *uptr, const char *cptr);
 extern t_stat dl_detach (CVPTR cvptr, UNIT *uptr);
 
-extern t_stat dl_set_model   (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-extern t_stat dl_set_protect (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-extern t_stat dl_set_diag    (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-extern t_stat dl_set_timing  (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+extern t_stat dl_set_model   (UNIT *uptr, int32 value, const char *cptr, void *desc);
+extern t_stat dl_set_protect (UNIT *uptr, int32 value, const char *cptr, void *desc);
+extern t_stat dl_set_diag    (UNIT *uptr, int32 value, const char *cptr, void *desc);
+extern t_stat dl_set_timing  (UNIT *uptr, int32 value, const char *cptr, void *desc);
 
-extern t_stat dl_show_protect (FILE *st, UNIT *uptr, int32 value, CONST void *desc);
-extern t_stat dl_show_diag    (FILE *st, UNIT *uptr, int32 value, CONST void *desc);
-extern t_stat dl_show_timing  (FILE *st, UNIT *uptr, int32 value, CONST void *desc);
+extern t_stat dl_show_protect (FILE *st, UNIT *uptr, int32 value, const void *desc);
+extern t_stat dl_show_diag    (FILE *st, UNIT *uptr, int32 value, const void *desc);
+extern t_stat dl_show_timing  (FILE *st, UNIT *uptr, int32 value, const void *desc);

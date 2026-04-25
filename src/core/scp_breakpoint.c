@@ -142,7 +142,7 @@ BRKTAB *sim_brk_fnd(t_addr loc)
 }
 
 /* Set a breakpoint of the requested type. */
-t_stat sim_brk_set(t_addr loc, int32 sw, int32 ncnt, CONST char *act)
+t_stat sim_brk_set(t_addr loc, int32 sw, int32 ncnt, const char *act)
 {
     BRKTAB *bp;
 

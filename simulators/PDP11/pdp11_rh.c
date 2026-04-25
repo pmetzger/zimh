@@ -163,8 +163,8 @@ MBACTX massbus[MBA_NUM];
 t_stat mba_reset (DEVICE *dptr);
 t_stat mba_rd (int32 *val, int32 pa, int32 access);
 t_stat mba_wr (int32 val, int32 pa, int32 access);
-t_stat mba_set_type (UNIT *uptr, int32 val, char *cptr, CONST void *desc);
-t_stat mba_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat mba_set_type (UNIT *uptr, int32 val, char *cptr, const void *desc);
+t_stat mba_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc);
 int32 mba0_inta (void);
 int32 mba1_inta (void);
 int32 mba2_inta (void);
@@ -857,7 +857,7 @@ if (!(dptr->flags & DEV_DIS))       /* Enabling? */
 
 /* Show Massbus adapter number */
 
-t_stat mba_show_num (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat mba_show_num (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 DEVICE *dptr = find_dev_from_unit (uptr);
 DIB *dibp;

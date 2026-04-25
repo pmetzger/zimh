@@ -332,9 +332,9 @@ uint32 eth_crc32(uint32 crc, const void* vbuf, size_t len); /* Compute Ethernet 
 void eth_packet_trace (ETH_DEV* dev, const uint8 *msg, int len, const char* txt); /* trace ethernet packet header+crc */
 void eth_packet_trace_ex (ETH_DEV* dev, const uint8 *msg, int len, const char* txt, int detail, uint32 reason); /* trace ethernet packet */
 t_stat eth_show (FILE* st, UNIT* uptr,                  /* show ethernet devices */
-                 int32 val, CONST void* desc);
+                 int32 val, const void* desc);
 t_stat eth_show_devices (FILE* st, DEVICE *dptr,        /* show ethernet devices */
-                         UNIT* uptr, int32 val, CONST char* desc);
+                         UNIT* uptr, int32 val, const char* desc);
 int eth_devices (int max, ETH_LIST* dev, ETH_BOOL framers); /* get ethernet devices on host */
 void eth_show_dev (FILE*st, ETH_DEV* dev);              /* show ethernet device state */
 

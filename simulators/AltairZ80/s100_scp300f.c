@@ -144,10 +144,10 @@ I8259_REGS scp300f_pic[2];
 static SCP300F_INFO scp300f_info_data = { { 0xFF800, SCP300F_ROM_SIZE, 0xF0, SCP300F_IO_SIZE }, 1, SCP300F_ROM_TARBELL };
 static SCP300F_INFO *scp300f_info = &scp300f_info_data;
 
-extern t_stat set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 extern uint32 PCX;
@@ -165,8 +165,8 @@ static const char* scp300f_description(DEVICE *dptr);
 
 static int32 scp300fdev(const int32 port, const int32 io, const int32 data);
 static int32 scp300f_mem(const int32 port, const int32 io, const int32 data);
-static t_stat scp300f_dev_set_rom(UNIT* uptr, int32 value, CONST char* cptr, void* desc);
-static t_stat scp300f_dev_show_rom(FILE* st, UNIT* uptr, int32 value, CONST void* desc);
+static t_stat scp300f_dev_set_rom(UNIT* uptr, int32 value, const char* cptr, void* desc);
+static t_stat scp300f_dev_show_rom(FILE* st, UNIT* uptr, int32 value, const void* desc);
 static void generate_scp300f_interrupt(void);
 
 static UNIT scp300f_unit[] = {
@@ -928,7 +928,7 @@ static t_stat scp300f_svc(UNIT* uptr)
 }
 
 /* Set ROM to Tarbell or Cromemco 16FDC */
-static t_stat scp300f_dev_set_rom(UNIT* uptr, int32 value, CONST char* cptr, void* desc)
+static t_stat scp300f_dev_set_rom(UNIT* uptr, int32 value, const char* cptr, void* desc)
 {
     if (cptr == NULL)
         return SCPE_ARG;
@@ -950,7 +950,7 @@ static t_stat scp300f_dev_set_rom(UNIT* uptr, int32 value, CONST char* cptr, voi
 }
 
 /* Show current ROM selection */
-static t_stat scp300f_dev_show_rom(FILE* st, UNIT* uptr, int32 value, CONST void* desc)
+static t_stat scp300f_dev_show_rom(FILE* st, UNIT* uptr, int32 value, const void* desc)
 {
     fprintf(st, "ROM=%s", scp300f_rom_type_str[scp300f_info->rom_type]);
 

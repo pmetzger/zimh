@@ -198,16 +198,16 @@ t_stat dtei_svc (UNIT *uptr);
 t_stat dte_svc (UNIT *uptr);
 t_stat dteo_svc (UNIT *uptr);
 t_stat dtertc_srv(UNIT * uptr);
-t_stat dte_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dte_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat dte_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dte_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat dte_reset (DEVICE *dptr);
-t_stat dte_stop_os (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat tty_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat dte_stop_os (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat dte_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *dte_description (DEVICE *dptr);
 extern uint64  SW;                                   /* Switch register */
 
-CONST char *pri_name[] = { "(0)", "EM2EI", "EM2TI", "EMSTR", "EMLNC", "EMRDS", "(6)",
+const char *pri_name[] = { "(0)", "EM2EI", "EM2TI", "EMSTR", "EMLNC", "EMRDS", "(6)",
        "EMHDS", "(10)", "EMRDT", "EMHDR", "EMFLO", "EMSNA", "EMDSC", "EMHUD",
        "EMLBE", "EMXOF", "EMXON", "EMHLS", "EMHLA", "EMRBI", "EMAKA", "EMTDO",
        "EMEDR", "EMLDR", "EMLDV" };
@@ -345,10 +345,10 @@ DEVICE dte_dev = {
 
 t_stat          lp20_svc (UNIT *uptr);
 t_stat          lp20_reset (DEVICE *dptr);
-t_stat          lp20_attach (UNIT *uptr, CONST char *cptr);
+t_stat          lp20_attach (UNIT *uptr, const char *cptr);
 t_stat          lp20_detach (UNIT *uptr);
-t_stat          lp20_setlpp(UNIT *, int32, CONST char *, void *);
-t_stat          lp20_getlpp(FILE *, UNIT *, int32, CONST void *);
+t_stat          lp20_setlpp(UNIT *, int32, const char *, void *);
+t_stat          lp20_getlpp(FILE *, UNIT *, int32, const void *);
 t_stat          lp20_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                          const char *cptr);
 const char     *lp20_description (DEVICE *dptr);
@@ -491,13 +491,13 @@ extern int32 tmxr_poll;
 t_stat ttyi_svc (UNIT *uptr);
 t_stat ttyo_svc (UNIT *uptr);
 t_stat tty_reset (DEVICE *dptr);
-t_stat tty_set_modem (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat tty_show_modem (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat tty_setnl (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat tty_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat tty_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat tty_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat tty_attach (UNIT *uptr, CONST char *cptr);
+t_stat tty_set_modem (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat tty_show_modem (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat tty_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat tty_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat tty_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat tty_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat tty_attach (UNIT *uptr, const char *cptr);
 t_stat tty_detach (UNIT *uptr);
 t_stat tty_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
         const char *cptr);
@@ -1908,7 +1908,7 @@ t_stat dte_reset (DEVICE *dptr)
 
 
 t_stat
-dte_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+dte_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE *dptr;
     dptr = find_dev_from_unit (uptr);
@@ -1920,7 +1920,7 @@ dte_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-dte_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+dte_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    DEVICE *dptr;
 
@@ -1937,13 +1937,13 @@ dte_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 
 /* Stop operating system */
 
-t_stat dte_stop_os (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dte_stop_os (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     M[CTY_SWITCH] = 1;                                 /* tell OS to stop */
     return SCPE_OK;
 }
 
-t_stat tty_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     dte_unit[0].flags = (dte_unit[0].flags & ~TT_MODE) | val;
     return SCPE_OK;
@@ -2167,7 +2167,7 @@ t_stat lp20_reset (DEVICE *dptr)
 
 /* Attach routine */
 
-t_stat lp20_attach (UNIT *uptr, CONST char *cptr)
+t_stat lp20_attach (UNIT *uptr, const char *cptr)
 {
     sim_switches |= SWMASK ('A');   /* Position to EOF */
     return attach_unit (uptr, cptr);
@@ -2185,7 +2185,7 @@ t_stat lp20_detach (UNIT *uptr)
  */
 
 t_stat
-lp20_setlpp(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+lp20_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_value   i;
     t_stat    r;
@@ -2202,7 +2202,7 @@ lp20_setlpp(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-lp20_getlpp(FILE *st, UNIT *uptr, int32 v, CONST void *desc)
+lp20_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_IERR;
@@ -2343,7 +2343,7 @@ t_stat tty_reset (DEVICE *dptr)
 
 /* SET LINES processor */
 
-t_stat tty_setnl (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tty_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32 newln, i, t;
     t_stat r;
@@ -2377,7 +2377,7 @@ t_stat tty_setnl (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* SET LOG processor */
 
-t_stat tty_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tty_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_stat r;
     char gbuf[CBUFSIZE];
@@ -2396,7 +2396,7 @@ t_stat tty_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* SET NOLOG processor */
 
-t_stat tty_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tty_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_stat r;
     int32 ln;
@@ -2411,7 +2411,7 @@ t_stat tty_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* SHOW LOG processor */
 
-t_stat tty_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat tty_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int32 i;
 
@@ -2426,7 +2426,7 @@ t_stat tty_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 
 /* Attach routine */
 
-t_stat tty_attach (UNIT *uptr, CONST char *cptr)
+t_stat tty_attach (UNIT *uptr, const char *cptr)
 {
 t_stat reason;
 

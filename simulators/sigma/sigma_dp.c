@@ -311,11 +311,11 @@ t_bool dp_end_sec (UNIT *uptr, uint32 lnt, uint32 exp, uint32 st);
 int32 dp_clr_int (uint32 cidx);
 void dp_set_ski (uint32 cidx, uint32 un);
 void dp_clr_ski (uint32 cidx, uint32 un);
-t_stat dp_attach (UNIT *uptr, CONST char *cptr);
-t_stat dp_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dp_set_auto (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dp_set_ctl (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat dp_show_ctl (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat dp_attach (UNIT *uptr, const char *cptr);
+t_stat dp_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dp_set_auto (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dp_set_ctl (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat dp_show_ctl (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 static DP_TYPE dp_tab[] = {
     { DP_ENT (7242, 7240) },
@@ -1285,7 +1285,7 @@ return SCPE_OK;
 
 /* Device attach */
 
-t_stat dp_attach (UNIT *uptr, CONST char *cptr)
+t_stat dp_attach (UNIT *uptr, const char *cptr)
 {
 uint32 i, p;
 t_stat r;
@@ -1312,7 +1312,7 @@ return SCPE_OK;
 
 /* Set drive type command validation routine */
 
-t_stat dp_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dp_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 dtype = GET_DTYPE (val);
 uint32 cidx = uptr->UCTX;
@@ -1329,7 +1329,7 @@ return SCPE_OK;
 
 /* Set unit autosize validation routine */
 
-t_stat dp_set_auto (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dp_set_auto (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 cidx = uptr->UCTX;
 
@@ -1344,7 +1344,7 @@ return SCPE_OK;
 
 /* Set controller type command validation routine */
 
-t_stat dp_set_ctl (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dp_set_ctl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 i, new_dtyp, cidx = uptr->UCTX;
 DP_CTX *ctx = &dp_ctx[cidx];
@@ -1380,7 +1380,7 @@ for (i = 0; i < DP_NUMDR_16B; i++) {
 return SCPE_OK;
 }
 
-t_stat dp_show_ctl (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat dp_show_ctl (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 uint32 cidx = uptr->UCTX;
 

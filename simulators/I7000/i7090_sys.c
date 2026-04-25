@@ -25,7 +25,7 @@
 #include "sim_card.h"
 #include <ctype.h>
 
-t_stat  parse_sym(CONST char *cptr, t_addr addr, UNIT * uptr, t_value * val, int32 sw);
+t_stat  parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int32 sw);
 
 /* SCP data structures and interface routines
 
@@ -220,7 +220,7 @@ const char          ascii_to_mem[128] = {
 /* Load a card image file into memory.  */
 
 t_stat
-sim_load(FILE * fileref, CONST char *cptr, CONST char *fnam, int flag)
+sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
 {
     t_uint64            wd;
     t_uint64            mask;
@@ -941,7 +941,7 @@ find_opcode(char *op, t_opcode * tab)
 */
 
 t_stat
-parse_sym(CONST char *cptr, t_addr addr, UNIT * uptr, t_value * val, int32 sw)
+parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int32 sw)
 {
     int                 i;
     t_value             d, tag;

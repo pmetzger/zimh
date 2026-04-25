@@ -116,9 +116,9 @@ int32 PCXreg;                                   /* External view of PC */
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_reset (DEVICE *dptr);
-t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw);
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw);
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw);
 
 void setarith(int32 reg);
 void setlogical(int32 reg);
@@ -1045,7 +1045,7 @@ t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 
 /* Set memory size
  */
-t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 mc = 0;
 uint32 i;
@@ -1128,7 +1128,7 @@ return -(oplen[inst] - 1);
    Outputs:
         status  =       error status
 */
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
 int32 cflag, i = 0, j, r;
 char gbuf[CBUFSIZE];

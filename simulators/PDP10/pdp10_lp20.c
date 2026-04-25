@@ -199,15 +199,15 @@ static t_stat idle_svc (UNIT *uptr);
 static void set_flush_timer (UNIT *uptr);
 static t_stat lp20_reset (DEVICE *dptr);
 static t_stat lp20_init (DEVICE *dptr);
-static t_stat lp20_attach (UNIT *uptr, CONST char *ptr);
+static t_stat lp20_attach (UNIT *uptr, const char *ptr);
 static t_stat lp20_detach (UNIT *uptr);
-static t_stat lp20_set_lpi (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat lp20_show_lpi (FILE *st, UNIT *up, int32 v, CONST void *dp);
-static t_stat lp20_set_vfu_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat lp20_show_vfu_type (FILE *st, UNIT *up, int32 v, CONST void *dp);
-static t_stat lp20_show_vfu (FILE *st, UNIT *up, int32 v, CONST void *dp);
-static t_stat lp20_set_tof (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat lp20_clear_vfu (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+static t_stat lp20_set_lpi (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat lp20_show_lpi (FILE *st, UNIT *up, int32 v, const void *dp);
+static t_stat lp20_set_vfu_type (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat lp20_show_vfu_type (FILE *st, UNIT *up, int32 v, const void *dp);
+static t_stat lp20_show_vfu (FILE *st, UNIT *up, int32 v, const void *dp);
+static t_stat lp20_set_tof (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat lp20_clear_vfu (UNIT *uptr, int32 val, const char *cptr, void *desc);
 static t_bool lp20_print (int32 c);
 static t_bool lp20_adv (int32 c, t_bool advdvu);
 static t_bool lp20_davfu (int32 c);
@@ -945,7 +945,7 @@ update_lpcs (0);                                        /* update status */
 return SCPE_OK;
 }
 
-static t_stat lp20_attach (UNIT *uptr, CONST char *cptr)
+static t_stat lp20_attach (UNIT *uptr, const char *cptr)
 {
 t_stat reason;
 
@@ -1010,7 +1010,7 @@ fflush (uptr->fileref);
 return SCPE_OK;
 }
 
-static t_stat lp20_set_vfu_type (UNIT *uptr, int32 val, CONST char *gptr, void *desc)
+static t_stat lp20_set_vfu_type (UNIT *uptr, int32 val, const char *gptr, void *desc)
 {
 char gbuf[CBUFSIZE], *cptr;
 char *fname, *cp;
@@ -1141,7 +1141,7 @@ fclose(vfile);
 return SCPE_FMT;
 }
 
-static t_stat lp20_show_vfu_type (FILE *st, UNIT *up, int32 v, CONST void *dp)
+static t_stat lp20_show_vfu_type (FILE *st, UNIT *up, int32 v, const void *dp)
 {
 if (lpcsb & CSB_OVFU)
     fprintf (st, "optical VFU");
@@ -1156,7 +1156,7 @@ else
 return SCPE_OK;
 }
 
-static t_stat lp20_set_lpi (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat lp20_set_lpi (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 newlpi;
 
@@ -1179,14 +1179,14 @@ lpi = newlpi;
 return SCPE_OK;
 }
 
-static t_stat lp20_show_lpi (FILE *st, UNIT *up, int32 v, CONST void *dp)
+static t_stat lp20_show_lpi (FILE *st, UNIT *up, int32 v, const void *dp)
 {
 fprintf (st, "%u LPI", lpi);
 
 return SCPE_OK;
 }
 
-static t_stat lp20_show_vfu (FILE *st, UNIT *up, int32 v, CONST void *dp)
+static t_stat lp20_show_vfu (FILE *st, UNIT *up, int32 v, const void *dp)
 {
 int l, c, sum;
 
@@ -1224,7 +1224,7 @@ if (!(sum & (1 << DV_BOF))) {
 
 return SCPE_OK;
 }
-static t_stat lp20_set_tof (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat lp20_set_tof (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 s_lpcsa = lpcsa;
 int32 s_lppagc = lppagc;
@@ -1255,7 +1255,7 @@ while (value) {
 return even;
 }
 
-static t_stat lp20_clear_vfu (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat lp20_clear_vfu (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int i;
 

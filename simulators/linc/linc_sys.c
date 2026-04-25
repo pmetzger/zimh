@@ -100,7 +100,7 @@ get_octal_word(FILE *fileref, uint16 *x)
 }
 
 t_stat
-sim_load(FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
   t_stat (*get_word)(FILE *fileref, uint16 *x) = get_binary_word;
   t_addr addr, length = MEMSIZE, start = 0, end;
@@ -655,7 +655,7 @@ static const struct symbol symbols[] = {
   { "JMP", 06000 }
 };
 
-t_stat parse_sym(CONST char *cptr, t_addr addr, UNIT *uptr,
+t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr,
                   t_value *val, int32 sw)
 {
   char gbuf[CBUFSIZE];

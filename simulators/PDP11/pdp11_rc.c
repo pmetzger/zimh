@@ -168,9 +168,9 @@ static t_stat rc_rd (int32 *, int32, int32);
 static t_stat rc_wr (int32, int32, int32);
 static t_stat rc_svc (UNIT *);
 static t_stat rc_reset (DEVICE *);
-static t_stat rc_attach (UNIT *, CONST char *);
-static t_stat rc_set_size (UNIT *, int32, CONST char *, void *);
-static t_stat rc_show_size (FILE *, UNIT *, int32, CONST void *);
+static t_stat rc_attach (UNIT *, const char *);
+static t_stat rc_set_size (UNIT *, int32, const char *, void *);
+static t_stat rc_show_size (FILE *, UNIT *, int32, const void *);
 static uint32 update_rccs (uint32, uint32);
 static const char *rc_description (DEVICE *dptr);
 
@@ -568,7 +568,7 @@ static t_stat rc_reset (DEVICE *dptr)
 
 /* Attach routine */
 
-static t_stat rc_attach (UNIT *uptr, CONST char *cptr)
+static t_stat rc_attach (UNIT *uptr, const char *cptr)
 {
     static const char *platters[] = {"1P", "2P", "3P", "4P", NULL};
     char plat[32];
@@ -581,7 +581,7 @@ static t_stat rc_attach (UNIT *uptr, CONST char *cptr)
 
 /* Change disk size */
 
-static t_stat rc_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat rc_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (val < 0)
         return (SCPE_IERR);
@@ -592,7 +592,7 @@ static t_stat rc_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return (SCPE_OK);
 }
 
-static t_stat rc_show_size (FILE *st, UNIT *uptr, int32 flag, CONST void *desc)
+static t_stat rc_show_size (FILE *st, UNIT *uptr, int32 flag, const void *desc)
 {
 fprintf (st, "%dP", UNIT_GETP (uptr->flags));
 return SCPE_OK;

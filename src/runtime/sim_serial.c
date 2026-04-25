@@ -310,7 +310,7 @@ for (i=0; i<count && !found; i++) {
   return (found ? temp : NULL);
 }
 
-t_stat sim_show_serial (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, CONST char* desc)
+t_stat sim_show_serial (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, const char* desc)
 {
 SERIAL_LIST  list[SER_MAX_DEVICE];
 int number = sim_serial_devices(SER_MAX_DEVICE, list);
@@ -353,7 +353,7 @@ SERHANDLE sim_open_serial (char *name, TMLN *lp, t_stat *stat)
 char temp1[1024], devname [1024];
 char *savname = name;
 SERHANDLE port = INVALID_HANDLE;
-CONST char *config;
+const char *config;
 t_stat status;
 
 config = get_glyph_nc (name, devname, ';');             /* separate port name from optional config params */
@@ -432,10 +432,10 @@ _serial_remove_from_open_list (port);
 sim_close_os_serial (port);
 }
 
-t_stat sim_config_serial  (SERHANDLE port, CONST char *sconfig)
+t_stat sim_config_serial  (SERHANDLE port, const char *sconfig)
 {
-CONST char *pptr;
-CONST char *sptr, *tptr;
+const char *pptr;
+const char *sptr, *tptr;
 SERCONFIG config = { 0 };
 t_bool arg_error = FALSE;
 t_stat r;

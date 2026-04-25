@@ -543,14 +543,14 @@ extern const char *tl_unit_name   (int32        unit);
 
 /* Tape library global SCP support routines */
 
-extern t_stat tl_attach (CVPTR cvptr, UNIT *uptr, CONST char *cptr);
+extern t_stat tl_attach (CVPTR cvptr, UNIT *uptr, const char *cptr);
 extern t_stat tl_detach (UNIT  *uptr);
 
-extern t_stat tl_set_timing   (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-extern t_stat tl_set_model    (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-extern t_stat tl_set_density  (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-extern t_stat tl_set_reelsize (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+extern t_stat tl_set_timing   (UNIT *uptr, int32 value, const char *cptr, void *desc);
+extern t_stat tl_set_model    (UNIT *uptr, int32 value, const char *cptr, void *desc);
+extern t_stat tl_set_density  (UNIT *uptr, int32 value, const char *cptr, void *desc);
+extern t_stat tl_set_reelsize (UNIT *uptr, int32 value, const char *cptr, void *desc);
 
-extern t_stat tl_show_timing   (FILE *st, UNIT *uptr, int32 value, CONST void *desc);
-extern t_stat tl_show_density  (FILE *st, UNIT *uptr, int32 value, CONST void *desc);
-extern t_stat tl_show_reelsize (FILE *st, UNIT *uptr, int32 value, CONST void *desc);
+extern t_stat tl_show_timing   (FILE *st, UNIT *uptr, int32 value, const void *desc);
+extern t_stat tl_show_density  (FILE *st, UNIT *uptr, int32 value, const void *desc);
+extern t_stat tl_show_reelsize (FILE *st, UNIT *uptr, int32 value, const void *desc);

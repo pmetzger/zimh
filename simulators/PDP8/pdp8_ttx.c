@@ -86,13 +86,13 @@ t_stat ttox_svc (UNIT *uptr);
 int32 ttx_getln (int32 inst);
 void ttx_new_flags (uint32 newi, uint32 newo, uint32 newe);
 t_stat ttx_reset (DEVICE *dptr);
-t_stat ttx_attach (UNIT *uptr, CONST char *cptr);
+t_stat ttx_attach (UNIT *uptr, const char *cptr);
 t_stat ttx_detach (UNIT *uptr);
 const char *ttix_description (DEVICE *dptr);
 const char *ttox_description (DEVICE *dptr);
 void ttx_reset_ln (int32 i);
-t_stat ttx_vlines (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat ttx_show_devno (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat ttx_vlines (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat ttx_show_devno (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 #define TTIX_SET_DONE(ln)       ttx_new_flags (ttix_done | (1u << (ln)), ttox_done, ttx_enbl)
 #define TTIX_CLR_DONE(ln)       ttx_new_flags (ttix_done & ~(1u << (ln)), ttox_done, ttx_enbl)
@@ -459,7 +459,7 @@ return;
 
 /* Attach master unit */
 
-t_stat ttx_attach (UNIT *uptr, CONST char *cptr)
+t_stat ttx_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 
@@ -486,7 +486,7 @@ return r;
 
 /* Change number of lines */
 
-t_stat ttx_vlines (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat ttx_vlines (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 newln, i, t;
 t_stat r;
@@ -524,7 +524,7 @@ return SCPE_OK;
 }
 
 /* Show device numbers */
-t_stat ttx_show_devno (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat ttx_show_devno (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 i, dev_offset;
 DEVICE *dptr;

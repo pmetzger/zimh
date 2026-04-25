@@ -228,7 +228,7 @@ t_stat      comi_srv(UNIT *uptr);
 t_stat      como_srv(UNIT *uptr);
 t_stat      comc_srv(UNIT *uptr);
 t_stat      com_reset(DEVICE *dptr);
-t_stat      com_attach(UNIT *uptr, CONST char *cptr);
+t_stat      com_attach(UNIT *uptr, const char *cptr);
 t_stat      com_detach(UNIT *uptr);
 void        com_reset_ln(int32 ln);
 const char  *com_description(DEVICE *dptr);     /* device description */
@@ -1218,7 +1218,7 @@ t_stat com_reset (DEVICE *dptr)
 
 
 /* attach master unit */
-t_stat com_attach(UNIT *uptr, CONST char *cptr)
+t_stat com_attach(UNIT *uptr, const char *cptr)
 {
     DEVICE  *dptr = get_dev(uptr);
     t_stat  r;

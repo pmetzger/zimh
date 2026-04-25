@@ -97,8 +97,8 @@ int32 fhd_time = 10;                                    /* time per word */
 int32 fhdio (int32 inst, int32 fnc, int32 dat, int32 dev);
 t_stat fhd_svc (UNIT *uptr);
 t_stat fhd_reset (DEVICE *dptr);
-t_stat fhd_attach (UNIT *uptr, CONST char *cptr);
-t_stat fhd_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat fhd_attach (UNIT *uptr, const char *cptr);
+t_stat fhd_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
 void fhd_go (uint32 dma);
 void fhd_go1 (uint32 dat);
 void fhd_go2 (uint32 dat);
@@ -456,7 +456,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat fhd_attach (UNIT *uptr, CONST char *cptr)
+t_stat fhd_attach (UNIT *uptr, const char *cptr)
 {
 uint32 sz, sf;
 uint32 ds_bytes = FH_WDPSF * sizeof (int16);
@@ -474,7 +474,7 @@ return attach_unit (uptr, cptr);
 
 /* Set size routine */
 
-t_stat fhd_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat fhd_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (val < 0)
     return SCPE_IERR;

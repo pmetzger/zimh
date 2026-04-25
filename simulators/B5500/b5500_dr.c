@@ -43,11 +43,11 @@
 
 t_stat              drm_srv(UNIT *);
 t_stat              drm_boot(int32, DEVICE *);
-t_stat              drm_attach(UNIT *, CONST char *);
+t_stat              drm_attach(UNIT *, const char *);
 t_stat              drm_detach(UNIT *);
-t_stat              set_drum(UNIT * uptr, int32 val, CONST char *cptr,
+t_stat              set_drum(UNIT * uptr, int32 val, const char *cptr,
                              void *desc);
-t_stat              set_auxmem(UNIT * uptr, int32 val, CONST char *cptr,
+t_stat              set_auxmem(UNIT * uptr, int32 val, const char *cptr,
                              void *desc);
 t_stat              drm_help (FILE *, DEVICE *, UNIT *, int32, const char *);
 const char         *drm_description (DEVICE *);
@@ -173,7 +173,7 @@ drm_boot(int32 unit_num, DEVICE * dptr)
 
 
 t_stat
-drm_attach(UNIT * uptr, CONST char *file)
+drm_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
     int                 u = uptr - drm_unit;
@@ -206,7 +206,7 @@ drm_detach(UNIT * uptr)
 }
 
 t_stat
-set_drum(UNIT * uptr, int32 val, CONST char *cptr, void *desc) {
+set_drum(UNIT * uptr, int32 val, const char *cptr, void *desc) {
     if ((uptr->flags & AUXMEM) == 0)
         return SCPE_OK;
     if (uptr->flags & UNIT_ATT) 
@@ -216,7 +216,7 @@ set_drum(UNIT * uptr, int32 val, CONST char *cptr, void *desc) {
 }
 
 t_stat
-set_auxmem(UNIT * uptr, int32 val, CONST char *cptr, void *desc) {
+set_auxmem(UNIT * uptr, int32 val, const char *cptr, void *desc) {
     int                 u = uptr - drm_unit;
 
     if (uptr->flags & AUXMEM)

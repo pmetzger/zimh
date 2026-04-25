@@ -90,10 +90,10 @@ t_stat sim_disk_wrsect (UNIT *uptr, t_lba lba, uint8 *buf, t_seccnt *sectswritte
 t_stat sim_disk_wrsect_a (UNIT *uptr, t_lba lba, uint8 *buf, t_seccnt *sectswritten, t_seccnt sects, DISK_PCALLBACK callback);
 t_stat sim_disk_unload (UNIT *uptr);
 t_stat sim_disk_erase (UNIT *uptr);
-t_stat sim_disk_set_fmt (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat sim_disk_show_fmt (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat sim_disk_set_capac (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat sim_disk_show_capac (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat sim_disk_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat sim_disk_show_fmt (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat sim_disk_set_capac (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat sim_disk_show_capac (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat sim_disk_set_asynch (UNIT *uptr, int latency);
 t_stat sim_disk_clr_asynch (UNIT *uptr);
 t_stat sim_disk_reset (UNIT *uptr);
@@ -107,8 +107,8 @@ t_offset sim_disk_size (UNIT *uptr);
 t_bool sim_disk_vhd_support (void);
 t_bool sim_disk_raw_support (void);
 void sim_disk_data_trace (UNIT *uptr, const uint8 *data, size_t lba, size_t len, const char* txt, int detail, uint32 reason);
-t_stat sim_disk_info_cmd (int32 flag, CONST char *ptr);
-t_stat sim_disk_set_noautosize (int32 flag, CONST char *cptr);
+t_stat sim_disk_info_cmd (int32 flag, const char *ptr);
+t_stat sim_disk_set_noautosize (int32 flag, const char *cptr);
 t_stat sim_disk_test (DEVICE *dptr, const char *cptr);
 
 #endif

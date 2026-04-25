@@ -200,7 +200,7 @@ int32 find_unit_index (UNIT *uptr)
 }
 
 /* Attach routine */
-t_stat i8272_attach(UNIT *uptr, CONST char *cptr)
+t_stat i8272_attach(UNIT *uptr, const char *cptr)
 {
     char header[4];
     t_stat rc;

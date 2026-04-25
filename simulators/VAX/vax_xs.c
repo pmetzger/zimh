@@ -54,7 +54,7 @@ void xs_clrint (CTLR* xs);
 void xs_read_callback (int status);
 void xs_write_callback (int status);
 t_stat xs_reset (DEVICE *dptr);
-t_stat xs_attach (UNIT *uptr, CONST char *cptr);
+t_stat xs_attach (UNIT *uptr, const char *cptr);
 t_stat xs_detach (UNIT* uptr);
 t_stat xs_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *xs_description (DEVICE *dptr);
@@ -723,7 +723,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat xs_attach (UNIT *uptr, CONST char *cptr)
+t_stat xs_attach (UNIT *uptr, const char *cptr)
 {
 t_stat status;
 char* tptr;

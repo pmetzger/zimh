@@ -67,10 +67,10 @@ t_addr ten11_end  = 04000000;
 
 static t_stat ten11_svc (UNIT *uptr);
 static t_stat ten11_reset (DEVICE *dptr);
-static t_stat ten11_attach (UNIT *uptr, CONST char *ptr);
+static t_stat ten11_attach (UNIT *uptr, const char *ptr);
 static t_stat ten11_detach (UNIT *uptr);
-static t_stat ten11_set_base (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat ten11_show_base (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat ten11_set_base (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat ten11_show_base (FILE *st, UNIT *uptr, int32 val, const void *desc);
 static t_stat ten11_attach_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 static const char *ten11_description (DEVICE *dptr);
 
@@ -139,7 +139,7 @@ static t_stat ten11_reset (DEVICE *dptr)
   return SCPE_OK;
 }
 
-static t_stat ten11_attach (UNIT *uptr, CONST char *cptr)
+static t_stat ten11_attach (UNIT *uptr, const char *cptr)
 {
   t_stat r;
 
@@ -435,7 +435,7 @@ int ten11_write (t_addr addr, uint64 data)
   return 0;
 }
 
-static t_stat ten11_set_base (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat ten11_set_base (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_stat r;
     t_value x;
@@ -453,7 +453,7 @@ static t_stat ten11_set_base (UNIT *uptr, int32 val, CONST char *cptr, void *des
     return SCPE_OK;
 }
 
-static t_stat ten11_show_base (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat ten11_show_base (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf (st, "Base: %011o", ten11_base);
     return SCPE_OK;

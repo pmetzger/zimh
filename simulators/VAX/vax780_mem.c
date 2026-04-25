@@ -289,7 +289,7 @@ sprintf (buf, "Memory controller %d", (int)(dptr-mctl_dev));
 return buf;
 }
 
-t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 struct {
     uint32 capacity;

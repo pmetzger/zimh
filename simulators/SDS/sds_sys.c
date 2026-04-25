@@ -201,7 +201,7 @@ int32 col, rpt, ptr, mask, cctbuf[CCT_LNT];
 t_stat r;
 extern int32 lpt_ccl, lpt_ccp;
 extern uint8 lpt_cct[CCT_LNT];
-CONST char *cptr;
+const char *cptr;
 char cbuf[CBUFSIZE], gbuf[CBUFSIZE];
 
 ptr = 0;
@@ -257,7 +257,7 @@ for (i = wd = 0; i < 4; ) {
 return wd;
 }
 
-t_stat sim_load (FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
 int32 i, wd, buf[8];
 int32 ldr = 1;
@@ -640,9 +640,9 @@ return SCPE_ARG;
         cptr  = updated pointer to input string
 */
 
-CONST char *get_tag (CONST char *cptr, t_value *tag)
+const char *get_tag (const char *cptr, t_value *tag)
 {
-CONST char *tptr;
+const char *tptr;
 char gbuf[CBUFSIZE];
 t_stat r;
 
@@ -666,7 +666,7 @@ return cptr;                                            /* no change */
         status  =       error status
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
 int32 i, j, k, ch;
 t_value d, tag;

@@ -80,7 +80,7 @@ int     i8253_T2_out[4];
 
 t_stat i8253_cfg(uint16 base, uint16 devnum, uint8 dummy);
 t_stat i8253_clr(void);
-t_stat i8253_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat i8253_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat i8253_svc (UNIT *uptr);
 t_stat i8253_reset (DEVICE *dptr);
 uint8 i8253t0(t_bool io, uint8 data, uint8 devnum);
@@ -195,7 +195,7 @@ t_stat i8253_clr(void)
 
 // show configuration parameters
 
-t_stat i8253_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat i8253_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int i;
     

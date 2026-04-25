@@ -83,7 +83,7 @@ const char *sim_stop_messages[SCPE_BASE] = {
    continue and load all blocks until end of tape.
 */
 
-t_stat sim_load (FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
 int32 c;
 uint32 org;
@@ -468,7 +468,7 @@ return SCPE_ARG;
         get_op          get optional bus operator
 */
 
-CONST char *get_fnc (CONST char *cptr, t_value *val)
+const char *get_fnc (const char *cptr, t_value *val)
 {
 char gbuf[CBUFSIZE];
 int32 i;
@@ -505,7 +505,7 @@ val[0] = val[0] | (fncv << I_V_OP);                     /* store fnc */
 return cptr;
 }
 
-CONST char *get_ma (CONST char *cptr, t_value *val, char term)
+const char *get_ma (const char *cptr, t_value *val, char term)
 {
 char gbuf[CBUFSIZE];
 t_value d;
@@ -521,7 +521,7 @@ val[1] = d;                                             /* second wd */
 return cptr;
 }
 
-CONST char *get_sd (CONST char *cptr, t_value *val, char term, t_bool src)
+const char *get_sd (const char *cptr, t_value *val, char term, t_bool src)
 {
 char gbuf[CBUFSIZE];
 int32 d;
@@ -542,10 +542,10 @@ val[0] = val[0] | (d << (src? I_V_SRC: I_V_DST));       /* or to inst */
 return cptr;
 }
 
-CONST char *get_op (CONST char *cptr, t_value *val, char term)
+const char *get_op (const char *cptr, t_value *val, char term)
 {
 char gbuf[CBUFSIZE];
-CONST char *tptr;
+const char *tptr;
 int32 i;
 
 tptr = get_glyph (cptr, gbuf, term);                    /* get glyph */
@@ -570,7 +570,7 @@ return cptr;                                            /* original ptr */
         status  =       error status
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
 int32 i, j, k;
 char gbuf[CBUFSIZE];

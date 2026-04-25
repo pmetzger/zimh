@@ -69,7 +69,7 @@ t_stat sim_instr(void)
     return SCPE_OK;
 }
 
-t_stat sim_load(FILE *ptr, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load(FILE *ptr, const char *cptr, const char *fnam, int flag)
 {
     (void)ptr;
     (void)cptr;
@@ -90,7 +90,7 @@ t_stat fprint_sym(FILE *ofile, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
     return SCPE_OK;
 }
 
-t_stat parse_sym(CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val,
+t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val,
                  int32 sw)
 {
     (void)cptr;

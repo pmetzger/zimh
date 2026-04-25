@@ -144,8 +144,8 @@ extern uint8 dataBus[MAX_INT_VECTORS];   /* FDC interrupt data bus values  */
 
 static SECTOR_FORMAT sdata;
 extern uint32 PCX;
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 extern int32 find_unit_index (UNIT *uptr);
@@ -398,7 +398,7 @@ uint8 wd179x_get_nheads(void)
 }
 
 /* Attach routine */
-t_stat wd179x_attach(UNIT *uptr, CONST char *cptr)
+t_stat wd179x_attach(UNIT *uptr, const char *cptr)
 {
     char header[4];
     t_stat r;

@@ -65,7 +65,7 @@ static t_stat gtyo_svc(UNIT *uptr);
 static t_stat gtyi_devio(uint32 dev, uint64 *data);
 static t_stat gtyo_devio(uint32 dev, uint64 *data);
 static t_stat ge_reset(DEVICE *dptr);
-static t_stat ge_attach(UNIT *uptr, CONST char *ptr);
+static t_stat ge_attach(UNIT *uptr, const char *ptr);
 static t_stat ge_detach(UNIT *uptr);
 static t_stat ge_attach_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 static const char *ge_description(DEVICE *dptr);
@@ -153,7 +153,7 @@ static t_stat ge_reset(DEVICE *dptr)
   return SCPE_OK;
 }
 
-static t_stat ge_attach(UNIT *uptr, CONST char *cptr)
+static t_stat ge_attach(UNIT *uptr, const char *cptr)
 {
   t_stat r;
 

@@ -191,14 +191,14 @@ extern void put_mbyte(uint16 addr, uint8 val);
 
 t_stat isbc206_cfg(uint16 base, uint16 size, uint8 devnum);
 t_stat isbc206_clr(void);
-t_stat isbc206_set_port(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat isbc206_set_int(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat isbc206_set_verb(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat isbc206_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat isbc206_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat isbc206_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat isbc206_set_verb(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat isbc206_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat isbc206_reset(DEVICE *dptr);
 void isbc206_reset_dev(void);
-t_stat isbc206_attach (UNIT *uptr, CONST char *cptr);
-t_stat isbc206_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat isbc206_attach (UNIT *uptr, const char *cptr);
+t_stat isbc206_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc);
 uint8 isbc206r0(t_bool io, uint8 data, uint8 devnum);  /* isbc206 port 0 */
 uint8 isbc206r1(t_bool io, uint8 data, uint8 devnum);  /* isbc206 port 1 */
 uint8 isbc206r2(t_bool io, uint8 data, uint8 devnum);  /* isbc206 port 2 */
@@ -351,7 +351,7 @@ t_stat isbc206_clr(void)
 
 /* isbc206 set mode = Write protect */
 
-t_stat isbc206_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat isbc206_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
@@ -371,7 +371,7 @@ t_stat isbc206_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // set base address parameter
 
-t_stat isbc206_set_port(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat isbc206_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result;
     
@@ -391,7 +391,7 @@ t_stat isbc206_set_port(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // set interrupt parameter
 
-t_stat isbc206_set_int(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat isbc206_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result;
     
@@ -404,7 +404,7 @@ t_stat isbc206_set_int(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat isbc206_set_verb(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat isbc206_set_verb(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
@@ -424,7 +424,7 @@ t_stat isbc206_set_verb(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // show configuration parameters
 
-t_stat isbc206_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat isbc206_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
@@ -477,7 +477,7 @@ void isbc206_reset_dev(void)
 
 /* isbc206 attach - attach an .IMG file to a HDD */
 
-t_stat isbc206_attach (UNIT *uptr, CONST char *cptr)
+t_stat isbc206_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
     uint8 hddnum;

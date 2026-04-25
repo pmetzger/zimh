@@ -19,7 +19,7 @@ static t_stat attach_err(UNIT *uptr, t_stat stat)
 }
 
 /* Open a host file and attach it to a unit using SCP's generic rules. */
-t_stat attach_unit(UNIT *uptr, CONST char *cptr)
+t_stat attach_unit(UNIT *uptr, const char *cptr)
 {
     DEVICE *dptr;
     t_bool open_rw = FALSE;

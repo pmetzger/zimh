@@ -159,7 +159,7 @@ static uint8 ct_fnc_tab[SRA_M_FNC + 1] = {
 int32 ct70 (int32 IR, int32 AC);
 t_stat ct_svc (UNIT *uptr);
 t_stat ct_reset (DEVICE *dptr);
-t_stat ct_attach (UNIT *uptr, CONST char *cptr);
+t_stat ct_attach (UNIT *uptr, const char *cptr);
 t_stat ct_detach (UNIT *uptr);
 t_stat ct_boot (int32 unitno, DEVICE *dptr);
 const char *ct_description (DEVICE *dptr);
@@ -655,7 +655,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat ct_attach (UNIT *uptr, CONST char *cptr)
+t_stat ct_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 

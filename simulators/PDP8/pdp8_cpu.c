@@ -251,9 +251,9 @@ InstHistory *hst = NULL;                                /* instruction history *
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_reset (DEVICE *dptr);
-t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_bool build_dev_tab (void);
 
 /* CPU data structures
@@ -1439,7 +1439,7 @@ return SCPE_OK;
 
 /* Memory size change */
 
-t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 mc = 0;
 uint32 i;
@@ -1458,7 +1458,7 @@ return SCPE_OK;
 
 /* Change device number for a device */
 
-t_stat set_dev (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_dev (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -1484,7 +1484,7 @@ return SCPE_OK;
 
 /* Show device number for a device */
 
-t_stat show_dev (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_dev (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -1560,7 +1560,7 @@ return FALSE;
 
 /* Set history */
 
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i, lnt;
 t_stat r;
@@ -1591,7 +1591,7 @@ return SCPE_OK;
 
 /* Show history */
 
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 l, k, di, lnt;
 const char *cptr = (const char *) desc;

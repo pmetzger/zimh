@@ -253,18 +253,18 @@ static INTERFACE msc_interface;
 
 static t_stat msc_svc (UNIT *uptr);
 static t_stat ms_reset (DEVICE *dptr);
-static t_stat msc_attach (UNIT *uptr, CONST char *cptr);
+static t_stat msc_attach (UNIT *uptr, const char *cptr);
 static t_stat msc_detach (UNIT *uptr);
-static t_stat msc_online (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat msc_online (UNIT *uptr, int32 value, const char *cptr, void *desc);
 static t_stat msc_boot (int32 unitno, DEVICE *dptr);
 static t_stat ms_write_gap (UNIT *uptr);
 static t_stat ms_map_err (UNIT *uptr, t_stat st);
-static t_stat ms_settype (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat ms_showtype (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat ms_set_timing (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat ms_show_timing (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat ms_set_reelsize (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat ms_show_reelsize (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat ms_settype (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat ms_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat ms_set_timing (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat ms_show_timing (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat ms_set_reelsize (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat ms_show_reelsize (FILE *st, UNIT *uptr, int32 val, const void *desc);
 static void ms_config_timing (void);
 static char *ms_cmd_name (uint32 cmd);
 static t_stat ms_clear (void);
@@ -1241,7 +1241,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-static t_stat msc_attach (UNIT *uptr, CONST char *cptr)
+static t_stat msc_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 
@@ -1262,7 +1262,7 @@ return sim_tape_detach (uptr);                          /* detach unit */
 
 /* Online routine */
 
-static t_stat msc_online (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat msc_online (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if (uptr->flags & UNIT_ATT) return SCPE_OK;
 else return SCPE_UNATT;
@@ -1281,7 +1281,7 @@ for (i = 0; i < (sizeof (timers) / sizeof (timers[0])); i++)
 
 /* Set controller timing */
 
-static t_stat ms_set_timing (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat ms_set_timing (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if ((val < 0) || (val > 1) || (cptr != NULL)) return SCPE_ARG;
 ms_timing = val;
@@ -1291,7 +1291,7 @@ return SCPE_OK;
 
 /* Show controller timing */
 
-static t_stat ms_show_timing (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat ms_show_timing (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if (ms_timing) fputs ("fast timing", st);
 else fputs ("realistic timing", st);
@@ -1300,7 +1300,7 @@ return SCPE_OK;
 
 /* Set controller type */
 
-static t_stat ms_settype (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat ms_settype (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i;
 
@@ -1319,7 +1319,7 @@ return SCPE_OK;
 
 /* Show controller type */
 
-static t_stat ms_showtype (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat ms_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if (ms_ctype == A13183)
     fprintf (st, "13183B");
@@ -1333,7 +1333,7 @@ return SCPE_OK;
    val = 0 -> SET MSCn CAPACITY=n
    val = 1 -> SET MSCn REEL=n */
 
-static t_stat ms_set_reelsize (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat ms_set_reelsize (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 reel;
 t_stat status;
@@ -1385,7 +1385,7 @@ return SCPE_OK;
    val = 0 -> SHOW MSC or SHOW MSCn or SHOW MSCn CAPACITY
    val = 1 -> SHOW MSCn REEL */
 
-static t_stat ms_show_reelsize (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat ms_show_reelsize (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 t_stat status = SCPE_OK;
 

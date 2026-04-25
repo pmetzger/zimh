@@ -164,7 +164,7 @@ void help_set_chan_type(FILE *st, DEVICE *dptr, const char *name)
 
 /* Sets the device onto a given channel */
 t_stat
-set_chan(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+set_chan(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE             *dptr;
     DIB                *dibp;
@@ -299,7 +299,7 @@ set_chan(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
 
 /* Print devices on channel */
 t_stat
-print_chan(FILE * st, UNIT * uptr, int32 v, CONST void *desc)
+print_chan(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
     int                 chan = uptr - chan_unit;
     int                 i;
@@ -337,7 +337,7 @@ print_chan(FILE * st, UNIT * uptr, int32 v, CONST void *desc)
 }
 
 t_stat
-get_chan(FILE * st, UNIT * uptr, int32 v, CONST void *desc)
+get_chan(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
     DEVICE             *dptr;
     DIB                *dibp;
@@ -357,7 +357,7 @@ get_chan(FILE * st, UNIT * uptr, int32 v, CONST void *desc)
 }
 
 t_stat
-chan9_set_select(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+chan9_set_select(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     int                 newsel;
     DEVICE             *dptr;
@@ -403,7 +403,7 @@ chan9_set_select(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-chan9_get_select(FILE * st, UNIT * uptr, int32 v, CONST void *desc)
+chan9_get_select(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_IERR;

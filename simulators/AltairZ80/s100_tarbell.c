@@ -46,10 +46,10 @@
 #endif
 
 extern uint32 PCX;
-extern t_stat set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 
@@ -223,15 +223,15 @@ static uint8 sdata[TARBELL_SECTOR_LEN];
 /* Local function prototypes */
 static t_stat tarbell_reset(DEVICE *tarbell_dev);
 static t_stat tarbell_svc(UNIT *uptr);
-static t_stat tarbell_attach(UNIT *uptr, CONST char *cptr);
+static t_stat tarbell_attach(UNIT *uptr, const char *cptr);
 static t_stat tarbell_detach(UNIT *uptr);
 static t_stat tarbell_boot(int32 unitno, DEVICE *dptr);
-static t_stat tarbell_set_dmabase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat tarbell_show_dmabase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat tarbell_set_prom(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat tarbell_show_prom(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat tarbell_set_model(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat tarbell_show_model(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat tarbell_set_dmabase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat tarbell_show_dmabase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat tarbell_set_prom(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat tarbell_show_prom(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat tarbell_set_model(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat tarbell_show_model(FILE *st, UNIT *uptr, int32 val, const void *desc);
 static uint32 secs_per_track(uint8 track);
 static uint32 bytes_per_track(uint8 track);
 static uint32 calculate_tarbell_sec_offset(uint8 track, uint8 sector);
@@ -451,7 +451,7 @@ static t_stat tarbell_svc(UNIT *uptr)
 }
 
 /* Attach routine */
-static t_stat tarbell_attach(UNIT *uptr, CONST char *cptr)
+static t_stat tarbell_attach(UNIT *uptr, const char *cptr)
 {
     char header[4];
     t_stat r;
@@ -540,7 +540,7 @@ static t_stat tarbell_detach(UNIT *uptr)
     return SCPE_OK;
 }
 
-static t_stat tarbell_set_dmabase(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat tarbell_set_dmabase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 newba;
     t_stat r;
@@ -573,7 +573,7 @@ static t_stat tarbell_set_dmabase(UNIT *uptr, int32 val, CONST char *cptr, void 
     return SCPE_OK;
 }
 
-static t_stat tarbell_show_dmabase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat tarbell_show_dmabase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (tarbell_info->ddEnabled) {
         fprintf(st, "DMA=0x%02X-0x%02X", tarbell_info->dma_base, tarbell_info->dma_base+tarbell_info->dma_size-1);
@@ -584,7 +584,7 @@ static t_stat tarbell_show_dmabase(FILE *st, UNIT *uptr, int32 val, CONST void *
     return SCPE_OK;
 }
 
-static t_stat tarbell_set_model(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat tarbell_set_model(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (!cptr) return SCPE_IERR;
 
@@ -611,14 +611,14 @@ static t_stat tarbell_set_model(UNIT *uptr, int32 val, CONST char *cptr, void *d
     return SCPE_OK;
 }
 
-static t_stat tarbell_show_model(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat tarbell_show_model(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "MODEL=%s", (tarbell_info->ddEnabled) ? "DD" : "SD");
 
     return SCPE_OK;
 }
 
-static t_stat tarbell_set_prom(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat tarbell_set_prom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
@@ -635,7 +635,7 @@ static t_stat tarbell_set_prom(UNIT *uptr, int32 val, CONST char *cptr, void *de
     return SCPE_OK;
 }
 
-static t_stat tarbell_show_prom(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat tarbell_show_prom(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "%s", (tarbell_info->promEnabled) ? "PROM" : "NOPROM");
 

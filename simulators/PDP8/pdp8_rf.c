@@ -126,8 +126,8 @@ t_stat rf_svc (UNIT *uptr);
 t_stat pcell_svc (UNIT *uptr);
 t_stat rf_reset (DEVICE *dptr);
 t_stat rf_boot (int32 unitno, DEVICE *dptr);
-t_stat rf_attach (UNIT *uptr, CONST char *cptr);
-t_stat rf_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat rf_attach (UNIT *uptr, const char *cptr);
+t_stat rf_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
 const char *rf_description (DEVICE *dptr);
 
 /* RF08 data structures
@@ -424,7 +424,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat rf_attach (UNIT *uptr, CONST char *cptr)
+t_stat rf_attach (UNIT *uptr, const char *cptr)
 {
 uint32 sz, p;
 uint32 ds_bytes = RF_DKSIZE * sizeof (int16);
@@ -442,7 +442,7 @@ return attach_unit (uptr, cptr);
 
 /* Change disk size */
 
-t_stat rf_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rf_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (val < 0)
     return SCPE_IERR;

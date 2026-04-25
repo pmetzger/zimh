@@ -74,7 +74,7 @@ const char *sim_stop_messages[SCPE_BASE] = {
    a string of literal bytes with no format special format. The
    load starts at the current value of the PC.
 */
-t_stat sim_load (FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
 int32 i, addr = 0, cnt = 0;
 

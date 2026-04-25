@@ -240,7 +240,7 @@ t_stat cio_reset(DEVICE *dptr);
 t_stat cio_svc(UNIT *uptr);
 
 t_stat cio_install(uint16 id,
-                   CONST char *name,
+                   const char *name,
                    uint8 ipl,
                    void (*exp_handler)(uint8 slot),
                    void (*full_handler)(uint8 slot),

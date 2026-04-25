@@ -205,14 +205,14 @@ extern void put_mbyte(uint16 addr, uint8 val);
 
 /* internal function prototypes */
 
-t_stat zx200a_set_port(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat zx200a_set_int(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat zx200a_set_verb(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat zx200a_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat zx200a_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat zx200a_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat zx200a_set_verb(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat zx200a_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat zx200a_reset(DEVICE *dptr);
 void zx200a_reset_dev(void);
-t_stat zx200a_attach (UNIT *uptr, CONST char *cptr);
-t_stat zx200a_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat zx200a_attach (UNIT *uptr, const char *cptr);
+t_stat zx200a_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc);
 uint8 zx200ar0SD(t_bool io, uint8 data, uint8 devnum);
 uint8 zx200ar0DD(t_bool io, uint8 data, uint8 devnum);
 uint8 zx200ar1SD(t_bool io, uint8 data, uint8 devnum);
@@ -334,7 +334,7 @@ DEVICE zx200a_dev = {
 
 /* zx200a set mode = Write protect */
 
-t_stat zx200a_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat zx200a_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
@@ -354,7 +354,7 @@ t_stat zx200a_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // set base address parameter
 
-t_stat zx200a_set_port(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat zx200a_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result;
     
@@ -382,7 +382,7 @@ t_stat zx200a_set_port(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // set interrupt parameter
 
-t_stat zx200a_set_int(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat zx200a_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result;
     
@@ -395,7 +395,7 @@ t_stat zx200a_set_int(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat zx200a_set_verb(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat zx200a_set_verb(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
@@ -415,7 +415,7 @@ t_stat zx200a_set_verb(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // show configuration parameters
 
-t_stat zx200a_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat zx200a_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
@@ -537,7 +537,7 @@ void zx200a_reset_dev(void)
 
 /* zx200a attach - attach an .IMG file to a FDD */
 
-t_stat zx200a_attach (UNIT *uptr, CONST char *cptr)
+t_stat zx200a_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
     uint8 fddnum;

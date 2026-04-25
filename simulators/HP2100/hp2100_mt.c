@@ -166,7 +166,7 @@ static const uint32 mtc_cmd_count = sizeof (mtc_cmd) / sizeof (mtc_cmd[0]);
 
 static t_stat mtc_svc (UNIT *uptr);
 static t_stat mt_reset (DEVICE *dptr);
-static t_stat mtc_attach (UNIT *uptr, CONST char *cptr);
+static t_stat mtc_attach (UNIT *uptr, const char *cptr);
 static t_stat mtc_detach (UNIT *uptr);
 static t_stat mt_map_err (UNIT *uptr, t_stat st);
 static t_stat mt_clear (void);
@@ -884,7 +884,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat mtc_attach (UNIT *uptr, CONST char *cptr)
+t_stat mtc_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 

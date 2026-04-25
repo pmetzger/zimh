@@ -193,7 +193,7 @@ disk_write(UNIT *uptr, uint64 *buffer, int sector, int wps)
 
 
 /* Set disk format */
-t_stat disk_set_fmt (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat disk_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int f;
 
@@ -211,7 +211,7 @@ t_stat disk_set_fmt (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* Show disk format */
 
-t_stat disk_show_fmt (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat disk_show_fmt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int fmt = GET_FMT(uptr->flags);
     int f;
@@ -228,7 +228,7 @@ t_stat disk_show_fmt (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 
 
 /* Device attach */
-t_stat disk_attach (UNIT *uptr, CONST char *cptr)
+t_stat disk_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
     char                 gbuf[30];

@@ -35,8 +35,8 @@
 
 #include "vax_defs.h"
 
-extern t_stat wtc_set (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat wtc_show (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat wtc_set (UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat wtc_show (FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern void wtc_set_valid (void);
 extern void wtc_set_invalid (void);
 extern int32 wtc_rd (int32 rg);

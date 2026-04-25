@@ -839,7 +839,7 @@ return;
 
 /* Parse options for hardware PAL instruction */
 
-CONST char *parse_opt_ev5 (CONST char *cptr, uint32 *val, struct pal_opt opt[])
+const char *parse_opt_ev5 (const char *cptr, uint32 *val, struct pal_opt opt[])
 {
 uint32 i;
 char *tptr, gbuf[CBUFSIZE];
@@ -900,11 +900,11 @@ return -3;
 
 /* Parse PAL hardware opcode symbolically */
 
-t_stat parse_pal_hwre (CONST char *cptr, t_value *inst)
+t_stat parse_pal_hwre (const char *cptr, t_value *inst)
 {
 uint32 i, d, val = 0;
 int32 reg;
-CONST char *tptr;
+const char *tptr;
 char gbuf[CBUFSIZE];
 t_stat r;
 

@@ -61,7 +61,7 @@
 t_stat         ptp_devio(uint32 dev, uint64 *data);
 t_stat         ptp_svc (UNIT *uptr);
 t_stat         ptp_reset (DEVICE *dptr);
-t_stat         ptp_attach (UNIT *uptr, CONST char *cptr);
+t_stat         ptp_attach (UNIT *uptr, const char *cptr);
 t_stat         ptp_detach (UNIT *uptr);
 t_stat         ptp_help (FILE *st, DEVICE *dptr, UNIT *uptr,
                             int32 flag, const char *cptr);
@@ -71,7 +71,7 @@ t_stat         ptr_devio(uint32 dev, uint64 *data);
 t_stat         ptr_svc (UNIT *uptr);
 t_stat         ptr_boot(int32 unit_num, DEVICE * dptr);
 t_stat         ptr_reset (DEVICE *dptr);
-t_stat         ptr_attach (UNIT *uptr, CONST char *cptr);
+t_stat         ptr_attach (UNIT *uptr, const char *cptr);
 t_stat         ptr_detach (UNIT *uptr);
 t_stat         ptr_help (FILE *st, DEVICE *dptr, UNIT *uptr,
                              int32 flag, const char *cptr);
@@ -213,7 +213,7 @@ t_stat ptp_reset (DEVICE *dptr)
 
 /* Attach routine */
 
-t_stat ptp_attach (UNIT *uptr, CONST char *cptr)
+t_stat ptp_attach (UNIT *uptr, const char *cptr)
 {
     t_stat reason;
 
@@ -378,7 +378,7 @@ t_stat ptr_reset (DEVICE *dptr)
 
 /* Attach routine */
 
-t_stat ptr_attach (UNIT *uptr, CONST char *cptr)
+t_stat ptr_attach (UNIT *uptr, const char *cptr)
 {
     t_stat reason;
 

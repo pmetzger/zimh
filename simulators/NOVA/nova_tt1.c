@@ -60,8 +60,8 @@ t_stat tti1_svc (UNIT *uptr);
 t_stat tto1_svc (UNIT *uptr);
 t_stat tti1_reset (DEVICE *dptr);
 t_stat tto1_reset (DEVICE *dptr);
-t_stat ttx1_setmod (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat tti1_attach (UNIT *uptr, CONST char *cptr);
+t_stat ttx1_setmod (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat tti1_attach (UNIT *uptr, const char *cptr);
 t_stat tti1_detach (UNIT *uptr);
 void ttx1_enbdis (int32 dis);
 
@@ -288,7 +288,7 @@ sim_cancel (&tto1_unit);                                /* deactivate unit */
 return SCPE_OK;
 }
 
-t_stat ttx1_setmod (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat ttx1_setmod (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 tti1_unit.flags = (tti1_unit.flags & ~UNIT_DASHER) | val;
 tto1_unit.flags = (tto1_unit.flags & ~UNIT_DASHER) | val;
@@ -297,7 +297,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat tti1_attach (UNIT *uptr, CONST char *cptr)
+t_stat tti1_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 

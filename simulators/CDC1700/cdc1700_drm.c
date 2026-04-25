@@ -97,15 +97,15 @@ extern void fw_IOintr(t_bool, DEVICE *, IO_DEVICE *, uint16, uint16, uint16, con
 
 extern void rebuildPending(void);
 
-extern t_stat show_addr(FILE *, UNIT *, int32, CONST void *);
+extern t_stat show_addr(FILE *, UNIT *, int32, const void *);
 
-extern t_stat set_protected(UNIT *, int32, CONST char *, void *);
-extern t_stat clear_protected(UNIT *, int32, CONST char *, void *);
+extern t_stat set_protected(UNIT *, int32, const char *, void *);
+extern t_stat clear_protected(UNIT *, int32, const char *, void *);
 
-extern t_stat set_equipment(UNIT *, int32, CONST char *, void *);
+extern t_stat set_equipment(UNIT *, int32, const char *, void *);
 
-extern t_stat set_stoponrej(UNIT *, int32, CONST char *, void *);
-extern t_stat clr_stoponrej(UNIT *, int32, CONST char *, void *);
+extern t_stat set_stoponrej(UNIT *, int32, const char *, void *);
+extern t_stat clr_stoponrej(UNIT *, int32, const char *, void *);
 
 extern uint16 LoadFromMem(uint16);
 extern t_bool IOStoreToMem(uint16, uint16, t_bool);
@@ -148,10 +148,10 @@ enum drmio_status {
 
 t_stat drm_svc(UNIT *);
 t_stat drm_reset(DEVICE *);
-t_stat drm_attach(UNIT *, CONST char *);
+t_stat drm_attach(UNIT *, const char *);
 t_stat drm_detach(UNIT *);
 
-t_stat drm_set_size(UNIT *, int32, CONST char *, void *);
+t_stat drm_set_size(UNIT *, int32, const char *, void *);
 
 void DRMstate(const char *, DEVICE *, IO_DEVICE *);
 t_bool DRMreject(IO_DEVICE *, t_bool, uint8);
@@ -711,7 +711,7 @@ t_stat drm_reset(DEVICE *dptr)
 
 /* Attach routine */
 
-t_stat drm_attach (UNIT *uptr, CONST char *cptr)
+t_stat drm_attach (UNIT *uptr, const char *cptr)
 {
   t_addr capac = uptr->capac;
   t_stat r;
@@ -762,7 +762,7 @@ t_stat drm_detach(UNIT *uptr)
 /*
  * Change drum capacity
  */
-t_stat drm_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat drm_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if ((uptr->flags & UNIT_ATT) != 0)
     return SCPE_ALATT;

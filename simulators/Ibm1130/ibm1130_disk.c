@@ -41,9 +41,9 @@ commands may NOT be accurate. This should probably be fixed.
 #ifdef TRACE_DMS_IO
 static int trace_dms = 0;
 static void tracesector (int iswrite, int nwords, int addr, int sector);
-static t_stat where_cmd (int32 flag, CONST char *ptr);
-static t_stat phdebug_cmd (int32 flag, CONST char *ptr);
-static t_stat fdump_cmd (int32 flags, CONST char *cptr);
+static t_stat where_cmd (int32 flag, const char *ptr);
+static t_stat phdebug_cmd (int32 flag, const char *ptr);
+static t_stat fdump_cmd (int32 flags, const char *cptr);
 static void enable_dms_tracing (int newsetting);
 #endif
 
@@ -87,7 +87,7 @@ static t_bool raw_disk_debug = FALSE;
 
 static t_stat dsk_svc    (UNIT *uptr);
 static t_stat dsk_reset  (DEVICE *dptr);
-static t_stat dsk_attach (UNIT *uptr, CONST char *cptr);
+static t_stat dsk_attach (UNIT *uptr, const char *cptr);
 static t_stat dsk_detach (UNIT *uptr);
 static t_stat dsk_boot   (int32 unitno, DEVICE *dptr);
 
@@ -496,7 +496,7 @@ static t_stat dsk_reset (DEVICE *dptr)
     return SCPE_OK;
 }
 
-static t_stat dsk_attach (UNIT *uptr, CONST char *cptr)
+static t_stat dsk_attach (UNIT *uptr, const char *cptr)
 {
     int drv = uptr - dsk_unit;
     t_stat rval;
@@ -647,7 +647,7 @@ const char * saywhere (int addr)
 
 static int phdebug_lo = -1, phdebug_hi = -1;
 
-static t_stat phdebug_cmd (int32 flag, CONST char *ptr)
+static t_stat phdebug_cmd (int32 flag, const char *ptr)
 {
     int val1, val2;
 
@@ -674,7 +674,7 @@ static t_stat phdebug_cmd (int32 flag, CONST char *ptr)
     return SCPE_OK;
 }
 
-static t_stat where_cmd (int32 flag, CONST char *ptr)
+static t_stat where_cmd (int32 flag, const char *ptr)
 {
     int addr;
     const char *where;
@@ -839,7 +839,7 @@ done:
         savesector(addr, offset, nwords, phid, name);
 }
 
-static t_stat fdump_cmd (int32 flags, CONST char *cptr)
+static t_stat fdump_cmd (int32 flags, const char *cptr)
 {
     int addr = 0x7a24;                              /* address of next statement */
     int sofst = 0x7a26, symaddr;

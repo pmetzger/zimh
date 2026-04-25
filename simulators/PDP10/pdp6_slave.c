@@ -55,7 +55,7 @@
 static t_stat slave_devio(uint32 dev, uint64 *data);
 static t_stat slave_svc (UNIT *uptr);
 static t_stat slave_reset (DEVICE *dptr);
-static t_stat slave_attach (UNIT *uptr, CONST char *ptr);
+static t_stat slave_attach (UNIT *uptr, const char *ptr);
 static t_stat slave_detach (UNIT *uptr);
 static t_stat slave_attach_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 static const char *slave_description (DEVICE *dptr);
@@ -127,7 +127,7 @@ static t_stat slave_reset (DEVICE *dptr)
   return SCPE_OK;
 }
 
-static t_stat slave_attach (UNIT *uptr, CONST char *cptr)
+static t_stat slave_attach (UNIT *uptr, const char *cptr)
 {
   t_stat r;
 

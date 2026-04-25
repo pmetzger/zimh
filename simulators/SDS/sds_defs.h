@@ -425,8 +425,8 @@ void chan_set_flag (int32 ch, uint32 fl);
 void chan_set_ordy (int32 ch);
 void chan_disc (int32 ch);
 void chan_set_uar (int32 ch, uint32 dev);
-t_stat set_chan (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat show_chan (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat set_chan (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat show_chan (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat chan_process (void);
 t_bool chan_testact (void);
 

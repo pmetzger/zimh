@@ -111,12 +111,12 @@ extern t_stat parse_sym_m68k(char* c, t_addr a, UNIT* u, t_value* val, int32 sw)
 void prepareMemoryAccessMessage(const t_addr loc);
 void prepareInstructionMessage(const t_addr loc, const uint32 op);
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw);
-t_stat parse_sym(CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw);
+t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw);
 
-t_stat set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 /* SCP data structures
     sim_name            simulator name string
@@ -839,7 +839,7 @@ static int32 parse_X80(const char *cptr, const int32 addr, uint32 *val, const ch
     Outputs:
         status  =   error status
 */
-t_stat parse_sym(CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw) {
+t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw) {
     static t_bool symbolicInputNotImplementedMessage8086 = FALSE;
     if ((sw & (SWMASK('M'))) && (chiptype == CHIP_TYPE_8086)) {
         if (!symbolicInputNotImplementedMessage8086) {
@@ -861,7 +861,7 @@ t_stat parse_sym(CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 
 }
 
 /* Set Memory Base Address routine */
-t_stat set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE *dptr;
     PNP_INFO *pnp;
@@ -901,7 +901,7 @@ t_stat set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 /* Show Base Address routine */
-t_stat show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     DEVICE *dptr;
     PNP_INFO *pnp;
@@ -920,7 +920,7 @@ t_stat show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 
 /* Set Memory Base Address routine */
-t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE *dptr;
     PNP_INFO *pnp;
@@ -961,7 +961,7 @@ t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 /* Show I/O Base Address routine */
-t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     DEVICE *dptr;
     PNP_INFO *pnp;

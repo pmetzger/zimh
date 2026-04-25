@@ -160,7 +160,7 @@ void        mt_ini(UNIT *uptr, t_bool);
 t_stat      mt_rschnlio(UNIT *uptr);
 t_stat      mt_haltio(UNIT *uptr);
 t_stat      mt_reset(DEVICE *dptr);
-t_stat      mt_attach(UNIT *uptr, CONST char *);
+t_stat      mt_attach(UNIT *uptr, const char *);
 t_stat      mt_detach(UNIT *uptr);
 t_stat      mt_help(FILE *, DEVICE *dptr, UNIT *uptr, int32, const char *);
 const char  *mt_description(DEVICE *);
@@ -1564,7 +1564,7 @@ t_stat mt_reset(DEVICE *dptr)
 }
 
 /* attach the specified file to the tape device */
-t_stat mt_attach(UNIT *uptr, CONST char *file)
+t_stat mt_attach(UNIT *uptr, const char *file)
 {
     uint16      chsa = GET_UADDR(uptr->CMD);    /* get address of mt device */
     CHANP       *chp = find_chanp_ptr(chsa);    /* get channel prog pointer */

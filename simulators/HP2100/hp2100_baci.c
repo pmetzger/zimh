@@ -388,7 +388,7 @@ static void   clock_uart (void);
 static t_stat baci_term_svc (UNIT *uptr);
 static t_stat baci_poll_svc (UNIT *uptr);
 static t_stat baci_reset (DEVICE *dptr);
-static t_stat baci_attach (UNIT *uptr, CONST char *cptr);
+static t_stat baci_attach (UNIT *uptr, const char *cptr);
 static t_stat baci_detach (UNIT *uptr);
 
 
@@ -1169,7 +1169,7 @@ return SCPE_OK;
 
 /* Attach line */
 
-static t_stat baci_attach (UNIT *uptr, CONST char *cptr)
+static t_stat baci_attach (UNIT *uptr, const char *cptr)
 {
 t_stat status = SCPE_OK;
 

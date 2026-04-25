@@ -70,11 +70,11 @@ int32  cp_inst;                        /* saved instr */
 
 t_stat  cp_devio(uint32 fnc, uint32 inst, uint32 *dat);
 t_stat  cp_svc(UNIT *);
-t_stat  cp_attach(UNIT * uptr, CONST char *file);
+t_stat  cp_attach(UNIT * uptr, const char *file);
 t_stat  cp_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 t_stat  cp_detach(UNIT * uptr);
 t_stat  cp_wrend(UNIT * uptr);
-t_stat  cp_show_cap (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat  cp_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc);
 void    cp_set_err (UNIT *uptr);
 
 
@@ -276,7 +276,7 @@ void cp_set_err (UNIT *uptr)
     return;
 }
 
-t_stat cp_attach(UNIT * uptr, CONST char *cptr) {
+t_stat cp_attach(UNIT * uptr, const char *cptr) {
     t_stat r;
     
     sim_card_set_fmt (uptr,0,"CBN",NULL);
@@ -295,14 +295,14 @@ t_stat cp_detach(UNIT * uptr) {
 
 /* Channel assignment routines */
 
-t_stat cp_set_chan (UNIT *uptr, int32 val, CONST char *sptr, void *desc)
+t_stat cp_set_chan (UNIT *uptr, int32 val, const char *sptr, void *desc)
 {
     t_stat r;
     r = set_chan (uptr, val, sptr, desc);
     return r;
 }
 
-t_stat cp_show_cap (FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
+t_stat cp_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc) {
     int n;
     
     if ((n = sim_card_output_hopper_count(uptr)) == 0)

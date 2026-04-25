@@ -414,7 +414,7 @@ uba_set_parity(uint16 ctl)
 }
 
 t_stat
-uba_set_addr(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+uba_set_addr(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE  *dptr;
     DIB     *dibp;
@@ -442,7 +442,7 @@ uba_set_addr(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-uba_show_addr (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+uba_show_addr (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     DEVICE  *dptr = find_dev_from_unit(uptr);
     DIB     *dibp = (DIB *) dptr->ctxt;
@@ -453,7 +453,7 @@ uba_show_addr (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 
 t_stat
-uba_set_br(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+uba_set_br(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE  *dptr;
     DIB     *dibp;
@@ -484,7 +484,7 @@ uba_set_br(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-uba_show_br (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+uba_show_br (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     DEVICE  *dptr = find_dev_from_unit(uptr);
     DIB *dibp = (DIB *) dptr->ctxt;
@@ -495,7 +495,7 @@ uba_show_br (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 
 t_stat
-uba_set_vect(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+uba_set_vect(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE  *dptr;
     DIB     *dibp;
@@ -524,7 +524,7 @@ uba_set_vect(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-uba_show_vect (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+uba_show_vect (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     DEVICE  *dptr = find_dev_from_unit(uptr);
     DIB *dibp = (DIB *) dptr->ctxt;
@@ -535,7 +535,7 @@ uba_show_vect (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 
 t_stat
-uba_set_ctl(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+uba_set_ctl(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE  *dptr;
     DIB     *dibp;
@@ -566,7 +566,7 @@ uba_set_ctl(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-uba_show_ctl (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+uba_show_ctl (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     DEVICE  *dptr = find_dev_from_unit(uptr);
     DIB *dibp = (DIB *) dptr->ctxt;

@@ -246,7 +246,7 @@ static void ha_calc_subdevs(void)
     }
 }
 
-t_stat ha_attach(UNIT *uptr, CONST char *cptr)
+t_stat ha_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r;
     r = scsi_attach(uptr, cptr);
@@ -1478,7 +1478,7 @@ void ha_fcm_express(uint8 tc)
     }
 }
 
-t_stat ha_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat ha_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (val < 0 || cptr || val > HA_MAX_DTYPE) {
         return SCPE_ARG;
@@ -1498,7 +1498,7 @@ t_stat ha_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat ha_show_type(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat ha_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf(st, "%s", ha_tab[GET_DTYPE(uptr->flags)].name);
 

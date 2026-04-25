@@ -577,9 +577,9 @@ static INTERFACE muxc_interface;
 static t_stat muxi_svc (UNIT *uptr);
 static t_stat muxo_svc (UNIT *uptr);
 static t_stat muxc_reset (DEVICE *dptr);
-static t_stat mux_attach (UNIT *uptr, CONST char *cptr);
+static t_stat mux_attach (UNIT *uptr, const char *cptr);
 static t_stat mux_detach (UNIT *uptr);
-static t_stat mux_setdiag (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+static t_stat mux_setdiag (UNIT *uptr, int32 val, const char *cptr, void *desc);
 
 
 /* Multiplexer SCP data structures */
@@ -1750,7 +1750,7 @@ return SCPE_OK;
 
 /* Attach master unit */
 
-t_stat mux_attach (UNIT *uptr, CONST char *cptr)
+t_stat mux_attach (UNIT *uptr, const char *cptr)
 {
 t_stat status = SCPE_OK;
 
@@ -1804,7 +1804,7 @@ return r;
    here.)
 */
 
-t_stat mux_setdiag (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat mux_setdiag (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 ln;
 

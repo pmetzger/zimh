@@ -71,7 +71,7 @@ const char         *sim_stop_messages[SCPE_BASE] = {
     0
 };
 
-static t_stat ibm650_deck_cmd(int32 arg, CONST char *buf);
+static t_stat ibm650_deck_cmd(int32 arg, const char *buf);
 
 static CTAB aux_cmds [] = {
 /*    Name         Action Routine     Argument   Help String */
@@ -227,7 +227,7 @@ vm_init(void) {
 /* Load a card image file into memory.  */
 
 t_stat
-sim_load(FILE * fileref, CONST char *cptr, CONST char *fnam, int flag)
+sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
 {
    /* Currently not implimented until I know format of load files */
     return SCPE_NOFNC;
@@ -358,7 +358,7 @@ print_opcode(FILE * of, t_int64 val)
     int DA; 
     int op;
     int n;
-    CONST char * opname;
+    const char * opname;
 
     if (val < 0) {sgn = -1; val = -val;} else sgn = 1;
 
@@ -452,7 +452,7 @@ find_opcode(char *op)
         d       =       parsed value
 */
 
-CONST char * parse_sgn(int *neg, CONST char *cptr)
+const char * parse_sgn(int *neg, const char *cptr)
 {
     *neg=0;
     while (isspace(*cptr)) cptr++;
@@ -464,7 +464,7 @@ CONST char * parse_sgn(int *neg, CONST char *cptr)
     return cptr;
 }
 
-CONST char * parse_n(t_int64 *d, CONST char *cptr, int n)
+const char * parse_n(t_int64 *d, const char *cptr, int n)
 {
     int i = 0;
 
@@ -509,7 +509,7 @@ int ascii_to_NN(int ch)
     return 0;
 }
 
-t_stat parse_sym(CONST char *cptr, t_addr addr, UNIT * uptr, t_value * val, int32 sw)
+t_stat parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int32 sw)
 {
     t_int64             d;
     int                 op, da, ia;
@@ -727,7 +727,7 @@ void deck_free(uint16 *deck)
 // MAX_CARDS_IN_DECK, but there is potential to make this flexible
 // and reduce the size to actually used size).
 // Uses cdr0 device/unit.
-t_stat deck_load(CONST char *fn, uint16 ** DeckImagePtr, int * nCards)
+t_stat deck_load(const char *fn, uint16 ** DeckImagePtr, int * nCards)
 {
     UNIT *              uptr = &cdr_unit[0];
     uint16 * DeckImage;
@@ -786,7 +786,7 @@ t_stat deck_load(CONST char *fn, uint16 ** DeckImagePtr, int * nCards)
 
 // write nCards starting at card from DeckImage array to file fn
 // uses cdr0 device/unit
-t_stat deck_save(CONST char *fn, uint16 * DeckImage, int card, int nCards)
+t_stat deck_save(const char *fn, uint16 * DeckImage, int card, int nCards)
 {
     UNIT *              uptr = &cdr_unit[0];
     uint16 image[80];
@@ -858,7 +858,7 @@ void deck_print_echo(uint16 * DeckImage, int nCards, int bPrint, int bEcho)
 // carddeck split <count> <dev|file0> <file1> <file2>
 // carddeck split   5CD   <dev|file0> <file1> <file2>
 // carddeck split   PAT   <dev|file0> <file1> <file2>
-static t_stat deck_split_cmd(CONST char *cptr)
+static t_stat deck_split_cmd(const char *cptr)
 {
     char fn0[4*CBUFSIZE];
     char fn1[4*CBUFSIZE];
@@ -1072,12 +1072,12 @@ static t_stat deck_split_cmd(CONST char *cptr)
 }
 
 // carddeck join <file1> <file2> ... as <file>
-static t_stat deck_join_cmd(CONST char *cptr)
+static t_stat deck_join_cmd(const char *cptr)
 {
     char fnSrc[4*CBUFSIZE];
     char fnDest[4*CBUFSIZE];
-    CONST char *cptr0;
-    CONST char *cptrAS;
+    const char *cptr0;
+    const char *cptrAS;
     char gbuf[4*CBUFSIZE];
     t_stat r;
 
@@ -1131,7 +1131,7 @@ static t_stat deck_join_cmd(CONST char *cptr)
 }
 
 // carddeck print <file> 
-static t_stat deck_print_cmd(CONST char *cptr)
+static t_stat deck_print_cmd(const char *cptr)
 {
     char fn[4*CBUFSIZE];
     t_stat r;
@@ -1161,7 +1161,7 @@ static t_stat deck_print_cmd(CONST char *cptr)
 }
 
 // carddeck echolast <dev> <count>
-static t_stat deck_echolast_cmd(CONST char *cptr)
+static t_stat deck_echolast_cmd(const char *cptr)
 {
     char gbuf[4*CBUFSIZE];
     t_stat r;
@@ -1216,7 +1216,7 @@ static t_stat deck_echolast_cmd(CONST char *cptr)
     return SCPE_OK;
 }
 
-static t_stat ibm650_deck_cmd(int32 arg, CONST char *buf)
+static t_stat ibm650_deck_cmd(int32 arg, const char *buf)
 {
     char gbuf[4*CBUFSIZE];
     const char *cptr;

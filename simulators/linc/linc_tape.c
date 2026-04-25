@@ -51,7 +51,7 @@ static int16 WANTED_BLOCK;
 static t_stat tape_svc(UNIT *uptr);
 static t_stat tape_reset(DEVICE *dptr);
 static t_stat tape_boot(int32 u, DEVICE *dptr);
-static t_stat tape_attach(UNIT *uptr, CONST char *cptr);
+static t_stat tape_attach(UNIT *uptr, const char *cptr);
 static t_stat tape_detach(UNIT *uptr);
 
 #define UNIT_FLAGS (UNIT_IDLE|UNIT_FIX|UNIT_ATTABLE|UNIT_DISABLE|UNIT_ROABLE)
@@ -430,7 +430,7 @@ t_stat tape_metadata(FILE *fileref, uint16 *block_size, int16 *forward_offset, i
   return SCPE_OK;
 }
 
-static t_stat tape_attach(UNIT *uptr, CONST char *cptr)
+static t_stat tape_attach(UNIT *uptr, const char *cptr)
 {
   t_stat stat;
   uint16 block_size;

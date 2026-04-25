@@ -1146,10 +1146,10 @@ extern int32 cpu_instruction_set;
 
 extern t_stat cpu_load_bootcode (const char *filename, const unsigned char *builtin_code, size_t size, t_bool rom, t_addr offset);
 extern t_stat cpu_print_model (FILE *st);
-extern t_stat cpu_show_model (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat cpu_set_model (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat cpu_show_instruction_set (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat cpu_set_instruction_set (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+extern t_stat cpu_show_model (FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat cpu_show_instruction_set (FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat cpu_set_instruction_set (UNIT *uptr, int32 val, const char *cptr, void *desc);
 extern t_stat cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 extern t_stat cpu_model_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 extern void vax_init(void);

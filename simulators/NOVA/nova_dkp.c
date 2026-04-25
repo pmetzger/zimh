@@ -347,9 +347,9 @@ int32 dkp (int32 pulse, int32 code, int32 AC);
 t_stat dkp_svc (UNIT *uptr);
 t_stat dkp_reset (DEVICE *dptr);
 t_stat dkp_boot (int32 unitno, DEVICE *dptr);
-t_stat dkp_attach (UNIT *uptr, CONST char *cptr);
+t_stat dkp_attach (UNIT *uptr, const char *cptr);
 t_stat dkp_go ( int32 pulse );
-t_stat dkp_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat dkp_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
 
 /* DKP data structures
 
@@ -987,7 +987,7 @@ return SCPE_OK;
 
 /* Attach routine (with optional autosizing) */
 
-t_stat dkp_attach (UNIT *uptr, CONST char *cptr)
+t_stat dkp_attach (UNIT *uptr, const char *cptr)
 {
 int32 i, p;
 t_stat   r;
@@ -1010,7 +1010,7 @@ return SCPE_OK;
 
 /* Set size command validation routine */
 
-t_stat dkp_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat dkp_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (uptr->flags & UNIT_ATT)
     return SCPE_ALATT;

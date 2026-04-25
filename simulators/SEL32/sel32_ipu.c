@@ -106,11 +106,11 @@ LOCAL   uint32          TRAPME = 0;         /* trap to be executed */
 t_stat ipu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw);
 t_stat ipu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw);
 t_stat ipu_reset(DEVICE * dptr);
-t_stat ipu_set_ipu(UNIT * uptr, int32 val, CONST char *cptr, void *desc);
-t_stat ipu_clr_ipu(UNIT * uptr, int32 val, CONST char *cptr, void *desc);
-t_stat ipu_show_ipu(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat ipu_show_hist(FILE * st, UNIT * uptr, int32 val, CONST void *desc);
-t_stat ipu_set_hist(UNIT * uptr, int32 val, CONST char *cptr, void *desc);
+t_stat ipu_set_ipu(UNIT * uptr, int32 val, const char *cptr, void *desc);
+t_stat ipu_clr_ipu(UNIT * uptr, int32 val, const char *cptr, void *desc);
+t_stat ipu_show_ipu(FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat ipu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc);
+t_stat ipu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc);
 uint32 ipu_cmd(UNIT * uptr, uint16 cmd, uint16 dev);
 t_stat ipu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *ipu_description (DEVICE *dptr);
@@ -7024,7 +7024,7 @@ t_stat ipu_dep(t_value val, t_addr baddr, UNIT *uptr, int32 sw)
     return SCPE_OK;                                 /* all OK */
 }
 
-t_stat ipu_set_ipu(UNIT *uptr, int32 sval, CONST char *cptr, void *desc)
+t_stat ipu_set_ipu(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 {
     sim_printf("ipu_set_ipu sval %x cptr %s desc %s\n", sval, cptr, (char *)desc);
     if ((CPU_MODEL == MODEL_55) || (CPU_MODEL == MODEL_27))
@@ -7036,7 +7036,7 @@ t_stat ipu_set_ipu(UNIT *uptr, int32 sval, CONST char *cptr, void *desc)
     return SCPE_OK;                                 /* we done */
 }
 
-t_stat ipu_clr_ipu(UNIT *uptr, int32 sval, CONST char *cptr, void *desc)
+t_stat ipu_clr_ipu(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 {
 //  sim_printf("ipu_clr_ipu sval %x cptr %s desc %s\n", sval, cptr, (char *)desc);
     ipu_unit.flags &= ~UNIT_IPU;                    /* disable IPU for this MODEL */
@@ -7044,7 +7044,7 @@ t_stat ipu_clr_ipu(UNIT *uptr, int32 sval, CONST char *cptr, void *desc)
     return SCPE_OK;                                 /* we done */
 }
 
-t_stat ipu_show_ipu(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat ipu_show_ipu(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (IPU_MODEL)
         sim_printf("IPU enabled\n");
@@ -7057,7 +7057,7 @@ t_stat ipu_show_ipu(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 
 /* Set history */
 t_stat
-ipu_set_hist(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+ipu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32               i, lnt;
     t_stat              r;
@@ -7088,7 +7088,7 @@ ipu_set_hist(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 /* Show history */
-t_stat ipu_show_hist(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat ipu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int32               k, di, lnt;
     char               *cptr = (char *) desc;

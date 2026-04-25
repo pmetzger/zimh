@@ -142,10 +142,10 @@ typedef struct {
 t_stat rz_svc (UNIT *uptr);
 t_stat rz_isvc (UNIT *uptr);
 t_stat rz_reset (DEVICE *dptr);
-t_stat rz_attach (UNIT *uptr, CONST char *cptr);
+t_stat rz_attach (UNIT *uptr, const char *cptr);
 t_stat rz_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
-t_stat rz_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat rz_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat rz_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat rz_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc);
 void rz_update_status (CTLR *rz);
 void rz_setint (CTLR *rz, uint32 flags);
 void rz_clrint (CTLR *rz);
@@ -827,7 +827,7 @@ return SCPE_OK;
 
 /* Set unit type (and capacity if user defined) */
 
-t_stat rz_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rz_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 CTLR *rz = rz_ctxmap[uptr->cnum];
 uint32 cap;
@@ -855,7 +855,7 @@ return SCPE_OK;
 
 /* Show unit type */
 
-t_stat rz_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat rz_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "%s", rzdev_tab[GET_DTYPE (uptr->flags)].name);
 return SCPE_OK;
@@ -881,7 +881,7 @@ scsi_help (st, dptr, uptr, flag, cptr);
 return SCPE_OK;
 }
 
-t_stat rz_attach (UNIT *uptr, CONST char *cptr)
+t_stat rz_attach (UNIT *uptr, const char *cptr)
 {
 return scsi_attach_ex (uptr, cptr, drv_types);
 }

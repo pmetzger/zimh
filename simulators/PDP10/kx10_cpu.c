@@ -388,12 +388,12 @@ int    do_extend(uint32 IA);
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_reset (DEVICE *dptr);
-t_stat cpu_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc);
 #if KI | KL | KS
-t_stat cpu_set_serial (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_serial (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat cpu_set_serial (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_serial (FILE *st, UNIT *uptr, int32 val, const void *desc);
 #endif
 t_stat cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                      const char *cptr);
@@ -13806,7 +13806,7 @@ t_stat cpu_detach (UNIT *uptr)
 
 /* Memory size change */
 
-t_stat cpu_set_size (UNIT *uptr, int32 sval, CONST char *cptr, void *desc)
+t_stat cpu_set_size (UNIT *uptr, int32 sval, const char *cptr, void *desc)
 {
 int32 i;
 int32 val = (int32)sval;
@@ -13970,7 +13970,7 @@ t_bool build_dev_tab (void)
 #if KI | KL | KS
 
 /* Set serial */
-t_stat cpu_set_serial (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_serial (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 lnt;
 t_stat r;
@@ -13993,7 +13993,7 @@ return SCPE_OK;
 }
 
 /* Show serial */
-t_stat cpu_show_serial (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_serial (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "Serial: " );
 if (apr_serial == -1) {
@@ -14006,7 +14006,7 @@ return SCPE_OK;
 #endif
 
 /* Set history */
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i, lnt;
 t_stat r;
@@ -14036,7 +14036,7 @@ return SCPE_OK;
 }
 
 /* Show history */
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 k, di, lnt;
 char *cptr = (char *) desc;

@@ -189,7 +189,7 @@ REG disk_reg[] = {
 };
 
 static FILE * syslog = NULL;
-t_stat disk_setsyslog (UNIT *up, int32 v, CONST char *cp, void *dp) {
+t_stat disk_setsyslog (UNIT *up, int32 v, const char *cp, void *dp) {
     if (syslog) {
         fclose(syslog);
         syslog = NULL;
@@ -207,7 +207,7 @@ t_stat disk_setsyslog (UNIT *up, int32 v, CONST char *cp, void *dp) {
 #define DISK_TYPE_29M  (1 << UNIT_V_UF)
 #define IS_29MB(u) (((u)->flags & DISK_TYPE_MASK) == DISK_TYPE_29M)
 
-t_stat disk_set_type (UNIT *up, int32 v, CONST char *cp, void *dp) {
+t_stat disk_set_type (UNIT *up, int32 v, const char *cp, void *dp) {
     int first_unit = (up->dptr - md_dev) * 8;
     int unit;
     for (unit = first_unit; unit < first_unit + 8; ++unit) {
@@ -222,7 +222,7 @@ t_stat disk_set_type (UNIT *up, int32 v, CONST char *cp, void *dp) {
     return SCPE_OK;
 }
 
-t_stat disk_show_type (FILE *f, UNIT *up, int32 v, CONST void *dp) {
+t_stat disk_show_type (FILE *f, UNIT *up, int32 v, const void *dp) {
     fprintf(f, IS_29MB(up) ? "EC-5061" : "EC-5052");
     return SCPE_OK;
 }
@@ -239,7 +239,7 @@ MTAB disk_mod[] = {
 
 
 t_stat disk_reset (DEVICE *dptr);
-t_stat disk_attach (UNIT *uptr, CONST char *cptr);
+t_stat disk_attach (UNIT *uptr, const char *cptr);
 t_stat disk_detach (UNIT *uptr);
 
 #define DEB_OPS 000001
@@ -341,7 +341,7 @@ t_stat disk_reset (DEVICE *dptr)
     return SCPE_OK;
 }
 
-t_stat disk_attach (UNIT *u, CONST char *cptr)
+t_stat disk_attach (UNIT *u, const char *cptr)
 {
     t_stat s;
     int32 saved_switches = sim_switches;

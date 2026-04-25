@@ -62,7 +62,7 @@ static struct boot_dev boot_tab[] = {
 
 t_stat sysd_reset (DEVICE *dptr);
 const char *sysd_description (DEVICE *dptr);
-t_stat vax610_boot (int32 flag, CONST char *ptr);
+t_stat vax610_boot (int32 flag, const char *ptr);
 t_stat vax610_boot_parse (int32 flag, const char *ptr);
 
 extern int32 iccs_rd (void);
@@ -355,7 +355,7 @@ return;
    Sets up R0-R5, calls SCP boot processor with effective BOOT CPU
 */
 
-t_stat vax610_boot (int32 flag, CONST char *ptr)
+t_stat vax610_boot (int32 flag, const char *ptr)
 {
 t_stat r;
 
@@ -510,7 +510,7 @@ AP = 1;
 return SCPE_OK;
 }
 
-t_stat vax610_set_instruction_set (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat vax610_set_instruction_set (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 char gbuf[CBUFSIZE];
 
@@ -538,7 +538,7 @@ const char *sysd_description (DEVICE *dptr)
 return "system devices";
 }
 
-t_stat cpu_set_model (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 char gbuf[CBUFSIZE];
 

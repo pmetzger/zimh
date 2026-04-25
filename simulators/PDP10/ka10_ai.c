@@ -189,7 +189,7 @@ static int image_count, image_sector_length;
 static t_stat ai_devio(uint32 dev, uint64 *data);
 static t_stat ai_svc(UNIT *);
 static t_stat ai_reset(DEVICE *);
-static t_stat ai_attach(UNIT *, CONST char *);
+static t_stat ai_attach(UNIT *, const char *);
 static t_stat ai_detach(UNIT *);
 static t_stat ai_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                        const char *cptr);
@@ -990,7 +990,7 @@ ai_reset(DEVICE *dptr)
 }
 
 /* Device attach */
-t_stat ai_attach (UNIT *uptr, CONST char *cptr)
+t_stat ai_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
     DEVICE *rptr;

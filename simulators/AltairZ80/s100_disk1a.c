@@ -66,10 +66,10 @@ typedef struct {
 static DISK1A_INFO disk1a_info_data = { { 0x0, 512, 0xC0, 4 } };
 static DISK1A_INFO *disk1a_info = &disk1a_info_data;
 
-extern t_stat set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 
@@ -83,7 +83,7 @@ extern uint32 PCX;      /* external view of PC  */
 
 static t_stat disk1a_reset(DEVICE *disk1a_dev);
 static t_stat disk1a_boot(int32 unitno, DEVICE *dptr);
-static t_stat disk1a_attach(UNIT *uptr, CONST char *cptr);
+static t_stat disk1a_attach(UNIT *uptr, const char *cptr);
 static t_stat disk1a_detach(UNIT *uptr);
 static const char* disk1a_description(DEVICE *dptr);
 
@@ -747,7 +747,7 @@ static t_stat disk1a_boot(int32 unitno, DEVICE *dptr)
 }
 
 /* Attach routine */
-static t_stat disk1a_attach(UNIT *uptr, CONST char *cptr)
+static t_stat disk1a_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r;
     r = i8272_attach(uptr, cptr);

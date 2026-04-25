@@ -60,10 +60,10 @@ uint32              cdp_cmd(UNIT *, uint16, uint16);
 void                cdp_ini(UNIT *, t_bool);
 t_stat              cdp_srv(UNIT *);
 t_stat              cdp_reset(DEVICE *);
-t_stat              cdp_attach(UNIT *, CONST char *);
+t_stat              cdp_attach(UNIT *, const char *);
 t_stat              cdp_detach(UNIT *);
-t_stat              cdp_get_input(FILE *, UNIT *, int32, CONST void *);
-t_stat              cdp_set_input(UNIT *, int32, CONST char *, void *);
+t_stat              cdp_get_input(FILE *, UNIT *, int32, const void *);
+t_stat              cdp_set_input(UNIT *, int32, const char *, void *);
 t_stat              cdp_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 const char         *cdp_description(DEVICE *dptr);
 t_stat              stk_help(FILE *, DEVICE *, UNIT *, int32, const char *);
@@ -344,7 +344,7 @@ cdp_ini(UNIT *uptr, t_bool f) {
 }
 
 t_stat
-cdp_attach(UNIT * uptr, CONST char *file)
+cdp_attach(UNIT * uptr, const char *file)
 {
     t_stat        r;
 
@@ -380,7 +380,7 @@ cdp_detach(UNIT * uptr)
 }
 
 t_stat
-cdp_set_input(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+cdp_set_input(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int       nflag = 1;
     int       num = 0;
@@ -457,7 +457,7 @@ cdp_set_input(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-cdp_get_input(FILE *st, UNIT *uptr, int32 v, CONST void *desc)
+cdp_get_input(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
     int u = (uptr - cdp_unit);
     UNIT *iuptr = &cdp_input_unit[u];

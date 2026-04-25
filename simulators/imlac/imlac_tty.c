@@ -40,10 +40,10 @@ static int tty_type = TTY_PORT;
 static uint16 tty_iot (uint16, uint16);
 static t_stat tty_r_svc (UNIT *uptr);
 static t_stat tty_t_svc (UNIT *uptr);
-static t_stat tty_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat tty_show_type (FILE *st, UNIT *up, int32 v, CONST void *dp);
+static t_stat tty_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat tty_show_type (FILE *st, UNIT *up, int32 v, const void *dp);
 static t_stat tty_boot (int32 u, DEVICE *dptr);
-static t_stat tty_attach (UNIT *uptr, CONST char *cptr);
+static t_stat tty_attach (UNIT *uptr, const char *cptr);
 static t_stat tty_detach (UNIT *uptr);
 
 static TMLN tty_ldsc = { 0 };
@@ -205,7 +205,7 @@ tty_iot (uint16 insn, uint16 AC)
 }
 
 static t_stat
-tty_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+tty_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   t_stat r = SCPE_OK;
   if (strcmp (cptr, "FILE") == 0)
@@ -218,7 +218,7 @@ tty_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 static t_stat
-tty_show_type (FILE *st, UNIT *up, int32 v, CONST void *dp)
+tty_show_type (FILE *st, UNIT *up, int32 v, const void *dp)
 {
   switch (tty_type) {
   case TTY_FILE:
@@ -258,7 +258,7 @@ static t_stat tty_boot (int32 u, DEVICE *dptr)
 }
 
 static t_stat
-tty_attach (UNIT *uptr, CONST char *cptr)
+tty_attach (UNIT *uptr, const char *cptr)
 {
   t_stat r;
 

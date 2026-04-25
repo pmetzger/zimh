@@ -477,7 +477,7 @@ void timer_write(uint32 pa, uint32 val, size_t size)
     }
 }
 
-CONST char *tmr_description(DEVICE *dptr)
+const char *tmr_description(DEVICE *dptr)
 {
 #if defined (REV3)
     return "82C54 Programmable Interval Timer";

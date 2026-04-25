@@ -85,10 +85,10 @@ typedef struct {
 
 extern WD179X_INFO_PUB *wd179x_infop;
 
-extern t_stat set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat set_iobase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+extern t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 extern void setBankSelect(const int32 b);
@@ -106,7 +106,7 @@ extern int32  timerInterruptHandler;            /* SIO timer address of interrup
 
 static t_stat adcs6_reset(DEVICE *adcs6_dev);
 static t_stat adcs6_boot(int32 unitno, DEVICE *dptr);
-static t_stat adcs6_attach(UNIT *uptr, CONST char *cptr);
+static t_stat adcs6_attach(UNIT *uptr, const char *cptr);
 static t_stat adcs6_detach(UNIT *uptr);
 
 static int32 adcs6_dma(const int32 port, const int32 io, const int32 data);
@@ -116,8 +116,8 @@ static int32 adcs6_control(const int32 port, const int32 io, const int32 data);
 static int32 adcs6_banksel(const int32 port, const int32 io, const int32 data);
 static int32 ccs2719(const int32 port, const int32 io, const int32 data);
 static int32 adcs6rom(const int32 port, const int32 io, const int32 data);
-static t_stat adcs6_dev_set_rom(UNIT* uptr, int32 value, CONST char* cptr, void* desc);
-static t_stat adcs6_dev_show_rom(FILE* st, UNIT* uptr, int32 val, CONST void* desc);
+static t_stat adcs6_dev_set_rom(UNIT* uptr, int32 value, const char* cptr, void* desc);
+static t_stat adcs6_dev_show_rom(FILE* st, UNIT* uptr, int32 val, const void* desc);
 static const char* adcs6_description(DEVICE *dptr);
 
 /* Boot ROM selection */
@@ -258,7 +258,7 @@ static REG adcs6_reg[] = {
 static const char* adcs6_description(DEVICE *dptr) {
     return ADCS6_NAME;
 }
-t_stat adcs6_show_vectable(FILE* st, UNIT* uptr, int32 val, CONST void* desc);
+t_stat adcs6_show_vectable(FILE* st, UNIT* uptr, int32 val, const void* desc);
 
 static MTAB adcs6_mod[] = {
     { MTAB_XTD|MTAB_VDV,    0,                  "MEMBASE",  "MEMBASE",
@@ -734,7 +734,7 @@ static t_stat adcs6_boot(int32 unitno, DEVICE *dptr)
 }
 
 /* Attach routine */
-static t_stat adcs6_attach(UNIT *uptr, CONST char *cptr)
+static t_stat adcs6_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r = SCPE_IERR;
 
@@ -777,7 +777,7 @@ static int32 adcs6rom(const int32 Addr, const int32 write, const int32 data)
 }
 
 /* Set ROM to ADC or DIGITEX */
-static t_stat adcs6_dev_set_rom(UNIT* uptr, int32 value, CONST char* cptr, void* desc)
+static t_stat adcs6_dev_set_rom(UNIT* uptr, int32 value, const char* cptr, void* desc)
 {
     if (cptr == NULL)
         return SCPE_ARG;
@@ -802,14 +802,14 @@ char* adcs6_rom_type_str[] = {
 };
 
 /* Show current ROM selection */
-static t_stat adcs6_dev_show_rom(FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+static t_stat adcs6_dev_show_rom(FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
     fprintf(st, "ROM=%s", adcs6_rom_type_str[adcs6_info->rom_type]);
 
     return SCPE_OK;
 }
 
-t_stat adcs6_show_vectable(FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat adcs6_show_vectable(FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
     uint8 i;
     int32 vectable = (IR_S & 0xFF00);

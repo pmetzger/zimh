@@ -107,15 +107,15 @@ extern void loadBootstrap(uint16 *, int, uint16, uint16);
 
 extern t_stat checkReset(DEVICE *, uint8);
 
-extern t_stat show_addr(FILE *, UNIT *, int32, CONST void *);
+extern t_stat show_addr(FILE *, UNIT *, int32, const void *);
 
-extern t_stat set_protected(UNIT *, int32, CONST char *, void *);
-extern t_stat clear_protected(UNIT *, int32, CONST char *, void *);
+extern t_stat set_protected(UNIT *, int32, const char *, void *);
+extern t_stat clear_protected(UNIT *, int32, const char *, void *);
 
-extern t_stat set_stoponrej(UNIT *, int32, CONST char *, void *);
-extern t_stat clr_stoponrej(UNIT *, int32, CONST char *, void *);
+extern t_stat set_stoponrej(UNIT *, int32, const char *, void *);
+extern t_stat clr_stoponrej(UNIT *, int32, const char *, void *);
 
-extern t_stat set_equipment(UNIT *, int32, CONST char *, void *);
+extern t_stat set_equipment(UNIT *, int32, const char *, void *);
 
 extern void buildDCtables(void);
 
@@ -126,11 +126,11 @@ extern t_bool IOFWinitialized;
 
 extern UNIT cpu_unit;
 
-t_stat mt_show_transport(FILE *, UNIT *, int32, CONST void *);
-t_stat mt_set_9track(UNIT *, int32, CONST char *, void *);
-t_stat mt_set_7track(UNIT *, int32, CONST char *, void *);
-t_stat mt_show_type(FILE *, UNIT *, int32, CONST void *);
-t_stat mt_set_type(UNIT *, int32, CONST char *, void *);
+t_stat mt_show_transport(FILE *, UNIT *, int32, const void *);
+t_stat mt_set_9track(UNIT *, int32, const char *, void *);
+t_stat mt_set_7track(UNIT *, int32, const char *, void *);
+t_stat mt_show_type(FILE *, UNIT *, int32, const void *);
+t_stat mt_set_type(UNIT *, int32, const char *, void *);
 
 #define DENS    u3
 
@@ -289,7 +289,7 @@ static enum  { MT_IDLE, MT_READING, MT_WRITING, MT_READTMO, MT_WRITETMO, MT_DSAD
 t_stat mt_svc(UNIT *);
 t_stat mt_reset(DEVICE *);
 t_stat mt_boot(int32, DEVICE *);
-t_stat mt_attach(UNIT *, CONST char *);
+t_stat mt_attach(UNIT *, const char *);
 t_stat mt_detach(UNIT *);
 
 void MTstate(const char *, DEVICE *, IO_DEVICE *);
@@ -832,7 +832,7 @@ void mt_data(UNIT *uptr, t_bool output, uint16 data)
   fprintf(DBGOUT, "MT%d: %s - 0x%04x\r\n", u, output ? "wrote" : "read", data);
 }
 
-t_stat mt_show_type(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat mt_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   switch (MTdev.iod_type) {
     case DEVTYPE_1732_A:
@@ -849,7 +849,7 @@ t_stat mt_show_type(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
   return SCPE_OK;
 }
 
-t_stat mt_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat mt_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (!cptr)
     return SCPE_IERR;
@@ -877,7 +877,7 @@ t_stat mt_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 /*
  * Display magtape transport
  */
-t_stat mt_show_transport(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat mt_show_transport(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   if (uptr == NULL)
     return SCPE_IERR;
@@ -897,7 +897,7 @@ t_stat mt_show_transport(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 /*
  * Set drive to 9-track transport.
  */
-t_stat mt_set_9track(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat mt_set_9track(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (uptr == NULL)
     return SCPE_IERR;
@@ -912,7 +912,7 @@ t_stat mt_set_9track(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 /*
  * Set drive to 7-track transport.
  */
-t_stat mt_set_7track(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat mt_set_7track(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (uptr == NULL)
     return SCPE_IERR;
@@ -1481,7 +1481,7 @@ t_stat mt_boot(int32 unitno, DEVICE *dptr)
 
 /* Attach routine */
 
-t_stat mt_attach(UNIT *uptr, CONST char *cptr)
+t_stat mt_attach(UNIT *uptr, const char *cptr)
 {
   t_stat r;
 

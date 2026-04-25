@@ -101,8 +101,8 @@ uint32 vds_analog[VDS_OUTPUTS];           /* Analog channel. */
 
 #include "ka10_dd_font.h"
 
-static t_stat dd_set_windows (UNIT *uptr, int32 val, CONST char *cptr, void *desc) ;
-static t_stat dd_show_windows (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat dd_set_windows (UNIT *uptr, int32 val, const char *cptr, void *desc) ;
+static t_stat dd_show_windows (FILE *st, UNIT *uptr, int32 val, const void *desc);
 static void dd_chargen (uint16 c, int column);
 static void dd_graphics (uint8 data, int column);
 static t_stat dd_devio(uint32 dev, uint64 *data);
@@ -640,7 +640,7 @@ dd_reset (DEVICE *dptr)
     return SCPE_OK;
 }
 
-static t_stat dd_set_windows (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat dd_set_windows (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     t_value x;
     t_stat r;
@@ -653,7 +653,7 @@ static t_stat dd_set_windows (UNIT *uptr, int32 val, CONST char *cptr, void *des
     return SCPE_OK;
 }
 
-static t_stat dd_show_windows (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat dd_show_windows (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_IERR;

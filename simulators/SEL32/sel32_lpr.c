@@ -166,10 +166,10 @@ t_stat      lpr_haltio(UNIT *uptr);
 t_stat      lpr_rschnlio(UNIT *uptr);
 t_stat      lpr_srv(UNIT *);
 t_stat      lpr_reset(DEVICE *);
-t_stat      lpr_attach(UNIT *, CONST char *);
+t_stat      lpr_attach(UNIT *, const char *);
 t_stat      lpr_detach(UNIT *);
-t_stat      lpr_setlpp(UNIT *, int32, CONST char *, void *);
-t_stat      lpr_getlpp(FILE *, UNIT *, int32, CONST void *);
+t_stat      lpr_setlpp(UNIT *, int32, const char *, void *);
+t_stat      lpr_getlpp(FILE *, UNIT *, int32, const void *);
 t_stat      lpr_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 const char  *lpr_description (DEVICE *dptr);
 
@@ -580,7 +580,7 @@ t_stat  lpr_haltio(UNIT *uptr) {
 }
 
 /* Set the number of lines per page on printer */
-t_stat lpr_setlpp(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat lpr_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int i;
     if (cptr == NULL)
@@ -603,7 +603,7 @@ t_stat lpr_setlpp(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 /* display the number of lines per page */
-t_stat lpr_getlpp(FILE *st, UNIT *uptr, int32 v, CONST void *desc)
+t_stat lpr_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_IERR;
@@ -612,7 +612,7 @@ t_stat lpr_getlpp(FILE *st, UNIT *uptr, int32 v, CONST void *desc)
 }
 
 /* attach a file to the line printer device */
-t_stat lpr_attach(UNIT *uptr, CONST char *file)
+t_stat lpr_attach(UNIT *uptr, const char *file)
 {
     t_stat      r;
     uint16      chsa = GET_UADDR(uptr->CMD);    /* get address of lpr device */

@@ -349,7 +349,7 @@ return get_uint (cptr, 8, DMASK, status);
    Outputs:
         status  =       error status
 */
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
 #if 0
     int32 cflag, d, i, j, k, sign;

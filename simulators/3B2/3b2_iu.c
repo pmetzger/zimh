@@ -237,7 +237,7 @@ MTAB contty_mod[] = {
     { 0 }
 };
 
-CONST char *brg_rates[IU_SPEED_REGS][IU_SPEEDS] = {
+const char *brg_rates[IU_SPEED_REGS][IU_SPEEDS] = {
     {"50",    "110",   "134.5", "200",
      "300",   "600",   "1200",  "1050",
      "2400",  "4800",  "7200",  "9600",
@@ -248,7 +248,7 @@ CONST char *brg_rates[IU_SPEED_REGS][IU_SPEEDS] = {
      "19200", NULL,    NULL,    NULL}
 };
 
-CONST char *parity[3] = {"O", "E", "N"};
+const char *parity[3] = {"O", "E", "N"};
 
 DEBTAB contty_deb_tab[] = {
     {"EXEC", EXECUTE_MSG, "Execute"},
@@ -323,7 +323,7 @@ uint8 brg_clk = 11;      /* Selected baud-rate generator clock */
 uint8 parity_sel = 1;    /* Selected parity */
 uint8 bits_per_char = 7;
 
-t_stat contty_attach(UNIT *uptr, CONST char *cptr)
+t_stat contty_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r;
     TMLN *lp;

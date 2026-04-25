@@ -56,11 +56,11 @@ t_stat      imx_svc (UNIT *uptr);
 t_stat      imx_reset (DEVICE *dptr);
 const char *imx_description (DEVICE *dptr);
 #if MPX_DEV
-t_stat      imx_set_mpx (UNIT *uptr, int32 val, CONST char *cptr, void *desc) ;
-t_stat      imx_show_mpx (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat      imx_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc) ;
+t_stat      imx_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc);
 #endif
-t_stat      imx_show_channel (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat      imx_set_channel (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
+t_stat      imx_show_channel (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat      imx_set_channel (UNIT* uptr, int32 val, const char* cptr, void* desc);
 
 static uint64 status = IMX_ASSIGNED;
 static uint64 imx_data;
@@ -235,7 +235,7 @@ t_stat imx_svc (UNIT *uptr)
 
 #if MPX_DEV
 /* set MPX level number */
-t_stat imx_set_mpx (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat imx_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32 mpx;
     t_stat r;
@@ -249,7 +249,7 @@ t_stat imx_set_mpx (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat imx_show_mpx (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat imx_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    if (uptr == NULL)
       return SCPE_IERR;
@@ -259,11 +259,11 @@ t_stat imx_show_mpx (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 #endif
 
-t_stat imx_set_channel (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat imx_set_channel (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   int chan, unit, axis, negate = 0;
   char gbuf[CBUFSIZE];
-  CONST char *tptr;
+  const char *tptr;
   t_stat r;
 
   if (cptr == NULL || *cptr == 0)
@@ -303,7 +303,7 @@ t_stat imx_set_channel (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
   return SCPE_OK;
 }
 
-t_stat imx_show_channel (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat imx_show_channel (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   int nothing = 1;
   const char *negate, *comma = "";

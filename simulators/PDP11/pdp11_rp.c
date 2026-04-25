@@ -585,16 +585,16 @@ t_stat rp_mbrd (int32 *data, int32 ofs, int32 drv);
 t_stat rp_mbwr (int32 data, int32 ofs, int32 drv);
 t_stat rp_svc (UNIT *uptr);
 t_stat rp_reset (DEVICE *dptr);
-t_stat rp_attach (UNIT *uptr, CONST char *cptr);
+t_stat rp_attach (UNIT *uptr, const char *cptr);
 t_stat rp_detach (UNIT *uptr);
 t_stat rp_boot (int32 unitno, DEVICE *dptr);
 void rp_set_er (int16 flg, int32 drv);
 void rp_clr_as (int32 mask);
 void rp_update_ds (uint16 flg, int32 drv);
 t_stat rp_go (int32 drv);
-t_stat rp_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat rp_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat rp_set_bad (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat rp_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat rp_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat rp_set_bad (UNIT *uptr, int32 val, const char *cptr, void *desc);
 int32 rp_abort (void);
 t_stat rp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *rp_description (DEVICE *dptr);
@@ -1366,7 +1366,7 @@ return SCPE_OK;
 
 /* Device attach */
 
-t_stat rp_attach (UNIT *uptr, CONST char *cptr)
+t_stat rp_attach (UNIT *uptr, const char *cptr)
 {
 int32 drv;
 t_stat r;
@@ -1407,7 +1407,7 @@ return sim_disk_detach (uptr);
 
 /* Set type command validation routine */
 
-t_stat rp_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rp_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if ((val < 0) || (cptr && *cptr))
     return SCPE_ARG;
@@ -1420,7 +1420,7 @@ return SCPE_OK;
 
 /* Show unit type */
 
-t_stat rp_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat rp_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "%s", drv_tab[GET_DTYPE (uptr->flags)].name);
 return SCPE_OK;
@@ -1428,7 +1428,7 @@ return SCPE_OK;
 
 /* Set bad block routine */
 
-t_stat rp_set_bad (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rp_set_bad (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (drv_tab[GET_DTYPE (uptr->flags)].dec144)
     return pdp11_bad_block (uptr, drv_tab[GET_DTYPE (uptr->flags)].sect, RP_NUMWD);

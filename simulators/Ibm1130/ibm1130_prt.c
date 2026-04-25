@@ -89,7 +89,7 @@ static t_stat prt1132_svc(UNIT *uptr);
 static t_stat prt1403_svc(UNIT *uptr);
 static t_stat prt_svc    (UNIT *uptr);
 static t_stat prt_reset  (DEVICE *dptr);
-static t_stat prt_attach (UNIT *uptr, CONST char *cptr);
+static t_stat prt_attach (UNIT *uptr, const char *cptr);
 static t_stat prt_detach (UNIT *uptr);
 
 static int16 PRT_DSW   = 0;                                 /* device status word */
@@ -699,7 +699,7 @@ static t_stat prt_reset (DEVICE *dptr)
     return SCPE_OK;
 }
 
-static t_stat prt_attach (UNIT *uptr, CONST char *cptr)
+static t_stat prt_attach (UNIT *uptr, const char *cptr)
 {
     t_stat rval;
     char gbuf[2*CBUFSIZE];

@@ -143,7 +143,7 @@ int32 mt (int32 dev, int32 pulse, int32 dat);
 int32 mt_iors (void);
 t_stat mt_svc (UNIT *uptr);
 t_stat mt_reset (DEVICE *dptr);
-t_stat mt_attach (UNIT *uptr, CONST char *cptr);
+t_stat mt_attach (UNIT *uptr, const char *cptr);
 t_stat mt_detach (UNIT *uptr);
 int32 mt_updcsta (UNIT *uptr, int32 val);
 t_stat mt_map_err (UNIT *uptr, t_stat st);
@@ -512,7 +512,7 @@ return (mt_sta & (STA_ERR | STA_DON))? IOS_MTA: 0;
 
 /* Attach routine */
 
-t_stat mt_attach (UNIT *uptr, CONST char *cptr)
+t_stat mt_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 

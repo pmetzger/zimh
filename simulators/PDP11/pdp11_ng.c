@@ -44,10 +44,10 @@ t_stat ng_wr(int32 data, int32 PA, int32 access);
 t_stat ng_svc(UNIT *uptr);
 t_stat ng_reset(DEVICE *dptr);
 t_stat ng_boot(int32 unit, DEVICE *dptr);
-t_stat ng_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat ng_show_type(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat ng_set_scale(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat ng_show_scale(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat ng_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat ng_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat ng_set_scale(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat ng_show_scale(FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat ng_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *ng_description (DEVICE *dptr);
 
@@ -235,7 +235,7 @@ ng_boot(int32 unit, DEVICE *dptr)
 }
 
 t_stat
-ng_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+ng_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (MATCH_CMD (cptr, "DAZZLE") == 0)
     ng_type = TYPE_DAZZLE;
@@ -247,7 +247,7 @@ ng_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-ng_show_type(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+ng_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   if (ng_type == TYPE_DAZZLE)
     fprintf(st, "type=DAZZLE");
@@ -259,7 +259,7 @@ ng_show_type(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 
 t_stat
-ng_set_scale(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+ng_set_scale(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   t_stat r;
   t_value v;
@@ -277,7 +277,7 @@ ng_set_scale(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 t_stat
-ng_show_scale(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+ng_show_scale(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   fprintf(st, "scale=%d", (int)ng_scale);
   return SCPE_OK;

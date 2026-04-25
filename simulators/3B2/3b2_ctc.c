@@ -743,7 +743,7 @@ t_stat ctc_svc(UNIT *uptr)
     return SCPE_OK;
 }
 
-t_stat ctc_attach(UNIT *uptr, CONST char *cptr)
+t_stat ctc_attach(UNIT *uptr, const char *cptr)
 {
     return sim_disk_attach(uptr, cptr, VTOC_SECSZ, 1, TRUE, 0, "CIPHER23", 0, 0);
 }

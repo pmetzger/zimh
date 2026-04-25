@@ -280,7 +280,7 @@ int32 dt76 (int32 IR, int32 AC);
 int32 dt77 (int32 IR, int32 AC);
 t_stat dt_svc (UNIT *uptr);
 t_stat dt_reset (DEVICE *dptr);
-t_stat dt_attach (UNIT *uptr, CONST char *cptr);
+t_stat dt_attach (UNIT *uptr, const char *cptr);
 const char *dt_description (DEVICE *dptr);
 void dt_flush (UNIT *uptr);
 t_stat dt_detach (UNIT *uptr);
@@ -1210,7 +1210,7 @@ return SCPE_OK;
    If 12b, read data into buffer
 */
 
-t_stat dt_attach (UNIT *uptr, CONST char *cptr)
+t_stat dt_attach (UNIT *uptr, const char *cptr)
 {
 uint32 pdp18b[D18_NBSIZE];
 uint16 pdp11b[D18_NBSIZE], *fbuf;

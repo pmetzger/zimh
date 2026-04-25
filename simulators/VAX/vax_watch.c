@@ -107,8 +107,8 @@ int32 wtc_csrd = 0;
 int32 wtc_mode = WTC_MODE_VMS;
 uint8 wtc_ram[64];
 
-t_stat wtc_set (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat wtc_show (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat wtc_set (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat wtc_show (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat wtc_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *wtc_description (DEVICE *dptr);
 t_stat wtc_reset (DEVICE *dptr);
@@ -314,7 +314,7 @@ if (sim_switches & SWMASK ('P')) {                      /* powerup? */
 return SCPE_OK;
 }
 
-t_stat wtc_set (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat wtc_set (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 char gbuf[CBUFSIZE];
 
@@ -334,7 +334,7 @@ if (cptr != NULL) {
 return SCPE_OK;
 }
 
-t_stat wtc_show (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat wtc_show (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf(st, "time=%s", (wtc_mode ? "vms" :"std"));
 return SCPE_OK;

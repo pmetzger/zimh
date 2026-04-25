@@ -27,9 +27,9 @@ t_stat rom_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw);
 t_stat rom_rd (int32 *data, int32 PA, int32 access);
 t_stat rom_reset (DEVICE *dptr);
 t_stat rom_boot (int32 u, DEVICE *dptr);
-t_stat rom_set_addr (UNIT *, int32, CONST char *, void *);
-t_stat rom_show_addr (FILE *, UNIT *, int32, CONST void *);
-t_stat rom_attach (UNIT *uptr, CONST char *cptr);
+t_stat rom_set_addr (UNIT *, int32, const char *, void *);
+t_stat rom_show_addr (FILE *, UNIT *, int32, const void *);
+t_stat rom_attach (UNIT *uptr, const char *cptr);
 t_stat rom_detach (UNIT *uptr);
 t_stat rom_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 t_stat rom_help_attach (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
@@ -119,7 +119,7 @@ cpu_set_boot (rom_unit[u].unit_base);
 return SCPE_OK;
 }
 
-t_stat rom_set_addr (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rom_set_addr (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 addr;
 t_stat r;
@@ -138,7 +138,7 @@ uptr->unit_base = uptr->unit_end = addr;
 return SCPE_OK;
 }
 
-t_stat rom_show_addr (FILE *f, UNIT *uptr, int32 val, CONST void *desc)
+t_stat rom_show_addr (FILE *f, UNIT *uptr, int32 val, const void *desc)
 {
 if (uptr == NULL)
     return SCPE_IERR;
@@ -159,7 +159,7 @@ dib->rd = &rom_rd;
 return build_ubus_tab (&rom_dev, dib);
 }
 
-t_stat rom_attach (UNIT *uptr, CONST char *cptr)
+t_stat rom_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 

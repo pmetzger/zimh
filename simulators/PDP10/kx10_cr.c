@@ -93,7 +93,7 @@
 t_stat              cr_devio(uint32 dev, uint64 *data);
 t_stat              cr_srv(UNIT *);
 t_stat              cr_reset(DEVICE *);
-t_stat              cr_attach(UNIT *, CONST char *);
+t_stat              cr_attach(UNIT *, const char *);
 t_stat              cr_detach(UNIT *);
 t_stat              cr_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 const char         *cr_description(DEVICE *dptr);
@@ -294,7 +294,7 @@ cr_srv(UNIT *uptr) {
 }
 
 t_stat
-cr_attach(UNIT * uptr, CONST char *file)
+cr_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
 

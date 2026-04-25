@@ -609,14 +609,14 @@ int     uba_rh_read(DEVICE *dptr, t_addr addr, uint16 *data, int32 access);
 int     uba_rh_write(DEVICE *dptr, t_addr addr, uint16 data, int32 access);
 void    uba_reset(void);
 
-t_stat  uba_set_addr(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat  uba_show_addr (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat  uba_set_br(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat  uba_show_br (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat  uba_set_vect(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat  uba_show_vect (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat  uba_set_ctl(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat  uba_show_ctl (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat  uba_set_addr(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat  uba_show_addr (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat  uba_set_br(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat  uba_show_br (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat  uba_set_vect(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat  uba_show_vect (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat  uba_set_ctl(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat  uba_show_ctl (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 void    rh_reset(DEVICE *dptr, struct rh_if *rh);
 void    rh_setup(struct rh_if *rh, uint32 addr);
@@ -709,8 +709,8 @@ int  dct_is_connect(int u);
 #endif
 
 /* Define RH10/RH20 functions */
-t_stat  rh_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat  rh_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat  rh_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat  rh_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat  rh_devio(uint32 dev, t_uint64 *data);
 t_addr  rh_devirq(uint32 dev, t_addr addr);
 void    rh_reset(DEVICE *dptr, struct rh_if *rh);

@@ -234,12 +234,12 @@ static INTERFACE tty_interface;
 
 /* TTY local SCP support routine declarations */
 
-static t_stat set_filter (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat set_auto   (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat set_mode   (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat set_endis  (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat set_filter (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat set_auto   (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat set_mode   (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat set_endis  (UNIT *uptr, int32 value, const char *cptr, void *desc);
 
-static t_stat show_mode (FILE *st, UNIT *uptr, int32 value, CONST void *desc);
+static t_stat show_mode (FILE *st, UNIT *uptr, int32 value, const void *desc);
 
 static t_stat tty_reset (DEVICE *dptr);
 
@@ -592,7 +592,7 @@ return outbound;                                        /* return the outbound s
    valid for the keyboard and is changed to mode 7B (7 bit) if specified.
 */
 
-static t_stat set_filter (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat set_filter (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if (uptr == &punch_unit)                                /* filters are not valid */
     return SCPE_NOFNC;                                  /*   for the punch */
@@ -618,7 +618,7 @@ else {
    reverts to normal keyboard operation.
 */
 
-static t_stat set_auto (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat set_auto (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if (uptr == &key_unit)                                  /* if this is the keyboard unit */
     return SCPE_OK;                                     /*   then allow the setting */
@@ -636,7 +636,7 @@ else                                                    /* otherwise auto LF mod
    not used.
 */
 
-static t_stat set_mode (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat set_mode (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if (value == DEV_REALTIME)                              /* if realistic timing mode is selected */
     tty_dev.flags |= DEV_REALTIME;                      /*   then set the real-time flag */
@@ -663,7 +663,7 @@ return SCPE_OK;                                         /* mode changes always s
    poll, as appropriate.
 */
 
-static t_stat set_endis (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+static t_stat set_endis (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 if (value)                                              /* if this is an ENABLE request */
     if (tty_dev.flags & DEV_DIS)                        /*   then if the device is disabled */
@@ -689,7 +689,7 @@ return tty_reset (&tty_dev);                            /* reset the TTY and res
    stream is passed in the "st" parameter, and the other parameters are ignored.
 */
 
-static t_stat show_mode (FILE *st, UNIT *uptr, int32 value, CONST void *desc)
+static t_stat show_mode (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
 if (tty_dev.flags & DEV_REALTIME)                       /* if the current mode is real time */
     fputs ("realistic timing", st);                     /*   then report it */

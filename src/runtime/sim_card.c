@@ -1195,7 +1195,7 @@ sim_punch_card(UNIT * uptr, uint16 image[80])
 }
 
 /* Set card format */
-t_stat sim_card_set_fmt (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat sim_card_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int f;
 
@@ -1212,7 +1212,7 @@ t_stat sim_card_set_fmt (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* Show card format */
 
-t_stat sim_card_show_fmt (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat sim_card_show_fmt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int f;
 
@@ -1228,7 +1228,7 @@ t_stat sim_card_show_fmt (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 
 
 t_stat
-sim_card_attach(UNIT * uptr, CONST char *cptr)
+sim_card_attach(UNIT * uptr, const char *cptr)
 {
     t_stat               r = SCPE_OK;
     int                  eof = 0;

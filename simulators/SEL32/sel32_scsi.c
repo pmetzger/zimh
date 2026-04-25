@@ -298,10 +298,10 @@ t_stat  scsi_boot(int32 unitnum, DEVICE *);
 void    scsi_ini(UNIT *, t_bool);
 t_stat  scsi_rschnlio(UNIT *uptr);
 t_stat  scsi_reset(DEVICE *);
-t_stat  scsi_attach(UNIT *, CONST char *);
+t_stat  scsi_attach(UNIT *, const char *);
 t_stat  scsi_detach(UNIT *);
-t_stat  scsi_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat  scsi_get_type(FILE * st, UNIT *uptr, int32 v, CONST void *desc);
+t_stat  scsi_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat  scsi_get_type(FILE * st, UNIT *uptr, int32 v, const void *desc);
 t_stat  scsi_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const   char  *scsi_description (DEVICE *dptr);
 
@@ -1702,7 +1702,7 @@ int scsi_format(UNIT *uptr) {
 }
 
 /* attach the selected file to the disk */
-t_stat scsi_attach(UNIT *uptr, CONST char *file) {
+t_stat scsi_attach(UNIT *uptr, const char *file) {
     uint16          chsa = GET_UADDR(uptr->CMD);
     int             type = GET_TYPE(uptr->flags);
     DEVICE          *dptr = get_dev(uptr);
@@ -1984,7 +1984,7 @@ t_stat scsi_boot(int32 unit_num, DEVICE *dptr) {
 }
 
 /* Disk option setting commands */
-t_stat scsi_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat scsi_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int     i;
 
@@ -2008,7 +2008,7 @@ t_stat scsi_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_ARG;
 }
 
-t_stat scsi_get_type(FILE * st, UNIT *uptr, int32 v, CONST void *desc)
+t_stat scsi_get_type(FILE * st, UNIT *uptr, int32 v, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_IERR;

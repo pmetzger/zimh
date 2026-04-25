@@ -786,12 +786,12 @@ extern void WriteE (a10 ea, d10 val);                   /* write, exec */
 extern void WriteP (a10 ea, d10 val);                   /* write, physical */
 extern t_bool AccViol (a10 ea, int32 prv, int32 mode);  /* access check */
 
-t_stat set_addr (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat set_addr_flt (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat show_addr (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat set_vec (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat show_vec (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat show_vec_mux (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat set_addr (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat set_addr_flt (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat show_addr (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat set_vec (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat show_vec (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat show_vec_mux (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat auto_config (const char *name, int32 num);
 
 extern d10 *ac_cur;                                     /* current AC block */

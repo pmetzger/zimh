@@ -47,8 +47,8 @@
 
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
-extern t_stat set_dev_enbdis(DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
-extern t_stat set_cmd(int32 flag, CONST char *cptr);
+extern t_stat set_dev_enbdis(DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+extern t_stat set_cmd(int32 flag, const char *cptr);
 extern void PutBYTEWrapper(const uint32 Addr, const uint32 Value);
 extern uint32 nmiInterrupt;
 
@@ -76,9 +76,9 @@ static t_stat jair_rx_svc(UNIT *uptr);
 static t_stat jair_tx_svc(UNIT *uptr);
 static t_stat jair_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 static t_stat jair_boot(int32 unitno, DEVICE *dptr);
-static t_stat jair_attach(UNIT *uptr, CONST char *cptr);
+static t_stat jair_attach(UNIT *uptr, const char *cptr);
 static t_stat jair_detach(UNIT *uptr);
-static t_stat jair_attach_mux(UNIT *uptr, CONST char *cptr);
+static t_stat jair_attach_mux(UNIT *uptr, const char *cptr);
 static t_stat jair_detach_mux(UNIT *uptr);
 static const char* jair_description(DEVICE *dptr);
 static t_stat jair_config_line(DEVICE *dev, TMLN *tmln, int baud);
@@ -91,12 +91,12 @@ static int jair_set_mc(TMLN *tmln, uint8 data);
 static int jair_new_baud(UNIT *uptr);
 static t_stat jair_set_baud(UNIT *uptr, int32 value, const char *cptr, void *desc);
 static t_stat jair_show_baud(FILE *st, UNIT *uptr, int32 value, const void *desc);
-static t_stat jair_show_ports(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat jair_show_ports(FILE *st, UNIT *uptr, int32 val, const void *desc);
 static int32 jairio(int32 addr, int32 rw, int32 data);
 static uint8 jair_io_in(uint32 addr);
 static uint8 jair_io_out(uint32 addr, int32 data);
-static t_stat jair_set_rom(UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-static t_stat jair_set_norom(UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+static t_stat jair_set_rom(UNIT *uptr, int32 value, const char *cptr, void *desc);
+static t_stat jair_set_norom(UNIT *uptr, int32 value, const char *cptr, void *desc);
 static int32 jair_shadow_rom(int32 Addr, int32 rw, int32 data);
 
 /***********/
@@ -1252,7 +1252,7 @@ static t_stat jair_tx_svc(UNIT *uptr)
 }
 
 /* Attach routines */
-static t_stat jair_attach(UNIT *uptr, CONST char *cptr)
+static t_stat jair_attach(UNIT *uptr, const char *cptr)
 {
     t_stat r;
     unsigned int i = 0;
@@ -1320,7 +1320,7 @@ static t_stat jair_detach(UNIT *uptr)
  * Used to attach (connect) MUX interfaces from the
  * JAIRS0, JAIRS1, and JAIRP devices
  */
-static t_stat jair_attach_mux(UNIT *uptr, CONST char *cptr)
+static t_stat jair_attach_mux(UNIT *uptr, const char *cptr)
 {
     JAIR_PORT_CTX *xptr;
     t_stat r;
@@ -1352,7 +1352,7 @@ static t_stat jair_detach_mux(UNIT *uptr)
     return r;
 }
 
-static t_stat jair_show_ports(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat jair_show_ports(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     JAIR_PORT_CTX *port;
 
@@ -1882,12 +1882,12 @@ static uint8 jair_io_out(uint32 addr, int32 data)
     return(0xff);
 }
 
-static t_stat jair_set_rom(UNIT *uptr, int32 value, CONST char *cptr, void *desc) {
+static t_stat jair_set_rom(UNIT *uptr, int32 value, const char *cptr, void *desc) {
     jair_ctx.sr_ena = TRUE;
     return SCPE_OK;
 }
 
-static t_stat jair_set_norom(UNIT *uptr, int32 value, CONST char *cptr, void *desc) {
+static t_stat jair_set_norom(UNIT *uptr, int32 value, const char *cptr, void *desc) {
     jair_ctx.sr_ena = FALSE;
     return SCPE_OK;
 }

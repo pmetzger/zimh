@@ -237,11 +237,11 @@ extern t_stat    di_reset (DEVICE *dptr);
 
 /* Disc interface global SCP routines */
 
-extern t_stat di_set_address (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-extern t_stat di_set_cable   (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+extern t_stat di_set_address (UNIT *uptr, int32 value, const char *cptr, void *desc);
+extern t_stat di_set_cable   (UNIT *uptr, int32 value, const char *cptr, void *desc);
 
-extern t_stat di_show_address (FILE *st, UNIT *uptr, int32 value, CONST void *desc);
-extern t_stat di_show_cable   (FILE *st, UNIT *uptr, int32 value, CONST void *desc);
+extern t_stat di_show_address (FILE *st, UNIT *uptr, int32 value, const void *desc);
+extern t_stat di_show_cable   (FILE *st, UNIT *uptr, int32 value, const void *desc);
 
 /* Disc interface global bus routines */
 

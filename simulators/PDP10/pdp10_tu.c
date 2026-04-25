@@ -343,7 +343,7 @@ t_stat tu_wr (int32 data, int32 PA, int32 access);
 int32 tu_inta (void);
 t_stat tu_svc (UNIT *uptr);
 t_stat tu_reset (DEVICE *dptr);
-t_stat tu_attach (UNIT *uptr, CONST char *cptr);
+t_stat tu_attach (UNIT *uptr, const char *cptr);
 t_stat tu_detach (UNIT *uptr);
 t_stat tu_boot (int32 unitno, DEVICE *dptr);
 void tu_go (int32 drv);
@@ -1189,7 +1189,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat tu_attach (UNIT *uptr, CONST char *cptr)
+t_stat tu_attach (UNIT *uptr, const char *cptr)
 {
 int32 drv = uptr - tu_dev.units;
 t_stat r;

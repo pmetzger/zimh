@@ -222,8 +222,8 @@ t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw);
 t_stat cpu_reset (DEVICE *dptr);
 t_stat cpu_svc (UNIT *uptr);
-t_stat cpu_set_size (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
-t_stat cpu_set_type (UNIT *uptr, int32 value, CONST char *cptr, void *desc);
+t_stat cpu_set_size (UNIT *uptr, int32 value, const char *cptr, void *desc);
+t_stat cpu_set_type (UNIT *uptr, int32 value, const char *cptr, void *desc);
 void calc_ints (void);
 
 extern t_stat ts_wr (int32 data, int32 addr, int32 access);
@@ -233,7 +233,7 @@ extern UNIT cr_unit, prt_unit[];
     static void   archive_backtrace(const char *inst);
     static void   reset_backtrace (void);
     static void   show_backtrace (int nshow);
-    static t_stat backtrace_cmd (int32 flag, CONST char *cptr);
+    static t_stat backtrace_cmd (int32 flag, const char *cptr);
 #else
     #define archive_backtrace(inst)
     #define reset_backtrace()
@@ -246,8 +246,8 @@ extern UNIT cr_unit, prt_unit[];
 #  define ARFSET(v)                         /* without GUI, no need for setting ARF */
 #endif
 
-static t_stat view_cmd (int32 flag, CONST char *cptr);
-static t_stat cpu_attach (UNIT *uptr, CONST char *cptr);
+static t_stat view_cmd (int32 flag, const char *cptr);
+static t_stat cpu_attach (UNIT *uptr, const char *cptr);
 static t_bool bsctest (int32 DSPLC, t_bool reset_V);
 static void   exit_irq (void);
 static void   trace_instruction (void);
@@ -1396,7 +1396,7 @@ t_stat cpu_svc (UNIT *uptr)
  * Memory allocation
  * ------------------------------------------------------------------------ */
 
-t_stat cpu_set_size (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat cpu_set_size (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
     t_bool used;
     int32 i;
@@ -1425,7 +1425,7 @@ t_stat cpu_set_size (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
 
 /* processor type */
 
-t_stat cpu_set_type (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat cpu_set_type (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
     REG *r;
 
@@ -1481,7 +1481,7 @@ void xio_error (const char *msg)
  * register_cmd - add a command to the extensible command table
  * ------------------------------------------------------------------------ */
 
-t_stat register_cmd (const char *name, t_stat (*action)(int32 flag, CONST char *ptr), int arg, const char *help)
+t_stat register_cmd (const char *name, t_stat (*action)(int32 flag, const char *ptr), int arg, const char *help)
 {
     int i;
 
@@ -1514,7 +1514,7 @@ t_stat register_cmd (const char *name, t_stat (*action)(int32 flag, CONST char *
  * echo_cmd - just echo the command line
  * ------------------------------------------------------------------------ */
 
-static t_stat echo_cmd (int32 flag, CONST char *cptr)
+static t_stat echo_cmd (int32 flag, const char *cptr)
 {
     printf("%s\n", cptr);
     return SCPE_OK;
@@ -1615,7 +1615,7 @@ static void show_backtrace (int nshow)
         putchar('\n');
 }
 
-static t_stat backtrace_cmd (int32 flag, CONST char *cptr)
+static t_stat backtrace_cmd (int32 flag, const char *cptr)
 {
     int n;
 
@@ -1699,7 +1699,7 @@ typedef struct tag_symentry {
 static PSYMENTRY syms = NULL;
 static t_bool new_log, log_fac;
 
-static t_stat cpu_attach (UNIT *uptr, CONST char *cptr)
+static t_stat cpu_attach (UNIT *uptr, const char *cptr)
 {
     char mapfile[200], buf[200], sym[100], gbuf[2*CBUFSIZE];
     int addr;
@@ -1936,7 +1936,7 @@ void debug_print (const char *fmt, ...)
 
 /* view_cmd - let user view and/or edit a file (e.g. a printer output file, script, or source deck) */
 
-static t_stat view_cmd (int32 flag, CONST char *cptr)
+static t_stat view_cmd (int32 flag, const char *cptr)
 {
 #ifdef _WIN32
     char cmdline[256];

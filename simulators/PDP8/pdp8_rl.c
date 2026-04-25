@@ -177,9 +177,9 @@ t_stat rl_svc (UNIT *uptr);
 t_stat rl_reset (DEVICE *dptr);
 void rl_set_done (int32 error);
 t_stat rl_boot (int32 unitno, DEVICE *dptr);
-t_stat rl_attach (UNIT *uptr, CONST char *cptr);
-t_stat rl_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat rl_set_bad (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat rl_attach (UNIT *uptr, const char *cptr);
+t_stat rl_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat rl_set_bad (UNIT *uptr, int32 val, const char *cptr, void *desc);
 const char *rl_description (DEVICE *dptr);
 
 /* RL8A data structures
@@ -574,7 +574,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat rl_attach (UNIT *uptr, CONST char *cptr)
+t_stat rl_attach (UNIT *uptr, const char *cptr)
 {
 uint32 p;
 t_stat r;
@@ -605,7 +605,7 @@ return SCPE_OK;
 
 /* Set size routine */
 
-t_stat rl_set_size (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rl_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (uptr->flags & UNIT_ATT)
     return SCPE_ALATT;
@@ -629,7 +629,7 @@ return SCPE_OK;
         sta     =       status code
 */
 
-t_stat rl_set_bad (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rl_set_bad (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i, da = RL_BBMAP * RL_NUMBY;
 

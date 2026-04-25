@@ -48,7 +48,7 @@ UNIT pl_unit [] = {
 unsigned char PL[2];
 
 t_stat pl_reset (DEVICE *dptr);
-t_stat pl_attach (UNIT *uptr, CONST char *cptr);
+t_stat pl_attach (UNIT *uptr, const char *cptr);
 t_stat pl_detach (UNIT *uptr);
 
 DEVICE pl_dev = {
@@ -74,7 +74,7 @@ t_stat pl_reset (DEVICE *dptr)
     return SCPE_OK;
 }
 
-t_stat pl_attach (UNIT *u, CONST char *cptr)
+t_stat pl_attach (UNIT *u, const char *cptr)
 {
     t_stat s;
     int num = u - pl_unit;

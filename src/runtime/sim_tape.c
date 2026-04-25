@@ -605,7 +605,7 @@ else
 
 /* Attach tape unit */
 
-t_stat sim_tape_attach (UNIT *uptr, CONST char *cptr)
+t_stat sim_tape_attach (UNIT *uptr, const char *cptr)
 {
 DEVICE *dptr;
 
@@ -875,7 +875,7 @@ switch (MT_GET_FMT (uptr)) {
         sim_switches |= SWMASK ('E');                   /* The TAR file must exist */
         FALLTHROUGH;
     default:
-        r = attach_unit (uptr, (CONST char *)cptr);     /* attach unit */
+        r = attach_unit (uptr, (const char *)cptr);     /* attach unit */
         break;
     }
 if (r != SCPE_OK) {                                     /* error? */
@@ -3326,7 +3326,7 @@ return MTSE_IOERR;
 
 /* Set tape format */
 
-t_stat sim_tape_set_fmt (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat sim_tape_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 f;
 
@@ -3361,7 +3361,7 @@ return sim_messagef (SCPE_ARG, "Unknown tape format: %s\n", cptr);
 
 /* Show tape format */
 
-t_stat sim_tape_show_fmt (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat sim_tape_show_fmt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "%s format", _sim_tape_format_name (uptr));
 return SCPE_OK;
@@ -3678,7 +3678,7 @@ return ((p == 0)? map[p]: map[p - 1]);
 
 /* Set tape capacity */
 
-t_stat sim_tape_set_capac (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat sim_tape_set_capac (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 t_addr cap;
 t_stat r;
@@ -3696,7 +3696,7 @@ return SCPE_OK;
 
 /* Show tape capacity */
 
-t_stat sim_tape_show_capac (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat sim_tape_show_capac (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if (uptr->capac) {
     if (uptr->capac >= (t_addr) 1000000)
@@ -3732,7 +3732,7 @@ return SCPE_OK;
    structure, and SCPE_OK is returned.
 */
 
-t_stat sim_tape_set_dens (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat sim_tape_set_dens (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 density, new_bpi;
 t_stat result = SCPE_OK;
@@ -3772,7 +3772,7 @@ return result;                                                  /* return the re
 
 /* Show the tape density */
 
-t_stat sim_tape_show_dens (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat sim_tape_show_dens (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 uint32 tape_density;
 

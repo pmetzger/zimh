@@ -87,7 +87,7 @@ void dr15_set_clr_ie (int32 val);
 t_stat dr15_svc (UNIT *uptr);
 t_stat dr15_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat dr15_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw);
-t_stat dr15_attach (UNIT *uptr, CONST char *cptr);
+t_stat dr15_attach (UNIT *uptr, const char *cptr);
 t_stat dr15_detach (UNIT *uptr);
 
 t_stat uc15_new_api (int32 val);                         /* callouts */
@@ -322,7 +322,7 @@ return SCPE_OK;
 
 /* Fake attach routine to kill attach attempts */
 
-t_stat dr15_attach (UNIT *uptr, CONST char *cptr)
+t_stat dr15_attach (UNIT *uptr, const char *cptr)
 {
 return SCPE_NOFNC;
 }

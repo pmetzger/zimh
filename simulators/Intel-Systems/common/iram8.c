@@ -44,9 +44,9 @@
 t_stat RAM_cfg(uint16 base, uint16 size, uint8 dummy);
 t_stat RAM_clr(void);
 t_stat RAM_reset (DEVICE *dptr);
-t_stat RAM_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat RAM_set_base(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat RAM_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat RAM_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat RAM_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat RAM_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc);
 uint8 RAM_get_mbyte(uint16 addr);
 void RAM_put_mbyte(uint16 addr, uint8 val);
 
@@ -147,7 +147,7 @@ t_stat RAM_reset (DEVICE *dptr)
 
 // set size parameter
 
-t_stat RAM_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat RAM_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result, i;
     
@@ -170,7 +170,7 @@ t_stat RAM_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // set base address parameter
 
-t_stat RAM_set_base(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat RAM_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result, i;
     
@@ -193,7 +193,7 @@ t_stat RAM_set_base(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 // show configuration parameters
 
-t_stat RAM_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat RAM_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;

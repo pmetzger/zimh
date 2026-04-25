@@ -82,12 +82,12 @@
 
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
-extern t_stat set_dev_enbdis(DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
+extern t_stat set_dev_enbdis(DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 extern t_stat (*vdm1_kb_callback)(SIM_KEY_EVENT *kev);
-extern t_stat set_membase(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-extern t_stat show_rambase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat show_rombase(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-extern t_stat set_cmd(int32 flag, CONST char *cptr);
+extern t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc);
+extern t_stat show_rambase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat show_rombase(FILE *st, UNIT *uptr, int32 val, const void *desc);
+extern t_stat set_cmd(int32 flag, const char *cptr);
 
 extern void PutBYTEWrapper(const uint32 Addr, const uint32 Value);
 extern uint32 nmiInterrupt;
@@ -115,9 +115,9 @@ static t_stat sol20_port_reset(DEVICE *dptr);
 static t_stat sol20_svc(UNIT *uptr);
 static t_stat sol20_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 static t_stat sol20_boot(int32 unitno, DEVICE *dptr);
-static t_stat sol20_attach_tape(UNIT *uptr, CONST char *cptr);
+static t_stat sol20_attach_tape(UNIT *uptr, const char *cptr);
 static t_stat sol20_detach_tape(UNIT *uptr);
-static t_stat sol20_attach_mux(UNIT *uptr, CONST char *cptr);
+static t_stat sol20_attach_mux(UNIT *uptr, const char *cptr);
 static t_stat sol20_detach_mux(UNIT *uptr);
 static const char* sol20_description(DEVICE *dptr);
 static t_stat sol20_config_line(DEVICE *dev, TMLN *tmln, int baud);
@@ -127,11 +127,11 @@ static const char* sol20s_description(DEVICE *dptr);
 static const char* sol20p_description(DEVICE *dptr);
 static t_stat sol20_set_baud(UNIT *uptr, int32 value, const char *cptr, void *desc);
 static t_stat sol20_show_baud(FILE *st, UNIT *uptr, int32 value, const void *desc);
-static t_stat sol20_set_rom(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat sol20_show_rom(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat sol20_show_ports(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-static t_stat sol20_set_tape(UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-static t_stat sol20_show_tape(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+static t_stat sol20_set_rom(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat sol20_show_rom(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat sol20_show_ports(FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat sol20_set_tape(UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat sol20_show_tape(FILE *st, UNIT *uptr, int32 val, const void *desc);
 static t_stat sol20_rewind(UNIT *uptr);
 static t_stat sol20_erase(UNIT *uptr);
 static int32 sol20io(int32 addr, int32 rw, int32 data);
@@ -1844,7 +1844,7 @@ static t_stat sol20_svc(UNIT *uptr)
 /*
  * Used to attach (insert) tapes into the SOL20T device
  */
-static t_stat sol20_attach_tape(UNIT *uptr, CONST char *cptr)
+static t_stat sol20_attach_tape(UNIT *uptr, const char *cptr)
 {
     t_stat r;
 
@@ -1863,7 +1863,7 @@ static t_stat sol20_attach_tape(UNIT *uptr, CONST char *cptr)
  * Used to attach (connect) MUX interfaces from the
  * SOL20K, SOL20S, and SOL20P devices
  */
-static t_stat sol20_attach_mux(UNIT *uptr, CONST char *cptr)
+static t_stat sol20_attach_mux(UNIT *uptr, const char *cptr)
 {
     SOL20_PORT_CTX *xptr;
     t_stat r;
@@ -1914,7 +1914,7 @@ static t_stat sol20_detach_mux(UNIT *uptr)
     return r;
 }
 
-static t_stat sol20_show_ports(FILE *st, UNIT *uptr, int32 val, CONST void *desc) {
+static t_stat sol20_show_ports(FILE *st, UNIT *uptr, int32 val, const void *desc) {
     SOL20_PORT_CTX *port;
 
     port = (SOL20_PORT_CTX *) uptr->dptr->ctxt;
@@ -1977,7 +1977,7 @@ static t_stat sol20_show_baud(FILE *st, UNIT *uptr, int32 value, const void *des
     return SCPE_OK;
 }
 
-static t_stat sol20_set_rom(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat sol20_set_rom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
@@ -2002,7 +2002,7 @@ static t_stat sol20_set_rom(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-static t_stat sol20_show_rom(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat sol20_show_rom(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (sol20_rom == sol20_rom_13) {
         fprintf(st, "ROM=v1.3");
@@ -2026,7 +2026,7 @@ static t_stat sol20_show_rom(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 /*
  * Sets tape speed to NORMAL or FAST
  */
-static t_stat sol20_set_tape(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+static t_stat sol20_set_tape(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
@@ -2045,7 +2045,7 @@ static t_stat sol20_set_tape(UNIT *uptr, int32 val, CONST char *cptr, void *desc
     return SCPE_OK;
 }
 
-static t_stat sol20_show_tape(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+static t_stat sol20_show_tape(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr->wait == SOL20_TAPE_NORMAL) {
         fprintf(st, "TAPE=NORMAL");
@@ -2554,7 +2554,7 @@ static uint8 translate_key(SIM_KEY_EVENT *kev)
 }
 
 /* Show ROM Address routine */
-t_stat show_rombase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_rombase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     DEVICE *dptr;
     SOL20_CTX *ctxp;
@@ -2573,7 +2573,7 @@ t_stat show_rombase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 }
 
 /* Show RAM Address routine */
-t_stat show_rambase(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_rambase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     DEVICE *dptr;
     SOL20_CTX *ctxp;

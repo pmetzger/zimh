@@ -162,7 +162,7 @@ extern UNIT cpu_unit;
 /* forwards */
 t_stat fdc_svc (UNIT *uptr);
 t_stat fdc_reset (DEVICE *uptr);
-t_stat fdc_attach(UNIT *uptr, CONST char *cptr);
+t_stat fdc_attach(UNIT *uptr, const char *cptr);
 t_stat fdc_detach(UNIT *uptr);
 t_stat pdq3_diskCreate(FILE *fileref, const char *ctlr_comment);
 t_stat pdq3_diskFormat(DISK_INFO *myDisk);
@@ -271,7 +271,7 @@ t_stat fdc_boot(int32 unitnum, DEVICE *dptr) {
   return fdc_autoload(unitnum);
 }
 
-t_stat fdc_attach(UNIT *uptr, CONST char *cptr) {
+t_stat fdc_attach(UNIT *uptr, const char *cptr) {
   t_stat rc;
   int i = uptr->u_unitno;
   char header[4];

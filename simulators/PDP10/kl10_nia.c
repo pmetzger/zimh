@@ -343,7 +343,7 @@ struct nia_device {
 
 extern int32 tmxr_poll;
 
-static CONST ETH_MAC broadcast_ethaddr = {0xff,0xff,0xff,0xff,0xff,0xff};
+static const ETH_MAC broadcast_ethaddr = {0xff,0xff,0xff,0xff,0xff,0xff};
 
 t_stat         nia_devio(uint32 dev, uint64 *data);
 void           nia_start(void);
@@ -357,11 +357,11 @@ t_stat         nia_eth_srv(UNIT *);
 t_stat         nia_rec_srv(UNIT *);
 t_stat         nia_cmd_srv(UNIT *);
 t_stat         nia_reset (DEVICE *dptr);
-t_stat         nia_show_mac (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat         nia_set_mac (UNIT* uptr, int32 val, CONST char* cptr, void* desc);
-t_stat         nia_attach (UNIT * uptr, CONST char * cptr);
+t_stat         nia_show_mac (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat         nia_set_mac (UNIT* uptr, int32 val, const char* cptr, void* desc);
+t_stat         nia_attach (UNIT * uptr, const char * cptr);
 t_stat         nia_detach (UNIT * uptr);
-t_stat         nia_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr);
+t_stat         nia_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char     *nia_description (DEVICE *dptr);
 
 struct rh_if   nia_rh = { NULL, NULL, NULL};
@@ -1544,7 +1544,7 @@ t_stat nia_rec_srv(UNIT * uptr)
 
 
 
-t_stat nia_show_mac (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat nia_show_mac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
     char buffer[20];
     eth_mac_fmt(nia_data.mac, buffer);
@@ -1552,7 +1552,7 @@ t_stat nia_show_mac (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
     return SCPE_OK;
 }
 
-t_stat nia_set_mac (UNIT* uptr, int32 val, CONST char* cptr, void* desc)
+t_stat nia_set_mac (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
     t_stat status;
 
@@ -1582,7 +1582,7 @@ t_stat nia_reset (DEVICE *dptr)
 }
 
 /* attach device: */
-t_stat nia_attach(UNIT* uptr, CONST char* cptr)
+t_stat nia_attach(UNIT* uptr, const char* cptr)
 {
     t_stat status;
     char* tptr;

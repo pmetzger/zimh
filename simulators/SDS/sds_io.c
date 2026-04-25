@@ -151,7 +151,7 @@ extern void set_dyn_map (void);
    support all widths.
 */
 
-t_stat chan_show_reg (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat chan_show_reg (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 struct aldisp {
     t_stat      (*pin) (uint32 num, uint32 *dat);       /* altnum, *dat */
@@ -907,7 +907,7 @@ return SCPE_OK;
 
 /* Channel assignment routines */
 
-t_stat set_chan (UNIT *uptr, int32 val, CONST char *sptr, void *desc)
+t_stat set_chan (UNIT *uptr, int32 val, const char *sptr, void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -934,7 +934,7 @@ for (i = 0; i < NUM_CHAN; i++) {                        /* match input */
 return SCPE_ARG;
 }
 
-t_stat show_chan (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_chan (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 DEVICE *dptr;
 DIB *dibp;
@@ -1002,7 +1002,7 @@ return FALSE;
 
 /* Display channel state */
 
-t_stat chan_show_reg (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat chan_show_reg (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 if ((val < 0) || (val >= NUM_CHAN)) return SCPE_IERR;
 fprintf (st, "UAR:      %02o\n", chan_uar[val]);

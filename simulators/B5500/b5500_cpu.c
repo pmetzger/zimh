@@ -265,12 +265,12 @@ t_stat              cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr,
 t_stat              cpu_dep(t_value val, t_addr addr, UNIT * uptr,
                             int32 sw);
 t_stat              cpu_reset(DEVICE * dptr);
-t_stat              cpu_msize(UNIT *up, int32 v, CONST char *cp, void *dp);
-t_stat              cpu_set_size(UNIT * uptr, int32 val, CONST char *cptr,
+t_stat              cpu_msize(UNIT *up, int32 v, const char *cp, void *dp);
+t_stat              cpu_set_size(UNIT * uptr, int32 val, const char *cptr,
                                  void *desc);
 t_stat              cpu_show_hist(FILE * st, UNIT * uptr, int32 val,
-                                  CONST void *desc);
-t_stat              cpu_set_hist(UNIT * uptr, int32 val, CONST char *cptr,
+                                  const void *desc);
+t_stat              cpu_set_hist(UNIT * uptr, int32 val, const char *cptr,
                                  void *desc);
 t_stat              cpu_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 /* Interval timer */
@@ -3892,7 +3892,7 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 }
 
 t_stat
-cpu_msize(UNIT *uptr, int32 v, CONST char *cptr, void *dptr)
+cpu_msize(UNIT *uptr, int32 v, const char *cptr, void *dptr)
 {
     int32 val;
     if ((v < 0) || (v > MAXMEMSIZE))
@@ -3907,7 +3907,7 @@ cpu_msize(UNIT *uptr, int32 v, CONST char *cptr, void *dptr)
 }
 
 t_stat
-cpu_set_size(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     t_uint64            mc = 0;
     uint32              i;
@@ -3935,7 +3935,7 @@ cpu_set_size(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
 
 /* Set history */
 t_stat
-cpu_set_hist(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     int32               i, lnt;
     t_stat              r;
@@ -3968,14 +3968,14 @@ cpu_set_hist(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
 /* Show history */
 
 t_stat
-cpu_show_hist(FILE * st, UNIT * uptr, int32 val, CONST void *desc)
+cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
     int32               k, di, lnt;
     const char          *cptr = (const char *) desc;
     t_stat              r;
     t_value             sim_eval;
     struct InstHistory *h;
-    CONST static char   flags[] = "ABCNSMV";
+    const static char   flags[] = "ABCNSMV";
 
     if (hst_lnt == 0)
         return SCPE_NOFNC;      /* enabled? */

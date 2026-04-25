@@ -196,14 +196,14 @@ t_stat va_svc (UNIT *uptr);
 t_stat va_dmasvc (UNIT *uptr);
 t_stat va_intsvc (UNIT *uptr);
 t_stat va_reset (DEVICE *dptr);
-t_stat va_set_enable (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat va_set_capture (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat va_show_capture (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat va_set_yoff (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat va_show_yoff (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat va_set_dpln (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat va_show_dpln (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
-t_stat va_show_cmap (FILE* st, UNIT* uptr, int32 val, CONST void* desc);
+t_stat va_set_enable (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat va_set_capture (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat va_show_capture (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat va_set_yoff (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat va_show_yoff (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat va_set_dpln (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat va_show_dpln (FILE* st, UNIT* uptr, int32 val, const void* desc);
+t_stat va_show_cmap (FILE* st, UNIT* uptr, int32 val, const void* desc);
 void va_setint (int32 src);
 int32 va_inta (void);
 void va_clrint (int32 src);
@@ -1138,7 +1138,7 @@ if (!vid_active)  {
 return auto_config (NULL, 0);                           /* run autoconfig */
 }
 
-t_stat va_set_yoff (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat va_set_yoff (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i;
 t_stat r;
@@ -1151,13 +1151,13 @@ for (i = 0; i < VA_YSIZE; i++)
 return r;
 }
 
-t_stat va_show_yoff (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat va_show_yoff (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 fprintf (st, "%d", va_yoff);
 return SCPE_OK;
 }
 
-t_stat va_set_dpln (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat va_set_dpln (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i;
 t_stat r;
@@ -1174,13 +1174,13 @@ for (i = 0; i < VA_YSIZE; i++)
 return r;
 }
 
-t_stat va_show_dpln (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat va_show_dpln (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 fprintf (st, "%d", va_dpln);
 return SCPE_OK;
 }
 
-t_stat va_show_cmap (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat va_show_cmap (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 int32 i;
 for (i = 0; i < VA_BPP; i++)
@@ -1189,12 +1189,12 @@ for (i = 0; i < VA_BPP; i++)
 return SCPE_OK;
 }
 
-t_stat va_set_enable (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat va_set_enable (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 return cpu_set_model (NULL, 0, (val ? "VAXSTATIONGPX" : "MICROVAX"), NULL);
 }
 
-t_stat va_set_capture (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat va_set_capture (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (vid_active)
     return sim_messagef (SCPE_ALATT, "Capture Mode Can't be changed with device enabled\n");
@@ -1202,7 +1202,7 @@ va_input_captured = val;
 return SCPE_OK;
 }
 
-t_stat va_show_capture (FILE* st, UNIT* uptr, int32 val, CONST void* desc)
+t_stat va_show_capture (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
 if (va_input_captured) {
     fprintf (st, "Captured Input Mode, ");

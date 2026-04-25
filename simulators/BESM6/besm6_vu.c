@@ -75,7 +75,7 @@ REG vu_reg[] = {
     { 0 }
 };
 
-t_stat vu_set_coldly (UNIT *u, int32 val, CONST char *cptr, void *desc)
+t_stat vu_set_coldly (UNIT *u, int32 val, const char *cptr, void *desc)
 {
     if (cptr && atoi(cptr) > 0) {
         vu_col_dly = atoi(cptr);
@@ -85,7 +85,7 @@ t_stat vu_set_coldly (UNIT *u, int32 val, CONST char *cptr, void *desc)
     return SCPE_ARG;
 }
 
-t_stat vu_set_enddly (UNIT *u, int32 val, CONST char *cptr, void *desc)
+t_stat vu_set_enddly (UNIT *u, int32 val, const char *cptr, void *desc)
 {
     if (cptr && atoi(cptr) > 0) {
         vu_end_dly = atoi(cptr);
@@ -95,7 +95,7 @@ t_stat vu_set_enddly (UNIT *u, int32 val, CONST char *cptr, void *desc)
     return SCPE_ARG;
 }
 
-t_stat vu_set_carddly (UNIT *u, int32 val, CONST char *cptr, void *desc)
+t_stat vu_set_carddly (UNIT *u, int32 val, const char *cptr, void *desc)
 {
     if (cptr && atoi(cptr) > 0) {
         vu_card_dly = atoi(cptr);
@@ -105,25 +105,25 @@ t_stat vu_set_carddly (UNIT *u, int32 val, CONST char *cptr, void *desc)
     return SCPE_ARG;
 }
 
-t_stat vu_show_coldly (FILE *st, UNIT *u, int32 v, CONST void *dp)
+t_stat vu_show_coldly (FILE *st, UNIT *u, int32 v, const void *dp)
 {
     fprintf(st, "Column delay is %d", vu_col_dly);
     return SCPE_OK;
 }
 
-t_stat vu_show_enddly (FILE *st, UNIT *u, int32 v, CONST void *dp)
+t_stat vu_show_enddly (FILE *st, UNIT *u, int32 v, const void *dp)
 {
     fprintf(st, "Delay before the end of card is %d", vu_end_dly);
     return SCPE_OK;
 }
 
-t_stat vu_show_carddly (FILE *st, UNIT *u, int32 v, CONST void *dp)
+t_stat vu_show_carddly (FILE *st, UNIT *u, int32 v, const void *dp)
 {
     fprintf(st, "Card delay is %d", vu_card_dly);
     return SCPE_OK;
 }
 
-t_stat vu_set_updk (UNIT *u, int32 val, CONST char *cptr, void *desc)
+t_stat vu_set_updk (UNIT *u, int32 val, const char *cptr, void *desc)
 {
     unsigned start, end;
     int num = u - vu_unit;
@@ -143,7 +143,7 @@ t_stat vu_set_updk (UNIT *u, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat vu_show_updk (FILE *st, UNIT *u, int32 v, CONST void *dp)
+t_stat vu_show_updk (FILE *st, UNIT *u, int32 v, const void *dp)
 {
     int num = u - vu_unit;
     if (vu_updkstart[num] == 0 && vu_updkend[num] == 0)
@@ -174,7 +174,7 @@ MTAB vu_mod[] = {
 
 
 t_stat vu_reset (DEVICE *dptr);
-t_stat vu_attach (UNIT *uptr, CONST char *cptr);
+t_stat vu_attach (UNIT *uptr, const char *cptr);
 t_stat vu_detach (UNIT *uptr);
 
 DEVICE vu_dev = {
@@ -227,7 +227,7 @@ t_stat vu_reset (DEVICE *dptr)
  * code as it allows each card to contain up to 120 characters. The columnwise GOST/UPDK code
  * is not supported yet.
  */
-t_stat vu_attach (UNIT *u, CONST char *cptr)
+t_stat vu_attach (UNIT *u, const char *cptr)
 {
     t_stat s;
     int num = u - vu_unit;

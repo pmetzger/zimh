@@ -380,6 +380,6 @@ extern const char  *dl_phase_name  (CNTLR_PHASE phase);
 
 /* Disc library global VM routines */
 
-extern t_stat dl_attach    (CVPTR cvptr, UNIT  *uptr, CONST char *cptr);
+extern t_stat dl_attach    (CVPTR cvptr, UNIT  *uptr, const char *cptr);
 extern t_stat dl_detach    (CVPTR cvptr, UNIT  *uptr);
-extern t_stat dl_set_model (UNIT  *uptr, int32 value, CONST char *cptr, void *desc);
+extern t_stat dl_set_model (UNIT  *uptr, int32 value, const char *cptr, void *desc);

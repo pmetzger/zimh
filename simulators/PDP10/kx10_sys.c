@@ -834,7 +834,7 @@ t_stat load_exb (FILE *fileref, int ftype)
 
 /* Master loader */
 
-t_stat sim_load (FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
     uint64 data;
     int32 wc, fmt;
@@ -1314,7 +1314,7 @@ t_value get_opnd (const char *cptr, t_stat *status)
         status  =       error status
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
     int32 i, j;
     t_value ac, dev;

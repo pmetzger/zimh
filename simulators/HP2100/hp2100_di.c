@@ -843,7 +843,7 @@ return SCPE_OK;
        at power-up.
 */
 
-t_stat di_set_address (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat di_set_address (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 t_stat status;
 uint32 index, new_address;
@@ -887,7 +887,7 @@ return status;                                              /* return the result
    address (0) or a card's bus address (1).
 */
 
-t_stat di_show_address (FILE *st, UNIT *uptr, int32 value, CONST void *desc)
+t_stat di_show_address (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
 const DEVICE *dptr = (const DEVICE *) desc;
 
@@ -918,7 +918,7 @@ return SCPE_OK;
        will no longer be necessary.
 */
 
-t_stat di_set_cable (UNIT *uptr, int32 value, CONST char *cptr, void *desc)
+t_stat di_set_cable (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
 DEVICE *dptr = (DEVICE *) desc;
 
@@ -943,7 +943,7 @@ return SCPE_OK;
    normal use (0) or to another card for diagnostics (1).
 */
 
-t_stat di_show_cable (FILE *st, UNIT *uptr, int32 value, CONST void *desc)
+t_stat di_show_cable (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
 const DEVICE *dptr = (const DEVICE *) desc;
 

@@ -146,16 +146,16 @@ static t_stat sim_os_ttcmd (void);
 static t_stat sim_os_ttclose (void);
 static t_bool sim_os_fd_isatty (int fd);
 
-static t_stat sim_set_rem_telnet (int32 flag, CONST char *cptr);
-static t_stat sim_set_rem_bufsize (int32 flag, CONST char *cptr);
-static t_stat sim_set_rem_connections (int32 flag, CONST char *cptr);
-static t_stat sim_set_rem_timeout (int32 flag, CONST char *cptr);
-static t_stat sim_set_rem_master (int32 flag, CONST char *cptr);
+static t_stat sim_set_rem_telnet (int32 flag, const char *cptr);
+static t_stat sim_set_rem_bufsize (int32 flag, const char *cptr);
+static t_stat sim_set_rem_connections (int32 flag, const char *cptr);
+static t_stat sim_set_rem_timeout (int32 flag, const char *cptr);
+static t_stat sim_set_rem_master (int32 flag, const char *cptr);
 
 /* Deprecated CONSOLE HALT, CONSOLE RESPONSE and CONSOLE DELAY support */
-static t_stat sim_set_halt (int32 flag, CONST char *cptr);
-static t_stat sim_set_response (int32 flag, CONST char *cptr);
-static t_stat sim_set_delay (int32 flag, CONST char *cptr);
+static t_stat sim_set_halt (int32 flag, const char *cptr);
+static t_stat sim_set_response (int32 flag, const char *cptr);
+static t_stat sim_set_delay (int32 flag, const char *cptr);
 
 
 #define KMAP_WRU        0
@@ -187,7 +187,7 @@ static uint32 sim_con_pos;                              /* console character out
 
 static t_stat sim_con_poll_svc (UNIT *uptr);                /* console connection poll routine */
 static t_stat sim_con_reset (DEVICE *dptr);                 /* console reset routine */
-static t_stat sim_con_attach (UNIT *uptr, CONST char *ptr); /* console attach routine (save,restore) */
+static t_stat sim_con_attach (UNIT *uptr, const char *ptr); /* console attach routine (save,restore) */
 static t_stat sim_con_detach (UNIT *uptr);                  /* console detach routine (save,restore) */
 
 UNIT sim_con_units[2] = {{ UDATA (&sim_con_poll_svc, UNIT_ATTABLE, 0)}}; /* console connection unit */
@@ -310,7 +310,7 @@ return sim_con_poll_svc (&dptr->units[0]);              /* establish polling as 
 
 /* Console Attach/Detach - only used indirectly in restore */
 
-static t_stat sim_con_attach (UNIT *uptr, CONST char *ptr)
+static t_stat sim_con_attach (UNIT *uptr, const char *ptr)
 {
 return tmxr_attach (&sim_con_tmxr, &sim_con_unit, ptr);
 }
@@ -414,7 +414,7 @@ static int32 *cons_kmap[] = {
 
 /* SET CONSOLE command */
 
-t_stat sim_set_console (int32 flag, CONST char *cptr)
+t_stat sim_set_console (int32 flag, const char *cptr)
 {
 char *cvptr, gbuf[CBUFSIZE];
 CTAB *ctptr;
@@ -439,7 +439,7 @@ return SCPE_OK;
 
 /* SHOW CONSOLE command */
 
-t_stat sim_show_console (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat sim_show_console (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
 SHTAB *shptr;
@@ -585,7 +585,7 @@ return SCPE_OK;
 
 /* SET REMOTE CONSOLE command */
 
-t_stat sim_set_remote_console (int32 flag, CONST char *cptr)
+t_stat sim_set_remote_console (int32 flag, const char *cptr)
 {
 char *cvptr, gbuf[CBUFSIZE];
 CTAB *ctptr;
@@ -610,7 +610,7 @@ return SCPE_OK;
 
 /* SHOW REMOTE CONSOLE command */
 
-t_stat sim_show_remote_console (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat sim_show_remote_console (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 int32 i, connections;
 REMOTE *rem;
@@ -718,42 +718,42 @@ if (sim_con_ldsc.conn)
 return SCPE_OK;
 }
 
-static t_stat x_continue_cmd (int32 flag, CONST char *cptr)
+static t_stat x_continue_cmd (int32 flag, const char *cptr)
 {
 return 1+SCPE_IERR;         /* This routine should never be called */
 }
 
-static t_stat x_repeat_cmd (int32 flag, CONST char *cptr)
+static t_stat x_repeat_cmd (int32 flag, const char *cptr)
 {
 return 2+SCPE_IERR;         /* This routine should never be called */
 }
 
-static t_stat x_collect_cmd (int32 flag, CONST char *cptr)
+static t_stat x_collect_cmd (int32 flag, const char *cptr)
 {
 return 3+SCPE_IERR;         /* This routine should never be called */
 }
 
-static t_stat x_sampleout_cmd (int32 flag, CONST char *cptr)
+static t_stat x_sampleout_cmd (int32 flag, const char *cptr)
 {
 return 4+SCPE_IERR;         /* This routine should never be called */
 }
 
-static t_stat x_execute_cmd (int32 flag, CONST char *cptr)
+static t_stat x_execute_cmd (int32 flag, const char *cptr)
 {
 return 5+SCPE_IERR;         /* This routine should never be called */
 }
 
-static t_stat x_step_cmd (int32 flag, CONST char *cptr)
+static t_stat x_step_cmd (int32 flag, const char *cptr)
 {
 return 6+SCPE_IERR;         /* This routine should never be called */
 }
 
-static t_stat x_run_cmd (int32 flag, CONST char *cptr)
+static t_stat x_run_cmd (int32 flag, const char *cptr)
 {
 return 7+SCPE_IERR;         /* This routine should never be called */
 }
 
-static t_stat x_help_cmd (int32 flag, CONST char *cptr);
+static t_stat x_help_cmd (int32 flag, const char *cptr);
 
 static CTAB allowed_remote_cmds[] = {
     { "EXAMINE",  &exdep_cmd,      EX_E },
@@ -847,7 +847,7 @@ static CTAB remote_only_cmds[] = {
     { NULL,       NULL }
     };
 
-static t_stat x_help_cmd (int32 flag, CONST char *cptr)
+static t_stat x_help_cmd (int32 flag, const char *cptr)
 {
 CTAB *cmdp, *cmdph;
 
@@ -917,7 +917,7 @@ if ((rem->act == NULL) &&
 void sim_remote_process_command (void)
 {
 char cbuf[4*CBUFSIZE], gbuf[CBUFSIZE], *argv[1] = {NULL};
-CONST char *cptr;
+const char *cptr;
 int32 saved_switches = sim_switches;
 t_stat stat;
 
@@ -1018,13 +1018,13 @@ return buf;
     Parse and setup Remote Console REPEAT command:
        REPEAT EVERY nnn USECS Command {; command...}
  */
-static t_stat sim_rem_repeat_cmd_setup (int32 line, CONST char **iptr)
+static t_stat sim_rem_repeat_cmd_setup (int32 line, const char **iptr)
 {
 char gbuf[CBUFSIZE];
 int32 val;
 t_bool all_stop = FALSE;
 t_stat stat = SCPE_OK;
-CONST char *cptr = *iptr;
+const char *cptr = *iptr;
 REMOTE *rem = &sim_rem_consoles[line];
 
 sim_debug (DBG_REP, &sim_remote_console, "Repeat Setup: %s\n", cptr);
@@ -1099,13 +1099,13 @@ return stat;
     Parse and setup Remote Console REPEAT command:
        COLLECT nnn SAMPLES EVERY nnn CYCLES reg{,reg...}
  */
-static t_stat sim_rem_collect_cmd_setup (int32 line, CONST char **iptr)
+static t_stat sim_rem_collect_cmd_setup (int32 line, const char **iptr)
 {
 char gbuf[CBUFSIZE];
 int32 samples, cycles, dither_pct;
 t_bool all_stop = FALSE;
 t_stat stat = SCPE_OK;
-CONST char *cptr = *iptr;
+const char *cptr = *iptr;
 REMOTE *rem = &sim_rem_consoles[line];
 
 sim_debug (DBG_SAM, &sim_remote_console, "Collect Setup: %s\n", cptr);
@@ -1385,7 +1385,7 @@ t_bool got_command;
 t_bool close_session = FALSE;
 TMLN *lp;
 char cbuf[4*CBUFSIZE], gbuf[CBUFSIZE], *argv[1] = {NULL};
-CONST char *cptr;
+const char *cptr;
 CTAB *cmdp = NULL;
 CTAB *basecmdp = NULL;
 uint32 read_start_time = 0;
@@ -1908,7 +1908,7 @@ if (sim_rem_con_tmxr.lines) {
 return SCPE_OK;
 }
 
-static t_stat sim_set_rem_telnet (int32 flag, CONST char *cptr)
+static t_stat sim_set_rem_telnet (int32 flag, const char *cptr)
 {
 t_stat r;
 
@@ -1954,7 +1954,7 @@ else {
 return SCPE_OK;
 }
 
-static t_stat sim_set_rem_connections (int32 flag, CONST char *cptr)
+static t_stat sim_set_rem_connections (int32 flag, const char *cptr)
 {
 int32 lines;
 REMOTE *rem;
@@ -2008,7 +2008,7 @@ for (i=0; i<lines; i++) {
 return SCPE_OK;
 }
 
-static t_stat sim_set_rem_timeout (int32 flag, CONST char *cptr)
+static t_stat sim_set_rem_timeout (int32 flag, const char *cptr)
 {
 int32 timeout;
 t_stat r;
@@ -2025,7 +2025,7 @@ else
 return SCPE_OK;
 }
 
-static t_stat sim_set_rem_bufsize (int32 flag, CONST char *cptr)
+static t_stat sim_set_rem_bufsize (int32 flag, const char *cptr)
 {
 char cmdbuf[CBUFSIZE];
 int32 bufsize;
@@ -2057,7 +2057,7 @@ return sim_rem_master_mode &&                                           /* maste
    mode or the simulator exits
  */
 
-static t_stat sim_set_rem_master (int32 flag, CONST char *cptr)
+static t_stat sim_set_rem_master (int32 flag, const char *cptr)
 {
 t_stat stat = SCPE_OK;
 
@@ -2128,7 +2128,7 @@ return stat;
 
 /* Set keyboard map */
 
-t_stat sim_set_kmap (int32 flag, CONST char *cptr)
+t_stat sim_set_kmap (int32 flag, const char *cptr)
 {
 DEVICE *dptr = sim_devices[0];
 int32 val, rdx;
@@ -2151,7 +2151,7 @@ return SCPE_OK;
 
 /* Show keyboard map */
 
-t_stat sim_show_kmap (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat sim_show_kmap (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 int32 kmap_char = *(cons_kmap[flag & KMAP_MASK]);
 
@@ -2171,7 +2171,7 @@ return SCPE_OK;
 
 /* Set printable characters */
 
-t_stat sim_set_pchar (int32 flag, CONST char *cptr)
+t_stat sim_set_pchar (int32 flag, const char *cptr)
 {
 DEVICE *dptr = sim_devices[0];
 uint32 val, rdx;
@@ -2191,7 +2191,7 @@ return SCPE_OK;
 
 /* Show printable characters */
 
-t_stat sim_show_pchar (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat sim_show_pchar (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 if (sim_devices[0]->dradix == 16)
     fprintf (st, "pchar mask = %X", sim_tt_pchar);
@@ -2219,7 +2219,7 @@ return SCPE_OK;
 
 /* Set input speed (bps) */
 
-t_stat sim_set_cons_speed (int32 flag, CONST char *cptr)
+t_stat sim_set_cons_speed (int32 flag, const char *cptr)
 {
 t_stat r = tmxr_set_line_speed (&sim_con_ldsc, cptr);
 
@@ -2228,7 +2228,7 @@ if ((r == SCPE_OK) && (sim_con_ldsc.uptr != NULL))
 return r;
 }
 
-t_stat sim_show_cons_speed (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat sim_show_cons_speed (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 if (sim_con_ldsc.rxbps) {
     fprintf (st, "Speed = %d", sim_con_ldsc.rxbps);
@@ -2241,7 +2241,7 @@ return SCPE_OK;
 
 /* Set log routine */
 
-t_stat sim_set_logon (int32 flag, CONST char *cptr)
+t_stat sim_set_logon (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
 t_stat r;
@@ -2273,7 +2273,7 @@ return SCPE_OK;
 
 /* Set nolog routine */
 
-t_stat sim_set_logoff (int32 flag, CONST char *cptr)
+t_stat sim_set_logoff (int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))                               /* now eol? */
     return SCPE_2MARG;
@@ -2289,7 +2289,7 @@ return SCPE_OK;
 
 /* Show log status */
 
-t_stat sim_show_log (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat sim_show_log (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
@@ -2318,7 +2318,7 @@ return old_deb_switches;
 
 /* Set debug routine */
 
-t_stat sim_set_debon (int32 flag, CONST char *cptr)
+t_stat sim_set_debon (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
 t_stat r;
@@ -2392,7 +2392,7 @@ return SCPE_OK;
 
 /* Set nodebug routine */
 
-t_stat sim_set_deboff (int32 flag, CONST char *cptr)
+t_stat sim_set_deboff (int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))                               /* now eol? */
     return SCPE_2MARG;
@@ -2425,7 +2425,7 @@ return sim_messagef (SCPE_OK, "Debug output disabled\n");
 
 /* Show debug routine */
 
-t_stat sim_show_debug (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat sim_show_debug (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 int32 i;
 
@@ -2486,7 +2486,7 @@ return SCPE_OK;
 
 /* Set console to Telnet port (and parameters) */
 
-t_stat sim_set_telnet (int32 flag, CONST char *cptr)
+t_stat sim_set_telnet (int32 flag, const char *cptr)
 {
 char *cvptr, gbuf[CBUFSIZE];
 CTAB *ctptr;
@@ -2521,7 +2521,7 @@ return SCPE_OK;
 
 /* Close console Telnet port */
 
-t_stat sim_set_notelnet (int32 flag, CONST char *cptr)
+t_stat sim_set_notelnet (int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))                               /* too many arguments? */
     return SCPE_2MARG;
@@ -2532,7 +2532,7 @@ return tmxr_close_master (&sim_con_tmxr);               /* close master socket *
 
 /* Show console Telnet status */
 
-t_stat sim_show_telnet (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, CONST char *cptr)
+t_stat sim_show_telnet (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
@@ -2559,7 +2559,7 @@ return SCPE_OK;
 
 /* Set console to Buffering  */
 
-t_stat sim_set_cons_buff (int32 flg, CONST char *cptr)
+t_stat sim_set_cons_buff (int32 flg, const char *cptr)
 {
 char cmdbuf[CBUFSIZE];
 
@@ -2569,7 +2569,7 @@ return tmxr_open_master (&sim_con_tmxr, cmdbuf);      /* open master socket */
 
 /* Set console to NoBuffering */
 
-t_stat sim_set_cons_unbuff (int32 flg, CONST char *cptr)
+t_stat sim_set_cons_unbuff (int32 flg, const char *cptr)
 {
 char cmdbuf[CBUFSIZE];
 
@@ -2579,7 +2579,7 @@ return tmxr_open_master (&sim_con_tmxr, cmdbuf);      /* open master socket */
 
 /* Set console to Logging */
 
-t_stat sim_set_cons_log (int32 flg, CONST char *cptr)
+t_stat sim_set_cons_log (int32 flg, const char *cptr)
 {
 char cmdbuf[CBUFSIZE];
 
@@ -2589,7 +2589,7 @@ return tmxr_open_master (&sim_con_tmxr, cmdbuf);      /* open master socket */
 
 /* Set console to NoLogging */
 
-t_stat sim_set_cons_nolog (int32 flg, CONST char *cptr)
+t_stat sim_set_cons_nolog (int32 flg, const char *cptr)
 {
 char cmdbuf[CBUFSIZE];
 
@@ -2597,7 +2597,7 @@ sprintf(cmdbuf, "NOLOG%c%s", cptr ? '=' : '\0', cptr ? cptr : "");
 return tmxr_open_master (&sim_con_tmxr, cmdbuf);      /* open master socket */
 }
 
-t_stat sim_show_cons_log (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, CONST char *cptr)
+t_stat sim_show_cons_log (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
@@ -2608,7 +2608,7 @@ else
 return SCPE_OK;
 }
 
-t_stat sim_show_cons_buff (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, CONST char *cptr)
+t_stat sim_show_cons_buff (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
@@ -2621,12 +2621,12 @@ return SCPE_OK;
 
 /* Set console Debug Mode */
 
-t_stat sim_set_cons_debug (int32 flg, CONST char *cptr)
+t_stat sim_set_cons_debug (int32 flg, const char *cptr)
 {
 return set_dev_debug (&sim_con_telnet, &sim_con_unit, flg, cptr);
 }
 
-t_stat sim_show_cons_debug (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, CONST char *cptr)
+t_stat sim_show_cons_debug (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
@@ -2635,7 +2635,7 @@ return show_dev_debug (st, &sim_con_telnet, &sim_con_unit, flag, cptr);
 
 /* Set console to Serial port (and parameters) */
 
-t_stat sim_set_serial (int32 flag, CONST char *cptr)
+t_stat sim_set_serial (int32 flag, const char *cptr)
 {
 char *cvptr, gbuf[CBUFSIZE], ubuf[CBUFSIZE];
 CTAB *ctptr;
@@ -2679,7 +2679,7 @@ return SCPE_OK;
 
 /* Close console Serial port */
 
-t_stat sim_set_noserial (int32 flag, CONST char *cptr)
+t_stat sim_set_noserial (int32 flag, const char *cptr)
 {
 if (cptr && (*cptr != 0))                               /* too many arguments? */
     return SCPE_2MARG;
@@ -2690,7 +2690,7 @@ return tmxr_close_master (&sim_con_tmxr);               /* close master socket *
 
 /* Show the console expect rules and state */
 
-t_stat sim_show_cons_expect (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, CONST char *cptr)
+t_stat sim_show_cons_expect (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, const char *cptr)
 {
 fprintf (st, "Console Expect processing:\n");
 return sim_exp_show (st, &sim_con_expect, cptr);
@@ -2885,7 +2885,7 @@ return &sim_con_expect;
 
 /* Display console Queued input data status */
 
-t_stat sim_show_cons_send_input (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, CONST char *cptr)
+t_stat sim_show_cons_send_input (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 fprintf (st, "Console Send processing:\n");
 return sim_show_send_input (st, &sim_con_send);
@@ -3052,7 +3052,7 @@ return c;
 
    Columns with tabs set are non-zero; columns without tabs are 0 */
 
-t_stat sim_tt_settabs (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat sim_tt_settabs (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint8 *temptabs, *tabs = (uint8 *) desc;
 int32 i, d;
@@ -3082,7 +3082,7 @@ free (temptabs);
 return SCPE_OK;
 }
 
-t_stat sim_tt_showtabs (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat sim_tt_showtabs (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 const uint8 *tabs = (const uint8 *) desc;
 int32 i, any;
@@ -3099,7 +3099,7 @@ fprintf (st, (any? "\n": "no tabs set\n"));
 return SCPE_OK;
 }
 
-t_stat sim_tt_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat sim_tt_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 par_mode = (TT_GET_MODE (uptr->flags) >> TTUF_W_MODE) & TTUF_M_PAR;
 
@@ -3110,14 +3110,14 @@ if (val != TT_MODE_8B)
 return SCPE_OK;
 }
 
-t_stat sim_tt_set_parity (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat sim_tt_set_parity (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uptr->flags = uptr->flags & ~(TTUF_M_MODE | TTUF_M_PAR);
 uptr->flags |= TT_MODE_7B | val;
 return SCPE_OK;
 }
 
-t_stat sim_tt_show_modepar (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat sim_tt_show_modepar (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 uint32 md = (TT_GET_MODE (uptr->flags) & TTUF_M_MODE);
 static const char *modes[] = {"7b", "8b", "UC", "7p"};
@@ -3934,7 +3934,7 @@ return;
 
 /* Set console halt */
 
-static t_stat sim_set_halt (int32 flag, CONST char *cptr)
+static t_stat sim_set_halt (int32 flag, const char *cptr)
 {
 if (flag == 0)                                              /* no halt? */
     sim_exp_clrall (&sim_con_expect);                       /* disable halt checks */
@@ -3968,7 +3968,7 @@ return SCPE_OK;
 
 /* Set console response */
 
-static t_stat sim_set_response (int32 flag, CONST char *cptr)
+static t_stat sim_set_response (int32 flag, const char *cptr)
 {
 if (flag == 0)                                          /* no response? */
     sim_send_clear (&sim_con_send);
@@ -3990,7 +3990,7 @@ return SCPE_OK;
 
 /* Set console delay */
 
-static t_stat sim_set_delay (int32 flag, CONST char *cptr)
+static t_stat sim_set_delay (int32 flag, const char *cptr)
 {
 int32 val;
 t_stat r;

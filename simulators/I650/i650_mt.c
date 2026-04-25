@@ -54,11 +54,11 @@ uint32              mt_cmd(UNIT *, uint16, uint16);
 t_stat              mt_srv(UNIT *);
 void                mt_ini(UNIT *, t_bool);
 t_stat              mt_reset(DEVICE *);
-t_stat              mt_attach(UNIT *, CONST char *);
+t_stat              mt_attach(UNIT *, const char *);
 t_stat              mt_detach(UNIT *);
-t_stat              mt_rew(UNIT * uptr, int32 val, CONST char *cptr,void *desc);
-t_stat              mt_set_len (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat              mt_show_len (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat              mt_rew(UNIT * uptr, int32 val, const char *cptr,void *desc);
+t_stat              mt_set_len (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat              mt_show_len (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat              mt_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char          *mt_description (DEVICE *dptr);
 
@@ -116,7 +116,7 @@ int mt_ready(int n)
 }
 
 /* Rewind tape drive */
-t_stat mt_rew(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+t_stat mt_rew(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     /* If drive is offline or not attached return not ready */
     if ((uptr->flags & UNIT_ATT) == 0)
@@ -601,7 +601,7 @@ t_stat mt_reset(DEVICE * dptr)
     return SCPE_OK;
 }
 
-t_stat mt_attach(UNIT * uptr, CONST char *file)
+t_stat mt_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
 
@@ -622,7 +622,7 @@ t_stat mt_detach(UNIT * uptr)
 
 /* Set tape length */
 
-t_stat mt_set_len (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat mt_set_len (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int len;
     t_stat r;
@@ -637,7 +637,7 @@ t_stat mt_set_len (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* Show tape length */
 
-t_stat mt_show_len (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat mt_show_len (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     fprintf (st, "length %d foot", uptr->u4 * 2400 / 28800);
     return SCPE_OK;

@@ -13,7 +13,7 @@
 #include "sim_defs.h"
 
 /* Open a host file and attach it to a unit using generic SCP rules. */
-t_stat attach_unit(UNIT *uptr, CONST char *cptr);
+t_stat attach_unit(UNIT *uptr, const char *cptr);
 
 /* Flush and detach a unit using generic SCP buffered-file rules. */
 t_stat detach_unit(UNIT *uptr);

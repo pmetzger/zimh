@@ -146,8 +146,8 @@ static const char* m6800_desc(DEVICE *dptr) {
 
 /* function prototypes */
 
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat m6800_reset (DEVICE *dptr);
 t_stat m6800_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw);
 t_stat m6800_dep(t_value val, t_addr addr, UNIT *uptr, int32 sw);
@@ -1981,7 +1981,7 @@ t_stat m6800_reset(DEVICE *dptr)
 
 #define HLEN    16
 
-int32 sim_load(FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+int32 sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
     int32 i, addr = 0, addr0 = 0, cnt = 0, cnt0 = 0, start = 0x10000;
     int32 addr1 = 0, end = 0, byte, chk, rtype, flag0 = 1;
@@ -2155,14 +2155,14 @@ t_stat fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
         status  =   error status
 */
 
-t_stat parse_sym(CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
     return (1);
 }
 
 /* Set history */
 
-t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int i, lnt;
     t_stat r;
@@ -2193,7 +2193,7 @@ t_stat cpu_set_hist (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 
 /* Show history */
 
-t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int k, di, lnt, ir;
     const char *cptr = (const char *) desc;

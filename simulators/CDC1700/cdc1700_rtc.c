@@ -37,9 +37,9 @@ extern char INTprefix[];
 
 extern t_stat checkReset(DEVICE *, uint8);
 
-extern t_stat show_addr(FILE *, UNIT *, int32, CONST void *);
+extern t_stat show_addr(FILE *, UNIT *, int32, const void *);
 
-extern t_stat set_equipment(UNIT *, int32, CONST char *, void *);
+extern t_stat set_equipment(UNIT *, int32, const char *, void *);
 
 extern void RaiseExternalInterrupt(DEVICE *);
 extern void rebuildPending(void);
@@ -48,8 +48,8 @@ extern uint16 Areg;
 
 extern t_bool IOFWinitialized;
 
-t_stat rtc_show_rate(FILE *, UNIT *, int32, CONST void *);
-t_stat rtc_set_rate(UNIT *, int32, CONST char *, void *);
+t_stat rtc_show_rate(FILE *, UNIT *, int32, const void *);
+t_stat rtc_set_rate(UNIT *, int32, const char *, void *);
 
 void RTCstate(char *, DEVICE *, IO_DEVICE *);
 uint16 RTCraised(DEVICE *);
@@ -192,7 +192,7 @@ DEVICE rtc_dev = {
   NULL, NULL, &rtc_help, NULL, NULL, NULL
 };
 
-t_stat rtc_show_rate(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat rtc_show_rate(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   struct RTCtimebase *tb = timeBase;
 
@@ -206,7 +206,7 @@ t_stat rtc_show_rate(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
   return SCPE_IERR;
 }
 
-t_stat rtc_set_rate(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rtc_set_rate(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   if (cptr) {
     struct RTCtimebase *tb = timeBase;

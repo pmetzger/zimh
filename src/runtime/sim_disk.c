@@ -354,7 +354,7 @@ static struct sim_disk_fmt fmts[] = {
 
 /* Set disk format */
 
-t_stat sim_disk_set_fmt (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat sim_disk_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 f;
 
@@ -388,7 +388,7 @@ for (i = 0; fmts[i].name; i++)
 return "invalid";
 }
 
-t_stat sim_disk_show_fmt (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat sim_disk_show_fmt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "%s format", sim_disk_fmt (uptr));
 return SCPE_OK;
@@ -396,7 +396,7 @@ return SCPE_OK;
 
 /* Set disk capacity */
 
-t_stat sim_disk_set_capac (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat sim_disk_set_capac (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 t_offset cap;
 t_stat r;
@@ -415,7 +415,7 @@ return SCPE_OK;
 
 /* Show disk capacity */
 
-t_stat sim_disk_show_capac (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat sim_disk_show_capac (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 const char *cap_units = "B";
 DEVICE *dptr = find_dev_from_unit (uptr);
@@ -492,7 +492,7 @@ return r;
 
 static t_bool sim_disk_no_autosize = FALSE;
 
-t_stat sim_disk_set_noautosize (int32 flag, CONST char *cptr)
+t_stat sim_disk_set_noautosize (int32 flag, const char *cptr)
 {
 DEVICE *dptr;
 uint32 dev, unit, count = 0;
@@ -6583,7 +6583,7 @@ if (info->flag == 0) {
     }
 }
 
-t_stat sim_disk_info_cmd (int32 flag, CONST char *cptr)
+t_stat sim_disk_info_cmd (int32 flag, const char *cptr)
 {
 DISK_INFO_CTX disk_info_state;
 t_stat stat;

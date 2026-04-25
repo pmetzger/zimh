@@ -107,8 +107,8 @@ t_stat ptr_reset (DEVICE *dptr);
 t_stat ptp_reset (DEVICE *dptr);
 t_stat tty_reset (DEVICE *dptr);
 t_stat ptr_boot (int32 unitno, DEVICE *dptr);
-t_stat ptr_attach (UNIT *uptr, CONST char *cptr);
-t_stat ptp_attach (UNIT *uptr, CONST char *cptr);
+t_stat ptr_attach (UNIT *uptr, const char *cptr);
+t_stat ptp_attach (UNIT *uptr, const char *cptr);
 t_stat ptr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 t_stat ptp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *ptr_description (DEVICE *dptr);
@@ -482,7 +482,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat ptr_attach (UNIT *uptr, CONST char *cptr)
+t_stat ptr_attach (UNIT *uptr, const char *cptr)
 {
 ptr_leader = PTR_LEADER;                                /* set up leader */
 if (sim_switches & SWMASK ('A'))
@@ -630,7 +630,7 @@ return SCPE_OK;
 
 /* Attach routine */
 
-t_stat ptp_attach (UNIT *uptr, CONST char *cptr)
+t_stat ptp_attach (UNIT *uptr, const char *cptr)
 {
 if (sim_switches & SWMASK ('A'))
     uptr->flags = uptr->flags | UNIT_ASCII;

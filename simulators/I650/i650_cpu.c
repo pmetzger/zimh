@@ -121,7 +121,7 @@
 t_stat              cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw);
 t_stat              cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw);
 t_stat              cpu_reset(DEVICE * dptr);
-t_stat              cpu_set_size(UNIT * uptr, int32 val, CONST char *cptr, void *desc);
+t_stat              cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc);
 t_stat              cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 t_stat              cpu_svc (UNIT *uptr);
 const char          *cpu_description (DEVICE *dptr);
@@ -670,9 +670,9 @@ int ApplyIndexRegisterModel4(int * DA, int * IA)
 // input: prior to call DecodeOpcode PR cpu register must be loaded with the word to decode
 // output: decoded instruction as opcode, DA, IA parts
 //         returns opname: points to opcode name or NULL if undef opcode
-CONST char * DecodeOpcode(t_int64 d, int * opcode, int * DA, int * IA)
+const char * DecodeOpcode(t_int64 d, int * opcode, int * DA, int * IA)
 {
-    CONST char * opname;
+    const char * opname;
     int opt;
 
     *opcode = Shift_Digits(&d, 2);          // current inste opcode
@@ -698,7 +698,7 @@ CONST char * DecodeOpcode(t_int64 d, int * opcode, int * DA, int * IA)
 // dir = "D->I" or "I->D"
 // bEOB = 1 -> End of IAS band terminated transfer
 // return number of words transfered
-int TransferIAS(CONST char * dir, int bEOB)
+int TransferIAS(const char * dir, int bEOB)
 {
     int n, f0, t0, f1, t1, ec, ZeroNeg;
     t_int64 d;
@@ -2094,7 +2094,7 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 }
 
 t_stat
-cpu_set_size(UNIT * uptr, int32 val, CONST char *cptr, void *desc)
+cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
     int                 mc = 0;
     uint32              i;

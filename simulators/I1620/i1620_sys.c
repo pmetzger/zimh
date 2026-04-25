@@ -123,7 +123,7 @@ const char *sim_stop_messages[SCPE_BASE] = {
    number of entries
 */
 
-t_stat sim_load (FILE *fileref, CONST char *cptr, CONST char *fnam, int flag)
+t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
 uint32 col, mask, cctbuf[CCT_LNT];
 int32 ptr, rpt;
@@ -501,7 +501,7 @@ return SCPE_OK;
                         <= 0  -number of extra words
 */
 
-t_stat parse_sym (CONST char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
 int32 i, qv, opfl, last;
 char la, *fptr, gbuf[CBUFSIZE];

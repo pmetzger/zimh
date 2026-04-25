@@ -340,7 +340,7 @@ typedef struct _mmu_state {
 t_stat mmu_init(DEVICE *dptr);
 uint32 mmu_read(uint32 pa, size_t size);
 void   mmu_write(uint32 pa, uint32 val, size_t size);
-CONST char *mmu_description(DEVICE *dptr);
+const char *mmu_description(DEVICE *dptr);
 
 /* Virtual memory translation */
 uint32 mmu_xlate_addr(uint32 va, uint8 r_acc);
@@ -351,8 +351,8 @@ t_stat mmu_decode_va(uint32 va, uint8 r_acc, t_bool fc, uint32 *pa);
 void   mmu_enable(void);
 void   mmu_disable(void);
 
-t_stat mmu_show_sdt(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat mmu_show_sdc(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
-t_stat mmu_show_pdc(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat mmu_show_sdt(FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat mmu_show_sdc(FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat mmu_show_pdc(FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 #endif /* _3B2_REV3_MMU_H_ */

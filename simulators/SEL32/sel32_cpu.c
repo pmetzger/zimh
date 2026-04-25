@@ -126,14 +126,14 @@ void* create_shared_memory(size_t size) ;
 t_stat cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw);
 t_stat cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw);
 t_stat cpu_reset(DEVICE * dptr);
-t_stat cpu_set_size(UNIT * uptr, int32 val, CONST char *cptr, void *desc);
+t_stat cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc);
 #ifdef DEFINE_IPU_MODELS
-t_stat cpu_set_ipu(UNIT * uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_clr_ipu(UNIT * uptr, int32 val, CONST char *cptr, void *desc);
-t_stat cpu_show_ipu(FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat cpu_set_ipu(UNIT * uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_clr_ipu(UNIT * uptr, int32 val, const char *cptr, void *desc);
+t_stat cpu_show_ipu(FILE *st, UNIT *uptr, int32 val, const void *desc);
 #endif
-t_stat cpu_show_hist(FILE * st, UNIT * uptr, int32 val, CONST void *desc);
-t_stat cpu_set_hist(UNIT * uptr, int32 val, CONST char *cptr, void *desc);
+t_stat cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc);
+t_stat cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc);
 uint32 cpu_cmd(UNIT * uptr, uint16 cmd, uint16 dev);
 t_stat cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *cpu_description (DEVICE *dptr);
@@ -7996,7 +7996,7 @@ uint32 memwds [] = {
     0x400000,   /*           10 -  16MB =   4MW */
 };
 
-t_stat cpu_set_size(UNIT *uptr, int32 sval, CONST char *cptr, void *desc)
+t_stat cpu_set_size(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 {
     uint32      i;
     uint32      sz;
@@ -8033,7 +8033,7 @@ t_stat cpu_set_size(UNIT *uptr, int32 sval, CONST char *cptr, void *desc)
 }
 
 #ifdef DEFINE_IPU_MODELS
-t_stat cpu_set_ipu(UNIT *uptr, int32 sval, CONST char *cptr, void *desc)
+t_stat cpu_set_ipu(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 {
 //  sim_printf("cpu_set_ipu sval %x cptr %s desc %s\n", sval, cptr, (char *)desc);
 #ifdef CPUONLY
@@ -8053,7 +8053,7 @@ t_stat cpu_set_ipu(UNIT *uptr, int32 sval, CONST char *cptr, void *desc)
     return SCPE_OK;                                 /* we done */
 }
 
-t_stat cpu_clr_ipu(UNIT *uptr, int32 sval, CONST char *cptr, void *desc)
+t_stat cpu_clr_ipu(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 {
     cpu_unit.flags &= ~UNIT_IPU;                    /* disable IPU for this MODEL */
 #ifdef USE_IPU_THREAD
@@ -8063,7 +8063,7 @@ t_stat cpu_clr_ipu(UNIT *uptr, int32 sval, CONST char *cptr, void *desc)
     return SCPE_OK;                                 /* we done */
 }
 
-t_stat cpu_show_ipu(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_ipu(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (IPU_MODEL)
         sim_printf("IPU enabled\n");
@@ -8077,7 +8077,7 @@ t_stat cpu_show_ipu(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
 
 /* Set history */
 t_stat
-cpu_set_hist(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int32               i, lnt;
     t_stat              r;
@@ -8109,7 +8109,7 @@ cpu_set_hist(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
 }
 
 /* Show history */
-t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int32               k, di, lnt;
     char               *cptr = (char *) desc;

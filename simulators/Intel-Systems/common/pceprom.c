@@ -38,7 +38,7 @@
 
 /* function prototypes */
 
-t_stat EPROM_attach (UNIT *uptr, CONST char *cptr);
+t_stat EPROM_attach (UNIT *uptr, const char *cptr);
 t_stat EPROM_reset (DEVICE *dptr, uint32 base, uint32 size);
 uint8 EPROM_get_mbyte(uint32 addr);
 
@@ -92,7 +92,7 @@ DEVICE EPROM_dev = {
 
 /* EPROM attach  */
 
-t_stat EPROM_attach (UNIT *uptr, CONST char *cptr)
+t_stat EPROM_attach (UNIT *uptr, const char *cptr)
 {
     uint16 j;
     int c;

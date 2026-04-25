@@ -2223,7 +2223,7 @@ t_bool tmxr_get_line_halfduplex (TMLN *lp)
 return (lp->halfduplex != FALSE);
 }
 
-t_stat tmxr_set_config_line (TMLN *lp, CONST char *config)
+t_stat tmxr_set_config_line (TMLN *lp, const char *config)
 {
 t_stat r;
 DEVICE *dptr = (lp->dptr ? lp->dptr : (lp->mp ? lp->mp->dptr : NULL));
@@ -3009,7 +3009,7 @@ static t_stat tmxr_parse_framer_spec (const char *framer, char *fr_eth,
                                       size_t fr_eth_size, int8 *fr_mode,
                                       int32 *fr_speed)
 {
-CONST char *cptr;
+const char *cptr;
 char option[CBUFSIZE];
 int32 speed;
 
@@ -3111,7 +3111,7 @@ return -1;
 }
 
 /* Parse one line-speed string and return the configured delay. */
-static int32 _tmln_speed_delta (CONST char *cptr)
+static int32 _tmln_speed_delta (const char *cptr)
 {
 int32 nspeed;
 int nfactor = 1;
@@ -3133,10 +3133,10 @@ lp->modem_control = enab_disab;
 return SCPE_OK;
 }
 
-t_stat tmxr_set_line_speed (TMLN *lp, CONST char *speed)
+t_stat tmxr_set_line_speed (TMLN *lp, const char *speed)
 {
 UNIT *uptr;
-CONST char *cptr;
+const char *cptr;
 t_stat r;
 uint32 rxbps;
 
@@ -3212,7 +3212,7 @@ static const char* _tmxr_getname (int number, char *name, size_t name_size)
 
 */
 
-t_stat tmxr_open_master (TMXR *mp, CONST char *cptr)
+t_stat tmxr_open_master (TMXR *mp, const char *cptr)
 {
 int32 i, line, nextline = -1;
 char tbuf[CBUFSIZE], listen[CBUFSIZE], destination[CBUFSIZE],
@@ -3227,7 +3227,7 @@ FRAMER *framer_s;
 ETH_DEV *eth;
 SOCKET sock;
 SERHANDLE serport;
-CONST char *tptr = cptr;
+const char *tptr = cptr;
 t_bool nolog, notelnet, listennotelnet, nomessage, listennomessage, modem_control, loopback, datagram, packet, disabled;
 TMLN *lp;
 t_stat r = SCPE_OK;
@@ -3277,7 +3277,7 @@ while (*tptr) {
         cptr = tbuf;
         if (!isdigit(*cptr)) {
             char gbuf[CBUFSIZE];
-            CONST char *init_cptr = cptr;
+            const char *init_cptr = cptr;
 
             cptr = get_glyph (cptr, gbuf, '=');
             if (0 == MATCH_CMD (gbuf, "LINE")) {
@@ -4470,7 +4470,7 @@ return sim_add_debug_flags (dptr, tmxr_debug);
 
 /* Attach unit to master socket */
 
-t_stat tmxr_attach_ex (TMXR *mp, UNIT *uptr, CONST char *cptr, t_bool async)
+t_stat tmxr_attach_ex (TMXR *mp, UNIT *uptr, const char *cptr, t_bool async)
 {
 t_stat r;
 int32 i;
@@ -4645,7 +4645,7 @@ return SCPE_OK;
 }
 
 
-t_stat tmxr_show_open_devices (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, CONST char* cptr)
+t_stat tmxr_show_open_devices (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, const char* cptr)
 {
 int i;
 char gbuf[CBUFSIZE];
@@ -5461,7 +5461,7 @@ if (lp->txstall)
     1. This function is usually called as an MTAB processing routine.
 */
 
-t_stat tmxr_dscln (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tmxr_dscln (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 TMXR *mp = (TMXR *) desc;
 TMLN *lp;
@@ -5494,7 +5494,7 @@ return SCPE_OK;
 
 /* Enable logging for line */
 
-t_stat tmxr_set_log (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tmxr_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 TMXR *mp = (TMXR *) desc;
 TMLN *lp;
@@ -5524,7 +5524,7 @@ return SCPE_OK;
 
 /* Disable logging for line */
 
-t_stat tmxr_set_nolog (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tmxr_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 TMXR *mp = (TMXR *) desc;
 TMLN *lp;
@@ -5548,7 +5548,7 @@ return SCPE_OK;
 
 /* Show logging status for line */
 
-t_stat tmxr_show_log (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat tmxr_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 const TMXR *mp = (const TMXR *) desc;
 TMLN *lp;
@@ -5609,7 +5609,7 @@ return SCPE_OK;
    If an error occurs, the original line order is not disturbed.
 */
 
-t_stat tmxr_set_lnorder (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat tmxr_set_lnorder (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 TMXR   *mp = (TMXR *) desc;
 char   *tbuf = NULL;
@@ -5736,7 +5736,7 @@ return result;                                          /* return the status */
    the end of the order list.
 */
 
-t_stat tmxr_show_lnorder (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat tmxr_show_lnorder (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 int32 i, j, low, last;
 const TMXR *mp = (const TMXR *) desc;
@@ -5788,7 +5788,7 @@ return SCPE_OK;
 
 /* Show summary processor */
 
-t_stat tmxr_show_summ (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat tmxr_show_summ (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 const TMXR *mp = (const TMXR *) desc;
 int32 i, t;
@@ -5807,7 +5807,7 @@ return SCPE_OK;
 
 /* Show conn/stat processor */
 
-t_stat tmxr_show_cstat (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat tmxr_show_cstat (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 const TMXR *mp = (const TMXR *) desc;
 int32 i, any;
@@ -5833,12 +5833,12 @@ return SCPE_OK;
 
 /* Show synchronous devices */
 
-t_stat tmxr_show_sync_devices (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, CONST char *desc)
+t_stat tmxr_show_sync_devices (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, const char *desc)
 {
 return tmxr_show_sync (st, uptr, val, NULL);
 }
 
-t_stat tmxr_show_sync (FILE* st, UNIT* uptr, int32 val, CONST void *desc)
+t_stat tmxr_show_sync (FILE* st, UNIT* uptr, int32 val, const void *desc)
 {
   ETH_LIST  list[ETH_MAX_DEVICE];
   int number, fcnt = 0;
@@ -5862,7 +5862,7 @@ t_stat tmxr_show_sync (FILE* st, UNIT* uptr, int32 val, CONST void *desc)
 
 /* Show number of lines */
 
-t_stat tmxr_show_lines (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat tmxr_show_lines (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 const TMXR *mp = (const TMXR *) desc;
 

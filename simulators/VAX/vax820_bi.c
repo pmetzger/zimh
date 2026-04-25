@@ -88,8 +88,8 @@ extern int32 tmr_int, tti_int, tto_int, fl_int;
 extern int32 cur_cpu;
 
 t_stat bi_reset (DEVICE *dptr);
-t_stat vax820_boot (int32 flag, CONST char *ptr);
-t_stat vax820_boot_parse (int32 flag, CONST char *ptr);
+t_stat vax820_boot (int32 flag, const char *ptr);
+t_stat vax820_boot_parse (int32 flag, const char *ptr);
 t_stat cpu_boot (int32 unitno, DEVICE *dptr);
 
 extern void uba_eval_int (void);
@@ -616,7 +616,7 @@ return cc;
    Sets up R0-R5, calls SCP boot processor with effective BOOT CPU
 */
 
-t_stat vax820_boot (int32 flag, CONST char *ptr)
+t_stat vax820_boot (int32 flag, const char *ptr)
 {
 t_stat r;
 
@@ -632,7 +632,7 @@ strncpy (cpu_boot_cmd, ptr, CBUFSIZE-1);                /* save for reboot */
 return run_cmd (flag, "CPU");
 }
 
-t_stat vax820_boot_parse (int32 flag, CONST char *ptr)
+t_stat vax820_boot_parse (int32 flag, const char *ptr)
 {
 char gbuf[CBUFSIZE];
 char *slptr;
@@ -714,7 +714,7 @@ return SCPE_OK;
 
 /* Show nexus */
 
-t_stat show_nexus (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat show_nexus (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "nexus=%d", val);
 return SCPE_OK;
@@ -792,7 +792,7 @@ for (i = 0; (dptr = sim_devices[i]) != NULL; i++) {     /* loop thru dev */
 return SCPE_OK;
 }
 
-t_stat cpu_set_model (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if (cptr == NULL)
     return SCPE_ARG;

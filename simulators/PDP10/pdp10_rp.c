@@ -371,13 +371,13 @@ int32 rp_inta (void);
 t_stat rp_svc (UNIT *uptr);
 t_stat rp_reset (DEVICE *dptr);
 t_stat rp_boot (int32 unitno, DEVICE *dptr);
-t_stat rp_attach (UNIT *uptr, CONST char *cptr);
+t_stat rp_attach (UNIT *uptr, const char *cptr);
 t_stat rp_detach (UNIT *uptr);
 void set_rper (int16 flag, int32 drv);
 void update_rpcs (int32 flags, int32 drv);
 void rp_go (int32 drv, int32 fnc);
-t_stat rp_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
-t_stat rp_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat rp_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat rp_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat rp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char *rp_description (DEVICE *dptr);
 
@@ -1144,7 +1144,7 @@ return SCPE_OK;
 
 /* Device attach */
 
-t_stat rp_attach (UNIT *uptr, CONST char *cptr)
+t_stat rp_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
 static const char *drives[] = {"RM03", "RP04", "RM80", "RP06", "RM05", "RP07", NULL};
@@ -1187,7 +1187,7 @@ return sim_disk_detach (uptr);
 
 /* Set type command validation routine */
 
-t_stat rp_set_type (UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat rp_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 if ((val < 0) || (cptr && *cptr))
     return SCPE_ARG;
@@ -1200,7 +1200,7 @@ return SCPE_OK;
 
 /* Show unit type */
 
-t_stat rp_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat rp_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 fprintf (st, "%s", drv_tab[GET_DTYPE (uptr->flags)].name);
 return SCPE_OK;

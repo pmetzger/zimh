@@ -434,7 +434,7 @@ uba_rh_read(DEVICE *dptr, t_addr addr, uint16 *data, int32 access) {
 extern uint32  eb_ptr;
 
 t_stat
-rh_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+rh_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     DEVICE *dptr;
     DIB    *dibp;
@@ -449,7 +449,7 @@ rh_set_type(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat rh_show_type (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat rh_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
    DEVICE *dptr;
 

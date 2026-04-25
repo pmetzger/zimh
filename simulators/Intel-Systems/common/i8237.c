@@ -243,10 +243,10 @@
 
 t_stat i8237_cfg(uint16 base, uint16 devnum, uint8 dummy);
 t_stat i8237_clr(void);
-t_stat i8237_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc);
+t_stat i8237_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat i8237_reset (DEVICE *dptr);
 void i8237_reset_dev (void);
-t_stat i8237_set_mode (UNIT *uptr, int32 val, CONST char *cptr, void *desc);
+t_stat i8237_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc);
 uint8 i8237_r0x(t_bool io, uint8 data, uint8 devnum);
 uint8 i8237_r1x(t_bool io, uint8 data, uint8 devnum);
 uint8 i8237_r2x(t_bool io, uint8 data, uint8 devnum);
@@ -426,7 +426,7 @@ t_stat i8237_clr(void)
 
 // show configuration parameters
 
-t_stat i8237_show_param (FILE *st, UNIT *uptr, int32 val, CONST void *desc)
+t_stat i8237_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
@@ -467,7 +467,7 @@ void i8237_reset_dev()
 /* i8237 set mode = 8- or 16-bit data bus */
 /* always 8-bit mode for current simulators */
 
-t_stat i8237_set_mode(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
+t_stat i8237_set_mode(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     sim_debug (DEBUG_flow, &i8237_dev, "   i8237_set_mode: Entered with val=%08XH uptr->flags=%08X\n", val, uptr->flags);
     sim_debug (DEBUG_flow, &i8237_dev, "   i8237_set_mode: Done\n");
