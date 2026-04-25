@@ -772,6 +772,7 @@ while (reason == 0) {                                   /* loop until halted */
     case 011:                                           /* LAC, indir */
         if (Ia (MA, &MA, 0))
             break;
+        FALLTHROUGH;
     case 010:                                           /* LAC, dir */
         INDEX (IR, MA);
         if (Read (MA, &MB, RD))
@@ -784,6 +785,7 @@ while (reason == 0) {                                   /* loop until halted */
     case 003:                                           /* DAC, indir */
         if (Ia (MA, &MA, 0))
             break;
+        FALLTHROUGH;
     case 002:                                           /* DAC, dir */
         INDEX (IR, MA);
         Write (MA, LAC & DMASK, WR);
@@ -794,6 +796,7 @@ while (reason == 0) {                                   /* loop until halted */
     case 007:                                           /* DZM, indir */
         if (Ia (MA, &MA, 0))
             break;
+        FALLTHROUGH;
     case 006:                                           /* DZM, direct */
         INDEX (IR, MA);
         Write (MA, 0, WR);
@@ -804,6 +807,7 @@ while (reason == 0) {                                   /* loop until halted */
     case 025:                                           /* AND, ind */
         if (Ia (MA, &MA, 0))
             break;
+        FALLTHROUGH;
     case 024:                                           /* AND, dir */
         INDEX (IR, MA);
         if (Read (MA, &MB, RD))
@@ -816,6 +820,7 @@ while (reason == 0) {                                   /* loop until halted */
     case 013:                                           /* XOR, ind */
         if (Ia (MA, &MA, 0))
             break;
+        FALLTHROUGH;
     case 012:                                           /* XOR, dir */
         INDEX (IR, MA);
         if (Read (MA, &MB, RD))
@@ -828,6 +833,7 @@ while (reason == 0) {                                   /* loop until halted */
     case 015:                                           /* ADD, indir */
         if (Ia (MA, &MA, 0))
             break;
+        FALLTHROUGH;
     case 014:                                           /* ADD, dir */
         INDEX (IR, MA);
         if (Read (MA, &MB, RD))
@@ -845,6 +851,7 @@ while (reason == 0) {                                   /* loop until halted */
     case 017:                                           /* TAD, indir */
         if (Ia (MA, &MA, 0))
             break;
+        FALLTHROUGH;
     case 016:                                           /* TAD, dir */
         INDEX (IR, MA);
         if (Read (MA, &MB, RD))
@@ -857,6 +864,7 @@ while (reason == 0) {                                   /* loop until halted */
     case 023:                                           /* ISZ, indir */
         if (Ia (MA, &MA, 0))
             break;
+        FALLTHROUGH;
     case 022:                                           /* ISZ, dir */
         INDEX (IR, MA);
         if (Read (MA, &MB, RD))
@@ -873,6 +881,7 @@ while (reason == 0) {                                   /* loop until halted */
     case 027:                                           /* SAD, indir */
         if (Ia (MA, &MA, 0))
             break;
+        FALLTHROUGH;
     case 026:                                           /* SAD, dir */
         INDEX (IR, MA);
         if (Read (MA, &MB, RD))
@@ -886,6 +895,7 @@ while (reason == 0) {                                   /* loop until halted */
     case 021:                                           /* XCT, indir */
         if (Ia (MA, &MA, 0))
             break;
+        FALLTHROUGH;
     case 020:                                           /* XCT, dir  */
         INDEX (IR, MA);
         if ((api_usmd | usmd) && (xct_count != 0)) {    /* chained and usmd? */
@@ -926,9 +936,12 @@ while (reason == 0) {                                   /* loop until halted */
         usmd = usmd_buf = 0;                            /* clear user mode */
         if ((cpu_unit.flags & UNIT_NOAPI) == 0) {       /* if API, act lvl 4 */
 #if defined (PDP15)                                     /* PDP15: if 0-3 inactive */
-          if ((api_act & (API_ML0|API_ML1|API_ML2|API_ML3)) == 0)
-#endif
+            if ((api_act & (API_ML0|API_ML1|API_ML2|API_ML3)) == 0) {
+                api_act = api_act | API_ML4;
+            }
+#else
             api_act = api_act | API_ML4;
+#endif
             api_int = api_eval (&int_pend);
             }
 #endif
@@ -947,6 +960,7 @@ while (reason == 0) {                                   /* loop until halted */
     case 005:                                           /* JMS, indir */
         if (Ia (MA, &MA, 0))
             break;
+        FALLTHROUGH;
     case 004:                                           /* JMS, dir */
         INDEX (IR, MA);
         PCQ_ENTRY;
@@ -1975,6 +1989,10 @@ int32 damask = memm? B_DAMASK: P_DAMASK;
 static const int32 g_mask[4] = { MM_G_W0, MM_G_W1, MM_G_W2, MM_G_W3 };
 t_stat sta = MM_OK;
 
+/* Shared helper signature.
+   This build variant does not use every parameter. */
+(void) jmp;
+
 if ((ma & damask & ~07) == 010) {                       /* autoincrement? */
     ma = ma & 017;                                      /* always in bank 0 */
     Read (ma, &t, DF);                                  /* +1 before use */
@@ -2138,6 +2156,10 @@ return;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 #if defined (PDP15)
 if (usmd && (sw & SWMASK ('V'))) {
     if (XVM)
@@ -2159,6 +2181,10 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 #if defined (PDP15)
 if (usmd && (sw & SWMASK ('V'))) {
     if (XVM)
@@ -2182,6 +2208,12 @@ t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 int32 mc = 0;
 uint32 i;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if ((val <= 0) || (val > MAXMEMSIZE) || ((val & 07777) != 0))
     return SCPE_ARG;
 for (i = val; i < MEMSIZE; i++)
@@ -2202,6 +2234,11 @@ DEVICE *dptr;
 DIB *dibp;
 uint32 newdev;
 t_stat r;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
 
 if (cptr == NULL)
     return SCPE_ARG;
@@ -2227,6 +2264,11 @@ t_stat show_devno (FILE *st, UNIT *uptr, int32 val, const void *desc)
 DEVICE *dptr;
 DIB *dibp;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 if (uptr == NULL)
     return SCPE_IERR;
 dptr = find_dev_from_unit (uptr);
@@ -2243,8 +2285,13 @@ return SCPE_OK;
 
 /* CPU device handler - should never get here! */
 
-int32 bad_dev (int32 dev, int32 pulse, int32 AC)
+static int32 bad_dev (int32 dev, int32 pulse, int32 AC)
 {
+/* Device dispatch signature.
+   This fallback does not use every parameter. */
+(void) dev;
+(void) pulse;
+
 return (SCPE_IERR << IOT_V_REASON) | AC;                /* broken! */
 }
 
@@ -2297,6 +2344,11 @@ t_stat set_3cyc_reg (UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat r;
 int32 newv;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if (cptr == NULL)
     return SCPE_ARG;
 newv = (int32) get_uint (cptr, 8, 0777777, &r);
@@ -2310,6 +2362,10 @@ return SCPE_OK;
 
 t_stat show_3cyc_reg (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 fprintf (st, "%s=", (const char *) desc);
 fprint_val (st, (t_value) M[val], 8, 18, PV_RZRO);
 return SCPE_OK;
@@ -2321,6 +2377,12 @@ t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 i, lnt;
 t_stat r;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
 
 if (cptr == NULL) {
     for (i = 0; i < hst_lnt; i++)
@@ -2356,6 +2418,11 @@ const char *cptr = (const char *) desc;
 t_value sim_eval[2];
 t_stat r;
 InstHistory *h;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
 
 if (hst_lnt == 0)                                       /* enabled? */
     return SCPE_NOFNC;
