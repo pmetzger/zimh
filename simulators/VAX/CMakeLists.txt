@@ -545,6 +545,26 @@ add_simulator(vax780
     PKG_FAMILY vax_family
     TEST vax-diag)
 
+find_package(Python3 COMPONENTS Interpreter)
+if (Python3_Interpreter_FOUND)
+    set(vax780_fp_smoke_dir
+        "${CMAKE_CURRENT_BINARY_DIR}/tests/vax780-fp-overflow-smoke")
+    file(MAKE_DIRECTORY "${vax780_fp_smoke_dir}")
+    add_test(
+        NAME simh-vax780-fp-overflow-smoke
+        COMMAND
+            ${Python3_EXECUTABLE}
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/vax780_fp_overflow_smoke.py"
+            $<TARGET_FILE:vax780>
+            --work-dir
+            "${vax780_fp_smoke_dir}")
+    set_tests_properties(
+        simh-vax780-fp-overflow-smoke
+        PROPERTIES
+            LABELS "simh;integration;simh-VAX"
+            ENVIRONMENT "SIMH_TEST_OUTPUT_DIR=${vax780_fp_smoke_dir}")
+endif ()
+
 add_simulator(vax8200
     SOURCES
         vax_cpu.c
