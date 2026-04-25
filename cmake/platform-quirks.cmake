@@ -135,7 +135,6 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES ".*Clang")
     # Turn on warnings about strict overflow/potential overflows.
     ## LIST(APPEND EXTRA_TARGET_CFLAGS "-Wall" "-fno-inline" "-fstrict-overflow" "-Wstrict-overflow=3")
     LIST(APPEND EXTRA_TARGET_CFLAGS
-        "-U__STRICT_ANSI__"
         "$<$<CONFIG:Debug>:$<$<OR:$<BOOL:${DEBUG_WALL}>,$<BOOL:${DEBUG_WARNINGS}>>:-Wall>>"
         "$<$<CONFIG:Release>:-Wall>"
         "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wextra>>"
