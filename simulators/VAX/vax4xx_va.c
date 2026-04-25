@@ -927,7 +927,7 @@ switch (src) {
         }
 }
 
-static SIM_INLINE void va_invalidate (uint32 y1, uint32 y2)
+static inline void va_invalidate (uint32 y1, uint32 y2)
 {
 uint32 ln;
 

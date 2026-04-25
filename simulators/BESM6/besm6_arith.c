@@ -45,7 +45,7 @@ static alureg_t toalu (t_value val)
     return ret;
 }
 
-static int SIM_INLINE is_negative (alureg_t *word)
+static inline int is_negative (alureg_t *word)
 {
     return (word->mantissa & BIT41) != 0;
 }

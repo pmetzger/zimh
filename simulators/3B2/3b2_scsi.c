@@ -779,7 +779,7 @@ static void ha_build_req(uint8 tc, uint8 subdev, t_bool express)
     }
 }
 
-static SIM_INLINE void ha_cmd_prep(uint8 tc, uint8 op, uint8 subdev, t_bool express)
+static inline void ha_cmd_prep(uint8 tc, uint8 op, uint8 subdev, t_bool express)
 {
     ha_state.ts[tc].pending = TRUE;
     ha_state.ts[tc].rep.op = op;

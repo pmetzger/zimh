@@ -1267,7 +1267,7 @@ switch (spx_upc) {
 return SCPE_OK;
 }
 
-static SIM_INLINE void ve_invalidate (uint32 y1, uint32 y2)
+static inline void ve_invalidate (uint32 y1, uint32 y2)
 {
 uint32 ln;
 

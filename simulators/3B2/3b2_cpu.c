@@ -83,39 +83,39 @@ static uint32 cpu_effective_address(operand * op);
 static uint32 cpu_read_op(operand * op);
 static void cpu_write_op(operand * op, t_uint64 val);
 static void cpu_set_nz_flags(t_uint64 data, operand * op);
-static SIM_INLINE void cpu_on_normal_exception(uint8 isc);
-static SIM_INLINE void cpu_on_stack_exception(uint8 isc);
-static SIM_INLINE void cpu_on_process_exception(uint8 isc);
-static SIM_INLINE void cpu_on_reset_exception(uint8 isc);
-static SIM_INLINE void cpu_perform_gate(uint32 index1, uint32 index2);
-static SIM_INLINE void clear_instruction(instr *inst);
-static SIM_INLINE int8 op_type(operand *op);
-static SIM_INLINE t_bool op_signed(operand *op);
-static SIM_INLINE uint32 sign_extend_b(uint8 val);
-static SIM_INLINE uint32 sign_extend_h(uint16 val);
-static SIM_INLINE t_bool cpu_z_flag(void);
-static SIM_INLINE t_bool cpu_n_flag(void);
-static SIM_INLINE t_bool cpu_c_flag(void);
-static SIM_INLINE t_bool cpu_v_flag(void);
-static SIM_INLINE void cpu_set_z_flag(t_bool val);
-static SIM_INLINE void cpu_set_n_flag(t_bool val);
-static SIM_INLINE void cpu_set_c_flag(t_bool val);
-static SIM_INLINE void cpu_set_v_flag(t_bool val);
-static SIM_INLINE void cpu_set_v_flag_op(t_uint64 val, operand *op);
-static SIM_INLINE uint8 cpu_execution_level(void);
-static SIM_INLINE void cpu_push_word(uint32 val);
-static SIM_INLINE uint32 cpu_pop_word(void);
-static SIM_INLINE void irq_push_word(uint32 val);
-static SIM_INLINE uint32 irq_pop_word(void);
-static SIM_INLINE void cpu_context_switch_1(uint32 pcbp);
-static SIM_INLINE void cpu_context_switch_2(uint32 pcbp);
-static SIM_INLINE void cpu_context_switch_3(uint32 pcbp);
-static SIM_INLINE t_bool op_is_psw(operand *op);
-static SIM_INLINE void add(t_uint64 a, t_uint64 b, operand *dst);
-static SIM_INLINE void sub(t_uint64 a, t_uint64 b, operand *dst);
+static inline void cpu_on_normal_exception(uint8 isc);
+static inline void cpu_on_stack_exception(uint8 isc);
+static inline void cpu_on_process_exception(uint8 isc);
+static inline void cpu_on_reset_exception(uint8 isc);
+static inline void cpu_perform_gate(uint32 index1, uint32 index2);
+static inline void clear_instruction(instr *inst);
+static inline int8 op_type(operand *op);
+static inline t_bool op_signed(operand *op);
+static inline uint32 sign_extend_b(uint8 val);
+static inline uint32 sign_extend_h(uint16 val);
+static inline t_bool cpu_z_flag(void);
+static inline t_bool cpu_n_flag(void);
+static inline t_bool cpu_c_flag(void);
+static inline t_bool cpu_v_flag(void);
+static inline void cpu_set_z_flag(t_bool val);
+static inline void cpu_set_n_flag(t_bool val);
+static inline void cpu_set_c_flag(t_bool val);
+static inline void cpu_set_v_flag(t_bool val);
+static inline void cpu_set_v_flag_op(t_uint64 val, operand *op);
+static inline uint8 cpu_execution_level(void);
+static inline void cpu_push_word(uint32 val);
+static inline uint32 cpu_pop_word(void);
+static inline void irq_push_word(uint32 val);
+static inline uint32 irq_pop_word(void);
+static inline void cpu_context_switch_1(uint32 pcbp);
+static inline void cpu_context_switch_2(uint32 pcbp);
+static inline void cpu_context_switch_3(uint32 pcbp);
+static inline t_bool op_is_psw(operand *op);
+static inline void add(t_uint64 a, t_uint64 b, operand *dst);
+static inline void sub(t_uint64 a, t_uint64 b, operand *dst);
 #if defined(REV3)
-static SIM_INLINE uint8 add_bcd(uint8 a, uint8 b);
-static SIM_INLINE uint8 sub_bcd(uint8 a, uint8 b);
+static inline uint8 add_bcd(uint8 a, uint8 b);
+static inline uint8 sub_bcd(uint8 a, uint8 b);
 #endif
 
 /* RO memory. */
@@ -1757,7 +1757,7 @@ t_stat cpu_set_size(UNIT *uptr, int32 val, CONST char *cptr, void *desc)
     return SCPE_OK;
 }
 
-static SIM_INLINE void clear_instruction(instr *inst)
+static inline void clear_instruction(instr *inst)
 {
     uint8 i;
 
@@ -2121,7 +2121,7 @@ uint8 decode_instruction(instr *instr)
     return offset;
 }
 
-static SIM_INLINE void cpu_context_switch_3(uint32 new_pcbp)
+static inline void cpu_context_switch_3(uint32 new_pcbp)
 {
     if (R[NUM_PSW] & PSW_R_MASK) {
 
@@ -2149,7 +2149,7 @@ static SIM_INLINE void cpu_context_switch_3(uint32 new_pcbp)
     }
 }
 
-static SIM_INLINE void cpu_context_switch_2(uint32 new_pcbp)
+static inline void cpu_context_switch_2(uint32 new_pcbp)
 {
     R[NUM_PCBP] = new_pcbp;
 
@@ -2166,7 +2166,7 @@ static SIM_INLINE void cpu_context_switch_2(uint32 new_pcbp)
     }
 }
 
-static SIM_INLINE void cpu_context_switch_1(uint32 new_pcbp)
+static inline void cpu_context_switch_1(uint32 new_pcbp)
 {
     /* Save the current PC in PCB */
     write_w(R[NUM_PCBP] + 4, R[NUM_PC], BUS_CPU);
@@ -3945,7 +3945,7 @@ t_stat sim_instr(void)
     return stop_reason;
 }
 
-static SIM_INLINE void cpu_on_process_exception(uint8 isc)
+static inline void cpu_on_process_exception(uint8 isc)
 {
     uint32 new_pcbp;
 
@@ -3972,7 +3972,7 @@ static SIM_INLINE void cpu_on_process_exception(uint8 isc)
     return;
 }
 
-static SIM_INLINE void cpu_on_reset_exception(uint8 isc)
+static inline void cpu_on_reset_exception(uint8 isc)
 {
     uint32 new_pcbp;
 
@@ -3998,7 +3998,7 @@ static SIM_INLINE void cpu_on_reset_exception(uint8 isc)
     abort_context = C_NONE;
 }
 
-static SIM_INLINE void cpu_on_stack_exception(uint8 isc)
+static inline void cpu_on_stack_exception(uint8 isc)
 {
     uint32 new_pcbp;
 
@@ -4030,7 +4030,7 @@ static SIM_INLINE void cpu_on_stack_exception(uint8 isc)
     abort_context = C_NONE;
 }
 
-static SIM_INLINE void cpu_on_normal_exception(uint8 isc)
+static inline void cpu_on_normal_exception(uint8 isc)
 {
     sim_debug(EXECUTE_MSG, &cpu_dev,
               "[cpu_on_normal_exception %d] %%sp=%08x abort_context=%d\n",
@@ -4071,7 +4071,7 @@ static SIM_INLINE void cpu_on_normal_exception(uint8 isc)
     abort_context = C_NONE;
 }
 
-static SIM_INLINE void cpu_perform_gate(uint32 index1, uint32 index2)
+static inline void cpu_perform_gate(uint32 index1, uint32 index2)
 {
     uint32 gate_l2, new_psw;
 
@@ -4530,7 +4530,7 @@ static void cpu_write_op(operand * op, t_uint64 val)
  * Returns the correct datatype for an operand -- either extended type
  * or default type.
  */
-static SIM_INLINE int8 op_type(operand *op) {
+static inline int8 op_type(operand *op) {
     if (op->etype > -1) {
         return op->etype;
     } else {
@@ -4538,18 +4538,18 @@ static SIM_INLINE int8 op_type(operand *op) {
     }
 }
 
-static SIM_INLINE t_bool op_signed(operand *op) {
+static inline t_bool op_signed(operand *op) {
     return (op_type(op) == WD || op_type(op) == HW || op_type(op) == SB);
 }
 
-static SIM_INLINE uint32 sign_extend_b(uint8 val)
+static inline uint32 sign_extend_b(uint8 val)
 {
     if (val & 0x80)
         return ((uint32) val) | 0xffffff00;
     return (uint32) val;
 }
 
-static SIM_INLINE uint32 sign_extend_h(uint16 val)
+static inline uint32 sign_extend_h(uint16 val)
 {
     if (val & 0x8000)
         return ((uint32) val) | 0xffff0000;
@@ -4559,39 +4559,39 @@ static SIM_INLINE uint32 sign_extend_h(uint16 val)
 /*
  * Returns the current CPU execution level.
  */
-static SIM_INLINE uint8 cpu_execution_level(void)
+static inline uint8 cpu_execution_level(void)
 {
     return (R[NUM_PSW] & PSW_CM_MASK) >> PSW_CM;
 }
 
-static SIM_INLINE t_bool cpu_z_flag(void)
+static inline t_bool cpu_z_flag(void)
 {
     return (R[NUM_PSW] & PSW_Z_MASK) != 0;
 }
 
-static SIM_INLINE t_bool cpu_n_flag(void)
+static inline t_bool cpu_n_flag(void)
 {
     return (R[NUM_PSW] & PSW_N_MASK) != 0;
 }
 
-static SIM_INLINE t_bool cpu_c_flag(void)
+static inline t_bool cpu_c_flag(void)
 {
     return (R[NUM_PSW] & PSW_C_MASK) != 0;
 }
 
-static SIM_INLINE t_bool cpu_v_flag(void)
+static inline t_bool cpu_v_flag(void)
 {
     return (R[NUM_PSW] & PSW_V_MASK) != 0;
 }
 
 #if defined(REV3)
-static SIM_INLINE t_bool cpu_x_flag(void)
+static inline t_bool cpu_x_flag(void)
 {
     return (R[NUM_PSW] & PSW_X_MASK) != 0;
 }
 #endif
 
-static SIM_INLINE void cpu_set_z_flag(t_bool val)
+static inline void cpu_set_z_flag(t_bool val)
 {
     if (val) {
         R[NUM_PSW] |= PSW_Z_MASK;
@@ -4600,7 +4600,7 @@ static SIM_INLINE void cpu_set_z_flag(t_bool val)
     }
 }
 
-static SIM_INLINE void cpu_set_n_flag(t_bool val)
+static inline void cpu_set_n_flag(t_bool val)
 {
     if (val) {
         R[NUM_PSW] |= PSW_N_MASK;
@@ -4609,7 +4609,7 @@ static SIM_INLINE void cpu_set_n_flag(t_bool val)
     }
 }
 
-static SIM_INLINE void cpu_set_c_flag(t_bool val)
+static inline void cpu_set_c_flag(t_bool val)
 {
     if (val) {
         R[NUM_PSW] |= PSW_C_MASK;
@@ -4619,7 +4619,7 @@ static SIM_INLINE void cpu_set_c_flag(t_bool val)
 }
 
 #if defined(REV3)
-static SIM_INLINE void cpu_set_x_flag(t_bool val)
+static inline void cpu_set_x_flag(t_bool val)
 {
     if (val) {
         R[NUM_PSW] |= PSW_X_MASK;
@@ -4629,7 +4629,7 @@ static SIM_INLINE void cpu_set_x_flag(t_bool val)
 }
 #endif
 
-static SIM_INLINE void cpu_set_v_flag_op(t_uint64 val, operand *op)
+static inline void cpu_set_v_flag_op(t_uint64 val, operand *op)
 {
     switch(op_type(op)) {
     case WD:
@@ -4648,7 +4648,7 @@ static SIM_INLINE void cpu_set_v_flag_op(t_uint64 val, operand *op)
     }
 }
 
-static SIM_INLINE void cpu_set_v_flag(t_bool val)
+static inline void cpu_set_v_flag(t_bool val)
 {
     if (val) {
         R[NUM_PSW] |= PSW_V_MASK;
@@ -4683,13 +4683,13 @@ static void cpu_set_nz_flags(t_uint64 data, operand *dst)
     }
 }
 
-static SIM_INLINE void cpu_push_word(uint32 val)
+static inline void cpu_push_word(uint32 val)
 {
     write_w(R[NUM_SP], val, BUS_CPU);
     R[NUM_SP] += 4;
 }
 
-static SIM_INLINE uint32 cpu_pop_word(void)
+static inline uint32 cpu_pop_word(void)
 {
     uint32 result;
     /* We always read fromthe stack first BEFORE decrementing,
@@ -4699,24 +4699,24 @@ static SIM_INLINE uint32 cpu_pop_word(void)
     return result;
 }
 
-static SIM_INLINE void irq_push_word(uint32 val)
+static inline void irq_push_word(uint32 val)
 {
     write_w(R[NUM_ISP], val, BUS_CPU);
     R[NUM_ISP] += 4;
 }
 
-static SIM_INLINE uint32 irq_pop_word(void)
+static inline uint32 irq_pop_word(void)
 {
     R[NUM_ISP] -= 4;
     return read_w(R[NUM_ISP], ACC_AF, BUS_CPU);
 }
 
-static SIM_INLINE t_bool op_is_psw(operand *op)
+static inline t_bool op_is_psw(operand *op)
 {
     return (op->mode == 4 && op->reg == NUM_PSW);
 }
 
-static SIM_INLINE void sub(t_uint64 a, t_uint64 b, operand *dst)
+static inline void sub(t_uint64 a, t_uint64 b, operand *dst)
 {
     t_uint64 result;
 
@@ -4729,7 +4729,7 @@ static SIM_INLINE void sub(t_uint64 a, t_uint64 b, operand *dst)
     cpu_set_v_flag_op(result, dst);
 }
 
-static SIM_INLINE void add(t_uint64 a, t_uint64 b, operand *dst)
+static inline void add(t_uint64 a, t_uint64 b, operand *dst)
 {
     t_uint64 result;
 
@@ -4773,7 +4773,7 @@ static SIM_INLINE void add(t_uint64 a, t_uint64 b, operand *dst)
  * bytes. This will set the C and X carry flags appropraitely if there
  * is a carry.
  */
-static SIM_INLINE uint8 add_bcd(uint8 packed_a, uint8 packed_b)
+static inline uint8 add_bcd(uint8 packed_a, uint8 packed_b)
 {
     uint16 l, h, result;
 
@@ -4803,7 +4803,7 @@ static SIM_INLINE uint8 add_bcd(uint8 packed_a, uint8 packed_b)
  * input bytes. This will set the C and X carry flags appropraitely if
  * there is a carry.
  */
-static SIM_INLINE uint8 sub_bcd(uint8 packed_a, uint8 packed_b)
+static inline uint8 sub_bcd(uint8 packed_a, uint8 packed_b)
 {
     uint16 l, h, result;
 

@@ -47,7 +47,7 @@ static t_bool ecc_err;   /* ECC multi-bit error */
  *
  * Checking and setting of ECC syndrome bits is a no-op for Rev 2.
  */
-static SIM_INLINE void check_ecc(uint32 pa, t_bool write, uint8 src)
+static inline void check_ecc(uint32 pa, t_bool write, uint8 src)
 {
 #if defined(REV3)
     /* Force ECC Syndrome mode enables a diagnostic mode on the AM2960

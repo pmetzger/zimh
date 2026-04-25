@@ -59,7 +59,7 @@
 #define POLLING(id)         ((id_dtlh & ID_DTLH_POLL) == 0)
 
 /* Static function declarations */
-static SIM_INLINE t_lba id_lba(uint16 cyl, uint8 head, uint8 sec);
+static inline t_lba id_lba(uint16 cyl, uint8 head, uint8 sec);
 
 /* DMAC request */
 t_bool id_drq = FALSE;
@@ -174,31 +174,31 @@ DEVICE id_dev = {
         }                                                \
     }
 
-static SIM_INLINE void id_set_status(uint8 flags)
+static inline void id_set_status(uint8 flags)
 {
     id_status |= flags;
     UPDATE_INT;
 }
 
-static SIM_INLINE void id_clr_status(uint8 flags)
+static inline void id_clr_status(uint8 flags)
 {
     id_status &= ~(flags);
     UPDATE_INT;
 }
 
-static SIM_INLINE void id_set_srqm(t_bool state)
+static inline void id_set_srqm(t_bool state)
 {
     id_srqm = state;
     UPDATE_INT;
 }
 
-static SIM_INLINE void id_clear_fifo(void)
+static inline void id_clear_fifo(void)
 {
     id_dpr = 0;
     id_dpw = 0;
 }
 
-static SIM_INLINE void id_activate(UNIT *uptr, int32 delay)
+static inline void id_activate(UNIT *uptr, int32 delay)
 {
     sim_activate_abs(uptr, delay);
 }
@@ -405,7 +405,7 @@ static t_lba id_lba(uint16 cyl, uint8 head, uint8 sec)
 
 /* At the end of each sector read or write, we update the FIFO
  * with the correct return parameters. */
-static void SIM_INLINE id_end_rw(uint8 est)
+static inline void id_end_rw(uint8 est)
 {
     uint8 id = id_sel_unit->u3;
 
@@ -421,7 +421,7 @@ static void SIM_INLINE id_end_rw(uint8 est)
 
 /* The controller wraps id_lsn, id_lhn, and id_lcnl on each sector
  * read, so that they point to the next C/H/S */
-static void SIM_INLINE id_update_chs(void)
+static inline void id_update_chs(void)
 {
     uint8 id = id_sel_unit->u3;
 

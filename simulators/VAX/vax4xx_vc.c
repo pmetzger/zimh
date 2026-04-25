@@ -352,7 +352,7 @@ if ((vc_dev.dctrl & DBG_CURSOR) && (vc_dev.dctrl & DBG_TCURSOR)) {
 vid_set_cursor (visible, 16, 16, data, mask, 0, 0);
 }
 
-static SIM_INLINE void vc_invalidate (uint32 y1, uint32 y2)
+static inline void vc_invalidate (uint32 y1, uint32 y2)
 {
 uint32 ln;
 

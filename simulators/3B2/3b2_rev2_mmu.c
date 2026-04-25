@@ -87,7 +87,7 @@ DEVICE mmu_dev = {
 /*
  * Find an SD in the cache.
  */
-static SIM_INLINE t_stat get_sdce(uint32 va, uint32 *sd0, uint32 *sd1)
+static inline t_stat get_sdce(uint32 va, uint32 *sd0, uint32 *sd1)
 {
     uint32 tag, sdch, sdcl;
     uint8 ci;
@@ -111,7 +111,7 @@ static SIM_INLINE t_stat get_sdce(uint32 va, uint32 *sd0, uint32 *sd1)
  * Find a PD in the cache. Sets both the PD and the cached access
  * permissions.
  */
-static SIM_INLINE t_stat get_pdce(uint32 va, uint32 *pd, uint8 *pd_acc)
+static inline t_stat get_pdce(uint32 va, uint32 *pd, uint8 *pd_acc)
 {
     uint32 tag, pdcll, pdclh, pdcrl, pdcrh;
     uint8 ci;
@@ -141,7 +141,7 @@ static SIM_INLINE t_stat get_pdce(uint32 va, uint32 *pd, uint8 *pd_acc)
     return SCPE_NXM;
 }
 
-static SIM_INLINE void put_sdce(uint32 va, uint32 sd0, uint32 sd1)
+static inline void put_sdce(uint32 va, uint32 sd0, uint32 sd1)
 {
     uint8 ci;
 
@@ -152,7 +152,7 @@ static SIM_INLINE void put_sdce(uint32 va, uint32 sd0, uint32 sd1)
 }
 
 
-static SIM_INLINE void put_pdce(uint32 va, uint32 sd0, uint32 pd)
+static inline void put_pdce(uint32 va, uint32 sd0, uint32 pd)
 {
     uint8  ci;
 
@@ -199,7 +199,7 @@ static SIM_INLINE void put_pdce(uint32 va, uint32 sd0, uint32 pd)
     }
 }
 
-static SIM_INLINE void flush_sdce(uint32 va)
+static inline void flush_sdce(uint32 va)
 {
     uint8 ci;
 
@@ -210,7 +210,7 @@ static SIM_INLINE void flush_sdce(uint32 va)
     }
 }
 
-static SIM_INLINE void flush_pdce(uint32 va)
+static inline void flush_pdce(uint32 va)
 {
     uint32 tag, pdcll, pdclh, pdcrl, pdcrh;
     uint8 ci;
@@ -233,7 +233,7 @@ static SIM_INLINE void flush_pdce(uint32 va)
     }
 }
 
-static SIM_INLINE void flush_cache_sec(uint8 sec)
+static inline void flush_cache_sec(uint8 sec)
 {
     int i;
 
@@ -246,7 +246,7 @@ static SIM_INLINE void flush_cache_sec(uint8 sec)
     }
 }
 
-static SIM_INLINE void flush_caches(void)
+static inline void flush_caches(void)
 {
     uint8 i;
 
@@ -255,7 +255,7 @@ static SIM_INLINE void flush_caches(void)
     }
 }
 
-static SIM_INLINE t_stat mmu_check_perm(uint8 flags, uint8 r_acc)
+static inline t_stat mmu_check_perm(uint8 flags, uint8 r_acc)
 {
     switch(MMU_PERM(flags)) {
     case 0:  /* No Access */
@@ -283,7 +283,7 @@ static SIM_INLINE t_stat mmu_check_perm(uint8 flags, uint8 r_acc)
 /*
  * Update the M (modified) or R (referenced) bit the SD and cache
  */
-static SIM_INLINE void mmu_update_sd(uint32 va, uint32 mask)
+static inline void mmu_update_sd(uint32 va, uint32 mask)
 {
     uint32 sd0;
     uint8  ci;
@@ -304,7 +304,7 @@ static SIM_INLINE void mmu_update_sd(uint32 va, uint32 mask)
 /*
  * Update the M (modified) or R (referenced) bit the PD and cache
  */
-static SIM_INLINE void mmu_update_pd(uint32 va, uint32 pd_addr, uint32 mask)
+static inline void mmu_update_pd(uint32 va, uint32 pd_addr, uint32 mask)
 {
     uint32 pd, tag, pdcll, pdclh, pdcrl, pdcrh;
     uint8  ci;

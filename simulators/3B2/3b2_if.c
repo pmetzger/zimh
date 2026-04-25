@@ -36,7 +36,7 @@
 #include "3b2_csr.h"
 
 /* Static function declarations */
-static SIM_INLINE uint32 if_lba(void);
+static inline uint32 if_lba(void);
 
 /*
  * Disk Format:
@@ -97,7 +97,7 @@ uint32   if_sec_ptr = 0;
 
 /* Function implementation */
 
-static SIM_INLINE void if_activate(uint32 delay_us)
+static inline void if_activate(uint32 delay_us)
 {
     sim_activate_after(&if_unit, delay_us);
 }
@@ -629,7 +629,7 @@ t_stat if_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 /*
  * Compute the offset of the currently selected C/H/S (in # of sectors)
  */
-static SIM_INLINE uint32 if_lba(void)
+static inline uint32 if_lba(void)
 {
     /* Reminder that sectors are numbered 1-9 instead
      * of being numbered 0-8 */

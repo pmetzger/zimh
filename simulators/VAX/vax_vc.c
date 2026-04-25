@@ -728,7 +728,7 @@ for (scrln = 0; scrln < 1024; scrln++) {
 vc_buf[rg] = nval;
 }
 
-static SIM_INLINE void vc_invalidate (uint32 y1, uint32 y2)
+static inline void vc_invalidate (uint32 y1, uint32 y2)
 {
 uint32 ln;
 

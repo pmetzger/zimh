@@ -115,14 +115,14 @@
 #define   TININESS_BEFORE_ROUNDING   TRUE
 
 /* Static function declarations */
-static SIM_INLINE void mau_case_div_zero(XFP *op1, XFP *op2, XFP *result);
+static inline void mau_case_div_zero(XFP *op1, XFP *op2, XFP *result);
 
-static SIM_INLINE void mau_exc(uint32 flag, uint32 mask);
-static SIM_INLINE void abort_on_fault(void);
-static SIM_INLINE void mau_decode(uint32 cmd, uint32 src, uint32 dst);
-static SIM_INLINE t_bool le_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1);
-static SIM_INLINE t_bool eq_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1);
-static SIM_INLINE t_bool lt_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1);
+static inline void mau_exc(uint32 flag, uint32 mask);
+static inline void abort_on_fault(void);
+static inline void mau_decode(uint32 cmd, uint32 src, uint32 dst);
+static inline t_bool le_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1);
+static inline t_bool eq_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1);
+static inline t_bool lt_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1);
 static uint8 leading_zeros(uint32 val);
 static uint8 leading_zeros_64(t_int64 val);
 static void shift_right_32_jamming(uint32 val, int16 count, uint32 *result);
@@ -384,7 +384,7 @@ CONST char *dst_op_names[16] = {
  * as a special case)
  */
 
-static SIM_INLINE void mau_case_div_zero(XFP *op1, XFP *op2, XFP *result)
+static inline void mau_case_div_zero(XFP *op1, XFP *op2, XFP *result)
 {
     mau_state.asr |= MAU_ASR_QS;
 
@@ -400,7 +400,7 @@ static SIM_INLINE void mau_case_div_zero(XFP *op1, XFP *op2, XFP *result)
     }
 }
 
-static SIM_INLINE void mau_exc(uint32 flag, uint32 mask)
+static inline void mau_exc(uint32 flag, uint32 mask)
 {
     sim_debug(TRACE_DBG, &mau_dev,
               "[mau_exc] asr=%08x flag=%08x mask=%08x\n",
@@ -432,7 +432,7 @@ static SIM_INLINE void mau_exc(uint32 flag, uint32 mask)
 /*
  * Returns true if an exceptional condition is present.
  */
-static SIM_INLINE t_bool mau_exception_present(void)
+static inline t_bool mau_exception_present(void)
 {
 
     return mau_state.asr & MAU_ASR_ECP &&
@@ -444,7 +444,7 @@ static SIM_INLINE t_bool mau_exception_present(void)
          ((mau_state.asr & MAU_ASR_QS) && (mau_state.asr & MAU_ASR_QM)));
 }
 
-static SIM_INLINE void abort_on_fault(void)
+static inline void abort_on_fault(void)
 {
     switch(mau_state.opcode) {
     case M_NOP:
@@ -541,7 +541,7 @@ t_stat mau_reset(DEVICE *dptr)
  *
  * Derived from the SoftFloat 2c package (see copyright notice above)
  */
-static SIM_INLINE t_bool le_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1)
+static inline t_bool le_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1)
 {
     return (a0 < b0) || ((a0 == b0) && (a1 <= b1));
 }
@@ -551,7 +551,7 @@ static SIM_INLINE t_bool le_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 
  *
  * Derived from the SoftFloat 2c package (see copyright notice above)
  */
-static SIM_INLINE t_bool eq_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1)
+static inline t_bool eq_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1)
 {
     return (a0 == b0) && (a1 == b1);
 }
@@ -561,7 +561,7 @@ static SIM_INLINE t_bool eq_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 
  *
  * Derived from the SoftFloat 2c package (see copyright notice above)
  */
-static SIM_INLINE t_bool lt_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1)
+static inline t_bool lt_128(t_uint64 a0, t_uint64 a1, t_uint64 b0, t_uint64 b1)
 {
     return (a0 < b0) || ((a0 == b0) && (a1 < b1));
 }
@@ -3443,7 +3443,7 @@ static void mau_remainder(void)
  * dst are optional depending on the WE32100 operand, and may be set
  * to any value if not used.
  */
-static SIM_INLINE void mau_decode(uint32 cmd, uint32 src, uint32 dst)
+static inline void mau_decode(uint32 cmd, uint32 src, uint32 dst)
 {
     mau_state.cmd = cmd;
     mau_state.src = src;
