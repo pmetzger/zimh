@@ -1565,12 +1565,14 @@ t_stat ExecOpcode(int opcode, int DA,
         case OP_WDS: // seek
             sim_debug(DEBUG_DETAIL, &cpu_dev, "... DIST: %06d%04d%c\n", printfd);
             n = abs((int)(DIST % D8)) % 1000000; // ramac operation address
+            i = (n / 100000) % 10;
+            neg = n % 10;
             sim_debug(DEBUG_DETAIL, &cpu_dev, "... RAMAC %s on Unit %d, Disk %d, Track %d, Arm %d started\n",
                      (opcode == OP_SDS) ? "SEEK" : (opcode == OP_RDS) ? "READ" : "WRITE",
-                     i=(n / 100000) % 10,  // unit
+                     i,                    // unit
                      (n / 1000) % 100,     // disk
                      (n /   10) % 100,     // track
-                     neg=(n % 10)          // arm
+                     neg                   // arm
                      );
             if (neg > 2) {
                sim_debug(DEBUG_EXP, &cpu_dev, "Arm out of range (should be 0..2)\n");
