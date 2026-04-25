@@ -178,7 +178,7 @@ uint64_t now, unixbase;
 
 unixbase = 116444736;
 unixbase *= 1000000000;
-GetSystemTimeAsFileTime((FILETIME*)&now);
+GetSystemTimePreciseAsFileTime((FILETIME*)&now);
 now -= unixbase;
 return now*100;
 }

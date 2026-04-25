@@ -18,7 +18,6 @@ At minimum:
 - `cmake`
 - `ninja`
 - `git`
-- `pkg-config`
 - `bison`
 
 For the normal default build, install these additional libraries:
@@ -61,8 +60,10 @@ Notes:
 
 - The source tree assumes a compiler with at least C11 support. A modern
   C17-capable compiler is preferred.
-- `bison` is required when regenerating parser sources from the checked-in
+- `bison` is required to regenerate parser sources from the checked-in
   `.y` grammars, including the SAGE and AltairZ80 Motorola 68000 parsers.
+- On Windows, the common WinFlexBison package installs `win_bison.exe`
+  instead of `bison.exe`. The CMake build accepts either executable name.
 - `cmocka` is for host-side unit tests rather than the historical
   simulator binaries themselves.
 - `SDL2_ttf` is the usual missing piece when a video-enabled build does
@@ -71,6 +72,8 @@ Notes:
   console input without interactive line-editing support.
   `libedit` support is not currently available for Windows because no
   port of the library to Windows exists.
+- The `VDE` library is not currently available for Windows, and so
+  building with it is not possible on that platform.
 - Some networking features may also use additional system libraries,
   such as `libpcap`, depending on the platform and enabled options.
 
@@ -89,7 +92,8 @@ Use the variant that matches your environment.
 
 If you prefer to install packages manually, make sure the compiler,
 CMake, Ninja, and the feature libraries listed above are visible through
-the normal compiler and `pkg-config` search paths.
+the normal compiler and CMake search paths. (POSIX hosts require
+packages to be visible via `pkg-config`.)
 
 ## Recommended build layout
 
@@ -247,6 +251,9 @@ Some useful CMake options:
   Disable SDL-based graphics support. Default: `On`.
 - `-DWITH_NETWORK=Off`
   Disable optional networking features. Default: `On`.
+- `-DWITH_VDE=Off`
+  Disable optional VDE networking support. Default: `On` on non-Windows
+  platforms. This option is not available on Windows.
 - `-DWARNINGS_FATAL=On`
   Treat warnings as errors. Default: `Off`.
 - `-DRELEASE_LTO=On`
@@ -312,5 +319,8 @@ pkg-config --modversion zlib
 pkg-config --modversion libedit
 bison --version
 ```
+
+- On Windows, `pkg-config` will not work. 
+- On Windows with WinFlexBison, use `win_bison --version` instead.
 
 If `SDL2_ttf` is missing, a full video-enabled build is not ready yet.

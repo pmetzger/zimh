@@ -40,6 +40,7 @@ if (WITH_NETWORK)
 
   target_include_directories(slirp
       PRIVATE
+          "${SIMH_COMPAT_ROOT}"
           "${SIMH_CORE_ROOT}"
           "${SIMH_RUNTIME_ROOT}"
           "${SIMH_THIRD_PARTY_ROOT}/slirp"

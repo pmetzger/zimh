@@ -13,7 +13,26 @@ static sim_nanosleep_fn sim_nanosleep_hook = NULL;
 /* Call the platform clock API used for wall-clock lookups. */
 static int sim_time_clock_gettime_default(int clock_id, struct timespec *tp)
 {
+#if defined(_WIN32)
+    ULARGE_INTEGER now;
+    FILETIME file_time;
+    const ULONGLONG unix_epoch = 116444736000000000ULL;
+
+    if (clock_id != CLOCK_REALTIME) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    GetSystemTimePreciseAsFileTime(&file_time);
+    now.LowPart = file_time.dwLowDateTime;
+    now.HighPart = file_time.dwHighDateTime;
+    now.QuadPart -= unix_epoch;
+    tp->tv_sec = (time_t)(now.QuadPart / 10000000ULL);
+    tp->tv_nsec = (long)((now.QuadPart % 10000000ULL) * 100ULL);
+    return 0;
+#else
     return clock_gettime(clock_id, tp);
+#endif
 }
 
 /* Call the platform sleep API used for interruptible delays. */

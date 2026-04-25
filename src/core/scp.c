@@ -2582,32 +2582,6 @@ static SHTAB show_unit_tab[] = {
     { NULL, NULL, 0 }
     };
 
-
-#if defined(_WIN32)
-static
-int setenv(const char *envname, const char *envval, int overwrite)
-{
-char *envstr = (char *)malloc(strlen(envname)+strlen(envval)+2);
-int r;
-
-sprintf(envstr, "%s=%s", envname, envval);
-#if defined(_WIN32)
-r = _putenv(envstr);
-free(envstr);
-#else
-r = putenv(envstr);
-#endif
-return r;
-}
-
-static
-int unsetenv(const char *envname)
-{
-setenv(envname, "", 1);
-return 0;
-}
-#endif
-
 t_stat process_stdin_commands (t_stat stat, char *argv[], t_bool do_called);
 
 /* Main command loop.

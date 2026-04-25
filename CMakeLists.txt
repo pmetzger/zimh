@@ -214,9 +214,14 @@ option(WITH_PCAP
 option(WITH_SLIRP
        "Enable (=1)/disable (=0) SLIRP network support. (def: enabled)"
        TRUE)
-option(WITH_VDE
-       "Enable (=1)/disable (=0) VDE2/VDE4 network support. (def: enabled)"
-       TRUE)
+if (WIN32)
+    set(WITH_VDE FALSE CACHE INTERNAL
+        "VDE2/VDE4 network support is not available on Windows.")
+else ()
+    option(WITH_VDE
+           "Enable (=1)/disable (=0) VDE2/VDE4 network support. (def: enabled)"
+           TRUE)
+endif ()
 option(WITH_TAP
        "Enable (=1)/disable (=0) TAP/TUN device network support. (def: enabled)"
        TRUE)
@@ -531,19 +536,33 @@ if (NOT DO_DEPENDENCY_BUILD)
     include(simh-extra-tools)
 
     if (WITH_UNIT_TESTS)
-        pkg_check_modules(CMOCKA IMPORTED_TARGET cmocka)
+        set(unittest_cmocka_target "")
 
-        if (CMOCKA_FOUND)
+        if (WIN32)
+            find_package(cmocka CONFIG QUIET)
+            if (TARGET cmocka::cmocka)
+                set(unittest_cmocka_target cmocka::cmocka)
+            endif ()
+        else ()
+            pkg_check_modules(CMOCKA IMPORTED_TARGET cmocka)
+            if (CMOCKA_FOUND)
+                set(unittest_cmocka_target PkgConfig::CMOCKA)
+            endif ()
+        endif ()
+
+        if (unittest_cmocka_target)
             add_library(unittest INTERFACE)
             add_subdirectory(tests/unit)
             target_link_libraries(unittest INTERFACE
-                PkgConfig::CMOCKA
+                ${unittest_cmocka_target}
                 simh_unit_support
             )
             message(STATUS "Host-side cmocka unit tests enabled")
         else ()
             message(STATUS "Host-side unit tests requested but cmocka was not found")
         endif ()
+
+        unset(unittest_cmocka_target)
     endif ()
 
     get_property(SIMH_UNIT_TEST_TARGETS GLOBAL PROPERTY SIMH_UNIT_TEST_TARGETS)

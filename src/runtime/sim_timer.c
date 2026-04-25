@@ -441,7 +441,7 @@ if (clk_id != CLOCK_REALTIME)
     return -1;
 unixbase = 116444736;
 unixbase *= 1000000000;
-GetSystemTimeAsFileTime((FILETIME*)&now);
+GetSystemTimePreciseAsFileTime((FILETIME*)&now);
 now -= unixbase;
 tp->tv_sec = (long)(now/10000000);
 tp->tv_nsec = (now%10000000)*100;
@@ -2183,7 +2183,7 @@ double sim_timenow_double (void)
 {
 struct timespec now;
 
-clock_gettime (CLOCK_REALTIME, &now);
+sim_clock_gettime (CLOCK_REALTIME, &now);
 return _timespec_to_double (&now);
 }
 

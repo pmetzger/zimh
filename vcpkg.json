@@ -1,18 +1,17 @@
 {
-    "name": "zimh",
-    "version-string": "4.1.0",
-    "description": [
-        "ZIMH: Historical computer simulator"
-    ],
-    "dependencies": [
-        "cmocka",
-        "freetype",
-        "libpcap",
-        "libpng",
-        "pcre2",
-        "pthreads",
-        "sdl2",
-        "sdl2-ttf",
-        "zlib"
-    ]
+  "name": "zimh",
+  "version-string": "4.1.0",
+  "description": "ZIMH: Historical computer simulator",
+  "builtin-baseline": "b781af668027bbf77f2f827f47b5c6cd8d825c08",
+  "dependencies": [
+    "cmocka",
+    "freetype",
+    "libpcap",
+    "libpng",
+    "pcre2",
+    "pthreads",
+    "sdl2",
+    "sdl2-ttf",
+    "zlib"
+  ]
 }

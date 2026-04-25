@@ -6,7 +6,9 @@
 ## Not yet: if this directory later gets a local unit-test subtree, declare
 ## it explicitly here with add_subdirectory(unit-tests).
 
-find_program(BISON_COMMAND bison REQUIRED)
+find_program(BISON_COMMAND
+    NAMES bison win_bison
+    REQUIRED)
 
 set(sage_parser_c "${CMAKE_CURRENT_BINARY_DIR}/m68k_parse.tab.c")
 set(sage_parser_h "${CMAKE_CURRENT_BINARY_DIR}/m68k_parse.tab.h")

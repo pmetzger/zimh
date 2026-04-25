@@ -13,6 +13,8 @@ Examples of the intended scope:
 - `strlcat`
 - `localtime_r`
 - `gmtime_r`
+- `setenv`
+- `unsetenv`
 - other small libc-style compatibility routines
 
 Rules for code placed here:

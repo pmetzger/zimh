@@ -33,6 +33,7 @@ if (WIN32)
     list(APPEND SIM_SOURCES
         ${SIMH_COMPAT_ROOT}/gmtime_r.c
         ${SIMH_COMPAT_ROOT}/localtime_r.c
+        ${SIMH_COMPAT_ROOT}/setenv.c
         ${SIMH_COMPAT_ROOT}/strlcat.c
         ${SIMH_COMPAT_ROOT}/strlcpy.c)
 endif ()
