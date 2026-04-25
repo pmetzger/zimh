@@ -125,7 +125,7 @@ t_stat tto_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cpt
 t_stat clk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 
 extern int32 sysd_hlt_enb (void);
-extern int32 fault_PC;
+extern uint32 fault_PC;
 
 /* TTI data structures
 

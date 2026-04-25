@@ -53,9 +53,9 @@
 #include "vax_mmu.h"
 #include <setjmp.h>
 
-int32 d_p0br, d_p0lr;                                   /* dynamic copies */
-int32 d_p1br, d_p1lr;                                   /* altered per ucode */
-int32 d_sbr, d_slr;
+uint32 d_p0br, d_p0lr;                                  /* dynamic copies */
+uint32 d_p1br, d_p1lr;                                  /* altered per ucode */
+uint32 d_sbr, d_slr;
 TLBENT stlb[VA_TBSIZE], ptlb[VA_TBSIZE];
 static const int32 cvtacc[16] = { 0, 0,
     TLB_ACCW (KERN)+TLB_ACCR (KERN),
@@ -140,8 +140,8 @@ DEVICE tlb_dev = {
 
 TLBENT fill (uint32 va, int32 lnt, int32 acc, int32 *stat)
 {
-int32 ptidx = (((uint32) va) >> 7) & ~03;
-int32 tlbpte, ptead, pte, tbi, vpn;
+uint32 ptidx = (va >> 7) & ~03u;
+uint32 tlbpte, ptead, pte, tbi, vpn;
 static TLBENT zero_pte = { 0, 0 };
 
 if (va & VA_S0) {                                       /* system space? */
@@ -212,11 +212,11 @@ return stlb[tbi];
 void set_map_reg (void)
 {
 d_p0br = P0BR & ~03;
-d_p1br = (P1BR - 0x800000) & ~03;                       /* VA<30> >> 7 */
-d_sbr = (SBR - 0x1000000) & ~03;                        /* VA<31> >> 7 */
-d_p0lr = (P0LR << 2);
-d_p1lr = (P1LR << 2) + 0x800000;                        /* VA<30> >> 7 */
-d_slr = (SLR << 2) + 0x1000000;                         /* VA<31> >> 7 */
+d_p1br = (((uint32) P1BR) - 0x800000u) & ~03u;          /* VA<30> >> 7 */
+d_sbr = (((uint32) SBR) - 0x1000000u) & ~03u;           /* VA<31> >> 7 */
+d_p0lr = ((uint32) P0LR) << 2;
+d_p1lr = (((uint32) P1LR) << 2) + 0x800000u;            /* VA<30> >> 7 */
+d_slr = (((uint32) SLR) << 2) + 0x1000000u;             /* VA<31> >> 7 */
 }
 
 /* Zap process (0) or whole (1) tb */

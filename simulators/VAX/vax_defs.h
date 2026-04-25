@@ -811,20 +811,136 @@ enum opcodes {
             C_SUB (r, s1, s2)
 
 #define CC_CMP_B(s1,s2) \
-            if (SXTB (s1) < SXTB (s2)) cc = CC_N; \
-            else if ((s1) == (s2)) cc = CC_Z; \
-            else cc = 0; \
-            if (((uint32) s1) < ((uint32) s2)) cc = cc | CC_C
+            cc = vax_cmp_b_cc ((uint32) (s1), (uint32) (s2))
 #define CC_CMP_W(s1,s2) \
-            if (SXTW (s1) < SXTW (s2)) cc = CC_N; \
-            else if ((s1) == (s2)) cc = CC_Z; \
-            else cc = 0; \
-            if (((uint32) s1) < ((uint32) s2)) cc = cc | CC_C
+            cc = vax_cmp_w_cc ((uint32) (s1), (uint32) (s2))
+
+/* Interpret VAX integer bit patterns as signed host values.
+
+   The VAX simulator stores architectural integer values in unsigned
+   containers so that arithmetic wraparound and bit manipulation are
+   defined by C.  Use these helpers at the points where the architecture
+   requires a signed byte, word, or longword interpretation. */
+
+/* Return the signed byte value represented by the low 8 bits of val. */
+static inline int32 vax_sbyte (uint32 val)
+{
+uint32 mag;
+
+val = val & BMASK;
+if ((val & BSIGN) == 0)
+    return (int32) val;
+mag = ((~val) + 1) & BMASK;
+return -(int32) mag;
+}
+
+/* Return the signed word value represented by the low 16 bits of val. */
+static inline int32 vax_sword (uint32 val)
+{
+uint32 mag;
+
+val = val & WMASK;
+if ((val & WSIGN) == 0)
+    return (int32) val;
+mag = ((~val) + 1) & WMASK;
+return -(int32) mag;
+}
+
+/* Return the signed longword value represented by all 32 bits of val. */
+static inline int32 vax_slong (uint32 val)
+{
+uint32 mag;
+
+if ((val & LSIGN) == 0)
+    return (int32) val;
+if (val == LSIGN)
+    return -2147483647 - 1;
+mag = ((~val) + 1) & LMASK;
+return -(int32) mag;
+}
+
+/* Compare two unsigned longword bit patterns as signed VAX longwords. */
+static inline t_bool vax_signed_lt_l (uint32 s1, uint32 s2)
+{
+if ((s1 ^ s2) & LSIGN)
+    return (s1 & LSIGN) != 0;
+return s1 < s2;
+}
+
+static inline t_bool vax_signed_le_l (uint32 s1, uint32 s2)
+{
+return (s1 == s2) || vax_signed_lt_l (s1, s2);
+}
+
+/* Return CMPB condition codes for two VAX byte bit patterns.
+
+   VAX compare uses signed ordering for N, equality for Z, unsigned
+   ordering for C, and leaves V clear. */
+static inline int32 vax_cmp_b_cc (uint32 s1, uint32 s2)
+{
+int32 cmp_cc = 0;
+
+s1 = s1 & BMASK;
+s2 = s2 & BMASK;
+if (vax_sbyte (s1) < vax_sbyte (s2))
+    cmp_cc = CC_N;
+else if (s1 == s2)
+    cmp_cc = CC_Z;
+if (s1 < s2)
+    cmp_cc = cmp_cc | CC_C;
+return cmp_cc;
+}
+
+/* Return CMPW condition codes for two VAX word bit patterns.
+
+   VAX compare uses signed ordering for N, equality for Z, unsigned
+   ordering for C, and leaves V clear. */
+static inline int32 vax_cmp_w_cc (uint32 s1, uint32 s2)
+{
+int32 cmp_cc = 0;
+
+s1 = s1 & WMASK;
+s2 = s2 & WMASK;
+if (vax_sword (s1) < vax_sword (s2))
+    cmp_cc = CC_N;
+else if (s1 == s2)
+    cmp_cc = CC_Z;
+if (s1 < s2)
+    cmp_cc = cmp_cc | CC_C;
+return cmp_cc;
+}
+
+/* Return CMPL condition codes for two VAX longword bit patterns.
+
+   VAX compare uses signed ordering for N, equality for Z, unsigned
+   ordering for C, and leaves V clear. */
+static inline int32 vax_cmp_l_cc (uint32 s1, uint32 s2)
+{
+int32 cmp_cc = 0;
+
+if (vax_signed_lt_l (s1, s2))
+    cmp_cc = CC_N;
+else if (s1 == s2)
+    cmp_cc = CC_Z;
+if (s1 < s2)
+    cmp_cc = cmp_cc | CC_C;
+return cmp_cc;
+}
+
+/* Shift a VAX longword right arithmetically using defined operations. */
+static inline uint32 vax_arith_rsh_l (uint32 val, uint32 sc)
+{
+if (sc == 0)
+    return val;
+if (sc >= 32)
+    return (val & LSIGN)? LMASK: 0;
+if (val & LSIGN)
+    return (val >> sc) | (LMASK << (32 - sc));
+return val >> sc;
+}
+
 #define CC_CMP_L(s1,s2) \
-            if ((s1) < (s2)) cc = CC_N; \
-            else if ((s1) == (s2)) cc = CC_Z; \
-            else cc = 0; \
-            if (((uint32) s1) < ((uint32) s2)) cc = cc | CC_C
+            cc = vax_cmp_l_cc ((uint32) (s1), (uint32) (s2))
 
 /* Operand Memory vs Register Indicator */
 #define OP_MEM          0xFFFFFFFF
@@ -843,7 +959,7 @@ extern int32 extra_bytes;           /* bytes referenced by current string instru
 extern BITFIELD cpu_psl_bits[];
 extern char const * const opcode[];
 extern const uint16 drom[NUM_INST][MAX_SPEC + 1];
-extern int32 cpu_emulate_exception (int32 *opnd, int32 cc, int32 opc, int32 acc);
+extern int32 cpu_emulate_exception (uint32 *opnd, int32 cc, int32 opc, int32 acc);
 void cpu_idle (void);
 
 /* Instruction History */
@@ -855,8 +971,8 @@ void cpu_idle (void);
 
 typedef struct {
     double              time;
-    int32               iPC;
-    int32               PSL;
+    uint32              iPC;
+    uint32              PSL;
     int32               opc;
     uint8               inst[INST_SIZE];
     uint32              opnd[OPND_SIZE];
@@ -866,23 +982,23 @@ typedef struct {
 
 /* CPU Register definitions */
 
-extern int32 R[16];                                     /* registers */
-extern int32 STK[5];                                    /* stack pointers */
-extern int32 PSL;                                       /* PSL */
-extern int32 SCBB;                                      /* SCB base */
-extern int32 PCBB;                                      /* PCB base */
-extern int32 SBR, SLR;                                  /* S0 mem mgt */                                          /* S0 mem mgt */
-extern int32 P0BR, P0LR;                                /* P0 mem mgt */
-extern int32 P1BR, P1LR;                                /* P1 mem mgt */
-extern int32 ASTLVL;                                    /* AST Level */
-extern int32 SISR;                                      /* swre int req */
+extern uint32 R[16];                                    /* registers */
+extern uint32 STK[5];                                   /* stack pointers */
+extern uint32 PSL;                                      /* PSL */
+extern uint32 SCBB;                                     /* SCB base */
+extern uint32 PCBB;                                     /* PCB base */
+extern uint32 SBR, SLR;                                 /* S0 mem mgt */                                          /* S0 mem mgt */
+extern uint32 P0BR, P0LR;                               /* P0 mem mgt */
+extern uint32 P1BR, P1LR;                               /* P1 mem mgt */
+extern uint32 ASTLVL;                                   /* AST Level */
+extern uint32 SISR;                                     /* swre int req */
 extern int32 pme;                                       /* perf mon enable */
-extern int32 trpirq;                                    /* trap/intr req */
-extern int32 fault_PC;                                  /* fault PC */
-extern int32 p1, p2;                                    /* fault parameters */
+extern uint32 trpirq;                                   /* trap/intr req */
+extern uint32 fault_PC;                                 /* fault PC */
+extern uint32 p1, p2;                                   /* fault parameters */
 extern int32 recq[];                                    /* recovery queue */
 extern int32 recqptr;                                   /* recq pointer */
-extern int32 pcq[PCQ_SIZE];                             /* PC queue */
+extern uint32 pcq[PCQ_SIZE];                            /* PC queue */
 extern int32 pcq_p;                                     /* PC queue ptr */
 extern int32 in_ie;                                     /* in exc, int */
 extern int32 ibcnt, ppc;                                /* prefetch ctl */
@@ -892,70 +1008,70 @@ extern int32 mem_err;
 extern int32 crd_err;
 
 /* vax_cpu1.c externals */
-extern int32 op_bb_n (int32 *opnd, int32 acc);
-extern int32 op_bb_x (int32 *opnd, int32 newb, int32 acc);
-extern int32 op_extv (int32 *opnd, int32 vfldrp1, int32 acc);
-extern void op_insv (int32 *opnd, int32 vfldrp1, int32 acc);
+extern int32 op_bb_n (uint32 *opnd, int32 acc);
+extern int32 op_bb_x (uint32 *opnd, int32 newb, int32 acc);
+extern int32 op_extv (uint32 *opnd, int32 vfldrp1, int32 acc);
+extern void op_insv (uint32 *opnd, int32 vfldrp1, int32 acc);
 extern int32 op_ffs (uint32 fld, int32 size);
-extern int32 op_call (int32 *opnd, t_bool gs, int32 acc);
+extern int32 op_call (uint32 *opnd, t_bool gs, int32 acc);
 extern int32 op_ret (int32 acc);
-extern int32 op_insque (int32 *opnd, int32 acc);
-extern int32 op_remque (int32 *opnd, int32 acc);
-extern int32 op_insqhi (int32 *opnd, int32 acc);
-extern int32 op_insqti (int32 *opnd, int32 acc);
-extern int32 op_remqhi (int32 *opnd, int32 acc);
-extern int32 op_remqti (int32 *opnd, int32 acc);
-extern void op_pushr (int32 *opnd, int32 acc);
-extern void op_popr (int32 *opnd, int32 acc);
-extern int32 op_movc (int32 *opnd, int32 opc, int32 acc);
-extern int32 op_cmpc (int32 *opnd, int32 opc, int32 acc);
-extern int32 op_locskp (int32 *opnd, int32 opc, int32 acc);
-extern int32 op_scnspn (int32 *opnd, int32 opc, int32 acc);
-extern int32 op_chm (int32 *opnd, int32 cc, int32 opc);
+extern int32 op_insque (uint32 *opnd, int32 acc);
+extern int32 op_remque (uint32 *opnd, int32 acc);
+extern int32 op_insqhi (uint32 *opnd, int32 acc);
+extern int32 op_insqti (uint32 *opnd, int32 acc);
+extern int32 op_remqhi (uint32 *opnd, int32 acc);
+extern int32 op_remqti (uint32 *opnd, int32 acc);
+extern void op_pushr (uint32 *opnd, int32 acc);
+extern void op_popr (uint32 *opnd, int32 acc);
+extern int32 op_movc (uint32 *opnd, int32 opc, int32 acc);
+extern int32 op_cmpc (uint32 *opnd, int32 opc, int32 acc);
+extern int32 op_locskp (uint32 *opnd, int32 opc, int32 acc);
+extern int32 op_scnspn (uint32 *opnd, int32 opc, int32 acc);
+extern int32 op_chm (uint32 *opnd, int32 cc, int32 opc);
 extern int32 op_rei (int32 acc);
 extern void op_ldpctx (int32 acc);
 extern void op_svpctx (int32 acc);
-extern int32 op_probe (int32 *opnd, int32 opc);
-extern int32 op_mtpr (int32 *opnd);
-extern int32 op_mfpr (int32 *opnd);
+extern int32 op_probe (uint32 *opnd, int32 opc);
+extern int32 op_mtpr (uint32 *opnd);
+extern int32 op_mfpr (uint32 *opnd);
 extern int32 intexc (int32 vec, int32 cc, int32 ipl, int ei);
 
 /* vax_cis.c externals */
-extern int32 op_cis (int32 *opnd, int32 cc, int32 opc, int32 acc);
+extern int32 op_cis (uint32 *opnd, int32 cc, int32 opc, int32 acc);
 
 /* vax_fpa.c externals */
-extern int32 op_ashq (int32 *opnd, int32 *rh, int32 *flg);
+extern int32 op_ashq (uint32 *opnd, int32 *rh, int32 *flg);
 extern int32 op_emul (int32 mpy, int32 mpc, int32 *rh);
-extern int32 op_ediv (int32 *opnd, int32 *rh, int32 *flg);
+extern int32 op_ediv (uint32 *opnd, int32 *rh, int32 *flg);
 extern int32 op_cmpfd (int32 h1, int32 l1, int32 h2, int32 l2);
 extern int32 op_cmpg (int32 h1, int32 l1, int32 h2, int32 l2);
 extern int32 op_cvtifdg (int32 val, int32 *rh, int32 opc);
-extern int32 op_cvtfdgi (int32 *opnd, int32 *flg, int32 opc);
-extern int32 op_emodf (int32 *opnd, int32 *intgr, int32 *flg);
-extern int32 op_emodd (int32 *opnd, int32 *rh, int32 *intgr, int32 *flg);
-extern int32 op_emodg (int32 *opnd, int32 *rh, int32 *intgr, int32 *flg);
+extern int32 op_cvtfdgi (uint32 *opnd, int32 *flg, int32 opc);
+extern int32 op_emodf (uint32 *opnd, int32 *intgr, int32 *flg);
+extern int32 op_emodd (uint32 *opnd, int32 *rh, int32 *intgr, int32 *flg);
+extern int32 op_emodg (uint32 *opnd, int32 *rh, int32 *intgr, int32 *flg);
 extern int32 op_movfd (int32 val);
 extern int32 op_mnegfd (int32 val);
 extern int32 op_movg (int32 val);
 extern int32 op_mnegg (int32 val);
-extern int32 op_cvtdf (int32 *opnd);
-extern int32 op_cvtfg (int32 *opnd, int32 *rh);
-extern int32 op_cvtgf (int32 *opnd);
-extern int32 op_addf (int32 *opnd, t_bool sub);
-extern int32 op_addd (int32 *opnd, int32 *rh, t_bool sub);
-extern int32 op_addg (int32 *opnd, int32 *rh, t_bool sub);
-extern int32 op_mulf (int32 *opnd);
-extern int32 op_muld (int32 *opnd, int32 *rh);
-extern int32 op_mulg (int32 *opnd, int32 *rh);
-extern int32 op_divf (int32 *opnd);
-extern int32 op_divd (int32 *opnd, int32 *rh);
-extern int32 op_divg (int32 *opnd, int32 *rh);
-extern void op_polyf (int32 *opnd, int32 acc);
-extern void op_polyd (int32 *opnd, int32 acc);
-extern void op_polyg (int32 *opnd, int32 acc);
+extern int32 op_cvtdf (uint32 *opnd);
+extern int32 op_cvtfg (uint32 *opnd, int32 *rh);
+extern int32 op_cvtgf (uint32 *opnd);
+extern int32 op_addf (uint32 *opnd, t_bool sub);
+extern int32 op_addd (uint32 *opnd, int32 *rh, t_bool sub);
+extern int32 op_addg (uint32 *opnd, int32 *rh, t_bool sub);
+extern int32 op_mulf (uint32 *opnd);
+extern int32 op_muld (uint32 *opnd, int32 *rh);
+extern int32 op_mulg (uint32 *opnd, int32 *rh);
+extern int32 op_divf (uint32 *opnd);
+extern int32 op_divd (uint32 *opnd, int32 *rh);
+extern int32 op_divg (uint32 *opnd, int32 *rh);
+extern void op_polyf (uint32 *opnd, int32 acc);
+extern void op_polyd (uint32 *opnd, int32 acc);
+extern void op_polyg (uint32 *opnd, int32 acc);
 
 /* vax_octa.c externals */
-extern int32 op_octa (int32 *opnd, int32 cc, int32 opc, int32 acc, int32 spec, int32 va, InstHistory *hst);
+extern int32 op_octa (uint32 *opnd, int32 cc, int32 opc, int32 acc, int32 spec, int32 va, InstHistory *hst);
 
 /* vax_cmode.c externals */
 extern int32 op_cmode (int32 cc);

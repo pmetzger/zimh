@@ -235,36 +235,36 @@
 
 
 uint32 *M = NULL;                                       /* memory */
-int32 R[16];                                            /* registers */
-int32 STK[5];                                           /* stack pointers */
-int32 PSL;                                              /* PSL */
-int32 SCBB = 0;                                         /* SCB base */
-int32 PCBB = 0;                                         /* PCB base */
-int32 P0BR = 0;                                         /* P0 mem mgt */
-int32 P0LR = 0;
-int32 P1BR = 0;                                         /* P1 mem mgt */
-int32 P1LR = 0;
-int32 SBR = 0;                                          /* S0 mem mgt */
-int32 SLR = 0;
-int32 SISR;                                             /* swre int req */
-int32 ASTLVL;                                           /* AST level */
+uint32 R[16];                                           /* registers */
+uint32 STK[5];                                          /* stack pointers */
+uint32 PSL;                                             /* PSL */
+uint32 SCBB = 0;                                        /* SCB base */
+uint32 PCBB = 0;                                        /* PCB base */
+uint32 P0BR = 0;                                        /* P0 mem mgt */
+uint32 P0LR = 0;
+uint32 P1BR = 0;                                        /* P1 mem mgt */
+uint32 P1LR = 0;
+uint32 SBR = 0;                                         /* S0 mem mgt */
+uint32 SLR = 0;
+uint32 SISR;                                            /* swre int req */
+uint32 ASTLVL;                                          /* AST level */
 int32 mapen;                                            /* map enable */
 int32 pme;                                              /* perf mon enable */
-int32 trpirq;                                           /* trap/intr req */
+uint32 trpirq;                                          /* trap/intr req */
 int32 in_ie = 0;                                        /* in exc, int */
 int32 recq[6];                                          /* recovery queue */
 int32 recqptr;                                          /* recq pointer */
 int32 hlt_pin = 0;                                      /* HLT pin intr */
 int32 mem_err = 0;
 int32 crd_err = 0;
-int32 p1 = 0, p2 = 0;                                   /* fault parameters */
-int32 fault_PC;                                         /* fault PC */
+uint32 p1 = 0, p2 = 0;                                  /* fault parameters */
+uint32 fault_PC;                                        /* fault PC */
 int32 mxpr_cc_vc = 0;                                   /* MxPR V,C bits */
 int32 pcq_p = 0;                                        /* PC queue ptr */
 int32 badabo = 0;
 int32 cpu_instruction_set = CPU_INSTRUCTION_SET;        /* Instruction Groups  */
 int32 cpu_astop = 0;
-int32 mchk_va, mchk_ref;                                /* mem ref param */
+uint32 mchk_va, mchk_ref;                               /* mem ref param */
 int32 ibufl, ibufh;                                     /* prefetch buf */
 int32 ibcnt, ppc;                                       /* prefetch ctl */
 uint32 cpu_idle_mask =                                  /* idle mask */
@@ -278,7 +278,7 @@ uint32 cpu_idle_type = 1;                               /* default VMS */
 int32 extra_bytes;                                      /* bytes referenced by current string instruction */
 jmp_buf save_env;
 REG *pcq_r = NULL;                                      /* PC queue reg ptr */
-int32 pcq[PCQ_SIZE] = { 0 };                            /* PC queue */
+uint32 pcq[PCQ_SIZE] = { 0 };                           /* PC queue */
 InstHistory *hst = NULL;                                /* instruction history */
 int32 hst_p = 0;                                        /* history pointer */
 int32 hst_lnt = 0;                                      /* history length */
@@ -330,10 +330,10 @@ t_stat cpu_show_instruction_set (FILE *st, UNIT *uptr, int32 val, CONST void *de
 const char *cpu_description (DEVICE *dptr);
 int32 cpu_get_vsw (int32 sw);
 static SIM_INLINE int32 get_istr (int32 lnt, int32 acc);
-int32 ReadOcta (int32 va, int32 *opnd, int32 j, int32 acc);
+int32 ReadOcta (uint32 va, uint32 *opnd, int32 j, int32 acc);
 t_bool cpu_show_opnd (FILE *st, InstHistory *h, int32 line);
 t_stat cpu_show_hist_records (FILE *st, t_bool do_header, int32 start, int32 count);
-int32 cpu_emulate_exception (int32 *opnd, int32 cc, int32 opc, int32 acc);
+int32 cpu_emulate_exception (uint32 *opnd, int32 cc, int32 opc, int32 acc);
 void cpu_idle (void);
 
 /* CPU data structures
@@ -496,10 +496,10 @@ volatile int32 acc;                                     /* set by setjmp */
 int abortval;
 t_stat ret;
 int32 r = 0, rh = 0, temp = 0;
-int32 spec = 0, disp = 0, rn = 0, index = 0, numspec = 0;
+int32 spec = 0, disp = 0, rn = 0, numspec = 0;
 int32 vfldrp1 = 0, brdisp = 0, flg = 0, mstat = 0;
-uint32 va = 0, iad = 0;
-int32 opnd[OPND_SIZE];                                  /* operand queue */
+uint32 va = 0, iad = 0, index = 0;
+uint32 opnd[OPND_SIZE];                                 /* operand queue */
 
 if ((ret = build_dib_tab ()) != SCPE_OK)                /* build, chk dib_tab */
     return ret;
@@ -971,7 +971,7 @@ for ( ;; ) {
                     }
                 else {
                     opnd[j++] = Read (va, L_LONG, RA);
-                    opnd[j++] = Read (va + 4, L_LONG, RA);  
+                    opnd[j++] = Read (va + 4, L_LONG, RA);
                     R[rn] = R[rn] + 8;
                     recq[recqptr++] = RQ_REC (disp, rn);
                     }
@@ -1012,7 +1012,7 @@ for ( ;; ) {
                     }
                 else {
                     opnd[j++] = Read (va, L_LONG, WA);
-                    opnd[j++] = Read (va + 4, L_LONG, WA);  
+                    opnd[j++] = Read (va + 4, L_LONG, WA);
                     R[rn] = R[rn] + 8;
                     recq[recqptr++] = RQ_REC (disp, rn);
                     }
@@ -1773,19 +1773,19 @@ for ( ;; ) {
         break;
 
     case CVTBW:
-        r = SXTBW (op0);                                /* ext sign */
+        r = vax_sbyte (op0) & WMASK;                    /* ext sign */
         WRITE_W (r);                                    /* store result */
         CC_IIZZ_W (r);                                  /* set cc's */
         break;
 
     case CVTBL:
-        r = SXTB (op0);                                 /* ext sign */
+        r = vax_sbyte (op0);                            /* ext sign */
         WRITE_L (r);                                    /* store result */
         CC_IIZZ_L (r);                                  /* set cc's */
         break;
 
     case CVTWL:
-        r = SXTW (op0);                                 /* ext sign */
+        r = vax_sword (op0);                            /* ext sign */
         WRITE_L (r);                                    /* store result */
         CC_IIZZ_L (r);                                  /* set cc's */
         break;
@@ -1794,7 +1794,8 @@ for ( ;; ) {
         r = op0 & BMASK;                                /* set result */
         WRITE_B (r);                                    /* store result */
         CC_IIZZ_B (r);                                  /* initial cc's */
-        if ((op0 > 127) || (op0 < -128)) {
+        temp = vax_slong (op0);
+        if ((temp > 127) || (temp < -128)) {
             V_INTOV;
             }
         break;
@@ -1803,7 +1804,8 @@ for ( ;; ) {
         r = op0 & WMASK;                                /* set result */
         WRITE_W (r);                                    /* store result */
         CC_IIZZ_W (r);                                  /* initial cc's */
-        if ((op0 > 32767) || (op0 < -32768)) {
+        temp = vax_slong (op0);
+        if ((temp > 32767) || (temp < -32768)) {
             V_INTOV;
             }
         break;
@@ -1812,14 +1814,14 @@ for ( ;; ) {
         r = op0 & BMASK;                                /* set result */
         WRITE_B (r);                                    /* store result */
         CC_IIZZ_B (r);                                  /* initial cc's */
-        temp = SXTW (op0);                              /* cvt op to long */
+        temp = vax_sword (op0);                         /* cvt op to long */
         if ((temp > 127) || (temp < -128)) {
             V_INTOV;
             }
         break;
 
     case ADAWI:
-        if (op1 >= 0) temp = R[op1] & WMASK;            /* reg? ADDW2 */
+        if (op1 != OP_MEM) temp = R[op1] & WMASK;       /* reg? ADDW2 */
         else {
             if (op2 & 1)                                /* mem? chk align */
                 RSVD_OPND_FAULT(ADAWI);
@@ -1934,7 +1936,7 @@ for ( ;; ) {
         break;
 
     case MULB2: case MULB3:
-        temp = SXTB (op0) * SXTB (op1);                 /* multiply */
+        temp = vax_sbyte (op0) * vax_sbyte (op1);       /* multiply */
         r = temp & BMASK;                               /* mask to result */
         WRITE_B (r);                                    /* store result */
         CC_IIZZ_B (r);                                  /* set cc's */
@@ -1944,7 +1946,7 @@ for ( ;; ) {
         break;
 
     case MULW2: case MULW3:
-        temp = SXTW (op0) * SXTW (op1);                 /* multiply */
+        temp = vax_sword (op0) * vax_sword (op1);       /* multiply */
         r = temp & WMASK;                               /* mask to result */
         WRITE_W (r);                                    /* store result */
         CC_IIZZ_W (r);                                  /* set cc's */
@@ -1974,7 +1976,7 @@ for ( ;; ) {
             INTOV;
             }
         else {
-            r = SXTB (op1) / SXTB (op0);                /* ok, divide */
+            r = vax_sbyte (op1) / vax_sbyte (op0);      /* ok, divide */
             temp = 0;
             }
         r = r & BMASK;                                  /* mask to result */
@@ -1995,7 +1997,7 @@ for ( ;; ) {
             INTOV;
             }
         else {
-            r = SXTW (op1) / SXTW (op0);                /* ok, divide */
+            r = vax_sword (op1) / vax_sword (op0);      /* ok, divide */
             temp = 0;
             }
         r = r & WMASK;                                  /* mask to result */
@@ -2017,7 +2019,7 @@ for ( ;; ) {
             INTOV;
             }
         else {
-            r = op1 / op0;                              /* ok, divide */
+            r = vax_slong (op1) / vax_slong (op0);      /* ok, divide */
             temp = 0;
             }
         r = r & LMASK;                                  /* mask to result */
@@ -2117,7 +2119,7 @@ for ( ;; ) {
             temp = 0x100 - op0;                         /* get |shift| */
             if (temp > 31)                              /* sc > 31? */
                 r = (op1 & LSIGN)? LMASK: 0;
-            else r = op1 >> temp;                       /* shift */
+            else r = vax_arith_rsh_l (op1, temp);       /* shift */
             WRITE_L (r);                                /* store result */
             CC_IIZZ_L (r);                              /* set cc's */
             break;
@@ -2127,7 +2129,7 @@ for ( ;; ) {
                 r = temp = 0;
             else {
                 r = (((uint32) op1) << op0) & LMASK;    /* shift */
-                temp = r >> op0;                        /* shift back */
+                temp = vax_arith_rsh_l (r, op0);        /* shift back */
                 }
             WRITE_L (r);                                /* store result */
             CC_IIZZ_L (r);                              /* set cc's */
@@ -2172,7 +2174,7 @@ for ( ;; ) {
 */
 
     case EDIV:
-        if (op5 < 0)                                    /* wtest remainder */
+        if (op5 == OP_MEM)                              /* wtest remainder */
             Read (op6, L_LONG, WA);
         if (op0 == 0) {                                 /* divide by zero? */
             flg = CC_V;                                 /* set V */
@@ -2186,10 +2188,10 @@ for ( ;; ) {
                 INTOV;
                 }
             }
-        if (op3 >= 0)                                   /* store quotient */
+        if (op3 != OP_MEM)                              /* store quotient */
             R[op3] = r;
         else Write (op4, r, L_LONG, WA);
-        if (op5 >= 0)                                   /* store remainder */
+        if (op5 != OP_MEM)                              /* store remainder */
             R[op5] = rh;
         else Write (op6, rh, L_LONG, WA);
         CC_IIZZ_L (r);                                  /* set cc's */
@@ -2368,7 +2370,7 @@ for ( ;; ) {
         WRITE_L (r);                                    /* store result */
         CC_IIZP_L (r);                                  /* set cc's */
         V_ADD_L (r, 1, op1);                            /* test for ovflo */
-        if (r < op0)                                    /* if < lim, branch */
+        if (vax_signed_lt_l (r, op0))                   /* if < lim, branch */
             BRANCHB_ALWAYS (brdisp);
         break;
 
@@ -2377,7 +2379,7 @@ for ( ;; ) {
         WRITE_L (r);                                    /* store result */
         CC_IIZP_L (r);                                  /* set cc's */
         V_ADD_L (r, 1, op1);                            /* test for ovflo */
-        if (r <= op0)                                   /* if < lim, branch */
+        if (vax_signed_le_l (r, op0))                   /* if < lim, branch */
             BRANCHB_ALWAYS (brdisp);
         break;
 
@@ -2396,7 +2398,8 @@ for ( ;; ) {
         WRITE_B (r);                                    /* store result */
         CC_IIZP_B (r);                                  /* set cc's */
         V_ADD_B (r, op1, op2);                          /* test for ovflo */
-        if ((op1 & BSIGN)? (SXTB (r) >= SXTB (op0)): (SXTB (r) <= SXTB (op0)))
+        if ((op1 & BSIGN)? (vax_sbyte (r) >= vax_sbyte (op0)):
+            (vax_sbyte (r) <= vax_sbyte (op0)))
             BRANCHW_ALWAYS (brdisp);
         break;
 
@@ -2405,7 +2408,8 @@ for ( ;; ) {
         WRITE_W (r);                                    /* store result */
         CC_IIZP_W (r);                                  /* set cc's */
         V_ADD_W (r, op1, op2);                          /* test for ovflo */
-        if ((op1 & WSIGN)? (SXTW (r) >= SXTW (op0)): (SXTW (r) <= SXTW (op0)))
+        if ((op1 & WSIGN)? (vax_sword (r) >= vax_sword (op0)):
+            (vax_sword (r) <= vax_sword (op0)))
             BRANCHW_ALWAYS (brdisp);
         break;
 
@@ -2414,7 +2418,8 @@ for ( ;; ) {
         WRITE_L (r);                                    /* store result */
         CC_IIZP_L (r);                                  /* set cc's */
         V_ADD_L (r, op1, op2);                          /* test for ovflo */
-        if ((op1 & LSIGN)? (r >= op0): (r <= op0))
+        if ((op1 & LSIGN)? !vax_signed_lt_l (r, op0):
+            vax_signed_le_l (r, op0))
             BRANCHW_ALWAYS (brdisp);
         break;
 
@@ -2702,7 +2707,8 @@ for ( ;; ) {
         break;
 
     case INDEX:
-        if ((op0 < op1) || (op0 > op2))
+        if (vax_signed_lt_l (op0, op1) ||
+            vax_signed_lt_l (op2, op0))
             SET_TRAP (TRAP_SUBSCR);
         r = (op0 + op4) * op3;
         WRITE_L (r);
@@ -2824,13 +2830,13 @@ for ( ;; ) {
         break;
 
     case CVTBF:
-        r = op_cvtifdg (SXTB (op0), NULL, opc);
+        r = op_cvtifdg (vax_sbyte (op0), NULL, opc);
         WRITE_L (r);
         CC_IIZZ_FP (r);
         break;
 
     case CVTWF:
-        r = op_cvtifdg (SXTW (op0), NULL, opc);
+        r = op_cvtifdg (vax_sword (op0), NULL, opc);
         WRITE_L (r);
         CC_IIZZ_FP (r);
         break;
@@ -2842,13 +2848,13 @@ for ( ;; ) {
         break;
 
     case CVTBD: case CVTBG:
-        r = op_cvtifdg (SXTB (op0), &rh, opc);
+        r = op_cvtifdg (vax_sbyte (op0), &rh, opc);
         WRITE_Q (r, rh);
         CC_IIZZ_FP (r);
         break;
 
     case CVTWD: case CVTWG:
-        r = op_cvtifdg (SXTW (op0), &rh, opc);
+        r = op_cvtifdg (vax_sword (op0), &rh, opc);
         WRITE_Q (r, rh);
         CC_IIZZ_FP (r);
         break;
@@ -3024,9 +3030,9 @@ for ( ;; ) {
 
     case EMODF:
         r = op_emodf (opnd, &temp, &flg);
-        if (op5 < 0)
+        if (op5 == OP_MEM)
             Read (op6, L_LONG, WA);
-        if (op3 >= 0)
+        if (op3 != OP_MEM)
             R[op3] = temp;
         else Write (op4, temp, L_LONG, WA);
         WRITE_L (r);
@@ -3047,11 +3053,11 @@ for ( ;; ) {
 
     case EMODD:
         r = op_emodd (opnd, &rh, &temp, &flg);
-        if (op7 < 0) {
+        if (op7 == OP_MEM) {
             Read (op8, L_BYTE, WA);
             Read ((op8 + 7) & LMASK, L_BYTE, WA);
             }
-        if (op5 >= 0)
+        if (op5 != OP_MEM)
             R[op5] = temp;
         else Write (op6, temp, L_LONG, WA);
         WRITE_Q (r, rh);
@@ -3063,11 +3069,11 @@ for ( ;; ) {
 
     case EMODG:
         r = op_emodg (opnd, &rh, &temp, &flg);
-        if (op7 < 0) {
+        if (op7 == OP_MEM) {
             Read (op8, L_BYTE, WA);
             Read ((op8 + 7) & LMASK, L_BYTE, WA);
             }
-        if (op5 >= 0)
+        if (op5 != OP_MEM)
             R[op5] = temp;
         else Write (op6, temp, L_LONG, WA);
         WRITE_Q (r, rh);
@@ -3234,12 +3240,12 @@ return val;
 
 /* Read octaword specifier */
 
-int32 ReadOcta (int32 va, int32 *opnd, int32 j, int32 acc)
+int32 ReadOcta (uint32 va, uint32 *opnd, int32 j, int32 acc)
 {
 opnd[j++] = Read (va, L_LONG, acc);
 opnd[j++] = Read (va + 4, L_LONG, acc);
-opnd[j++] = Read (va + 8, L_LONG, acc);  
-opnd[j++] = Read (va + 12, L_LONG, acc);  
+opnd[j++] = Read (va + 8, L_LONG, acc);
+opnd[j++] = Read (va + 12, L_LONG, acc);
 return j;
 }
 
@@ -3256,7 +3262,7 @@ return j;
    In both cases, the exception occurs in the current mode.
 */
 
-int32 cpu_emulate_exception (int32 *opnd, int32 cc, int32 opc, int32 acc)
+int32 cpu_emulate_exception (uint32 *opnd, int32 cc, int32 opc, int32 acc)
 {
 int32 vec;
 
@@ -3272,7 +3278,7 @@ if (PSL & PSL_FPD) {                                    /* FPD set? */
     }
 else {
     if (opc == CVTPL)                                   /* CVTPL? .wl */
-        opnd[2] = (opnd[2] >= 0)? ~opnd[2]: opnd[3];
+        opnd[2] = (opnd[2] != OP_MEM)? ~opnd[2]: opnd[3];
     Read (SP - 1, L_BYTE, WA);                          /* wchk stack */
     Write (SP - 48, opc, L_LONG, WA);                   /* push opcode */
     Write (SP - 44, fault_PC, L_LONG, WA);              /* push old PC */

@@ -52,8 +52,8 @@
 #include <setjmp.h>
 
 typedef struct {
-    int32       tag;                                    /* tag */
-    int32       pte;                                    /* pte */
+    uint32      tag;                                    /* tag */
+    uint32      pte;                                    /* pte */
     } TLBENT;
 
 extern uint32 *M;
@@ -61,10 +61,10 @@ extern UNIT cpu_unit;
 extern DEVICE cpu_dev;
 extern int32 mapen;                                     /* map enable */
 
-extern int32 mchk_va, mchk_ref;                         /* for mcheck */
+extern uint32 mchk_va, mchk_ref;                        /* for mcheck */
 extern TLBENT stlb[VA_TBSIZE], ptlb[VA_TBSIZE];
 
-static const int32 insert[4] = {
+static const uint32 insert[4] = {
     0x00000000, 0x000000FF, 0x0000FFFF, 0x00FFFFFF
     };
 
@@ -118,8 +118,8 @@ static SIM_INLINE void WriteL (uint32 pa, int32 val);
 
 static SIM_INLINE int32 Read (uint32 va, int32 lnt, int32 acc)
 {
-int32 vpn, off, tbi, pa;
-int32 pa1, bo, sc, wl, wh;
+uint32 vpn, off, tbi, pa;
+uint32 pa1, bo, sc, wl, wh;
 TLBENT xpte;
 
 mchk_va = va;
@@ -184,8 +184,8 @@ else {
 
 static SIM_INLINE void Write (uint32 va, int32 val, int32 lnt, int32 acc)
 {
-int32 vpn, off, tbi, pa;
-int32 pa1, bo, sc;
+uint32 vpn, off, tbi, pa;
+uint32 pa1, bo, sc;
 TLBENT xpte;
 
 mchk_va = va;
@@ -244,7 +244,7 @@ return;
 
 static SIM_INLINE int32 Test (uint32 va, int32 acc, int32 *status)
 {
-int32 vpn, off, tbi;
+uint32 vpn, off, tbi;
 TLBENT xpte;
 
 *status = PR_OK;                                        /* assume ok */
@@ -362,10 +362,10 @@ return ((dat >> sc) & insert[lnt]);
 static SIM_INLINE void WriteB (uint32 pa, int32 val)
 {
 if (ADDR_IS_MEM (pa)) {
-    int32 id = pa >> 2;
-    int32 sc = (pa & 3) << 3;
-    int32 mask = 0xFF << sc;
-    M[id] = (M[id] & ~mask) | (val << sc);
+    uint32 id = pa >> 2;
+    uint32 sc = (pa & 3) << 3;
+    uint32 mask = 0xFFu << sc;
+    M[id] = (M[id] & ~mask) | (((uint32) val << sc) & mask);
     }
 else {
     mchk_ref = REF_V;
@@ -380,9 +380,10 @@ return;
 static SIM_INLINE void WriteW (uint32 pa, int32 val)
 {
 if (ADDR_IS_MEM (pa)) {
-    int32 id = pa >> 2;
-    M[id] = (pa & 2)? (M[id] & 0xFFFF) | (val << 16):
-        (M[id] & ~0xFFFF) | val;
+    uint32 id = pa >> 2;
+    uint32 uval = (uint32) val;
+    M[id] = (pa & 2)? (M[id] & 0xFFFFu) | ((uval & WMASK) << 16):
+        (M[id] & ~0xFFFFu) | (uval & WMASK);
     }
 else {
     mchk_ref = REF_V;
@@ -436,9 +437,11 @@ return;
 static SIM_INLINE void WriteU (uint32 pa, int32 val, int32 lnt)
 {
 if (ADDR_IS_MEM (pa)) {
-    int32 bo = pa & 3;
-    int32 sc = bo << 3;
-    M[pa >> 2] = (M[pa >> 2] & ~(insert[lnt] << sc)) | ((val & insert[lnt]) << sc);
+    uint32 bo = pa & 3;
+    uint32 sc = bo << 3;
+    uint32 mask = insert[lnt] << sc;
+    M[pa >> 2] = (M[pa >> 2] & ~mask) |
+        ((((uint32) val) & insert[lnt]) << sc);
     }
 else {
     mchk_ref = REF_V;

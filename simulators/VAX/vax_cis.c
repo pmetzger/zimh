@@ -96,7 +96,7 @@ extern int32 eval_int (void);
 
 /* CIS emulator */
 
-int32 op_cis (int32 *op, int32 cc, int32 opc, int32 acc)
+int32 op_cis (uint32 *op, int32 cc, int32 opc, int32 acc)
 {
 int32 i, j, c, t, pop, rpt, V;
 int32 match, fill, sign, shift;
@@ -173,7 +173,7 @@ switch (opc) {                                          /* case on opcode */
             mvl = R[0] & STR_LNMASK;                    /* orig move len */
             if (mvl >= (R[4] & STR_LNMASK))
                 mvl = R[4] & STR_LNMASK;
-            if (((uint32) R[1]) < ((uint32) R[5])) {    /* backward? */
+            if (R[1] < R[5]) {                          /* backward? */
                 while (R[2]) {                          /* loop thru char */
                     t = Read ((R[1] + R[2] - 1) & LMASK, L_BYTE, RA);
                     c = Read ((R[3] + t) & LMASK, L_BYTE, RA);
@@ -739,13 +739,13 @@ switch (opc) {                                          /* case on opcode */
             result = (~result + 1) & LMASK;
         if (src1.sign ^ ((result & LSIGN) != 0))        /* test for overflow */
             V = 1;
-        if (op[2] < 0)                                  /* if mem, store result */
+        if (op[2] == OP_MEM)                            /* if mem, store result */
             Write (op[3], result, L_LONG, WA);          /* before reg update */
         R[0] = 0;                                       /* update registers */
         R[1] = op[1];
         R[2] = 0;
         R[3] = 0;
-        if (op[2] >= 0)                                 /* if reg, store result */
+        if (op[2] != OP_MEM)                            /* if reg, store result */
             R[op[2]] = result;                          /* after reg update */
         if (V && (PSL & PSW_IV))                        /* ovflo and IV? trap */
             SET_TRAP (TRAP_INTOV);

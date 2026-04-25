@@ -106,7 +106,7 @@
 #define RQ_QTIME        100
 #define RQ_XTIME        200
 #define OLDPC           fault_PC
-extern int32 fault_PC;
+extern uint32 fault_PC;
 
 #else                                                   /* PDP-11 version */
 #include "pdp11_defs.h"

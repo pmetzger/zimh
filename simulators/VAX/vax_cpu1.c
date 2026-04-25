@@ -100,7 +100,7 @@ extern t_bool BadCmPSL (int32 newpsl);
    Returns bit to be tested
 */
 
-int32 op_bb_n (int32 *opnd, int32 acc)
+int32 op_bb_n (uint32 *opnd, int32 acc)
 {
 int32 pos = opnd[0];
 int32 rn = opnd[1];
@@ -118,7 +118,7 @@ by = Read (ea, L_BYTE, RA);                             /* read byte */
 return ((by >> pos) & 1);                               /* get bit */
 }
 
-int32 op_bb_x (int32 *opnd, int32 newb, int32 acc)
+int32 op_bb_x (uint32 *opnd, int32 newb, int32 acc)
 {
 int32 pos = opnd[0];
 int32 rn = opnd[1];
@@ -151,7 +151,7 @@ return bit;
    If the field is in a register, rn + 1 is in vfldrp1
 */
 
-int32 op_extv (int32 *opnd, int32 vfldrp1, int32 acc)
+int32 op_extv (uint32 *opnd, int32 vfldrp1, int32 acc)
 {
 int32 pos = opnd[0];
 int32 size = opnd[1];
@@ -195,7 +195,7 @@ return wd & byte_mask[size];
    If the field is in a register, rn + 1 is in vfldrp1
 */
 
-void op_insv (int32 *opnd, int32 vfldrp1, int32 acc)
+void op_insv (uint32 *opnd, int32 vfldrp1, int32 acc)
 {
 uint32 ins = opnd[0];
 int32 pos = opnd[1];
@@ -334,7 +334,7 @@ return size;
                 update PSW traps, clear condition codes
 */
 
-int32 op_call (int32 *opnd, t_bool gs, int32 acc)
+int32 op_call (uint32 *opnd, t_bool gs, int32 acc)
 {
 int32 addr = opnd[1];
 int32 mask, stklen, tsp, wd;
@@ -419,7 +419,7 @@ return spamask & (CC_MASK);                             /* return cc's */
 
 /* PUSHR and POPR */
 
-void op_pushr (int32 *opnd, int32 acc)
+void op_pushr (uint32 *opnd, int32 acc)
 {
 int32 mask = opnd[0] & 0x7FFF;
 int32 stklen, tsp;
@@ -449,7 +449,7 @@ SP = tsp;                                               /* update stk ptr */
 return;
 }
 
-void op_popr (int32 *opnd, int32 acc)
+void op_popr (uint32 *opnd, int32 acc)
 {
 int32 mask = opnd[0] & 0x7FFF;
 int32 stklen;
@@ -503,11 +503,12 @@ return;
    might be misaligned.
 */
 
-int32 op_insque (int32 *opnd, int32 acc)
+int32 op_insque (uint32 *opnd, int32 acc)
 {
-int32 p = opnd[1];
-int32 e = opnd[0];
-int32 s, cc;
+uint32 p = opnd[1];
+uint32 e = opnd[0];
+uint32 s;
+int32 cc;
 
 s = Read (p, L_LONG, WA);                               /* s <- (p), wchk */
 Read (s + 4, L_LONG, WA);                               /* wchk s+4 */
@@ -543,10 +544,11 @@ return cc;
 
 */
 
-int32 op_remque (int32 *opnd, int32 acc)
+int32 op_remque (uint32 *opnd, int32 acc)
 {
-int32 e = opnd[0];
-int32 s, p, cc;
+uint32 e = opnd[0];
+uint32 s, p;
+int32 cc;
 
 s = Read (e, L_LONG, RA);                               /* s <- (e) */
 p = Read (e + 4, L_LONG, RA);                           /* p <- (e+4) */
@@ -595,11 +597,11 @@ return cc;
         not be equal.
 */
 
-int32 op_insqhi (int32 *opnd, int32 acc)
+int32 op_insqhi (uint32 *opnd, int32 acc)
 {
-int32 h = opnd[1];
-int32 d = opnd[0];
-int32 a;
+uint32 h = opnd[1];
+uint32 d = opnd[0];
+uint32 a;
 int32 t;
 
 if ((h == d) || ((h | d) & 07))                         /* h, d quad align? */
@@ -621,11 +623,11 @@ Write (h, d - h, L_LONG, WA);                           /* (h) <- d-h, rls int *
 return (a == h)? CC_Z: 0;                               /* Z = 1 if a = h */
 }
 
-int32 op_insqti (int32 *opnd, int32 acc)
+int32 op_insqti (uint32 *opnd, int32 acc)
 {
-int32 h = opnd[1];
-int32 d = opnd[0];
-int32 a, c;
+uint32 h = opnd[1];
+uint32 d = opnd[0];
+uint32 a, c;
 int32 t;
 
 if ((h == d) || ((h | d) & 07))                         /* h, d quad align? */
@@ -680,10 +682,10 @@ return 0;                                               /* q >= 2 entries */
         the header and the destination must not be equal.
 */
 
-int32 op_remqhi (int32 *opnd, int32 acc)
+int32 op_remqhi (uint32 *opnd, int32 acc)
 {
-int32 h = opnd[0];
-int32 ar, a, b;
+uint32 h = opnd[0];
+uint32 ar, a, b;
 int32 t;
 
 if (h & 07)                                             /* h quad aligned? */
@@ -721,10 +723,10 @@ if (ar == 0)                                            /* empty, cc = 0110 */
 return (b == h)? CC_Z: 0;                               /* if b = h, q empty */
 }
 
-int32 op_remqti (int32 *opnd, int32 acc)
+int32 op_remqti (uint32 *opnd, int32 acc)
 {
-int32 h = opnd[0];
-int32 ar, b, c;
+uint32 h = opnd[0];
+uint32 ar, b, c;
 int32 t;
 
 if (h & 07)                                             /* h quad aligned? */
@@ -804,7 +806,7 @@ return 0;                                               /* q can't be empty */
         R5      =       cc/state
 */
 
-int32 op_movc (int32 *opnd, int32 movc5, int32 acc)
+int32 op_movc (uint32 *opnd, int32 movc5, int32 acc)
 {
 int32 i, cc, fill, wd;
 int32 j, lnt, mlnt[3];
@@ -814,7 +816,7 @@ if (PSL & PSL_FPD) {                                    /* FPD set? */
     SETPC (fault_PC + STR_GETDPC (R[0]));               /* reset PC */
     fill = STR_GETCHR (R[0]);                           /* get fill */
     R[2] = R[2] & STR_LNMASK;                           /* mask lengths */
-    if (R[4] > 0)
+    if (vax_slong (R[4]) > 0)
         R[4] = R[4] & STR_LNMASK;
     }
 else {
@@ -834,7 +836,7 @@ else {
         }
     R[0] = STR_PACK (fill, R[2]);                       /* initial mvlen */
     if (R[2]) {                                         /* any move? */
-        if (((uint32) R[1]) < ((uint32) R[3])) {
+        if (R[1] < R[3]) {
             R[1] = R[1] + R[2];                         /* backward, adjust */
             R[3] = R[3] + R[2];                         /* addr to end */
             R[5] = MVC_BACK;                            /* set state */
@@ -897,7 +899,7 @@ switch (R[5] & MVC_M_STATE) {                           /* case on state */
 
     case MVC_FILL:                                      /* fill */
     FILL:
-        if (R[4] <= 0)                                  /* any fill? */
+        if (vax_slong (R[4]) <= 0)                      /* any fill? */
             break;
         R[5] = R[5] | MVC_FILL;                         /* set state */
         mlnt[0] = (4 - R[3]) & 3;                       /* length to align */
@@ -950,7 +952,7 @@ return cc;
         R3      =       source2 address
 */
 
-int32 op_cmpc (int32 *opnd, int32 cmpc5, int32 acc)
+int32 op_cmpc (uint32 *opnd, int32 cmpc5, int32 acc)
 {
 int32 cc, s1, s2, fill;
 
@@ -1010,7 +1012,7 @@ return cc;
         R1      =       source address
 */
 
-int32 op_locskp (int32 *opnd, int32 skpc, int32 acc)
+int32 op_locskp (uint32 *opnd, int32 skpc, int32 acc)
 {
 int32 c, match;
 
@@ -1050,7 +1052,7 @@ return (R[0]? 0: CC_Z);                                 /* set cc's */
         R3      =       table address
 */
 
-int32 op_scnspn (int32 *opnd, int32 spanc, int32 acc)
+int32 op_scnspn (uint32 *opnd, int32 spanc, int32 acc)
 {
 int32 c, t, mask;
 
@@ -1148,7 +1150,7 @@ return 0;
         opnd[0] =       operand
 */
 
-int32 op_chm (int32 *opnd, int32 cc, int32 opc)
+int32 op_chm (uint32 *opnd, int32 cc, int32 opc)
 {
 int32 mode = opc & PSL_M_MODE;
 int32 cur = PSL_GETCUR (PSL);
@@ -1171,7 +1173,7 @@ if (Test (p2 = tsp - 12, WA, &sta) < 0) {
     p1 = MM_WRITE | (sta & MM_EMASK);
     ABORT ((sta & 4)? ABORT_TNV: ABORT_ACV);
     }
-Write (tsp - 12, SXTW (opnd[0]), L_LONG, WA);           /* push argument */
+Write (tsp - 12, vax_sword (opnd[0]), L_LONG, WA);      /* push argument */
 Write (tsp - 8, PC, L_LONG, WA);                        /* push PC */
 Write (tsp - 4, PSL | cc, L_LONG, WA);                  /* push PSL */
 SP = tsp - 12;                                          /* set new stk */
@@ -1374,7 +1376,7 @@ return;
         opnd[2] =       base address
 */
 
-int32 op_probe (int32 *opnd, int32 rw)
+int32 op_probe (uint32 *opnd, int32 rw)
 {
 int32 mode = opnd[0] & PSL_M_MODE;                      /* mask mode */
 int32 length = opnd[1];
@@ -1424,7 +1426,7 @@ return 0;
         opnd[1] =       register number
 */
 
-int32 op_mtpr (int32 *opnd)
+int32 op_mtpr (uint32 *opnd)
 {
 uint32 val = (uint32)opnd[0];
 uint32 prn = (uint32)opnd[1];
@@ -1556,7 +1558,7 @@ switch (prn) {                                          /* case on reg # */
 return cc;
 }
 
-int32 op_mfpr (int32 *opnd)
+int32 op_mfpr (uint32 *opnd)
 {
 uint32 prn = (uint32)opnd[0];
 int32 val;
