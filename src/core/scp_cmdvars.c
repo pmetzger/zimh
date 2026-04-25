@@ -361,7 +361,7 @@ static void sim_subststr_substr(const char *ops, char *rbuf, size_t rbuf_size)
                 length = rbuf_len - MIN(-l, rbuf_len);
             else
                 length = l;
-            /* fall through */
+            FALLTHROUGH;
         case 1:
             if (o < 0)
                 offset = rbuf_len - MIN(-o, rbuf_len);

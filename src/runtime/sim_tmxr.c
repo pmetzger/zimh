@@ -2523,7 +2523,7 @@ for (i = 0; i < mp->lines; i++) {                       /* loop thru lines */
                             lp->telnet_sent_opts[tmp] |= TNOS_DONT;/* Record DONT sent */
                             }
                         }
-                    /* fall through */
+                    FALLTHROUGH;
                 case TNS_WONT:           /* IAC+WILL/WONT prev */
                     if (tmp == TN_BIN) {                /* BIN? */
                         if (lp->tsta == TNS_WILL) {
@@ -2603,7 +2603,7 @@ for (i = 0; i < mp->lines; i++) {                       /* loop thru lines */
                                 lp->telnet_sent_opts[tmp] |= TNOS_WONT;/* Record WONT sent */
                             }
                         }
-                    /* fall through */
+                    FALLTHROUGH;
                 case TNS_SKIP: default:                 /* skip char */
                     tmxr_rmvrc (lp, j);                 /* remove char */
                     lp->tsta = TNS_NORM;                /* next normal */
@@ -6078,7 +6078,7 @@ if ((dptr) && (dbits & dptr->dctrl)) {
                         i += (tmxr_buf_debug_telnet_options ((u_char *)(&buf[i]), bufsize-i) - 1);
                         break;
                         }
-                    /* fall through */
+                    FALLTHROUGH;
                 default:
                     if (isprint((u_char)buf[i]))
                         tmxr_buf_debug_char (buf[i]);

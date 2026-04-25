@@ -873,7 +873,7 @@ switch (MT_GET_FMT (uptr)) {
         if ((uptr->recsize % 512) != 0)
             return sim_messagef (SCPE_ARG, "TAR format block size of %" SIZE_T_FMT "u is not a multiple of 512\n", uptr->recsize);
         sim_switches |= SWMASK ('E');                   /* The TAR file must exist */
-        /* fall through */
+        FALLTHROUGH;
     default:
         r = attach_unit (uptr, (CONST char *)cptr);     /* attach unit */
         break;
@@ -2060,7 +2060,7 @@ switch (f) {                                            /* case on format */
 
     case MTUF_F_STD:                                    /* standard */
         sbc = MTR_L ((bc + 1) & ~1);                    /* pad odd length */
-        /* fall through into the E11 handler */
+        FALLTHROUGH;
     case MTUF_F_E11:                                    /* E11 */
         (void)sim_fwrite (&bc, sizeof (t_mtrlnt), 1, uptr->fileref);
         (void)sim_fwrite (buf, sizeof (uint8), sbc, uptr->fileref);

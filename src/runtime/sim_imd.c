@@ -518,7 +518,7 @@ t_stat sectRead(DISK_INFO *myDisk,
         case SECT_RECORD_NORM_ERR:      /* Normal Data with read error */
         case SECT_RECORD_NORM_DAM_ERR:  /* Normal Data with deleted address mark with read error */
             *flags |= IMD_DISK_IO_ERROR_CRC;
-            /* fall through */
+            FALLTHROUGH;
         case SECT_RECORD_NORM:          /* Normal Data */
         case SECT_RECORD_NORM_DAM:      /* Normal Data with deleted address mark */
 
@@ -531,7 +531,7 @@ t_stat sectRead(DISK_INFO *myDisk,
         case SECT_RECORD_NORM_COMP_ERR: /* Compressed Normal Data */
         case SECT_RECORD_NORM_DAM_COMP_ERR: /* Compressed Normal Data with deleted address mark */
             *flags |= IMD_DISK_IO_ERROR_CRC;
-            /* fall through */
+            FALLTHROUGH;
         case SECT_RECORD_NORM_COMP:     /* Compressed Normal Data */
         case SECT_RECORD_NORM_DAM_COMP: /* Compressed Normal Data with deleted address mark */
 /*          sim_debug(myDisk->debugmask, myDisk->device, "Compressed Data\n"); */
@@ -551,6 +551,7 @@ t_stat sectRead(DISK_INFO *myDisk,
         case SECT_RECORD_NORM_DAM_COMP: /* Compressed Normal Data with deleted address mark */
         case SECT_RECORD_NORM_DAM_COMP_ERR: /* Compressed Normal Data with deleted address mark */
             *flags |= IMD_DISK_IO_DELETED_ADDR_MARK;
+            FALLTHROUGH;
         default:
             break;
     }

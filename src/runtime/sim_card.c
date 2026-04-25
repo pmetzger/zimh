@@ -234,7 +234,7 @@ static const uint16          ascii_to_dec_029[128] = {
     0x604, 0x602, 0x601, 0xA00, 0xC00, 0x600, 0x700,0xf000
 };
 
-#if SIMH_EVER_USES_THIS
+#if 0
 /* This is a static const that isn't referenced in this code.
  * Kept for historical reference.
  */
@@ -737,6 +737,7 @@ _sim_parse_card(UNIT *uptr, DEVICE *dptr, struct _card_buffer *buf, uint16 (*ima
                 case '\0':
                 case '\r':
                     col = 80;
+                    FALLTHROUGH;
                 case ' ':
                     break;              /* Ignore these */
                 case '\t':

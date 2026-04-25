@@ -8849,7 +8849,7 @@ while (size--) {
         case '\'':
             if (quote == *iptr)
                 *tptr++ = '\\';
-            /* fall through */
+            FALLTHROUGH;
         default:
             if (sim_isprint (*iptr))
                 *tptr++ = *iptr;

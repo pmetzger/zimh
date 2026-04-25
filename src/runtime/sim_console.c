@@ -1595,7 +1595,7 @@ for (i=(was_active_command ? sim_rem_cmd_active_line : 0);
                 case '\n':
                     if (rem->buf_ptr == 0)
                         break;
-                    /* fall through */
+                    FALLTHROUGH;
                 case '\r':
                     tmxr_linemsg (lp, "\r\n");
                     if (rem->buf_ptr+1 >= rem->buf_size) {

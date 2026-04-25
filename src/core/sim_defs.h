@@ -165,6 +165,30 @@
 #define CONST const
 #endif
 
+/* Prefer the C23 fallthrough attribute when available. This compatibility
+   macro can be removed once all supported compilers accept [[fallthrough]]. */
+#ifndef FALLTHROUGH
+#  if defined(__has_c_attribute)
+#    if __has_c_attribute(fallthrough)
+#      define FALLTHROUGH [[fallthrough]]
+#    endif
+#  endif
+
+#  if !defined(FALLTHROUGH) && defined(__has_attribute)
+#    if __has_attribute(fallthrough)
+#      define FALLTHROUGH __attribute__((fallthrough))
+#    endif
+#  endif
+
+#  if !defined(FALLTHROUGH) && defined(__GNUC__) && __GNUC__ >= 7
+#    define FALLTHROUGH __attribute__((fallthrough))
+#  endif
+
+#  if !defined(FALLTHROUGH)
+#    define FALLTHROUGH ((void)0)
+#  endif
+#endif
+
 /* Length specific integer declarations */
 
 /* All supported toolchains provide stdint.h. */
