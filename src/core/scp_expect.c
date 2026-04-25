@@ -406,6 +406,7 @@ t_stat send_cmd(int32 flag, CONST char *cptr)
         return sim_send_clear(snd);
     delay = snd->default_delay;
     after = snd->default_after;
+    tptr = get_glyph(cptr, gbuf, ',');
     while (*cptr) {
         if ((!strncmp(gbuf, "DELAY=", 6)) && (gbuf[6])) {
             delay = (uint32)get_uint(&gbuf[6], 10, 2000000000, &r);
