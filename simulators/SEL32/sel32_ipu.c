@@ -6673,8 +6673,8 @@ newpsd:
                     /* bad address for trap vector, lets halt */
                     fprintf(stderr, "IPU Bad trap tta %08x PSD1 %08x PSD2 %08x TRAPME %02x\r\n",
                         tta, PSD1, PSD2, TRAPME);
-                    fprintf(stderr, "IPU Bad trap address tvl %08x, tta %02x CCW %08x status %08x\r\n",
-                        tvl, tta, CCW, IPUSTATUS);
+                    fprintf(stderr, "IPU Bad trap address tta %02x CCW %08x status %08x\r\n",
+                        tta, CCW, IPUSTATUS);
                     fflush(stderr);
                     goto doahalt;
                 }
