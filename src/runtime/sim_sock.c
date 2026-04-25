@@ -531,9 +531,18 @@ if ((hostp != NULL) && (*hostp != '\0')) {
     if (']' == hostp[strlen(hostp)-1]) {
         if ('[' != hostp[0])
             return -1;                                  /* invalid domain literal */
-        /* host may be the const default_host so move to temp buffer before modifying */
-        strncpy(gbuf, hostp+1, sizeof(gbuf)-1);         /* remove brackets from domain literal host */
-        gbuf[strlen(gbuf)-1] = '\0';
+        size_t domain_literal_len = strlen(hostp);
+
+        /* Reject empty literals like "[]" and literals that cannot fit after
+           removing the brackets. */
+        if ((domain_literal_len <= 2) ||
+            (domain_literal_len - 2 >= sizeof(gbuf)))
+            return -1;
+        /* hostp may point inside gbuf when parsing "[addr]:port", or it may
+           point at const default_host.  Use memmove so bracket removal is
+           safe when the source and destination overlap. */
+        memmove(gbuf, hostp+1, domain_literal_len - 2); /* remove brackets */
+        gbuf[domain_literal_len - 2] = '\0';
         hostp = gbuf;
         }
     }
