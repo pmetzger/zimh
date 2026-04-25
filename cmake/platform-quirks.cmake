@@ -132,17 +132,10 @@ endif ()
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES ".*Clang")
     # include(fpintrin)
 
-    # Temporarily require wraparound overflow semantics while the code base
-    # still contains signed-overflow UB that must not be exploited by the
-    # optimizer.
-    message(STATUS "Forcing temporary signed-overflow safety flags")
-
     # Turn on warnings about strict overflow/potential overflows.
     ## LIST(APPEND EXTRA_TARGET_CFLAGS "-Wall" "-fno-inline" "-fstrict-overflow" "-Wstrict-overflow=3")
     LIST(APPEND EXTRA_TARGET_CFLAGS
         "-U__STRICT_ANSI__"
-        "-fwrapv"
-        "-fno-strict-overflow"
         "$<$<CONFIG:Debug>:$<$<OR:$<BOOL:${DEBUG_WALL}>,$<BOOL:${DEBUG_WARNINGS}>>:-Wall>>"
         "$<$<CONFIG:Release>:-Wall>"
         "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wextra>>"
