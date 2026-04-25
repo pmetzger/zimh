@@ -452,6 +452,7 @@ static int setup_sim_tmxr_fixture(void **state)
     struct sim_tmxr_fixture *fixture;
     size_t i;
 
+    simh_test_reset_simulator_state();
     fixture = calloc(1, sizeof(*fixture));
     assert_non_null(fixture);
 
@@ -504,6 +505,7 @@ static int setup_sim_tmxr_fixture(void **state)
     }
 
     tmxr_io_fixture = fixture;
+    sim_init_sock();
     tmxr_reset_io_hooks();
 
     *state = fixture;
@@ -537,6 +539,7 @@ static int teardown_sim_tmxr_fixture(void **state)
     free(fixture->mux.ring_ipad);
     free(fixture->unit.filename);
     tmxr_reset_io_hooks();
+    sim_cleanup_sock();
     tmxr_io_fixture = NULL;
     free(fixture);
     *state = NULL;
