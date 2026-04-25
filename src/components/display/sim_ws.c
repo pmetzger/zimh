@@ -57,14 +57,14 @@ int ws_lp_y = -1;
 
 /* A device simulator can optionally set the vid_display_kb_event_process
  * routine pointer to the address of a routine.
- * Simulator code which uses the display library which processes window 
+ * Simulator code which uses the display library which processes window
  * keyboard data with code in display/sim_ws.c can use this routine to
- * explicitly get access to keyboard events that arrive in the display 
+ * explicitly get access to keyboard events that arrive in the display
  * window.  This routine should return 0 if it has handled the event that
  * was passed, and non zero if it didn't handle it.  If the routine address
  * is not set or a non zero return value occurs, then the keyboard event
  * will be processed by the display library which may then be handled as
- * console character input if the device console code is implemented to 
+ * console character input if the device console code is implemented to
  * accept this.
  */
 int (*vid_display_kb_event_process)(SIM_KEY_EVENT *kev) = NULL;
@@ -191,16 +191,16 @@ key_to_ascii (SIM_KEY_EVENT *kev)
         case SIM_KEY_0: case SIM_KEY_1: case SIM_KEY_2: case SIM_KEY_3: case SIM_KEY_4:
         case SIM_KEY_5: case SIM_KEY_6: case SIM_KEY_7: case SIM_KEY_8: case SIM_KEY_9:
             if (kev->state != SIM_KEYPRESS_UP)
-                display_last_char = (unsigned char)('0' + (kev->key - SIM_KEY_0)); 
+                display_last_char = (unsigned char)('0' + (kev->key - SIM_KEY_0));
             break;
         case SIM_KEY_A: case SIM_KEY_B: case SIM_KEY_C: case SIM_KEY_D: case SIM_KEY_E:
         case SIM_KEY_F: case SIM_KEY_G: case SIM_KEY_H: case SIM_KEY_I: case SIM_KEY_J:
         case SIM_KEY_K: case SIM_KEY_L: case SIM_KEY_M: case SIM_KEY_N: case SIM_KEY_O:
         case SIM_KEY_P: case SIM_KEY_Q: case SIM_KEY_R: case SIM_KEY_S: case SIM_KEY_T:
         case SIM_KEY_U: case SIM_KEY_V: case SIM_KEY_W: case SIM_KEY_X: case SIM_KEY_Y:
-        case SIM_KEY_Z: 
+        case SIM_KEY_Z:
             if (kev->state != SIM_KEYPRESS_UP)
-                display_last_char = (unsigned char)((kev->key - SIM_KEY_A) + 
+                display_last_char = (unsigned char)((kev->key - SIM_KEY_A) +
                                         (k_ctrl ? 1 : (k_shift ? 'A' : 'a')));
             break;
         }
@@ -217,7 +217,7 @@ ws_poll(int *valp, int maxus)
 
     if (SCPE_OK == vid_poll_mouse (&mev)) {
         unsigned char old_lp_sw = display_lp_sw;
-        
+
         if ((display_lp_sw = mev.b1_state)) {
             ws_lp_x = mev.x_pos;
             ws_lp_y = (ypixels - 1) - mev.y_pos; /* range 0 - (ypixels-1) */
@@ -235,7 +235,7 @@ ws_poll(int *valp, int maxus)
         vid_set_cursor_position (mev.x_pos, mev.y_pos);
         }
     if (SCPE_OK == vid_poll_kb (&kev)) {
-        if ((vid_display_kb_event_process == NULL) || 
+        if ((vid_display_kb_event_process == NULL) ||
             (vid_display_kb_event_process (&kev) != 0)) {
             switch (kev.state) {
                 case SIM_KEYPRESS_DOWN:
@@ -317,7 +317,7 @@ CURSOR *result = NULL;
 int width, height, colors, cpp;
 int hot_x = 0, hot_y = 0;
 
-if (4 > sscanf(image[0], "%d %d %d %d %d %d", 
+if (4 > sscanf(image[0], "%d %d %d %d %d %d",
                &width, &height, &colors, &cpp, &hot_x, &hot_y))
     return result;
 if ((cpp != 1) || (0 != width%8) || (colors != 3))
@@ -388,7 +388,7 @@ ws_init(const char *name, int xp, int yp, int colors, void *dptr)
 {
     int i;
     int ret;
-    
+
     arrow_cursor = ws_create_cursor (arrow);
     cross_cursor = ws_create_cursor (cross);
     xpixels = xp;
@@ -417,7 +417,7 @@ void *
 ws_color_rgb(int r, int g, int b)
 {
     uint32 color, i;
-    
+
     color = vid_map_rgb ((r >> 8) & 0xFF, (g >> 8) & 0xFF, (b >> 8) & 0xFF);
     for (i=0; i<ncolors; i++) {
         if (colors[i] == color)
@@ -463,7 +463,7 @@ ws_display_point(int x, int y, void *color)
         brush = (uint32 *)ws_color_black ();
     if (pix_size > 1) {
         int i, j;
-        
+
         for (i=0; i<pix_size; i++)
             for (j=0; j<pix_size; j++)
                 surface[(y + i)*xpixels + x + j] = *brush;
@@ -471,7 +471,7 @@ ws_display_point(int x, int y, void *color)
     else
         surface[y*xpixels + x] = *brush;
 }
-  
+
 void
 ws_sync(void) {
     vid_draw (0, 0, xpixels, ypixels, surface);

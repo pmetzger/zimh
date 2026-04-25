@@ -25,11 +25,11 @@
 
     NOTES:
 
-        This software was written by Bill Beech, 24 Jan 13, to allow emulation of 
+        This software was written by Bill Beech, 24 Jan 13, to allow emulation of
         more complex Multibus Computer Systems.
 
-        This program simulates up to 4 i8259 devices.  It handles 1 i8259 
-        device on the iSBC 80/20 and iSBC 80/30 SBCs.  Other devices could be on 
+        This program simulates up to 4 i8259 devices.  It handles 1 i8259
+        device on the iSBC 80/20 and iSBC 80/30 SBCs.  Other devices could be on
         other multibus boards in the simulated system.
 */
 
@@ -65,7 +65,7 @@ extern uint8 unreg_dev(uint16);
 /* these bytes represent the input and output to/from a device instance */
 
 uint8 i8259_IR[4];                      //interrupt inputs (bits 0-7)
-uint8 i8259_CAS[4];                     //interrupt cascade I/O (bits 0-2) 
+uint8 i8259_CAS[4];                     //interrupt cascade I/O (bits 0-2)
 uint8 i8259_INT[4];                     //interrupt output (bit 0)
 
 uint8 i8259_base[4];
@@ -108,7 +108,7 @@ DEBTAB i8259_debug[] = {
 };
 
 MTAB i8259_mod[] = {
-    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, i8259_show_param, NULL, 
+    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, i8259_show_param, NULL,
         "show configured parameters for i8259" },
     { 0 }
 };
@@ -133,7 +133,7 @@ DEVICE i8259_dev = {
     NULL,               //attach
     NULL,               //detach
     NULL,               //ctxt
-    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags 
+    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags
     0,                  //dctrl
     i8259_debug,        //debflags
     NULL,               //msize
@@ -155,8 +155,8 @@ t_stat i8259_cfg(uint16 base, uint16 devnum, uint8 dummy)
     i8259_baseport[devnum] = base & BYTEMASK;
     sim_printf("    i8259%d: installed at base port 0%02XH\n",
         devnum, i8259_baseport[devnum]);
-    reg_dev(i8259a, i8259_baseport[devnum], devnum, 0); 
-    reg_dev(i8259b, i8259_baseport[devnum] + 1, devnum, 0); 
+    reg_dev(i8259a, i8259_baseport[devnum], devnum, 0);
+    reg_dev(i8259b, i8259_baseport[devnum] + 1, devnum, 0);
     i8259_num++;
     return SCPE_OK;
 }
@@ -164,15 +164,15 @@ t_stat i8259_cfg(uint16 base, uint16 devnum, uint8 dummy)
 t_stat i8259_clr(void)
 {
     int i;
-    
+
     for (i=0; i<i8259_num; i++) {
-        unreg_dev(i8259_baseport[i]); 
-        unreg_dev(i8259_baseport[i] + 1); 
+        unreg_dev(i8259_baseport[i]);
+        unreg_dev(i8259_baseport[i] + 1);
         i8259_baseport[i] = -1;
         i8259_intnum[i] = 0;
         i8259_verb[i] = 0;
     }
-    i8259_num = 0; 
+    i8259_num = 0;
     return SCPE_OK;
 }
 
@@ -181,7 +181,7 @@ t_stat i8259_clr(void)
 t_stat i8259_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int i;
-    
+
     if (uptr == NULL)
         return SCPE_ARG;
     fprintf(st, "Device %s\n", ((i8259_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled");
@@ -202,7 +202,7 @@ t_stat i8259_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 t_stat i8259_reset (DEVICE *dptr)
 {
     uint8 devnum;
-    
+
     for (devnum=0; devnum < 4; devnum++) {
         if (devnum < i8259_num) {
             i8259_unit[devnum].flags = 0;

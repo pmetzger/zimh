@@ -88,11 +88,11 @@
     For RSX there exists a CR/CM task handler.  Is there a CD
     handler?
 
-    To-do (RSX): The CR11 unit works as a regular device (ie, 
+    To-do (RSX): The CR11 unit works as a regular device (ie,
     you can PIP from it) but it does not work well as a job
     input device (it works just once, somwhow the CRP processor
     gets stuck).
- 
+
     Don't have any information about Unix or Ultrix-11 yet.  Same
     for VAX Unices.
 
@@ -186,9 +186,9 @@
 */
 
 /* Configuration notes:
- * Keep VM_arch symbols here and use them only to select features.  
+ * Keep VM_arch symbols here and use them only to select features.
  * CR attributes use generic symbols so device support is easy to change,
- * e.g. if software is discovered that uses a previously unsupported option. 
+ * e.g. if software is discovered that uses a previously unsupported option.
  * Conventions:
  * *_ONLY (AND *_req) means feature * is unconditionally present/required.
  * *_OK means feature * is selectable at runtime.
@@ -198,7 +198,7 @@
  * Don't mix "_ONLY" and "_OK" for the same feature.  You won't like it.
  *
  * The CD/CR will work on any UNIBUS, and the CR will also work on a QBUS.
- * The configuration options used here are more restrictive to reflect 
+ * The configuration options used here are more restrictive to reflect
  * known software support, as this reduces user configuration errors/confusion.
  */
 
@@ -385,7 +385,7 @@
 #define CDDB_V_PICK        13 /* Pick check (card present, not grabbed) */
 #define CDDB_V_STACK       12 /* Card did not arrive in stacker */
 
-/* N.B. Per TOPS-20 driver, which references CD11 manual and printset: 
+/* N.B. Per TOPS-20 driver, which references CD11 manual and printset:
  * Stacker full is indicated by:
  * CDCSR_RDRCHK && !(CDDB_READ|CDDB_PICK|CDDB_STACK)
  */
@@ -525,15 +525,15 @@ static const REG cr_reg[] = {
 static char *translation_help = NULL;
 static MTAB cr_mod[] = {
 #if defined (CR11_OK)
-    { UNIT_TYPE, UNIT_CR11, "CR11", "CR11", 
+    { UNIT_TYPE, UNIT_CR11, "CR11", "CR11",
         &cr_set_type, NULL, NULL, "Set device type to CR11" },
 #endif
 #if defined (CD11_OK)
-    { UNIT_TYPE,         0, "CD11", "CD11", 
+    { UNIT_TYPE,         0, "CD11", "CD11",
         &cr_set_type, NULL, NULL, "Set device type to CD11" },
 #endif
 #if defined (CD20_OK)
-    { UNIT_TYPE, UNIT_CD20, "CD20", "CD20", 
+    { UNIT_TYPE, UNIT_CD20, "CD20", "CD20",
         &cr_set_type, NULL, NULL, "Set device type to CD20" },
 #endif
 #if defined (CR11_ONLY) || defined (CD11_ONLY) || defined (CD20_ONLY)
@@ -547,9 +547,9 @@ static MTAB cr_mod[] = {
     { (UNIT_TYPE|UNIT_AIECO), (UNIT_CD20|0),          "standard", "NOAIECO",
         &cr_set_aieco, NULL, NULL, "Disable CD20 augmented image ECO" },
 #endif
-    { UNIT_AUTOEOF, UNIT_AUTOEOF, "auto EOF", "AUTOEOF", 
+    { UNIT_AUTOEOF, UNIT_AUTOEOF, "auto EOF", "AUTOEOF",
         NULL, NULL, NULL, "Enable auto EOF mode" },
-    { UNIT_AUTOEOF,            0, "no auto EOF", "NOAUTOEOF", 
+    { UNIT_AUTOEOF,            0, "no auto EOF", "NOAUTOEOF",
         NULL, NULL, NULL, "Disable auto EOF mode" },
 #if !defined (CR11_ONLY)
     { UNIT_RDCHECK, UNIT_RDCHECK, "read check", "RDCHECK",
@@ -651,7 +651,7 @@ static t_bool fileEOF ( UNIT  *uptr,
         cdst |= CDCSR_HOPPER;
         return (TRUE);
     }
-    
+
     /* Not auto EOF, or EOF already handled. This is an attempt to read
      * with an empty hopper.  Report a pick, read or stacker check as well
      * as hopper empty to indicate that no data was transfered.  One might
@@ -1003,13 +1003,13 @@ t_stat cr_rd (  int32   *data,
             else
                 fprintf (sim_deb, "\r\ncr_rd cdba %06o\n", cdba);
         }
-       crb2 = 0;    /* see note for crb1 */ 
+       crb2 = 0;    /* see note for crb1 */
        break;
     case 3:
     default:
         if (CR11_CTL(&cr_unit)) /* CR11 maintenance */
             *data = crm;
-        else /* CD11 data buffer/status.  Note this implementation returns extended 
+        else /* CD11 data buffer/status.  Note this implementation returns extended
               * status even while busy (rather than the zone).  Might be wrong.
               */
             *data = 0100000 | (cddbs & (CDDB_READ|CDDB_PICK|CDDB_STACK)) |
@@ -1037,7 +1037,7 @@ t_stat cr_wr (  int32   data,
                 break;
             /* fixup data for low byte write */
             if (access == WRITEB)
-                data = (crs & ~0377) | (data & 0377); 
+                data = (crs & ~0377) | (data & 0377);
             if (!(data & CSR_IE))
                 cr_clr_int ();
             crs = (crs & ~CRCSR_RW) | (data & CRCSR_RW);
@@ -1045,7 +1045,7 @@ t_stat cr_wr (  int32   data,
             crs &= ~(CSR_ERR | CRCSR_ONLINE | CRCSR_CRDDONE | CRCSR_TIMERR);
             if (crs & CRCSR_OFFLINE)
                 crs |= CSR_ERR;
-            /* 
+            /*
              * Read card requested:
              * Check if there was any error which required an operator
              * intervention, and if so, reassert the corresponding
@@ -1121,9 +1121,9 @@ t_stat cr_wr (  int32   data,
                     }
                 }
             } else {
-                cdst = (cdst & ~(CSR_ERR | CDCSR_RDRCHK | CDCSR_EOF | CDCSR_DATAERR | CDCSR_LATE | 
+                cdst = (cdst & ~(CSR_ERR | CDCSR_RDRCHK | CDCSR_EOF | CDCSR_DATAERR | CDCSR_LATE |
                                  CDCSR_NXM | CSR_IE | CDCSR_XBA17 | CDCSR_XBA16 | CDCSR_ONLINE | CDCSR_PACK))
-                      |(data &  (CSR_ERR | CDCSR_RDRCHK | CDCSR_EOF | CDCSR_DATAERR | CDCSR_LATE | 
+                      |(data &  (CSR_ERR | CDCSR_RDRCHK | CDCSR_EOF | CDCSR_DATAERR | CDCSR_LATE |
                                  CDCSR_NXM | CSR_IE | CDCSR_XBA17 | CDCSR_XBA16 | CDCSR_ONLINE | CDCSR_PACK));
             }
             /* Apparently the hardware does not set int if ready/online are already set.  If it did, TOPS-10's driver wouldn't work */
@@ -1181,7 +1181,7 @@ t_stat cr_wr (  int32   data,
 
 /*
  * Interrupt acknowledge routine
- * Reschedule service routine if needed (based on 
+ * Reschedule service routine if needed (based on
  * schedule_svc flag).
  * Do the actual scheduling just for the CR11 (VAX/PDP11). The PDP10 does
  * not seem to call this entry point.
@@ -1221,7 +1221,7 @@ t_stat cr_svc ( UNIT    *uptr    )
     /* (almost) anything we do now will cause a CR (But not a CD) interrupt */
     if ((CR11_CTL(uptr)) && (crs & CSR_IE))
        cr_set_int ();
-    
+
     /* Unit not attached, or error status while idle */
     if (!(uptr->flags & UNIT_ATT) || (!(crs & CRCSR_BUSY) && ((CR11_CTL(uptr)?crs : cdst) & CSR_ERR))) {
         if (CD11_CTL(uptr)) {
@@ -1243,7 +1243,7 @@ t_stat cr_svc ( UNIT    *uptr    )
 
          if (DEBUG_PRS (cr_dev))
             fprintf (sim_deb, "cr_svc card done\n");
-         
+
          /* Check CD11 error status that stops transfers */
         if (CD11_CTL(uptr) && (cdst & (CDCSR_LATE | CDCSR_NXM))) {
             cdst |= CSR_ERR | CDCSR_OFFLINE | CDCSR_RDY | CDCSR_RDRCHK;
@@ -1262,13 +1262,13 @@ t_stat cr_svc ( UNIT    *uptr    )
             return (SCPE_OK);
     }
 
-    /* If unit is not busy: try to read a card */ 
+    /* If unit is not busy: try to read a card */
     if (!(crs & CRCSR_BUSY)) {
         crs &= ~CRCSR_CRDDONE; /* This line WAS commented out - JGP 2013.02.05 */
 
         /* Call the appropriate read card routine.
          * If no card is read (FALSE return), we tried to read with an empty hopper.
-         * The card read routine set the appropriate error bits.  Shutdown. 
+         * The card read routine set the appropriate error bits.  Shutdown.
          */
         if (!readRtn (uptr, hcard, ccard, acard)) {
             blowerState = BLOW_STOP;
@@ -1296,7 +1296,7 @@ readFault:
             sim_activate_after (uptr, spinDown);
             return (SCPE_OK);
         }
-        
+
         /* Card read: reset column counter and assert BUSY */
         currCol = colStart;
         crs |= CRCSR_BUSY;
@@ -1304,7 +1304,7 @@ readFault:
         /* Update status if this read emptied hopper.
          * The CR11 doesn't set SUPPLY until after the last card is read.
          */
-       
+
         /* I/O error status bits have been set during read.
          * Look ahead to see if another card is in file.
          */
@@ -1327,14 +1327,14 @@ readFault:
                 eofPending = FALSE;
             }
         }
-        
+
         if (EOFcard)
             EOFcard = 1;
-        
-        
+
+
         if (CD11_CTL(uptr)) {
              /* Handle read check: punches in col 0 or 81/last (DEC only did 80 cols, but...) */
-            if ((uptr->flags & UNIT_RDCHECK) && 
+            if ((uptr->flags & UNIT_RDCHECK) &&
                 (((colStart == 0) && (hcard[0] != 0)) || ((colEnd & 1) && (hcard[colEnd] != 0)))) {
                 cdst |= (CDCSR_RDRCHK | CSR_ERR);
                 cddbs |= CDDB_READ;
@@ -1384,7 +1384,7 @@ incremented properly.  If this causes problems, I'll fix it.
                 /* "Augmented Image" - provides full column binary and packed encoding in 15 bits.
                  * Bits <14:12> encode which zone, if any, of 1-7 is punched.  0 => none, otherwise zone #.
                  * Bit 15 set indicates that more than one punch occured in zones 1-7; in this case the packed
-                 * encoding is not valid. (Card may be binary data.)  
+                 * encoding is not valid. (Card may be binary data.)
                  * This was probably an ECO to the CD11.  TOPS-10/20 depend on it, so it's definitely in the CD20.
                  */
                 if (uptr->flags & UNIT_AIECO) {
@@ -1422,7 +1422,7 @@ incremented properly.  If this causes problems, I'll fix it.
     currCol++;    /* advance the column counter */
 
     /* Schedule next service cycle */
-    /* CR11 (VAX/PDP11): just raise the schedule_svc flag; the intack 
+    /* CR11 (VAX/PDP11): just raise the schedule_svc flag; the intack
      * routine will do the actual rescheduling.
      * CD11/20 (PDP10): Do the rescheduling (the intack seems to do nothing)
      */
@@ -1454,7 +1454,7 @@ t_stat cr_reset (   DEVICE  *dptr    )
         }
         translation_help[strlen (translation_help) - 1] = '\0';
         strlcat (translation_help, "}", size);
-        for (i = 0; i < (sizeof cr_mod / sizeof cr_mod[0]); i++ ) 
+        for (i = 0; i < (sizeof cr_mod / sizeof cr_mod[0]); i++ )
             if (cr_mod[i].pstring && !strcmp(cr_mod[i].pstring, "TRANSLATION")) {
                 cr_mod[i].mstring = translation_help;
                 break;
@@ -1530,7 +1530,7 @@ t_stat cr_attach (  UNIT    *uptr,
     if(uptr->flags & UNIT_ATT) {
         setupCardFile(uptr, sim_switches);
     }
-    
+
     return (reason);
 }
 
@@ -1682,7 +1682,7 @@ t_stat cr_set_reset (   UNIT    *uptr,
  */
     if ((crs & CRCSR_BUSY) || !(uptr->flags & UNIT_ATT))
         return (SCPE_OK);
- 
+
     /* if no errors, signal transition to on line */
     crs |= CRCSR_ONLINE;
     /* Clear error bits                           */
@@ -1713,8 +1713,8 @@ t_stat cr_set_reset (   UNIT    *uptr,
     cddb = 0;
     cddbs = 0;
     EOFcard = 0;
-    
-    /* start up the blower if the hopper is not empty 
+
+    /* start up the blower if the hopper is not empty
     if (blowerState != BLOW_ON) {
         blowerState = BLOW_START;
         sim_activate_after(uptr, spinUp);
@@ -1880,7 +1880,7 @@ if ((crtypes & -crtypes) != crtypes) {
     fprintf (st, "\nThe controller type must be set before attaching a virtual card deck to\n");
     fprintf (st, "the device.  You may NOT change controller type once a file is attached.\n\n");
     fprintf (st, "The primary differences between the controllers are summarized in the\n");
-    fprintf (st, "table below.  By default, %s simulation is selected.\n\n", 
+    fprintf (st, "table below.  By default, %s simulation is selected.\n\n",
                     (DFLT_TYPE & UNIT_CD20)? "CD20": ((DFLT_TYPE & UNIT_CR11)? "CR11" : "CD11"));
     fprintf (st, "                    CR11                CD11/CD20\n");
     fprintf (st, "    BR              6                   4\n");

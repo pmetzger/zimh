@@ -273,7 +273,7 @@ switch ((PA >> 1) & 03) {                               /* decode PA<2:1> */
         *data = dli_buf[ln] & DLIBUF_RD;
         dli_csr[ln] &= ~CSR_DONE;                       /* clr rcv done */
         dli_clr_int (ln, DLI_RCI);                      /* clr rcv int req */
-        /* Reschedule the next poll preceisely so that 
+        /* Reschedule the next poll preceisely so that
            the programmed input speed is observed. */
         sim_clock_coschedule_abs (&dli_unit, tmxr_poll);
         break;
@@ -616,7 +616,7 @@ else {
         if ((dlx_desc.lines + dlx_tu58_count()) > 16) {
             char lines[16];
             int32 saved_switches = sim_switches;
-            
+
             sprintf (lines, "%d", 16 - dlx_tu58_count());
             sim_switches |= SWMASK('Y');
             dlx_set_lines (NULL, 0, lines, NULL);
@@ -736,6 +736,6 @@ return SCPE_OK;
 
 const char *dlx_description (DEVICE *dptr)
 {
-return (dptr == &dli_dev) ? "DL11 asynchronous line interface - receiver" 
+return (dptr == &dli_dev) ? "DL11 asynchronous line interface - receiver"
                           : "DL11 asynchronous line interface - transmitter";
 }

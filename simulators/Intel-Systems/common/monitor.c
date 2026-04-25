@@ -60,11 +60,11 @@ t_stat monitor_cfg(uint16 base, uint16 size, uint8 devnum)
     return SCPE_OK;
 }
 
-/*  Monitor reset routine 
+/*  Monitor reset routine
     put here to cause a reset of the entire IPC system */
 
 t_stat monitor_reset (DEVICE *dptr)
-{    
+{
     monitor_boot = 0x00;
     return SCPE_OK;
 }

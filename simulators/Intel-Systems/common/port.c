@@ -61,11 +61,11 @@ extern uint16 PCX;
 
 /* multibus Standard SIMH Device Data Structures */
 
-UNIT port_unit = { 
+UNIT port_unit = {
     UDATA (&port_svc, 0, 0), 1
 };
 
-REG port_reg[] = { 
+REG port_reg[] = {
     { NULL }
 };
 
@@ -79,25 +79,25 @@ DEBTAB port_debug[] = {
 };
 
 DEVICE port_dev = {
-    "PORT",             //name 
-    &port_unit,         //units 
-    port_reg,           //registers 
+    "PORT",             //name
+    &port_unit,         //units
+    port_reg,           //registers
     NULL,               //modifiers
-    1,                  //numunits 
-    16,                 //aradix  
-    16,                 //awidth  
-    1,                  //aincr  
-    16,                 //dradix  
+    1,                  //numunits
+    16,                 //aradix
+    16,                 //awidth
+    1,                  //aincr
+    16,                 //dradix
     8,                  //dwidth
-    NULL,               //examine  
-    NULL,               //deposit  
-    &port_reset,        //reset 
+    NULL,               //examine
+    NULL,               //deposit
+    &port_reset,        //reset
     NULL,               //boot
-    NULL,               //attach  
+    NULL,               //attach
     NULL,               //detach
-    NULL,               //ctxt     
-    DEV_DEBUG,          //flags 
-    0,                  //dctrl 
+    NULL,               //ctxt
+    DEV_DEBUG,          //flags
+    0,                  //dctrl
     port_debug,         //debflags
     NULL,               //msize
     NULL,               //lname
@@ -113,7 +113,7 @@ DEVICE port_dev = {
 
 t_stat port_reset(DEVICE *dptr)
 {
-//    if (SBC_reset(NULL) == 0) { 
+//    if (SBC_reset(NULL) == 0) {
 //        sim_printf("  Port: Reset\n");
         sim_activate (&port_unit, port_unit.wait); /* activate unit */
         return SCPE_OK;
@@ -136,7 +136,7 @@ device addresses, if a device is plugged to a port it's routine
 address is here, 'nulldev' means no device has been registered.
 */
 struct idev {
-    uint8 (*routine)(t_bool io, uint8 data, uint8 devnum); 
+    uint8 (*routine)(t_bool io, uint8 data, uint8 devnum);
     uint16 port;
     uint16 devnum;
     uint8 dummy;
@@ -233,7 +233,7 @@ uint8 reg_dev(uint8 (*routine)(t_bool io, uint8 data, uint8 devnum),
 void clr_dev(void)
 {
     int i;
-    
+
     for (i=0; i<256; i++)
         unreg_dev(i);
 }

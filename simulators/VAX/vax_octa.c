@@ -377,7 +377,7 @@ switch (opc) {
         break;
 
 /* ACBH
-        
+
         opnd[0:3] =     limit.rh
         opnd[4:7] =     add.rh
         opnd[8:11] =    index.mh
@@ -402,7 +402,7 @@ switch (opc) {
         opnd[4] =       deg.rb
         opnd[5] =       table.ah
 */
-        
+
     case POLYH:
         op_polyh (opnd, acc);                           /* eval polynomial */
         CC_IIZZ_FP (R[0]);                              /* set cc's */
@@ -592,7 +592,7 @@ return h_rpackh (&a, hflt);                             /* round and pack */
 int32 op_mulh (uint32 *opnd, uint32 *hflt)
 {
 UFPH a, b;
-    
+
 h_unpackh (&opnd[0], &a);                               /* unpack s1, s2 */
 h_unpackh (&opnd[4], &b);
 vax_hmul (&a, &b, 0);                                   /* do multiply */
@@ -812,7 +812,7 @@ UQP quo = { 0, 0, 0, 0 };
 if (a->exp == 0)                                        /* divr = 0? */
     FLT_DZRO_FAULT;
 if (b->exp == 0)                                        /* divd = 0? */
-    return; 
+    return;
 b->sign = b->sign ^ a->sign;                            /* result sign */
 b->exp = b->exp - a->exp + H_BIAS + 1;                  /* unbiased exp */
 qp_rsh (&a->frac, 1);                                   /* allow 1 bit left */

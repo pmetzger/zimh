@@ -1,11 +1,11 @@
 ##+
 ## dep-link.cmake: Create the dependency interface libraries
 ##-
-             
+
 add_library(simh_regexp INTERFACE)
 add_library(simh_video INTERFACE)
 add_library(simh_network INTERFACE)
-        
+
 ## LIBPCAP is a special case
 set(LIBPCAP_PROJECT "libpcap")
 set(LIBPCAP_ARCHIVE_NAME "libpcap")
@@ -13,7 +13,7 @@ set(LIBPCAP_RELEASE "1.10.1")
 set(LIBPCAP_ARCHIVE_TYPE "tar.gz")
 set(LIBPCAP_TAR_ARCHIVE "${LIBPCAP_ARCHIVE_NAME}-${LIBPCAP_RELEASE}.${LIBPCAP_ARCHIVE_TYPE}")
 set(LIBPCAP_SOURCE_URL  "https://github.com/the-tcpdump-group/libpcap/archive/refs/tags/${LIBPCAP_TAR_ARCHIVE}")
-                                                             
+
 function(fix_interface_libs _targ)
 get_target_property(_aliased ${_targ} ALIASED_TARGET)
     if(NOT _aliased)
@@ -312,7 +312,7 @@ if (WITH_NETWORK)
             else (HAVE_BSDTUNTAP)
                 list(APPEND NETWORK_PKG_STATUS "TAP")
             endif (HAVE_BSDTUNTAP)
-   
+
         endif (HAVE_TAP_NETWORK)
     endif (WITH_TAP)
 

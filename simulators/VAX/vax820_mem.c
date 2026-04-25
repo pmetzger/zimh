@@ -94,7 +94,7 @@ DEVICE mctl_dev[] = {
     NULL, NULL, &mctl_reset,
     NULL, NULL, NULL,
     &mctl0_dib, DEV_NEXUS, 0,
-    NULL, NULL, NULL, NULL, NULL, NULL, 
+    NULL, NULL, NULL, NULL, NULL, NULL,
     &mctl_description
     },
     {
@@ -103,7 +103,7 @@ DEVICE mctl_dev[] = {
     NULL, NULL, &mctl_reset,
     NULL, NULL, NULL,
     &mctl1_dib, DEV_NEXUS, 0,
-    NULL, NULL, NULL, NULL, NULL, NULL, 
+    NULL, NULL, NULL, NULL, NULL, NULL,
     &mctl_description
     }
     };

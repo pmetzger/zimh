@@ -19,7 +19,7 @@
  * Blank lines are ignored and may occur at any place in the input file.
  *
  * A typical card specification might look like this:
- 
+
    start
    * This is a comment line
    12-1-2

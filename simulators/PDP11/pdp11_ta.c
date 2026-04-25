@@ -24,7 +24,7 @@
    in this Software without prior written authorization from Robert M Supnik.
 
    ta           TA11/TU60 cassette tape
-   
+
    26-Mar-22    RMS     Added extra case points for new MTSE definitions
    23-Oct-13    RMS     Revised for new boot setup routine
    06-Jun-13    RMS     Reset must set RDY (Ian Hammond)
@@ -183,9 +183,9 @@ REG ta_reg[] = {
     };
 
 MTAB ta_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable tape drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock tape drive" },
     { MTAB_XTD|MTAB_VUN, 0, "CAPACITY", NULL,
       NULL, &sim_tape_show_capac, NULL, "Display tape capacity" },
@@ -203,7 +203,7 @@ DEVICE ta_dev = {
     &ta_boot, &ta_attach, &ta_detach,
     &ta_dib, DEV_DISABLE | DEV_DIS | DEV_DEBUG | DEV_UBUS | DEV_TAPE, 0,
     NULL, NULL, NULL, &ta_help, NULL, NULL,
-    &ta_description 
+    &ta_description
     };
 
 /* I/O dispatch routines, I/O addresses 17777500 - 17777503
@@ -303,7 +303,7 @@ if ((fnc != TACS_REW) && !(flg & OP_WRI)) {             /* spc/read cmd? */
     if ((old_ust ^ uptr->UST) == (UST_REV|UST_GAP)) {   /* reverse in gap? */
         if (uptr->UST)                                  /* skip file gap */
             (void)sim_tape_rdrecr (uptr, ta_xb, &t, TA_MAXFR);
-        else 
+        else
             (void)sim_tape_rdrecf (uptr, ta_xb, &t, TA_MAXFR);
         if (DEBUG_PRS (ta_dev))
             fprintf (sim_deb, ">>TA skip gap: op=%o, old_sta = %o, pos=%d\n",
@@ -445,7 +445,7 @@ switch (uptr->FNC) {                                    /* case on function */
         break;
 
     default:                                            /* never get here! */
-        return SCPE_IERR;        
+        return SCPE_IERR;
         }                                               /* end case */
 
 ta_cs |= TACS_RDY;                                      /* set ready */

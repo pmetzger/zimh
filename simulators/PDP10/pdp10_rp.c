@@ -45,7 +45,7 @@
    30-Sep-01    RMS     Moved CS1<5:0> into drives
    28-Sep-01    RMS     Fixed interrupt handling for SC/ATA
    23-Aug-01    RMS     Added read/write header stubs for ITS
-                        (found by Mirian Crzig Lennox) 
+                        (found by Mirian Crzig Lennox)
    13-Jul-01    RMS     Changed fread call to fxread (Peter Schorn)
    14-May-01    RMS     Added check for unattached drive
 
@@ -446,9 +446,9 @@ REG rp_reg[] = {
     };
 
 MTAB rp_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable disk drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock disk drive" },
     { MTAB_XTD|MTAB_VUN, RM03_DTYPE, NULL, "RM03",
       &rp_set_type, NULL, NULL, "Set RM03 Disk Type" },
@@ -464,9 +464,9 @@ MTAB rp_mod[] = {
       &rp_set_type, NULL, NULL, "Set RP07 Disk Type" },
     { MTAB_XTD|MTAB_VUN, 0, "TYPE", NULL,
       NULL, &rp_show_type, NULL, "Display device type" },
-    { UNIT_NOAUTO, 0, "autosize", "AUTOSIZE", 
+    { UNIT_NOAUTO, 0, "autosize", "AUTOSIZE",
       NULL, NULL, NULL, "Set type based on file size at attach" },
-    { UNIT_NOAUTO, UNIT_NOAUTO, "noautosize",   "NOAUTOSIZE",   
+    { UNIT_NOAUTO, UNIT_NOAUTO, "noautosize",   "NOAUTOSIZE",
       NULL, NULL, NULL, "Disable disk autosize on attach" },
     { MTAB_XTD|MTAB_VUN|MTAB_VALR, 0, "FORMAT", "FORMAT={AUTO|SIMH|VHD|RAW}",
       &sim_disk_set_fmt, &sim_disk_show_fmt, NULL, "Display disk format" },
@@ -655,7 +655,7 @@ switch (j) {                                            /* decode PA<5:1> */
                 else rp_go (drv, uptr->FUNC);
                 }
             }
-        break;  
+        break;
 
     case 001:                                           /* RPWC */
         if (access == WRITEB)
@@ -896,7 +896,7 @@ switch (uptr->FUNC) {                                   /* case on function */
     case FNC_RETURN:                                    /* return to centerline */
         rpds[drv] = (rpds[drv] & ~DS_OF) | DS_ATA;      /* clear offset, set attn */
         update_rpcs (CS1_SC, drv);
-        break;  
+        break;
 
     case FNC_UNLOAD:                                    /* unload */
         rp_detach (uptr);                               /* detach unit */

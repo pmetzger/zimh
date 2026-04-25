@@ -23,7 +23,7 @@
 
 #include "b5500_defs.h"
 
-#if (NUM_DEVS_DSK > 0) 
+#if (NUM_DEVS_DSK > 0)
 
 
 /* in u3 is device address */
@@ -158,20 +158,20 @@ t_stat dsk_cmd(uint16 cmd, uint16 dev, uint8 chan, uint16 *wc)
     uptr = &dsk_unit[u];
 
     /* If unit disabled return error */
-    if (uptr->flags & UNIT_DIS) 
+    if (uptr->flags & UNIT_DIS)
         return SCPE_NODEV;
 
     /* Check if drive is ready to recieve a command */
-    if ((uptr->CMD & DK_BSY)) 
+    if ((uptr->CMD & DK_BSY))
         return SCPE_BUSY;
 
     uptr->CMD = chan|DK_BSY;
     if (dev == DSK2_DEV)
         uptr->CMD |= DK_CTRL;
     uptr->CMD |= (cmd & 077) << 12;
-    if (cmd & URCSTA_INHIBIT) 
+    if (cmd & URCSTA_INHIBIT)
         uptr->CMD |= DK_RDCK;
-    else if (cmd & URCSTA_READ) 
+    else if (cmd & URCSTA_READ)
         uptr->CMD |= DK_RD;
     else
         uptr->CMD |= DK_WR;
@@ -191,7 +191,7 @@ t_stat dsk_cmd(uint16 cmd, uint16 dev, uint8 chan, uint16 *wc)
     sim_activate(uptr, 90);
     return SCPE_OK;
 }
-        
+
 
 /* Handle processing disk controller commands */
 t_stat dsk_srv(UNIT * uptr)
@@ -214,7 +214,7 @@ t_stat dsk_srv(UNIT * uptr)
     if (uptr->CMD & DK_ADDR) {
         /* Read in 8 characters which are the address */
         for (i = 0; i < 8; i++) {
-            if (chan_read_disk(chan, &abuf[i], 0)) 
+            if (chan_read_disk(chan, &abuf[i], 0))
                 break;
             abuf[i] &= 017;     /* Mask zone out */
             if (abuf[i] == 012) /* Zero to zero */
@@ -231,14 +231,14 @@ t_stat dsk_srv(UNIT * uptr)
         uptr->ADDR = addr;
 
         /* Map to ESU */
-        if (u && (dsk_unit[u].flags & DFX) == 0) 
+        if (u && (dsk_unit[u].flags & DFX) == 0)
            esu += 10;
         sim_debug(DEBUG_DETAIL, dptr, "Disk access %d %s %02o %d,%d\n", u,
-                (uptr->CMD & DK_RDCK) ? "rcheck" : 
+                (uptr->CMD & DK_RDCK) ? "rcheck" :
                 (uptr->CMD & DK_RD) ? "read" :
                 (uptr->CMD & DK_WR)? "write" : "nop", (uptr->CMD >> 9) & 077,
                 esu, addr);
-        
+
         uptr->ESU = esu;
         eptr = &esu_unit[uptr->ESU];
         /* Check if valid */
@@ -251,17 +251,17 @@ t_stat dsk_srv(UNIT * uptr)
 
         /* Check if Read Check or Write Check */
         if ((uptr->CMD & (DK_WCZERO|DK_WC|DK_SECMASK)) == (DK_WCZERO|DK_WC)) {
-            if (uptr->ADDR >= eptr->wait) 
+            if (uptr->ADDR >= eptr->wait)
                 chan_set_eof(chan);
-            
+
             if (uptr->CMD & DK_WR) {
-                sim_debug(DEBUG_DETAIL, dptr, "Disk write int %d %d %o\n", 
+                sim_debug(DEBUG_DETAIL, dptr, "Disk write int %d %d %o\n",
                       uptr->ESU, uptr->ADDR, uptr->CMD);
             }
             if (uptr->CMD & DK_RD) {
-                sim_debug(DEBUG_DETAIL, dptr, "Disk read int %d %d %o\n", 
+                sim_debug(DEBUG_DETAIL, dptr, "Disk read int %d %d %o\n",
                       uptr->ESU, uptr->ADDR, uptr->CMD);
-                if (eptr->flags & MODIB) 
+                if (eptr->flags & MODIB)
                    chan_set_error(chan);
             }
             chan_set_end(chan);
@@ -271,10 +271,10 @@ t_stat dsk_srv(UNIT * uptr)
 
         sim_activate(uptr, 5000);
         return SCPE_OK;
-    } 
+    }
 
     /* Kick off actual transfer to ESU */
-    if (((uptr->CMD & DK_ADDR) == 0) && 
+    if (((uptr->CMD & DK_ADDR) == 0) &&
                 ((uptr->CMD & (DK_RDCK|DK_RD|DK_WR)) != 0)) {
         eptr = &esu_unit[uptr->ESU];
 
@@ -287,7 +287,7 @@ t_stat dsk_srv(UNIT * uptr)
             if (uptr->CMD & DK_RDCK) {
                 uptr->CMD = 0;
                 chan_set_end(chan);
-            } else 
+            } else
                 uptr->CMD &= ~(DK_RDCK|DK_RD|DK_WR);
             sim_activate(eptr, 8000);
             return SCPE_OK;
@@ -310,7 +310,7 @@ void esu_set_end(UNIT *uptr, int err) {
         dsk_unit[dsk].CMD = 0;
         chan_set_end(chan);
 }
-        
+
 /* Handle processing esu controller commands */
 t_stat esu_srv(UNIT * uptr)
 {
@@ -319,8 +319,8 @@ t_stat esu_srv(UNIT * uptr)
     int                 u = uptr - esu_unit;
     int                 dsk = ((uptr->CMD & DK_CTRL) != 0);
     int                 wc;
-    
- 
+
+
     /* Process for each unit */
     if (uptr->CMD & DK_RD) {
         /* Check if at start of segment */
@@ -343,14 +343,14 @@ t_stat esu_srv(UNIT * uptr)
             }
             sim_debug(DEBUG_DETAIL, dptr, "Disk read %d %d %d %o %d\n",
                                  u,uptr->POS, uptr->ADDR, uptr->CMD, da);
-        
+
             if (sim_fseek(uptr->fileref, da, SEEK_SET) < 0) {
                 esu_set_end(uptr, 1);
                 return SCPE_OK;
             }
             wc = sim_fread(&dsk_buffer[dsk][0], 1, DK_SEC_SIZE,
                                  uptr->fileref);
-            for (; wc < DK_SEC_SIZE; wc++) 
+            for (; wc < DK_SEC_SIZE; wc++)
                 dsk_buffer[dsk][wc] = (uptr->CMD & DK_BIN) ? 0 :020;
             uptr->POS = 0;
             uptr->ADDR++; /* Advance disk address */
@@ -377,7 +377,7 @@ t_stat esu_srv(UNIT * uptr)
             }
             sim_debug(DEBUG_DETAIL, dptr, "Disk rdchk %d %d %d %o\n", u,
                          uptr->POS, uptr->ADDR, uptr->CMD);
-        
+
             uptr->ADDR++; /* Advance disk address */
             uptr->CMD -= DK_SECT;
             uptr->POS = 0;
@@ -404,10 +404,10 @@ t_stat esu_srv(UNIT * uptr)
         /* Transfer one Character */
         if (chan_read_char(chan, &dsk_buffer[dsk][uptr->POS], 0)) {
             if (uptr->POS != 0) {
-                while (uptr->POS < DK_SEC_SIZE) 
+                while (uptr->POS < DK_SEC_SIZE)
                     dsk_buffer[dsk][uptr->POS++] = (uptr->CMD & DK_BIN) ? 0 :020;
             }
-        } 
+        }
         uptr->POS++;
 
         /* Check if at end of segment */
@@ -416,21 +416,21 @@ t_stat esu_srv(UNIT * uptr)
 
            /* Check if over end of disk */
            if (uptr->ADDR >= uptr->wait) {
-               sim_debug(DEBUG_DETAIL, dptr, "Disk write over %d %d %o\n", 
+               sim_debug(DEBUG_DETAIL, dptr, "Disk write over %d %d %o\n",
                            uptr->POS, uptr->ADDR, uptr->CMD);
                chan_set_eof(chan);
                esu_set_end(uptr, 0);
                return SCPE_OK;
            }
-        
+
            sim_debug(DEBUG_DETAIL, dptr, "Disk write %d %d %d %o %d\n",
                             u, uptr->POS, uptr->ADDR, uptr->CMD, da);
            if (sim_fseek(uptr->fileref, da, SEEK_SET) < 0) {
                esu_set_end(uptr, 1);
                return SCPE_OK;
            }
-        
-           wc = sim_fwrite(&dsk_buffer[dsk][0], 1, DK_SEC_SIZE, 
+
+           wc = sim_fwrite(&dsk_buffer[dsk][0], 1, DK_SEC_SIZE,
                                    uptr->fileref);
            if (wc != DK_SEC_SIZE) {
                esu_set_end(uptr, 1);
@@ -439,18 +439,18 @@ t_stat esu_srv(UNIT * uptr)
            uptr->POS = 0;
            uptr->ADDR++;  /* Advance disk address */
            uptr->CMD -= DK_SECT;
-        } 
+        }
     }
     sim_activate(uptr, (uptr->flags & MODIB) ? 500 :300);
     return SCPE_OK;
 }
-                
+
 t_stat
 set_mod(UNIT *uptr, int32 val, const char *cptr, void *desc) {
     if (uptr == NULL)   return SCPE_IERR;
-    if (val == MODIB) 
+    if (val == MODIB)
         uptr->wait = DK_MAXSEGS2;
-    else 
+    else
         uptr->wait = DK_MAXSEGS;
     uptr->capac = DK_SEC_SIZE * uptr->wait;
     return SCPE_OK;
@@ -509,13 +509,13 @@ esu_detach(UNIT * uptr)
     if (u < 10) {
         mask = DSK1_FLAG;
         /* If DFX, then both controllers */
-        if ((dsk_unit[1].flags & DFX) != 0) 
+        if ((dsk_unit[1].flags & DFX) != 0)
            mask |= DSK2_FLAG;
         lim = 10;
         i = 0;
     } else {
         /* If DFX, then drive not attached */
-        if ((dsk_unit[1].flags & DFX) != 0) 
+        if ((dsk_unit[1].flags & DFX) != 0)
            return r;
         mask = DSK2_FLAG;
         lim = 20;
@@ -523,11 +523,11 @@ esu_detach(UNIT * uptr)
     }
     /* Scan to see if any disks still attached */
     while (i < lim) {
-        if (esu_unit[i].flags & UNIT_ATT) 
+        if (esu_unit[i].flags & UNIT_ATT)
            return r;    /* Something still there */
         i++;
     }
-    /* There are no longer any drives attached to 
+    /* There are no longer any drives attached to
         this controller */
     iostatus &= ~mask;
     return r;
@@ -558,7 +558,7 @@ dsk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 }
 
 const char *
-dsk_description (DEVICE *dptr) 
+dsk_description (DEVICE *dptr)
 {
    return "B5470 disk controller module";
 }
@@ -584,7 +584,7 @@ esu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 }
 
 const char *
-esu_description (DEVICE *dptr) 
+esu_description (DEVICE *dptr)
 {
     return  "B471 electrontics unit and 5 B457 storage units.";
 }

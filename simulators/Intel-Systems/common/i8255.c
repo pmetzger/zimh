@@ -36,12 +36,12 @@
         to any parallel I/O device.
 
         All I/O is via programmed I/O.  The i8255 has a control port (i8255s)
-        and three data ports (i8255a, i8255b, and i8255c).    
+        and three data ports (i8255a, i8255b, and i8255c).
 
-        The simulated device supports a select from I/O space and two address lines. 
+        The simulated device supports a select from I/O space and two address lines.
         The data ports are at the lower addresses and the control port is at
         the highest.
-        
+
         A write to the control port can configure the device:
 
         Control Word
@@ -53,7 +53,7 @@
             D0  Port C (lower) 1-Input, 0-Output
             D1  Port B 1-Input, 0-Output
             D2  Mode Selection  0-Mode 0, 1-Mode 1
-                                
+
             Group A
             D3  Port C (upper) 1-Input, 0-Output
             D4  Port A 1-Input, 0-Output
@@ -68,10 +68,10 @@
             Bit Set - D7=0, D3:1 select port C bit, D0 1=set, 0=reset
 
         A read to the data ports gets the current port value, a write
-        to the data ports writes the character to the device.  
+        to the data ports writes the character to the device.
 
-        This program simulates up to 4 i8255 devices.  It handles 2 i8255 
-        devices on the iSBC 80/10 SBC.  Other devices could be on other 
+        This program simulates up to 4 i8255 devices.  It handles 2 i8255
+        devices on the iSBC 80/10 SBC.  Other devices could be on other
         multibus boards in the simulated system.
 */
 
@@ -121,7 +121,7 @@ UNIT i8255_unit[] = {
     { UDATA (0, 0, 0) },                /* i8255 0 */
     { UDATA (0, 0, 0) },                /* i8255 1 */
     { UDATA (0, 0, 0) },                /* i8255 2 */
-    { UDATA (0, 0, 0) }                 /* i8255 3 */ 
+    { UDATA (0, 0, 0) }                 /* i8255 3 */
 };
 
 REG i8255_reg[] = {
@@ -151,7 +151,7 @@ MTAB i8255_mod[] = {
 //        NULL, NULL, "Sets the base port for i8255"},
 //    { MTAB_XTD | MTAB_VDV, 0, NULL, "INT", &isbc202_set_int,
 //        NULL, NULL, "Sets the interrupt number for i8255"},
-    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, i8255_show_param, NULL, 
+    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, i8255_show_param, NULL,
         "show configured parameters for i8255" },
     { 0 }
 };
@@ -172,7 +172,7 @@ DEVICE i8255_dev = {
     i8255_unit,         //units
     i8255_reg,          //registers
     i8255_mod,          //modifiers
-    I8255_NUM,          //numunits 
+    I8255_NUM,          //numunits
     16,                 //aradix
     16,                 //awidth
     1,                  //aincr
@@ -185,7 +185,7 @@ DEVICE i8255_dev = {
     NULL,               //attach
     NULL,               //detach
     NULL,               //ctxt
-    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags 
+    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags
     0,                  //dctrl
     i8255_debug,        //debflags
     NULL,               //msize
@@ -201,14 +201,14 @@ DEVICE i8255_dev = {
 t_stat i8255_cfg(uint16 base, uint16 devnum, uint8 dummy)
 {
     DEVICE *dptr;
-    
+
     dptr = find_dev (i8255_dev.name);
     i8255_baseport[devnum] = base & BYTEMASK;
     sim_printf("    i8255%d: installed at base port 0%02XH\n",
         devnum, i8255_baseport[devnum]);
-    reg_dev(i8255a, i8255_baseport[devnum], devnum, 0); 
-    reg_dev(i8255b, i8255_baseport[devnum] + 1, devnum, 0); 
-    reg_dev(i8255c, i8255_baseport[devnum] + 2, devnum, 0); 
+    reg_dev(i8255a, i8255_baseport[devnum], devnum, 0);
+    reg_dev(i8255b, i8255_baseport[devnum] + 1, devnum, 0);
+    reg_dev(i8255c, i8255_baseport[devnum] + 2, devnum, 0);
     reg_dev(i8255s, i8255_baseport[devnum] + 3, devnum, 0);
     i8255_num++;
     return SCPE_OK;
@@ -217,17 +217,17 @@ t_stat i8255_cfg(uint16 base, uint16 devnum, uint8 dummy)
 t_stat i8255_clr(void)
 {
     int i;
-    
+
     for (i=0; i<i8255_num; i++) {
-        unreg_dev(i8255_baseport[i]); 
-        unreg_dev(i8255_baseport[i] + 1); 
-        unreg_dev(i8255_baseport[i] + 2); 
+        unreg_dev(i8255_baseport[i]);
+        unreg_dev(i8255_baseport[i] + 1);
+        unreg_dev(i8255_baseport[i] + 2);
         unreg_dev(i8255_baseport[i] + 3);
         i8255_baseport[i] = -1;
         i8255_intnum[i] = 0;
         i8255_verb[i] = 0;
     }
-    i8255_num = 0; 
+    i8255_num = 0;
     return SCPE_OK;
 }
 
@@ -236,7 +236,7 @@ t_stat i8255_clr(void)
 t_stat i8255_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int i;
-    
+
     if (uptr == NULL)
         return SCPE_ARG;
     fprintf(st, "Device %s\n", ((i8255_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled");
@@ -263,7 +263,7 @@ t_stat i8255_reset (DEVICE *dptr)
 t_stat i8255_reset_dev (void)
 {
     uint8 devnum;
-    
+
     for (devnum = 0; devnum < i8255_num+1; devnum++) {
         i8255_unit[devnum].u3 = 0x9B; /* control */
         i8255_A[devnum] = 0xFF; /* Port A */
@@ -282,7 +282,7 @@ t_stat i8255_reset_dev (void)
 uint8 i8255s(t_bool io, uint8 data, uint8 devnum)
 {
     uint8 bit;
-    
+
     if (io == 0) {                      /* read status port */
         return 0xFF;                    //undefined
     } else {                            /* write status port */
@@ -329,13 +329,13 @@ uint8 i8255c(t_bool io, uint8 data, uint8 devnum)
     } else {                            /* write data port */
         if (devnum == 0) {
             if((i8255_C[devnum] & 0x80) != (data & 0x80)) { //change in ROM enable
-                if (data & 0x80) 
+                if (data & 0x80)
                     sim_printf("Onboard EPROM: Enabled\n");
                 else
                     sim_printf("Onboard EPROM: Disabled\n");
             }
             if((i8255_C[devnum] & 0x20) != (data & 0x20)) { //change in RAM enable
-                if (data & 0x20) 
+                if (data & 0x20)
                     sim_printf("Onboard RAM: Enabled\n");
                 else
                     sim_printf("Onboard RAM: Disabled\n");

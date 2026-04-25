@@ -66,7 +66,7 @@ static struct disk_formats fmts[] = {
     {0, 0},
 };
 
-t_stat 
+t_stat
 disk_read(UNIT *uptr, uint64 *buffer, int sector, int wps)
 {
     int      da;
@@ -236,7 +236,7 @@ t_stat disk_attach (UNIT *uptr, const char *cptr)
     /* Reset to SIMH format on attach */
     uptr->flags &= ~UNIT_FMT;
     /* Pickup optional format specifier during RESTORE */
-    cptr = get_sim_sw (cptr);                 
+    cptr = get_sim_sw (cptr);
     if (sim_switches & SWMASK ('F')) {        /* format spec? */
         cptr = get_glyph (cptr, gbuf, 0);     /* get spec */
         if (*cptr == 0) return SCPE_2FARG;    /* must be more */
@@ -260,15 +260,15 @@ t_stat disk_detach (UNIT *uptr)
 t_stat disk_attach_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
     fprintf (st, "%s Disk Attach Help\n\n", dptr->name);
-    
+
     fprintf (st, "Disk container files can be one of 3 different types:\n\n");
     fprintf (st, "    SIMH   A disk is an unstructured binary file of 64bit integers\n");
     fprintf (st, "    DBD9   Compatible with KLH10 is a packed big endian word\n");
     fprintf (st, "    DLD9   Compatible with KLH10 is a packed little endian word\n");
-    
+
     if (dptr->numunits > 1) {
         uint32 i;
-    
+
         for (i=0; (i < dptr->numunits); ++i)
             if ((dptr->units[i].flags & UNIT_ATTABLE) &&
                 !(dptr->units[i].flags & UNIT_DIS)) {

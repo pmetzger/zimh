@@ -415,7 +415,7 @@ DEVICE cd_dev = {
 static t_stat show_drive(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   int32 fixed, u;
-  
+
   if (uptr == NULL)
     return SCPE_IERR;
 
@@ -571,7 +571,7 @@ void CDstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
       /*** more to print ***/
       fprintf(DBGOUT,
               "%s[%d: State: %s, OnCyl: %s, Busy: %s]\r\n",
-              INTprefix, i, CDstateStr[iou->state], 
+              INTprefix, i, CDstateStr[iou->state],
               iou->oncyl ? "Yes" : "No",
               iou->busy ? "Yes" : "No");
       if ((uptr->flags & UNIT_ATT) != 0)
@@ -1114,7 +1114,7 @@ t_stat cd_detach(UNIT *uptr)
 {
   struct cdio_unit *iou = (struct cdio_unit *)uptr->up7;
   t_stat stat;
-  
+
   sim_cancel(uptr);
   stat = detach_unit(uptr);
 
@@ -1237,7 +1237,7 @@ enum IOstatus CDout(IO_DEVICE *iod, uint8 reg)
         if ((IOAreg & IO_1733_USEL) != 0) {
           CDdev.iod_drive = NULL;
           CDdev.STATUS &= ~(IO_1733_ONCYL | IO_ST_BUSY | IO_ST_READY);
-          
+
           if (((iou->ondrive[0]->flags & UNIT_ATT) != 0) ||
               ((iou->ondrive[1]->flags & UNIT_ATT) != 0)) {
             CDdev.iod_drive = iou;
@@ -1262,7 +1262,7 @@ enum IOstatus CDout(IO_DEVICE *iod, uint8 reg)
               CDdev.STATUS |= IO_1733_ONCYL;
               CDdev.CYLADRSTATUS = iou->sectorAddr;
             }
-          }         
+          }
         }
       }
       break;
@@ -1287,7 +1287,7 @@ enum IOstatus CDout(IO_DEVICE *iod, uint8 reg)
           if ((cd_dev.dctrl & DBG_DERROR) != 0)
             fprintf(DBGOUT,
                     "%sCD - Bad Load Address (%04X)\r\n", INTprefix, Areg);
-          
+
           fw_IOintr(FALSE, &cd_dev, &CDdev, IO_1733_ADDRERR | IO_ST_EOP |IO_ST_ALARM, 0, 0xFFFF, "Bad load address");
         }
       } else return IO_REJECT;

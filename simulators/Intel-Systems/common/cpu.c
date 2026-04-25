@@ -70,11 +70,11 @@ t_stat SBC_config(void)
     return SCPE_OK;
 }
 
-/*  SBC reset routine 
+/*  SBC reset routine
     put here to cause a reset of the entire MDS-800 system */
 
 t_stat SBC_reset (DEVICE *dptr)
-{    
+{
     sim_printf("SBC_reset: \n");
     EPROM_enable = 1;
     BUS_OVERRIDE = 0;

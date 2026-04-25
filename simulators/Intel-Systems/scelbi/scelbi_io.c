@@ -68,7 +68,7 @@
 #include "system_defs.h"
 
 /* This is the I/O configuration table. There are 8 possible
-   input device addresses (octal 0 - 7) and 24 possible output 
+   input device addresses (octal 0 - 7) and 24 possible output
    device addresses (octal 10 - 37).
    The port numbers are specified as for the 8008 AS Macro Assembler,
    in other 8008 assemblers outport 012 (octal) may be specified as 2.

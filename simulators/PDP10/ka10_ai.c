@@ -800,7 +800,7 @@ static void channel_command (uint64 data)
     case DSDRST:
         if (data & DUNENB)
             channel_unit = &ai_unit[(data >> 033) & 017];
-      
+
         sim_debug(DEBUG_CMD, &ai_dev,
                   "DSDRST, store unit %d status in %012llo.\n",
                   (int)(channel_unit - ai_unit), data & ADDR);

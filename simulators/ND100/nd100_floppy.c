@@ -39,7 +39,7 @@
  *
  * Currently only floppies implemented (no streamer).
  *
- * The device uses eight IOX addresses, but the transfer commands 
+ * The device uses eight IOX addresses, but the transfer commands
  * are given in a command block of 12 words in memory.
  *
  * ND uses three floppy formats (but in theory can handle a lot of formats).
@@ -289,7 +289,7 @@ readfmt(UNIT *up)
         }
         return -1;
 }
-        
+
 
 t_stat
 floppy_svc(UNIT *uptr)
@@ -388,7 +388,7 @@ floppy_boot(int32 unitno, DEVICE *dptr)
 /*
  * It seems that some of the boot programs uses the Z80 test programs
  * on the controller card.  We try to mimic the behaviour.
- * 
+ *
  * This data structure (in ND100) is used in test T13 and T14.
  *
  *      15                    8 7                     0
@@ -416,7 +416,7 @@ floppy_test(UNIT *up)
                 bcnt = prdmem(cbaddr+2, PM_CPU);
                 if (bcnt > 3584)
                         return STOP_UNHIOX;
-                printf("\r\n addr %06o nd100 %06o z80 %04x count %o\r\n", 
+                printf("\r\n addr %06o nd100 %06o z80 %04x count %o\r\n",
                     cbaddr, prdmem(cbaddr, PM_CPU),
                     prdmem(cbaddr+1, PM_CPU), prdmem(cbaddr+2, PM_CPU));
                 dtomem(up->fileref, up->devaddr + z80addr - 0x2200,
@@ -430,7 +430,7 @@ floppy_test(UNIT *up)
 }
 
 /*
- * Execute. Fills in the unit local vars memaddr/wcnt/devaddr from the 
+ * Execute. Fills in the unit local vars memaddr/wcnt/devaddr from the
  * command block and setup for interrupt later.
  */
 static int

@@ -78,22 +78,22 @@ MTAB isbc064_mod[] = {
     NULL,                               /* location descriptor */
     "Sets the RAM size for iSBC 064"    /* help string */
 },
-    { MTAB_XTD | MTAB_VDV,              /* mask */ 
-    0                                   /* match */, 
-    NULL,                               /* print string */ 
-    "BASE",                             /* match string */ 
+    { MTAB_XTD | MTAB_VDV,              /* mask */
+    0                                   /* match */,
+    NULL,                               /* print string */
+    "BASE",                             /* match string */
     &isbc064_set_base,                  /* validation routine */
     NULL,                               /* display routine */
     NULL,                               /* location descriptor */
     "Sets the RAM base for iSBC 064"    /* help string */
 },
-    { MTAB_XTD|MTAB_VDV,                /* mask */ 
+    { MTAB_XTD|MTAB_VDV,                /* mask */
     0,                                  /* match */
-    "PARAM",                            /* print string */ 
-    NULL,                               /* match string */ 
-    NULL,                               /* validation routine */ 
+    "PARAM",                            /* print string */
+    NULL,                               /* match string */
+    NULL,                               /* validation routine */
     &isbc064_show_param,                /* display routine */
-    NULL,                               /* location descriptor */ 
+    NULL,                               /* location descriptor */
     "Show current Parameters for iSBC 064" /* help string */
 },
     { 0 }
@@ -144,7 +144,7 @@ DEVICE isbc064_dev = {
 t_stat isbc064_cfg(uint16 base, uint16 size, uint8 dummy)
 {
     isbc064_unit.capac = size;
-    isbc064_unit.u3 = base; 
+    isbc064_unit.u3 = base;
     isbc064_dev.units->filebuf = (uint8 *)calloc(isbc064_unit.capac, sizeof(uint8)); //alloc buffer
     if (isbc064_dev.units->filebuf == NULL) { //CALLOC error
         sim_printf ("    SBC064: Calloc error\n");
@@ -168,7 +168,7 @@ t_stat isbc064_clr(void)
 t_stat isbc064_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result, i;
-    
+
     if (cptr == NULL)
         return SCPE_ARG;
     result = sscanf(cptr, "%i%n", &size, &i);
@@ -176,13 +176,13 @@ t_stat isbc064_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
         ((cptr[i + 1] == 'B') && (cptr[i + 2] == 0)))) {
         if (size & 0xff8f) {
             sim_printf("SBC064: Size error\n");
-            return SCPE_ARG;     
+            return SCPE_ARG;
         } else {
             isbc064_unit.capac = (size * 1024) - 1;
             sim_printf("SBC064: Size=%04XH\n", isbc064_unit.capac);
             return SCPE_OK;
         }
-    }   
+    }
     return SCPE_ARG;
 }
 
@@ -191,7 +191,7 @@ t_stat isbc064_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat isbc064_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result, i;
-    
+
     if (cptr == NULL)
         return SCPE_ARG;
     result = sscanf(cptr, "%i%n", &size, &i);
@@ -199,13 +199,13 @@ t_stat isbc064_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
         ((cptr[i + 1] == 'B') && (cptr[i + 2] == 0)))) {
         if (size & 0xff8f) {
             sim_printf("SBC064: Base error\n");
-            return SCPE_ARG;     
+            return SCPE_ARG;
         } else {
             isbc064_unit.u3 = size * 1024;
             sim_printf("SBC064: Base=%04XH\n", isbc064_unit.u3);
             return SCPE_OK;
         }
-    }   
+    }
     return SCPE_ARG;
 }
 
@@ -213,8 +213,8 @@ t_stat isbc064_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc064_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
-    fprintf(st, "Device %s, Base address=0%04XH, Size=0%04XH  ", 
-        ((isbc064_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled", 
+    fprintf(st, "Device %s, Base address=0%04XH, Size=0%04XH  ",
+        ((isbc064_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled",
         isbc064_unit.u3, isbc064_unit.capac);
     return SCPE_OK;
 }

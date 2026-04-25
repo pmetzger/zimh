@@ -402,7 +402,7 @@ static const char *opcode[] = {
 "MOV","CMP","BIT","BIC",
 "BIS","ADD",
 "MUL","DIV","ASH","ASHC",
-"XOR", 
+"XOR",
 "FADD","FSUB","FMUL","FDIV",
 "L2DR",
 "MOVC","MOVRC","MOVTC",
@@ -452,14 +452,14 @@ static const int32 opc_val[] = {
 0000000+I_NPN, 0000001+I_NPN, 0000002+I_NPN, 0000003+I_NPN,
 0000004+I_NPN, 0000005+I_NPN, 0000006+I_NPN, 0000007+I_NPN,
 0000100+I_SOP, 0000200+I_REG, 0000230+I_3B,
-0000240+I_CCC, 0000241+I_CCC, 0000242+I_CCC, 0000243+I_NPN, 
-0000244+I_CCC, 0000245+I_NPN, 0000246+I_NPN, 0000247+I_NPN, 
-0000250+I_CCC, 0000251+I_NPN, 0000252+I_NPN, 0000253+I_NPN, 
-0000254+I_NPN, 0000255+I_NPN, 0000256+I_NPN, 0000257+I_CCC, 
-0000260+I_CCS, 0000261+I_CCS, 0000262+I_CCS, 0000263+I_NPN, 
-0000264+I_CCS, 0000265+I_NPN, 0000266+I_NPN, 0000267+I_NPN, 
-0000270+I_CCS, 0000271+I_NPN, 0000272+I_NPN, 0000273+I_NPN, 
-0000274+I_NPN, 0000275+I_NPN, 0000276+I_NPN, 0000277+I_CCS, 
+0000240+I_CCC, 0000241+I_CCC, 0000242+I_CCC, 0000243+I_NPN,
+0000244+I_CCC, 0000245+I_NPN, 0000246+I_NPN, 0000247+I_NPN,
+0000250+I_CCC, 0000251+I_NPN, 0000252+I_NPN, 0000253+I_NPN,
+0000254+I_NPN, 0000255+I_NPN, 0000256+I_NPN, 0000257+I_CCC,
+0000260+I_CCS, 0000261+I_CCS, 0000262+I_CCS, 0000263+I_NPN,
+0000264+I_CCS, 0000265+I_NPN, 0000266+I_NPN, 0000267+I_NPN,
+0000270+I_CCS, 0000271+I_NPN, 0000272+I_NPN, 0000273+I_NPN,
+0000274+I_NPN, 0000275+I_NPN, 0000276+I_NPN, 0000277+I_CCS,
 0000300+I_SOP, 0000400+I_BR, 0001000+I_BR, 0001400+I_BR,
 0002000+I_BR, 0002400+I_BR, 0003000+I_BR, 0003400+I_BR,
 0004000+I_RSOP,
@@ -476,7 +476,7 @@ static const int32 opc_val[] = {
 0076020+I_REG,
 0076030+I_NPN, 0076031+I_NPN, 0076032+I_NPN,
 0076040+I_NPN, 0076041+I_NPN, 0076042+I_NPN, 0076043+I_NPN,
-0076044+I_NPN, 0076045+I_NPN, 
+0076044+I_NPN, 0076045+I_NPN,
 0076050+I_NPN, 0076051+I_NPN, 0076052+I_NPN, 0076053+I_NPN,
 0076054+I_NPN, 0076055+I_NPN, 0076056+I_NPN, 0076057+I_NPN,
 0076060+I_REG,
@@ -484,7 +484,7 @@ static const int32 opc_val[] = {
 0076074+I_NPN, 0076075+I_NPN, 0076076+I_NPN, 0076077+I_NPN,
 0076130+I_NPN, 0076131+I_NPN, 0076132+I_NPN,
 0076140+I_NPN, 0076141+I_NPN, 0076142+I_NPN, 0076143+I_NPN,
-0076144+I_NPN, 0076145+I_NPN, 
+0076144+I_NPN, 0076145+I_NPN,
 0076150+I_NPN, 0076151+I_NPN, 0076152+I_NPN, 0076153+I_NPN,
 0076154+I_NPN, 0076155+I_NPN, 0076156+I_NPN, 0076157+I_NPN,
 0076170+I_NPN, 0076171+I_NPN, 0076172+I_NPN, 0076173+I_NPN,
@@ -505,14 +505,14 @@ static const int32 opc_val[] = {
 0170400+I_FOP, 0170400+I_FOP+I_D, 0170500+I_FOP, 0170500+I_FOP+I_D,
 0170600+I_FOP, 0170600+I_FOP+I_D, 0170700+I_FOP, 0170700+I_FOP+I_D,
 0171000+I_FOPA, 0171000+I_FOPA+I_D, 0171400+I_FOPA, 0171400+I_FOPA+I_D,
-0172000+I_FOPA, 0172000+I_FOPA+I_D, 0172400+I_FOPA, 0172400+I_FOPA+I_D, 
+0172000+I_FOPA, 0172000+I_FOPA+I_D, 0172400+I_FOPA, 0172400+I_FOPA+I_D,
 0173000+I_FOPA, 0173000+I_FOPA+I_D, 0173400+I_FOPA, 0173400+I_FOPA+I_D,
 0174000+I_AFOP, 0174000+I_AFOP+I_D, 0174400+I_FOPA, 0174400+I_FOPA+I_D,
 0175000+I_ASOP,
-0175400+I_ASMD, 0175400+I_ASMD+I_D, 0175400+I_ASMD+I_L, 0175400+I_ASMD+I_D+I_L, 
+0175400+I_ASMD, 0175400+I_ASMD+I_D, 0175400+I_ASMD+I_L, 0175400+I_ASMD+I_D+I_L,
 0176000+I_AFOP, 0176000+I_AFOP+I_D,
-0176400+I_SOPA, 
-0177000+I_SMDA, 0177000+I_SMDA+I_D, 0177000+I_SMDA+I_L, 0177000+I_SMDA+I_D+I_L, 
+0176400+I_SOPA,
+0177000+I_SMDA, 0177000+I_SMDA+I_D, 0177000+I_SMDA+I_L, 0177000+I_SMDA+I_D+I_L,
 0177400+I_FOPA, 0177400+I_FOPA+I_D,
 -1
 };
@@ -756,13 +756,13 @@ for (i = 0; opc_val[i] >= 0; i++) {                     /* loop thru ops */
             wd2 = fprint_spec (of, addr - wd1 - wd1, dstm,
                 val[1 - wd1], cflag, TRUE);
             break;
- 
+
         case I_V_FOPA:                                  /* fopa */
             fprintf (of, "%s ", opcode[i]);
             wd1 = fprint_spec (of, addr, dstm, val[1], cflag, FALSE);
             fprintf (of, ",%s", fname[fac]);
             break;
- 
+
         case I_V_SOPA: case I_V_SMDA:                   /* sopa, smda */
             fprintf (of, "%s ", opcode[i]);
             wd1 = fprint_spec (of, addr, dstm, val[1], cflag, TRUE);
@@ -1127,7 +1127,7 @@ switch (j) {                                            /* case on class */
         val[0] = val[0] | (reg << 6);                   /* fall through */
     case I_V_FOP:                                       /* fop */
         cptr = get_glyph (cptr, gbuf, 0);               /* get glyph */
-        if ((n1 = get_spec (gbuf, addr, 0, &spec, &val[1], cflag, 
+        if ((n1 = get_spec (gbuf, addr, 0, &spec, &val[1], cflag,
             (j == I_V_ASOP) || (j == I_V_ASMD))) > 0)
             return SCPE_ARG;
         val[0] = val[0] | spec;
@@ -1160,7 +1160,7 @@ switch (j) {                                            /* case on class */
 
     case I_V_FOPA: case I_V_SOPA: case I_V_SMDA:        /* (s)fop, fac */
         cptr = get_glyph (cptr, gbuf, ',');             /* get glyph */
-        if ((n1 = get_spec (gbuf, addr, 0, &spec, &val[1], cflag, 
+        if ((n1 = get_spec (gbuf, addr, 0, &spec, &val[1], cflag,
             (j == I_V_SOPA) || (j == I_V_SMDA))) > 0)
             return SCPE_ARG;
         val[0] = val[0] | spec;

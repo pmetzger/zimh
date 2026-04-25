@@ -372,8 +372,8 @@ DEVICE cpu_dev = {
 
 LOCAL int nobase_mode[] = {
    /*    00            04             08             0C  */
-   /*    00            ANR,           ORR,           EOR */ 
-         HLF,        SCC|R1|RR|SD|HLF, SCC|R1|RR|SD|HLF, SCC|R1|RR|SD|HLF, 
+   /*    00            ANR,           ORR,           EOR */
+         HLF,        SCC|R1|RR|SD|HLF, SCC|R1|RR|SD|HLF, SCC|R1|RR|SD|HLF,
 
    /*    10            14             18             1C */
    /*    CAR,          CMR,           SBR            ZBR */
@@ -381,15 +381,15 @@ LOCAL int nobase_mode[] = {
 
    /*    20            24             28             2C  */
    /*    ABR           TBR            REG            TRR  */
-         HLF,          HLF,           HLF,           HLF, 
+         HLF,          HLF,           HLF,           HLF,
 
    /*    30            34             38             3C */
    /*    CALM          LA             ADR            SUR */
        HLF,            SD|ADR,        HLF,           HLF,
 
-   /*    40            44             48             4C  */ 
+   /*    40            44             48             4C  */
    /*    MPR           DVR                             */
-      SCC|SD|HLF,      HLF,           HLF|INV,       HLF|INV, 
+      SCC|SD|HLF,      HLF,           HLF|INV,       HLF|INV,
 
    /*    50            54             58             5C */
    /*                                                 */
@@ -397,18 +397,18 @@ LOCAL int nobase_mode[] = {
 
    /*    60            64             68             6C   */
    /*    NOR           NORD           SCZ            SRA  */
-         HLF,          HLF,           HLF,           HLF, 
+         HLF,          HLF,           HLF,           HLF,
 
    /*    70            74             78             7C */
-   /*    SRL           SRC            SRAD           SRLD */ 
+   /*    SRL           SRC            SRAD           SRLD */
          HLF,          HLF,           HLF,           HLF,
 
    /*    80            84             88             8C   */
    /*    LEAR          ANM            ORM            EOM  */
-       SD|ADR,  SD|RR|RNX|ADR,  SD|RR|RNX|ADR,  SD|RR|RNX|ADR,  
+       SD|ADR,  SD|RR|RNX|ADR,  SD|RR|RNX|ADR,  SD|RR|RNX|ADR,
 
    /*    90            94             98             9C */
-   /*    CAM           CMM            SBM            ZBM  */ 
+   /*    CAM           CMM            SBM            ZBM  */
       SCC|RR|RM|ADR,   RR|RM|ADR,     ADR,           ADR,
 
    /*    A0            A4             A8             AC  */
@@ -416,30 +416,30 @@ LOCAL int nobase_mode[] = {
          ADR,          ADR,           ADR,        SCC|SD|RM|ADR,
 
    /*    B0            B4             B8             BC */
-   /*    LM            LN             ADM            SUM  */ 
+   /*    LM            LN             ADM            SUM  */
      SCC|SD|RM|ADR,    SCC|SD|RM|ADR,  SD|RR|RM|ADR,  SD|RR|RM|ADR,
 
    /*    C0            C4             C8             CC    */
    /*    MPM           DVM            IMM            LF  */
-     SCC|SD|RM|ADR,    RM|ADR,        IMM,           ADR, 
+     SCC|SD|RM|ADR,    RM|ADR,        IMM,           ADR,
 
    /*    D0            D4             D8             DC */
-   /*    LEA           ST             STM            STF */ 
-     SD|ADR,           RR|SM|ADR,     RR|SM|ADR,     ADR,  
+   /*    LEA           ST             STM            STF */
+     SD|ADR,           RR|SM|ADR,     RR|SM|ADR,     ADR,
 
    /*    E0            E4             E8             EC   */
    /*    ADF           MPF            ARM            BCT  */
-     ADR,           ADR,      SM|RR|RNX|ADR,  ADR, 
+     ADR,           ADR,      SM|RR|RNX|ADR,  ADR,
 
    /*    F0            F4             F8             FC */
-   /*    BCF           BI             MISC           IO */ 
-        ADR,           RR|SD|WRD,     ADR,           IMM,  
+   /*    BCF           BI             MISC           IO */
+        ADR,           RR|SD|WRD,     ADR,           IMM,
 };
 
 LOCAL int base_mode[] = {
    /* 00        04            08         0C      */
    /* 00        AND,          OR,        EOR  */
-     HLF,      SCC|R1|RR|SD|HLF,     SCC|R1|RR|SD|HLF,     SCC|R1|RR|SD|HLF,  
+     HLF,      SCC|R1|RR|SD|HLF,     SCC|R1|RR|SD|HLF,     SCC|R1|RR|SD|HLF,
 
    /* 10        14           18        1C  */
    /* SACZ      CMR         xBR         SRx */
@@ -447,7 +447,7 @@ LOCAL int base_mode[] = {
 
    /* 20        24            28         2C   */
    /* SRxD      SRC          REG        TRR      */
-     HLF,       HLF,         HLF,       HLF,    
+     HLF,       HLF,         HLF,       HLF,
 
    /* 30        34          38           3C */
    /*           LA          FLRop        SUR */
@@ -455,25 +455,25 @@ LOCAL int base_mode[] = {
 
    /* 40        44            48         4C     */
    /*                                        */
-      INV,      INV,        INV,       INV, 
+      INV,      INV,        INV,       INV,
 
     /* 50       54          58            5C */
-   /*  LA       BASE        BASE          CALLM */ 
+   /*  LA       BASE        BASE          CALLM */
     SD|ADR,     SM|ADR,     SB|ADR,    RM|ADR,
 
    /* 60        64            68         6C     */
    /*                                         */
-      INV,      INV,         INV,      INV,   
+      INV,      INV,         INV,      INV,
 
    /* 70       74           78           7C */
-   /*                                          */ 
-    INV,     INV,        INV,        INV,  
+   /*                                          */
+    INV,     INV,        INV,        INV,
 
    /* LEAR      ANM          ORM        EOM   */
    /* 80        84            88         8C   */
-    SD|ADR,    SD|RR|RNX|ADR, SD|RR|RNX|ADR, SD|RR|RNX|ADR, 
+    SD|ADR,    SD|RR|RNX|ADR, SD|RR|RNX|ADR, SD|RR|RNX|ADR,
 
-   /* CAM       CMM           SBM        ZBM  */ 
+   /* CAM       CMM           SBM        ZBM  */
    /* 90        94            98         9C   */
     SCC|RR|RM|ADR, RR|RM|ADR,   ADR,     ADR,
 
@@ -482,24 +482,24 @@ LOCAL int base_mode[] = {
       ADR,      ADR,          ADR,    SCC|SD|RM|ADR,
 
    /* B0        B4            B8         BC   */
-   /* LM        LN            ADM        SUM  */ 
+   /* LM        LN            ADM        SUM  */
    SCC|SD|RM|ADR,   SCC|SD|RM|ADR,      SD|RR|RM|ADR,     SD|RR|RM|ADR,
 
    /* C0        C4            C8         CC   */
    /* MPM       DVM           IMM        LF   */
-    SCC|SD|RM|ADR,  RM|ADR,       IMM,       ADR, 
+    SCC|SD|RM|ADR,  RM|ADR,       IMM,       ADR,
 
    /*  D0       D4            D8         DC */
-   /*  LEA      ST            STM        STFBR */ 
-     INV,       RR|SM|ADR,    RR|SM|ADR,    ADR,  
+   /*  LEA      ST            STM        STFBR */
+     INV,       RR|SM|ADR,    RR|SM|ADR,    ADR,
 
    /* E0        E4            E8         EC     */
    /* ADF       MPF           ARM        BCT      */
-    ADR,     ADR,     SM|RR|RNX|ADR,    ADR, 
+    ADR,     ADR,     SM|RR|RNX|ADR,    ADR,
 
    /* F0        F4            F8         FC */
-  /*  BCF       BI            MISC       IO */ 
-    ADR,        RR|SD|WRD,    ADR,       IMM,  
+  /*  BCF       BI            MISC       IO */
+    ADR,        RR|SD|WRD,    ADR,       IMM,
 };
 
 #define MAX32       32      /* 32/77 map limit */
@@ -749,7 +749,7 @@ LOCAL t_stat load_maps(uint32 thepsd[2], uint32 lmap)
 
     /* process a 32/27, 32/67, 32/87, 32/97, V6, or V9 here with 2KW (8kb) maps */
     /* 32/27 & 32/87 have 256 maps. Others have 2048 maps */
-    /* 32/27 & 32/87 must have all maps preallocated and loaded */ 
+    /* 32/27 & 32/87 must have all maps preallocated and loaded */
     /* 32/67 & 32/97 must load O/S maps and have user preallocated maps loaded on access */
     /* V6 and V9 must load O/S maps and have user maps allocated and loaded on access */
 
@@ -821,7 +821,7 @@ npmem:
     spc = osmidl & MASK16;                          /* get 16 bit O/S segment description count */
 
     /* see if we are to only load the O/S */
-    if (cpix == 0) { 
+    if (cpix == 0) {
         CPIX = cpix;                                /* save CPIX */
         onlyos = 1;                                 /* flag to only load O/S, nothing else */
         if (osmidl & BIT0) {                        /* see if the O/S retain bit 0 is on */
@@ -918,7 +918,7 @@ nomaps:
             goto nomaps;                            /* we have error, make way out */
         }
 
-        /* see if any O/S maps to load */ 
+        /* see if any O/S maps to load */
         if (spc == 0) {
             BPIX = 0;                               /* no os maps loaded */
             /* O/S page count is zero, so just load the user */
@@ -1047,7 +1047,7 @@ loaduser:
         return ALLOK;                               /* all cache is loaded, return OK */
     }
     /**************END-OF-NON-VIRTUAL-USER-MAPPING-FOR-27-87************/
-   
+
     sim_debug(DEBUG_CMD, my_dev,
         "load_maps Processing 32/67 & 32/97 Model# %02x\n", CPU_MODEL);
 
@@ -1370,7 +1370,7 @@ LOCAL t_stat RealAddr(uint32 addr, uint32 *realaddr, uint32 *prot, uint32 access
         /* get protection status of map */
         offset = ((map >> 12) & 0x6);               /* get bits p1 & p2 from map into bits 13 & 14 */
         if (MODES & PRIVBIT)                        /* all access if privledged */
-            *prot = offset | 0x8;                   /* set priv bit */ 
+            *prot = offset | 0x8;                   /* set priv bit */
         else
             *prot = offset;                         /* return memory write protection status */
 
@@ -1436,7 +1436,7 @@ LOCAL t_stat RealAddr(uint32 addr, uint32 *realaddr, uint32 *prot, uint32 access
         mix = nix;                                  /* get map index in memory */
     else
         mix = nix-BPIX;                             /* get map index in memory */
-    map = RMH(msdl+(mix<<1));                       /* map content from memory */      
+    map = RMH(msdl+(mix<<1));                       /* map content from memory */
     sim_debug(DEBUG_DETAIL, my_dev,
         "Addr %06x RealAddr %06x Map0[%04x] HIT %04x TLB[%3x] %08x MAPC[%03x] %08x\n",
         addr, word, mix, map, nix, TLB[nix], nix/2, MAPC[nix/2]);
@@ -1496,7 +1496,7 @@ LOCAL t_stat RealAddr(uint32 addr, uint32 *realaddr, uint32 *prot, uint32 access
         /* get protection status of map */
         offset = ((map >> 12) & 0x6);               /* get bits p1 & p2 from map into bits 13 & 14 */
         if (MODES & PRIVBIT)                        /* all access if privledged */
-            *prot = offset | 0x8;                   /* set priv bit */ 
+            *prot = offset | 0x8;                   /* set priv bit */
         else
             *prot = offset;                         /* return memory write protection status */
     }
@@ -1535,7 +1535,7 @@ LOCAL t_stat RealAddr(uint32 addr, uint32 *realaddr, uint32 *prot, uint32 access
             /* hit not on, so load the map */
             /* allow the excess map entry to be loaded, even though bad */
             if (nix <= (BPIX+CPIXPL)) {             /* needs to be a mapped reg */
-                map = RMH(msdl+(mix<<1));           /* map content from memory */      
+                map = RMH(msdl+(mix<<1));           /* map content from memory */
                 sim_debug(DEBUG_DETAIL, my_dev,
                     "Addr2a %06x MapX[%04x] HIT %04x, TLB[%3x] %08x MAPC[%03x] %08x\n",
                     addr, mix, map, nix, TLB[nix], nix/2, MAPC[nix/2]);
@@ -1634,7 +1634,7 @@ LOCAL t_stat Mem_read(uint32 addr, uint32 *data)
                     mix = nix-BPIX;                 /* get map index in memory */
                     msdl = RMW(mpl+CPIX+4);         /* get mpl entry for given cpix */
                 }
-                nmap = RMH(msdl+(mix<<1));          /* map content from memory */      
+                nmap = RMH(msdl+(mix<<1));          /* map content from memory */
                 map = RMR((page<<1));               /* read the map reg contents */
                 /* if I remove this test, we fail at test 14/0 */
                 if (((map & 0x800) == 0)) {
@@ -1725,7 +1725,7 @@ LOCAL t_stat Mem_write(uint32 addr, uint32 *data)
                     mix = nix-BPIX;                 /* get map index in memory */
                     msdl = RMW(mpl+CPIX+4);         /* get mpl entry for given cpix */
                 }
-                nmap = RMH(msdl+(mix<<1));          /* map content from memory */      
+                nmap = RMH(msdl+(mix<<1));          /* map content from memory */
                 if ((nmap & 0x1000) == 0) {
                     nmap |= 0x1800;                 /* set the modify/accessed bit in the map cache entry */
                     WMR((page<<1), nmap);           /* store the map reg contents into cache */
@@ -1797,7 +1797,7 @@ LOCAL void set_CCs(uint32 value, int ovr)
         CC |= CC3BIT;                               /* CC3 for neg */
     else if (value == 0)
         CC |= CC4BIT;                               /* CC4 for zero */
-    else 
+    else
         CC |= CC2BIT;                               /* CC2 for greater than zero */
     PSD1 |= (CC & 0x78000000);                      /* update the CC's in the PSD */
 }
@@ -2452,9 +2452,9 @@ exec2:
             hst_p += 1;                             /* next history location */
             if (hst_p >= hst_lnt)                   /* check for wrap */
                 hst_p = 0;                          /* start over at beginning */
-            hst[hst_p].opsd1 = OPSD1;               /* set original psd1 */ 
-            hst[hst_p].opsd2 = OPSD2;               /* set original psd2 */ 
-            hst[hst_p].oir = OIR;                   /* set original instruction */ 
+            hst[hst_p].opsd1 = OPSD1;               /* set original psd1 */
+            hst[hst_p].opsd2 = OPSD2;               /* set original psd2 */
+            hst[hst_p].oir = OIR;                   /* set original instruction */
             hst[hst_p].modes = MODES;               /* save current mode bits */
             hst[hst_p].modes &= ~(INTBLKD|IPUMODE); /* clear blocked and ipu bits */
             if (CPUSTATUS & BIT24)
@@ -2491,7 +2491,7 @@ exec2:
                     goto newpsd;                    /* go execute the trap now */
                 }
                 ix = (IR >> 16) & 7;                /* get base reg from instruction */
-                if (ix != 0)     
+                if (ix != 0)
                     addr += (BR[ix] & MASK24);      /* if not zero, add to base reg contents */
                 FC = ((IR & F_BIT) ? 4 : 0);        /* get F bit from original instruction */
                 FC |= addr & 3;                     /* set new C bits to address from orig or regs */
@@ -2509,7 +2509,7 @@ exec2:
             if (PC >= 0x80000) {
                 TRAPME = MAPFAULT_TRAP;             /* Map Fault Trap */
                 // DIAG add 97 for correct PSD address CN.MMM test 32, subtest 1 fails
-                if ((CPU_MODEL <= MODEL_27) || (CPU_MODEL == MODEL_67) || 
+                if ((CPU_MODEL <= MODEL_27) || (CPU_MODEL == MODEL_67) ||
                     (CPU_MODEL == MODEL_87) || (CPU_MODEL == MODEL_97)) {
                     // DIAG fix for 32/87 test 33/2, clear psd bit 31
                     if ((CPU_MODEL == MODEL_87))
@@ -2603,7 +2603,7 @@ exec2:
                     if (ix != 0)
                         addr += (GPR[ix] & MASK19); /* add the register to the address */
                     /* if no F or C bits set, use original, else new */
-                    if ((temp & F_BIT) || (addr & 3)) 
+                    if ((temp & F_BIT) || (addr & 3))
                         FC = ((temp & F_BIT) ? 0x4 : 0) | (addr & 3);
                     else {
                         addr |= (IR & F_BIT);       /* copy F bit from instruction */
@@ -2626,7 +2626,7 @@ exec2:
         }
 
         /* Read memory operand */
-        if (i_flags & RM) { 
+        if (i_flags & RM) {
             if ((TRAPME = Mem_read(addr, &temp))) { /* get the word from memory */
                 sim_debug(DEBUG_TRAP, my_dev,
                     "case RM Mem_read status %02x @ %08x\n", TRAPME, addr);
@@ -2677,7 +2677,7 @@ exec2:
         }
 
         /* Read memory operand without doing sign extend for EOMX/ANMX/ORMX/ARMX */
-        if (i_flags & RNX) { 
+        if (i_flags & RNX) {
             if ((TRAPME = Mem_read(addr, &temp))) { /* get the word from memory */
                 sim_debug(DEBUG_TRAP, my_dev,
                     "case RNX 2 Mem_read status %02x @ %08x\n", TRAPME, addr);
@@ -3158,7 +3158,7 @@ exec2:
                 if (dest & MSIGN)
                     dest |= D32LMASK;               /* force upper word to all ones */
                 i_flags |=  SCC;                    /* make sure we set CC's for dest value */
-                break; 
+                break;
 
             case 0xA:       /* CMC */               /* Cache Memory Control - Diag use only */
                 if (CPU_MODEL == MODEL_87)
@@ -3800,7 +3800,7 @@ tbr:                                                /* handle basemode TBR too *
                         }
                     }
 
-                    /* keep bits 0-7 from old PSD */ 
+                    /* keep bits 0-7 from old PSD */
                     PSD1 = (PSD1 & 0xff000000) | ((BR[sreg]) & MASK24); /* New PSD address */
                     BR[1] = BR[sreg];               /* Rs reg to BR 1 */
                     BR[3] = GPR[reg];               /* Rd to BR 3 (AP) */
@@ -3992,7 +3992,7 @@ tbr:                                                /* handle basemode TBR too *
                 CPUSTATUS &= 0xfffff0bf;            /* zero bits that can change */
                 CPUSTATUS |= (temp & 0x0f40);       /* or in the new status bits */
                 CPUSTATUS |= BIT22;                 /* HS Floating is set to off */
-                /* make sure WCS is off and prom mode set to 0 (on) */ 
+                /* make sure WCS is off and prom mode set to 0 (on) */
                 CPUSTATUS &= ~(BIT20|BIT21);        /* make zero */
                 sim_debug(DEBUG_CMD, my_dev,
                     "SETCPU orig %08x user bits %08x New CPUSTATUS %08x SPAD[f9] %08x\n",
@@ -4109,7 +4109,7 @@ tbr:                                                /* handle basemode TBR too *
                 TRAPME = AEXPCEPT_TRAP;             /* set the trap type */
                 goto newpsd;                        /* handle trap */
             }
-skipit:        
+skipit:
             /* for retain, leave PSD2 alone */
             break;
 
@@ -4605,7 +4605,7 @@ doovr4:
             break;
 
         case 0x40>>2:       /* 0x40 SCC|SD|HLF - INV */ /* MPR */
-            if (MODES & BASEBIT) 
+            if (MODES & BASEBIT)
                 goto inv;                           /* invalid instruction in basemode */
             if (reg & 1) {                          /* odd reg specified? */
                 /* Spec fault */
@@ -4787,7 +4787,7 @@ doovr3:
                         goto newpsd;                /* memory read error or map fault */
 
                     BR[1] = addr;                   /* effective address contents to BR 1 */
-                    /* keep bits 0-7 from old PSD */ 
+                    /* keep bits 0-7 from old PSD */
                     PSD1 = ((PSD1 & 0xff000000) | (BR[1] & 0x01fffffe)); /* New PSD address */
                     BR[3] = GPR[0];                 /* GPR[0] to BR[3] (AP) */
                     BR[0] = cfp;                    /* set current frame pointer into BR[0] */
@@ -4843,7 +4843,7 @@ doovr3:
                         goto newpsd;                /* memory read error or map fault */
 
                     BR[1] = addr;                   /* effective address contents to BR 1 */
-                    /* keep bits 0-6 from old PSD */ 
+                    /* keep bits 0-6 from old PSD */
                     PSD1 = (PSD1 & 0xff000000) | ((BR[1]) & 0x01fffffe); /* New PSD address */
                     BR[3] = GPR[reg];               /* Rd to BR 3 (AP) */
                     BR[0] = cfp;                    /* set current frame pointer into BR[0] */
@@ -4905,7 +4905,7 @@ doovr3:
             break;
 
         case 0x68>>2:       /* 0x68 HLF - INV */    /* non basemode SCZ */
-            if (MODES & BASEBIT) 
+            if (MODES & BASEBIT)
                 goto inv;                           /* invalid instruction */
             if (OPR & 0xf) {                        /* any subop not zero is error */
                 TRAPME = UNDEFINSTR_TRAP;           /* Undefined Instruction Trap */
@@ -4916,7 +4916,7 @@ doovr3:
             goto sacz;                              /* use basemode sacz instruction */
 
         case 0x6C>>2:       /* 0x6C HLF - INV */    /* non basemode SRA & SLA */
-            if (MODES & BASEBIT) 
+            if (MODES & BASEBIT)
                 goto inv;                           /* invalid instruction */
             bc = OPR & 0x1f;                        /* get bit shift count */
             temp = GPR[reg];                        /* get reg value to shift */
@@ -4951,7 +4951,7 @@ doovr3:
             break;
 
         case 0x70>>2:       /* 0x70 SD|HLF - INV */ /* non-basemode SRL & SLL */
-            if (MODES & BASEBIT) 
+            if (MODES & BASEBIT)
                 goto inv;                           /* invalid instruction in basemode */
             bc = OPR & 0x1f;                        /* get bit shift count */
             if (OPR & 0x0040)                       /* is this SLL, bit 9 set */
@@ -4961,7 +4961,7 @@ doovr3:
             break;
 
         case 0x74>>2:       /* 0x74 SD|HLF - INV */ /* non-basemode SRC & SLC */
-            if (MODES & BASEBIT) 
+            if (MODES & BASEBIT)
                 goto inv;                           /* invalid instruction in basemode */
             bc = OPR & 0x1f;                        /* get bit shift count */
             temp = GPR[reg];                        /* get reg value to shift */
@@ -5026,7 +5026,7 @@ doovr3:
             break;
 
         case 0x7C>>2:       /* 0x7C HLF - INV */    /* non-basemode SRLD & SLLD */
-            if (MODES & BASEBIT) 
+            if (MODES & BASEBIT)
                 goto inv;                           /* invalid instruction in basemode */
             if (reg & 1) {                          /* see if odd reg specified */
                 TRAPME = ADDRSPEC_TRAP;             /* bad reg address, error */
@@ -5085,7 +5085,7 @@ doovr3:
                     mix = nix-BPIX;                 /* get map index in memory */
                     msdl = RMW(mpl+CPIX+4);         /* get mpl entry for given CPIX */
                 }
-                Mmap = RMH(msdl+(mix<<1));          /* map content from memory */      
+                Mmap = RMH(msdl+(mix<<1));          /* map content from memory */
                 map = RMR((nix<<1));                /* read the map cache contents */
                 if (((map & 0x800) == 0)) {         /* see if access bit is already on */
                     Mmap |= 0x800;                  /* set the accessed bit in the map cache entry */
@@ -5272,7 +5272,7 @@ meoa:       /* merge point for eor, and, or */
                 td = dest;                          /* save dest */
                 dest ^= source;                     /* <= 32 bits, so just do lower 32 bits */
                 dest &= (((t_uint64)GPR[4]) & D32RMASK);    /* mask with reg 4 contents */
-            }           
+            }
             CC = 0;
             if (dest == 0ll)
                 CC |= CC4BIT;
@@ -5343,7 +5343,7 @@ meoa:       /* merge point for eor, and, or */
                     "SBM @ PSD %08x %08x bit %08x addr %06x CCs %08x\r\n",
                     PSD1, PSD2, bc, addr, PSD1 & 0x78000000);
             break;
-                  
+
         case 0x9C>>2:       /* 0x9C ADR - ADR */    /* ZBM */
             if ((FC & 04) == 0)  {
                 /* Fault, byte address not allowed */
@@ -5504,7 +5504,7 @@ meoa:       /* merge point for eor, and, or */
 #endif
             goto dohist;                            /* merge with EXR code */
             break;
- 
+
         case 0xAC>>2:       /* 0xAC SCC|SD|RM|ADR - SCC|SD|RM|ADR */ /* Lx */
             dest = source;                          /* set value to load into reg */
             break;
@@ -5520,9 +5520,9 @@ meoa:       /* merge point for eor, and, or */
                 dest &= (((t_uint64)GPR[4]) & D32RMASK);    /* mask with reg 4 contents */
                 if (dest & 0x80000000)              /* see if we need to sign extend */
                     dest |= D32LMASK;               /* force upper word to all ones */
-            }           
+            }
             break;
- 
+
         case 0xB4>>2:       /* 0xB4 SCC|SD|RM|ADR - SCC|SD|RM|ADR */ /* LNx */
             dest = NEGATE32(source);                /* set the value to load into reg */
             td = dest;
@@ -5559,7 +5559,7 @@ meoa:       /* merge point for eor, and, or */
                 dest |= td;                         /* insert 32 bit result into dest */
                 /* if both signs are neg and result sign is positive, overflow */
                 /* if both signs are pos and result sign is negative, overflow */
-                if (((t == 3) && ((dest & MSIGN) == 0)) || 
+                if (((t == 3) && ((dest & MSIGN) == 0)) ||
                     ((t == 0) && ((dest & MSIGN) != 0)))
                     ovr = 1;
                 if ((td == 0) && ((source & MSIGN) == MSIGN) && ovr)
@@ -5583,7 +5583,7 @@ meoa:       /* merge point for eor, and, or */
                 dest = td;                          /* insert 64 bit result into dest */
                 /* if both signs are neg and result sign is positive, overflow */
                 /* if both signs are pos and result sign is negative, overflow */
-                if (((t == 3) && ((dest & DMSIGN) == 0)) || 
+                if (((t == 3) && ((dest & DMSIGN) == 0)) ||
                     ((t == 0) && ((dest & DMSIGN) != 0)))
                     ovr = 1;
                 if (td == 0)
@@ -6079,7 +6079,7 @@ dohist:
             break;
 
         case 0xD0>>2:       /* 0xD0 SD|ADR - INV */ /* LEA  none basemode only */
-            if (MODES & BASEBIT) 
+            if (MODES & BASEBIT)
                 goto inv;                           /* invalid instruction in basemode */
             /* bc has last bits 0,1 for indirect addr of both 1 for no indirection */
             addr &= 0x3fffffff;                     /* clear bits 0-1 */
@@ -6100,7 +6100,7 @@ dohist:
                 dest &= nm;                         /* mask both regs with reg 4 contents */
             } else {
                 dest &= (((t_uint64)GPR[4]) & D32RMASK);    /* mask with reg 4 contents */
-            }           
+            }
             break;
 
         case 0xDC>>2:       /* 0xDC INV - ADR */    /* INV nonbasemode (STFx basemode) */
@@ -6329,7 +6329,7 @@ dohist:
                 dest |= td;                         /* insert result into dest */
                 /* if both signs are neg and result sign is positive, overflow */
                 /* if both signs are pos and result sign is negative, overflow */
-                if (((t == 3) && ((dest & MSIGN) == 0)) || 
+                if (((t == 3) && ((dest & MSIGN) == 0)) ||
                     ((t == 0) && ((dest & MSIGN) != 0)))
                     ovr = 1;
                 if (dest & MSIGN)
@@ -6353,7 +6353,7 @@ dohist:
                 dest = td;                          /* insert result into dest */
                 /* if both signs are neg and result sign is positive, overflow */
                 /* if both signs are pos and result sign is negative, overflow */
-                if (((t == 3) && ((dest & DMSIGN) == 0)) || 
+                if (((t == 3) && ((dest & DMSIGN) == 0)) ||
                     ((t == 0) && ((dest & DMSIGN) != 0)))
                     ovr = 1;
                 if (td == 0)
@@ -6489,7 +6489,7 @@ dohist:
                 if (((MODES & BASEBIT) == 0) && (IR & IND)) /* see if CCs from last indirect wanted */
                     PSD1 = (PSD1 & 0x87fffffe) | CC;    /* insert last CCs */
                 /* update the PSD with new address */
-                if (MODES & BASEBIT) 
+                if (MODES & BASEBIT)
                     PSD1 = (PSD1 & 0xff000000) | (addr & 0xfffffe); /* bit 8-30 */
                 else
                     PSD1 = (PSD1 & 0xff000000) | (addr & 0x07fffe); /* bit 13-30 */
@@ -6781,7 +6781,7 @@ dohist:
                     t = SPAD[prior+0x80];           /* get spad entry for interrupt */
                     if ((t == 0) || ((t&MASK24) == MASK24))  /* if unused, ignore instruction */
                         break;                      /* ignore */
-      
+
                     if ((t & 0x0f800000) == 0x0f000000) /* if class F ignore instruction */
                         break;                      /* ignore for F class */
 
@@ -6808,10 +6808,10 @@ dohist:
                         break;                      /* ignore */
                     /* SPAD entries for interrupts begin at 0x80 */
                     t = SPAD[prior+0x80];           /* get spad entry for interrupt */
-     
+
                     if ((t == 0) || ((t&MASK24) == MASK24)) /* if unused, ignore instruction */
                         break;                      /* ignore */
-         
+
                     if ((t & 0x0f800000) == 0x0f000000) /* if class F ignore instruction */
                         break;                      /* ignore for F class */
 
@@ -6841,7 +6841,7 @@ dohist:
                     t = SPAD[prior+0x80];           /* get spad entry for interrupt */
                     if ((t == 0) || ((t&MASK24) == MASK24))  /* if unused, ignore instruction */
                         break;                      /* ignore */
-           
+
                     if ((t & 0x0f800000) == 0x0f000000) /* if class F ignore instruction */
                         break;                      /* ignore for F class */
 
@@ -6858,7 +6858,7 @@ dohist:
                     t = SPAD[prior+0x80];           /* get spad entry for interrupt */
                     if ((t == 0) || ((t&MASK24) == MASK24))  /* if unused, ignore instruction */
                         break;                      /* ignore */
-      
+
                     if ((t & 0x0f800000) == 0x0f000000) /* if class F ignore instruction */
                         break;                      /* ignore for F class */
 
@@ -6947,7 +6947,7 @@ dohist:
                             status = itm_rdwr(temp, GPR[0], ix);    /* read/write the interval timer */
                             /* see if the cmd does not return value */
                             /* if bit 25 set, read reg val into R0 */
-                            if (temp & 0x40) 
+                            if (temp & 0x40)
                                 GPR[0] = status;    /* return count in reg 0 */
                             /* No CC's going out */
                         } else {
@@ -7076,7 +7076,7 @@ mcheck:
                     "SIO ret PSD1 %08x %08x chsa %04x status %08x BLK %1x\n",
                     PSD1, PSD2, lchsa, rstatus, CPUSTATUS&0x80?1:0);
                 break;
-                            
+
             case 0x03:      /* Test I/O TIO */
                 if ((TRAPME = testxio(lchsa, &rstatus))) {
                     sim_debug(DEBUG_TRAP, my_dev,
@@ -7089,7 +7089,7 @@ mcheck:
                    "TIO ret PSD1 %08x lchsa %04x stat %08x spad %08x INTS[%02x] %08x BLK %1x\n",
                    PSD1, lchsa, rstatus, t, ix, INTS[ix], CPUSTATUS&0x80?1:0);
                 break;
-                            
+
             case 0x04:      /* Stop I/O STPIO */
                 if ((TRAPME = stopxio(lchsa, &rstatus)))
                     goto newpsd;                    /* error returned, trap cpu */
@@ -7145,7 +7145,7 @@ mcheck:
                 sim_debug(DEBUG_XIO, my_dev,
                     "ECI after checkxio rchsa %04x suba %04x status %08x\n",
                     rchsa, suba, rstatus);
-    
+
                 if ((INTS[ix] & INTS_ACT) == 0)
                     sim_debug(DEBUG_XIO, my_dev,
                         "ECI INT %02x is NOT set rchsa %04x lchsa %04x status %08x\n",
@@ -7332,7 +7332,7 @@ mcheck:
             if (ovr)                                /* if overflow, set CC1 */
                 CC = CC1BIT;                        /* show we had AEXP */
             else
-                CC = 0;                             /* no CC's yet */   
+                CC = 0;                             /* no CC's yet */
             if (dest & DMSIGN)                      /* if neg, set CC3 */
                 CC |= CC3BIT;                       /* if neg, set CC3 */
             else if (dest == 0)
@@ -7356,7 +7356,7 @@ mcheck:
                 EXM_EXR = 0;                        /* reset PC increment for EXR */
             } else
             if (i_flags & HLF) {                    /* if nop in rt hw, bump pc a word */
-                if ((drop_nop) && ((CPU_MODEL == MODEL_67) || (CPU_MODEL == MODEL_V6))) {    
+                if ((drop_nop) && ((CPU_MODEL == MODEL_67) || (CPU_MODEL == MODEL_V6))) {
                     PSD1 = (PSD1 + 4) | (((PSD1 & 2) >> 1) & 1);
                 } else {
                     PSD1 = (PSD1 + 2) | (((PSD1 & 2) >> 1) & 1);
@@ -7494,7 +7494,7 @@ newpsd:
                         EXM_EXR = 0;                /* reset PC increment for EXR */
                     } else
                     if (i_flags & HLF) {            /* if nop in rt hw, bump pc a word */
-                        if ((drop_nop) && ((CPU_MODEL == MODEL_67) || (CPU_MODEL == MODEL_V6))) {    
+                        if ((drop_nop) && ((CPU_MODEL == MODEL_67) || (CPU_MODEL == MODEL_V6))) {
                             PSD1 = (PSD1 + 4) | (((PSD1 & 2) >> 1) & 1);
                         } else {
                             PSD1 = (PSD1 + 2) | (((PSD1 & 2) >> 1) & 1);
@@ -7568,7 +7568,7 @@ newpsd:
 #else
                 /* next line changed to force halt on halt trap */
                 /* TRIED 041320 for MPX3.X install and testing */
-                if (((tvl == 0) || (CPUSTATUS & 0x40) == 0) || 
+                if (((tvl == 0) || (CPUSTATUS & 0x40) == 0) ||
                     (TRAPME == PRIVHALT_TRAP)) {    /* 0xB8 PL0E Privlege Mode Halt Trap */
 #endif
 doahalt:
@@ -7873,7 +7873,7 @@ t_stat cpu_reset(DEVICE *dptr)
             SPAD[0xf0] = 0x20;                      /* default Trap Table Address (TTA) */
         else
             SPAD[0xf0] = 0x80;                      /* default Trap Table Address (TTA) */
-#else 
+#else
         SPAD[0xf0] = 0x80;                          /* default Trap Table Address (TTA) */
 #endif
         SPAD[0xf1] = 0x100;                         /* Interrupt Table Address (ITA) */
@@ -8037,11 +8037,11 @@ t_stat cpu_set_ipu(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 {
 //  sim_printf("cpu_set_ipu sval %x cptr %s desc %s\n", sval, cptr, (char *)desc);
 #ifdef CPUONLY
-    sim_printf("IPU not available for this version of sel32\n");  
+    sim_printf("IPU not available for this version of sel32\n");
     return SCPE_ARG;                                /* error, we done */
 #endif
     if ((CPU_MODEL == MODEL_55) || (CPU_MODEL == MODEL_27)) {
-       sim_printf("IPU not available for model 32/55 or 32/27\n");  
+       sim_printf("IPU not available for model 32/55 or 32/27\n");
         return SCPE_ARG;                                /* error, we done */
     } else {
         cpu_unit.flags |= (1 << UNIT_V_IPU);        /* enable IPU for this MODEL */
@@ -8166,7 +8166,7 @@ t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 }
 
 /* return description for the specified device */
-const char *cpu_description (DEVICE *dptr) 
+const char *cpu_description (DEVICE *dptr)
 {
     return "SEL 32 CPU";                            /* return description */
 }

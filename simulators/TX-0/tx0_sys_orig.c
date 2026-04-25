@@ -107,7 +107,7 @@ inst = val[0];
 op = (inst >> 16) & 3;
 
 switch (op) {
-    case 0: 
+    case 0:
         fprintf (of, "sto %06o", inst & 0177777);              /* opcode */
         break;
     case 1:

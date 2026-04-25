@@ -52,7 +52,7 @@ DEVICE *sim_devices[] = {
   &bel_dev,   /* 71 */
   NULL
 };
-  
+
 const char *sim_stop_messages[SCPE_BASE] = {
   "Unknown error",
   "HALT instruction",
@@ -254,7 +254,7 @@ t_bool build_dev_tab (void)
 }
 
 static t_stat fprint_class1 (FILE *of, uint16 insn)
-{ 
+{
   switch (insn & 0777) {
   case 0000: fprintf (of, "NOP"); break;
   case 0001: fprintf (of, "CLA"); break;
@@ -275,7 +275,7 @@ static t_stat fprint_class1 (FILE *of, uint16 insn)
 }
 
 static t_stat fprint_class2 (FILE *of, uint16 insn)
-{ 
+{
   switch (insn & 0770) {
   case 0000: fprintf (of, "RAL %o", insn & 7); break;
   case 0020: fprintf (of, "RAR %o", insn & 7); break;
@@ -288,7 +288,7 @@ static t_stat fprint_class2 (FILE *of, uint16 insn)
 }
 
 static t_stat fprint_class3 (FILE *of, uint16 insn)
-{ 
+{
   switch (insn & 0177777) {
   case 0002001: fprintf (of, "ASZ"); break;
   case 0102001: fprintf (of, "ASN"); break;
@@ -314,7 +314,7 @@ static t_stat fprint_class3 (FILE *of, uint16 insn)
 }
 
 static t_stat fprint_iot (FILE *of, uint16 insn)
-{ 
+{
   SUBDEV *imdev;
 
   imdev = dev_tab[(insn >> 3) & 077];
@@ -404,7 +404,7 @@ fprint_cpu (FILE *of, uint16 insn, uint16 addr)
     fprintf (of, "%06o", insn);
     break;
   }
-  
+
   fprintf (of, " ");
   if (insn & 0100000)
     fprintf (of, "@");
@@ -452,7 +452,7 @@ fprint_dopr (FILE *of, uint16 insn)
     fprintf (of, "DHVC ");
   if ((insn & 04000) == 0)
     fprintf (of, "DHLT ");
-    
+
   return SCPE_OK;
 }
 

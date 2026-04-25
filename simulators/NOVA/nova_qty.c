@@ -818,7 +818,7 @@ t_stat qty_setnl( UNIT * uptr, int32 val, const char * cptr, void * desc )
  *              11  <ignored>
  *      DIC     read receiver or modem status
  *      DOC     00  control line section and diag mode
- *              01  
+ *              01
  *              10  specify line characteristics
  *              11
  *

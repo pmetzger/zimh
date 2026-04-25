@@ -573,13 +573,13 @@ t_stat lpr_srv(UNIT * uptr)
         if (action == 0 || action == 1) {
         /* If reading grab next word */
             r = chan_read(chan, &lpr_data[u].wbuff[wrow], 0);
-            sim_debug(DEBUG_DATA, &lpr_dev, "print read row < %d %d %012llo eor=%d\n", 
+            sim_debug(DEBUG_DATA, &lpr_dev, "print read row < %d %d %012llo eor=%d\n",
                  pos, wrow, lpr_data[u].wbuff[wrow], 0);
             if (action == 1)
                 chan_clear(chan, DEV_WRITE);
         } else { /* action == 2 || action == 3 */
         /* Place echo data in buffer */
-            sim_debug(DEBUG_DATA, &lpr_dev, "print read row > %d %d %012llo eor=%d\n", 
+            sim_debug(DEBUG_DATA, &lpr_dev, "print read row > %d %d %012llo eor=%d\n",
                 pos, wrow, wd, eor);
             r = chan_write(chan, &wd, 0);
             /* Change back to reading */

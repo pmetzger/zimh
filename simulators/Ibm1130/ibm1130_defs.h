@@ -102,7 +102,7 @@ void debug_print(const char *fmt, ...);
 /* ------------------------------------------------------------------------ */
 /* memory IO routines */
 
-int32 ReadW  (int32 a); 
+int32 ReadW  (int32 a);
 void  WriteW (int32 a, int32 d);
 
 /* ------------------------------------------------------------------------ */
@@ -285,7 +285,7 @@ const char * quotefix (const char *cptr, char * buf);
 t_bool keyboard_is_busy (void);
 void   forms_check (int set);                       /* device notification to console lamp display */
 void   print_check (int set);
-void   keyboard_selected (int select);              
+void   keyboard_selected (int select);
 void   disk_ready (int ready);
 void   disk_unlocked (int unlocked);
 void   gui_run(int running);

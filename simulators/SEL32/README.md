@@ -10,7 +10,7 @@ future. Additional processors are now supported. The 32/6780, 32/8780,
 additional instruction stream.  Threads are used so support is provided
 by both Windows and Linux.
 
-# SEL Concept/32 
+# SEL Concept/32
 
 This simulator is capable of running UTX2.1A, UTX2.1B, MPX 1.5F, MPX 3.4,
 MPX 3.5, MPX 3.6, and SEL diagnostics. Actually any software using the SEL
@@ -87,7 +87,7 @@ diag.tap     - bootable level one diagnostic tape w/auto testing.
                CV.CMD - Cache/Shadow diag.  Disabled in auto testing.
                CN.MMM - Non virtual memory diag runs OK.
                VM.MMM - Virtual memory diag for V6 & V9 runs OK.
-               CV.IPT - IPU trap diag.  Disabled in auto testing. 
+               CV.IPT - IPU trap diag.  Disabled in auto testing.
                CV.CSD - WCS read/write trap diag.  Disabled in auto testing.
                CV.CON - Operators Console runs all tests for all CPUs.
                CV.DXP - Diagnostic executive for level 2 diags. OK in batch.

@@ -482,7 +482,7 @@ key_event (SIM_KEY_EVENT *ev)
 
   if (key_modifiers (ev))
     return 0;
-    
+
   if (ev->state == SIM_KEYPRESS_DOWN) {
     uint16 code;
     if (modifiers & SHFT)

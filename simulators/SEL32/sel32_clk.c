@@ -384,7 +384,7 @@ int32 itm_rdwr(uint32 cmd, int32 cnt, uint32 level)
                 /* we only get here if timer ran out and no reload value */
                 /* get simulated negative start time in counts */
                 temp = temp - itm_strt;     /* make into a negative number */
-            } 
+            }
         }
         sim_cancel (&itm_unit);             /* cancel itc */
         itm_run = 0;                        /* timer is not running */
@@ -449,7 +449,7 @@ int32 itm_rdwr(uint32 cmd, int32 cnt, uint32 level)
                 /* we only get here if timer ran out and no reload value */
                 /* get simulated negative start time in counts */
                 temp = temp - itm_strt;     /* make into a negative number */
-            } 
+            }
             sim_cancel (&itm_unit);         /* cancel timer */
         }
         /* start timer with current or user value, reload on zero time */
@@ -510,7 +510,7 @@ int32 itm_rdwr(uint32 cmd, int32 cnt, uint32 level)
                 /* we only get here if timer ran out and no reload value */
                 /* get simulated negative start time in counts */
                 temp = temp - itm_strt;     /* make into a negative number */
-            } 
+            }
         }
         sim_debug(DEBUG_CMD, &itm_dev,
             "Intv 0x40 return value %08x (%d)\n", temp, temp);
@@ -529,7 +529,7 @@ int32 itm_rdwr(uint32 cmd, int32 cnt, uint32 level)
                 /* we only get here if timer ran out and no reload value */
                 /* get simulated negative start time in counts */
                 temp = temp - itm_strt;     /* make into a negative number */
-            } 
+            }
             sim_cancel (&itm_unit);         /* cancel timer */
         }
         sim_debug(DEBUG_CMD, &itm_dev,
@@ -555,7 +555,7 @@ int32 itm_rdwr(uint32 cmd, int32 cnt, uint32 level)
                 /* we only get here if timer ran out and no reload value */
                 /* get simulated negative start time in counts */
                 temp = temp - itm_strt;     /* make into a negative number */
-            } 
+            }
             sim_cancel (&itm_unit);         /* cancel timer */
         }
         sim_debug(DEBUG_CMD, &itm_dev,
@@ -589,7 +589,7 @@ int32 itm_rdwr(uint32 cmd, int32 cnt, uint32 level)
                 /* we only get here if timer ran out and no reload value */
                 /* get simulated negative start time in counts */
                 temp = temp - itm_strt;     /* make into a negative number */
-            } 
+            }
         }
         sim_debug(DEBUG_CMD, &itm_dev,
             "Intv 0x%02x temp value %08x (%08d)\n", cmd, temp, temp);

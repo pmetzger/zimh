@@ -183,7 +183,7 @@ int32 idx, val;
 if (ADDR_IS_QBM (pa)) {                                /* Qbus memory? */
     qbmem_rd (&val, pa, READ);
     return val;
-    }  
+    }
 idx = (pa & IOPAGEMASK) >> 1;
 if (iodispR[idx]) {
     iodispR[idx] (&val, pa, READ);

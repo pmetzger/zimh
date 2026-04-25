@@ -24,7 +24,7 @@
     in this Software without prior written authorization from William A. Beech.
 
     28 Oct 17 - Original file.
-    
+
     18 May 19 - Equipment Emulated:
     Model 210 chassis.
     Integrated processor board (IPB).
@@ -32,7 +32,7 @@
     ROM-resident system monitor.
     Auxiliary ROM board with MCS-80/MCS-85 assembler
     and text editor.
-    
+
 */
 
 #include "system_defs.h"

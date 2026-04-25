@@ -104,7 +104,7 @@ DEVICE lpt_dev = {
     NULL, NULL, &lpt_reset,
     NULL, &lpt_attach, &lpt_detach,
     NULL, DEV_DISABLE, 0,
-    NULL, NULL, NULL, &lpt_help, NULL, NULL, 
+    NULL, NULL, NULL, &lpt_help, NULL, NULL,
     &lpt_description
     };
 

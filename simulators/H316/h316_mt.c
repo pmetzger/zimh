@@ -156,9 +156,9 @@ REG mt_reg[] = {
     };
 
 MTAB mt_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write ring in place" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "no Write ring in place" },
     { MTAB_XTD|MTAB_VUN, 0, "FORMAT", "FORMAT",
       &sim_tape_set_fmt, &sim_tape_show_fmt, NULL },
@@ -218,7 +218,7 @@ switch (inst) {                                         /* case on opcode */
             mt_updint (0, mt_mdirq);                    /* clear ready */
             if (wrt_fnc[uptr->FNC & 017] == 1)          /* writing? */
                 mt_eor = 1;                             /* set transfer done */
-            break;          
+            break;
 
         default:                                        /* motion command */
             if (mt_busy) return dat;                    /* nop if ctlr busy */
@@ -441,7 +441,7 @@ switch (uptr->FNC) {                                    /* case on function */
         if (mt_dma)                                     /* DMC/DMA? req chan */
             SET_CH_REQ (ch);
         return SCPE_OK;                                 /* continue */
-        
+
     case FNC_WBCD2: case FNC_WBIN2: case FNC_WBIN3:     /* write first */
         mt_ptr = 0;                                     /* clear buf ptr */
         mt_updint (1, mt_mdirq);                        /* set ready */

@@ -144,7 +144,7 @@ DEVICE tv_dev = {
     NULL, NULL, &tv_reset,
     NULL, NULL, NULL,
     &tv_dib, DEV_DIS | DEV_DISABLE | DEV_UBUS | DEV_DEBUG,
-    0, tv_deb, NULL, NULL, NULL, NULL, NULL, 
+    0, tv_deb, NULL, NULL, NULL, NULL, NULL,
     &tv_description
 };
 

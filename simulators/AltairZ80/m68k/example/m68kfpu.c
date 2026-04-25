@@ -1375,7 +1375,7 @@ static void fmove_fpcr(uint16 w2)
 	}
 	else		// From <ea> to system control reg
 	{
-      if (reg & 4) 
+      if (reg & 4)
 		{
 		  REG_FPCR = READ_EA_32(ea);
 		  // JFF: need to update rounding mode from softfloat module
@@ -1400,11 +1400,11 @@ static void fmovem(uint16 w2)
 	{
 		switch (mode)
 	{
-	  	case 2:		// (JFF): Static register list, postincrement or control addressing mode.     
+		case 2:		// (JFF): Static register list, postincrement or control addressing mode.
 	    {
 	      int imode = (ea >> 3) & 0x7;
 	      int reg = (ea & 0x7);
-	      int di_mode = imode == 5;	      
+	      int di_mode = imode == 5;
 	      uint32 di_mode_ea = di_mode ? (REG_A[reg]+MAKE_INT_16(m68ki_read_imm_16())) : 0;
 	      for (i=0; i < 8; i++)
 			{
@@ -1428,7 +1428,7 @@ static void fmovem(uint16 w2)
 	      // to call EA_AY_DI_32() (that advances PC & reads displacement) each time
 	      // when the proper behaviour is 1) read once, 2) increment ea for each matching register
 	      // this forces to pre-read the mode (named "imode") so we can decide to read displacement, only once
-	      int di_mode = imode == 5;	      
+	      int di_mode = imode == 5;
 	      uint32 di_mode_ea =  di_mode ? (REG_A[reg]+MAKE_INT_16(m68ki_read_imm_16())) : 0;
 				for (i=0; i < 8; i++)
 				{
@@ -1456,7 +1456,7 @@ static void fmovem(uint16 w2)
 			{
 		      int imode = (ea >> 3) & 0x7;
 		      int reg = (ea & 0x7);
-		      int di_mode = imode == 5;	    
+		      int di_mode = imode == 5;
 		      uint32 di_mode_ea = di_mode ? (REG_A[reg]+MAKE_INT_16(m68ki_read_imm_16())) : 0;
 				for (i=0; i < 8; i++)
 				{
@@ -1480,20 +1480,20 @@ static void fmovem(uint16 w2)
 
 static void fscc()
 {
-  // added by JFF, this seems to work properly now 
+  // added by JFF, this seems to work properly now
   int condition = OPER_I_16() & 0x3f;
 
   int cc = TEST_CONDITION(condition);
   int mode = (REG_IR & 0x38) >> 3;
   int v = (cc ? 0xff : 0x00);
-  
+
   switch (mode)
   {
   case 0:  // fscc Dx
     {
       // If the specified floating-point condition is true, sets the byte integer operand at
       // the destination to TRUE (all ones); otherwise, sets the byte to FALSE (all zeros).
-      
+
       REG_D[REG_IR & 7] = (REG_D[REG_IR & 7] & 0xFFFFFF00) | v;
       break;
     }
@@ -1504,7 +1504,7 @@ static void fscc()
     m68ki_write_8(ea,v);
     break;
     }
-    
+
   default:
     {
       // unimplemented see fpu_uae.cpp around line 1300
@@ -1764,6 +1764,5 @@ void m68040_fpu_op1()
 		default:	fatalerror("m68040_fpu_op1: unimplemented op %d at %08X\n", (REG_IR >> 6) & 0x3, REG_PC-2);
 	}
 }
-
 
 

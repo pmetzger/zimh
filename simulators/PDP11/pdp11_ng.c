@@ -107,7 +107,7 @@ DEVICE ng_dev = {
     NULL, NULL, &ng_reset,
     &ng_boot, NULL, NULL,
     &ng_dib, DEV_DIS | DEV_DISABLE | DEV_UBUS | DEV_DEBUG,
-    0, ng_deb, NULL, NULL, NULL, &ng_help, NULL, 
+    0, ng_deb, NULL, NULL, NULL, &ng_help, NULL,
     &ng_description
 };
 
@@ -120,10 +120,10 @@ t_stat
 ng_rd(int32 *data, int32 PA, int32 access)
 {
   t_stat stat = SCPE_OK;
-    
+
   switch (PA & 002) {
-  case 000:  *data = ng_get_csr(); break; 
-  case 002:  *data = ng_get_reloc(); break; 
+  case 000:  *data = ng_get_csr(); break;
+  case 002:  *data = ng_get_reloc(); break;
   default: stat = SCPE_NXM;
   }
   return stat;
@@ -230,7 +230,7 @@ ng_boot(int32 unit, DEVICE *dptr)
     sim_printf ("in exploring the software.  It can currently be found here:\n");
     sim_printf ("https://dspace.mit.edu/handle/1721.1/6228\n\n");
     sim_printf ("To get started with turtle graphics, type STARTDISPLAY.\n\n\n");
-                
+
     return r;
 }
 

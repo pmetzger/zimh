@@ -152,9 +152,9 @@ REG mt_reg[] = {
     };
 
 MTAB mt_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable tape drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock tape drive" },
     { MTAB_XTD|MTAB_VUN, 0, "FORMAT", "FORMAT",
       &sim_tape_set_fmt, &sim_tape_show_fmt, NULL },
@@ -204,7 +204,7 @@ switch (fnc) {                                          /* case function */
             }
         else if (sim_is_active (uptr))                  /* busy? */
             CRETIOP;
-        uptr->eotf = 0;                                 /* clr eot flag */      
+        uptr->eotf = 0;                                 /* clr eot flag */
         mt_eof = 0;                                     /* clr eof flag */
         mt_skip = 0;                                    /* clr skp flag */
         mt_bptr = mt_blnt = 0;                          /* init buffer */
@@ -249,7 +249,7 @@ switch (fnc) {                                          /* case function */
         if ((r = mt_wrend (inst)))                      /* end record */
             return r;
         mt_gap = 1;                                     /* in gap */
-        sim_activate (uptr, mt_gtime);                  /* start timer */        
+        sim_activate (uptr, mt_gtime);                  /* start timer */
         break;
 
     case IO_SKS:                                        /* SKS */
@@ -330,7 +330,7 @@ switch (fnc) {                                          /* case function */
         }
 
 return SCPE_OK;
-} 
+}
 
 /* Unit service */
 

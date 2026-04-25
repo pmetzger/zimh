@@ -103,12 +103,12 @@ struct card_wirings wirings[] = {
     {WIRING_8WORD,       "8WORD"},
     {WIRING_RA,          "RA"},
     {WIRING_FDS,         "FDS"},
-    {WIRING_SOAP,        "SOAP"}, 
-    {WIRING_SOAPA,       "SOAPA"}, 
-    {WIRING_SUPERSOAP,   "SUPERSOAP"}, 
-    {WIRING_IS,          "IS"}, 
-    {WIRING_IT,          "IT"}, 
-    {WIRING_FORTRANSIT,  "FORTRANSIT"}, 
+    {WIRING_SOAP,        "SOAP"},
+    {WIRING_SOAPA,       "SOAPA"},
+    {WIRING_SUPERSOAP,   "SUPERSOAP"},
+    {WIRING_IS,          "IS"},
+    {WIRING_IT,          "IT"},
+    {WIRING_FORTRANSIT,  "FORTRANSIT"},
     {0, 0},
 };
 
@@ -129,7 +129,7 @@ char    mem_to_ascii[101] = {
 
 // representation of word digit 0-9 in card including Y(12) and X(11) punchs
 char    digits_ascii[31] = {
-          '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',   /* 0-9 */  
+          '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',   /* 0-9 */
           '?', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',   /* 0-9 w/HiPunch Y(12) */
           '!', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R',   /* 0-9 w/Negative Punch X(11) */
           0};
@@ -191,10 +191,10 @@ char     sim_hol_to_ascii(uint16 hol)
     if (hol == 0x600) return '!'; // -0
     for (c=31;c<127;c++) {
         if (ascii_to_hol[c] == hol) {
-            // take in consideration the aliases between hol and ascii to return 
+            // take in consideration the aliases between hol and ascii to return
             // char as for 026 FORT charset
             // hol = 0x022   -> 8-4   punches -> "-" or "'" or "@".   Must be "-"
-            // hol = 0x222   -> 0-8-4 punches -> "(" or "%".          Must be "("  
+            // hol = 0x222   -> 0-8-4 punches -> "(" or "%".          Must be "("
             if (c == '%') {c = '(';} else
             if (c == '@') {c = '-';} else
             if (c == '\'') {c = '-';};
@@ -215,7 +215,7 @@ vm_init(void) {
         return;
     inited = 1;
 
-    // Initialize vm memory to all plus zero 
+    // Initialize vm memory to all plus zero
     for(i = 0; i < MAXDRUMSIZE; i++) DRUM[i] = DRUM_NegativeZeroFlag[i] = 0;
     for(i = 0; i < 60; i++) IAS[i] = IAS_NegativeZeroFlag[i] = 0;
 
@@ -236,7 +236,7 @@ sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
 
 /* Opcodes */
 t_opcode  base_ops[100] = {
-        // opcode     name    soap name      R/W? option Valid Data Address Interlock 
+        // opcode     name    soap name      R/W? option Valid Data Address Interlock
         {OP_NOOP,     "NOOP",  "NOP",          0, 0,             vda_DAITS},
         {OP_STOP,     "STOP",  "HLT",          0, 0,             vda_DAITS},
         {OP_UFA,      "FASN",  "UFA",   opReadDA, opStorUnit,    vda_DAIS},
@@ -250,8 +250,8 @@ t_opcode  base_ops[100] = {
 
         {OP_AU,       "AU",    "AUP",   opReadDA, 0,             vda_DAIS},
         {OP_SU,       "SU",    "SUP",   opReadDA, 0,             vda_DAIS},
-        {12,          NULL,    NULL,           0, 0,             0},     
-        {13,          NULL,    NULL,           0, 0,             0}, 
+        {12,          NULL,    NULL,           0, 0,             0},
+        {13,          NULL,    NULL,           0, 0,             0},
         {OP_DIV,      "DIV",   "DIV",   opReadDA, 0,             vda_DAIS},
         {OP_AL,       "AL",    "ALO",   opReadDA, 0,             vda_DAIS},
         {OP_SL,       "SL",    "SLO",   opReadDA, 0,             vda_DAIS},
@@ -269,7 +269,7 @@ t_opcode  base_ops[100] = {
         {OP_SET,      "SET",   "SET",          0, opStorUnit,    vda_S,     IL_IAS},
         {OP_SIB,      "STBB",  "SIB",          0, opStorUnit,    vda_D,     IL_IAS},
         {OP_STI,      "STB",   "STI",          0, opStorUnit,    vda_D,     IL_IAS},
-        
+
         {OP_SRT,      "SRT",   "SRT",          0, 0,             vda_DAITS},
         {OP_SRD,      "SRD",   "SRD",          0, 0,             vda_DAITS},
         {OP_FAD,      "FA",    "FAD",   opReadDA, opStorUnit,    vda_DAIS},
@@ -280,7 +280,7 @@ t_opcode  base_ops[100] = {
         {OP_FAM,      "FAAB",  "FAM",   opReadDA, opStorUnit,    vda_DAIS},
         {OP_FSM,      "FSAB",  "FSM",   opReadDA, opStorUnit,    vda_DAIS},
         {OP_FMP,      "FM",    "FMP",   opReadDA, opStorUnit,    vda_DAIS},
-        
+
         {OP_NZA,      "BNZA",  "NZA",          0, opStorUnit,    vda_DAIS},
         {OP_BMA,      "BMNA",  "BMA",          0, opStorUnit,    vda_DAIS},
         {OP_NZB,      "BNZB",  "NZB",          0, opStorUnit,    vda_DAIS},
@@ -305,7 +305,7 @@ t_opcode  base_ops[100] = {
 
         {OP_RAU,      "RAU",   "RAU",   opReadDA, 0,             vda_DAIS},
         {OP_RSU,      "RSU",   "RSU",   opReadDA, 0,             vda_DAIS},
-        {62,          NULL,    NULL,           0, 0,             0},     
+        {62,          NULL,    NULL,           0, 0,             0},
         {OP_TLE,      "TLE",   "TLE",          0, opTLE,         vda_DS},
         {OP_DIVRU,    "DIVRU", "DVR",   opReadDA, 0,             vda_DAIS},
         {OP_RAL,      "RAL",   "RAL",   opReadDA, 0,             vda_DAIS},
@@ -354,8 +354,8 @@ print_opcode(FILE * of, t_int64 val)
 {
 
     int sgn;
-    int IA; 
-    int DA; 
+    int IA;
+    int DA;
     int op;
     int n;
     const char * opname;
@@ -365,7 +365,7 @@ print_opcode(FILE * of, t_int64 val)
     opname = DecodeOpcode(val, &op, &DA, &IA);
     if (opname == NULL) {
        fprintf(of, " %d Unknown opcode", op);
-       return; 
+       return;
     }
     fputs(opname, of);
     n = strlen(opname);
@@ -398,7 +398,7 @@ fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
         inst = 0;
         NegZero = 1;
     } else {
-        inst = *val; 
+        inst = *val;
         NegZero = 0;
     }
 
@@ -427,7 +427,7 @@ fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
     return SCPE_OK;
 }
 
-int 
+int
 find_opcode(char *op)
 {
     int i;
@@ -457,7 +457,7 @@ const char * parse_sgn(int *neg, const char *cptr)
     *neg=0;
     while (isspace(*cptr)) cptr++;
     if (*cptr == '+') {
-        cptr++; 
+        cptr++;
     } else if (*cptr == '-') {
         cptr++; *neg = 1;
     }
@@ -481,8 +481,8 @@ const char * parse_n(t_int64 *d, const char *cptr, int n)
             *d = (*d * 10) + (*cptr++ - '0');
         }
     }
-    if (n ==  4) {*d = *d % D4; } else 
-    if (n == 10) {*d = *d % D10;}  
+    if (n ==  4) {*d = *d % D4; } else
+    if (n == 10) {*d = *d % D10;}
     return cptr;
 }
 
@@ -530,7 +530,7 @@ t_stat parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int3
         if (op < 0) return STOP_UUO;
 
         if (DecodeOpcode(op * (t_int64) D8, &op, &da, &ia) == NULL) {
-            // opcode exists, but not availble because associated hw (Storage Unit or Control Unit) 
+            // opcode exists, but not availble because associated hw (Storage Unit or Control Unit)
             // is not enabled
             return STOP_UUO;
         }
@@ -538,13 +538,13 @@ t_stat parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int3
         while (isspace(*cptr)) cptr++;
         /* Collect first argument: da */
         cptr = parse_n(&d, cptr, 4);
-        da = (int) d; 
+        da = (int) d;
 
         /* Skip blanks */
         while (isspace(*cptr)) cptr++;
         /* Collect second argument: ia */
         cptr = parse_n(&d, cptr, 4);
-        ia = (int) d; 
+        ia = (int) d;
         // construct inst
         d = op * (t_int64) D8 + da * (t_int64) D4 + (t_int64) ia;
     } else if (sw & SWMASK('C')) {
@@ -552,7 +552,7 @@ t_stat parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int3
         if ((*cptr == 34) || (*cptr == 39)) cptr++; // skip double or single quotes if present
         for(i=0; i<5;i++) {
             d = d * 100;
-            ch = *cptr; 
+            ch = *cptr;
             if (ch == '\0') continue;
             if ((*cptr == 34) || (*cptr == 39)) continue; // double or single quotes mark end of text
             cptr++;
@@ -566,7 +566,7 @@ t_stat parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int3
     cptr = parse_sgn(&neg, cptr);
     if (neg) IsNeg = 1;
     if ((IsNeg) && (d == 0)) {
-        *val = NEGZERO_value; // val has this special value to represent -0 (minus zero == negative zero) 
+        *val = NEGZERO_value; // val has this special value to represent -0 (minus zero == negative zero)
     } else {
         if (IsNeg) d=-d;
         *val = (t_value) d;
@@ -599,7 +599,7 @@ char * word_to_ascii(char * buf, int CharStart, int CharLen, t_int64 d)
 
 
 // return hi digit (digit 10) al leftmost position in number (no sign)
-int Get_HiDigit(t_int64 d)  
+int Get_HiDigit(t_int64 d)
 {
     return (int) ((AbsWord(d) * 10) / D10);
 }
@@ -607,7 +607,7 @@ int Get_HiDigit(t_int64 d)
 // shift d value for nDigits positions (max 7)
 // if nDigit > 0 shift left, if < 0 then shift right
 // return value of shifted digits (without sign)
-int Shift_Digits(t_int64 * d, int nDigits)  
+int Shift_Digits(t_int64 * d, int nDigits)
 {
     int i,n;
     int neg = 0;
@@ -620,18 +620,18 @@ int Shift_Digits(t_int64 * d, int nDigits)
     if (nDigits > 0) {                                    // shift left
         for (i=0;i<nDigits;i++) {
             n  = n * 10 + (int) (*d / (1000000000L));     // nine digits (9 zeroes)
-            *d = (*d % (1000000000L)) * 10;      
+            *d = (*d % (1000000000L)) * 10;
         }
     } else {                                              // shift right
         for (i=0;i<-nDigits;i++) {
             n = *d % 10;
-            *d = *d / 10;      
+            *d = *d / 10;
         }
     }
     if (neg) *d=-*d;
     return n;
 }
-/* deck operations 
+/* deck operations
 
    carddeck [-q] <operation> <parameters...>
 
@@ -641,37 +641,37 @@ int Shift_Digits(t_int64 * d, int nDigits)
                         with different formats. To set the format for carddeck operations use
 
                            set cpr0 -format xxxx
-                        
+
                         this will apply to all operations, both on reading and writing deck files
 
    carddeck split       split the deck being punched in IBM 533 device in two separate destination decks
 
                         carddeck split <count> <dev|file0> <file1> <file2>
 
-                        <dev>    should be cdp1 to cdp3. File must be attached. The cards punched on 
+                        <dev>    should be cdp1 to cdp3. File must be attached. The cards punched on
                                  this file are the ones on source deck to split.
 
                         <file0>  if instead of cdp1, cdp2 or cdp3, a file can be specified containing
                                  the source deck to be splitted
 
-                        <count>  number of cards in each splitted deck. 
-                                 If count > 0, indicates the cards on first destination deck file 
+                        <count>  number of cards in each splitted deck.
+                                 If count > 0, indicates the cards on first destination deck file
                                                remaining cards go to the second destination deck
-                                 If count < 0, indicates the cards on second destination deck file 
+                                 If count < 0, indicates the cards on second destination deck file
                                                (so deck 2 contains lasts count cards from source)
                                  if cound is 5cd, file2 received 5 words-per-load-card deck
                                                if file2 has no cards, it is deleted.
 
                         <file1>  first destination deck file
                         <file2>  second destination deck file
-                                 
-                        when using <dev> as source both <file1> or <file2> can have same name as the currently 
+
+                        when using <dev> as source both <file1> or <file2> can have same name as the currently
                         attached file to cdp device. On command execution, cdp gest its file detached.
                         file1 and file are created (overwritten if already exists).
 
                         when using <file0> as source both <file1> or <file2> can have same name as <file0>.
-                        <file0> is completly read by SimH in its internal buffer (room for 10K cards) 
-                        and then splitted to <file1> and <file2>. 
+                        <file0> is completly read by SimH in its internal buffer (room for 10K cards)
+                        and then splitted to <file1> and <file2>.
 
    carddeck join        join several deck files into a new one
 
@@ -683,17 +683,17 @@ int Shift_Digits(t_int64 * d, int nDigits)
                         <file>   destination deck file
 
                         any source file <file1>, <file2>, etc can have same name as destination file <file>.
-                        Each source file is completly read in turn by SimH in its internal buffer (room for 10K cards) 
-                        and then written on destination file. This allos to append une deck on the top/end of 
+                        Each source file is completly read in turn by SimH in its internal buffer (room for 10K cards)
+                        and then written on destination file. This allos to append une deck on the top/end of
                         another one.
 
    carddeck print       print deck on console, and on simulated IBM 407 is any file is attached to cpd0
 
-                        carddeck print <file>                         
+                        carddeck print <file>
 
    carddeck echolast    echo on console last n cards already read that are in the take hopper
 
-                        carddeck echolasty <count> <dev> 
+                        carddeck echolasty <count> <dev>
 
                         <count>  number of cards to display (upo to 10)
 
@@ -701,8 +701,8 @@ int Shift_Digits(t_int64 * d, int nDigits)
 
 
    switches:            if present mut be just after carddeck and before deck operation
-    -Q                  quiet return status. 
-           
+    -Q                  quiet return status.
+
 */
 
 /*
@@ -794,7 +794,7 @@ t_stat deck_save(const char *fn, uint16 * DeckImage, int card, int nCards)
     int i,nc;
 
     // set flags for create new file
-    uptr->flags &= ~UNIT_RO; 
+    uptr->flags &= ~UNIT_RO;
     sim_switches |= SWMASK ('N');
 
     // attach file to cdr unit 0
@@ -821,11 +821,11 @@ t_stat deck_save(const char *fn, uint16 * DeckImage, int card, int nCards)
     return r;
 }
 
-// echo/print nCards from DeckImage array 
+// echo/print nCards from DeckImage array
 // uses cdp0 device/unit
 void deck_print_echo(uint16 * DeckImage, int nCards, int bPrint, int bEcho)
 {
-    char line[81]; 
+    char line[81];
     int i,c,nc;
     uint16 hol;
 
@@ -835,12 +835,12 @@ void deck_print_echo(uint16 * DeckImage, int nCards, int bPrint, int bEcho)
             hol = DeckImage[nc * 80 + i];
             c = sim_hol_to_ascii(hol);
             c = toupper(c);                             // IBM 407 can only print uppercase
-            if ((c == '?') || (c == '!')) c = '0';      // remove Y(12) or X(11) punch on zero 
+            if ((c == '?') || (c == '!')) c = '0';      // remove Y(12) or X(11) punch on zero
             if (strchr(mem_to_ascii, c) == 0) c = ' ';  // space if not in IBM 650 character set
             line[i] = c;
         }
         line[80]=0;
-        sim_trim_endspc(line); 
+        sim_trim_endspc(line);
         // echo on console (add CR LF)
         if (bEcho) {
             for (i=0;line[i];i++) sim_putchar(line[i]);
@@ -849,8 +849,8 @@ void deck_print_echo(uint16 * DeckImage, int nCards, int bPrint, int bEcho)
         // printout will be directed to file attached to CDP0 unit, if any
         if ((bPrint) && (cdp_unit[0].flags & UNIT_ATT)) {
             sim_fwrite(line, 1, strlen(line), cdp_unit[0].fileref); // fwrite clears line!
-            line[0] = 13; line[1] = 10; line[2] = 0;  
-            sim_fwrite(line, 1, 2, cdp_unit[0].fileref); 
+            line[0] = 13; line[1] = 10; line[2] = 0;
+            sim_fwrite(line, 1, 2, cdp_unit[0].fileref);
         }
     }
 }
@@ -872,9 +872,9 @@ static t_stat deck_split_cmd(const char *cptr)
     int bSplitPAT = 0;
 
     uint16 *DeckImage = NULL;
-    int nCards, nCards1, tail; 
+    int nCards, nCards1, tail;
 
-    while (sim_isspace (*cptr)) cptr++;                     // trim leading spc 
+    while (sim_isspace (*cptr)) cptr++;                     // trim leading spc
     if (*cptr == '-') {
         tail = 1;
         cptr++;
@@ -882,7 +882,7 @@ static t_stat deck_split_cmd(const char *cptr)
         tail = 0;
     }
     nCards1 = 0;
-    cptr = get_glyph (cptr, gbuf, 0);                       // get cards count param    
+    cptr = get_glyph (cptr, gbuf, 0);                       // get cards count param
     if ((tail == 0) && (strlen(gbuf) == 3) && (strncmp(gbuf, "5CD", 3) == 0)) {
         // split 5-words per card load cards fron deck
         bSplit5CD = 1;
@@ -890,14 +890,14 @@ static t_stat deck_split_cmd(const char *cptr)
         // split availability table load cards fron deck
         bSplitPAT = 1;
     } else {
-        // 
+        //
         nCards1 = (int32) get_uint (gbuf, 10, 10000, &r);
         if (r != SCPE_OK) return sim_messagef (SCPE_ARG, "Invalid count value\n");
         if (nCards1 == 0) return sim_messagef (SCPE_ARG, "Count cannot be zero\n");
     }
 
-    get_glyph (cptr, gbuf, 0);                              // get dev param 
-    cptr = get_glyph_quoted (cptr, fn0, 0);                 // re-read using get_glyph_quoted to do not 
+    get_glyph (cptr, gbuf, 0);                              // get dev param
+    cptr = get_glyph_quoted (cptr, fn0, 0);                 // re-read using get_glyph_quoted to do not
                                                             // change the capitalization of file name
     if ((strlen(gbuf) != 4) || (strncmp(gbuf, "CDP", 3)) ||
         (gbuf[3] < '1') || (gbuf[3] > '3') ) {
@@ -929,15 +929,15 @@ static t_stat deck_split_cmd(const char *cptr)
     }
     if (nCards1 > nCards) nCards1 = nCards;
 
-    while (sim_isspace (*cptr)) cptr++;                     // trim leading spc 
+    while (sim_isspace (*cptr)) cptr++;                     // trim leading spc
     cptr = get_glyph_quoted (cptr, fn1, 0);                 // get next param: filename 1
     if (fn1[0] == 0) return sim_messagef (SCPE_ARG, "Missing first filename\n");
-    while (sim_isspace (*cptr)) cptr++;                     // trim leading spc 
+    while (sim_isspace (*cptr)) cptr++;                     // trim leading spc
     cptr = get_glyph_quoted (cptr, fn2, 0);                 // get next param: filename 2
     if (fn2[0] == 0) return sim_messagef (SCPE_ARG, "Missing second filename\n");
-    
+
     if (bSplit5CD ) {
-        // separate 5cd deck 
+        // separate 5cd deck
         uint16 *DeckImage1 = deck_alloc(nCards);
         uint16 *DeckImage2 = deck_alloc(nCards);
         int i, nc, nc1, nc2, bFound;
@@ -948,13 +948,13 @@ static t_stat deck_split_cmd(const char *cptr)
             // determnine type of load card: is regular 1 word per card or 5 words per card
             bFound = 0;                         // soap4 5cd cards have non blanks cols 11 to 17
             for (i=10;i<16;i++) {               // soap4 5cd also col 1 = "0" and col2 = "1"
-                hol = DeckImage[nc * 80 + i];   
-                if (hol != 0) bFound++; 
+                hol = DeckImage[nc * 80 + i];
+                if (hol != 0) bFound++;
             }
             if (bSplit5CD) {
-                if ((DeckImage[nc * 80 + 0] != 0x200) || (DeckImage[nc * 80 + 1] != 0x100)) bFound = 0; 
+                if ((DeckImage[nc * 80 + 0] != 0x200) || (DeckImage[nc * 80 + 1] != 0x100)) bFound = 0;
             } else {
-                if ((DeckImage[nc * 80 + 0] != 0x200) || (DeckImage[nc * 80 + 1] != 0x200)) bFound = 0; 
+                if ((DeckImage[nc * 80 + 0] != 0x200) || (DeckImage[nc * 80 + 1] != 0x200)) bFound = 0;
             }
             hol=0;
             for (i=0;i<6;i++) {
@@ -1000,7 +1000,7 @@ static t_stat deck_split_cmd(const char *cptr)
     }
 
     if (bSplitPAT)  {
-        // separate pat deck 
+        // separate pat deck
         uint16 *DeckImage1 = deck_alloc(nCards);
         uint16 *DeckImage2 = deck_alloc(nCards);
         int i, nc, nc1, nc2, bFound;
@@ -1009,10 +1009,10 @@ static t_stat deck_split_cmd(const char *cptr)
         nc1 = nc2 = 0;
         for (nc=0; nc<nCards; nc++) {
             // PAT table has 8 words with hi punch on last digit
-            bFound = 0;                         
-            for (i=1;i<=8;i++) {    
-                hol = DeckImage[nc * 80 + i*10-1]; 
-                if (hol & 0x800) bFound++; 
+            bFound = 0;
+            for (i=1;i<=8;i++) {
+                hol = DeckImage[nc * 80 + i*10-1];
+                if (hol & 0x800) bFound++;
             }
             bFound = (bFound == 8) ? 1:0; // is an availability table load card?
             // store in appropiate output deck
@@ -1087,7 +1087,7 @@ static t_stat deck_join_cmd(const char *cptr)
     cptr0 = cptr;
     // look for "as"
     while (*cptr) {
-        while (sim_isspace (*cptr)) cptr++;                 // trim leading spc 
+        while (sim_isspace (*cptr)) cptr++;                 // trim leading spc
         cptrAS = cptr; // mark position of AS
         cptr = get_glyph_quoted (cptr, gbuf, 0);            // get next param
         if (gbuf[0] == 0) return sim_messagef (SCPE_ARG, "AS <file> not found\n");
@@ -1095,8 +1095,8 @@ static t_stat deck_join_cmd(const char *cptr)
         if (strcmp(gbuf, "AS") == 0) break;
     }
 
-    while (sim_isspace (*cptr)) cptr++;                     // trim leading spc 
-    cptr = get_glyph_quoted (cptr, fnDest, 0);              // get next param: destination filename 
+    while (sim_isspace (*cptr)) cptr++;                     // trim leading spc
+    cptr = get_glyph_quoted (cptr, fnDest, 0);              // get next param: destination filename
     if (fnDest[0] == 0) return sim_messagef (SCPE_ARG, "Missing destination filename\n");
     if (*cptr) return sim_messagef (SCPE_ARG, "Extra unknown parameters after destination filename\n");
 
@@ -1104,9 +1104,9 @@ static t_stat deck_join_cmd(const char *cptr)
     nDeck = nCards = 0;
     while (1) {
 
-        while (sim_isspace (*cptr)) cptr++;                 // trim leading spc 
+        while (sim_isspace (*cptr)) cptr++;                 // trim leading spc
         if (cptrAS == cptr) break;                          // break if reach "AS"
-        cptr = get_glyph_quoted (cptr, fnSrc, 0);           // get next param: source filename 
+        cptr = get_glyph_quoted (cptr, fnSrc, 0);           // get next param: source filename
         if (fnSrc[0] == 0) return sim_messagef (SCPE_ARG, "Missing source filename\n");
 
         // read source deck
@@ -1126,11 +1126,11 @@ static t_stat deck_join_cmd(const char *cptr)
     if ((sim_switches & SWMASK ('Q')) == 0) {
         sim_messagef (SCPE_OK, "Destination Deck has %d cards (%s)\n", nCards, fnDest);
     }
-    
+
     return SCPE_OK;
 }
 
-// carddeck print <file> 
+// carddeck print <file>
 static t_stat deck_print_cmd(const char *cptr)
 {
     char fn[4*CBUFSIZE];
@@ -1139,8 +1139,8 @@ static t_stat deck_print_cmd(const char *cptr)
     uint16 *DeckImage = NULL;
     int nCards;
 
-    while (sim_isspace (*cptr)) cptr++;                     // trim leading spc 
-    cptr = get_glyph_quoted (cptr, fn, 0);                  // get next param: source filename 
+    while (sim_isspace (*cptr)) cptr++;                     // trim leading spc
+    cptr = get_glyph_quoted (cptr, fn, 0);                  // get next param: source filename
     if (fn[0] == 0) return sim_messagef (SCPE_ARG, "Missing filename\n");
     if (*cptr) return sim_messagef (SCPE_ARG, "Extra unknown parameters after filename\n");
 
@@ -1156,7 +1156,7 @@ static t_stat deck_print_cmd(const char *cptr)
     }
 
     deck_free(DeckImage);
-    
+
     return SCPE_OK;
 }
 
@@ -1169,14 +1169,14 @@ static t_stat deck_echolast_cmd(const char *cptr)
     uint16 *DeckImage = NULL;
     int i,nc,nCards, ic, nh, ncdr;
 
-    while (sim_isspace (*cptr)) cptr++;                     // trim leading spc 
+    while (sim_isspace (*cptr)) cptr++;                     // trim leading spc
 
-    cptr = get_glyph (cptr, gbuf, 0);                       // get cards count param    
+    cptr = get_glyph (cptr, gbuf, 0);                       // get cards count param
     nCards = (int32) get_uint (gbuf, 10, MAX_CARDS_IN_READ_STAKER_HOPPER, &r);
     if (r != SCPE_OK) return sim_messagef (SCPE_ARG, "Invalid count value\n");
     if (nCards == 0) return sim_messagef (SCPE_ARG, "Count cannot be zero\n");
 
-    cptr = get_glyph (cptr, gbuf, 0);                       // get dev param    
+    cptr = get_glyph (cptr, gbuf, 0);                       // get dev param
     if ((strlen(gbuf) != 4) || (strncmp(gbuf, "CDR", 3)) ||
         (gbuf[3] < '1') || (gbuf[3] > '3') ) {
         return sim_messagef (SCPE_ARG, "Device should be CDR1 CDR2 or CDR3\n");
@@ -1196,7 +1196,7 @@ static t_stat deck_echolast_cmd(const char *cptr)
 
     // get last nCards cards, so
     // first card to echo is count ones before last one
-    nh = ReadStakerLast[ncdr] - (nCards-1);                 
+    nh = ReadStakerLast[ncdr] - (nCards-1);
     nh = nh % MAX_CARDS_IN_READ_STAKER_HOPPER;
     for (nc=0; nc<nCards; nc++) {
         // copy card form read hopper buf to deck image
@@ -1212,7 +1212,7 @@ static t_stat deck_echolast_cmd(const char *cptr)
     if ((sim_switches & SWMASK ('Q')) == 0) {
         sim_messagef (SCPE_OK, "Last %d cards from Read take Hopper\n", nCards);
     }
-        
+
     return SCPE_OK;
 }
 

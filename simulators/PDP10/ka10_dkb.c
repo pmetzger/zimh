@@ -30,7 +30,7 @@
 #define NUM_DEVS_DKB 0
 #endif
 
-#if NUM_DEVS_DKB > 0 
+#if NUM_DEVS_DKB > 0
 
 #include "sim_video.h"
 
@@ -239,7 +239,7 @@ int dkb_keys (SIM_KEY_EVENT *kev, UNIT *uptr)
   case SIM_KEY_C:
     if (dkb_kmod == (META|TOP|SHFT))   /* Control C */
         uptr->DATA = dkb_kmod | 043;
-    else 
+    else
         uptr->DATA = dkb_kmod | 003;
     return 1;
   case SIM_KEY_D:
@@ -377,7 +377,7 @@ int dkb_keys (SIM_KEY_EVENT *kev, UNIT *uptr)
   case SIM_KEY_SLASH: /* Ok */
     if ((dkb_kmod & (TOP|SHFT)) == TOP)    /* / ? */
         uptr->DATA = (dkb_kmod | 056) & ~TOP;  //TOP+.
-    else 
+    else
         uptr->DATA = dkb_kmod | 057;
     return 1;
   case SIM_KEY_ESC:
@@ -480,7 +480,7 @@ t_stat dkb_reset( DEVICE *dptr)
     dkb_kmod = SHFT|TOP|META|CTRL;
     return SCPE_OK;
 }
-    
+
 
 t_stat dkb_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {

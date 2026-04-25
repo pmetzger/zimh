@@ -85,7 +85,7 @@
 /* Global release string */
 
 const char *hp_vm_release = "8";                /* HP 3000 simulator release number */
-const char *hp_vm_release_message = 
+const char *hp_vm_release_message =
    "This is the last version of this simulator which is API compatible\n"
    "with the 4.x version of the simh framework.  A supported version of\n"
    "this simulator can be found at: http://simh.trailing-edge.com/hp\n";

@@ -1843,7 +1843,7 @@ int main (void)
     return 1;
 
   fprintf (f, "static uint8 font[128][12] = {\n");
-  
+
   for (i = 0; i < 128; i++) {
     font = sail7_font[i];
     fprintf (f, "  { %03o, %03o, %03o, %03o, %03o, %03o, ",

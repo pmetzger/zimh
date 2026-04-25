@@ -538,9 +538,9 @@ MTAB dp_mod[] = {
       NULL, "3282", &dp_set_size },
     { (UNIT_AUTO+UNIT_DTYPE), (DP_3283 << UNIT_V_DTYPE),
       NULL, "3283", &dp_set_size },
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable disk drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock disk drive" },
     { MTAB_XTD|MTAB_VDV, 0, "CHAN", "CHAN",
       &io_set_dvc, &io_show_dvc, NULL },
@@ -880,7 +880,7 @@ switch (uptr->UCMD) {
                 chan_uen (dva);                         /* force uend */
                 return SCPE_OK;
                 }
-            }        
+            }
         if (dp_end_sec (uptr, i, DP_WDSC * 4, st))      /* transfer done? */
             return SCPE_OK;                             /* err or cont */
         break;
@@ -969,7 +969,7 @@ if (uptr->UCMD != DSC_SEEK) {                           /* int? */
 return SCPE_OK;
 }
 
-/* Common read/write sector end routine 
+/* Common read/write sector end routine
 
    case 1 - more to transfer, not end cylinder - reschedule, return TRUE
    case 2 - more to transfer, end cylinder - uend, return TRUE

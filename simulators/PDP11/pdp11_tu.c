@@ -299,7 +299,7 @@ REG tu_reg[] = {
     };
 
 MTAB tu_mod[] = {
-    { MTAB_XTD|MTAB_VDV, 0, "MASSBUS", NULL, 
+    { MTAB_XTD|MTAB_VDV, 0, "MASSBUS", NULL,
         NULL, &mba_show_num, NULL, "Display Massbus number" },
 #if defined (VM_PDP11)
     { MTAB_XTD|MTAB_VDV, 0, "FORMATTER", "TM02",
@@ -309,15 +309,15 @@ MTAB tu_mod[] = {
 #endif
     { MTAB_XTD|MTAB_VDV, 0, "FORMATTER", NULL,
       NULL, &tu_show_fmtr, NULL, "Display formatter/controller type" },
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write ring in place" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "no Write ring in place" },
-    { UNIT_TYPE, UNIT_TE16, "TE16", "TE16", 
+    { UNIT_TYPE, UNIT_TE16, "TE16", "TE16",
         NULL, NULL, NULL, "Set drive type to TE16" },
-    { UNIT_TYPE, UNIT_TU45, "TU45", "TU45", 
+    { UNIT_TYPE, UNIT_TU45, "TU45", "TU45",
         NULL, NULL, NULL, "Set drive type to TU45" },
-    { UNIT_TYPE, UNIT_TU77, "TU77", "TU77", 
+    { UNIT_TYPE, UNIT_TU77, "TU77", "TU77",
         NULL, NULL, NULL, "Set drive type to TU77" },
     { MTAB_XTD|MTAB_VUN|MTAB_VALR, 0, "FORMAT", "FORMAT",
         &sim_tape_set_fmt, &sim_tape_show_fmt, NULL, "Set/Display tape format (SIMH, E11, TPC, P7B, AWS, TAR)" },
@@ -424,7 +424,7 @@ switch (ofs) {                                          /* decode PA<4:1> */
             if (tucs1 & CS1_GO)
                 return tu_go (drv);
             }
-        break;  
+        break;
 
     case FC_OF:                                         /* MTFC */
         if (tucs1 & CS1_GO)
@@ -526,7 +526,7 @@ switch (fnc) {                                          /* case on function */
         sim_activate (uptr, tu_time);
         tucs1 = tucs1 & ~CS1_GO;
         tufs = tufs & ~FS_TMK;
-        return SCPE_OK; 
+        return SCPE_OK;
 
     case FNC_REWIND:
         if ((uptr->flags & UNIT_ATT) == 0) {            /* unattached? */

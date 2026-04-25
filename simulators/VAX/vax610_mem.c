@@ -77,7 +77,7 @@ DEVICE mctl_dev = {
     1, DEV_RDX, 20, 1, DEV_RDX, 8,
     NULL, NULL, &mctl_reset,
     NULL, NULL, NULL,
-    &mctl_dib, DEV_QBUS, 0, NULL, NULL, NULL, NULL, NULL, NULL, 
+    &mctl_dib, DEV_QBUS, 0, NULL, NULL, NULL, NULL, NULL, NULL,
     &mctl_description
     };
 
@@ -134,9 +134,9 @@ struct {
     } boards[] = {
         {  4096, "MSV11-QC"},
         {  2048, "MSV11-QB"},
-        {  1024, "MSV11-QA"}, 
-        {   512, "MSV11-PL"}, 
-        {   256, "MSV11-PK"}, 
+        {  1024, "MSV11-QA"},
+        {   512, "MSV11-PL"},
+        {   256, "MSV11-PK"},
         {     0, NULL}};
 int32 i;
 

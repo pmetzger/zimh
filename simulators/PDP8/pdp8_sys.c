@@ -196,7 +196,7 @@ while ((c = getc (fi)) != EOF) {                        /* read char */
     else
         if (c > 0200)                                   /* channel 8 set? */
             *newf = (c & 070) << 9;                     /* change field */
-    else 
+    else
         return c;                                       /* otherwise ok */
     }
 return EOF;
@@ -273,7 +273,7 @@ for (;;) {
         if (wd > 07777)                                 /* chan 7 set? */
             origin = wd & 07777;                        /* new origin */
         else {                                          /* no, data */
-            if ((field | origin) >= MEMSIZE) 
+            if ((field | origin) >= MEMSIZE)
                 return SCPE_NXM;
             if (do_load)
                 M[field | origin] = wd;
@@ -400,7 +400,7 @@ static const char *opcode[] = {
  NULL, NULL, NULL, NULL,                                /* decode only */
  NULL
  };
- 
+
 static const int32 opc_val[] = {
  06000+I_NPN, 06001+I_NPN, 06002+I_NPN, 06003+I_NPN,
  06004+I_NPN, 06005+I_NPN, 06006+I_NPN, 06007+I_NPN,
@@ -408,8 +408,8 @@ static const int32 opc_val[] = {
  06020+I_NPN, 06021+I_NPN, 06022+I_NPN, 06024+I_NPN, 06026+I_NPN,
  06030+I_NPN, 06031+I_NPN, 06032+I_NPN, 06034+I_NPN, 06035+I_NPN, 06036+I_NPN,
  06040+I_NPN, 06041+I_NPN, 06042+I_NPN, 06044+I_NPN, 06045+I_NPN, 06046+I_NPN,
- 06051+I_NPN, 06053+I_NPN, 06054+I_NPN, 06057+I_NPN, 
- 06061+I_NPN, 06063+I_NPN, 06064+I_NPN, 06067+I_NPN, 
+ 06051+I_NPN, 06053+I_NPN, 06054+I_NPN, 06057+I_NPN,
+ 06061+I_NPN, 06063+I_NPN, 06064+I_NPN, 06067+I_NPN,
  06101+I_NPN, 06102+I_NPN, 06103+I_NPN,
  06131+I_NPN, 06132+I_NPN, 06133+I_NPN, 06135+I_NPN, 06136+I_NPN, 06137+I_NPN,
  06204+I_NPN, 06214+I_NPN, 06224+I_NPN, 06234+I_NPN,
@@ -601,7 +601,7 @@ return sp;
         *of     =       output stream
         addr    =       current PC
         *val    =       pointer to data
-        *uptr   =       pointer to unit 
+        *uptr   =       pointer to unit
         sw      =       switches
    Outputs:
         return  =       status code
@@ -662,7 +662,7 @@ if (opc == 06) {                                        /* IOT? */
             }
         }
     }
-        
+
 for (i = 0; opc_val[i] >= 0; i++) {                     /* loop thru ops */
     j = (opc_val[i] >> I_V_FL) & I_M_FL;                /* get class */
     if ((opc_val[i] & 077777) == (inst & masks[j])) {   /* match? */
@@ -702,7 +702,7 @@ for (i = 0; opc_val[i] >= 0; i++) {                     /* loop thru ops */
             if (opcode[i])
                 fprintf (of, "%s", opcode[i]); /* skips */
             fprint_opr (of, inst & 0206, j, opcode[i] != NULL);
-            break;      
+            break;
 
         case I_V_OP3:                                   /* operate group 3 */
             sp = fprint_opr (of, inst & 0320, j, 0);
@@ -1011,7 +1011,7 @@ switch (j) {                                            /* case on class */
 
     case F_V_MR1D:
     case F_V_MR2D:
-        return SCPE_IERR;          
+        return SCPE_IERR;
         }                                               /* end case */
 
 if (*cptr != 0) return SCPE_ARG;                        /* junk at end? */

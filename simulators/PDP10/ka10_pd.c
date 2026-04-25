@@ -106,7 +106,7 @@ t_stat pd_devio(uint32 dev, uint64 *data)
         pd_unit[0].PIA_CH |= (int32)(*data & PIA_FLG);
         if (pd_unit[0].PIA_CH & PIA_FLG) {
             if (!sim_is_active(pd_unit))
-                sim_activate(pd_unit, 10000); 
+                sim_activate(pd_unit, 10000);
         }
         if (*data & CLK_IRQ) {
             pd_unit[0].PIA_CH &= ~(CLK_IRQ);

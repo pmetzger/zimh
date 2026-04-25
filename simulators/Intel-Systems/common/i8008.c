@@ -868,7 +868,7 @@ int32 cond(int32 con)
         case 2: /* sign */
             if (Sflag != 0) return (1);
             break;
-        case 3: /* parity */ 
+        case 3: /* parity */
             if (Pflag != 0) return (1);
             break;
         default:
@@ -1097,7 +1097,7 @@ fprintf (of, "%s", opcode[inst]);
 
 /* Handle INP/OUT op codes */
 if ((inst & 0301) == 0101) {
-  fprintf (of, " %o", (inst & 076) >> 1); 
+  fprintf (of, " %o", (inst & 076) >> 1);
 }
 
 if (oplen[inst] == 2) {

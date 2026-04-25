@@ -64,12 +64,12 @@ extern DEVICE isbc464_dev;
 
 /* multibus Standard SIMH Device Data Structures */
 
-UNIT irq_unit = { 
+UNIT irq_unit = {
     UDATA (&irq_svc, 0, 0), 1
 };
 
-REG irq_reg[] = { 
-    { HRDATA (MBIRQ, mbirq, 32) }, 
+REG irq_reg[] = {
+    { HRDATA (MBIRQ, mbirq, 32) },
     { NULL }
 };
 
@@ -83,25 +83,25 @@ DEBTAB irq_debug[] = {
 };
 
 DEVICE irq_dev = {
-    "IRQ",              //name 
-    &irq_unit,          //units 
-    irq_reg,            //registers 
+    "IRQ",              //name
+    &irq_unit,          //units
+    irq_reg,            //registers
     NULL,               //modifiers
-    1,                  //numunits 
-    16,                 //aradix  
-    16,                 //awidth  
-    1,                  //aincr  
-    16,                 //dradix  
+    1,                  //numunits
+    16,                 //aradix
+    16,                 //awidth
+    1,                  //aincr
+    16,                 //dradix
     8,                  //dwidth
-    NULL,               //examine  
-    NULL,               //deposit  
-    &irq_reset,         //reset 
+    NULL,               //examine
+    NULL,               //deposit
+    &irq_reset,         //reset
     NULL,               //boot
-    NULL,               //attach  
+    NULL,               //attach
     NULL,               //detach
-    NULL,               //ctxt     
-    DEV_DEBUG,          //flags 
-    0,                  //dctrl 
+    NULL,               //ctxt
+    DEV_DEBUG,          //flags
+    0,                  //dctrl
     irq_debug,          //debflags
     NULL,               //msize
     NULL,               //lname
@@ -117,7 +117,7 @@ DEVICE irq_dev = {
 
 t_stat irq_reset(DEVICE *dptr)
 {
-//    if (SBC_reset(NULL) == 0) { 
+//    if (SBC_reset(NULL) == 0) {
 //        sim_printf("  Interrupt: Reset\n");
         sim_activate (&irq_unit, irq_unit.wait); /* activate unit */
         return SCPE_OK;

@@ -34,8 +34,8 @@
         serial port.  It provides 7 or 8-bit ASCII RS-232 interface to Terminals
         or 20 mA current loop interface to a model 33 or 37 Teletype.  It is not
         compatible with baudot Teletypes.  Baud rates from 110 to 1200 are
-        switch selectable from S! on the MP-S. The ACIA ports appear at all 
-        4 addresses.  This fact is used by SWTBUG to determine the presence of the 
+        switch selectable from S! on the MP-S. The ACIA ports appear at all
+        4 addresses.  This fact is used by SWTBUG to determine the presence of the
         MP-S vice MP-C serial card.  The ACIA interrupt request line can be connected
         to the IRQ or NMI interrupt lines by a jumper on the MP-S.
 
@@ -52,7 +52,7 @@
               on the data port and is ready to be read.
         TXE - A 1 in this bit means the port is ready to receive a character
               on the data port and transmit it out over the serial line.
-     
+
         A read to the data port gets the buffered character, a write
         to the data port writes the character to the device.
 */
@@ -99,7 +99,7 @@ int32 sio1d(int32 io, int32 data);
    sio_reg        SIO register list
    sio_mod        SIO modifiers list */
 
-UNIT sio_unit = { 
+UNIT sio_unit = {
     UDATA (&sio_svc, 0, 0), KBD_POLL_WAIT
 };
 
@@ -116,18 +116,18 @@ MTAB sio_mod[] = {
 };
 
 DEVICE sio_dev = {
-    "MP-S",                             //name 
-    &sio_unit,                          //units 
-    sio_reg,                            //registers 
+    "MP-S",                             //name
+    &sio_unit,                          //units
+    sio_reg,                            //registers
     sio_mod,                            //modifiers
-    1,                                  //numunits 
-    10,                                 //aradix 
-    31,                                 //awidth 
-    1,                                  //aincr 
-    8,                                  //dradix 
+    1,                                  //numunits
+    10,                                 //aradix
+    31,                                 //awidth
+    1,                                  //aincr
+    8,                                  //dradix
     8,                                  //dwidth
-    NULL,                               //examine 
-    NULL,                               //deposit 
+    NULL,                               //examine
+    NULL,                               //deposit
     &sio_reset,                         //reset
     NULL,                               //boot
     NULL,                               //attach
@@ -147,16 +147,16 @@ UNIT ptr_unit = { UDATA (&ptr_svc, UNIT_SEQ + UNIT_ATTABLE, 0), KBD_POLL_WAIT
 DEVICE ptr_dev = {
     "PTR",                              //name
     &ptr_unit,                          //units
-    NULL,                               //registers 
+    NULL,                               //registers
     NULL,                               //modifiers
-    1,                                  //numunits 
-    10,                                 //aradix 
-    31,                                 //awidth 
-    1,                                  //aincr 
-    8,                                  //dradix 
+    1,                                  //numunits
+    10,                                 //aradix
+    31,                                 //awidth
+    1,                                  //aincr
+    8,                                  //dradix
     8,                                  //dwidth
-    NULL,                               //examine 
-    NULL,                               //deposit 
+    NULL,                               //examine
+    NULL,                               //deposit
     &ptr_reset,                         //reset
     NULL,                               //boot
     NULL,                               //attach
@@ -174,17 +174,17 @@ UNIT ptp_unit = { UDATA (&ptp_svc, UNIT_SEQ + UNIT_ATTABLE, 0), KBD_POLL_WAIT
 };
 DEVICE ptp_dev = {
     "PTP",                              //name
-    &ptp_unit,                          //units 
-    NULL,                               //registers 
+    &ptp_unit,                          //units
+    NULL,                               //registers
     NULL,                               //modifiers
-    1,                                  //numunits 
-    10,                                 //aradix 
-    31,                                 //awidth 
-    1,                                  //aincr 
-    8,                                  //dradix 
+    1,                                  //numunits
+    10,                                 //aradix
+    31,                                 //awidth
+    1,                                  //aincr
+    8,                                  //dradix
     8,                                  //dwidth
-    NULL,                               //examine 
-    NULL,                               //deposit 
+    NULL,                               //examine
+    NULL,                               //deposit
     &ptp_reset,                         //reset
     NULL,                               //boot
     NULL,                               //attach
@@ -203,7 +203,7 @@ t_stat sio_svc (UNIT *uptr)
     sio_unit.buf = temp & BYTEMASK;     // Save char
     if (sio_unit.buf==127) {
         // convert BackSpace (ascii 127) so del char (ascii 8) for swtbug
-        sio_unit.buf=8; 
+        sio_unit.buf=8;
     }
     sio_unit.u3 |= RXF;                 // Set RXF flag
     /* Do any special character handling here */
@@ -273,7 +273,7 @@ int32 sio0s(int32 io, int32 data)
     if (io == 0) {                      // control register read
         if (ptr_flag) {                 // reader enabled?
             if ((ptr_unit.flags & UNIT_ATT) == 0) { // attached?
-                ptr_unit.u3 &= ~RXF;    // no, clear RXF flag 
+                ptr_unit.u3 &= ~RXF;    // no, clear RXF flag
                 ptr_flag = 0;           // clear reader flag
                 printf("Reader not attached to file\n");
             } else {                    // attached

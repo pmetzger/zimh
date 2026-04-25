@@ -348,14 +348,14 @@ DIB rp_dib[] = {
 
 MTAB                rp_mod[] = {
 #if KL
-    {MTAB_XTD|MTAB_VDV, TYPE_RH10, NULL, "RH10",  &rh_set_type, NULL, 
+    {MTAB_XTD|MTAB_VDV, TYPE_RH10, NULL, "RH10",  &rh_set_type, NULL,
               NULL, "Sets controller to RH10" },
     {MTAB_XTD|MTAB_VDV, TYPE_RH20, "RH20", "RH20", &rh_set_type, &rh_show_type,
               NULL, "Sets controller to RH20"},
 #endif
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock drive" },
     {UNIT_DTYPE, (RP07_DTYPE << UNIT_V_DTYPE), "RP07", "RP07", &rp_set_type },
     {UNIT_DTYPE, (RP06_DTYPE << UNIT_V_DTYPE), "RP06", "RP06", &rp_set_type },
@@ -393,7 +393,7 @@ REG                 rpa_reg[] = {
     {ORDATA(BUF, rp_rh[0].buf, 36), REG_HRO},
     {BRDATA(BUFF, rp_buf[0], 16, 64, RP_NUMWD), REG_HRO},
     {0}
-};  
+};
 
 DEVICE              rpa_dev = {
     "RPA", rp_unit, rpa_reg, rp_mod,
@@ -421,7 +421,7 @@ REG                 rpb_reg[] = {
     {ORDATA(BUF, rp_rh[1].buf, 36), REG_HRO},
     {BRDATA(BUFF, rp_buf[1], 16, 64, RP_NUMWD), REG_HRO},
     {0}
-};  
+};
 
 DEVICE              rpb_dev = {
     "RPB", &rp_unit[010], rpb_reg, rp_mod,
@@ -449,7 +449,7 @@ REG                 rpc_reg[] = {
     {ORDATA(BUF, rp_rh[2].buf, 36), REG_HRO},
     {BRDATA(BUFF, rp_buf[2], 16, 64, RP_NUMWD), REG_HRO},
     {0}
-};  
+};
 
 DEVICE              rpc_dev = {
     "RPC", &rp_unit[020], rpc_reg, rp_mod,
@@ -477,7 +477,7 @@ REG                 rpd_reg[] = {
     {ORDATA(BUF, rp_rh[3].buf, 36), REG_HRO},
     {BRDATA(BUFF, rp_buf[3], 16, 64, RP_NUMWD), REG_HRO},
     {0}
-};  
+};
 
 DEVICE              rpd_dev = {
     "RPD", &rp_unit[030], rpd_reg, rp_mod,
@@ -773,7 +773,7 @@ rp_read(DEVICE *dptr, struct rh_if *rhc, int reg, uint32 *data) {
         temp = GET_SC(regs[RPDA]) << 6;
         temp ^= ((regs[RPLA] + 1) >> 4) & 07760;
         if ((regs[RPMR] & 1) == 0)
-            regs[RPLA] += 1024; 
+            regs[RPLA] += 1024;
         break;
     case  016:  /* ecc position */
     case  017:  /* ecc pattern */
@@ -920,7 +920,7 @@ t_stat rp_svc (UNIT *uptr)
             uptr->DATAPTR = 0;
             /* On read headers, transfer 2 words to start */
             if (GET_FNC(regs[RPCS1]) == FNC_READH) {
-                rhc->buf = (((uint64)cyl) << 18) | 
+                rhc->buf = (((uint64)cyl) << 18) |
                          ((uint64)((GET_SF(regs[RPDA]) << 8) | GET_SF(regs[RPDA])));
                 sim_debug(DEBUG_DATA, dptr, "%s%o read word h1 %012llo %09o %06o\n",
                    dptr->name, unit, rhc->buf, rhc->cda, rhc->wcr);
@@ -962,7 +962,7 @@ rd_end:
             regs[RPCS1] &= ~CS1_GO;
             regs[RPDS] &= ~DS_PIP;
             regs[RPDS] |= DS_DRY;
-            if (uptr->DATAPTR == RP_NUMWD) 
+            if (uptr->DATAPTR == RP_NUMWD)
                (void)rh_blkend(rhc);
             rh_finish_op(rhc, 0);
             return SCPE_OK;

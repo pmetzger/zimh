@@ -66,7 +66,7 @@
 #define RAM_SIZE        0x3FFFF
 
 /* set INTR for CPU on the 8088 */
-#define INT_R           INT_1  
+#define INT_R           INT_1
 
 /* xtbus interrupt definitions */
 

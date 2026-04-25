@@ -28,7 +28,7 @@
         29 Oct 17 - Original file.
 
     NOTES:
-    
+
     TO DO:
         Set up for actual ROM sizes 2708-...
 
@@ -36,7 +36,7 @@
 
 #include "system_defs.h"
 
-#define BASE_ADDR       u3    
+#define BASE_ADDR       u3
 
 #define isbc464_NAME    "Intel iSBC 464 ROM Board"
 
@@ -63,7 +63,7 @@ int isbc464_onetime = 1;
 static const char* isbc464_desc(DEVICE *dptr) {
     return isbc464_NAME;
 }
-    
+
 /* isbc464 Standard I/O Data Structures */
 
 UNIT isbc464_unit = {
@@ -75,7 +75,7 @@ MTAB isbc464_mod[] = {
         NULL, NULL, "Sets the ROM size for iSBC464"               },
    { MTAB_XTD | MTAB_VDV, 0, NULL, "BASE", &isbc464_set_base,
         NULL, NULL, "Sets the ROM base for iSBC464"               },
-    { MTAB_XTD|MTAB_VDV, 0, "PARAM", NULL, NULL, &isbc464_show_param, NULL, 
+    { MTAB_XTD|MTAB_VDV, 0, "PARAM", NULL, NULL, &isbc464_show_param, NULL,
         "show configured parameters for SBC 464" },
     { 0 }
 };
@@ -125,7 +125,7 @@ DEVICE isbc464_dev = {
 t_stat isbc464_cfg(uint16 base, uint16 size, uint8 dummy)
 {
     isbc464_unit.capac = size;
-    isbc464_unit.u3 = base; 
+    isbc464_unit.u3 = base;
     isbc464_unit.filebuf = (uint8 *)calloc(size, sizeof(uint8));
     if (isbc464_unit.filebuf == NULL) {
         sim_printf ("    isbc464: Calloc error\n");
@@ -149,7 +149,7 @@ t_stat isbc464_clr(void)
 t_stat isbc464_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result, i;
-    
+
     if (cptr == NULL)
         return SCPE_ARG;
     result = sscanf(cptr, "%i%n", &size, &i);
@@ -170,11 +170,11 @@ t_stat isbc464_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
                 break;
             default:
                 sim_printf("SBC464: Size error\n");
-                return SCPE_ARG;     
-        }    
+                return SCPE_ARG;
+        }
         sim_printf("SBC464: Size=%04X\n", uptr->capac);
         return SCPE_OK;
-    }   
+    }
     return SCPE_ARG;
 }
 
@@ -183,7 +183,7 @@ t_stat isbc464_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat isbc464_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result, i;
-    
+
     if (cptr == NULL)
         return SCPE_ARG;
     result = sscanf(cptr, "%i%n", &size, &i);
@@ -204,11 +204,11 @@ t_stat isbc464_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
                 break;
             default:
                 sim_printf("SBC464: Base error\n");
-                return SCPE_ARG;     
-        }    
+                return SCPE_ARG;
+        }
         sim_printf("SBC464: Base=%04X\n", uptr->BASE_ADDR);
         return SCPE_OK;
-    }   
+    }
     return SCPE_ARG;
 }
 
@@ -216,8 +216,8 @@ t_stat isbc464_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc464_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
-    fprintf(st, "%s, Size=%04X, Base=%04X ", 
-        ((isbc464_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled", 
+    fprintf(st, "%s, Size=%04X, Base=%04X ",
+        ((isbc464_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled",
         uptr->capac, uptr->BASE_ADDR);
     return SCPE_OK;
 }

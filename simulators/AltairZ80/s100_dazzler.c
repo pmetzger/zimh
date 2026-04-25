@@ -309,7 +309,7 @@ static t_stat daz_boot(int32 unitno, DEVICE *dptr)
         exdep_cmd(EX_D, "-m 11B JP NZ,10FH");
         exdep_cmd(EX_D, "-m 11E JP 11EH");
     }
-    
+
     *((int32 *) sim_PC->loc) = 0x0100;
 
     return SCPE_OK;

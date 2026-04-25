@@ -37,7 +37,7 @@
                        cause an operation complete interrupt. Standard DMS routines were not
                        sensitive to this but DUP uses its own interrupt handler, and this
                        is why DUP would hang at end of deck.
- 
+
  *  Update 2005-05-19  Added support for 2501 reader
 
  *  Update 2004-11-08  Merged in correct physical card reader code
@@ -54,7 +54,7 @@
 
  *  Update 2003-07-23: Added autodetect for card decks (029 vs binary),
     made this the default.
- 
+
  *  Update 2003-06-21: Fixed bug in XIO_SENSE: op_complete and response
     bits were being cleared before the DSW was saved in ACC. Somehow DMS
     worked with this, but APL didn't.
@@ -74,7 +74,7 @@
 
      -q quiet mode, the simulator will not print the name of each file it opens
         while processing deck files (which are discussed below). For example,
-      
+
         ATTACH CR -q @deckfile
 
      -l makes the simulator convert lower case letters in text decks
@@ -112,7 +112,7 @@
    attach command is constructed this way:
 
        attach CR @deckfile %1 %2 %3
-    
+
    This will pass the ibm1130 or do script arguments to attach, which will make
    them available in the deckfile. Then, for instance the line
 
@@ -124,7 +124,7 @@
 
    Filenames may be followed by whitespace and one or more mode options:
    The mode options are:
-    
+
             b       forces interpration as raw binary
             a       forces conversion from ascii to 029 coding, tabs are left alone
             af      forces 029 ascii conversion, and interprets tabs in Fortran mode
@@ -139,11 +139,11 @@
    If a tab mode is not specified, tabs are left unmolested (and are treated as invalid characters)
 
    Example:
-   
+
        attach cr @decklist
 
    reads filenames from file "decklist," which might contain:
-  
+
        file01.for xf
        file02.dat a
        file03 bin b
@@ -160,7 +160,7 @@
    program.for
    !// XEQ
    program.dat
-   
+
    looks like two literal supervisor control cards, followed by the contents
    of file program.for, followed by an // XEQ card, followed by the contents
    of file program.dat.
@@ -170,11 +170,11 @@
    The line
 
    !BREAK
-   
+
    has a special meaning: when read from a deck file, it stops the
    emulator as if "IMMEDIATE STOP" was pressed. This returns control to
    the command interpreter or to the current DO command script.
-   
+
 *  Card image format.
    Card files can be ascii text or binary.  There are several ASCII modes:
    CODE_029, CODE_26F, etc, corresponding to different code sets.
@@ -230,9 +230,9 @@
 
         are rearranged so that the input fields are placed in the appropriate columns
 
-        The label must start on the first character of the line. If there is no label, 
+        The label must start on the first character of the line. If there is no label,
         the first character(s) before the opcode must be whitespace. Following the opcode, there
-        MUST be a tab character, followed by the format and tag. Following the format and tag 
+        MUST be a tab character, followed by the format and tag. Following the format and tag
         may be exactly one whitespace character, and then starts the argument.
 
         Input lines with * in column 1 and blank lines are turned into Assembler comments,
@@ -283,7 +283,7 @@ way to solve the problem, the other is to keep DSW up-to-date all the time).
    copies the read station buffer to the punch station buffer, and if
    the punch unit is attached to a file, writes the punch station buffer to
    the output file.
-   
+
    The read and punch cycles operate on the appropriate card buffer.
 
    Detaching the card punch flushes the punch station buffer if necessary.
@@ -311,7 +311,7 @@ way to solve the problem, the other is to keep DSW up-to-date all the time).
 
             MSB                                LSB
    byte 0   [ 6] [ 7] [ 8] [ 9]   0    0    0    0
-   byte 1   [12] [11] [ 0] [ 1] [ 2] [ 3] [ 4] [ 5] 
+   byte 1   [12] [11] [ 0] [ 1] [ 2] [ 3] [ 4] [ 5]
 
    This means we can read words (little endian) and get this in memory:
 
@@ -404,7 +404,7 @@ static int32 cr_cols = 0;                                   /* 2501 reader colum
 
 #define UNIT_OP          (3u << UNIT_V_OPERATION)           /* two bits */
 #define UNIT_CODE        (7u << UNIT_V_CODE)                /* three bits */
-#define UNIT_CR_EMPTY    (1u << UNIT_V_CR_EMPTY)                
+#define UNIT_CR_EMPTY    (1u << UNIT_V_CR_EMPTY)
 #define UNIT_SCRATCH     (1u << UNIT_V_SCRATCH)             /* temp file */
 #define UNIT_QUIET       (1u << UNIT_V_QUIET)
 #define UNIT_DEBUG       (1u << UNIT_V_DEBUG)
@@ -1594,7 +1594,7 @@ static t_stat cr_attach (UNIT *uptr, const char *iptr)
     if (sim_switches & SWMASK('A')) tab_proc = EditToAsm;
     if (sim_switches & SWMASK('T')) tab_proc = EditToWhitespace;
 
-    /* user can specify multiple names on the CR attach command if using a deck file. The deck file 
+    /* user can specify multiple names on the CR attach command if using a deck file. The deck file
      * can contain %n tokens to pickup the additional name(s). */
 
     c = cptr;                                       /* extract arguments */
@@ -2245,7 +2245,7 @@ static t_stat pcr_open_controller (const char *devname)
     dcb.fInX            = 0;
     dcb.fErrorChar      = 0;
     dcb.fNull           = 0;
-    dcb.fRtsControl     = RTS_CONTROL_ENABLE;                
+    dcb.fRtsControl     = RTS_CONTROL_ENABLE;
     dcb.fAbortOnError   = 0;
     dcb.XonLim          = 0;
     dcb.XoffLim         = 0;
@@ -2327,7 +2327,7 @@ static void pcr_xio_sense (int modify)
 static void report_error (char *msg, DWORD err)
 {
     char *lpMessageBuffer = NULL;
-        
+
     FormatMessage(
       FORMAT_MESSAGE_ALLOCATE_BUFFER |
       FORMAT_MESSAGE_FROM_SYSTEM,
@@ -2448,7 +2448,7 @@ static DWORD CALLBACK pcr_thread (LPVOID arg)
 
             case PCR_STATE_WAIT_DATA_START:             /* waiting for leadin character from P command (= or !) */
                 if (nrcvd <= 0) {                       /* (this could take an indefinite amount of time) */
-                    if (cr_unit.flags & UNIT_DEBUG) 
+                    if (cr_unit.flags & UNIT_DEBUG)
                         printf("PCR: NO RESP YET\n");
 
                     continue;                           /* reader is not ready */
@@ -2581,7 +2581,7 @@ static void pcr_set_dsw_from_status (BOOL post_pick)
                                                     /* set 1130 status word bits */
     CLRBIT(cr_dsw, CR_DSW_1442_LAST_CARD | CR_DSW_1442_BUSY | CR_DSW_1442_NOT_READY | CR_DSW_1442_ERROR_CHECK);
 
-    if (pcr_status & PCR_STATUS_HEMPTY)             
+    if (pcr_status & PCR_STATUS_HEMPTY)
         SETBIT(cr_dsw, CR_DSW_1442_LAST_CARD | CR_DSW_1442_NOT_READY);
 
     if (pcr_status & PCR_STATUS_ERROR)

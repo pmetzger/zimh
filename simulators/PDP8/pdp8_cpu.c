@@ -366,14 +366,14 @@ while (reason == 0) {                                   /* loop until halted */
         }
 
     MA = IF | PC;                                       /* form PC */
-    if (sim_brk_summ && 
+    if (sim_brk_summ &&
         sim_brk_test (MA, (1u << SIM_BKPT_V_SPC) | SWMASK ('E'))) { /* breakpoint? */
         reason = STOP_IBKPT;                            /* stop simulation */
         break;
         }
 
     IR = M[MA];                                         /* fetch instruction */
-    if (sim_brk_summ && 
+    if (sim_brk_summ &&
         sim_brk_test (IR, (2u << SIM_BKPT_V_SPC) | SWMASK ('I'))) { /* breakpoint? */
         reason = STOP_OPBKPT;                            /* stop simulation */
         break;
@@ -999,7 +999,7 @@ switch ((IR >> 7) & 037) {                              /* decode IR<0:4> */
    1x001        SCA + SCL       DAD
    1x010        SCA + MUY       DST
    1x011        SCA + DVI       SWBA            NOP if not detected earlier
-   1x100        SCA + NMI       DPSZ            
+   1x100        SCA + NMI       DPSZ
    1x101        SCA + SHL       DPIC            must be combined with MQA!MQL
    1x110        SCA + ASR       DCM             must be combined with MQA!MQL
    1x111        SCA + LSR       SAM
@@ -1318,7 +1318,7 @@ switch ((IR >> 7) & 037) {                              /* decode IR<0:4> */
                     break;
                     }                                   /* end switch device */
                 break;
-            
+
             default:
                 reason = stop_inst;
                 break;
@@ -1374,7 +1374,7 @@ return reason;
 
 /*
  * This sequence of instructions is a mix that hopefully
- * represents a resonable instruction set that is a close 
+ * represents a resonable instruction set that is a close
  * estimate to the normal calibrated result.
  */
 
@@ -1398,7 +1398,7 @@ UF = UB = gtf = emode = 0;
 pcq_r = find_reg ("PCQ", NULL, dptr);
 if (pcq_r)
     pcq_r->qptr = 0;
-else 
+else
     return SCPE_IERR;
 sim_clock_precalibrate_commands = pdp8_clock_precalibrate_commands;
 sim_vm_initial_ips = 10 * SIM_INITIAL_IPS;

@@ -37,7 +37,7 @@
                         correctly for DHU vs. DHV; mark each unit
                         enabled or disabled as appropriate; reset
                         the vector length; reset the number of units.
-   02-Jun-11    MP      Added debugging support to trace register, interrupt 
+   02-Jun-11    MP      Added debugging support to trace register, interrupt
                         and data traffic (SET VH DEBUG[=REG;INT;XMT;RCV])
                         Added SET LOG and SET NOLOG support for logging mux
                         traffic
@@ -244,7 +244,7 @@ BITFIELD vh_rxtimer_bits[] = {
 #define RATE_38400      (15)
 
 static const char *vh_charsizes[] = {"5", "6", "7", "8"};
-static const char *vh_baudrates[] = {"50", "75", "110", "134.5", "150", "300", "600", "1200", 
+static const char *vh_baudrates[] = {"50", "75", "110", "134.5", "150", "300", "600", "1200",
                         "1800", "2000", "2400", "4800", "7200", "9600", "19200", "38400"};
 static const char *vh_parity[] = {"N", "N", "E", "O"};
 static const char *vh_stopbits[] = {"1", "2", "1", "1.5"};
@@ -491,7 +491,7 @@ static int32 vh_txinta (void);
 static t_stat vh_clear (int32 vh, t_bool flag);
 static t_stat vh_reset (DEVICE *dptr);
 static t_stat vh_attach (UNIT *uptr, const char *cptr);
-static t_stat vh_detach (UNIT *uptr);       
+static t_stat vh_detach (UNIT *uptr);
 static t_stat vh_show_detail (FILE *st, UNIT *uptr, int32 val, const void *desc);
 static t_stat vh_show_rbuf (FILE *st, UNIT *uptr, int32 val, const void *desc);
 static t_stat vh_show_txq (FILE *st, UNIT *uptr, int32 val, const void *desc);
@@ -551,18 +551,18 @@ static const REG vh_reg[] = {
 
 static const MTAB vh_mod[] = {
 #if !UNIBUS
-    { UNIT_MODEDHU,            0, "DHV mode", "DHV", 
+    { UNIT_MODEDHU,            0, "DHV mode", "DHV",
         &vh_setmode, NULL,  NULL, "Set DHV mode" },
 #endif
-    { UNIT_MODEDHU, UNIT_MODEDHU, "DHU mode", "DHU", 
+    { UNIT_MODEDHU, UNIT_MODEDHU, "DHU mode", "DHU",
         &vh_setmode, NULL,  NULL, "Set DHU mode" },
     { UNIT_FASTDMA,            0, NULL,       "NORMAL",
         NULL,        NULL,  NULL, "Set Normal DMA mode" },
-    { UNIT_FASTDMA, UNIT_FASTDMA, "fast DMA", "FASTDMA", 
+    { UNIT_FASTDMA, UNIT_FASTDMA, "fast DMA", "FASTDMA",
         NULL,        NULL,  NULL, "Enable Fast DMA mode" },
     { UNIT_MODEM,              0, NULL,       "NOMODEM",
         NULL,        NULL,  NULL, "Disable modem control" },
-    { UNIT_MODEM,     UNIT_MODEM, "Modem",    "MODEM", 
+    { UNIT_MODEM,     UNIT_MODEM, "Modem",    "MODEM",
         NULL,        NULL,  NULL, "Enable modem control" },
     { UNIT_HANGUP,             0, NULL,       "NOHANGUP",
         NULL,        NULL,  NULL, "Disable disconnect on DTR drop" },
@@ -740,7 +740,7 @@ static int32 fifo_put ( int32   vh,
     if (((lp->lnctrl >> LNCTRL_V_MAINT) & LNCTRL_M_MAINT) == 2)
         goto override;
     if (!(lp->lnctrl & LNCTRL_RX_ENA))
-        return (0); 
+        return (0);
 override:
     vh_csr[vh] |= CSR_RX_DATA_AVAIL;
     if (rbuf_idx[vh] < FIFO_SIZE) {
@@ -764,7 +764,7 @@ override:
                 vh_set_rxint (vh);
             else if (vh_timeo[vh] == 0) {
                 vh_timeo[vh] = MS2SIMH (vh_timer[vh]) + 1;
-                sim_debug (DBG_TIM, &vh_dev, "Timeout set vh=%d, timeout=%d\n", vh, vh_timeo[vh]); 
+                sim_debug (DBG_TIM, &vh_dev, "Timeout set vh=%d, timeout=%d\n", vh, vh_timeo[vh]);
                 }
         } else {
             /* Interrupt on transition _from_ an empty FIFO */
@@ -776,7 +776,7 @@ override:
         vh_crit |= (1 << vh);
     /* Implement RX FIFO-level flow control */
     if (lp != NULL) {
-        if ((lp->lnctrl & LNCTRL_FORCE_XOFF) || 
+        if ((lp->lnctrl & LNCTRL_FORCE_XOFF) ||
               ((vh_crit & (1 << vh)) && (lp->lnctrl & LNCTRL_IAUTO))) {
             int32   chan = RBUF_GETLINE(vh, data);
             vh_stall[vh] ^= (1 << chan);
@@ -831,7 +831,7 @@ static int32 fifo_get ( int32   vh  )
     if (rbuf_idx[vh] == 0)                  /* FIFO just became empty? */
         vh_csr[vh] &= ~CSR_RX_DATA_AVAIL;   /* clear CSR bit ti indicate this */
 
-    /* Reschedule the next poll preceisely so that the 
+    /* Reschedule the next poll preceisely so that the
        programmed input speed is observed. */
     sim_clock_coschedule_abs (vh_poll_unit, tmxr_poll);
     return (data & 0177777);
@@ -991,7 +991,7 @@ static void vh_getc (   int32   vh  )
 static void vh_set_config (     TMLX    *lp)
 {
     char lineconfig[16];
-    
+
     sprintf(lineconfig, "%s-%s%s%s", LPR_GETSPD(lp->lpr), LPR_GETCHARSIZE(lp->lpr), LPR_GETPARITY(lp->lpr), LPR_GETSTOPBITS(lp->lpr));
     if (!lp->tmln->serconfig || (0 != strcmp(lp->tmln->serconfig, lineconfig))) /* config changed? */
         tmxr_set_config_line (lp->tmln, lineconfig);      /* set it */
@@ -1080,7 +1080,7 @@ static t_stat vh_rd (   int32   *data,
         break;
     }
 
-    sim_debug(DBG_RREG, &vh_dev, "vh_rd(vh=%d, PA=0x%08X [%s], access=%d, data=0x%X) ", vh, PA, 
+    sim_debug(DBG_RREG, &vh_dev, "vh_rd(vh=%d, PA=0x%08X [%s], access=%d, data=0x%X) ", vh, PA,
               ((vh_unit[vh].flags & UNIT_MODEDHU) ? vh_rd_dhu_regs : vh_rd_dhv_regs)[(PA >> 1) & 07], access, *data);
     sim_debug_bits(DBG_RREG, &vh_dev, bitdefs[(PA >> 1) & 07], (uint32)(*data), (uint32)(*data), TRUE);
 
@@ -1100,11 +1100,11 @@ static t_stat vh_wr (   int32   ldata,
     if (vh > VH_MAXMUX)                         /* validate mux number */
         return SCPE_IERR;
 
-    sim_debug(DBG_WREG, &vh_dev, "vh_wr(vh=%d, PA=0x%08X [%s], access=%d, data=0x%X) ", vh, PA, 
+    sim_debug(DBG_WREG, &vh_dev, "vh_wr(vh=%d, PA=0x%08X [%s], access=%d, data=0x%X) ", vh, PA,
               ((vh_unit[vh].flags & UNIT_MODEDHU) ? vh_wr_dhu_regs : vh_wr_dhv_regs)[(PA >> 1) & 07], access, data);
     sim_debug_bits(DBG_WREG, &vh_dev, bitdefs[(PA >> 1) & 07], (uint32)((PA & 1) ? data<<8 : data), (uint32)((PA & 1) ? data<<8 : data), TRUE);
 
-    switch ((PA >> 1) & 7) {   
+    switch ((PA >> 1) & 7) {
     case 0:     /* CSR, but no read-modify-write */
         if (access == WRITEB)
             data = (PA & 1) ?
@@ -1114,7 +1114,7 @@ static t_stat vh_wr (   int32   ldata,
             sim_cancel (vh_poll_unit);
             vh_mcount[vh] = MS2SIMH (1200); /* 1.2 seconds */
             sim_clock_coschedule (vh_timer_unit, tmxr_poll);
-            sim_debug (DBG_TIM, &vh_dev, "vh_wr() - Master Reset Timeout set vh=%d, timeout=%d\n", vh, vh_mcount[vh]); 
+            sim_debug (DBG_TIM, &vh_dev, "vh_wr() - Master Reset Timeout set vh=%d, timeout=%d\n", vh, vh_mcount[vh]);
         }
         if ((data & CSR_RXIE) == 0)
             vh_clr_rxint (vh);
@@ -1130,7 +1130,7 @@ static t_stat vh_wr (   int32   ldata,
                     vh_set_rxint (vh);
                 else if (vh_timeo[vh] == 0) {
                     vh_timeo[vh] = MS2SIMH (vh_timer[vh]) + 1;
-                    sim_debug (DBG_TIM, &vh_dev, "vh_wr() - Timeout set vh=%d, timeout=%d\n", vh, vh_timeo[vh]); 
+                    sim_debug (DBG_TIM, &vh_dev, "vh_wr() - Timeout set vh=%d, timeout=%d\n", vh, vh_timeo[vh]);
                     }
             } else {
                 vh_set_rxint (vh);
@@ -1175,7 +1175,7 @@ static t_stat vh_wr (   int32   ldata,
             line = (vh * VH_LINES) + CSR_GETCHAN (vh_csr[vh]);
             lp = &vh_parm[line];
             if (access == WRITEB)
-                data = (PA & 1) ?   
+                data = (PA & 1) ?
                     (lp->txchar & 0377) | (data << 8) :
                     (lp->txchar & ~0377) | (data & 0377);
             lp->txchar = data;  /* TXCHAR */
@@ -1235,7 +1235,7 @@ static t_stat vh_wr (   int32   ldata,
                 break;
             tx_fifo_put (lp, TXCHAR_TX_DATA_VALID | (data & 0377));
             if (lp->txfifo_cnt == 1) {
-                sim_debug (DBG_XMTSCH, &vh_dev, "VH-%d PIO Scheduling Start - 0x%X '%c' %s 0x%X '%c'\n", (int)(lp - vh_parm), data & 0xFF, isprint (data & 0xFF) ? data & 0xFF : '.', 
+                sim_debug (DBG_XMTSCH, &vh_dev, "VH-%d PIO Scheduling Start - 0x%X '%c' %s 0x%X '%c'\n", (int)(lp - vh_parm), data & 0xFF, isprint (data & 0xFF) ? data & 0xFF : '.',
                                                                                                          (access == WRITEB) ? "" : "Extra Byte", data >> 8, isprint (data >> 8) ? data >> 8 : '.' );
                 sim_activate_abs (vh_xmit_unit, 0);
                 }
@@ -1249,7 +1249,7 @@ static t_stat vh_wr (   int32   ldata,
             sim_clock_coschedule (vh_timer_unit, tmxr_poll);
             break;
         }
-        if (CSR_GETCHAN (vh_csr[vh]) >= VH_LINES)   
+        if (CSR_GETCHAN (vh_csr[vh]) >= VH_LINES)
             break;
         line = (vh * VH_LINES) + CSR_GETCHAN (vh_csr[vh]);
         lp = &vh_parm[line];
@@ -1325,7 +1325,7 @@ static t_stat vh_wr (   int32   ldata,
             sim_clock_coschedule (vh_timer_unit, tmxr_poll);
             break;
         }
-        if (CSR_GETCHAN (vh_csr[vh]) >= VH_LINES)   
+        if (CSR_GETCHAN (vh_csr[vh]) >= VH_LINES)
             break;
         line = (vh * VH_LINES) + CSR_GETCHAN (vh_csr[vh]);
         lp = &vh_parm[line];
@@ -1420,7 +1420,7 @@ static void doDMA ( int32   vh,
         sim_debug (DBG_XMTSCH, &vh_dev, "VH-%d DMAed: %d, remaining: %u - %d\n", (int)(lp - vh_parm), sent, lp->tbuffct, status);
         if (((tmxr_txdone_ln (lp->tmln)) &&
              (sent == 0) &&
-             (lp->tbuffct == 0)) || 
+             (lp->tbuffct == 0)) ||
             (!lp->tmln->conn)) {
             lp->tbuf2 &= ~TB2_TX_DMA_START;
             q_tx_report (lp, status);
@@ -1449,7 +1449,7 @@ static t_stat vh_timersvc (  UNIT    *uptr   )
                 vh_timeo[vh] -= 1;
                 if ((vh_timeo[vh] == 0) && rbuf_idx[vh]) {
                     vh_set_rxint (vh);
-                    sim_debug (DBG_TIM, &vh_dev, "vh_timersvc() - vh=%d, RX FIFO Timeout\n", vh); 
+                    sim_debug (DBG_TIM, &vh_dev, "vh_timersvc() - vh=%d, RX FIFO Timeout\n", vh);
                 }
             }
         }
@@ -1461,7 +1461,7 @@ static t_stat vh_timersvc (  UNIT    *uptr   )
                 vh_mcount[vh] -= 1;
             else {
                 vh_clear (vh, FALSE);
-                sim_debug (DBG_TIM, &vh_dev, "vh_timersvc() - vh=%d, Master Reset Complete\n", vh); 
+                sim_debug (DBG_TIM, &vh_dev, "vh_timersvc() - vh=%d, Master Reset Complete\n", vh);
             }
         }
     }
@@ -1535,8 +1535,8 @@ static t_stat vh_xmt_svc (  UNIT    *uptr   )
             /* process any pending programmed output */
             if (lp->txfifo_cnt) {
                 if (lp->tbuf2 & TB2_TX_ENA) {
-                    sim_debug (DBG_XMTSCH, &vh_dev, "VH-%d PIO: %s - 0x%X '%c'\n", (int)(lp - vh_parm), 
-                                                                              (lp->txstate == TXS_PIO_PENDING) ? "Pending" : ((lp->txstate == TXS_PIO_START) ? "Starting" : ((lp->txstate == TXS_IDLE) ? "Idle" : "Unknown")), 
+                    sim_debug (DBG_XMTSCH, &vh_dev, "VH-%d PIO: %s - 0x%X '%c'\n", (int)(lp - vh_parm),
+                                                                              (lp->txstate == TXS_PIO_PENDING) ? "Pending" : ((lp->txstate == TXS_PIO_START) ? "Starting" : ((lp->txstate == TXS_IDLE) ? "Idle" : "Unknown")),
                                                                               lp->txfifo[lp->txfifo_idx] & 0xFF, isprint (lp->txfifo[lp->txfifo_idx] & 0xFF) ? lp->txfifo[lp->txfifo_idx] & 0xFF : '.');
                     switch (lp->txstate) {
                         case TXS_PIO_PENDING:
@@ -1545,7 +1545,7 @@ static t_stat vh_xmt_svc (  UNIT    *uptr   )
                             tx_fifo_get (lp);
                             q_tx_report (lp, 0);
                             lp->txstate = TXS_IDLE;
-                            if (lp->txfifo_cnt == 0) 
+                            if (lp->txfifo_cnt == 0)
                                 break;
                             /* fall through */
                         case TXS_IDLE:

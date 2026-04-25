@@ -35,13 +35,13 @@
  SDS Internal Code as defined by the SDS 930 Computer Reference Manual.  The
  translation function was modified from the sim_card.c code to provide SDS
  Internal BCD codes.
- 
+
  The card reader delays the disconnect after the last character until the trailing
  edge of the card is detected.  In this simulator, this delay is accomplished
  by scheduling a final service request after the last characters have been
  delivered too the channel.  The timing for this service has been adjusted to
  handle some example SDS programs.  Too long a delay causes errors in some, too short
- a delay affects others. 
+ a delay affects others.
  */
 
 #include "sds_defs.h"
@@ -99,7 +99,7 @@ MTAB    cr_mod[] = {
     {MTAB_XTD | MTAB_VDV, 0, "CHANNEL", "CHANNEL",
         &set_chan,&show_chan,NULL, "Device Channel"},
     {MTAB_XTD | MTAB_VDV, 0, "FORMAT", "FORMAT",
-        &sim_card_set_fmt, &sim_card_show_fmt, 
+        &sim_card_set_fmt, &sim_card_show_fmt,
         NULL,"Card Format"},
     { MTAB_XTD|MTAB_VDV, 0, "CAPACITY", NULL,
         NULL, &cr_show_cap, NULL, "Card Input Status" },
@@ -119,7 +119,7 @@ DEVICE  cr_dev = {
  */
 uint8 hol_to_sdsbcd(uint16 hol) {
     uint8 bcd;
-    
+
     /* Convert 10,11,12 rows */
     switch (hol & 0xe00) {
         case 0x000:
@@ -147,20 +147,20 @@ uint8 hol_to_sdsbcd(uint16 hol) {
         default: /* Double punch in 10,11,12 rows */
             return 0x7f;
     }
-    
+
     hol &= 0x1ff;       /* Mask rows 0-9 */
     /* Check row 8 punched */
     if (hol & 0x2) {
         bcd += 8;
         hol &= ~0x2;
     }
-    
+
     /* Convert rows 0-9 */
     while (hol != 0 && (hol & 0x200) == 0) {
         bcd++;
         hol <<= 1;
     }
-    
+
     /* Any more columns punched? */
     if ((hol & 0x1ff) != 0)
         return 0x7f;
@@ -174,7 +174,7 @@ t_stat cr_devio (uint32 fnc, uint32 inst, uint32 *dat) {
     int32 t;
     t_stat r;
     unsigned char chr;
-    
+
     switch (fnc) {                                      /* case function */
         case IO_CONN:                                   /* bufer control EOM */
             new_ch = I_GETEOCH (inst);                  /* get new chan */
@@ -313,7 +313,7 @@ t_stat cr_svc(UNIT * uptr) {
 /* Read start - get next record */
 t_stat cr_readrec (UNIT *uptr) {
     int r;
-    
+
     switch(r = sim_read_card(uptr, cr_buffer)) {
         case CDSE_EOF:                  /* parser found tape mark attach */
         case CDSE_EMPTY:                /* not attached or hopper empty */
@@ -357,7 +357,7 @@ t_stat cr_attach (UNIT *uptr, const char *cptr) {
 /* Boot routine - simulate FILL console command */
 t_stat cr_boot (int32 unitno, DEVICE *dptr) {
     extern uint32 P, M[];
-    
+
     cr_reset(dptr);
     M[0] = 077777771;       /* -7B */
     M[1] = 007100000;       /* LDX 0 */
@@ -367,10 +367,10 @@ t_stat cr_boot (int32 unitno, DEVICE *dptr) {
     P = 1;                  /* start at 1 */
     return SCPE_OK;
 }
-   
+
 t_stat cr_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc) {
     int n;
-    
+
     if ((n = sim_card_input_hopper_count(uptr)) == 0)
         fprintf(st,"hopper empty");
     else {

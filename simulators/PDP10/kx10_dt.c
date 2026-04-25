@@ -326,9 +326,9 @@ REG dt_reg[] = {
     };
 
 MTAB dt_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock drive" },
     { UNIT_8FMT + UNIT_11FMT, 0, "18b", NULL, NULL },
     { UNIT_8FMT + UNIT_11FMT, UNIT_8FMT, "12b", NULL, NULL },
@@ -504,7 +504,7 @@ t_stat dt_devio(uint32 dev, uint64 *data) {
 
      case CONI|04:
           *data = dtsb;
-          if (dtsb & 0770000 & (dtsb >> 18)) 
+          if (dtsb & 0770000 & (dtsb >> 18))
              *data |= DTB_FLGREQ;
           sim_debug(DEBUG_CONI, &dt_dev, "DTB %03o CONI %012llo PC=%o\n",
                dev, *data, PC);
@@ -759,7 +759,7 @@ if (uptr->DSTATE & DTC_MOT) {
            sim_activate(uptr,DT_WRDTIM*2);
            sim_debug(DEBUG_DETAIL, &dt_dev, "DTA %o rev reverse check\n", u);
            word = (uptr->DSTATE >> DTC_V_BLK) & DTC_M_BLK;
-           uptr->DSTATE = DTC_BLOCK|(word << DTC_V_BLK)|(DTC_M_WORD << DTC_V_WORD) | 
+           uptr->DSTATE = DTC_BLOCK|(word << DTC_V_BLK)|(DTC_M_WORD << DTC_V_WORD) |
                                 (DTC_MOTMASK & uptr->DSTATE);
            if (dtsb & DTB_STOP) {
                dtsa &= ~0700;          /* Clear command */
@@ -1159,7 +1159,7 @@ t_stat dt_attach (UNIT *uptr, const char *cptr)
     uint32 ba, sz, k, *fbuf;
     int32 u = uptr - dt_dev.units;
     t_stat r;
-    
+
     r = attach_unit (uptr, cptr);                           /* attach */
     if (r != SCPE_OK)                                       /* error? */
         return r;

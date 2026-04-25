@@ -91,11 +91,11 @@ uint8 i8253c(t_bool io, uint8 data, uint8 devnum);
 /* i8253 Standard I/O Data Structures */
 /* up to 4 i8253 devices */
 
-UNIT i8253_unit[] = { 
-    { UDATA (&i8253_svc, 0, 0), 20 }, 
-    { UDATA (&i8253_svc, 0, 0), 20 }, 
-    { UDATA (&i8253_svc, 0, 0), 20 }, 
-    { UDATA (&i8253_svc, 0, 0), 20 } 
+UNIT i8253_unit[] = {
+    { UDATA (&i8253_svc, 0, 0), 20 },
+    { UDATA (&i8253_svc, 0, 0), 20 },
+    { UDATA (&i8253_svc, 0, 0), 20 },
+    { UDATA (&i8253_svc, 0, 0), 20 }
 };
 
 REG i8253_reg[] = {
@@ -116,7 +116,7 @@ DEBTAB i8253_debug[] = {
 };
 
 MTAB i8253_mod[] = {
-    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, i8253_show_param, NULL, 
+    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, i8253_show_param, NULL,
         "show configured parameters for i8253" },
     { 0 }
 };
@@ -141,7 +141,7 @@ DEVICE i8253_dev = {
     NULL,               //attach
     NULL,               //detach
     NULL,               //ctxt
-    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags 
+    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags
     0,                  //dctrl
     i8253_debug,        //debflags
     NULL,               //msize
@@ -164,9 +164,9 @@ t_stat i8253_cfg(uint16 base, uint16 devnum, uint8 dummy)
     i8253_baseport[devnum] = base & BYTEMASK;
     sim_printf("    i8253%d: installed at base port 0%02XH\n",
         devnum, i8253_baseport[devnum]);
-    reg_dev(i8253t0, i8253_baseport[devnum], devnum, 0); 
-    reg_dev(i8253t1, i8253_baseport[devnum] + 1, devnum, 0); 
-    reg_dev(i8253t2, i8253_baseport[devnum] + 2, devnum, 0); 
+    reg_dev(i8253t0, i8253_baseport[devnum], devnum, 0);
+    reg_dev(i8253t1, i8253_baseport[devnum] + 1, devnum, 0);
+    reg_dev(i8253t2, i8253_baseport[devnum] + 2, devnum, 0);
     reg_dev(i8253c, i8253_baseport[devnum] + 3, devnum, 0);
     uptr->u6 = i8253_num;
     i8253_num++;
@@ -179,17 +179,17 @@ t_stat i8253_cfg(uint16 base, uint16 devnum, uint8 dummy)
 t_stat i8253_clr(void)
 {
     int i;
-    
+
     for (i=0; i<i8253_num; i++) {
-        unreg_dev(i8253_baseport[i]); 
-        unreg_dev(i8253_baseport[i] + 1); 
-        unreg_dev(i8253_baseport[i] + 2); 
+        unreg_dev(i8253_baseport[i]);
+        unreg_dev(i8253_baseport[i] + 1);
+        unreg_dev(i8253_baseport[i] + 2);
         unreg_dev(i8253_baseport[i] + 3);
         i8253_baseport[i] = -1;
         i8253_intnum[i] = 0;
         i8253_verb[i] = 0;
     }
-    i8253_num = 0; 
+    i8253_num = 0;
     return SCPE_OK;
 }
 
@@ -198,7 +198,7 @@ t_stat i8253_clr(void)
 t_stat i8253_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int i;
-    
+
     if (uptr == NULL)
         return SCPE_ARG;
     fprintf(st, "Device %s\n", ((i8253_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled");
@@ -219,12 +219,12 @@ t_stat i8253_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 t_stat i8253_svc (UNIT *uptr)
 {
     int devnum;
-    
+
     if (uptr == NULL)
         return SCPE_ARG;
     devnum = uptr->u6;              //get devnum for unit
     switch (i8253_T0_control_word[devnum]) {
-        case 0:                 //mode 0    
+        case 0:                 //mode 0
             break;
         case 1:                 //mode 1
             break;
@@ -258,11 +258,11 @@ t_stat i8253_svc (UNIT *uptr)
             break;
         case 4:                 //mode 4
             break;
-        case 5:                 //mode 5              
+        case 5:                 //mode 5
             break;
     }
     switch (i8253_T1_control_word[devnum]) {
-        case 0:                 //mode 0    
+        case 0:                 //mode 0
             break;
         case 1:                 //mode 1
             break;
@@ -296,11 +296,11 @@ t_stat i8253_svc (UNIT *uptr)
             break;
         case 4:                 //mode 4
             break;
-        case 5:                 //mode 5              
+        case 5:                 //mode 5
             break;
     }
     switch (i8253_T2_control_word[devnum]) {
-        case 0:                 //mode 0    
+        case 0:                 //mode 0
             break;
         case 1:                 //mode 1
             break;
@@ -334,7 +334,7 @@ t_stat i8253_svc (UNIT *uptr)
             break;
         case 4:                 //mode 4
             break;
-        case 5:                 //mode 5              
+        case 5:                 //mode 5
             break;
     }
     sim_activate (uptr, uptr->wait);    /* continue poll */

@@ -408,7 +408,7 @@ uint32 scsisec2star(uint32 daddr, int type)
     int32 sec = daddr % scsi_type[type].spt;    /* get sector value */
     int32 spc = scsi_type[type].nhds * scsi_type[type].spt; /* sec per cyl */
     int32 cyl = daddr / spc;                    /* cylinders */
-    int32 hds = (daddr % spc) / scsi_type[type].spt;    /* heads */ 
+    int32 hds = (daddr % spc) / scsi_type[type].spt;    /* heads */
 
     /* now return the star value */
     return (CHS2STAR(cyl,hds,sec));             /* return STAR */
@@ -882,7 +882,7 @@ t_stat scsi_srv(UNIT *uptr)
                     (scsi_buf[bufnum][unit][9]);
                 sim_debug(DEBUG_CMD, dptr,
                     "scsi_srv TCMD call read DATA cmd %02x, chsa %04x buf addr %08x SA %08x cnt %02x\n",
-                    ch, chsa, chp->ccw_addr, tstart, bcnt); 
+                    ch, chsa, chp->ccw_addr, tstart, bcnt);
 
                 /* convert sect address to chs value */
                 uptr->CHS = tstart;
@@ -1206,7 +1206,7 @@ doread:
                     (scsi_buf[bufnum][unit][5]);
                 sim_debug(DEBUG_CMD, dptr,
                     "scsi_srv TCMD call write DATA cmd %02x, chsa %04x addr %08x data %08x %08x\n",
-                    ch, chsa, chp->ccw_addr, RMW(chp->ccw_addr), RMW(chp->ccw_addr+4)); 
+                    ch, chsa, chp->ccw_addr, RMW(chp->ccw_addr), RMW(chp->ccw_addr+4));
 
                 /* convert sect address to chs value */
                 uptr->CHS = tstart;             /* set seek sector address */
@@ -1751,10 +1751,10 @@ t_stat scsi_attach(UNIT *uptr, const char *file) {
         buff[i] = 0;                            /* zero the buffer */
 
     sim_debug(DEBUG_CMD, dptr, "SCSI Disk %s %04x cyl %d hds %d sec %d ssiz %d capacity %d\n",
-        scsi_type[type].name, chsa, scsi_type[type].cyl, scsi_type[type].nhds, 
+        scsi_type[type].name, chsa, scsi_type[type].cyl, scsi_type[type].nhds,
         scsi_type[type].spt, ssize, uptr->capac); /* disk capacity */
     printf("SCSI Disk %s %04x cyl %d hds %d sec %d ssiz %d capacity %d\r\n",
-        scsi_type[type].name, chsa, scsi_type[type].cyl, scsi_type[type].nhds, 
+        scsi_type[type].name, chsa, scsi_type[type].cyl, scsi_type[type].nhds,
         scsi_type[type].spt, ssize, uptr->capac); /* disk capacity */
 
     /* see if -i or -n specified on attach command */
@@ -1884,11 +1884,11 @@ ldone:
 
     sim_debug(DEBUG_CMD, dptr,
         "SCSI Attach %s %04x cyl %d hds %d spt %d spc %d cap sec %d cap bytes %d\n",
-        scsi_type[type].name, chsa, CYL(type), HDS(type), SPT(type), SPC(type),  
+        scsi_type[type].name, chsa, CYL(type), HDS(type), SPT(type), SPC(type),
         CAP(type), CAPB(type));
 
     printf("SCSI Attach %s %04x cyl %d hds %d spt %d spc %d cap sec %d cap bytes %d\r\n",
-        scsi_type[type].name, chsa, CYL(type), HDS(type), SPT(type), SPC(type),  
+        scsi_type[type].name, chsa, CYL(type), HDS(type), SPT(type), SPC(type),
         CAP(type), CAPB(type));
 
     sim_debug(DEBUG_CMD, dptr, "SCSI File %s at chsa %04x attached to %s is ready\n",

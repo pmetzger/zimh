@@ -119,7 +119,7 @@ DEBTAB ioc_cont_debug[] = {
 };
 
 MTAB ioc_cont_mod[] = {
-    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, ioc_cont_show_param, NULL, 
+    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, ioc_cont_show_param, NULL,
         "show configured parameters for ioc_cont" },
     { 0 }
 };
@@ -144,7 +144,7 @@ DEVICE ioc_cont_dev = {
     NULL,               //attach
     NULL,               //detach
     NULL,               //ctxt
-    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags 
+    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags
     0,                  //dctrl
     ioc_cont_debug,     //debflags
     NULL,               //msize
@@ -158,15 +158,15 @@ t_stat ioc_cont_cfg(uint16 base, uint16 devnum, uint8 dummy)
     sim_printf("    ioc-cont: installed at base port 0%02XH\n",
         base & BYTEMASK);
     ioc_cont_baseport = base & BYTEMASK;
-    reg_dev(ioc_cont0, base, 0, 0); 
-    reg_dev(ioc_cont1, base + 1, 0, 0); 
+    reg_dev(ioc_cont0, base, 0, 0);
+    reg_dev(ioc_cont1, base + 1, 0, 0);
     return SCPE_OK;
 }
 
 t_stat ioc_cont_clr(void)
 {
-    unreg_dev(ioc_cont_baseport); 
-    unreg_dev(ioc_cont_baseport + 1); 
+    unreg_dev(ioc_cont_baseport);
+    unreg_dev(ioc_cont_baseport + 1);
     ioc_cont_baseport = -1;
     return SCPE_OK;
 }
@@ -177,8 +177,8 @@ t_stat ioc_cont_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
-    fprintf(st, "%s, Base port 0%04XH", 
-        ((ioc_cont_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled", 
+    fprintf(st, "%s, Base port 0%04XH",
+        ((ioc_cont_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled",
         ioc_cont_baseport);
     return SCPE_OK;
 }
@@ -218,12 +218,12 @@ uint8 ioc_cont1(t_bool io, uint8 data, uint8 devnum)
     if (io == 0) {                      /* read status port */
         if ((dbb_stat & F0) && (dbb_stat & IBF)) {
             return dbb_stat;
-        } 
+        }
         if ((dbb_stat & F0) && (dbb_stat & OBF)) {
             temp = dbb_stat;
             dbb_stat &= ~OBF;           //reset OBF flag
             return temp;
-        } 
+        }
         if (dbb_stat & F0) {
             return dbb_stat;
         }

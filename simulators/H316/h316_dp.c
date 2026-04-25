@@ -325,9 +325,9 @@ REG dp_reg[] = {
     };
 
 MTAB dp_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock drive" },
     { MTAB_XTD | MTAB_VDV, TYPE_4623, NULL, "4623",
       &dp_settype, NULL, NULL },
@@ -388,7 +388,7 @@ switch (inst) {                                         /* case on opcode */
                 }
             dp_otas = OTA_NOP;                          /* clear state */
             dp_sta = dp_sta & ~STA_BUSY;                /* clear busy */
-            break;      
+            break;
 
         case FNC_RDS:                                   /* read status */
             if (dp_sta & STA_BUSY)                      /* ignore if busy */
@@ -592,7 +592,7 @@ switch (uptr->FNC) {                                    /* case on function */
         else dcyl = uptr->CYL + offs;
         if ((offs == 0) ||
             (dcyl < 0) ||
-            (dcyl >= (int32) dp_tab[dp_ctype].cyl))     
+            (dcyl >= (int32) dp_tab[dp_ctype].cyl))
             return dp_done (1, STA_SEKER);              /* bad seek? */
 
     case FNC_SK0:                                       /* recalibrate */
@@ -859,7 +859,7 @@ dpxb[dp_rptr + lnt + REC_OVHD] = 0;                     /* zap rest of track */
 if ((r = dp_wrdone (uptr, STA_UNSER)))                  /* dump track */
     return r;
 return STOP_DPOVR;
-}       
+}
 
 /* Write done, dump track, clear busy */
 

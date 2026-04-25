@@ -72,7 +72,7 @@ MTAB EPROM_mod[] = {
 //        NULL, NULL, "Sets the ROM size for EPROM"               },
 //    { MTAB_XTD | MTAB_VDV, 0, NULL, "BASE", &isbc464_set_base,
 //        NULL, NULL, "Sets the ROM base for EPROM"               },
-    { MTAB_XTD|MTAB_VDV, 0, "PARAM", NULL, NULL, &EPROM_show_param, NULL, 
+    { MTAB_XTD|MTAB_VDV, 0, "PARAM", NULL, NULL, &EPROM_show_param, NULL,
         "show configured parameters for iEPROM" },
     { 0 }
 };
@@ -104,7 +104,7 @@ DEVICE EPROM_dev = {
     &EPROM_attach,      //attach
     NULL,               //detach
     NULL,               //ctxt
-    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags 
+    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags
     0,                  //dctrl
     EPROM_debug,        //debflags
     NULL,               //msize
@@ -137,7 +137,7 @@ t_stat EPROM_cfg(uint16 base, uint16 size, uint8 devnum)
 t_stat EPROM_clr(void)
 {
     int i;
-    
+
     for(i=0; i<ieprom_num; i++) {
         EPROM_unit[i].capac = 0;
         EPROM_unit[i].u3 = 0;
@@ -160,12 +160,12 @@ t_stat EPROM_reset (DEVICE *dptr)
 t_stat EPROM_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int i;
-    
+
     if (uptr == NULL)
         return SCPE_ARG;
     fprintf(st, "Device %s\n", ((EPROM_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled");
     for (i=0; i<ieprom_num; i++) {
-        fprintf(st, "Unit %d at Base Address 0%04XH (%dD) for 0%04XH (%dD) Bytes ", 
+        fprintf(st, "Unit %d at Base Address 0%04XH (%dD) for 0%04XH (%dD) Bytes ",
             i,
             EPROM_unit[i].u3, EPROM_unit[i].u3, EPROM_unit[i].capac, EPROM_unit[i].capac);
     }
@@ -187,7 +187,7 @@ t_stat EPROM_attach (UNIT *uptr, const char *cptr)
     return SCPE_OK;
 }
 
-/*  get a byte from memory */ 
+/*  get a byte from memory */
 
 uint8 EPROM_get_mbyte(uint16 addr, uint8 devnum)
 {

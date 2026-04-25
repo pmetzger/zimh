@@ -132,7 +132,7 @@ REG dp_reg[] = {
 
 MTAB dp_mod[] = {
     { UNIT_WAE, 0, "write address disabled", "ADDROFF", NULL, NULL, NULL, "set unit n address enable off" },
-    { UNIT_WAE, UNIT_WAE, "write address enabled", "ADDRON", NULL, NULL, NULL, "set unit n address enable on" }, 
+    { UNIT_WAE, UNIT_WAE, "write address enabled", "ADDRON", NULL, NULL, NULL, "set unit n address enable on" },
     { 0 }
     };
 
@@ -223,7 +223,7 @@ switch (f1 & ~(FNC_WCH | FNC_NRL)) {                    /* case on function */
                 break;                                  /* error? */
             psec = dp_trkop (drv, sec) + ((psec + 1) % DP_NUMSC);
             }
-        break;                                          /* done, clean up */        
+        break;                                          /* done, clean up */
 
     case FNC_SEC + FNC_WRI:                             /* write sectors */
         if (cnt <= 0)                                   /* bad count? */
@@ -366,7 +366,7 @@ for (i = 0; i < DP_DATA; i++) {                         /* copy data */
     if (da >= uptr->hwmark)
         uptr->hwmark = da + 1;
     if (dp_tstgm (*ap, qnr)) {                          /* grp mrk fm mem? */
-        dp_fill (uptr, da + 1, DP_DATA - i - 1);        /* fill data */ 
+        dp_fill (uptr, da + 1, DP_DATA - i - 1);        /* fill data */
         return STOP_WRLERR;                             /* error */
         }
     da++; ap++; PP (dp_ba);                             /* adv ptrs */
@@ -392,7 +392,7 @@ if (dskad == sec) {                                     /* match? */
         return psec;
     ind[IN_DACH] = ind[IN_DERR] = 1;                    /* no match */
     return -1;
-    }           
+    }
 psec = psec - (psec % DP_NUMSC);                        /* sector 0 */
 for (i = 0; i < DP_NUMSC; i++, psec++) {                /* check track */
     da = psec * DP_NUMCH;                               /* char number */
@@ -406,7 +406,7 @@ for (i = 0; i < DP_NUMSC; i++, psec++) {                /* check track */
         ind[IN_DACH] = ind[IN_DERR] = 1;                /* no match */
         return -1;
         }
-    }           
+    }
 ind[IN_DACH] = ind[IN_DERR] = 1;                        /* no match */
 return -1;
 }

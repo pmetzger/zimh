@@ -86,21 +86,21 @@
    of junk.  File marks are represented by a byte count of 0.
 
    (Notes on indicators from Bob Abeles)
-   The 1401 implements a "tape indicator" latch per tape drive. When a  
-   1401 branch-on-indicator instruction addresses the "end-of-reel"  
-   indicator, the 1401 addresses the "tape indicator" latch in the  
-   currently selected and ready tape drive. The tape drive itself resets  
-   its "tape indicator" latch only when a tape unload occurs. Tape  
-   unload may be initiated by push button control or by the CPU "Rewind  
-   Tape and Unload" instruction. The tape drive sets the "tape  
-   indicator" latch when in write status and the end-of-reel reflective  
-   strip photocell is activated. The CPU resets the "tape indicator"  
-   latch in the selected and ready tape drive when the "end-of-reel"  
-   indicator is tested by a branch-on-indicator instruction. If no tape  
-   drive is selected, or the currently selected tape drive is not ready,  
-   the "end-of-reel" indicator will appear to be off and no "tape  
-   indicator" latch will be reset. The CPU sets the "tape indicator"  
-   latch in the selected and ready tape drive whenever it reads a tape- 
+   The 1401 implements a "tape indicator" latch per tape drive. When a
+   1401 branch-on-indicator instruction addresses the "end-of-reel"
+   indicator, the 1401 addresses the "tape indicator" latch in the
+   currently selected and ready tape drive. The tape drive itself resets
+   its "tape indicator" latch only when a tape unload occurs. Tape
+   unload may be initiated by push button control or by the CPU "Rewind
+   Tape and Unload" instruction. The tape drive sets the "tape
+   indicator" latch when in write status and the end-of-reel reflective
+   strip photocell is activated. The CPU resets the "tape indicator"
+   latch in the selected and ready tape drive when the "end-of-reel"
+   indicator is tested by a branch-on-indicator instruction. If no tape
+   drive is selected, or the currently selected tape drive is not ready,
+   the "end-of-reel" indicator will appear to be off and no "tape
+   indicator" latch will be reset. The CPU sets the "tape indicator"
+   latch in the selected and ready tape drive whenever it reads a tape-
    mark character in the first character position of a record.
 */
 
@@ -159,9 +159,9 @@ REG mt_reg[] = {
     };
 
 MTAB mt_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable tape drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock tape drive" },
     { MTAB_XTD|MTAB_VUN, 0, "FORMAT", "FORMAT",
       &sim_tape_set_fmt, &sim_tape_show_fmt, NULL },

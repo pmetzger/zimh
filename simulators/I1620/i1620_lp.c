@@ -100,7 +100,7 @@ REG lpt_reg[] = {
 
 MTAB lp_mod[] = {
     { UNIT_FF, 0, "no form feeds", "NOFF", NULL },
-    { UNIT_FF, UNIT_FF, "form feeds", "FF", NULL }, 
+    { UNIT_FF, UNIT_FF, "form feeds", "FF", NULL },
     { 0 }
     };
 
@@ -178,7 +178,7 @@ static const int8 lpt_ktbl[128] = {
   };
 
 /* Line printer IO routine
- 
+
    - Hard errors halt the system.
    - Invalid characters print a blank, set the WRCHK and PRCHK
      flags, and halt the system if IO stop is set.
@@ -332,7 +332,7 @@ return STOP_CCT;                                        /* runaway channel */
 }
 
 /* Space routine - space or skip n lines
-   
+
    Inputs:
         count   =       number of lines to space or skip
         sflag   =       skip (TRUE) or space (FALSE)

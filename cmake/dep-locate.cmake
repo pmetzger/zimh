@@ -255,7 +255,7 @@ IF (WITH_VIDEO)
             INSTALL_COMMAND ""
         )
 
-        BuildDepMatrix(freetype-dep Freetype 
+        BuildDepMatrix(freetype-dep Freetype
             CMAKE_ARGS
                 "-DBUILD_SHARED_LIBS:Bool=${BUILD_SHARED_DEPS}"
                 "-DFT_DISABLE_BZIP2:Bool=TRUE"

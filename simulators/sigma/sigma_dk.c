@@ -154,7 +154,7 @@ DEVICE dk_dev = {
     &dk_dib, DEV_DISABLE
     };
 
-/* DK: IO dispatch routine 
+/* DK: IO dispatch routine
 
    For all calls except AIO, dva is the full channel/device/unit address
    For AIO, the handler must return the unit number
@@ -298,7 +298,7 @@ switch (dk_cmd) {
             return SCPE_OK;
             }
         break;                                          /* seek done */
-        
+
     case DKS_SENSE:                                     /* sense */
         c[0] = ((dk_ad >> 8) & 0x7F) | ((uptr->flags & UNIT_RO)? 0x80: 0);
         c[1] = dk_ad & 0xFF;                            /* address */
@@ -361,7 +361,7 @@ switch (dk_cmd) {
                 return SCPE_OK;
                 }
             da = da + ((++i % 4) == 0);                 /* every 4th byte */
-            }        
+            }
         if (dk_end_sec (uptr, i, DK_WDSC * 4, st))      /* transfer done? */
             return SCPE_OK;                             /* err or cont */
         break;
@@ -388,7 +388,7 @@ sim_activate (uptr, chan_ctl_time);
 return SCPE_OK;
 }
 
-/* Common read/write sector end routine 
+/* Common read/write sector end routine
 
    case 1 - more to transfer, not end disk - reschedule, return TRUE
    case 2 - more to transfer, end disk - uend, return TRUE
@@ -424,7 +424,7 @@ st = DVS_AUTO;                                          /* flags */
 if (sim_is_active (&dk_unit[un]))                       /* active => busy */
     st |= DVS_DBUSY;
 else if ((dk_unit[un].flags & UNIT_ATT) == 0)           /* not att => offl */
-    st |= DVS_DOFFL;                                 
+    st |= DVS_DOFFL;
 for (i = 0; i < DK_NUMDR; i++) {                        /* loop thru units */
     if (sim_is_active (&dk_unit[i]))                    /* active? */
         st |= (DVS_CBUSY | (CC2 << DVT_V_CC));          /* ctrl is busy */

@@ -74,7 +74,7 @@ DEBTAB ipc_cont_debug[] = {
 };
 
 MTAB ipc_cont_mod[] = {
-    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, ipc_cont_show_param, NULL, 
+    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, ipc_cont_show_param, NULL,
         "show configured parameters for ipc_cont" },
     { 0 }
 };
@@ -99,7 +99,7 @@ DEVICE ipc_cont_dev = {
     NULL,               //attach
     NULL,               //detach
     NULL,               //ctxt
-    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags 
+    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags
     0,                  //dctrl
     ipc_cont_debug,     //debflags
     NULL,               //msize
@@ -113,13 +113,13 @@ t_stat ipc_cont_cfg(uint16 base, uint16 devnum, uint8 dummy)
     sim_printf("    ipc-cont: installed at base port 0%02XH\n",
         base & BYTEMASK);
     ipc_cont_baseport = base & BYTEMASK;
-    reg_dev(ipc_cont, base, 0, 0); 
+    reg_dev(ipc_cont, base, 0, 0);
     return SCPE_OK;
 }
 
 t_stat ipc_cont_clr(void)
 {
-    unreg_dev(ipc_cont_baseport); 
+    unreg_dev(ipc_cont_baseport);
     ipc_cont_baseport = -1;
     return SCPE_OK;
 }
@@ -130,8 +130,8 @@ t_stat ipc_cont_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
-    fprintf(st, "%s, Base port 0%04XH", 
-        ((ipc_cont_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled", 
+    fprintf(st, "%s, Base port 0%04XH",
+        ((ipc_cont_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled",
         ipc_cont_baseport);
     return SCPE_OK;
 }
@@ -155,7 +155,7 @@ uint8 ipc_cont(t_bool io, uint8 data, uint8 devnum)
     if (io == 0) {                      /* read status port */
         return ipc_cont_unit.u3;
     } else {                            /* write control port */
-        //this simulates an 74LS259 register 
+        //this simulates an 74LS259 register
         //d0-d2 address the reg(in reverse order!)
         //d3 is the data to be latched (inverted)
         switch(data & 0x07) {

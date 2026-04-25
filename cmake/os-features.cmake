@@ -68,12 +68,12 @@ endif (WITH_ASYNC)
 ##     list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_FILE_OFFSET_BITS=64 -D_LARGEFILE64_SOURCE=1)
 ##     check_type_size(off64_t SIZE_OFF64_T)
 ##     set(xxx_CMAKE_REQUIRED_DEFINITIONS ${CMAKE_REQUIRED_DEFINITIONS})
-## 
+##
 ##     if (SIZE_OFF64_T)
 ##         target_compile_definitions(os_features INTERFACE _FILE_OFFSET_BITS=64 _LARGEFILE64_SOURCE=1)
 ##     endif ()
 ## endif()
-## 
+##
 ## if (SIZE_OFF64_T)
 ##     target_compile_definitions(os_features INTERFACE SIZE_OFF64_T=${SIZE_OFF64_T})
 ## endif ()

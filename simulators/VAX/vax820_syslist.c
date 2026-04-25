@@ -68,7 +68,7 @@ extern UNIT cpu_unit;
 extern void WriteB (uint32 pa, int32 val);
 extern void rom_wr_B (int32 pa, int32 val);
 
-DEVICE *sim_devices[] = { 
+DEVICE *sim_devices[] = {
     &cpu_dev,
     &tlb_dev,
     &bi_dev,

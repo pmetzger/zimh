@@ -128,9 +128,9 @@ void sim_byte_swap_data (void *bptr, size_t size, size_t count)
      * LTO tries to inline this function where it's used and ends up evaluating the loop.
      * It's clearly a LTO bug that needs to be worked around as opposed to waiting for a
      * compiler update (and SIMH can't guarantee that users will maintain updated platforms).
-     * 
+     *
      * Output from the compiler looks like:
-     * 
+     *
      * 363 | int32 f, u, comp, cyl, sect, surf;
      *     |             ^
      * PDP18B/pdp18b_rp.c:363:13: note: at offset [16, 48] into destination object ‘comp’ of size 4

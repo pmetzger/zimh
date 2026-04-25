@@ -65,7 +65,7 @@ DEVICE nar_dev = {
     1, 16, NARAWIDTH, 4, 16, 32,
     &nar_ex, &nar_dep, &nar_reset,
     NULL, NULL, NULL,
-    NULL, 0, 0, NULL, NULL, NULL, &nar_help, NULL, NULL, 
+    NULL, 0, 0, NULL, NULL, NULL, &nar_help, NULL, NULL,
     &nar_description
     };
 

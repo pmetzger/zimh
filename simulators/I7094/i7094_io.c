@@ -411,17 +411,17 @@ DEVICE ch_dev[NUM_CHAN] = {
                          device timeout drives next transition
                       -> stall if device is busy
                          repeat until device is idle
-        chan reset:   -> IDLE   
+        chan reset:   -> IDLE
 
    PDS (PNDS) - channel is polling device to start data (non-data) select
 
         chan timeout: -> DSW (NDS) if device is idle
                          device timeout drives next transition
                       -> no change if device is busy, schedule channel
-        chan reset:   -> IDLE   
-        
+        chan reset:   -> IDLE
+
    DSW - channel is waiting for channel start command
-   
+
         dev timeout:  -> IDLE if no stacked non-data select
                       -> PNDS if stacked non-data select
                          channel timeout drives next transition
@@ -430,10 +430,10 @@ DEVICE ch_dev[NUM_CHAN] = {
                       -> IDLE if channel disconnects, no stacked NDS
                       -> PNDS if channel disconnects, stacked NDS
                          channel timeout drives next transition
-        chan reset:   -> IDLE   
-                     
+        chan reset:   -> IDLE
+
    DSX - channel is executing data select
-   
+
         dev timeout:  -> DSX if transfer not complete, reschedule device
                          device timeout drives next transition
                       -> DSW if channel command completes, CHF_LDW set
@@ -442,10 +442,10 @@ DEVICE ch_dev[NUM_CHAN] = {
                       -> PNDS if channel disconnects, stacked NDS
                          channel timeout drives next transition
         start chan:   -> DSX with CHF_LDW, CPU stall
-        chan reset:   -> IDLE   
+        chan reset:   -> IDLE
 
    NDS - channel is executing non-data select
-   
+
         dev timeout:  -> IDLE if transfer complete, no stacked DS
                       -> PDS if channel disconnects, stacked DS
                          channel timeout drives next transition
@@ -491,7 +491,7 @@ DEVICE ch_dev[NUM_CHAN] = {
                                 (timed wait)
                 LCHx, stalls            :
                                 timeout, EOR/EOC        IOxT: ->DSW, resched
-   DSW          LCHx            (timed wait)            ->DSX, etc              
+   DSW          LCHx            (timed wait)            ->DSX, etc
 
    7909 channel overview
 
@@ -547,7 +547,7 @@ DEVICE ch_dev[NUM_CHAN] = {
         channel: disconnect on CPYD, send STOP
 
     For both reads and writes, devices must implement an 'interblock' or
-    'interrecord' state that is long enough for the channel to see the 
+    'interrecord' state that is long enough for the channel to see the
     end, disconnect, and send a stop signal.
 */
 
@@ -808,7 +808,7 @@ switch (ch_sta[ch]) {                                   /* case on chan state */
 return SCPE_OK;
 }
 
-/* Store channel 
+/* Store channel
 
    7607/7289 stores op,ca,nostore,clc
    7909 stores clc,,ca */
@@ -827,7 +827,7 @@ else *dat = (((t_uint64) ch_clc[ch] & CHAMASK) << INST_V_DEC) |
 return SCPE_OK;
 }
 
-/* Store channel diagnostic 
+/* Store channel diagnostic
 
    7607 is undefined
    7289 stores IOC+???
@@ -842,13 +842,13 @@ if ((ch >= NUM_CHAN) || (ch_dev[ch].flags & DEV_DIS))
 if (ch_flags[ch] & DEV_7289)
     *dat = drm_sdc (ch);
 else if (ch_flags[ch] & DEV_7909)
-    *dat = (((t_uint64) (ch_lcc[ch] & CHF_M_LCC)) << CHF_V_LCC) | 
+    *dat = (((t_uint64) (ch_lcc[ch] & CHF_M_LCC)) << CHF_V_LCC) |
         (ch_flags[ch] & CHF_SDC_7909);
 else *dat = 0;
 return SCPE_OK;
 }
 
-/* Reset data channel 
+/* Reset data channel
 
    7607 responds to RDC
    7909 responds to RIC */
@@ -1042,7 +1042,7 @@ if (ch_dev[ch].flags & DEV_7909) {                      /* 7909 */
                 break;                                  /* new command */
                 }
             return SCPE_OK;                             /* wait for end */
-            }   
+            }
         if (ch_flags[ch] & CHF_RDS)                     /* read? */
             return ch9_rd_putw (ch);
         return ch9_wr_getw (ch);                        /* no, write */
@@ -1059,7 +1059,7 @@ if (ch_dev[ch].flags & DEV_7909) {                      /* 7909 */
         if (ch_wc[ch] == 0)                             /* done? get next */
             break;
         return SCPE_OK;                                 /* more to do */
-            
+
     default:
         return STOP_ILLIOP;
         }
@@ -1127,19 +1127,19 @@ else if (ch_flags[ch] & CHF_RDS) {                      /* 7607 read? */
             ch_flags[ch] = ch_flags[ch] & ~CHF_EOR;     /* clear flag */
             return ch6_new_cmd (ch, FALSE);             /* get next cmd */
             }
-        ch6_rd_putw (ch);                               /* store wd; ignore wc */ 
+        ch6_rd_putw (ch);                               /* store wd; ignore wc */
         if (ch_flags[ch] & CHF_EOR) {                   /* EOR? */
             ch_flags[ch] = ch_flags[ch] & ~CHF_EOR;     /* clear flag */
             return ch6_new_cmd (ch, FALSE);             /* get next cmd */
             }
         return SCPE_OK;                                 /* done */
-        
+
     case CH6_IORT:                                      /* IORT */
         if (ch_flags[ch] & CHF_EOR) {                   /* (new) EOR set? */
             ch_flags[ch] = ch_flags[ch] & ~CHF_EOR;     /* clear flag */
             return ch6_ioxt (ch);                       /* get next cmd */
             }
-        ch6_rd_putw (ch);                               /* store wd; ignore wc */ 
+        ch6_rd_putw (ch);                               /* store wd; ignore wc */
         if (ch_flags[ch] & CHF_EOR) {                   /* EOR? */
             ch_flags[ch] = ch_flags[ch] & ~CHF_EOR;     /* clear flag */
             return ch6_ioxt (ch);                       /* unstall or disc */
@@ -1567,7 +1567,7 @@ switch (ch_op[ch]) {                                    /* check initial cond */
             ch9_eval_int (ch, CHINT_SEQC);
         ch_flags[ch] &= ~CHF_EOR;
         ch_req |= REQ_CH (ch);                          /* process in chan */
-        break;  
+        break;
 
     case CH9_CPYD:                                      /* data transfers */
     case CH9_CPYP:
@@ -1654,7 +1654,7 @@ if ((ch < NUM_CHAN) && (ch_sta[ch] == CHXS_DSX))
 return FALSE;
 }
 
-/* Evaluate interrupts 
+/* Evaluate interrupts
 
    - Interrupt requests set flags in the channel flags word
    - If an interrupt is not in progress, interrupt requests are evaluated
@@ -1847,7 +1847,7 @@ for (i = 0; i < NUM_CHAN; i++) {
     else ch2dev[i] = ch_map_flags (i, ch_dev[i].flags);
     }
 return;
-}       
+}
 
 /* Disable channel, deassign device */
 

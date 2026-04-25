@@ -561,7 +561,7 @@ error:
 //    if ((word & PRI_CMT_QP) == 0) {
  //       goto error;
   //  }
-        
+
     in = &dn_in[dn_in_ptr];
     /* Check if indirect */
     if ((word & PRI_CMT_IP) != 0) {

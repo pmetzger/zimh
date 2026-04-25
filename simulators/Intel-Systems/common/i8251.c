@@ -38,12 +38,12 @@
         selectable for each port from 110 to 9600.
 
         All I/O is via programmed I/O.  The i8251 has a status port
-        and a data port.    
+        and a data port.
 
-        The simulated device does not support synchronous mode.  The simulated device 
-        supports a select from I/O space and one address line.  The data port is at the 
+        The simulated device does not support synchronous mode.  The simulated device
+        supports a select from I/O space and one address line.  The data port is at the
         lower address and the status/command port is at the higher.
-        
+
         A write to the status port can select some options for the device:
 
         Asynchronous Mode Instruction
@@ -61,7 +61,7 @@
             Character Length
             L2  0       1       0       1
             L1  0       0       1       1
-                5       6       7       8  
+                5       6       7       8
                 bits    bits    bits    bits
 
             EP - A 1 in this bit position selects even parity.
@@ -106,7 +106,7 @@
             DSR - A 1 in this bit position signals *DSR is at zero.
 
         A read from the data port gets the typed character, a write
-        to the data port writes the character to the device.  
+        to the data port writes the character to the device.
 */
 
 #include "system_defs.h"
@@ -154,7 +154,7 @@ void i8251_reset_dev(uint16 devnum);
 /* i8251 Standard I/O Data Structures */
 /* up to 4 i8251 devices */
 
-UNIT i8251_unit[4] = { 
+UNIT i8251_unit[4] = {
     { UDATA (&i8251_svc, 0, 0), KBD_POLL_WAIT },
     { UDATA (&i8251_svc, 0, 0), KBD_POLL_WAIT },
     { UDATA (&i8251_svc, 0, 0), KBD_POLL_WAIT },
@@ -193,7 +193,7 @@ DEBTAB i8251_debug[] = {
 MTAB i8251_mod[] = {
     { UNIT_ANSI, 0, "ANSI", "ANSI", NULL },
     { UNIT_ANSI, UNIT_ANSI, "TTY", "TTY", NULL },
-    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, i8251_show_param, NULL, 
+    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, i8251_show_param, NULL,
         "show configured parameters for i8251" },
     { 0 }
 };
@@ -218,7 +218,7 @@ DEVICE i8251_dev = {
     NULL,               //attach
     NULL,               //detach
     NULL,               //ctxt
-    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags 
+    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags
     0,                  //dctrl
     i8251_debug,        //debflags
     NULL,               //memeory size change
@@ -236,8 +236,8 @@ t_stat i8251_cfg(uint16 base, uint16 devnum, uint8 dummy)
     i8251_baseport[devnum] = base & BYTEMASK;
     sim_printf("    i8251%d: installed at base port 0%02XH\n",
         devnum, i8251_baseport[devnum]);
-    reg_dev(i8251d, i8251_baseport[devnum], devnum, 0); 
-    reg_dev(i8251s, i8251_baseport[devnum] + 1, devnum, 0); 
+    reg_dev(i8251d, i8251_baseport[devnum], devnum, 0);
+    reg_dev(i8251s, i8251_baseport[devnum] + 1, devnum, 0);
     i8251_reset_dev(devnum);
     if (devnum == 0)
         sim_activate (&i8251_unit[devnum], i8251_unit[devnum].wait); /* activate unit 0 */
@@ -248,15 +248,15 @@ t_stat i8251_cfg(uint16 base, uint16 devnum, uint8 dummy)
 t_stat i8251_clr(void)
 {
     int i;
-    
+
     for (i=0; i<i8251_num; i++) {
-        unreg_dev(i8251_baseport[i]); 
-        unreg_dev(i8251_baseport[i] + 1); 
+        unreg_dev(i8251_baseport[i]);
+        unreg_dev(i8251_baseport[i] + 1);
         i8251_baseport[i] = -1;
         i8251_intnum[i] = 0;
         i8251_verb[i] = 0;
     }
-    i8251_num = 0; 
+    i8251_num = 0;
     return SCPE_OK;
 }
 
@@ -265,7 +265,7 @@ t_stat i8251_clr(void)
 t_stat i8251_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int i;
-    
+
     if (uptr == NULL)
         return SCPE_ARG;
     fprintf(st, "Device %s\n", ((i8251_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled");
@@ -304,7 +304,7 @@ t_stat i8251_svc (UNIT *uptr)
 t_stat i8251_reset (DEVICE *dptr)
 {
     uint8 devnum;
-    
+
     for (devnum=0; devnum<i8251_num+1; devnum++) {
         i8251_reset_dev(devnum);
         if (devnum == 0)

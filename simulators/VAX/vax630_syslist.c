@@ -70,7 +70,7 @@ extern DEVICE lk_dev;
 extern DEVICE vs_dev;
 extern DEVICE dpv_dev;
 
-DEVICE *sim_devices[] = { 
+DEVICE *sim_devices[] = {
     &cpu_dev,
     &tlb_dev,
     &rom_dev,

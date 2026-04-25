@@ -15,7 +15,7 @@
 <!--- markdown message will be displayed.-->
 
 <!--- PLEASE provide the below specified NON OPTIONAL details.
-      If they are not provided, the issue will most likely be quickly 
+      If they are not provided, the issue will most likely be quickly
       closed immediately.  It may be re-opened by you once you actually
       provide this information: -->
 

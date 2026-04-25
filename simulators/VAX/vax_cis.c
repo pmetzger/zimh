@@ -107,9 +107,9 @@ t_stat r;
 DSTR accum, src1, src2, dst;
 DSTR mptable[10];
 
-if (((DR_GETIGRP(IG_PACKD) == DR_GETIGRP(drom[opc][0])) && 
-     (!(cpu_instruction_set & VAX_PACKED)))    || 
-    ((DR_GETIGRP(IG_EMONL) == DR_GETIGRP(drom[opc][0])) && 
+if (((DR_GETIGRP(IG_PACKD) == DR_GETIGRP(drom[opc][0])) &&
+     (!(cpu_instruction_set & VAX_PACKED)))    ||
+    ((DR_GETIGRP(IG_EMONL) == DR_GETIGRP(drom[opc][0])) &&
      (!(cpu_instruction_set & VAX_EMONL)))) {      /* Emulated? */
         /* CIS and emulate only instructions - invoke emulator interface
             opnd[0:5] =     six operands to be pushed (if PSL<fpd> = 0)
@@ -328,7 +328,7 @@ switch (opc) {                                          /* case on opcode */
                 match = (c == t);                       /* continue if match */
                 }                                       /* end for substring */
             if (match)                                  /* exit if match */
-                break; 
+                break;
             R[2] = (R[2] - 1) & STR_LNMASK;             /* decr src length */
             R[3] = (R[3] + 1) & LMASK;                  /* next string char */
             if (i >= sim_interval) {                    /* done with interval? */
@@ -457,7 +457,7 @@ switch (opc) {                                          /* case on opcode */
         R3              =       addr of src2 string
         (ADDP6, SUBP6 only)
         R4              =       0
-        R5              =       addr of dest string     
+        R5              =       addr of dest string
 */
 
     case ADDP4: case SUBP4:
@@ -515,7 +515,7 @@ switch (opc) {                                          /* case on opcode */
         R2              =       0
         R3              =       addr of src2 string
         R4              =       0
-        R5              =       addr of dest string     
+        R5              =       addr of dest string
 */
 
     case MULP:
@@ -565,7 +565,7 @@ switch (opc) {                                          /* case on opcode */
         R2              =       0
         R3              =       addr of src2 string
         R4              =       0
-        R5              =       addr of dest string     
+        R5              =       addr of dest string
 */
 
     case DIVP:
@@ -682,7 +682,7 @@ switch (opc) {                                          /* case on opcode */
         shift = op[0];                                  /* get shift count */
         if (shift & BSIGN) {                            /* right shift? */
             shift = BMASK + 1 - shift;                  /* !shift! */
-            WordRshift (&src1, shift / 8);              /* do word shifts */    
+            WordRshift (&src1, shift / 8);              /* do word shifts */
             NibbleRshift (&src1, shift % 8, 0);         /* do nibble shifts */
             t = op[3] & 0xF;                            /* get round nibble */
             if ((t + (src1.val[0] & 0xF)) > 9)          /* rounding needed? */
@@ -831,7 +831,7 @@ switch (opc) {                                          /* case on opcode */
         R[3] = op[3];
         return cc;
 
-/* CVTPS 
+/* CVTPS
 
    Operands:
         op[0:1]         =       source string descriptor
@@ -1137,7 +1137,7 @@ switch (opc) {                                          /* case on opcode */
                             cc = (cc | CC_V | CC_C) & ~CC_Z;
                         }                               /* end for */
                     edit_adv_src (R[0] - t);            /* adv src ptr */
-                    }                                   /* end else */      
+                    }                                   /* end else */
                 else R[0] = R[0] | (((R[0] - t) & WMASK) << 16);
                 R[3]++;
                 break;
@@ -1232,7 +1232,7 @@ for (i = 0; i <= end; i++) {                            /* loop thru string */
     if ((i == end) && ((lnt & 1) == 0))
         c = c & 0xF;
 /*    if (((c & 0xF0) > 0x90) ||                        *//* check hi digit */
-/*        ((c & 0x0F) > 0x09))                          *//* check lo digit */    
+/*        ((c & 0x0F) > 0x09))                          *//* check lo digit */
 /*        RSVD_OPND_FAULT; */
     src->val[i / 4] = src->val[i / 4] | (c << ((i % 4) * 8));
     }                                                   /* end for */
@@ -1240,7 +1240,7 @@ if ((t == 0xB) || (t == 0xD))                           /* if -, set sign */
     src->sign = 1;
 return TestDstr (src);                                  /* clean -0 */
 }
-       
+
 /* Store decimal string
 
    Arguments:
@@ -1542,7 +1542,7 @@ if (sc != 0) {
         dsrc->val[i] = 0;
     }
 return c;
-}               
+}
 
 /* Nibble shift decimal string right
 

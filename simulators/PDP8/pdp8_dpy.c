@@ -63,7 +63,7 @@ DEVICE dpy_dev = {
     NULL, NULL, &dpy_reset,
     NULL, NULL, NULL,
     &dpy_dib, DEV_DIS | DEV_DISABLE, 0,
-    NULL, NULL, NULL, NULL, NULL, NULL, 
+    NULL, NULL, NULL, NULL, NULL, NULL,
     &dpy_description
 };
 
@@ -147,7 +147,7 @@ void
 cpu_set_switches(unsigned long w1, unsigned long w2)
 {
 }
-    
+
 #else  /* USE_DISPLAY not defined */
 char pdp8_dpy_unused;   /* sometimes empty object modules cause problems */
 #endif /* USE_DISPLAY not defined */

@@ -29,13 +29,13 @@
 
    The simulator writes 120 byte records to the cp attached output file.  There
    is no control or formatting meta data included in the file.
- 
+
    Output requests in EBCDIC mode produce hollerith encoded card images.
    Output in binary mode produces column binary card images.
- 
+
    Capacity describes the number of punched cards in the outout stacker.  This
    accumulates indefinitely.  It is not reset when the output file is detached.
-  
+
 */
 
 #include "sigma_io_defs.h"
@@ -133,7 +133,7 @@ DEVICE cp_dev = {
 /* Card Punch : IO Dispatch rotine*/
 
 uint32 cp_disp (uint32 op, uint32 dva, uint32 *dvst) {
-   
+
     switch (op) {
 
         case OP_SIO:                                        /* start I/O */
@@ -146,15 +146,15 @@ uint32 cp_disp (uint32 op, uint32 dva, uint32 *dvst) {
                 sim_activate (&cp_unit, 0);
             }
             break;
-            
+
         case OP_TIO:                                        /* test status */
             *dvst = cp_tio_status ();                       /* return status */
             break;
-            
+
         case OP_TDV:                                        /* test status */
             *dvst = cp_tdv_status ();                       /* return status */
             break;
-            
+
         case OP_HIO:                                        /* halt I/O */
             chan_clr_chi (cp_dib.dva);                      /* clear int */
             *dvst = cp_tio_status ();                       /* get status */
@@ -165,17 +165,17 @@ uint32 cp_disp (uint32 op, uint32 dva, uint32 *dvst) {
                 cp_unit.UCMD = 0;                           /* ctlr idle */
             }
             break;
-            
+
         case OP_AIO:                                        /* acknowledge int */
             chan_clr_chi (cp_dib.dva);                      /* clr int*/
             *dvst = 0;                                      /* no status */
             break;
-            
+
         default:
             *dvst = 0;
             return SCPE_IERR;
     }
-    
+
     return 0;
 }
 
@@ -187,7 +187,7 @@ t_stat cp_svc(UNIT *uptr) {
     uint32 st;
     uint32 i;
     uint32 c;
-    
+
     if (uptr->UCMD == CPS_INIT) {                           /* init state? */
         st = chan_get_cmd (cp_dib.dva, &cmd);               /* get order */
         if (CHS_IFERR (st))
@@ -271,7 +271,7 @@ t_stat cp_svc(UNIT *uptr) {
 uint32 cp_tio_status (void)
 {
     uint32 st;
-    
+
     st = cp_unit.flags & UNIT_ATT? DVS_AUTO: 0;     /* AUTO : MANUAL */
     if (sim_is_active (&cp_unit))                   /* dev busy? */
         st |= ( DVS_DBUSY | (CC2 << DVT_V_CC));
@@ -318,14 +318,14 @@ t_stat cp_attach(UNIT * uptr, const char *cptr) {
 }
 
 t_stat cp_detach(UNIT * uptr) {
-    
+
     return  (detach_unit(uptr));
 }
 
 
 t_stat cp_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc) {
     int n;
-    
+
     if ((n = cp_stacker1) == 0)
         fprintf(st,"stacker empty");
     else {

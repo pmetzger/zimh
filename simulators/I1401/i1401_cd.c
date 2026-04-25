@@ -415,7 +415,7 @@ if (fgets (buf, sz, cdr_unit.fileref)) {};              /* rd bin/char card */
 if (feof (cdr_unit.fileref))                            /* eof? */
     return STOP_NOCD;
 if (ferror (cdr_unit.fileref)) {                        /* error? */
-    ind[IN_READ] = 1;  
+    ind[IN_READ] = 1;
     sim_perror ("Card reader I/O error");
     clearerr (cdr_unit.fileref);
     if (iochk)

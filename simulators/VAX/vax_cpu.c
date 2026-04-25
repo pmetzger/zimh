@@ -29,15 +29,15 @@
    14-Apr-19    RMS     Added hook for non-standard MxPR CC's
    31-Mar-17    RMS     Fixed uninitialized variable on FPD path (COVERITY)
    13-Mar-17    RMS     Fixed dangling else in show_opnd (COVERITY)
-   20-Sep-11    MP      Fixed idle conditions for various versions of Ultrix, 
+   20-Sep-11    MP      Fixed idle conditions for various versions of Ultrix,
                         Quasijarus-4.3BSD, NetBSD and OpenBSD.
-                        Note: Since NetBSD and OpenBSD are still actively 
-                        developed operating systems, new versions of 
-                        these OSes are moving targets with regard to 
-                        providing idle detection.  At this time, recent versions 
-                        of OpenBSD have veered from the traditional OS idle 
-                        approach taken in the other BSD derived OSes.  
-                        Determining a reasonable idle detection pattern does 
+                        Note: Since NetBSD and OpenBSD are still actively
+                        developed operating systems, new versions of
+                        these OSes are moving targets with regard to
+                        providing idle detection.  At this time, recent versions
+                        of OpenBSD have veered from the traditional OS idle
+                        approach taken in the other BSD derived OSes.
+                        Determining a reasonable idle detection pattern does
                         not seem possible for these versions.
    13-Sep-11    RMS     Fixed XFC, BPT to clear PSL<tp> before exception
                         (Camiel Vanderhoeven)
@@ -741,10 +741,10 @@ for ( ;; ) {
         RSVD_INST_FAULT(opc);
 #endif
 #if defined(VAX_610)
-    /* 
-     * This case is formally UNPREDICTABLE, but it is how the MicroVAX I 
-     * CPU worked.  Instructions without the DR_F in their drom table 
-     * entry are specifically uninterruptible instructions, so this 
+    /*
+     * This case is formally UNPREDICTABLE, but it is how the MicroVAX I
+     * CPU worked.  Instructions without the DR_F in their drom table
+     * entry are specifically uninterruptible instructions, so this
      * would not ever happen during normal execution, but the MicroVAX I
      * HCORE diagnostic contrives this as a test and expects thost cases
      * to be ignored.
@@ -767,7 +767,7 @@ for ( ;; ) {
         r.o     opnd[j:j+3]     =       value of operand
         a.bwlqo opnd[j]         =       address of operand
         m.bwl   opnd[j]         =       value of operand
-        m.q     opnd[j:j+1]     =       value of operand 
+        m.q     opnd[j:j+1]     =       value of operand
         m.o     opnd[j:j+3]     =       value of operand
         w.bwlqo opnd[j]         =       register/memory flag
                 opnd[j+1]       =       memory address
@@ -1140,14 +1140,14 @@ for ( ;; ) {
                 break;
 
             case BDP|RQ: case BDP|RD: case BDP|RG:
-                GET_ISTR (temp, L_BYTE);        
+                GET_ISTR (temp, L_BYTE);
                 va = R[rn] + SXTB (temp);
                 opnd[j++] = Read (va, L_LONG, RA);
                 opnd[j++] = Read (va + 4, L_LONG, RA);
                 break;
 
             case BDP|RO: case BDP|RH:
-                GET_ISTR (temp, L_BYTE);        
+                GET_ISTR (temp, L_BYTE);
                 va = R[rn] + SXTB (temp);
                 j = ReadOcta (va, opnd, j, RA);
                 break;
@@ -1159,14 +1159,14 @@ for ( ;; ) {
                 break;
 
             case BDP|MQ:
-                GET_ISTR (temp, L_BYTE);        
+                GET_ISTR (temp, L_BYTE);
                 va = R[rn] + SXTB (temp);
                 opnd[j++] = Read (va, L_LONG, WA);
                 opnd[j++] = Read (va + 4, L_LONG, WA);
                 break;
 
             case BDP|MO:
-                GET_ISTR (temp, L_BYTE);        
+                GET_ISTR (temp, L_BYTE);
                 va = R[rn] + SXTB (temp);
                 j = ReadOcta (va, opnd, j, WA);
                 break;
@@ -1183,9 +1183,9 @@ for ( ;; ) {
                 break;
 
             case BDD|RB: case BDD|RW: case BDD|RL: case BDD|RF:
-                GET_ISTR (temp, L_BYTE);        
+                GET_ISTR (temp, L_BYTE);
                 iad = R[rn] + SXTB (temp);
-                va = Read (iad, L_LONG, RA);    
+                va = Read (iad, L_LONG, RA);
                 opnd[j++] = Read (va, DR_LNT (disp), RA);
                 break;
 
@@ -1195,19 +1195,19 @@ for ( ;; ) {
                 va = Read (iad, L_LONG, RA);
                 opnd[j++] = Read (va, L_LONG, RA);
                 opnd[j++] = Read (va + 4, L_LONG, RA);
-                break;  
+                break;
 
             case BDD|RO: case BDD|RH:
                 GET_ISTR (temp, L_BYTE);
                 iad = R[rn] + SXTB (temp);
                 va = Read (iad, L_LONG, RA);
                 j = ReadOcta (va, opnd, j, RA);
-                break;  
+                break;
 
             case BDD|MB: case BDD|MW: case BDD|ML:
-                GET_ISTR (temp, L_BYTE);        
+                GET_ISTR (temp, L_BYTE);
                 iad = R[rn] + SXTB (temp);
-                va = Read (iad, L_LONG, RA);    
+                va = Read (iad, L_LONG, RA);
                 opnd[j++] = Read (va, DR_LNT (disp), WA);
                 break;
 
@@ -1217,14 +1217,14 @@ for ( ;; ) {
                 va = Read (iad, L_LONG, RA);
                 opnd[j++] = Read (va, L_LONG, WA);
                 opnd[j++] = Read (va + 4, L_LONG, WA);
-                break;  
+                break;
 
             case BDD|MO:
                 GET_ISTR (temp, L_BYTE);
                 iad = R[rn] + SXTB (temp);
                 va = Read (iad, L_LONG, RA);
                 j = ReadOcta (va, opnd, j, WA);
-                break;  
+                break;
 
 /* Word displacement */
 
@@ -1293,7 +1293,7 @@ for ( ;; ) {
                 break;
 
             case WDD|RQ: case WDD|RD: case WDD|RG:
-                GET_ISTR (temp, L_WORD);        
+                GET_ISTR (temp, L_WORD);
                 iad = R[rn] + SXTW (temp);
                 va = Read (iad, L_LONG, RA);
                 opnd[j++] = Read (va, L_LONG, RA);
@@ -1301,7 +1301,7 @@ for ( ;; ) {
                 break;
 
             case WDD|RO: case WDD|RH:
-                GET_ISTR (temp, L_WORD);        
+                GET_ISTR (temp, L_WORD);
                 iad = R[rn] + SXTW (temp);
                 va = Read (iad, L_LONG, RA);
                 j = ReadOcta (va, opnd, j, RA);
@@ -1315,7 +1315,7 @@ for ( ;; ) {
                 break;
 
             case WDD|MQ:
-                GET_ISTR (temp, L_WORD);        
+                GET_ISTR (temp, L_WORD);
                 iad = R[rn] + SXTW (temp);
                 va = Read (iad, L_LONG, RA);
                 opnd[j++] = Read (va, L_LONG, WA);
@@ -1323,7 +1323,7 @@ for ( ;; ) {
                 break;
 
             case WDD|MO:
-                GET_ISTR (temp, L_WORD);        
+                GET_ISTR (temp, L_WORD);
                 iad = R[rn] + SXTW (temp);
                 va = Read (iad, L_LONG, RA);
                 j = ReadOcta (va, opnd, j, WA);
@@ -1449,7 +1449,7 @@ for ( ;; ) {
                     R[rn] = R[rn] - DR_LNT (disp);
                     recq[recqptr++] = RQ_REC (ADC | (disp & DR_LNMASK), rn);
                 case RGD:
-                    CHECK_FOR_PC;       
+                    CHECK_FOR_PC;
                     index = index + R[rn];
                     break;
 
@@ -1592,7 +1592,7 @@ for ( ;; ) {
 
 /* Dispatch to instructions */
 
-    switch (opc) {              
+    switch (opc) {
 
 /* Single operand instructions with dest, write only - CLRx dst.wx
 
@@ -1699,7 +1699,7 @@ for ( ;; ) {
         break;
 
 /* Push instructions - PUSHL src.rl or PUSHAx src.ax
-        
+
         opnd[0] =       source
 */
 
@@ -1710,7 +1710,7 @@ for ( ;; ) {
         break;
 
 /* Moves, converts, and ADAWI - op src.rx, dst.wx
-        
+
         opnd[0] =       source
         spec    =       reg/mem flag
         rn      =       register number
@@ -2012,7 +2012,7 @@ for ( ;; ) {
             temp = CC_V;
             SET_TRAP (TRAP_DIVZRO);
             }
-        else if ((((uint32)op0) == LMASK) && 
+        else if ((((uint32)op0) == LMASK) &&
                  (((uint32)op1) == LSIGN)) {            /* overflow? */
             r = op1;
             temp = CC_V;
@@ -2088,7 +2088,7 @@ for ( ;; ) {
         spec    =       register/memory flag
         rn      =       register number
         va      =       memory address
-        
+
 */
 
     case MOVQ:
@@ -2342,7 +2342,7 @@ for ( ;; ) {
         r = op0 - 1;                                    /* decr index */
         WRITE_L (r);                                    /* store result */
         CC_IIZP_L (r);                                  /* set cc's */
-        V_SUB_L (r, 1, op0);                            /* test for ovflo */    
+        V_SUB_L (r, 1, op0);                            /* test for ovflo */
         if (r >= 0)                                     /* if >= 0, branch */
             BRANCHB_ALWAYS (brdisp);
         break;
@@ -2351,7 +2351,7 @@ for ( ;; ) {
         r = op0 - 1;                                    /* decr index */
         WRITE_L (r);                                    /* store result */
         CC_IIZP_L (r);                                  /* set cc's */
-        V_SUB_L (r, 1, op0);                            /* test for ovflo */    
+        V_SUB_L (r, 1, op0);                            /* test for ovflo */
         if (r > 0)                                      /* if >= 0, branch */
             BRANCHB_ALWAYS (brdisp);
         break;
@@ -2645,7 +2645,7 @@ for ( ;; ) {
         if (PSL & PSL_CUR)                              /* not kern? rsvd inst */
             RSVD_INST_FAULT(HALT);
         else {
-            /* allow potentially pending I/O (console output, 
+            /* allow potentially pending I/O (console output,
                or other devices) to complete before taking
                the appropriate halt action */
             while ((sim_clock_queue != QUEUE_LIST_END) &&
@@ -3167,7 +3167,7 @@ for ( ;; ) {
     case ADDH2: case ADDH3: case SUBH2: case SUBH3:
     case MULH2: case MULH3: case DIVH2: case DIVH3:
     case ACBH: case POLYH: case EMODH:
-        cc = op_octa (opnd, cc, opc, acc, spec, va, 
+        cc = op_octa (opnd, cc, opc, acc, spec, va,
                       (hst_lnt ? &hst[hst_p ? hst_p-1 : hst_lnt -1] : NULL) );
         if (cc & LSIGN) {                               /* ACBH branch? */
             BRANCHW (brdisp);
@@ -3268,7 +3268,7 @@ int32 vec;
 
 if (PSL & PSL_FPD) {                                    /* FPD set? */
     Read (SP - 1, L_BYTE, WA);                          /* wchk stack */
-    Write (SP - 8, fault_PC, L_LONG, WA);               /* push old PC */       
+    Write (SP - 8, fault_PC, L_LONG, WA);               /* push old PC */
     Write (SP - 4, PSL | cc, L_LONG, WA);               /* push PSL */
     SP = SP - 8;                                        /* decr stk ptr */
     vec = ReadLP ((SCBB + SCB_EMULFPD) & PAMASK);
@@ -3312,7 +3312,7 @@ sim_idle (TMR_CLK, TRUE);
 /*
  * This sequence of instructions is a mix that mimics
  * a resonable instruction set that is a close estimate
- * to the calibrated result without a direct "loop to 
+ * to the calibrated result without a direct "loop to
  * self" instruction that would halt simulation.
  */
 
@@ -3407,7 +3407,7 @@ t_stat cpu_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 int32 st;
 uint32 addr = (uint32) exta;
 
-if (vptr == NULL) 
+if (vptr == NULL)
     return SCPE_ARG;
 if (sw & SWMASK ('V')) {
     int32 acc = cpu_get_vsw (sw);
@@ -3468,7 +3468,7 @@ for (i = 0; i < clim; i = i + 4)
     nM[i >> 2] = M[i >> 2];
 free (M);
 M = nM;
-MEMSIZE = uval; 
+MEMSIZE = uval;
 reset_all (0);
 return SCPE_OK;
 }
@@ -3515,7 +3515,7 @@ int32 md;
 set_map_reg ();                                         /* update dyn reg */
 if (sw & SWMASK ('K'))
     md = KERN;
-else if (sw & SWMASK ('E')) 
+else if (sw & SWMASK ('E'))
     md = EXEC;
 else if (sw & SWMASK ('S'))
     md = SUPV;
@@ -3575,7 +3575,7 @@ if (lnt) {
             hst_lnt = 0;
             hst = NULL;
             return sim_messagef(SCPE_OPENERR, "Unable to open file '%s': %s\n", cptr, strerror (errno));
-            }            
+            }
         }
     }
 return SCPE_OK;
@@ -3787,7 +3787,7 @@ if (sim_idle_enab && (cpu_idle_type != 0))
 sim_show_idle (st, uptr, val, desc);
 return SCPE_OK;
 }
- 
+
 static struct {
     int32 mask;
     const char *match;

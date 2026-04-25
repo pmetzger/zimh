@@ -1,4 +1,4 @@
-/* sel32_defs.h: SEL-32 Concept/32 simulator definitions 
+/* sel32_defs.h: SEL-32 Concept/32 simulator definitions
 
    Copyright (c) 2018-2023, James C. Bevier
    Portions provided by Richard Cornwell, Geert Rolf and other SIMH contributers
@@ -455,7 +455,7 @@ extern DEBTAB dev_debug[];
 #define MODEL_V6IPU     14              /* */
 #define MODEL_V9IPU     15              /* */
 
-#define TMR_RTC         1               /* RTC will not work if set to 0!! */ 
+#define TMR_RTC         1               /* RTC will not work if set to 0!! */
 //#define TMR_RTC         0
 
 #define HIST_MIN        64

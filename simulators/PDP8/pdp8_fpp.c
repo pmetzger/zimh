@@ -35,7 +35,7 @@
    27-Mar-09    RHM     Fixed handling of Underflow fix (zero FAC on underflow)
                         Implemented FPP division and multiplication algorithms
                         FPP behavior on traps - FEXIT does not update APT
-                        Follow FPP settings for OPADD 
+                        Follow FPP settings for OPADD
                         Correct detection of DP add/sub overflow
                         Detect and handle add/sub overshift
                         Single-step mode made consistent with FPP
@@ -301,7 +301,7 @@ switch (IR & 07) {                                      /* decode IR<9:11> */
     case 5:                                             /* FPST */
         if (!fpp_flag && !(fpp_sta & FPS_RUN)) {        /* flag clr, !run? */
             if (fpp_ssf)
-                fpp_sta |= fpp_last_lockbit; 
+                fpp_sta |= fpp_last_lockbit;
             fpp_sta &= ~FPS_HLTX;                       /* Clear halted */
             fpp_apta = (FPC_GETAPTF (fpp_cmd) << 12) | AC;
             fpp_load_apt (fpp_apta);                    /* load APT */
@@ -381,7 +381,7 @@ do {                                                    /* repeat */
 
             case 0:                                     /* FEXIT */
             /* if already trapped, don't update APT, just update status */
-                if (fpp_sta & (FPS_DVZX|FPS_IOVX|FPS_FOVX|FPS_UNF)) 
+                if (fpp_sta & (FPS_DVZX|FPS_IOVX|FPS_FOVX|FPS_UNF))
                     fpp_sta |= FPS_HLTX;
                 else
                     fpp_dump_apt (fpp_apta, 0);
@@ -561,7 +561,7 @@ do {                                                    /* repeat */
         fpp_read_op (ea, &x);
         fpp_add (&fpp_ac, &x, 0);
         break;
-        
+
     case 006:
         ea = fpp_2wd_dir (ir);
         fpp_read_op (ea, &x);
@@ -591,7 +591,7 @@ do {                                                    /* repeat */
         fpp_read_op (ea, &x);
         fpp_add (&fpp_ac, &x, 1);
         break;
-        
+
     case 012:
         ea = fpp_2wd_dir (ir);
         fpp_read_op (ea, &x);
@@ -615,7 +615,7 @@ do {                                                    /* repeat */
         fpp_read_op (ea, &x);
         fpp_div (&fpp_ac, &x);
         break;
-        
+
     case 016:
         ea = fpp_2wd_dir (ir);
         fpp_read_op (ea, &x);
@@ -633,7 +633,7 @@ do {                                                    /* repeat */
         fpp_read_op (ea, &x);
         fpp_mul (&fpp_ac, &x);
         break;
-        
+
     case 022:
         ea = fpp_2wd_dir (ir);
         fpp_read_op (ea, &x);
@@ -657,7 +657,7 @@ do {                                                    /* repeat */
         fpp_add (&x, &fpp_ac, 0);
         fpp_write_op (ea, &x);                          /* store result */
         break;
-        
+
     case 026:
         fpp_sta |= FPS_XXXM;
         ea = fpp_2wd_dir (ir);
@@ -723,7 +723,7 @@ do {                                                    /* repeat */
         fpp_mul (&x, &fpp_ac);
         fpp_write_op (ea, &x);                          /* store result */
         break;
-        
+
     case 036:
         fpp_sta |= FPS_XXXM;
         ea = fpp_2wd_dir (ir);
@@ -748,7 +748,7 @@ do {                                                    /* repeat */
 
     if (sim_interval)
         sim_interval = sim_interval - 1;
-    } while ((sim_interval > 0) && 
+    } while ((sim_interval > 0) &&
              ((fpp_sta & (FPS_RUN|FPS_PAUSE|FPS_LOCK)) == (FPS_RUN|FPS_LOCK)));
 if ((fpp_sta & (FPS_RUN|FPS_PAUSE)) == FPS_RUN)
     sim_activate (uptr, 1);
@@ -760,7 +760,7 @@ return SCPE_OK;
 
 uint32 fpp_1wd_dir (uint32 ir)
 {
-uint32 ad; 
+uint32 ad;
 
 ad = fpp_bra + ((ir & 0177) * 3);                       /* base + 3*7b off */
 if (fpp_sta & FPS_DP)                                   /* dp? skip exp */
@@ -1150,7 +1150,7 @@ return;
 
 /* Fraction multiply - always develop 60b, multiply is
    either 24b*24b or 60b*60b
-   
+
    This is a signed multiply.  The shift in for signed multiply is
    technically ALU_N XOR ALU_V.  This can be simplified as follows:
 
@@ -1178,7 +1178,7 @@ b_sign = b[0] & FPN_FRSIGN;                         /* remember b's sign */
 fpp_fr_fill (c, 0, FPN_NFR_MDS);                    /* clr answer */
 if (fpp_sta & FPS_EP)                               /* ep? */
     lo = FPN_NFR_EP;                                /* low order mpyr word */
-else  
+else
     lo = FPN_NFR_FP;                                /* low order mpyr word */
 
 if (fix)
@@ -1186,7 +1186,7 @@ if (fix)
 wc = 2;                                             /* 3 words at start */
 fill = 0;
 cnt = lo * 12;                                      /* total steps */
-for (i = 0; i < cnt; i++) { 
+for (i = 0; i < cnt; i++) {
     if ((i % 12) == 0) {
         wc++;                                       /* do another word */
         lo--;                                       /* and next mpyr word */
@@ -1200,7 +1200,7 @@ for (i = 0; i < cnt; i++) {
     fill = ((c[0] & FPN_FRSIGN) ? 07777 : 0);       /* remember sign */
     fpp_fr_lsh1 (c, wc);                            /* shift the result */
     fpp_fr_lsh1 (b + lo, 1);                        /* shift mpcd */
-    
+
     }
 
 if (!fix)                                           /* imul shifts result */

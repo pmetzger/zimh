@@ -33,7 +33,7 @@
  mode is specified by the buffer control EOM.  When BCD mode is
  specified by the EOM, output data is translated into Hollerith code
  from SDS Internal Code as defined by the SDS 930 Computer Reference Manual
- 
+
  The SDS card punch protocol defined by the 930 Computer Reference manual
  specifies that the output image be sent to the buffer 12 times, once
  for each row.  In this simulator the card image is only written after
@@ -43,10 +43,10 @@
  before issueing a connect EOM to determine if it needs to write 12 rows
  per card, or just 1.  To make Symbol work right we always return TRUE,
  (skip) for this test.
-  
+
  I can't find anything in the computer reference manuals that describes
  how this should work.  Why did Symbol do this?
- 
+
  */
 
 
@@ -90,7 +90,7 @@ MTAB  cp_mod[] = {
         &set_chan, &show_chan,
         NULL, "Device Channel"},
     {MTAB_XTD | MTAB_VDV, 0, "FORMAT", "FORMAT",
-        &sim_card_set_fmt, &sim_card_show_fmt, 
+        &sim_card_set_fmt, &sim_card_show_fmt,
         NULL,"Card Format"},
     { MTAB_XTD|MTAB_VDV, 0, "CAPACITY", NULL,
         NULL, &cp_show_cap, NULL, "Stacker Count" },
@@ -119,13 +119,13 @@ DEVICE cp_dev = {
 
 uint16 sdsbcd_to_hol(uint8 bcd) {
     uint16      hol;
-    
+
     /* Handle space correctly */
     if (bcd == 0)                       /* 0 to row 10 */
         return 0x200;
     if (bcd == 060)                     /* 60 no punch */
         return 0;
-    
+
     /* Convert to top column */
     switch (bcd & 060) {
         default:
@@ -142,7 +142,7 @@ uint16 sdsbcd_to_hol(uint8 bcd) {
             hol = 0x200;                /* row 10  */
             break;
     }
-    
+
     /* Convert to 0-9 row */
     bcd &= 017;
     if (bcd > 9) {
@@ -160,7 +160,7 @@ t_stat cp_devio(uint32 fnc, uint32 inst, uint32 *dat) {
     uint8  chr;
     t_stat r;
     uint32 t;
-    
+
     switch (fnc) {
         case IO_CONN:
             new_ch = I_GETEOCH (inst);      /* get new chan */
@@ -236,14 +236,14 @@ t_stat cp_devio(uint32 fnc, uint32 inst, uint32 *dat) {
         case IO_READ:
             CRETINS;
     }
-    
+
     return SCPE_OK;
 }
 
 
 /* punch service */
 t_stat cp_svc(UNIT *uptr) {
-    
+
     uptr->STATUS |= CARD_IN_PUNCH;
     cp_bptr = 0;
     cp_blnt = 80;
@@ -254,7 +254,7 @@ t_stat cp_svc(UNIT *uptr) {
 
 t_stat cp_wrend(UNIT * uptr) {
     t_stat st;
-    
+
     st = sim_punch_card(uptr, cp_buffer);
     cp_row = 0;
     if (st != CDSE_OK) {
@@ -278,7 +278,7 @@ void cp_set_err (UNIT *uptr)
 
 t_stat cp_attach(UNIT * uptr, const char *cptr) {
     t_stat r;
-    
+
     sim_card_set_fmt (uptr,0,"CBN",NULL);
     if ((r = sim_card_attach(uptr, cptr)) != SCPE_OK)
         return r;
@@ -287,7 +287,7 @@ t_stat cp_attach(UNIT * uptr, const char *cptr) {
 }
 
 t_stat cp_detach(UNIT * uptr) {
-    
+
     if (uptr->STATUS & CARD_IN_PUNCH)
         sim_punch_card(uptr, cp_buffer);
     return sim_card_detach(uptr);
@@ -304,7 +304,7 @@ t_stat cp_set_chan (UNIT *uptr, int32 val, const char *sptr, void *desc)
 
 t_stat cp_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc) {
     int n;
-    
+
     if ((n = sim_card_output_hopper_count(uptr)) == 0)
         fprintf(st,"stacker empty");
     else {

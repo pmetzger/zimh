@@ -249,7 +249,7 @@ dp_opr(uint16 insn)
   case 000:
     if (insn & 1) {
       sim_debug (DBG, &dp_dev, "DADR ");
-      MIT8K = !MIT8K; 
+      MIT8K = !MIT8K;
     }
     break;
   case 004:

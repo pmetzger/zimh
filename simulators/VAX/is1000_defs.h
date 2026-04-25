@@ -79,7 +79,7 @@
 
 /* CPU */
 
-#define CPU_MODEL_MODIFIERS 
+#define CPU_MODEL_MODIFIERS
 
 /* Memory */
 

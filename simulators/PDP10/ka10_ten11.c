@@ -339,7 +339,7 @@ int ten11_read (t_addr addr, uint64 *data)
     read_word (unibus, uaddr, &word1);
     read_word (unibus, uaddr + 2, &word2);
     *data = ((uint64)word1 << 20) | (word2 << 4);
-    
+
     sim_debug (DBG_TRC, &ten11_dev,
                "Read: (%o) %06o -> %012llo\n",
                unibus, uaddr, *data);

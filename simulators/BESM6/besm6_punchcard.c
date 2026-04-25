@@ -52,7 +52,7 @@ typedef enum {
 } pi_state_t;
 
 typedef struct {
-    /* 
+    /*
      * A 3-card long tract, with 12 lines per card,
      * represented as 4 20-bit registers each.
      */
@@ -62,7 +62,7 @@ typedef struct {
     pi_state_t state;
     void (*punch_fn)(int, int);
 } pi_t;
-    
+
 /*
  * There are 2 card punchers */
 pi_t PI[2];
@@ -296,7 +296,7 @@ t_stat pi_reset (DEVICE *dptr)
 }
 
 /*
- * Punching mode switches: 
+ * Punching mode switches:
  * -b - raw binary, line-wise, 120 bytes per p/c;
  * -v - a visual form using Unicode Braille patterns;
  * -d - a visual form using dots and Os;
@@ -463,7 +463,7 @@ void pi_write (int num, uint32 val)
         besm6_debug("<<< PI-%d, writing out of turn, useless", num);
         return;
     }
-    if (pi_dev.dctrl) { 
+    if (pi_dev.dctrl) {
         besm6_debug("Card %d line %d pos %d <- val %05x",
                     card, line, pos, val);
     }

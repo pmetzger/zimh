@@ -72,7 +72,7 @@
 #define ABORT_MCHK      (-SCB_MCHK)                     /* machine check */
 #define ABORT_RESIN     (-SCB_RESIN)                    /* rsvd instruction */
 #define ABORT_RESAD     (-SCB_RESAD)                    /* rsvd addr mode */
-#define ABORT_RESOP     (-SCB_RESOP)                    /* rsvd operand */      
+#define ABORT_RESOP     (-SCB_RESOP)                    /* rsvd operand */
 #define ABORT_CMODE     (-SCB_CMODE)                    /* comp mode fault */
 #define ABORT_ARITH     (-SCB_ARITH)                    /* arithmetic trap */
 #define ABORT_ACV       (-SCB_ACV)                      /* access violation */
@@ -448,7 +448,7 @@ extern jmp_buf save_env;
 #define RB_SP  (14 << DR_V_RESMASK)     /* @SP         */
 #define DR_GETRES(x)    (((x) >> DR_V_RESMASK) & DR_M_RESMASK)
 
-/* Extra bits in the opcode flag word of the Decode ROM array 
+/* Extra bits in the opcode flag word of the Decode ROM array
    to identify instruction group */
 
 #define DR_V_IGMASK     12

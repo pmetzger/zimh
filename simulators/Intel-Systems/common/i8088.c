@@ -38,7 +38,7 @@ extern void do_trace(void);
 uint16 port;                            //port called in dev_table[port]
 
 struct idev {
-    uint8 (*routine)(t_bool io, uint8 data, uint8 devnum); 
+    uint8 (*routine)(t_bool io, uint8 data, uint8 devnum);
     uint16 port;
     uint16 devnum;
     uint8 dummy;
@@ -211,20 +211,20 @@ DEVICE i8088_dev = {
     i8088_reg,          //registers
     i8088_mod,          //modifiers
     1,                  //numunits
-    16,                 //aradix 
-    20,                 //awidth 
-    1,                  //aincr 
-    16,                 //dradix 
+    16,                 //aradix
+    20,                 //awidth
+    1,                  //aincr
+    16,                 //dradix
     8,                  //dwidth
-    &i8088_ex,          //examine 
-    &i8088_dep,         //deposit 
+    &i8088_ex,          //examine
+    &i8088_dep,         //deposit
     &i8088_reset,       //reset
     NULL,               //boot
-    NULL,               //attach 
+    NULL,               //attach
     NULL,               //detach
     NULL,               //ctxt
-    DEV_DEBUG,          //flags 
-    DEBUG_reg+DEBUG_asm,//dctrl 
+    DEV_DEBUG,          //flags
+    DEBUG_reg+DEBUG_asm,//dctrl
     i8088_debug,        //debflags
     NULL,               //msize
     NULL                //lname
@@ -3481,7 +3481,7 @@ int32 sim_instr (void) {
                         port = DATA8 = oper1b = getmem8 (segregs[regcs], IP);
                         StepIP (1);
 //                        putreg16 (regax, portin16 (oper1b) );
-//                        putreg16 (regax, 
+//                        putreg16 (regax,
                         putreg8(regal, dev_table[oper1b+1].routine(0, 0, dev_table[oper1b+1].devnum & 0xff));
                         putreg8(regah, dev_table[oper1b].routine(0, 0, dev_table[oper1b].devnum & 0xff));
                         break;
@@ -3681,9 +3681,9 @@ int32 sim_instr (void) {
 
 t_stat i8088_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
-    if (addr >= MAXMEMSIZE20) 
+    if (addr >= MAXMEMSIZE20)
         return SCPE_NXM;
-    if (vptr != NULL) 
+    if (vptr != NULL)
         *vptr = get_mbyte(addr);
     return SCPE_OK;
 }
@@ -3692,14 +3692,14 @@ t_stat i8088_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 
 t_stat i8088_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
-    if (addr >= MAXMEMSIZE20) 
+    if (addr >= MAXMEMSIZE20)
         return SCPE_NXM;
     put_mbyte(addr, val);
     return SCPE_OK;
 }
 
 /* This is the binary loader.  The input file is considered to be
-   a string of literal bytes with no special format. The load 
+   a string of literal bytes with no special format. The load
    starts at the current value of the PC.
 */
 

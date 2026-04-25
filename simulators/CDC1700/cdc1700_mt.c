@@ -24,7 +24,7 @@
    in this Software without prior written authorization from John Forecast.
 
 */
-        
+
 /* cdc1700_mt.c: 1732-A/B and 1732-3 magtape device support
  *               Simh devices: mt0, mt1, mt2, mt3
  */
@@ -385,7 +385,7 @@ t_stat mt_help(FILE *, DEVICE *, UNIT *, int32, const char *);
      |   Storage Parity Error (1732-3 only)
      Protect Fault (1732-3 only)
 
-  Director Status 2 
+  Director Status 2
 
     15                       9   8   7   6   5   4   3   2   1   0
    +---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+---+
@@ -482,9 +482,9 @@ MTAB mt_mod[] = {
     &mt_set_type, &mt_show_type, NULL, "Set/Display magtape controller type" },
   { MTAB_XTD|MTAB_VDV, 0, "EQUIPMENT", "EQUIPMENT=hexAddress",
     &set_equipment, &show_addr, NULL, "Set/Display equipment address" },
-  { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+  { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable tape drive" },
-  { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+  { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock tape drive" },
   { MTAB_XTD|MTAB_VUN, 0, "FORMAT", "FORMAT",
     &sim_tape_set_fmt, &sim_tape_show_fmt, NULL, "Define tape format" },
@@ -1235,7 +1235,7 @@ t_stat mt_svc(UNIT *uptr)
           sim_activate(uptr, mt_densityTimeout(FALSE));
           if ((mt_dev.dctrl & DBG_OPS) != 0) {
             int32 u = uptr - mt_dev.units;
-            
+
             fprintf(DBGOUT,
                     "[MT%d: DSA Read started, CWA: 0x%04X, LWA: 0x%04X, Mode: 0x%X\r\n",
                     u, MTdev.iod_CWA, MTdev.iod_LWA, MTdev.iod_mode);
@@ -1284,7 +1284,7 @@ t_stat mt_svc(UNIT *uptr)
       mt_detach(uptr);
       if ((mt_dev.dctrl & DBG_OPS) != 0)
         mt_trace(uptr, "REWU", status, FALSE);
-      
+
       mask &= ~IO_ST_EOP;
       break;
 
@@ -1327,10 +1327,10 @@ t_stat mt_svc(UNIT *uptr)
       status = MTSE_OK;
       while (!sim_tape_eot(uptr)) {
         status = sim_tape_sprecf(uptr, &temp);
-        
+
         if ((mt_dev.dctrl & DBG_MTIO) != 0)
           mtio_trace(uptr, "sprecf", status, FALSE, 0);
-        
+
         if (status == MTSE_TMK)
           MTdev.STATUS |= IO_1732_FMARK;
 
@@ -1372,7 +1372,7 @@ t_stat mt_svc(UNIT *uptr)
 
       if ((mt_dev.dctrl & DBG_MTIO) != 0)
         mtio_trace(uptr, "rewind", status, FALSE, 0);
-      
+
       MTdev.STATUS |= IO_1732_BOT;
       if ((mt_dev.dctrl & DBG_OPS) != 0)
         mt_trace(uptr, "REWL", status, FALSE);
@@ -1595,7 +1595,7 @@ t_bool MTreject(IO_DEVICE *iod, t_bool output, uint8 reg)
             return ((iod->STATUS & IO_1732_ACTIVE) != 0);
       }
       break;
-      
+
     case 2:
       if (output)
         return ((iod->STATUS & IO_1732_ACTIVE) != 0);
@@ -1907,7 +1907,7 @@ enum IOstatus MTout(IO_DEVICE *iod, uint8 reg)
             if ((mt_dev.dctrl & DBG_DENS) != 0) {
               DEVICE *dptr = find_dev_from_unit(uptr);
               int32 u = uptr - dptr->units;
-              
+
               fprintf(DBGOUT,
                       "MT%d: Density changed to %04X\r\n",
                       u, Areg & (IO_1732_1600 | IO_1732_556 | IO_1732_800));
@@ -1930,7 +1930,7 @@ enum IOstatus MTout(IO_DEVICE *iod, uint8 reg)
           if (MTdev.iod_unit != NULL) {
             DEVICE *dptr = find_dev_from_unit(uptr);
             int32 u = uptr - dptr->units;
-            
+
             fprintf(DBGOUT, "MT%d - Deselected\r\n", u);
           }
 
@@ -1944,7 +1944,7 @@ enum IOstatus MTout(IO_DEVICE *iod, uint8 reg)
         MTdev.iod_unit = NULL;
         MTdev.STATUS &= ~(IO_1732_STCINT | IO_1732_FMARK | IO_1732_EOT);
         fw_clearForced(&MTdev, IO_ST_READY);
-        
+
         uptr = &mt_unit[unit];
 
         if ((uptr->flags & UNIT_ATT) != 0) {

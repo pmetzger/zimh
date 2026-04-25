@@ -310,7 +310,7 @@ int32 i;
 if (cnt == 0) {                                         /* overprint */
      fputc ('\r', uptr->fileref);
      return 1;
-    } 
+    }
 for (i = 0; i < cnt; i++)                               /* 'cnt' newlines */
     fputc ('\n', uptr->fileref);
 lpt_ccp = (lpt_ccp + cnt) % lpt_ccl;                    /* advance CCT */

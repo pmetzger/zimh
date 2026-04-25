@@ -64,8 +64,8 @@
 #define SNS_SPARE2      0x08000000  /* Spare */
 #define SNS_SPARE3      0x04000000  /* Spare */
 #define SNS_MODE_M      0x03000000  /* Mode Mask */
-                                
-/* Sense byte 1 */              
+
+/* Sense byte 1 */
 #define SNS_RCV_RDY     0x00800000  /* Receive unit ready */
 #define SNS_TMT_DEF     0x00400000  /* Transmission deferred */
 #define SNS_COL_RTY     0x00300000  /* Collision retry */
@@ -294,7 +294,7 @@ MTAB ec_mod[] = {
       &ec_set_mac, &ec_show_mac, NULL, "MAC address" },
     { MTAB_XTD|MTAB_VDV|MTAB_NMO, 0, "ETH", NULL, NULL,
       &eth_show, NULL, "Display attachedable devices" },
-    {MTAB_XTD | MTAB_VUN | MTAB_VALR, 0, "DEV", "DEV", 
+    {MTAB_XTD | MTAB_VUN | MTAB_VALR, 0, "DEV", "DEV",
       &set_dev_addr, &show_dev_addr, NULL, "Device channel address"},
     { 0 }
     };
@@ -557,7 +557,7 @@ loop:
     /* make a 24 bit address */
     chp->ccw_addr = word1 & MASK24;             /* set the data/seek address */
 
-    /* validate parts of IOCD2 that are reserved */    
+    /* validate parts of IOCD2 that are reserved */
     if (word2 & 0x07ff0000) {                   /* bits 5-15 must be zero */
         chp->chan_status |= STATUS_PCHK;        /* program check for invalid iocd */
         sim_debug(DEBUG_EXP, dptr,
@@ -584,7 +584,7 @@ loop:
 
     if (docmd) {                                /* see if we need to process a command */
         DIB *dibp = dib_unit[chp->chan_dev];    /* get the DIB pointer */
- 
+
         uptr = chp->unitptr;                    /* get the unit ptr */
         if (dibp == 0 || uptr == 0) {
             chp->chan_status |= STATUS_PCHK;    /* program check if it is */
@@ -805,7 +805,7 @@ t_stat ec_srv(UNIT *uptr)
             if (chan_read_byte(chsa, &buf[i])) {
                 chan_end(chsa, SNS_CHNEND|SNS_DEVEND|SNS_UNITCHK);
                 return SCPE_OK;
-                
+
             }
         }
         eth_copy_mac(ec_data.mac, &buf[0]);
@@ -903,7 +903,7 @@ t_stat ec_srv(UNIT *uptr)
             while (chan_read_byte(chsa, &ch) == 0) {
                 if (i < ETH_MAX_PACKET) {
                     if (i>6 && i<28)            /* only display char 7-27 */
-                        sim_debug(DEBUG_DATA, dptr, "ec_srv data[%2x]: %06x %02x\n", 
+                        sim_debug(DEBUG_DATA, dptr, "ec_srv data[%2x]: %06x %02x\n",
                         i, chp->ccw_addr, ch);
                     pck[i] = ch;
                     if (i == len + 2)
@@ -966,7 +966,7 @@ t_stat ec_srv(UNIT *uptr)
             while (chan_read_byte(chsa, &ch) == 0) {
                 if (i < ETH_MAX_PACKET) {
                     if (i>6 && i<28)            /* only display char 7-27 */
-                        sim_debug(DEBUG_DATA, dptr, "ec_srv data[%2x]: %06x %02x\n", 
+                        sim_debug(DEBUG_DATA, dptr, "ec_srv data[%2x]: %06x %02x\n",
                         i, chp->ccw_addr, ch);
                     pck[i] = ch;
                     if (i == (len+2))
@@ -1003,7 +1003,7 @@ t_stat ec_srv(UNIT *uptr)
             n = 0;
             while (dcnt++ % 4) {
                 pck[i+n] = RMB(((chp->ccw_addr+n)));
-                sim_debug(DEBUG_DATA, dptr, "ec_srx i %x data[%3x]: %06x %02x\n", 
+                sim_debug(DEBUG_DATA, dptr, "ec_srx i %x data[%3x]: %06x %02x\n",
                     i, i+n, chp->ccw_addr+n, pck[i+n]);
                 n++;
             }
@@ -1042,7 +1042,7 @@ t_stat ec_srv(UNIT *uptr)
             while (chan_read_byte(chsa, &ch) == 0) {
                 if (i < ETH_MAX_PACKET) {
                     if (i>6 && i<28)
-                        sim_debug(DEBUG_DATA, dptr, "ec_srv data[%3x]: %06x %02x\n", 
+                        sim_debug(DEBUG_DATA, dptr, "ec_srv data[%3x]: %06x %02x\n",
                         i, chp->ccw_addr, ch);
                     pck[i] = ch;
                     if (i == len + 2)
@@ -1088,7 +1088,7 @@ t_stat ec_srv(UNIT *uptr)
             n = 0;
             while (dcnt++ % 4) {
                 pck[i+n] = RMB(((chp->ccw_addr+n)));
-                sim_debug(DEBUG_DATA, dptr, "ec_srx i %x data[%3x]: %06x %02x\n", 
+                sim_debug(DEBUG_DATA, dptr, "ec_srx i %x data[%3x]: %06x %02x\n",
                     i, i+n, chp->ccw_addr+n, pck[i+n]);
                 n++;
             }
@@ -1204,7 +1204,7 @@ wr_end:
         uptr->CMD &= LMASK;                     /* remove old status bits & cnt */
 
         /* Read must be word bounded */
-        if (chp->ccw_addr & 0x3) { 
+        if (chp->ccw_addr & 0x3) {
             sim_debug(DEBUG_EXP, dptr,
                 "ec_srv iocd bad address caw %06x ccw %06x\n",
                 chp->chan_caw, chp->ccw_addr);
@@ -1390,9 +1390,9 @@ wr_end:
         uptr->CMD &= LMASK;                     /* remove old status bits & cmd */
         sim_debug(DEBUG_DETAIL, dptr, "ec_srv stats drop_count %08x\n", ec_data.drop_cnt);
         for (i = 0; i < STAT_LEN * 2; i++) {
-            if (i == 6) 
+            if (i == 6)
                ch = (ec_data.drop_cnt >> 8) & 0xff;
-            if (i == 7) 
+            if (i == 7)
                ch = ec_data.drop_cnt & 0xff;
             if (i == 8)
                ch = 0;
@@ -1796,7 +1796,7 @@ t_stat ec_set_mode (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
     if (newmode > 3)
         return SCPE_ARG;
-   
+
     uptr->flags &= ~UNIT_MODE;
     uptr->flags |= SET_MODE(newmode);
     return SCPE_OK;

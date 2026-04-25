@@ -78,7 +78,7 @@ DEVICE daz_dev = {
   NULL, NULL, &daz_reset,
   &daz_boot, NULL, NULL,
   &daz_dib, DEV_DIS | DEV_DISABLE | DEV_UBUS,
-  0, NULL, NULL, NULL, NULL, &daz_help, NULL, 
+  0, NULL, NULL, NULL, NULL, &daz_help, NULL,
   &daz_description
 };
 
@@ -93,10 +93,10 @@ daz_rd(int32 *data, int32 PA, int32 access)
   switch (PA & 002) {
   case 000:
     *data = 0x0000;
-    break; 
+    break;
   case 002:
     *data = 0x8000 | buttons[(devadd >> 10) & 3];
-    break; 
+    break;
   default:
     return SCPE_NXM;
   }

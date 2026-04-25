@@ -74,7 +74,7 @@ DEVICE *sim_devices[] = {
 const char *sim_stop_messages[SCPE_BASE] = {
     "Unknown error",
     "Wait",
-    "Invalid command", 
+    "Invalid command",
     "Simulator breakpoint",
     "Use of incomplete simulator function",
     "Power off",
@@ -265,7 +265,7 @@ static const char *lsopcode[] = {"SLA ", "SLCA ", "SLT ", "SLC "};
 static const char *rsopcode[] = {"SRA ", "?188 ", "SRT ", "RTE "};
 static const char tagc[]      = " 123";
 
-static int ascii_to_ebcdic_table[128] = 
+static int ascii_to_ebcdic_table[128] =
 {
     0x00,0x01,0x02,0x03,0x37,0x2d,0x2e,0x2f, 0x16,0x05,0x25,0x0b,0x0c,0x0d,0x0e,0x0f,
     0x10,0x11,0x12,0x13,0x3c,0x3d,0x32,0x26, 0x18,0x19,0x3f,0x27,0x1c,0x1d,0x1e,0x1f,

@@ -148,7 +148,7 @@ set_clock:
            sim_cancel(uptr);
         }
         if (uptr->INT_REG == uptr->CLK_REG) {
-           uptr->STAT_REG |= CLK_FLG; 
+           uptr->STAT_REG |= CLK_FLG;
            set_interrupt(dev, uptr->STAT_REG);
         }
         if (uptr->STAT_REG & CLK_EN) {

@@ -225,7 +225,7 @@ if (lpxb[0]) {                                          /* any char left? */
         r = SCPE_IOERR;
         }
     lpt_unit.pos = lpt_unit.pos + strlen (lpxb);        /* update position */
-    }   
+    }
 lpt_bptr = 0;                                           /* reset buffer */
 for (i = 0; i < LPT_WIDTH; i++)
     lpxb[i] = ' ';

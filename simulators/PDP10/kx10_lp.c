@@ -204,7 +204,7 @@ lpt_printline(UNIT *uptr, int nl) {
     } else if (nl < 0 && uptr->LINE >= (int32)uptr->capac) {
         uptr->LINE = 0;
     }
-       
+
     sim_fwrite(&lpt_buffer, 1, uptr->POS, uptr->fileref);
     uptr->pos += uptr->POS;
     uptr->COL = 0;
@@ -314,7 +314,7 @@ lpt_output(UNIT *uptr, char c) {
         uptr->COL++;
     } else if ((uptr->flags & UNIT_CT) == UNIT_WA) {
         uint16 u = c & 0x7f;
-        if (c < 040) 
+        if (c < 040)
              u = waits_code[c & 0x1f];
         else if (c == 0136) /* up arrow */
              u = 0x2191;

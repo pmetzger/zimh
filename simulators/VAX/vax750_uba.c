@@ -172,7 +172,7 @@ DEVICE uba_dev = {
     &uba_ex, &uba_dep, &uba_reset,
     NULL, NULL, NULL,
     &uba_dib, DEV_NEXUS | DEV_DEBUG, 0,
-    uba_deb, NULL, NULL, NULL, NULL, NULL, 
+    uba_deb, NULL, NULL, NULL, NULL, NULL,
     &uba_description
     };
 
@@ -370,7 +370,7 @@ if ((lvl == IPL_UBA) && uba_int) {                      /* UBA lvl, int? */
 for (i = 0; int_req[lvl] && (i < 32); i++) {
     if ((int_req[lvl] >> i) & 1) {
         int32 vec;
-        
+
         int_req[lvl] = int_req[lvl] & ~(1u << i);
         if (int_ack[lvl][i])
             vec = int_ack[lvl][i]();

@@ -123,7 +123,7 @@ void IO_reset_dev(uint8 devnum);
 
 /* imm-60 Standard I/O Data Structures */
 
-UNIT IO_unit[4] = { 
+UNIT IO_unit[4] = {
     { UDATA (&IO_svc, 0, 0), 10 }, //TTY input/output
     { UDATA (&IO_svc, 0, 0), 10 }, //TTY status/command
     { UDATA (&IO_svc, 0, 0), KBD_POLL_WAIT }, //PROM data input/output
@@ -192,7 +192,7 @@ DEVICE IO_dev = {
     NULL                //lname
 };
 
-UNIT PTR_unit[1] = { 
+UNIT PTR_unit[1] = {
     { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_BUFABLE+UNIT_MUSTBUF, 0x1000) } //TTY reader/punch
 };
 
@@ -252,10 +252,10 @@ t_stat IO_cfg(uint8 base, uint8 devnum)
 {
     sim_printf("    io[%d]: at base port 0%02XH\n",
         devnum, base & 0xFF);
-    reg_dev(IO_id, base, devnum); 
-    reg_dev(IO_is, base + 1, devnum); 
-    reg_dev(IO_oc, base + 2, devnum); 
-    reg_dev(IO_od, base + 3, devnum); 
+    reg_dev(IO_id, base, devnum);
+    reg_dev(IO_is, base + 1, devnum);
+    reg_dev(IO_oc, base + 2, devnum);
+    reg_dev(IO_od, base + 3, devnum);
     return SCPE_OK;
 }
 
@@ -285,7 +285,7 @@ t_stat IO_svc (UNIT *uptr)
 t_stat IO_reset (DEVICE *dptr)
 {
     uint8 devnum;
-    
+
     for (devnum=0; devnum < IO_NUM; devnum++) {
         IO_reset_dev(devnum);
         sim_activate (&IO_unit[devnum], IO_unit[devnum].wait); /* activate unit */
@@ -307,7 +307,7 @@ t_stat IO_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
 
-    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) { 
+    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) {
         sim_printf("   IO_attach: Attach error %d\n", r);
         return r;
     }
@@ -323,7 +323,7 @@ t_stat PTR_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
 
-    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) { 
+    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) {
         sim_printf("   PTR_attach: Attach error %d\n", r);
         return r;
     }
@@ -355,7 +355,7 @@ uint8 IO_is(t_bool io, uint8 data, uint8 devnum)
 uint8 IO_id(t_bool io, uint8 data, uint8 devnum)
 {
     char val;
-    
+
     if (io == 0) {                  /* read data port */
         if (command & RBIT) {       //read from tty rdr
             status |= TTYDA;        //set TTYDA off
@@ -367,7 +367,7 @@ uint8 IO_id(t_bool io, uint8 data, uint8 devnum)
             return (val);
         }
     } else {                        /* write data port - works*/
-//        IO_unit[devnum].u3 |= TTYBE;    //set TTYBE off   
+//        IO_unit[devnum].u3 |= TTYBE;    //set TTYBE off
         val = ~data;
         sim_putchar(val & 0x7f);
     }
@@ -388,7 +388,7 @@ uint8 IO_oc(t_bool io, uint8 data, uint8 devnum)
 uint8 IO_od(t_bool io, uint8 data, uint8 devnum)
 {
     char val;
-    
+
     if (io == 0) {                  /* read data port */
         status |= PTRDA;            //set PTRDA off
         val = IO_unit[devnum].buf;
@@ -396,7 +396,7 @@ uint8 IO_od(t_bool io, uint8 data, uint8 devnum)
         return (val);
     } else {                        /* write data port - works*/
         data = data;
-//        IO_unit[devnum].u3 |= TTYBE;    //set TTYBE off   
+//        IO_unit[devnum].u3 |= TTYBE;    //set TTYBE off
 //        val = ~data;
 //        sim_putchar(val & 0x7f);
     }

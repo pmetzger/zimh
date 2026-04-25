@@ -65,7 +65,7 @@
 #define RAM_SIZE        0x40000
 
 /* set INTR for CPU on the IBM PC XT */
-#define INT_R           INT_1  
+#define INT_R           INT_1
 
 /* xtbus interrupt definitions */
 

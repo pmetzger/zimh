@@ -41,7 +41,7 @@ if (WIN32)
         endif (MSVC)
 
         find_library(PTW_${flavor}_LIBRARY_RELEASE
-            NAMES 
+            NAMES
                 libpthread${libflavor}  pthread${libflavor}
             HINTS
                 ENV PTW_ DIR
@@ -52,7 +52,7 @@ if (WIN32)
         )
 
         find_library(PTW_${flavor}_LIBRARY_DEBUG
-            NAMES 
+            NAMES
                 libpthread${libflavor}d  pthread${libflavor}d
             HINTS
                 ENV PTW_ DIR

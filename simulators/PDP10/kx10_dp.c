@@ -269,9 +269,9 @@ DIB dp_dib[] = {
 
 
 MTAB                dp_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock drive" },
     {MTAB_XTD|MTAB_VDV, 0, NULL, "NOHEADERS",
             &dp_set_hdr, &dp_show_hdr, NULL, "Disable header writing"},
@@ -280,7 +280,7 @@ MTAB                dp_mod[] = {
     {UNIT_DTYPE, (RP03_DTYPE << UNIT_V_DTYPE), "RP03", "RP03", &dp_set_type },
     {UNIT_DTYPE, (RP02_DTYPE << UNIT_V_DTYPE), "RP02", "RP02", &dp_set_type },
     {UNIT_DTYPE, (RP01_DTYPE << UNIT_V_DTYPE), "RP01", "RP01", &dp_set_type },
-    {MTAB_XTD|MTAB_VUN, 0, "FORMAT", "FORMAT", NULL, &disk_show_fmt }, 
+    {MTAB_XTD|MTAB_VUN, 0, "FORMAT", "FORMAT", NULL, &disk_show_fmt },
     {0},
 };
 
@@ -465,7 +465,7 @@ t_stat dp_devio(uint32 dev, uint64 *data) {
          if ((uptr->UFLAGS & DONE) != 0) {
             df10_setirq(df10);
          }
-  
+
          sim_debug(DEBUG_CONO, dptr, "DP %03o CONO %06o %d PC=%o %06o\n", dev,
                  (uint32)*data, ctlr, PC, df10->status);
          break;

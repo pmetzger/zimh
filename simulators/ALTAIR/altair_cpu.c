@@ -34,7 +34,7 @@
    A<0:7>               Accumulator
    BC<0:15>             BC Register Pair
    DE<0:15>             DE Register Pair
-   HL<0:15>             HL Register Pair                                
+   HL<0:15>             HL Register Pair
    C                    carry flag
    Z                    zero flag
    S                    Sign bit

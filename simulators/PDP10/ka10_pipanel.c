@@ -92,7 +92,7 @@ int           rep_count;  /* Count down to repeat trigger */
 #define AB_V_2               0           /* right */
 
 /* led row 3 */
-#define IX_MASK3             017 
+#define IX_MASK3             017
 #define IX_V_3               0            /* left */
 #define IND_LAMP             020
 #define AC_MASK3             017
@@ -184,7 +184,7 @@ t_stat gpio_mux_thread_start()
     int res;
     res = pthread_create(&blink_thread, NULL, blink, &blink_thread_terminate);
     if (res) {
-        return sim_messagef(SCPE_IERR, 
+        return sim_messagef(SCPE_IERR,
                      "Error creating gpio_mux thread, return code %d\n", res);
     }
     sim_messagef(SCPE_OK, "Created blink_thread\n");
@@ -229,7 +229,7 @@ read_sw()
 
     spec.tv_sec = 0;
     new_as = 0;
-    for (row=0; row<5; row++) { 
+    for (row=0; row<5; row++) {
         /* Select row address */
         for (i = 0; i < 3; i++) {
              if ((row & (1 << i)) == 0) {
@@ -277,7 +277,7 @@ read_sw()
                 adr_cond |= ((sw & ADR_STOP_SW) == 0) ? ADR_STOP : 0;
                 adr_cond |= ((sw & ADR_BRK_SW) == 0) ? ADR_BREAK : 0;
                 nxm_stop = (sw & NXM_STOP) == 0;
-#endif         
+#endif
                 sing_inst_sw = ((sw & SING_INST) == 0) ||
                                ((sw & SING_CYCL) == 0);
                 /* PAR_STOP handle special features */
@@ -540,7 +540,7 @@ void *blink(void *ptr)
             }
        }
 
-       /* done with reading the switches, 
+       /* done with reading the switches,
         * so start the next cycle of lighting up LEDs
         */
     }

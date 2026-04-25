@@ -1,4 +1,4 @@
-/* i650_mt.c: IBM 650 Magnetic tape 
+/* i650_mt.c: IBM 650 Magnetic tape
 
    Copyright (c) 2018, Roberto Sancho
 
@@ -74,7 +74,7 @@ UNIT                mt_unit[6] = {
 MTAB                mt_mod[] = {
     { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",  &set_writelock, &show_writelock,   NULL, "Write ring in place" },
     { MTAB_XTD|MTAB_VUN, 1, NULL,            "LOCKED",        &set_writelock, NULL,   NULL, "no Write ring in place" },
-    {MTAB_XTD | MTAB_VUN, 0, "FORMAT", "FORMAT",              &sim_tape_set_fmt, &sim_tape_show_fmt, NULL, 
+    {MTAB_XTD | MTAB_VUN, 0, "FORMAT", "FORMAT",              &sim_tape_set_fmt, &sim_tape_show_fmt, NULL,
                                                                                 "Set/Display tape format (SIMH, E11, TPC, P7B)"},
     {MTAB_XTD | MTAB_VUN, 0, "LENGTH", "LENGTH",              &mt_set_len, &mt_show_len, NULL,
                                                                                 "Set tape medium length (50 to 10000 foot)" },
@@ -96,7 +96,7 @@ int LastTapeIndicator = 0;    // last tape operation has some indication to tell
 int bFastMode = 0;            // =1 for FAST operation
 
 const char * TapeIndicatorStr[11] = { "OK",
-                                      "WRITE PROTECTED", 
+                                      "WRITE PROTECTED",
                                       "IO CHECK",
                                       "END OF FILE",
                                       "END OF TAPE",
@@ -104,9 +104,9 @@ const char * TapeIndicatorStr[11] = { "OK",
                                       "SHORT RECORD",
                                       "NO TAPE UNIT AT THIS ADDRESS",
                                       "NO REEL LOADED",
-                                      "NOT READY", 
+                                      "NOT READY",
                                       "BAD CHAR"};
-                                                             
+
 // return 1 if tape unit n (0..5) is ready to receive a command
 int mt_ready(int n)
 {
@@ -128,7 +128,7 @@ t_stat mt_rew(UNIT * uptr, int32 val, const char *cptr, void *desc)
 
 int mt_read_numeric_word(uint8 * buf, t_int64 * d, int * ZeroNeg)
 {
-    int i, neg; 
+    int i, neg;
     char c;
 
     neg = 0;
@@ -136,13 +136,13 @@ int mt_read_numeric_word(uint8 * buf, t_int64 * d, int * ZeroNeg)
     if (ZeroNeg != NULL) *ZeroNeg = 0;
     for (i=0;i<10;i++) {
         c = *buf++;
-        if (i==9) { // is last word digit 
+        if (i==9) { // is last word digit
             if ((c >= '0') && (c <= '9')) return MT_IND_BADCHAR;          // last digit should have sign
             if (c == '?') c = '0';                                        // +0
             if ((c >= 'A') && (c <= 'I')) c = c - 'A' + '1';              // +1 to +9
             if ((c >= 'J') && (c <= 'R')) {c = c - 'J' + '1'; neg=1;}     // -1 to -9
             if (c == '!') {c = '0'; neg=1;}                               // -0
-        } 
+        }
         if ((c < '0') || (c > '9')) return MT_IND_BADCHAR;
         *d = *d * 10 + (c - '0');
     }
@@ -153,7 +153,7 @@ int mt_read_numeric_word(uint8 * buf, t_int64 * d, int * ZeroNeg)
 
 int mt_read_alpha_word(uint8 * buf, t_int64 * d)
 {
-    int i, n; 
+    int i, n;
     char c;
 
     *d = 0;
@@ -171,8 +171,8 @@ int mt_transfer_tape_rec_to_IAS(uint8 * buf, t_mtrlnt reclen, char mode)
     int n,ic,r, ZeroNeg;
     t_int64 d, CtrlWord;
     char s[6];
-    t_mtrlnt expected_reclen; 
-    
+    t_mtrlnt expected_reclen;
+
     if (mode == 'N') {
         // numeric mode
         expected_reclen = (60 - IAS_TimingRing) * 10; // record len expected
@@ -190,8 +190,8 @@ int mt_transfer_tape_rec_to_IAS(uint8 * buf, t_mtrlnt reclen, char mode)
             // store into IAS
             IAS[IAS_TimingRing] = d;
             IAS_NegativeZeroFlag[IAS_TimingRing] = ZeroNeg;
-            sim_debug(DEBUG_DETAIL, &cpu_dev, "... Tape to IAS %04d: %06d%04d%c '%s'\n", 
-                        IAS_TimingRing+9000, printfw(d,ZeroNeg), 
+            sim_debug(DEBUG_DETAIL, &cpu_dev, "... Tape to IAS %04d: %06d%04d%c '%s'\n",
+                        IAS_TimingRing+9000, printfw(d,ZeroNeg),
                         word_to_ascii(s, 1, 5, d));
             // incr IAS_TimingRing, exit if arrived to end of IAS
             IAS_TimingRing = (IAS_TimingRing + 1) % 60;
@@ -233,8 +233,8 @@ int mt_transfer_tape_rec_to_IAS(uint8 * buf, t_mtrlnt reclen, char mode)
             // store into IAS
             IAS[IAS_TimingRing] = d;
             IAS_NegativeZeroFlag[IAS_TimingRing] = ZeroNeg;
-            sim_debug(DEBUG_DETAIL, &cpu_dev, "... Tape to IAS %04d: %06d%04d%c '%s'\n", 
-                        IAS_TimingRing+9000, printfw(d,ZeroNeg), 
+            sim_debug(DEBUG_DETAIL, &cpu_dev, "... Tape to IAS %04d: %06d%04d%c '%s'\n",
+                        IAS_TimingRing+9000, printfw(d,ZeroNeg),
                         word_to_ascii(s, 1, 5, d));
             // incr IAS_TimingRing, exit if arrived to end of IAS
             IAS_TimingRing = (IAS_TimingRing + 1) % 60;
@@ -252,7 +252,7 @@ int mt_transfer_tape_rec_to_IAS(uint8 * buf, t_mtrlnt reclen, char mode)
 
 void mt_write_numeric_word(uint8 * buf, t_int64 d, int ZeroNeg)
 {
-    int i, neg; 
+    int i, neg;
     char c;
 
     neg = 0;
@@ -268,14 +268,14 @@ void mt_write_numeric_word(uint8 * buf, t_int64 d, int ZeroNeg)
                 if ((c >= '1') && (c <= '9')) {c = c - '1' + 'J';}            // -1 to -9
                 if (c == '0') {c = '!';}                                      // -0
             }
-        } 
+        }
         *buf++ = c;
     }
 }
 
 void mt_write_alpha_word(uint8 * buf, t_int64 d)
 {
-    int i, n; 
+    int i, n;
     char c;
 
     for (i=0;i<5;i++) {
@@ -298,8 +298,8 @@ void mt_transfer_IAS_to_tape_rec(uint8 * buf, t_mtrlnt * reclen, char mode)
             // read IAS
             d = IAS[IAS_TimingRing];
             ZeroNeg = IAS_NegativeZeroFlag[IAS_TimingRing];
-            sim_debug(DEBUG_DETAIL, &cpu_dev, "... IAS %04d to Tape: %06d%04d%c '%s'\n", 
-                        IAS_TimingRing+9000, printfw(d,ZeroNeg), 
+            sim_debug(DEBUG_DETAIL, &cpu_dev, "... IAS %04d to Tape: %06d%04d%c '%s'\n",
+                        IAS_TimingRing+9000, printfw(d,ZeroNeg),
                         word_to_ascii(s, 1, 5, d));
             // write numeric to tape buf
             mt_write_numeric_word(&buf[ic], d, ZeroNeg);
@@ -331,7 +331,7 @@ void mt_transfer_IAS_to_tape_rec(uint8 * buf, t_mtrlnt * reclen, char mode)
                 ic += 10;
             } else {
                 // write alphanumeric word to tape buf
-                mt_write_alpha_word(&buf[ic], d); 
+                mt_write_alpha_word(&buf[ic], d);
                 ic += 5;
             }
             CtrlWord = CtrlWord / 10;
@@ -352,7 +352,7 @@ uint32 mt_cmd(UNIT * uptr, uint16 cmd, uint16 fast)
     DEVICE             *dptr = find_dev_from_unit(uptr);
     int                 unit = uptr - &mt_unit[0];
     int                 i, ic, time;
-    t_stat              r;   
+    t_stat              r;
     uint8               buf[1024];
     char                cbuf[100];
     t_mtrlnt            reclen;
@@ -398,16 +398,16 @@ uint32 mt_cmd(UNIT * uptr, uint16 cmd, uint16 fast)
         if (r == MTSE_TMK) {
             sim_debug(DEBUG_EXP, dptr, "Tape unit %d: tape mark sensed\n", unit);
             LastTapeIndicator = MT_IND_EOF;
-            uptr->u5 |= MT_IND; 
+            uptr->u5 |= MT_IND;
         } else if ((r == MTSE_EOM) || (uptr->u3 > uptr->u4*1000)) {
             sim_debug(DEBUG_EXP, dptr, "Tape unit %d: end of tape sensed\n", unit);
             LastTapeIndicator = MT_IND_EOT;
-            uptr->u5 |= MT_IND; 
+            uptr->u5 |= MT_IND;
         } else if (r == MTSE_RECE) {
             // record header contains error flag
             sim_debug(DEBUG_EXP, dptr, "Tape unit %d: longitudinal or vertical check error\n", unit);
             LastTapeIndicator = MT_IND_IOCHECK;
-            uptr->u5 |= MT_IND; 
+            uptr->u5 |= MT_IND;
         } else if (r != MTSE_OK) {
             sim_debug(DEBUG_EXP, dptr, "Tape unit %d: read error %d\n", unit, r);
             return STOP_IO;
@@ -425,13 +425,13 @@ uint32 mt_cmd(UNIT * uptr, uint16 cmd, uint16 fast)
             if (ic == reclen) break;
         }
         // calc wordcount time needed to finish tape operation
-        time = msec_to_wordtime(11 + reclen * 0.068); 
+        time = msec_to_wordtime(11 + reclen * 0.068);
         // transfer read data to IAS
-        if ((cmd != OP_RTC) && (LastTapeIndicator == 0)) {            
+        if ((cmd != OP_RTC) && (LastTapeIndicator == 0)) {
             LastTapeIndicator = mt_transfer_tape_rec_to_IAS(buf, reclen, (cmd == OP_RTN) ? 'N':'A');
             if (LastTapeIndicator) {
-                sim_debug(DEBUG_EXP, dptr, "Tape unit %d: decode error %s\n", unit, TapeIndicatorStr[LastTapeIndicator]); 
-                uptr->u5 |= MT_IND; 
+                sim_debug(DEBUG_EXP, dptr, "Tape unit %d: decode error %s\n", unit, TapeIndicatorStr[LastTapeIndicator]);
+                uptr->u5 |= MT_IND;
             }
         }
         break;
@@ -469,10 +469,10 @@ uint32 mt_cmd(UNIT * uptr, uint16 cmd, uint16 fast)
         // process result conditions
         if (r == MTSE_WRP) {
             LastTapeIndicator = MT_IND_WRT_PROT;
-            uptr->u5 |= MT_IND; 
+            uptr->u5 |= MT_IND;
         } else if ((r == MTSE_EOM) || (uptr->u3 > uptr->u4*1000)) {
             LastTapeIndicator = MT_IND_EOT;
-            uptr->u5 |= MT_IND; 
+            uptr->u5 |= MT_IND;
         } else if (r != MTSE_OK) {
             sim_debug(DEBUG_EXP, dptr, "Tape unit %d: write error %d\n", unit, r);
             return STOP_IO;
@@ -551,7 +551,7 @@ t_stat mt_srv(UNIT * uptr)
             sim_debug(DEBUG_CMD, dptr, "Tape unit %d: free TCI interlock\n", unit);
             // calculate end of backspace/rew time
             if (cmd == OP_BST) {
-                time = msec_to_wordtime(38.5 + 22); 
+                time = msec_to_wordtime(38.5 + 22);
             } else {
                 // max time to rew is 1.2 minutes.
                 // get a rought aprox on % medium used (not exacta as not taking into account Hi/low speed rew)
@@ -566,11 +566,11 @@ t_stat mt_srv(UNIT * uptr)
             goto tape_done;
         }
         break;
-    default: 
+    default:
         return SCPE_ARG; // should never occurs. just to catch it if so.
     tape_done:
         sim_debug(DEBUG_CMD, dptr, "Tape unit %d: ready\n", unit);
-        sim_debug(DEBUG_DETAIL, &cpu_dev, "... Tape %d done, used %4.2f%% of medium\n", 
+        sim_debug(DEBUG_DETAIL, &cpu_dev, "... Tape %d done, used %4.2f%% of medium\n",
             unit,
             (uptr->u3 / (uptr->u4*1000.0))*100.0
             );
@@ -590,7 +590,7 @@ void mt_ini(UNIT * uptr, t_bool f)
     }
     uptr->u3 = 0;
     if (uptr->u4 == 0) uptr->u4 = 28800; // default 2400 ft reel; 1 foot = 12 inches; 2400 ft = 28800 inches
-} 
+}
 
 t_stat mt_reset(DEVICE * dptr)
 {

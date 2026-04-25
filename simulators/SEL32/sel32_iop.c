@@ -25,7 +25,7 @@
    TIO instructions..
 
    Possible devices:
-   The f8iop communication controller (TY7EA0), (TY7EB0), (TY7EC0) 
+   The f8iop communication controller (TY7EA0), (TY7EB0), (TY7EC0)
    The ctiop console communications controller (CT7EFC & CT7EFD)
    The lpiop line printer controller (LP7EF8), (LP7EF9)
 

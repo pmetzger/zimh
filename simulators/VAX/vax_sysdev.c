@@ -132,7 +132,7 @@ CTAB vax_cmd[] = {
 #define CACR_V_DPAR     24                              /* data parity */
 #define CACR_FIXED      0x00000040                      /* fixed bits */
 #define CACR_CPE        0x00000020                      /* parity err W1C */
-#define CACR_CEN        0x00000010                      /* enable */                    
+#define CACR_CEN        0x00000010                      /* enable */
 #define CACR_DPE        0x00000004                      /* disable par NI */
 #define CACR_WWP        0x00000002                      /* write wrong par NI */
 #define CACR_DIAG       0x00000001                      /* diag mode */
@@ -348,7 +348,7 @@ DEVICE rom_dev = {
     1, 16, ROMAWIDTH, 4, 16, 32,
     &rom_ex, &rom_dep, &rom_reset,
     NULL, NULL, NULL,
-    NULL, 0, 0, NULL, NULL, NULL, &rom_help, NULL, NULL, 
+    NULL, 0, 0, NULL, NULL, NULL, &rom_help, NULL, NULL,
     &rom_description
     };
 
@@ -376,7 +376,7 @@ DEVICE nvr_dev = {
     1, 16, NVRAWIDTH, 4, 16, 32,
     &nvr_ex, &nvr_dep, &nvr_reset,
     NULL, &nvr_attach, &nvr_detach,
-    NULL, 0, 0, NULL, NULL, NULL, &nvr_help, NULL, NULL, 
+    NULL, 0, 0, NULL, NULL, NULL, &nvr_help, NULL, NULL,
     &nvr_description
     };
 
@@ -522,7 +522,7 @@ DEVICE sysd_dev = {
     2, 16, 16, 1, 16, 8,
     NULL, NULL, &sysd_reset,
     NULL, NULL, NULL,
-    &sysd_dib, DEV_DEBUG, 0, sysd_debug, NULL, NULL, &sysd_help, NULL, NULL, 
+    &sysd_dib, DEV_DEBUG, 0, sysd_debug, NULL, NULL, &sysd_help, NULL, NULL,
     &sysd_description
     };
 
@@ -537,10 +537,10 @@ DEVICE sysd_dev = {
    into instruction based timing loops. As the host platform gets
    much faster than the original VAX, the assumptions embedded in
    these code loops are no longer valid.
-   
+
    Code has been added to the ROM implementation to limit CPU speed
    to about 500K instructions per second.  This heads off any future
-   issues with the embedded timing loops.  
+   issues with the embedded timing loops.
 */
 
 int32 rom_rd (int32 pa)
@@ -1063,7 +1063,7 @@ struct reglink *p;
 
 for (p = &regtable[0]; p->low != 0; p++) {
     if ((pa >= p->low) && (pa < p->high) && p->write) {
-        p->write (pa, val, lnt);  
+        p->write (pa, val, lnt);
         return;
         }
     }
@@ -1459,9 +1459,9 @@ switch (rg) {
 
 /* Programmable timers
 
-   The SSC timers, which increment at 1Mhz, cannot be simulated 
+   The SSC timers, which increment at 1Mhz, cannot be simulated
    with ticks due to the overhead that would be required for 1M
-   clock events per second.  
+   clock events per second.
 
    The powerup TOY Test sometimes failed its tolerance test.  This was
    due to varying system load causing varying calibration values to be
@@ -1592,7 +1592,7 @@ if (new_tir < tmr_tir[tmr]) {                           /* ovflo? */
         sim_debug (DBG_INT, &sysd_dev, "tmr_incr(tmr=%d) - SET_INT\n", tmr);
         if (tmr)
             SET_INT (TMR1);
-        else 
+        else
             SET_INT (TMR0);
         }
     }

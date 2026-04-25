@@ -127,7 +127,7 @@ DEVICE tti_dev = {
     1, 10, 31, 1, 16, 8,
     NULL, NULL, &tti_reset,
     NULL, NULL, NULL,
-    &tti_dib, 0, 0, NULL, NULL, NULL, &tti_help, NULL, NULL, 
+    &tti_dib, 0, 0, NULL, NULL, NULL, &tti_help, NULL, NULL,
     &tti_description
     };
 
@@ -167,7 +167,7 @@ DEVICE tto_dev = {
     1, 10, 31, 1, 16, 8,
     NULL, NULL, &tto_reset,
     NULL, NULL, NULL,
-    &tto_dib, 0, 0, NULL, NULL, NULL, &tto_help, NULL, NULL, 
+    &tto_dib, 0, 0, NULL, NULL, NULL, &tto_help, NULL, NULL,
     &tto_description
     };
 
@@ -202,7 +202,7 @@ DEVICE clk_dev = {
     1, 0, 0, 0, 0, 0,
     NULL, NULL, &clk_reset,
     NULL, NULL, NULL,
-    &clk_dib, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, 
+    &clk_dib, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
     &clk_description
     };
 
@@ -317,8 +317,8 @@ else
 
 t_stat cpu_show_leds (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
-fprintf (st, "leds=%d(%s,%s,%s)", tto_leds, tto_leds&4 ? "ON" : "OFF", 
-                                            tto_leds&2 ? "ON" : "OFF", 
+fprintf (st, "leds=%d(%s,%s,%s)", tto_leds, tto_leds&4 ? "ON" : "OFF",
+                                            tto_leds&2 ? "ON" : "OFF",
                                             tto_leds&1 ? "ON" : "OFF");
 return SCPE_OK;
 }

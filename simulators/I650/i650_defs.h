@@ -28,8 +28,8 @@
 #define STOP_HALT       1               /* HALT */
 #define STOP_IBKPT      2               /* breakpoint */
 #define STOP_UUO        3               /* invalid opcode */
-#define STOP_IO         4               /* Stop on IO: 
-                                             card reader/punch error: 
+#define STOP_IO         4               /* Stop on IO:
+                                             card reader/punch error:
                                                no card in hopper, read/punch failure, no cards, stop pressed on cdr/cdp
                                                only simulated no card in hopper situation when all cards from attached file has been read
                                              tape:
@@ -80,7 +80,7 @@ extern t_int64 GlobalWordTimeCount;
 
 /* Device information block */
 struct dib {
-        uint8   upc;                        // Number of Units in device 
+        uint8   upc;                        // Number of Units in device
         uint32  (*cmd)(UNIT *up, uint16 cmd, uint16 dev);/* Issue command. */
         void    (*ini)(UNIT *up, t_bool f);
 };
@@ -97,8 +97,8 @@ extern DEBTAB dev_debug[];
 extern DEBTAB crd_debug[];
 
 /* Returns from device commands */
-#define SCPE_BUSY           (1)     // Device is active 
-#define SCPE_NOCARDS        (2)     // No cards to read or to write 
+#define SCPE_BUSY           (1)     // Device is active
+#define SCPE_NOCARDS        (2)     // No cards to read or to write
 #define SCPE_OK_INPROGRESS  (3)     // Operation in progress
 
 /* Global device definitions */
@@ -107,7 +107,7 @@ extern DEVICE       cp_dev;
 #endif
 
 #define MAX_CARDS_IN_DECK  10000            // max number of cards in deck for carddeck internal command
-#define MAX_CARDS_IN_READ_STAKER_HOPPER 10  // max number of cards in card reader take 
+#define MAX_CARDS_IN_READ_STAKER_HOPPER 10  // max number of cards in card reader take
                                             // staker that can be viewev with carddeck echolast
 
 extern DIB          cdr_dib;
@@ -133,7 +133,7 @@ extern DEVICE       mt_dev;
 extern uint32       mt_cmd(UNIT *, uint16, uint16);
 extern UNIT         mt_unit[6];
 extern int          LastTapeSelected;
-extern int          LastTapeIndicator;    
+extern int          LastTapeIndicator;
 extern const char * TapeIndicatorStr[11];
 extern int          mt_ready(int n);
 extern void         mt_ini(UNIT * uptr, t_bool f);
@@ -183,15 +183,15 @@ extern REG         cpu_reg[];
 extern const char *cpu_description(DEVICE *dptr);
 
 /* Opcodes */
-// Instructions on Basic machine 
-#define OP_AABL    17  // Add absolute to lower accumulator 
-#define OP_AL      15  // Add to lower accumulator 
-#define OP_AU      10  // Add to upper accumulator 
-#define OP_BRNZ    45  // Branch on accumulator non-zero 
-#define OP_BRMIN   46  // Branch on minus accumulator 
-#define OP_BRNZU   44  // Branch on non-zero in upper accumulator 
-#define OP_BROV    47  // Branch on overflow 
-#define OP_BRD1    91  // Branch on 8 in distributor positions 1-10 
+// Instructions on Basic machine
+#define OP_AABL    17  // Add absolute to lower accumulator
+#define OP_AL      15  // Add to lower accumulator
+#define OP_AU      10  // Add to upper accumulator
+#define OP_BRNZ    45  // Branch on accumulator non-zero
+#define OP_BRMIN   46  // Branch on minus accumulator
+#define OP_BRNZU   44  // Branch on non-zero in upper accumulator
+#define OP_BROV    47  // Branch on overflow
+#define OP_BRD1    91  // Branch on 8 in distributor positions 1-10
 #define OP_BRD2    92
 #define OP_BRD3    93
 #define OP_BRD4    94
@@ -201,35 +201,35 @@ extern const char *cpu_description(DEVICE *dptr);
 #define OP_BRD8    98
 #define OP_BRD9    99
 #define OP_BRD10   90
-#define OP_DIV     14   // Divide 
-#define OP_DIVRU   64   // Divide and reset upper accumulator 
-#define OP_LD      69   // Load distributor 
-#define OP_MULT    19   // Multiply 
-#define OP_NOOP    00   // No operation 
-#define OP_PCH     71   // Punch a card 
-#define OP_RD      70   // Read a card 
-#define OP_RAABL   67   // Reset accumulator and add absolute to lower accumulator 
-#define OP_RAL     65   // Reset accumulator and add to lower accumulator 
-#define OP_RAU     60   // Reset accumulator and add to upper accumulator 
-#define OP_RSABL   68   // Reset accumulator and subtract absolute from lower accumulator 
-#define OP_RSL     66   // Reset accumulator and subtract from lower accumulator 
-#define OP_RSU     61   // Reset accumulator and subtract from upper accumulator 
-#define OP_SLT     35   // Shift accumulator left 
-#define OP_SCT     36   // Shift accumulator left and count  
-#define OP_SRT     30   // Shift accumulator right 
-#define OP_SRD     31   // Shift accumulator right and round accumulator 
-#define OP_STOP    01   // Stop if console switch is set to stop, otherwise continue as a NO-OP 
-#define OP_STD     24   // Store distributor into memory 
+#define OP_DIV     14   // Divide
+#define OP_DIVRU   64   // Divide and reset upper accumulator
+#define OP_LD      69   // Load distributor
+#define OP_MULT    19   // Multiply
+#define OP_NOOP    00   // No operation
+#define OP_PCH     71   // Punch a card
+#define OP_RD      70   // Read a card
+#define OP_RAABL   67   // Reset accumulator and add absolute to lower accumulator
+#define OP_RAL     65   // Reset accumulator and add to lower accumulator
+#define OP_RAU     60   // Reset accumulator and add to upper accumulator
+#define OP_RSABL   68   // Reset accumulator and subtract absolute from lower accumulator
+#define OP_RSL     66   // Reset accumulator and subtract from lower accumulator
+#define OP_RSU     61   // Reset accumulator and subtract from upper accumulator
+#define OP_SLT     35   // Shift accumulator left
+#define OP_SCT     36   // Shift accumulator left and count
+#define OP_SRT     30   // Shift accumulator right
+#define OP_SRD     31   // Shift accumulator right and round accumulator
+#define OP_STOP    01   // Stop if console switch is set to stop, otherwise continue as a NO-OP
+#define OP_STD     24   // Store distributor into memory
 #define OP_STDA    22   // Store lower accumulator data address into distributor, then store distributor into memory
 #define OP_STIA    23   // Store lower accumulator instruction address into distributor, then store distributor into memory
-#define OP_STL     20   // Store lower accumulator into memory 
-#define OP_STU     21   // Store upper accumulator into memory 
-#define OP_SABL    18   // Subtract absolute from lower accumulator 
-#define OP_SL      16   // Subtract from lower accumulator 
-#define OP_SU      11   // Subtract from upper accumulator 
-#define OP_TLU     84   // Table lookup 
+#define OP_STL     20   // Store lower accumulator into memory
+#define OP_STU     21   // Store upper accumulator into memory
+#define OP_SABL    18   // Subtract absolute from lower accumulator
+#define OP_SL      16   // Subtract from lower accumulator
+#define OP_SU      11   // Subtract from upper accumulator
+#define OP_TLU     84   // Table lookup
 #define OP_TLE     63   // Table lookup on equal
-// Instructions on Storage Unit 
+// Instructions on Storage Unit
 // opcodes for indexing
 #define OP_AXA     50   // Add to index register A
 #define OP_SXA     51   // Substract from index A
@@ -291,18 +291,18 @@ extern const char *cpu_description(DEVICE *dptr);
 #define OP_BIN     26   // Branch on Inquiry
 #define OP_RPY     79   // Reply on Inquiry
 
-// Valid Data Address (DA) 
+// Valid Data Address (DA)
 #define  vda_D      1   // 0000-1999    Drum
-#define  vda_A      2   // 8000-8003    Arithmetic unit registers (ACC Low & Hi), Distributor, Console Switches register 
+#define  vda_A      2   // 8000-8003    Arithmetic unit registers (ACC Low & Hi), Distributor, Console Switches register
 #define  vda_I      4   // 8005-8007    Index Registers (IR)
 #define  vda_T      8   // 8010-8015    Tape address
 #define  vda_S     16   // 9000-9059    Immediate Access Storage (IAS)
-#define  vda_9000  32   // 9000         Only addr 9000 valid 
+#define  vda_9000  32   // 9000         Only addr 9000 valid
 
-#define  vda_DAITS    (vda_D | vda_A | vda_I | vda_T | vda_S ) 
-#define  vda_DAIS     (vda_D | vda_A | vda_I |         vda_S ) 
-#define  vda_DAS      (vda_D | vda_A |                 vda_S ) 
-#define  vda_DS       (vda_D |                         vda_S ) 
+#define  vda_DAITS    (vda_D | vda_A | vda_I | vda_T | vda_S )
+#define  vda_DAIS     (vda_D | vda_A | vda_I |         vda_S )
+#define  vda_DAS      (vda_D | vda_A |                 vda_S )
+#define  vda_DS       (vda_D |                         vda_S )
 
 #define  opReadDA        1   // opcode fetchs data from DA address
 #define  opWriteDA       2   // opcode write data to DA
@@ -329,11 +329,11 @@ extern const char *cpu_description(DEVICE *dptr);
 
 
 /* Symbol tables */
-typedef struct 
+typedef struct
 {
     uint16              opbase;         // opcode number
     const char         *name1;          // opcode name as in operation manual
-    const char         *name2;          // opcode name as in soap 
+    const char         *name2;          // opcode name as in soap
     uint8               opRW;           // =wDA, rDA or zero
     int                 option;         // =0 -> opcode in basic machine, =1 -> Opcode because Storage Unit, =2 -> Opcode because Control Unit
     int                 validDA;        // valid data address for this instruction

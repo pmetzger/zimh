@@ -115,7 +115,7 @@ t_uint64 s_normfd(t_uint64 num, uint32 *cc);
 *  1     1     0     0    exp underflow, fraction positive    *
 *  1     1     0     1    exp overflow, fraction positive     *
 *                                                             *
-**************************************************************/  
+**************************************************************/
 
 /* normalize floating point fraction */
 uint32 s_nor(uint32 reg, uint32 *exp) {
@@ -305,7 +305,7 @@ t_uint64 s_normfd(t_uint64 num, uint32 *cc) {
     }
 
     /* special case pos exponent & zero mantissa to be 0 */
-    if (((num & 0x8000000000000000LL) == 0) && ((num & 0xff00000000000000LL) > 0) && 
+    if (((num & 0x8000000000000000LL) == 0) && ((num & 0xff00000000000000LL) > 0) &&
         (num & 0x00ffffffffffffffLL) == 0) {
         ret = 0;                        /* 0 to any power is still 0 */
         CCs = CC4BIT;                   /* set zero CC */
@@ -428,7 +428,7 @@ setcc:
         CC |= CC3BIT;                   /* CC3 for neg */
     else if (temp == 0)
         CC |= CC4BIT;                   /* CC4 for zero */
-    else 
+    else
         CC |= CC2BIT;                   /* CC2 for greater than zero */
     /* return temp for destination reg */
     *cc = CC;                           /* return CC's */
@@ -489,7 +489,7 @@ uint32 s_fltw(uint32 intv, uint32 *cc) {
         CC |= CC3BIT;                   /* CC3 for neg */
     else if (ret == 0)
         CC |= CC4BIT;                   /* CC4 for zero */
-    else 
+    else
         CC |= CC2BIT;                   /* CC2 for greater than zero */
     /* return temp for destination reg */
     *cc = CC;                           /* save CC's */
@@ -560,7 +560,7 @@ dodblcc:
         CC |= CC3BIT;                   /* CC3 for neg */
     else if (dest == 0)
         CC |= CC4BIT;                   /* CC4 for zero */
-    else 
+    else
         CC |= CC2BIT;                   /* CC2 for greater than zero */
     *cc = CC;                           /* return CC's */
     return dest;                        /* return result */
@@ -637,7 +637,7 @@ t_uint64 s_fltd(t_uint64 intv, uint32 *cc) {
         CC |= CC3BIT;                   /* CC3 for neg */
     else if (ret == 0)
         CC |= CC4BIT;                   /* CC4 for zero */
-    else 
+    else
         CC |= CC2BIT;                   /* CC2 for greater than zero */
 
     /* return temp for destination regs */
@@ -807,7 +807,7 @@ uint32 s_adfw(uint32 reg, uint32 mem, uint32 *cc)
     if (CC == 0) {
         CC = CC4BIT;                    /* zero value */
     } else {
-        if (sign & 2)  
+        if (sign & 2)
             res = NEGATE32(res);        /* make negative */
         CC = (CC & 3) << 28;            /* neg is CC3, pos is CC2 */
     }
@@ -1089,7 +1089,7 @@ setcc:
     else
     if (temp == 0)
         CC |= CC4BIT;                   /* CC4 for zero */
-    else 
+    else
         CC |= CC2BIT;                   /* CC2 for greater than zero */
     /* return temp to destination reg */
     *cc = CC;                           /* return CC's */
@@ -1159,7 +1159,7 @@ t_uint64 s_adfd(t_uint64 reg, t_uint64 mem, uint32 *cc)
     temp = er - em;                     /* get signed exp difference */
 
     if (temp > 0) {                     /* reg exp > mem exp */
-        if (temp > 15) {  
+        if (temp > 15) {
             mem = 0;                    /* if too much difference, make zero */
         } else {
             /* Shift mem right if reg has larger exponent */

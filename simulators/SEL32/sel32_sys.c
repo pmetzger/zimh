@@ -47,22 +47,22 @@
 /*   1        01       104              External/software Interrupt 1 */
 /*   2        02       108              External/software Interrupt 2 */
 /*   3        03       10C              External/software Interrupt 3 */
-/*   4        04       110    704  700  I/O Channel 0 interrupt */  
-/*   5        05       114    70C  708  I/O Channel 1 interrupt */  
-/*   6        06       118    714  710  I/O Channel 2 interrupt */  
-/*   7        07       11C    71C  718  I/O Channel 3 interrupt */  
-/*   8        08       120    724  720  I/O Channel 4 interrupt */  
-/*   9        09       124    72C  728  I/O Channel 5 interrupt */  
-/*   A        0A       128    734  730  I/O Channel 6 interrupt */  
-/*   B        0B       12C    73C  738  I/O Channel 7 interrupt */  
-/*   C        0C       130    744  740  I/O Channel 8 interrupt */  
-/*   D        0D       134    74C  748  I/O Channel 9 interrupt */  
-/*   E        0E       138    754  750  I/O Channel A interrupt */  
-/*   F        0F       13C    75C  758  I/O Channel B interrupt */  
-/*  10        10       140    764  760  I/O Channel C interrupt */  
-/*  11        11       144    76C  768  I/O Channel D interrupt */  
-/*  12        12       148    774  770  I/O Channel E interrupt */  
-/*  13        13       14c    77C  778  I/O Channel F interrupt */  
+/*   4        04       110    704  700  I/O Channel 0 interrupt */
+/*   5        05       114    70C  708  I/O Channel 1 interrupt */
+/*   6        06       118    714  710  I/O Channel 2 interrupt */
+/*   7        07       11C    71C  718  I/O Channel 3 interrupt */
+/*   8        08       120    724  720  I/O Channel 4 interrupt */
+/*   9        09       124    72C  728  I/O Channel 5 interrupt */
+/*   A        0A       128    734  730  I/O Channel 6 interrupt */
+/*   B        0B       12C    73C  738  I/O Channel 7 interrupt */
+/*   C        0C       130    744  740  I/O Channel 8 interrupt */
+/*   D        0D       134    74C  748  I/O Channel 9 interrupt */
+/*   E        0E       138    754  750  I/O Channel A interrupt */
+/*   F        0F       13C    75C  758  I/O Channel B interrupt */
+/*  10        10       140    764  760  I/O Channel C interrupt */
+/*  11        11       144    76C  768  I/O Channel D interrupt */
+/*  12        12       148    774  770  I/O Channel E interrupt */
+/*  13        13       14c    77C  778  I/O Channel F interrupt */
 /*  14        14       150              External/Software Interrupt */
 /*  15        15       154              External/Software Interrupt */
 /*  16        16       158              External/Software Interrupt */
@@ -72,7 +72,7 @@
 /*  1A        1A       1A8              External/Software Interrupt */
 /*  1B        1B       1AC              External/Software Interrupt */
 /*  1C        1C       1B0              External/Software Interrupt */
-/* THRU      THRU     THRU                        THRU              */ 
+/* THRU      THRU     THRU                        THRU              */
 /*  6C        6C       2B0              External/Software Interrupt */
 /*  6D        6D       2B4              External/Software Interrupt */
 /*  6E        6E       2B8              External/Software Interrupt */
@@ -399,7 +399,7 @@ char *dump_buf(uint8 *mp, int32 off, int cnt)
 }
 
 /*
- * get_word - function to load a 32 bit word from the input file 
+ * get_word - function to load a 32 bit word from the input file
  * return 1 - OK
  * return 0 - error or eof
  */
@@ -418,7 +418,7 @@ int get_word(FILE *fileref, uint32 *word)
 
 #ifdef NO_TAP_FOR_NOW
 /*
- * get_halfword - function to load a 16 bit halfword from the input file 
+ * get_halfword - function to load a 16 bit halfword from the input file
  * return 1 - OK
  * return 0 - error or eof
  */
@@ -589,7 +589,7 @@ t_stat load_tap (FILE *fileref)
  * *INT2D=12                External interrupt
  * *END
  */
- 
+
 /* process two hex input characters into a number
  * pt - input char pointer
  * val - word oiunter when number will be saved
@@ -809,7 +809,7 @@ t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 
 /*
  * The SEL 32 supports the following instruction formats.
- * 
+ *
  * TYPE     Format   Normal     Base Mode
  *  A       ADR      d,[*]o,x   d,o[(b)],x  FC = extra
  *  B       BRA      [*]o,x     o[(b)],x
@@ -823,23 +823,23 @@ t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
  *  I       SHF      d,v        d,v
  *  K       RBT      d,b        d,b
  *  L       EXR      s          s
- *  M       IOP      n,b        n,b  
- *  N       SVC      n,b        n,b  
+ *  M       IOP      n,b        n,b
+ *  N       SVC      n,b        n,b
  */
 
 #define TYPE_A          0
-#define TYPE_B          1 
+#define TYPE_B          1
 #define TYPE_C          2
-#define TYPE_D          3 
+#define TYPE_D          3
 #define TYPE_E          4
-#define TYPE_F          5 
+#define TYPE_F          5
 #define TYPE_G          6
-#define TYPE_H          7 
-#define TYPE_I          8 
-#define TYPE_K          9 
-#define TYPE_L          10 
-#define TYPE_M          11 
-#define TYPE_N          12 
+#define TYPE_H          7
+#define TYPE_I          8
+#define TYPE_K          9
+#define TYPE_L          10
+#define TYPE_M          11
+#define TYPE_N          12
 #define H               0x10                /* halfword instruction */
 /* all instruction unless specified as base/nobase only will be either */
 #define B               0x20                /* base register mode only */
@@ -1073,7 +1073,7 @@ int fprint_inst(FILE *of, uint32 val, int32 sw)
 
     if ((PSD[0] & 0x02000000) || (sw & SWMASK('M'))) /* bit 6 is base mode */
         mode = 1;
-    /* loop through the instruction table for an opcode match and get the type */ 
+    /* loop through the instruction table for an opcode match and get the type */
     for (tab = optab; tab->name != NULL; tab++) {
         if (tab->opbase == (inst & tab->mask)) {
             if (mode && (tab->type & (X | N)))
@@ -1146,7 +1146,7 @@ int fprint_inst(FILE *of, uint32 val, int32 sw)
 //                      fputc('R', of);
                         if (tab->type != TYPE_D)
                             fputc('0'+((inst & 0x60) >> 5), of);    /* output the index reg number */
-                        else { 
+                        else {
                             if ((inst & 0xfc00) != 0xf400)
                                 fputc('0'+((inst & 0x60) >> 5), of);    /* output the index reg number */
                         }
@@ -1191,7 +1191,7 @@ int fprint_inst(FILE *of, uint32 val, int32 sw)
                 fputc('0'+((inst>>7) & 07), of);    /* reg number */
                 fputc(',', of);
                 fprint_val(of, inst&0x1f, 10, 5, PV_LEFT);  /* 5 bit shift count */
-                break; 
+                break;
 
             /* register bit operations */
             case TYPE_K:                    /* r,rb */
@@ -1201,7 +1201,7 @@ int fprint_inst(FILE *of, uint32 val, int32 sw)
                 fputc(',', of);
                 i = ((inst & 3) << 3) | ((inst >> 7) & 07);
                 fprint_val(of, i, 10, 5, PV_LEFT);  /* reg bit number to operate on */
-                break; 
+                break;
 
             /* interrupt control instructions */
             case TYPE_L:                    /* i */
@@ -1275,13 +1275,13 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
     if (addr & 0x02)
         l = 2;
     /* determine base for number output */
-    if (sw & SWMASK ('D')) 
+    if (sw & SWMASK ('D'))
         rdx = 10;                           /* decimal */
     else
-    if (sw & SWMASK ('O')) 
+    if (sw & SWMASK ('O'))
         rdx = 8;                            /* octal */
     else
-    if (sw & SWMASK ('H')) 
+    if (sw & SWMASK ('H'))
         rdx = 16;                           /* hex */
 
     if (sw & SWMASK ('M')) {                /* machine base mode? */
@@ -1298,7 +1298,7 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
     if (sw & SWMASK('W')) {
         l = 2;                              /* halfwords are 2 bytes */
     } else
-    if (sw & SWMASK('B')) { 
+    if (sw & SWMASK('B')) {
         l = 1;                              /* bytes */
     }
 
@@ -1314,7 +1314,7 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
         fputc('\'', of);                    /* closing apostorphe */
     } else
     /* go print the symbolic instruction for base or nonbase mode */
-    if (sw & (SWMASK('M') | SWMASK('N'))) { 
+    if (sw & (SWMASK('M') | SWMASK('N'))) {
         num = 0;
         for (i = 0; i < l && i < 4; i++) {
             num |= (uint32)val[i] << ((l-i-1) * 8); /* collect 8-32 bit data value to print */
@@ -1330,14 +1330,14 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
     } else {
         /* print the numeric value of the memory data */
         num = 0;
-        for (i = 0; i < l && i < 4; i++) 
+        for (i = 0; i < l && i < 4; i++)
             num |= (uint32)val[i] << ((l-i-1) * 8); /* collect 8-32 bit data value to print */
         fprint_val(of, num, rdx, l*8, PV_RZRO); /* print it in requested radix */
     }
     return -(l-1);                          /* will be negative if we did anything */
 }
 
-/* 
+/*
  * Collect offset in radix.
  */
 t_stat get_off (const char *cptr, const char **tptr, uint32 radix, t_value *val, char *m)
@@ -1362,7 +1362,7 @@ t_stat get_off (const char *cptr, const char **tptr, uint32 radix, t_value *val,
     return r;                               /* return status */
 }
 
-/* 
+/*
  * Collect immediate in radix.
  */
 t_stat get_imm (const char *cptr, const char **tptr, uint32 radix, t_value *val)
@@ -1407,13 +1407,13 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
     char       gbuf[CBUFSIZE];
 
     /* determine base for numbers */
-    if (sw & SWMASK ('D')) 
+    if (sw & SWMASK ('D'))
         rdx = 10;                           /* decimal */
     else
-    if (sw & SWMASK ('O')) 
+    if (sw & SWMASK ('O'))
         rdx = 8;                            /* octal */
     else
-    if (sw & SWMASK ('H')) 
+    if (sw & SWMASK ('H'))
         rdx = 16;                           /* hex */
 
     /* set instruction size */
@@ -1448,7 +1448,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                     break;                  /* found */
             } else
             /* test the full opcode name */
-            if (sim_strcasecmp(tab->name, gbuf) == 0) 
+            if (sim_strcasecmp(tab->name, gbuf) == 0)
                 break;                      /* found */
         }
         if (tab->name == NULL)              /* see if anything found */
@@ -1484,7 +1484,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                     if (*cptr++ != ',')     /* check for required comma */
                         return SCPE_ARG;    /* anything else is an argument error */
                     num |= x << 23;         /* position reg number in instruction */
-                } else 
+                } else
                     return SCPE_ARG;        /* invalid reg number is an argument error */
             }
             /* Fall through */
@@ -1510,7 +1510,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
             if (*cptr >= '0' || *cptr <= '7') { /* reg# is 0-7 */
                 x = *cptr++ - '0';          /* get reg number */
                 num |= x << 20;             /* position and put into instruction */
-            } else 
+            } else
                 return SCPE_ARG;            /* reg# not 0-7, so arg error */
         }
         break;
@@ -1526,7 +1526,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                 if (*cptr++ != ',')         /* next char need to be a comma */
                     return SCPE_ARG;        /* it's not, so arg error */
                 num |= x << 23;             /* position and put into instruction */
-            } else 
+            } else
                 return SCPE_ARG;            /* invalid reg#, so arg error */
             while (sim_isspace(*cptr))
                 cptr++;                     /* skip any blanks */
@@ -1546,7 +1546,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                 if (*cptr++ != ',')         /* test for required ',' */
                     return SCPE_ARG;        /* it's not there, so error */
                 num |= x << 23;             /* insert first reg# into instruction */
-            } else 
+            } else
                 return SCPE_ARG;            /* reg# invalid, so arg error */
             while (sim_isspace(*cptr))
                 cptr++;                     /* skip more spaces */
@@ -1555,7 +1555,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                 while (sim_isspace(*cptr))
                     cptr++;                 /* skip any spaces */
                 num |= x << 20;             /* insert 2nd reg# into instruction */
-            } else 
+            } else
                 return SCPE_ARG;            /* reg# invalid, so arg error */
             break;
 
@@ -1568,7 +1568,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                 while (sim_isspace(*cptr))
                     cptr++;                 /* skip spaces */
                 num |= x << 23;             /* insert first reg# into instruction */
-            } else 
+            } else
                 return SCPE_ARG;            /* reg# invalid, so arg error */
             break;
 
@@ -1587,7 +1587,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                 if (*cptr++ != ',')         /* test for required ',' */
                     return SCPE_ARG;        /* it's not there, so error */
                 num |= (x << 23);           /* insert first reg# into instruction */
-            } else 
+            } else
                 return SCPE_ARG;            /* reg# invalid, so arg error */
             while (sim_isspace(*cptr))
                 cptr++;                     /* skip any blanks */
@@ -1596,7 +1596,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
             if (*val > 0x1f)                /* 5 bit max count */
                 return SCPE_ARG;            /* invalid shift count */
             num |= (*val << 16);            /* or in the 5 bit value */
-            break; 
+            break;
 
         /* register bit operations */
         case TYPE_K:                        /* r,rb */
@@ -1609,7 +1609,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                 if (*cptr++ != ',')         /* test for required ',' */
                     return SCPE_ARG;        /* it's not there, so error */
                 num |= (x << 20);           /* insert reg# into instruction */
-            } else 
+            } else
                 return SCPE_ARG;            /* reg# invalid, so arg error */
             while (sim_isspace(*cptr))
                 cptr++;                     /* skip any blanks */
@@ -1621,7 +1621,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
             num |= (x & 3) << 16;           /* insert 2 bit byte code into instruction */
             x = *val % 8;                   /* get bit in byte value */
             num |= (x & 7) << 23;           /* or in the bit value */
-            break; 
+            break;
 
         /* interrupt control instructions */
         case TYPE_L:                        /* i */
@@ -1658,7 +1658,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
         /* process base mode instruction */
         cptr = get_glyph(cptr, gbuf, 0);    /* Get uppercase opcode */
         l = strlen(gbuf);                   /* save the num of char in opcode */
-        /* loop through the instruction table for an opcode match and get the type */ 
+        /* loop through the instruction table for an opcode match and get the type */
         for (tab = optab; tab->name != NULL; tab++) {
             i = tab->type & 0xf;            /* get the type */
             /* check for memory reference instruction */
@@ -1668,7 +1668,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                     break;                  /* found */
             } else
             /* test the full opcode name */
-            if (sim_strcasecmp(tab->name, gbuf) == 0) 
+            if (sim_strcasecmp(tab->name, gbuf) == 0)
                 break;                      /* found */
         }
         if (tab->name == NULL)              /* see if anything found */
@@ -1704,7 +1704,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                     if (*cptr++ != ',')     /* check for required comma */
                         return SCPE_ARG;    /* anything else is an argument error */
                     num |= x << 23;         /* position reg number in instruction */
-                } else 
+                } else
                     return SCPE_ARG;        /* invalid reg number is an argument error */
             }
           /* Fall through */
@@ -1732,7 +1732,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                 if (*cptr >= '0' || *cptr <= '7') { /* reg# is 0-7 */
                     x = *cptr++ - '0';      /* get reg number */
                     num |= x << 20;         /* position and put into instruction */
-                } else 
+                } else
                     return SCPE_ARG;        /* reg# not 0-7, so arg error */
             }
             break;
@@ -1748,7 +1748,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                 if (*cptr++ != ',')         /* next char need to be a comma */
                     return SCPE_ARG;        /* it's not, so arg error */
                 num |= x << 23;             /* position and put into instruction */
-            } else 
+            } else
                 return SCPE_ARG;            /* invalid reg#, so arg error */
             while (sim_isspace(*cptr))
                 cptr++;                     /* skip any blanks */
@@ -1768,7 +1768,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                 if (*cptr++ != ',')         /* test for required ',' */
                     return SCPE_ARG;        /* it's not there, so error */
                 num |= x << 23;             /* insert first reg# into instruction */
-            } else 
+            } else
                 return SCPE_ARG;            /* reg# invalid, so arg error */
             while (sim_isspace(*cptr))
                 cptr++;                     /* skip more spaces */
@@ -1777,7 +1777,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                 while (sim_isspace(*cptr))
                     cptr++;                 /* skip any spaces */
                 num |= x << 20;             /* insert 2nd reg# into instruction */
-            } else 
+            } else
                 return SCPE_ARG;            /* reg# invalid, so arg error */
             break;
 
@@ -1790,7 +1790,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                 while (sim_isspace(*cptr))
                     cptr++;                 /* skip spaces */
                 num |= x << 23;             /* insert first reg# into instruction */
-            } else 
+            } else
                 return SCPE_ARG;            /* reg# invalid, so arg error */
             break;
 
@@ -1809,7 +1809,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                 if (*cptr++ != ',')         /* test for required ',' */
                     return SCPE_ARG;        /* it's not there, so error */
                 num |= (x << 23);           /* insert first reg# into instruction */
-            } else 
+            } else
                 return SCPE_ARG;            /* reg# invalid, so arg error */
             while (sim_isspace(*cptr))
                 cptr++;                     /* skip any blanks */
@@ -1818,7 +1818,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
             if (*val > 0x1f)                /* 5 bit max count */
                 return SCPE_ARG;            /* invalid shift count */
             num |= (*val << 16);            /* or in the 5 bit value */
-            break; 
+            break;
 
         /* register bit operations */
         case TYPE_K:                        /* r,rb */
@@ -1831,7 +1831,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
                 if (*cptr++ != ',')         /* test for required ',' */
                     return SCPE_ARG;        /* it's not there, so error */
                 num |= (x << 20);           /* insert reg# into instruction */
-            } else 
+            } else
                 return SCPE_ARG;            /* reg# invalid, so arg error */
             while (sim_isspace(*cptr))
                 cptr++;                     /* skip any blanks */
@@ -1843,7 +1843,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
             num |= (x & 3) << 16;           /* insert 2 bit byte code into instruction */
             x = *val % 8;                   /* get bit in byte value */
             num |= (x & 7) << 23;           /* or in the bit value */
-            break; 
+            break;
 
         /* interrupt control instructions */
         case TYPE_L:                        /* i */
@@ -1878,7 +1878,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
     /* get here for any other switch value */
     /* this code will get a value based on length specified in switches */
     num = get_uint(cptr, rdx, max[l], &r);  /* get the unsigned value */
-    for (i = 0; i < l && i < 4; i++) 
+    for (i = 0; i < l && i < 4; i++)
         val[i] = (num >> ((l - (1 + i)) * 8)) & 0xff; /* get 1-4 bytes of data */
     return -(l-1);
 }

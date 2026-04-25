@@ -87,27 +87,27 @@ int ipc_onetime = 0;
 t_stat SBC_config(void)
 {
     sim_printf("Configuring IPC SBC\n  Onboard Devices:\n");
-    i8251_cfg(I8251_BASE_0, 0, 0); 
-    i8251_cfg(I8251_BASE_1, 1, 0); 
-    i8253_cfg(I8253_BASE, 0, 0); 
-    i8255_cfg(I8255_BASE_0, 0, 0); 
-    i8255_cfg(I8255_BASE_1, 1, 0); 
-    i8259_cfg(I8259_BASE_0, 0, 0); 
-    i8259_cfg(I8259_BASE_1, 1, 0); 
-    ipc_cont_cfg(ICONT_BASE, 0, 0); 
-    ioc_cont_cfg(DBB_BASE, 0, 0); 
+    i8251_cfg(I8251_BASE_0, 0, 0);
+    i8251_cfg(I8251_BASE_1, 1, 0);
+    i8253_cfg(I8253_BASE, 0, 0);
+    i8255_cfg(I8255_BASE_0, 0, 0);
+    i8255_cfg(I8255_BASE_1, 1, 0);
+    i8259_cfg(I8259_BASE_0, 0, 0);
+    i8259_cfg(I8259_BASE_1, 1, 0);
+    ipc_cont_cfg(ICONT_BASE, 0, 0);
+    ioc_cont_cfg(DBB_BASE, 0, 0);
     EPROM_cfg(ROM_BASE, ROM_SIZE, 0);
     RAM_cfg(RAM_BASE, RAM_SIZE, 0);
     return SCPE_OK;
 }
 
-/*  CPU reset routine 
+/*  CPU reset routine
     put here to cause a reset of the entire IPC system */
 
 t_stat SBC_reset (DEVICE *dptr)
-{ 
+{
     if (ipc_onetime == 0) {
-        SBC_config();   
+        SBC_config();
         ipc_onetime++;
     }
     i8080_reset(&i8080_dev);

@@ -84,7 +84,7 @@
 /* CPU */
 
 #if defined (VAX_411) || defined (VAX_412)
-#define CPU_MODEL_MODIFIERS 
+#define CPU_MODEL_MODIFIERS
 #else
 #if defined (VAX_41A) || defined (VAX_41D)
 #define CPU_MODEL_MODIFIERS \

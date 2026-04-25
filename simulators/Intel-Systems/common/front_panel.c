@@ -50,11 +50,11 @@ t_stat fp_cfg(uint16 base, uint16 size, uint8 devnum)
     return SCPE_OK;
 }
 
-/*  CPU reset routine 
+/*  CPU reset routine
     put here to cause a reset of the entire IPC system */
 
 t_stat fp_reset (DEVICE *dptr)
-{    
+{
     return SCPE_OK;
 }
 

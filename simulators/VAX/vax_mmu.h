@@ -253,7 +253,7 @@ if (mapen) {                                            /* mapping on? */
     off = VA_GETOFF (va);
     tbi = VA_GETTBI (vpn);
     xpte = (va & VA_S0)? stlb[tbi]: ptlb[tbi];          /* access tlb */
-    if ((xpte.pte & acc) && (xpte.tag == vpn))          /* TB hit, acc ok? */ 
+    if ((xpte.pte & acc) && (xpte.tag == vpn))          /* TB hit, acc ok? */
         return (xpte.pte & TLB_PFN) | off;
     xpte = fill (va, L_BYTE, acc, status);              /* fill TB */
     if (*status == PR_OK)
@@ -298,7 +298,7 @@ else {
     mchk_ref = REF_V;
     if (ADDR_IS_IO (pa))
         dat = ReadIO (pa, L_WORD);
-    else 
+    else
         dat = ReadReg (pa, L_WORD);
     }
 return ((dat >> ((pa & 2)? 16: 0)) & WMASK);

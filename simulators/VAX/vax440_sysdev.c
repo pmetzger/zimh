@@ -193,7 +193,7 @@ DEVICE sysd_dev = {
     1, 16, 16, 1, 16, 8,
     NULL, NULL, &sysd_reset,
     NULL, NULL, NULL,
-    NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, 
+    NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
     &sysd_description
     };
 
@@ -799,7 +799,7 @@ struct reglink *p;
 
 for (p = &regtable[0]; p->low != 0; p++) {
     if ((pa >= p->low) && (pa < p->high) && p->write) {
-        p->write (pa, val, lnt);  
+        p->write (pa, val, lnt);
         return;
         }
     }

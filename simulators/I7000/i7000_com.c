@@ -1,5 +1,5 @@
 /* i7090_com.c: IBM 7094 7750 communications interface simulator
-   Derived from Bob Supnik's i7094_com.c 
+   Derived from Bob Supnik's i7094_com.c
 
 
    Copyright (c) 2005-2009, Robert M Supnik
@@ -382,11 +382,11 @@ UNIT                coml_unit[] = {
 };
 
 MTAB                coml_mod[] = {
-    {UNIT_K35 + UNIT_2741, 0, "KSR-37", "KSR-37", NULL, NULL, NULL, 
+    {UNIT_K35 + UNIT_2741, 0, "KSR-37", "KSR-37", NULL, NULL, NULL,
                "Standard KSR"},
-    {UNIT_K35 + UNIT_2741, UNIT_K35, "KSR-35", "KSR-35", NULL, NULL, NULL, 
+    {UNIT_K35 + UNIT_2741, UNIT_K35, "KSR-35", "KSR-35", NULL, NULL, NULL,
                "Upper case only KSR"},
-    {UNIT_K35 + UNIT_2741, UNIT_2741, "2741", "2741", NULL, NULL, NULL, 
+    {UNIT_K35 + UNIT_2741, UNIT_2741, "2741", "2741", NULL, NULL, NULL,
                "IBM 2741 terminal"},
     {MTAB_XTD | MTAB_VUN, 0, NULL, "DISCONNECT",
      &tmxr_dscln, NULL, &com_desc, "Disconnect line"},
@@ -407,7 +407,7 @@ DEVICE              coml_dev = {
     "COML", coml_unit, coml_reg, coml_mod,
     COM_TLINES, 10, 31, 1, 16, 8,
     NULL, NULL, &com_reset, NULL, NULL, NULL,
-    NULL, DEV_DISABLE, 0, NULL, NULL, 
+    NULL, DEV_DISABLE, 0, NULL, NULL,
     NULL, &coml_help, NULL, NULL, &coml_description
 };
 

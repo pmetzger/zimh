@@ -117,7 +117,7 @@ struct idev dev_table[32] = {
 
 /* RSV - LFD-400 routines */
 struct idev dev_table2[8] = {
-        {&fd400_cstatus}, {&fd400_data}, {&fd400_cursect}, {&fd400_fdcstatus}, /* Port CC00-CC03 */ 
+        {&fd400_cstatus}, {&fd400_data}, {&fd400_cursect}, {&fd400_fdcstatus}, /* Port CC00-CC03 */
         {&fd400_startrw}, {&nulldev},    {&nulldev},       {&nulldev}   /* Port CC04-CC07 */
 };
 
@@ -138,7 +138,7 @@ int32 nulldev(int32 io, int32 data)
     MB_mod        Mother Board modifiers list
 */
 
-UNIT MB_unit = { 
+UNIT MB_unit = {
     UDATA (NULL, 0, 0)
 };
 

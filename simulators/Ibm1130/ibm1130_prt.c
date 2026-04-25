@@ -50,7 +50,7 @@
 #include <stdlib.h>             /* needed for atexit, for cgi mode */
 
 /***************************************************************************************
- *  1132 PRINTER 
+ *  1132 PRINTER
  ***************************************************************************************/
 
 #define PRT1132_DSW_READ_EMITTER_RESPONSE       0x8000
@@ -121,7 +121,7 @@ static t_bool formfed = FALSE;                              /* last line printed
 #define UNIT_PRINTING     (1u << UNIT_V_PRINTING)
 #define UNIT_TRANSFERRING (1u << UNIT_V_TRANSFERRING)
 #define UNIT_1403         (1u << UNIT_V_1403)
-#define UNIT_PARITYCHECK  (1u << UNIT_V_PARITYCHECK)    
+#define UNIT_PARITYCHECK  (1u << UNIT_V_PARITYCHECK)
 #define UNIT_RINGCHECK    (1u << UNIT_V_RINGCHECK)
 #define UNIT_SYNCCHECK    (1u << UNIT_V_SYNCCHECK)
 #define UNIT_PHYSICAL_PTR (1u << UNIT_V_PHYSICAL_PTR)
@@ -164,7 +164,7 @@ DEVICE prt_dev = {
     NULL, NULL, &prt_reset,
     NULL, prt_attach, prt_detach};
 
-#define MAX_COLUMNS     120                             
+#define MAX_COLUMNS     120
 #define MAX_OVPRINT      20
 #define PRT1132_COLUMNS 120
 #define PRT1403_COLUMNS 120                             /* the 1130's version of the 1403 printed in 120 columns only (see Functional Characteristics) */
@@ -418,7 +418,7 @@ void xio_1132_printer (int32 iocc_addr, int32 func, int32 modify)
                 SETBIT(PRT_DSW, PRT1132_DSW_CARRIAGE_BUSY);
             else
                 CLRBIT(PRT_DSW, PRT1132_DSW_CARRIAGE_BUSY);
-            
+
             if ((uptr->flags & (UNIT_SKIPPING|UNIT_SPACING)) == (UNIT_SKIPPING|UNIT_SPACING)) {
                 sprintf(msg, "1132 printer skip and space at same time?");
                 xio_error(msg);
@@ -585,7 +585,7 @@ void xio_1403_printer (int32 iocc_addr, int32 func, int32 modify)
             ACC = PRT_DSW;
             if (modify & 0x01) {                                    /* reset interrupts */
                 CLRBIT(PRT_DSW, PRT1403_DSW_PARITY_CHECK   | PRT1403_DSW_TRANSFER_COMPLETE |
-                                PRT1403_DSW_PRINT_COMPLETE | PRT1403_DSW_CARRIAGE_COMPLETE | 
+                                PRT1403_DSW_PRINT_COMPLETE | PRT1403_DSW_CARRIAGE_COMPLETE |
                                 PRT1403_DSW_RING_CHECK     | PRT1403_DSW_SYNC_CHECK);
                 CLRBIT(ILSW[4], ILSW_4_1403_PRINTER);
             }

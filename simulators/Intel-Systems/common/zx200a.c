@@ -30,7 +30,7 @@
     NOTES:
 
         This controller will mount 4 DD disk images on drives :F0: thru :F3: addressed
-        at ports 078H to 07FH.  It also will mount 2 SD disk images on :F4: and :F5: 
+        at ports 078H to 07FH.  It also will mount 2 SD disk images on :F4: and :F5:
         addressed at ports 088H to 08FH.  These are on physical drives :F0: and :F1:.
 
     Registers:
@@ -131,7 +131,7 @@
         u6 - fdd number.
 
     The ZX-200A appears to the multibus system as if there were an iSBC-201
-    installed addressed at 0x88-0x8f and an iSBC-202 installed addressed at 
+    installed addressed at 0x88-0x8f and an iSBC-202 installed addressed at
     0x78-0x7F.  The DD disks are drive 0 - 3.  The SD disks are mapped over
     DD disks 0 - 1.  Thus drive 0 - 1 can be SD or DD, but not both.  Drive
     2 - 3 are always DD.
@@ -143,7 +143,7 @@
 #define UNIT_WPMODE     (1 << UNIT_V_WPMODE)
 
 #define FDD_NUM         6
-#define SECSIZ          128                     
+#define SECSIZ          128
 
 //disk controoler operations
 #define DNOP            0x00            //disk no operation
@@ -256,12 +256,12 @@ FDCDEF    zx200a;
 /* ZX-200A Standard I/O Data Structures */
 
 UNIT zx200a_unit[] = {
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSDD) }, 
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSDD) }, 
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSDD) }, 
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSDD) }, 
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSSD) }, 
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSSD) }, 
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSDD) },
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSDD) },
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSDD) },
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSDD) },
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSSD) },
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSSD) },
     { NULL }
 };
 
@@ -285,7 +285,7 @@ MTAB zx200a_mod[] = {
         NULL, NULL, "Sets the base port for ZX-200A"},
     { MTAB_XTD | MTAB_VDV, 0, NULL, "INT", &zx200a_set_int,
         NULL, NULL, "Sets the interrupt number for ZX-200A"},
-    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, &zx200a_show_param, NULL, 
+    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, &zx200a_show_param, NULL,
         "show configured parameters for ZX-200A" },
     { 0 }
 };
@@ -316,11 +316,11 @@ DEVICE zx200a_dev = {
     NULL,               //deposit
     zx200a_reset,       //reset
     NULL,               //boot
-    &zx200a_attach,     //attach  
+    &zx200a_attach,     //attach
     NULL,               //detach
     NULL,               //ctxt
-    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags 
-    0,                  //dctrl 
+    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags
+    0,                  //dctrl
     zx200a_debug,       //debflags
     NULL,               //msize
     NULL,               //lname
@@ -357,7 +357,7 @@ t_stat zx200a_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat zx200a_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result;
-    
+
     if (uptr == NULL)
         return SCPE_ARG;
     result = sscanf(cptr, "%02x", &size);
@@ -366,13 +366,13 @@ t_stat zx200a_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
         sim_printf("ZX200A: Installed at base port=%04X\n", zx200a.baseport);
     reg_dev(zx200ar0DD, zx200a.baseport, 0, 0); //read status
     reg_dev(zx200ar1DD, zx200a.baseport + 1, 0, 0); //read rslt type/write IOPB addr-l
-    reg_dev(zx200ar2DD, zx200a.baseport + 2, 0, 0); //write IOPB addr-h and start 
-    reg_dev(zx200ar3, zx200a.baseport + 3, 0, 0); //read rstl byte 
+    reg_dev(zx200ar2DD, zx200a.baseport + 2, 0, 0); //write IOPB addr-h and start
+    reg_dev(zx200ar3, zx200a.baseport + 3, 0, 0); //read rstl byte
     reg_dev(zx200ar7, zx200a.baseport + 7, 0, 0); //write reset fdc202
     reg_dev(zx200ar0SD, zx200a.baseport, 0, 0); //read status
     reg_dev(zx200ar1SD, zx200a.baseport + 1, 0, 0); //read rslt type/write IOPB addr-l
-    reg_dev(zx200ar2SD, zx200a.baseport + 2, 0, 0); //write IOPB addr-h and start 
-    reg_dev(zx200ar3, zx200a.baseport + 3, 0, 0); //read rstl byte 
+    reg_dev(zx200ar2SD, zx200a.baseport + 2, 0, 0); //write IOPB addr-h and start
+    reg_dev(zx200ar3, zx200a.baseport + 3, 0, 0); //read rstl byte
     reg_dev(zx200ar7, zx200a.baseport + 7, 0, 0); //write reset fdc202
 //    if (zx200a.verb)
         sim_printf("    ZX200A: Enabled base port at 0%02XH  Interrupt #=%02X  %s\n",
@@ -385,7 +385,7 @@ t_stat zx200a_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat zx200a_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result;
-    
+
     if (uptr == NULL)
         return SCPE_ARG;
     result = sscanf(cptr, "%02x", &size);
@@ -419,8 +419,8 @@ t_stat zx200a_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
-    fprintf(st, "%s Base port at %04X  Interrupt # is %i  %s", 
-        ((zx200a_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled", 
+    fprintf(st, "%s Base port at %04X  Interrupt # is %i  %s",
+        ((zx200a_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled",
         zx200a.baseport, zx200a.intnum,
         zx200a.verb ? "Verbose" : "Quiet"
         );
@@ -437,7 +437,7 @@ t_stat zx200a_reset(DEVICE *dptr)
 {
     int i;
     UNIT *uptr;
-    
+
     if (dptr == NULL)
         return SCPE_ARG;
     if (zx200a_onetime) {
@@ -446,7 +446,7 @@ t_stat zx200a_reset(DEVICE *dptr)
         zx200a.verb = 0;                //set verb = 0
         zx200a_onetime = 0;
         // one-time initialization for all FDDs for this FDC instance
-        for (i = 0; i < FDD_NUM; i++) { 
+        for (i = 0; i < FDD_NUM; i++) {
             uptr = zx200a_dev.units + i;
             uptr->u6 = i;               //fdd unit number
         }
@@ -454,13 +454,13 @@ t_stat zx200a_reset(DEVICE *dptr)
     if ((dptr->flags & DEV_DIS) == 0) { // enabled
         reg_dev(zx200ar0DD, zx200a.baseport, 0, 0); //read status
         reg_dev(zx200ar0DD, zx200a.baseport + 1, 0, 0); //read rslt type/write IOPB addr-l
-        reg_dev(zx200ar0DD, zx200a.baseport + 2, 0, 0); //write IOPB addr-h and start 
-        reg_dev(zx200ar3, zx200a.baseport + 3, 0, 0); //read rstl byte 
+        reg_dev(zx200ar0DD, zx200a.baseport + 2, 0, 0); //write IOPB addr-h and start
+        reg_dev(zx200ar3, zx200a.baseport + 3, 0, 0); //read rstl byte
         reg_dev(zx200ar7, zx200a.baseport + 7, 0, 0); //write reset zx200a
         reg_dev(zx200ar0SD, zx200a.baseport + 16, 0, 0);  //read status
         reg_dev(zx200ar1SD, zx200a.baseport + 17, 0, 0); //read rslt type/write IOPB addr-l
-        reg_dev(zx200ar2SD, zx200a.baseport + 18, 0, 0); //write IOPB addr-h and start 
-        reg_dev(zx200ar3, zx200a.baseport + 19, 0, 0); //read rstl byte 
+        reg_dev(zx200ar2SD, zx200a.baseport + 18, 0, 0); //write IOPB addr-h and start
+        reg_dev(zx200ar3, zx200a.baseport + 19, 0, 0); //read rstl byte
         reg_dev(zx200ar7, zx200a.baseport + 23, 0, 0); //write reset zx200a
         zx200a_reset_dev(); //software reset
 //        if (zx200a.verb)
@@ -469,13 +469,13 @@ t_stat zx200a_reset(DEVICE *dptr)
     } else {
         unreg_dev(zx200a.baseport);         //read status
         unreg_dev(zx200a.baseport + 1);     //read rslt type/write IOPB addr-l
-        unreg_dev(zx200a.baseport + 2);     //write IOPB addr-h and start 
-        unreg_dev(zx200a.baseport + 3);     //read rstl byte 
+        unreg_dev(zx200a.baseport + 2);     //write IOPB addr-h and start
+        unreg_dev(zx200a.baseport + 3);     //read rstl byte
         unreg_dev(zx200a.baseport + 7);     //write reset fdc201
         unreg_dev(zx200a.baseport + 16);    //read status
         unreg_dev(zx200a.baseport + 17);    //read rslt type/write IOPB addr-l
-        unreg_dev(zx200a.baseport + 18);    //write IOPB addr-h and start 
-        unreg_dev(zx200a.baseport + 19);    //read rstl byte 
+        unreg_dev(zx200a.baseport + 18);    //write IOPB addr-h and start
+        unreg_dev(zx200a.baseport + 19);    //read rstl byte
         unreg_dev(zx200a.baseport + 23);    //write reset fdc201
         if (zx200a.verb)
             sim_printf("    ZX200A: Disabled\n");
@@ -543,7 +543,7 @@ t_stat zx200a_attach (UNIT *uptr, const char *cptr)
     uint8 fddnum;
 
     sim_debug (DEBUG_flow, &zx200a_dev, "   zx200a_attach: Entered with cptr=%s\n", cptr);
-    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) { 
+    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) {
         sim_printf("   zx200a_attach: Attach error %d\n", r);
         return r;
     }
@@ -694,7 +694,7 @@ void zx200a_diskio(void)
     UNIT *uptr;
     uint8 *fbuf;
 
-    //parse the IOPB 
+    //parse the IOPB
     cw = get_mbyte(zx200a.iopb);
     di = get_mbyte(zx200a.iopb + 1);
     nr = get_mbyte(zx200a.iopb + 2);
@@ -859,7 +859,7 @@ void zx200a_diskio(void)
                     dskoff = ((ta * MAXSECSD) + (sa - 1)) * 128;
                 }
                 //copy sector from image to RAM
-                for (i=0; i<128; i++) { 
+                for (i=0; i<128; i++) {
                     data = *(fbuf + (dskoff + i));
                     put_mbyte(ba + i, data);
                 }

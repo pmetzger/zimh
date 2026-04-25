@@ -683,7 +683,7 @@ int disassem(char *buf, uint16 addr, t_bool dbg, t_bool targ, t_bool exec)
             break;
 
           case 2:
-            sprintf(buf, "[ => %04X%s (B:%04X%s) %s {%04X}", 
+            sprintf(buf, "[ => %04X%s (B:%04X%s) %s {%04X}",
                     taddr2, rel, base, rel,
                     P[MEMADDR(taddr)] ? "(P)" : "",
                     LoadFromMem(taddr));

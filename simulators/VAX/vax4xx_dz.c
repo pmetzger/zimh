@@ -104,7 +104,7 @@ BITFIELD dz_rbuf_bits[] = {
     };
 
 const char *dz_charsizes[] = {"5", "6", "7", "8"};
-const char *dz_baudrates[] = {"50", "75", "110", "134.5", "150", "300", "600", "1200", 
+const char *dz_baudrates[] = {"50", "75", "110", "134.5", "150", "300", "600", "1200",
                         "1800", "2000", "2400", "3600", "4800", "7200", "9600", "19200"};
 const char *dz_parity[] = {"N", "E", "N", "O"};
 const char *dz_stopbits[] = {"1", "2", "1", "1.5"};
@@ -317,7 +317,7 @@ DEVICE dz_dev = {
 /* Register names for Debug tracing */
 static const char *dz_rd_regs[] =
     {"CSR ", "RBUF", "TCR ", "MSR " };
-static const char *dz_wr_regs[] = 
+static const char *dz_wr_regs[] =
     {"CSR ", "LPR ", "TCR ", "TDR "};
 
 /* IO dispatch routines */
@@ -351,7 +351,7 @@ switch ((pa >> 2) & 03) {                               /* case on PA<2:1> */
             dz_update_rcvi ();                          /* no rx intr */
             }
         data = dz_rbuf;
-        
+
         break;
 
     case 02:                                            /* TCR */
@@ -362,7 +362,7 @@ switch ((pa >> 2) & 03) {                               /* case on PA<2:1> */
         if (dz_mctl) {
             int32 modem_bits;
             TMLN *lp;
-            
+
             lp = &dz_ldsc[2];                           /* get line desc */
             tmxr_set_get_modem_bits (lp, 0, 0, &modem_bits);
 
@@ -624,7 +624,7 @@ if (dz_csr & CSR_MSE) {                                 /* enabled? */
             dz_silo[dz_scnt] = (uint16)c;
             ++dz_scnt;
             }
-        
+
         }
     }
 if (dz_scnt && (dz_csr & CSR_MSE)) {                    /* input & enabled? */

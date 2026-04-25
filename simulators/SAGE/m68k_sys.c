@@ -1,5 +1,5 @@
 /* m68k_sys.c: assembler/disassembler/misc simfuncs for generic m68k_cpu
-  
+
    Copyright (c) 2009, Holger Veit
 
    Permission is hereby granted, free of charge, to any person obtaining a
@@ -78,7 +78,7 @@ t_stat m68k_set_cpu(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
     if (value < 0 || value > CPU_TYPE_68030)
         return SCPE_ARG;
-    
+
     cputype = (value & UNIT_CPUTYPE_MASK) >> UNIT_CPU_V_TYPE;
     uptr->flags &= ~UNIT_CPUTYPE_MASK;
     uptr->flags |= value;
@@ -172,7 +172,7 @@ static t_stat m68k_sread(FILE* fptr)
     int d, len, chksum, i;
     int end = FALSE;
     int line = 0;
-    
+
     fseek(fptr,0l,SEEK_SET);
     for(;;) {
         while ((i = fgetc(fptr)) == '\r' || i == '\n');
@@ -188,7 +188,7 @@ static t_stat m68k_sread(FILE* fptr)
         if (len==EOF || addr==EOF || a==EOF) { typ = 'X'; goto error; }
         addr = (addr << 8) | a;
         i = 3;
-        
+
         switch (typ) {
         case '0':
             for (i=2; i<len; i++) (void)getHex(fptr,&chksum);
@@ -237,7 +237,7 @@ t_stat sim_load(FILE* fptr, const char* cptr, const char* fnam, t_bool flag)
     uint16 data;
     uint8 s;
     int32 addr = saved_PC;
-    
+
     /* no dump */
     if (*cptr != 0 || flag != 0) return SCPE_ARG;
 
@@ -293,7 +293,7 @@ const char *sim_stop_messages[SCPE_BASE] = {
 #define DATA_B(x) (x&0xff)
 #define DATA_W(x) (x&0xffff)
 
-static t_stat _fsymea(FILE* of,t_addr addr,int ea, int oplen,t_value* rest) 
+static t_stat _fsymea(FILE* of,t_addr addr,int ea, int oplen,t_value* rest)
 {
     int eamod = EAMOD_FIELD(ea);
     char eareg = REG0_CHAR(ea);
@@ -303,24 +303,24 @@ static t_stat _fsymea(FILE* of,t_addr addr,int ea, int oplen,t_value* rest)
     char da = (rest[0] & 0x8000)? 'a' : 'd';
     char xreg = ((rest[0]>>12) & 7) + '0';
     char wl = (rest[0] & 0x800) ? 'l' : 'w';
-    
+
     switch (eamod) {
-    case 000: fprintf(of,"d%c",eareg); return 0; 
-    case 010: fprintf(of,"a%c",eareg); return 0; 
-    case 020: fprintf(of,"(a%c)",eareg); return 0; 
-    case 030: fprintf(of,"(a%c)+",eareg); return 0; 
-    case 040: fprintf(of,"-(a%c)",eareg); return 0; 
-    case 050: fprintf(of,"($%x,a%c)",offw,eareg); return -2; 
-    case 060: 
+    case 000: fprintf(of,"d%c",eareg); return 0;
+    case 010: fprintf(of,"a%c",eareg); return 0;
+    case 020: fprintf(of,"(a%c)",eareg); return 0;
+    case 030: fprintf(of,"(a%c)+",eareg); return 0;
+    case 040: fprintf(of,"-(a%c)",eareg); return 0;
+    case 050: fprintf(of,"($%x,a%c)",offw,eareg); return -2;
+    case 060:
         if (offb)
             fprintf(of,"($%x,a%c,%c%c.%c)",offb,eareg,da,xreg,wl);
         else
             fprintf(of,"(a%c,%c%c.%c)",eareg,da,xreg,wl);
         return -2;
-    case 070: 
+    case 070:
         switch (eareg) {
         case '0': fprintf(of,"($%x).w",(uint32)((uint16)offw)); return -2;
-        case '1': 
+        case '1':
             if (offw)
                 fprintf(of,"($%x%04x).l",offw,offw2);
             else
@@ -340,7 +340,7 @@ static t_stat _fsymea(FILE* of,t_addr addr,int ea, int oplen,t_value* rest)
             switch(oplen) {
             case 0: fprintf(of,"#$%x",offb); return -2;
             case 1: fprintf(of,"#$%x",offw); return -2;
-            case 2: 
+            case 2:
                 if (offw)
                     fprintf(of,"#$%x%04x",offw,offw2);
                 else
@@ -359,10 +359,10 @@ static t_stat _fsymea(FILE* of,t_addr addr,int ea, int oplen,t_value* rest)
 static t_stat _fsymead(FILE* of,int dir,char reg9,t_addr addr,int ea,int oplen,t_value* rest)
 {
     int rc;
-    if (dir) { 
-        fprintf(of,"d%c,",reg9); rc = _fsymea(of,addr,ea,oplen,rest); 
+    if (dir) {
+        fprintf(of,"d%c,",reg9); rc = _fsymea(of,addr,ea,oplen,rest);
     } else {
-        rc = _fsymea(of,addr,ea,oplen,rest); ONERR_QUIT(); fprintf(of,",d%c",reg9); 
+        rc = _fsymea(of,addr,ea,oplen,rest); ONERR_QUIT(); fprintf(of,",d%c",reg9);
     }
     return rc-1;
 }
@@ -417,7 +417,7 @@ static t_stat _fsym0(FILE* of,t_value inst,t_addr addr,t_value* rest)
     if (s) {
         fprintf(of,"%s d%c,",s,reg9); rc = _fsymea(of,addr,ea,3,rest); ONERR_QUIT(); return rc-1;
     }
-    
+
     switch (inst & 007000) {
     case 000000:
         s = "ori"; break;
@@ -448,7 +448,7 @@ static t_stat _fsym0(FILE* of,t_value inst,t_addr addr,t_value* rest)
     default:
         return SCPE_ARG;
     }
-    
+
     fprintf(of,"%s.%c ",s,bwl); rc = _fsymimm(of,oplen,rest); ONERR_QUIT();
     fputc(',',of); rc = _fsymea(of,addr,ea,oplen+3,rest+rc);
     return rc - 3 - ((oplen==2) ? 2 : 0);
@@ -507,13 +507,13 @@ static t_stat _fsym4(FILE* of,t_value inst,t_addr addr,t_value* rest)
     char reg0 = REG0_CHAR(inst);
     int oplen = OPLEN_FIELD(inst);
     const char* s;
-    
+
     switch (inst & 000700) {
     case 000600:
         fprintf(of,"chk "); rc = _fsymea(of,addr,ea,1,rest); ONERR_QUIT();
         fprintf(of,",d%c",reg9); return rc-1;
     case 000700:
-        fprintf(of,"lea "); rc = _fsymea(of,addr,ea,2,rest); ONERR_QUIT(); 
+        fprintf(of,"lea "); rc = _fsymea(of,addr,ea,2,rest); ONERR_QUIT();
         fprintf(of,",a%c",reg9); return rc-1;
     case 000000:
         switch (inst & 007000) {
@@ -591,7 +591,7 @@ static t_stat _fsym4(FILE* of,t_value inst,t_addr addr,t_value* rest)
             return SCPE_ARG;
         }
         fputs(s,of); rc = _fsymea(of,addr,ea,1,rest); ONERR_QUIT(); return rc-1;
-        
+
     case 000200:
         switch (inst & 007000) {
         case 000000:
@@ -687,7 +687,7 @@ static t_stat _fsym5(FILE* of,t_value inst,t_addr addr,t_value* rest)
         if (data==0) data = 8;
         fprintf(of,"%s.%c #%d,",s,bwl,data); rc = _fsymea(of,addr,ea,oplen,rest); ONERR_QUIT(); return rc-1;
     }
-    
+
 }
 static t_stat _fsym6(FILE* of,t_value inst,t_addr addr,t_value* rest)
 {
@@ -728,10 +728,10 @@ static t_stat _fsym8(FILE* of,t_value inst,t_addr addr,t_value* rest)
     case 000000:
     case 000100:
     case 000200:
-        fprintf(of,"or.%c ",bwl); rc = _fsymea(of,addr,ea,oplen,rest); ONERR_QUIT(); 
+        fprintf(of,"or.%c ",bwl); rc = _fsymea(of,addr,ea,oplen,rest); ONERR_QUIT();
         fprintf(of,",d%c",reg9); return rc-1;
     case 000300:
-        fprintf(of,"divu.w "); rc = _fsymea(of,addr,ea,1,rest); ONERR_QUIT(); 
+        fprintf(of,"divu.w "); rc = _fsymea(of,addr,ea,1,rest); ONERR_QUIT();
         fprintf(of,",d%c",reg9); return rc-1;
     case 000400:
         switch (eamod) {
@@ -748,7 +748,7 @@ static t_stat _fsym8(FILE* of,t_value inst,t_addr addr,t_value* rest)
         fprintf(of,"or.%c d%c,",bwl,reg9); rc = _fsymea(of,addr,ea,oplen,rest); ONERR_QUIT();
         return rc-1;
     case 000700:
-        fprintf(of,"divs.w "); rc = _fsymea(of,addr,ea,1,rest); ONERR_QUIT(); 
+        fprintf(of,"divs.w "); rc = _fsymea(of,addr,ea,1,rest); ONERR_QUIT();
         fprintf(of,",d%c",reg9); return rc-1;
     }
     return SCPE_ARG; /* Not reached, but silence agressive compiler warnings */
@@ -763,15 +763,15 @@ static t_stat _fsym9(FILE* of,t_value inst,t_addr addr,t_value* rest)
     char bwl  = BWL_CHAR(oplen);
     int ea    = EA_FIELD(inst);
     int eamod = EAMOD_FIELD(inst);
-    
+
     switch (inst & 000700) {
     case 000000:
     case 000100:
     case 000200:
-        fprintf(of,"sub.%c ",bwl); rc = _fsymea(of,addr,ea,oplen,rest); ONERR_QUIT(); 
+        fprintf(of,"sub.%c ",bwl); rc = _fsymea(of,addr,ea,oplen,rest); ONERR_QUIT();
         fprintf(of,",d%c",reg9);return rc-1;
     case 000300:
-        fprintf(of,"suba.w "); rc = _fsymea(of,addr,ea,1,rest); ONERR_QUIT(); 
+        fprintf(of,"suba.w "); rc = _fsymea(of,addr,ea,1,rest); ONERR_QUIT();
         fprintf(of,",a%c",reg9);return rc-1;
     case 000400:
         switch (eamod) {
@@ -786,7 +786,7 @@ static t_stat _fsym9(FILE* of,t_value inst,t_addr addr,t_value* rest)
     case 000600:
         fprintf(of,"sub.%c d%c,",bwl,reg9); rc = _fsymea(of,addr,ea,oplen,rest); ONERR_QUIT(); return rc-1;
     case 000700:
-        fprintf(of,"suba.l "); rc = _fsymea(of,addr,ea,2,rest); ONERR_QUIT(); 
+        fprintf(of,"suba.l "); rc = _fsymea(of,addr,ea,2,rest); ONERR_QUIT();
         fprintf(of,",a%c",reg9);return rc-1;
     default:
         return SCPE_ARG;
@@ -838,7 +838,7 @@ static t_stat _fsymc(FILE* of,t_value inst,t_addr addr,t_value* rest)
 {
     char reg9 = REG9_CHAR(inst);
     int ea    = EA_FIELD(inst);
-    int reg0  = REG0_CHAR(inst); 
+    int reg0  = REG0_CHAR(inst);
     int oplen = OPLEN_FIELD(inst);
     char bwl  = BWL_CHAR(oplen);
 
@@ -882,7 +882,7 @@ static t_stat _fsymd(FILE* of,t_value inst,t_addr addr,t_value* rest)
     int eamod = EAMOD_FIELD(inst);
     int oplen = OPLEN_FIELD(inst);
     char bwl  = BWL_CHAR(oplen);
-    
+
     switch (inst & 000700) {
     case 000000:
     case 000100:
@@ -930,7 +930,7 @@ static t_stat _fsyme(FILE* of,t_value inst,t_addr addr,t_value* rest)
     case 3: s = "ro"; break;
     default: s = "??"; break;
     }
-    fprintf(of,"%s%c",s,dir); 
+    fprintf(of,"%s%c",s,dir);
     if (oplen<3) {
         fprintf(of,".%c ",bwl);
         if (ir)

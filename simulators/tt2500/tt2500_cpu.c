@@ -139,7 +139,7 @@ static uint16 crm_read (uint16 addr)
     return tt2500_rom[addr];
 
   ROM = 0;
-  return CRM[addr]; 
+  return CRM[addr];
 }
 
 static uint16 bus_read (uint16 reg)

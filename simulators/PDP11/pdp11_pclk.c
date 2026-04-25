@@ -246,7 +246,7 @@ DEVICE pclk_dev = {
     1, 0, 0, 0, 0, 0,
     NULL, NULL, &pclk_reset,
     NULL, NULL, NULL,
-    &pclk_dib, DEV_DEBUG | DEV_DISABLE | DEV_DIS | DEV_UBUS | DEV_QBUS, 
+    &pclk_dib, DEV_DEBUG | DEV_DISABLE | DEV_DIS | DEV_UBUS | DEV_QBUS,
     0, pclk_deb, NULL, NULL, NULL,
     NULL, NULL, &pclk_description,
     };
@@ -359,7 +359,7 @@ if (!sim_is_active (&pclk_unit))
 rv = CSR_GETRATE (pclk_csr);                            /* get rate */
 val = (uint32)((sim_activate_time_usecs (&pclk_unit) / xtim[rv]));
 val &= DMASK;
-if (pclk_csr & CSR_UPDN) 
+if (pclk_csr & CSR_UPDN)
     val = DMASK + 1 - val;
 return val;
 }

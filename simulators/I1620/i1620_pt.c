@@ -192,7 +192,7 @@ const int8 alp_to_ptp[256] = {
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
  0x70,   -1,   -1, 0x5B, 0x4C,   -1,   -1,   -1,        /* 10 */
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
- 0x40, 0x31,   -1, 0x3B, 0x2C,   -1,   -1,   -1,        /* 20 */ 
+ 0x40, 0x31,   -1, 0x3B, 0x2C,   -1,   -1,   -1,        /* 20 */
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1, 0x0B, 0x1C,   -1,   -1,   -1,        /* 30 */
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
@@ -220,7 +220,7 @@ const int8 alp_to_ptp[256] = {
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1,        /* F0 */
    -1,   -1,   -1,   -1,   -1,   -1,   -1,   -1
- }; 
+ };
 
 /* Paper tape reader IO init routine */
 
@@ -320,7 +320,7 @@ switch (cpuio_opc) {
             }
        PAR = ADDR_A (PAR, 2);                           /* incr mem addr */
        cpuio_cnt = cpuio_cnt + 2;
-       return SCPE_OK;       
+       return SCPE_OK;
 
     default:                                            /* invalid function */
         break;
@@ -488,7 +488,7 @@ d = M[PAR] & (FLAG | DIGIT);                            /* get char */
 ptc = num_to_ptp[d];                                    /* translate digit */
 if (ptc < 0) {                                          /* bad char? */
     ind[IN_WRCHK] = 1;                                  /* write check */
-    CRETIOE(io_stop, STOP_INVCHR);                                  
+    CRETIOE(io_stop, STOP_INVCHR);
     }
 r = ptp_write (ptc);                                    /* write char */
 if (r != SCPE_OK)                                       /* error? */

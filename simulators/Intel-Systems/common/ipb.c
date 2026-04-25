@@ -53,9 +53,9 @@ extern t_stat i8259_reset(DEVICE *dptr);
 extern t_stat EPROM_reset(DEVICE *dptr);
 extern t_stat RAM_reset(DEVICE *dptr);
 extern t_stat ipc_cont_reset(DEVICE *dptr);
-extern t_stat ipc_cont_cfg(uint8 base, uint8 devnum, uint8 dummy); 
+extern t_stat ipc_cont_cfg(uint8 base, uint8 devnum, uint8 dummy);
 extern t_stat ioc_cont_reset(DEVICE *dptr);
-extern t_stat ioc_cont_cfg(uint8 base, uint8 devnum, uint8 dummy); 
+extern t_stat ioc_cont_cfg(uint8 base, uint8 devnum, uint8 dummy);
 extern uint8 reg_dev(uint8 (*routine)(t_bool, uint8, uint8), uint16, uint16, uint8);
 extern t_stat EPROM_cfg(uint16 base, uint16 size, uint8 devnum);
 extern t_stat RAM_cfg(uint16 base, uint16 size, uint8 dummy);
@@ -86,11 +86,11 @@ t_stat SBC_config(void)
     return SCPE_OK;
 }
 
-/*  CPU reset routine 
+/*  CPU reset routine
     put here to cause a reset of the entire IPC system */
 
 t_stat SBC_reset (DEVICE *dptr)
-{    
+{
     if (ipb_onetime == 0) {
         ipb_onetime++;
     }

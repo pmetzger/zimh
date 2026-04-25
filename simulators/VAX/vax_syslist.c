@@ -65,7 +65,7 @@ extern DEVICE dpv_dev;
 
 extern UNIT cpu_unit;
 
-DEVICE *sim_devices[] = { 
+DEVICE *sim_devices[] = {
     &cpu_dev,
     &tlb_dev,
     &rom_dev,

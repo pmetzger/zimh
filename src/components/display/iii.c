@@ -96,7 +96,7 @@ iii_draw_line(int x1, int y1, int x2, int y2, int l)
             x1+=ax;
         }
         return;
-    } 
+    }
     /* Diagnonal line */
     if (dx == dy) {
         for (i = 1; i < dx; i++) {
@@ -156,7 +156,7 @@ iii_draw_line(int x1, int y1, int x2, int y2, int l)
            ipc--;
         if ((ws & 1) != 0)
            et += dx;
-        
+
         /* Draw run in y direction */
         for (j = 0; j < ipc; j++) {
              display_point(x1, y1, l, 0);

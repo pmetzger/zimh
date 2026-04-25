@@ -36,7 +36,7 @@
         file only emulates the minimum DC-4 functionality to interface with
         the virtual disk file.
 
-        The floppy controller is interfaced to the CPU by use of 5 memory 
+        The floppy controller is interfaced to the CPU by use of 5 memory
         addreses.  These are SS-30 slot numbers 5 and 6 (0x8014-0x801B).
 
         Address     Mode    Function
@@ -68,7 +68,7 @@
         | M | S | X | X | X | X | Device|
         +---+---+---+---+---+---+---+---+
 
-        M = If this bit is 1, the one-shot is triggered/retriggered to 
+        M = If this bit is 1, the one-shot is triggered/retriggered to
             start/keep the motors on.
         S = Side select. If set, side one is selected otherwise side zero
             is selected.
@@ -82,7 +82,7 @@
         +---+---+---+---+---+---+---+---+
 
         B - When 1, the controller is busy.
-        D - When 1, index mark detected (type I) or data request - read data 
+        D - When 1, index mark detected (type I) or data request - read data
             ready/write data empty (type II or III).
         H - When 1, track 0 (type I) or lost data (type II or III).
         C - When 1, crc error detected.
@@ -391,10 +391,10 @@ t_stat dsk_reset (DEVICE *dptr)
     cpd = 0;
     dsksiz = 0;
     //RSV - for hansling multiple disk formats and OSs
-    sectsize = SECT_SIZE; 
+    sectsize = SECT_SIZE;
     multiple_sector=0;
     index_countdown=0;
-    sector_base=1; 
+    sector_base=1;
     return SCPE_OK;
 }
 
@@ -404,7 +404,7 @@ t_stat dsk_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
 
-    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) { 
+    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) {
         sim_printf("dsk_attach: Attach error %d\n", r);
         return r;
     }
@@ -423,12 +423,12 @@ int32 fdcdrv(int32 io, int32 data)
 {
     static long pos;
     static int32 err;
-    uint8  *SIR; 
-    int32  disk_image_size; 
+    uint8  *SIR;
+    int32  disk_image_size;
 
     if (io) {                           // write to DC-4 drive register
         if (cur_dsk == (data & 0x03))   // already selected?
-            return 0;                   //yes                   
+            return 0;                   //yes
         cur_dsk = data & 0x03;          // only 2 drive select bits/
         dsk_unit[cur_dsk].u3 &= ~LOST;  //RSV - reset LOST flag
         if ((dsk_unit[cur_dsk].flags & UNIT_ENABLE) == 0) //RO?
@@ -438,36 +438,36 @@ int32 fdcdrv(int32 io, int32 data)
         if (dsk_unit[cur_dsk].fileref == 0) // no file attached
             return 0;
         /* RSV - Read in SIR */
-        pos = 0x200;                    
+        pos = 0x200;
         sim_fseek(dsk_unit[cur_dsk].fileref, pos, SEEK_SET); /* seek to SIR */
         sim_fread(dsk_unit[cur_dsk].filebuf, SECT_SIZE, 1, dsk_unit[cur_dsk].fileref); /* read in SIR */
         dsk_unit[cur_dsk].u3 |= BUSY | DRQ; /* set DRQ & BUSY */
         dsk_unit[cur_dsk].pos = 0;      /* clear counter */
-        SIR = (uint8 * )(dsk_unit[cur_dsk].filebuf); 
+        SIR = (uint8 * )(dsk_unit[cur_dsk].filebuf);
         // detect disk type based on image geometry or SIR record
         disk_image_size = sim_fsize(dsk_unit[cur_dsk].fileref); //get actual file size
         if (disk_image_size == 35 * 10 * 256) { // 89600 bytes -> FDOS image
-            // FDOS disc has no SIR record. 
+            // FDOS disc has no SIR record.
             spt = 10;                   // 10 sectors
             cpd = 35;                   // 35 tracks
-            sectsize = 256; 
+            sectsize = 256;
             sector_base = 0;            // first sector in track is number ZERO
         } else if (disk_image_size == 35 * 18 * 128) { // 80640 bytes -> FLEX 1.0 image
             spt = 18;                   // 18 sectors
             cpd = 35;                   // 35 tracks
-            sectsize = 128; 
+            sectsize = 128;
             sector_base = 1;            // first sector in track is number ONE
         } else if ((SIR[0] == 0) && (SIR[1] == 0)) {
             // FLEX disc has SIR record. on disk image offset $200
-            spt = SIR[MAXSEC];          // Highest number of tracks. As in FLEX sectors are numbered as 
+            spt = SIR[MAXSEC];          // Highest number of tracks. As in FLEX sectors are numbered as
                                         // 1,2,..Hi this is also the number of sectors per track
             cpd = SIR[MAXCYL] + 1;      // highest track number . On FLEX, first track is track zero
-            sectsize = 256; 
+            sectsize = 256;
             sector_base = 1;            // first sector in track is number ONE
         } else {
-            spt = 18; 
-            sectsize = 128; 
-            cpd = disk_image_size / (spt * sectsize); 
+            spt = 18;
+            sectsize = 128;
+            cpd = disk_image_size / (spt * sectsize);
             sector_base = 1;            // first sector in track is number ONE
         }
         heds = 0;                       //RSV - always SS
@@ -498,11 +498,11 @@ int32 fdccmd(int32 io, int32 data)
         // RSV - on commands type I ...
         if ((data & 0x80) == 0) {
             // ... set bits h V r1r0 to h=1 (home drive), V=0 (verify off), r1r0=11 (40msec track stepping)
-            data = ((data & 0xF0) | 0x0B); 
+            data = ((data & 0xF0) | 0x0B);
             // and starts countdown for index status bit
-            index_countdown = 10; 
+            index_countdown = 10;
         } else {
-            index_countdown = 0; 
+            index_countdown = 0;
         }
         // process command
         switch(data) {
@@ -510,7 +510,7 @@ int32 fdccmd(int32 io, int32 data)
             case 0x9C:                  //read multiple sectors command type II
                 if ((dsk_unit[cur_dsk].u5 - sector_base >= spt) || (dsk_unit[cur_dsk].u5 < sector_base)) {
                     dsk_unit[cur_dsk].u3 |= RECNF; /* RSV - set RECORD NOT FOUND */
-                    break; 
+                    break;
                 }
                 dsk_unit[cur_dsk].u3 |= BUSY; /* set BUSY */
                 pos = trksiz * dsk_unit[cur_dsk].u4; /* calculate file offset */
@@ -521,7 +521,7 @@ int32 fdccmd(int32 io, int32 data)
                     return SCPE_IOERR;
                 }
                 /* read in buffer */
-                err = sim_fread(dsk_unit[cur_dsk].filebuf, sectsize, 1, dsk_unit[cur_dsk].fileref); 
+                err = sim_fread(dsk_unit[cur_dsk].filebuf, sectsize, 1, dsk_unit[cur_dsk].fileref);
                 if (err != 1) {
                     sim_printf("fdccmd: File error in read command\n");
                     return SCPE_IOERR;
@@ -541,7 +541,7 @@ int32 fdccmd(int32 io, int32 data)
                     if (err) {
                         sim_printf("fdccmd: Seek error in write command\n");
                         return SCPE_IOERR;
-                    } 
+                    }
                     dsk_unit[cur_dsk].u3 |= DRQ;/* set DRQ */
                     wrt_flag = 1;       /* RSV - set write flag */
                     dsk_unit[cur_dsk].pos = 0; /* clear counter */
@@ -551,7 +551,7 @@ int32 fdccmd(int32 io, int32 data)
                 dsk_unit[cur_dsk].u4 = fdcbyte;      /* set track */
                 dsk_unit[cur_dsk].u3 &= ~(BUSY | DRQ); /* clear flags */
                 break;
-            case 0x0B:                  //restore command type I  
+            case 0x0B:                  //restore command type I
                 dsk_unit[cur_dsk].u4 = 0;                /* home the drive */
                 dsk_unit[cur_dsk].u3 &= ~(BUSY | DRQ | RECNF); /* clear flags */
                 break;
@@ -569,7 +569,7 @@ int32 fdccmd(int32 io, int32 data)
         if (index_countdown) {          // RSV - Handle INDEX flag
             index_countdown--;
             // if index countdoen expires, set index flag in status returned to cpu
-            if (index_countdown==0) val |= INDEX; 
+            if (index_countdown==0) val |= INDEX;
         }
     }
     return val;
@@ -593,9 +593,9 @@ int32 fdcsec(int32 io, int32 data)
     if (io) {
         dsk_unit[cur_dsk].u3 &= ~(RECNF); /* reset RECNF flag */
         dsk_unit[cur_dsk].u5 = data & BYTEMASK;
-        if (dsk_unit[cur_dsk].u5 < sector_base) //RSV - force to sector 1 
-            dsk_unit[cur_dsk].u5 = sector_base; 
-        return 0; 
+        if (dsk_unit[cur_dsk].u5 < sector_base) //RSV - force to sector 1
+            dsk_unit[cur_dsk].u5 = sector_base;
+        return 0;
     }
     return dsk_unit[cur_dsk].u5;
 }
@@ -606,8 +606,8 @@ int32 fdcdata(int32 io, int32 data)
 {
     int32 val, err;
 
-    if (cur_dsk >= NUM_DISK)            // RSV - illegal disk 
-        return 0; 
+    if (cur_dsk >= NUM_DISK)            // RSV - illegal disk
+        return 0;
     if (io) {                           /* write byte to fdc */
         fdcbyte = data;                 /* save for seek */
         if (dsk_unit[cur_dsk].pos < (t_addr) sectsize) { /* copy bytes to buffer */
@@ -634,7 +634,7 @@ int32 fdcdata(int32 io, int32 data)
                         sim_printf("fdccmd: File error in read command\n");
                         return SCPE_IOERR;
                     }
-                    dsk_unit[cur_dsk].pos = 0; 
+                    dsk_unit[cur_dsk].pos = 0;
                 } else { // RSV - handle multiple sector disk read
                     dsk_unit[cur_dsk].u5++;
                     dsk_unit[cur_dsk].u3 &= ~(BUSY | DRQ); /* clear flags */

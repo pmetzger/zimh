@@ -1726,7 +1726,7 @@ static uint8 jair_io_out(uint32 addr, int32 data)
                         jair_ctx.sd_cmd_len = 6;
                         jair_ctx.sd_cmd_idx = 1;
                         jair_ctx.sd_ostate = JAIR_STATE_CMD;
-                    }  
+                    }
                     break;
 
                 case JAIR_STATE_CMD:

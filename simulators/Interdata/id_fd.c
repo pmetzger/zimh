@@ -183,9 +183,9 @@ REG fd_reg[] = {
     };
 
 MTAB fd_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock drive" },
     { MTAB_XTD|MTAB_VDV, 0, "DEVNO", "DEVNO",
       &set_dev, &show_dev, NULL },
@@ -399,7 +399,7 @@ switch (fnc) {                                          /* case on function */
 if (uptr->FNC & FNC_STOPPING) {                         /* stopping? */
     uptr->FNC = FNC_STOP;                               /* fnc = STOP */
     sim_activate (uptr, fd_ctime);                      /* schedule */
-    }   
+    }
 fd_sta = fd_sta & ~STA_BSY;                             /* clear busy */
 if (fd_arm)                                             /* if armed, int */
     SET_INT (v_FD);

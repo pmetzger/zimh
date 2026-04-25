@@ -939,7 +939,7 @@ switch (op) {
             GR[0] = (GR[0] + 1) & DMASK;
             }
         while (GR[0] && (++t < 32));                    /* until cnt or limit */
-        break;      
+        break;
 
     case EAO_NORM:                                      /* norm? */
         if ((AX | AY) != 0) {                           /* can normalize? */

@@ -427,15 +427,15 @@ REG rk_reg[] = {
     };
 
 MTAB rk_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable disk drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock disk drive" },
     { MTAB_XTD|MTAB_VUN, 0, "TYPE", NULL,
       NULL, &rk_show_type, NULL, "Display device type" },
-    { UNIT_NOAUTO,           0, "autosize", "AUTOSIZE", 
+    { UNIT_NOAUTO,           0, "autosize", "AUTOSIZE",
       NULL, NULL, NULL, "Set type based on file size at attach" },
-    { UNIT_NOAUTO, UNIT_NOAUTO, "noautosize",   "NOAUTOSIZE",   
+    { UNIT_NOAUTO, UNIT_NOAUTO, "noautosize",   "NOAUTOSIZE",
       NULL, NULL, NULL, "Disable disk autosize on attach" },
     { MTAB_XTD|MTAB_VUN|MTAB_VALR, 0, "FORMAT", "FORMAT={AUTO|SIMH|VHD|RAW}",
       &sim_disk_set_fmt, &sim_disk_show_fmt, NULL, "Set/Display disk format" },
@@ -453,7 +453,7 @@ DEVICE rk_dev = {
     &rk_boot, &rk_attach, &rk_detach,
     &rk_dib, DEV_DISABLE | DEV_UBUS | DEV_Q18 | DEV_DEBUG | RK_DIS | DEV_DISK, 0,
     rk_deb, NULL, NULL, &rk_help, NULL, NULL,
-    &rk_description 
+    &rk_description
     };
 
 /* I/O dispatch routine, I/O addresses 17777400 - 17777416
@@ -920,8 +920,8 @@ return auto_config (0, 0);
 t_stat rk_attach (UNIT *uptr, const char *cptr)
 {
 t_stat r;
-r = sim_disk_attach_ex2 (uptr, cptr, RK_NUMWD * sizeof (uint16), 
-                         sizeof (uint16), TRUE, 0, 
+r = sim_disk_attach_ex2 (uptr, cptr, RK_NUMWD * sizeof (uint16),
+                         sizeof (uint16), TRUE, 0,
                          "RK05", 0, 0, NULL, RK_RSRVSEC);
 if (r != SCPE_OK)                                       /* error? */
     return r;

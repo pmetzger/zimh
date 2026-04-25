@@ -65,12 +65,12 @@ extern uint16 port;                         //port called in dev_table[port]
 
 /* Standard SIMH Device Data Structures */
 
-UNIT xtbus_unit = { 
-    UDATA (&xtbus_svc, 0, 0), 20 
+UNIT xtbus_unit = {
+    UDATA (&xtbus_svc, 0, 0), 20
 };
 
-REG xtbus_reg[] = { 
-    { HRDATA (MBIRQ, mbirq, 32) }, 
+REG xtbus_reg[] = {
+    { HRDATA (MBIRQ, mbirq, 32) },
 };
 
 DEBTAB xtbus_debug[] = {
@@ -84,25 +84,25 @@ DEBTAB xtbus_debug[] = {
 };
 
 DEVICE xtbus_dev = {
-    "PCBUS",                    //name 
-    &xtbus_unit,                //units 
-    xtbus_reg,                  //registers 
+    "PCBUS",                    //name
+    &xtbus_unit,                //units
+    xtbus_reg,                  //registers
     NULL,                       //modifiers
-    1,                          //numunits 
-    16,                         //aradix  
-    16,                         //awidth  
-    1,                          //aincr  
-    16,                         //dradix  
+    1,                          //numunits
+    16,                         //aradix
+    16,                         //awidth
+    1,                          //aincr
+    16,                         //dradix
     8,                          //dwidth
-    NULL,                       //examine  
-    NULL,                       //deposit  
-    &xtbus_reset,               //reset 
+    NULL,                       //examine
+    NULL,                       //deposit
+    &xtbus_reset,               //reset
     NULL,                       //boot
-    NULL,                       //attach  
+    NULL,                       //attach
     NULL,                       //detach
-    NULL,                       //ctxt     
-    DEV_DEBUG,                  //flags 
-    0,                          //dctrl 
+    NULL,                       //ctxt
+    DEV_DEBUG,                  //flags
+    0,                          //dctrl
     xtbus_debug,                //debflags
     NULL,                       //msize
     NULL                        //lname
@@ -131,7 +131,7 @@ t_stat xtbus_svc(UNIT *uptr)
 
 t_stat xtbus_reset(DEVICE *dptr)
 {
-    SBC_reset(NULL); 
+    SBC_reset(NULL);
     sim_printf("   Xtbus: Reset\n");
     sim_activate (&xtbus_unit, xtbus_unit.wait); /* activate unit */
     return SCPE_OK;
@@ -156,7 +156,7 @@ The actual 808X can address 65,536 I/O ports but the IBM only uses
 the first 1024. */
 
 struct idev {
-    uint8 (*routine)(t_bool io, uint8 data, uint8 devnum); 
+    uint8 (*routine)(t_bool io, uint8 data, uint8 devnum);
     uint8 port;
     uint8 devnum;
 };
@@ -447,7 +447,7 @@ void dump_dev_table(void)
 
     for (i=0; i<1024; i++) {
         if (dev_table[i].routine != &nulldev) {  /* assigned port */
-            sim_printf("Port %03X is assigned\n", i); 
+            sim_printf("Port %03X is assigned\n", i);
         }
     }
 }

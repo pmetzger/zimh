@@ -1,7 +1,7 @@
 /***  mmd.c: Morrow Micro-Decision
- 
+
     Created by Patrick Linstruth (patrick@deltecent.com)
- 
+
     Permission is hereby granted, free of charge, to any person obtaining a
     copy of this software and associated documentation files (the "Software"),
     to deal in the Software without restriction, including without limitation
@@ -62,7 +62,7 @@
     40 Cylinders
     5 Sectors/Track
     1024 Bytes per Track
-   
+
     Tracks 0-1 Bootable Image (10K)
 
     Double sided disks have 80 tracks, with even numbered tracks on side 0

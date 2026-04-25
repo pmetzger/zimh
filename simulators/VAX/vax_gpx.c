@@ -1033,7 +1033,7 @@ switch (adp_opc) {                                      /* address processor opc
         sim_debug (DBG_ROP, gpx_dev, "   Slow Source 1 DY: %d\n", va_adp[ADP_SSDY]);
         sim_debug (DBG_ROP, gpx_dev, "   Fast Scale: %d\n", va_adp[ADP_FS]);
         sim_debug (DBG_ROP, gpx_dev, "   Slow Scale: %d\n", va_adp[ADP_SS]);
-        
+
         va_fifo_clr ();
         va_adpstat (ADPSTAT_IC, (ADPSTAT_AC | ADPSTAT_RC));
         if (cmd & 0x40)

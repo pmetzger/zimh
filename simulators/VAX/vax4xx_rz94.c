@@ -154,9 +154,9 @@ REG rz_reg[] = {
     };
 
 MTAB rz_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &scsi_set_wlk, &scsi_show_wlk,   NULL, "Write enable drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &scsi_set_wlk, NULL,   NULL, "Write lock drive" },
     { MTAB_XTD|MTAB_VUN, RZ23_DTYPE, NULL, "RZ23",
       &rz_set_type, NULL, NULL, "Set RZ23 Disk Type" },
@@ -240,7 +240,7 @@ static const char *rz_rd_regs[] =
      "STAT", "INT ", "SEQ ", "FFLG",
      "CFG1", "RSVD", "RSVD", "CFG2",
      "CFG3", "RSVD", "RSVD", "RSVD" };
-static const char *rz_wr_regs[] = 
+static const char *rz_wr_regs[] =
     {"TX L", "TX H", "FIFO", "CMD ",
      "DST ", "TMO ", "SYNP", "SYNO",
      "CFG1", "CLK ", "TEST", "CFG2",
@@ -633,7 +633,7 @@ switch (cmd & 0x7f) {
     case 0x44:                                          /* enable selection/reselection */
         sim_debug (DBG_CMD, &rz_dev, "enable selection/reselection\n");
         break;
-    
+
     case 0x46:                                          /* select with ATN3 */
         sim_debug (DBG_CMD, &rz_dev, "select with atn3\n");
         scsi_set_atn (&rz_bus);
@@ -652,12 +652,12 @@ switch (cmd & 0x7f) {
             sim_activate (&rz_unit[8], 50);
             }
         break;
-    
+
     case 0x1B:                                          /* reset ATN */
         sim_debug (DBG_CMD, &rz_dev, "reset atn\n");
         scsi_release_atn (&rz_bus);
         break;
-    
+
     case 0x10:
         sim_debug (DBG_CMD, &rz_dev, "transfer information\n");
         if (cmd & 0x80) {                               /* DMA */
@@ -684,7 +684,7 @@ switch (cmd & 0x7f) {
                     txc = scsi_write (&rz_bus, &rz_buf[0], txc);
                     }
                 break;
-                
+
             case SCSI_DATI:                             /* data in */
             case SCSI_STS:                              /* status */
             case SCSI_MSGI:                             /* message in */
@@ -727,7 +727,7 @@ switch (cmd & 0x7f) {
         rz_int |= INT_FC;
         sim_activate (&rz_unit[8], 50);
         break;
-    
+
     case 0x12:
         sim_debug (DBG_CMD, &rz_dev, "message accepted\n");
         scsi_release (&rz_bus);
@@ -755,7 +755,7 @@ switch (cmd & 0x7f) {
                 if (rz_txc == 0)
                     rz_stat |= STS_TC;
                 break;
-                
+
             case SCSI_DATI:                             /* data in */
             case SCSI_STS:                              /* status */
             case SCSI_MSGI:                             /* message in */

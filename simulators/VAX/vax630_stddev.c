@@ -104,7 +104,7 @@ DEVICE tti_dev = {
     1, 10, 31, 1, 16, 8,
     NULL, NULL, &tti_reset,
     NULL, NULL, NULL,
-    &tti_dib, 0, 0, NULL, NULL, NULL, &tti_help, NULL, NULL, 
+    &tti_dib, 0, 0, NULL, NULL, NULL, &tti_help, NULL, NULL,
     &tti_description
     };
 
@@ -144,7 +144,7 @@ DEVICE tto_dev = {
     1, 10, 31, 1, 16, 8,
     NULL, NULL, &tto_reset,
     NULL, NULL, NULL,
-    &tto_dib, 0, 0, NULL, NULL, NULL, &tto_help, NULL, NULL, 
+    &tto_dib, 0, 0, NULL, NULL, NULL, &tto_help, NULL, NULL,
     &tto_description
     };
 
@@ -179,7 +179,7 @@ DEVICE clk_dev = {
     1, 0, 0, 0, 0, 0,
     NULL, NULL, &clk_reset,
     NULL, NULL, NULL,
-    &clk_dib, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, 
+    &clk_dib, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
     &clk_description
     };
 

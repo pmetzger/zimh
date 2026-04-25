@@ -366,15 +366,15 @@ extern const ETH_MAC eth_mac_bcast;
 /* Type-enforcing MAC address copy function.
  *
  * This inline helps to prevent the following situation:
- * 
+ *
  *   void network_func(DEVICE *dev, ETH_MAC *mac)
  *   {
  *     ETH_MAC other_mac;
- * 
+ *
  *     ...
  *     memcpy(other_mac, mac, sizeof(ETH_MAC));
  *   }
- * 
+ *
  * The compiler will happily accept the memcpy() as valid because src and dst are
  * converted to "void *". This is a subtle bug -- mac is a pointer to an ETH_MAC
  * and memcpy will copy from somewhere other than the first byte of the source MAC

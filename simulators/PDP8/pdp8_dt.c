@@ -349,9 +349,9 @@ REG dt_reg[] = {
     };
 
 MTAB dt_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock drive" },
     { UNIT_8FMT + UNIT_11FMT, 0, "18b", NULL, NULL },
     { UNIT_8FMT + UNIT_11FMT, UNIT_8FMT, "12b", NULL, NULL },
@@ -535,7 +535,7 @@ if (prev_mot < DTS_ATSF) {                              /* not at speed? */
     }
 
 dt_newfnc (uptr, DTS_STA (DTS_ATSF | new_dir, new_fnc));/* state = fnc */
-return; 
+return;
 }
 
 /* Schedule new DECtape function
@@ -785,7 +785,7 @@ switch (fnc) {                                          /* at speed, check fnc *
         if read dir != write dir, bits must be scrambled
         if wc overflow, next state is wc overflow
         if end of block, possibly set DTF, next state is start of block
-   Wc ovf, not start of block - 
+   Wc ovf, not start of block -
         if end of block, possibly set DTF, next state is start of block
    Wc ovf, start of block - if end of block reached, timing error,
         otherwise, continue to next word
@@ -829,9 +829,9 @@ switch (fnc) {                                          /* at speed, check fnc *
                 if (((dtsa & DTA_MODE) == 0) || (dt_substate == DTO_WCO))
                     dtsb = dtsb | DTB_DTF;              /* set DTF */
                 }
-            break;                      
+            break;
 
-        case DTO_WCO | DTO_SOB:                         /* next block */        
+        case DTO_WCO | DTO_SOB:                         /* next block */
             if (wrd == (dir? 0: DTU_BSIZE (uptr)))      /* end of block? */
                 dt_seterr (uptr, DTB_TIM);              /* timing error */
             else sim_activate (uptr, DT_WSIZE * dt_ltime);
@@ -892,7 +892,7 @@ switch (fnc) {                                          /* at speed, check fnc *
                 if (((dtsa & DTA_MODE) == 0) || (M[DT_WC] == 0))
                     dtsb = dtsb | DTB_DTF;              /* set DTF */
                 }
-            break;                      
+            break;
 
         case DTO_WCO | DTO_SOB:                         /* all done */
             dt_schedez (uptr, dir);                     /* sched end zone */
@@ -1146,7 +1146,7 @@ for (i = 0; i < DT_NUMDR; i++) {                        /* stop all activity */
         }
     else {
         sim_cancel (uptr);                              /* sim reset */
-        uptr->STATE = 0;  
+        uptr->STATE = 0;
         uptr->LASTT = sim_grtime ();
         }
     }
@@ -1155,7 +1155,7 @@ DT_UPDINT;                                              /* reset interrupt */
 return SCPE_OK;
 }
 
-/* Bootstrap routine 
+/* Bootstrap routine
 
    This is actually the 4K disk monitor bootstrap, which also
    works with OS/8.  The reverse is not true - the OS/8 bootstrap

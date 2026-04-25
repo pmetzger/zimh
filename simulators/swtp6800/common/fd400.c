@@ -28,11 +28,11 @@
     NOTES:
 
         The FDC-400 is a 5-1/4"-inch floppy controller which can control up
-        to four 5-1/4inch floppy drives.  
+        to four 5-1/4inch floppy drives.
         This file only emulates the minimum functionality to interface with
         the virtual disk file.
 
-        The floppy controller is interfaced to the CPU by use of 7 memory 
+        The floppy controller is interfaced to the CPU by use of 7 memory
         addreses (0xCC00-0xCC06).
 
         Address     Mode    Function
@@ -63,7 +63,7 @@
 
 
         RECEIVED DATA (Read 0xCC01):
-        WRITE DATA PORT (Write 0xCC01): 
+        WRITE DATA PORT (Write 0xCC01):
 
         +---+---+---+---+---+---+---+---+
         |              byte             |
@@ -74,13 +74,13 @@
 
 
         CURRENT SECTOR (Read 0xCC02):
-        WRITE FILL CHAR (Write 0xCC02): 
+        WRITE FILL CHAR (Write 0xCC02):
 
         +---+---+---+---+---+---+---+---+
         | x |          Sector           |
         +---+---+---+---+---+---+---+---+
 
-        Return current Sector 
+        Return current Sector
         Set the fill char for write sector
 
 
@@ -111,11 +111,11 @@
 
         LFD-400 Disck supports these operating systems (1977)
 
-        - MINIDOS: Just Load/Save ram starting at given sector in disk. 
-                   No files. No sector allocation management. Rom based 
-        - MPX (also know as MiniDOS Plus or MiniDOS/MPX or MiniDOS-PlusX): 
+        - MINIDOS: Just Load/Save ram starting at given sector in disk.
+                   No files. No sector allocation management. Rom based
+        - MPX (also know as MiniDOS Plus or MiniDOS/MPX or MiniDOS-PlusX):
                    Based on MiniDOS, add named files, contiguos allocation management. Transient disk command
-        - MiniDisk+ DOS: 
+        - MiniDisk+ DOS:
                    Based on MiniDOS, add named files, contiguos allocation management. More disk commands
 
 
@@ -142,7 +142,7 @@
 
 /* emulate a Disk disk with 10 sectors and 40 tracks */
 
-#define NUM_DISK        4               
+#define NUM_DISK        4
 #define SECT_SIZE       (8+4+256)  /* sector size=header (10 bytes) + data (256 bytes) + CRC (2 bytes)  */
 #define NUM_SECT        10              /* sectors/track */
 #define TRAK_SIZE       (SECT_SIZE * NUM_SECT) /* trk size (bytes) */
@@ -173,8 +173,8 @@ int32 fd400_startrw(int32 io, int32 data);
 struct {
     int32   cur_dsk;                        /* Currently selected drive */
     int32   SectorPulse;                    // Head positioned at beginning of sector
-    int32   StepBit;                        
-    uint8   FillChar; 
+    int32   StepBit;
+    uint8   FillChar;
 } fd400 = {0};
 
 /* Floppy Disk Controller data structures
@@ -262,38 +262,38 @@ t_stat fd400_dsk_reset (DEVICE *dptr)
 int32 fd400_fdcstatus(int32 io, int32 data)
 {
     int32 val;
-    UNIT * uptr; 
+    UNIT * uptr;
 
-    uptr = &fd400_dsk_unit[fd400.cur_dsk]; 
-    if (io==0) { 
+    uptr = &fd400_dsk_unit[fd400.cur_dsk];
+    if (io==0) {
         // io=0 when reading from io register (return data read from i/o device register)
-        val=(fd400.cur_dsk & 3) << 6; 
+        val=(fd400.cur_dsk & 3) << 6;
         val |= 8;  // write gate door allways closed
-        if ((uptr->flags & UNIT_ATT) == 0) {  
+        if ((uptr->flags & UNIT_ATT) == 0) {
             sim_debug (DEBUG_flow, &fd400_dsk_dev, "Current Drive %d has no file attached \n", fd400.cur_dsk);
         } else {
             // file attached = disk inserted into unit
             if ((uptr->flags & UNIT_RO) == 0) val |= 1;  // unit is read/write
             if (TRK!=0)                       val |= 2;  // head is NOT in track zero
-            if (fd400.SectorPulse)  { 
-                val |= 16;  
+            if (fd400.SectorPulse)  {
+                val |= 16;
                 fd400.SectorPulse--;
-            } else { 
+            } else {
                 // set sector pulse and incr current sector
                 // Simulates somewhat disk rotation whitout having to set up _svr and sim_activate
-                fd400.SectorPulse=2; 
+                fd400.SectorPulse=2;
                 SECT++; if (SECT >= NUM_SECT) SECT = 0;
                 uptr->pos=0; // init sector read
             }
             if (SECT==0)  val |= 32;  // index pulse: head is positioned in sector zero
         }
-        sim_debug (DEBUG_flow, &fd400_dsk_dev, "Status Returned %02X, Current Drive %d TRK %d SECT %d \n", 
+        sim_debug (DEBUG_flow, &fd400_dsk_dev, "Status Returned %02X, Current Drive %d TRK %d SECT %d \n",
             val, fd400.cur_dsk, TRK, SECT);
-        return val; 
+        return val;
     }
     // io=1 -> writing data to i/o register,
     fd400.cur_dsk = data >> 6; // select current disk
-    fd400.SectorPulse = 0; // init sector pulse 
+    fd400.SectorPulse = 0; // init sector pulse
     if (data & 32) {
         fd400.StepBit=1; // Step bit set to one
     } else if ((data & 32)==0) { // Step bit set to zero
@@ -301,19 +301,19 @@ int32 fd400_fdcstatus(int32 io, int32 data)
             // but was already zero -> no action
         } else {
             // StepBit changing from 1 to 0 -> step track motot
-            fd400.StepBit=0; 
+            fd400.StepBit=0;
             // step track depending on direction bit
             if (data & 16) TRK++; else TRK--;
-            if (TRK < 0) TRK=0; 
-            if (TRK >= NUM_CYL) TRK = NUM_CYL-1; 
+            if (TRK < 0) TRK=0;
+            if (TRK >= NUM_CYL) TRK = NUM_CYL-1;
             // on changing track also incr sect num, but not issue sector pulse (landed on middle of sector)
-            SECT++; if (SECT >= NUM_SECT) SECT = 0; 
+            SECT++; if (SECT >= NUM_SECT) SECT = 0;
             uptr->pos=0; // init sector read
         }
     }
-    sim_debug (DEBUG_flow, &fd400_dsk_dev, "Set Drive and Track %02X, Current Drive %d TRK %d SECT %d \n", 
+    sim_debug (DEBUG_flow, &fd400_dsk_dev, "Set Drive and Track %02X, Current Drive %d TRK %d SECT %d \n",
         data, fd400.cur_dsk, TRK, SECT);
-    return 0; 
+    return 0;
 }
 
 /* CONTROLLER STATUS register (read $CC00)*/
@@ -322,7 +322,7 @@ int32 fd400_cstatus(int32 io, int32 data)
 {
     // controller allways ready, byte read from sector allways ready
     // writing to is set the sync byte. This is not implemented
-    return 128+1; 
+    return 128+1;
 }
 
 /* DATA register */
@@ -330,13 +330,13 @@ int32 fd400_cstatus(int32 io, int32 data)
 int32 fd400_data(int32 io, int32 data)
 {
     uint32 loc;
-    UNIT * uptr = &fd400_dsk_unit[fd400.cur_dsk]; 
+    UNIT * uptr = &fd400_dsk_unit[fd400.cur_dsk];
     uint8 dsk_sect[SECT_SIZE]; // image of sector read/saved in disk image
     uint8 * p = (uint8 *)(uptr->filebuf); // sector byte stream as seen by program
-    int i, n; 
+    int i, n;
 
     if ((uptr->flags & UNIT_ATT) == 0) return 0; // not attached
-    if (io==0) { 
+    if (io==0) {
         // io=0 when reading from io register (return data read from i/o device register)
         // read data from sector
         if (uptr->pos==0) {
@@ -344,7 +344,7 @@ int32 fd400_data(int32 io, int32 data)
             // init buffer to zero
             memset(uptr->filebuf, 0, SECT_SIZE);
             // calculate location of current sector in disk image file
-            loc=(TRK * NUM_SECT + SECT) * SECT_SIZE; 
+            loc=(TRK * NUM_SECT + SECT) * SECT_SIZE;
             if (loc >= uptr->capac) {
                 // reading past image file current size -> read as zeroes
             } else {
@@ -355,7 +355,7 @@ int32 fd400_data(int32 io, int32 data)
                 //
                 // Data in MiniDOS MPX disk image:
                 //     BT BS FT FS NN AH AL TY   CH CL PH PL   [256 data bytes] = 268 bytes
-                //     where BT=Backward link track, DS=Backward link sector, 
+                //     where BT=Backward link track, DS=Backward link sector,
                 //           FT=Forward link track, FS=Forward link sector. = 00 00 if this is last sector of file
                 //           NN=Number of data bytes (00=256 bytes)
                 //           AH AL=Addr in RAM where to load sector data bytes (H=High byte, L=Low byte)
@@ -363,7 +363,7 @@ int32 fd400_data(int32 io, int32 data)
                 //           CH CL=CheckSum Hi/Low byte
                 //           PH PL=Postamble Hi/Low byte. Holds program start addr on last sector
                 //
-                // Data as expected by MiniDOS ROM when reading a sector 
+                // Data as expected by MiniDOS ROM when reading a sector
                 //     SY TR SE BT BS FT FS NN AH AL TY [NN data bytes] CH CL PH PL
                 //     where SY=Sync Byte=$FD
                 //           TR SE=This track and sector
@@ -378,59 +378,59 @@ int32 fd400_data(int32 io, int32 data)
                 for (i=0; i<n; i++) p[3+8+i]=dsk_sect[i+12]; // copy data bytes from disk-read-buffer to sector buffer in unit
                 for (i=0; i<4; i++) p[3+8+n+i]=dsk_sect[i+8]; // copy checksum and postamble
             }
-            sim_debug (DEBUG_read, &fd400_dsk_dev, "Read Disc Image at loc %d, Current Drive %d TRK %d SECT %d \n", 
+            sim_debug (DEBUG_read, &fd400_dsk_dev, "Read Disc Image at loc %d, Current Drive %d TRK %d SECT %d \n",
               loc, fd400.cur_dsk, TRK, SECT);
-            uptr->pos=0; 
+            uptr->pos=0;
         }
         // retrieve read byte from sector buffer
         if (uptr->pos>=BUF_SIZE) {
-           sim_debug (DEBUG_write, &fd400_dsk_dev, "Sector overrun - do not read data\n"); 
-           return 0; 
+           sim_debug (DEBUG_write, &fd400_dsk_dev, "Sector overrun - do not read data\n");
+           return 0;
         }
         data=p[uptr->pos];
-        sim_debug (DEBUG_read, &fd400_dsk_dev, "Read byte %02X (dec=%d char='%c'), Current Drive %d TRK %d SECT %d POS %d\n", 
+        sim_debug (DEBUG_read, &fd400_dsk_dev, "Read byte %02X (dec=%d char='%c'), Current Drive %d TRK %d SECT %d POS %d\n",
               data, data, (data < 32) ? '?':data, fd400.cur_dsk, TRK, SECT, uptr->pos);
         uptr->pos++;
-        
+
         return data;
     }
     // io=1 -> writing data to i/o register,
     // write data to sector
     if (uptr->flags & UNIT_RO) {
-        sim_debug (DEBUG_write, &fd400_dsk_dev, "Write data %02X, but Current Drive %d is Read Only\n", 
+        sim_debug (DEBUG_write, &fd400_dsk_dev, "Write data %02X, but Current Drive %d is Read Only\n",
             data, fd400.cur_dsk);
-        return 0; 
+        return 0;
     }
-    sim_debug (DEBUG_write, &fd400_dsk_dev, "Write data %02X, Current Drive %d TRK %d SECT %d POS %d\n", 
+    sim_debug (DEBUG_write, &fd400_dsk_dev, "Write data %02X, Current Drive %d TRK %d SECT %d POS %d\n",
         data, fd400.cur_dsk, TRK, SECT, uptr->pos);
     // store byte into sector buffer
     if (uptr->pos==0) {
         if (data==0) return 0; // ignore zero bytes before sync byte
     }
     if (uptr->pos >= BUF_SIZE) {
-       sim_debug (DEBUG_write, &fd400_dsk_dev, "Sector overrun - do not write data\n"); 
-       return 0; 
+       sim_debug (DEBUG_write, &fd400_dsk_dev, "Sector overrun - do not write data\n");
+       return 0;
     }
     // save byte to buffer
-    p[uptr->pos]=data; 
+    p[uptr->pos]=data;
     uptr->pos++;
     // calculate location of current sector in disk image file
-    loc=(TRK * NUM_SECT + SECT) * SECT_SIZE; 
+    loc=(TRK * NUM_SECT + SECT) * SECT_SIZE;
     if (loc >= uptr->capac) {
        // writing past image file current size -> extend disk image size
        uint8 buf[SECT_SIZE];
        memset(buf, 0, sizeof(buf));
        sim_fseek(uptr->fileref, uptr->capac, SEEK_SET);
        while (uptr->capac <= loc) {
-           sim_fwrite(buf, 1, SECT_SIZE, uptr->fileref); 
+           sim_fwrite(buf, 1, SECT_SIZE, uptr->fileref);
            uptr->capac += SECT_SIZE;
        }
-       sim_debug (DEBUG_write, &fd400_dsk_dev, "Disk image extended up to %d bytes \n", uptr->capac); 
-    } 
-    // convert byte stream into sector format to save to disk. 
+       sim_debug (DEBUG_write, &fd400_dsk_dev, "Disk image extended up to %d bytes \n", uptr->capac);
+    }
+    // convert byte stream into sector format to save to disk.
     // reorganize buffer to match the byte order expected by MiniDOS
     //
-    // Data as sent to controller by MiniDOS ROM when writing a sector 
+    // Data as sent to controller by MiniDOS ROM when writing a sector
     //     SY TR SE BT BS FT FS NN AH AL TY [NN data bytes] CH CL PH PL
     //     where SY=Sync Byte=$FD
     //           TR SE=This track and sector
@@ -439,7 +439,7 @@ int32 fd400_data(int32 io, int32 data)
     //
     // Data in MiniDOS MPX disk image:
     //     BT BS FT FS NN AH AL TY   CH CL PH PL   [256 data bytes] = 268 bytes
-    //     where BT=Backward link track, DS=Backward link sector, 
+    //     where BT=Backward link track, DS=Backward link sector,
     //           FT=Forward link track, FS=Forward link sector. = 00 00 if this is last sector of file
     //           NN=Number of data bytes (00=256 bytes)
     //           AH AL=Addr in RAM where to load sector data bytes (H=High byte, L=Low byte)
@@ -447,20 +447,20 @@ int32 fd400_data(int32 io, int32 data)
     //           CH CL=CheckSum Hi/Low byte
     //           PH PL=Postamble Hi/Low byte. Holds program start addr on last sector
     //
-    // so we create the sector to write in disk image file (dsk_sect) reordering data from filebuf (p pointer) 
+    // so we create the sector to write in disk image file (dsk_sect) reordering data from filebuf (p pointer)
 
     memset(dsk_sect, 255, sizeof(dsk_sect));
     for (i=0; i<8; i++) dsk_sect[i]=p[3+i]; // disk sector start with 8 byte header with bytes BT BS FT FS NN AH AL TY
     n=uptr->pos-11; // number of data bytes
-    if (n>256+4) n=256+4; 
+    if (n>256+4) n=256+4;
     if (n>4) {
         for (i=0; i<4; i++) dsk_sect[i+8]=p[3+8+n+i-4]; // copy checksum and postamble
-        for (i=0; i<n-4; i++) dsk_sect[i+12]=p[3+8+i]; // copy data bytes to disk-write-buffer 
+        for (i=0; i<n-4; i++) dsk_sect[i+12]=p[3+8+i]; // copy data bytes to disk-write-buffer
     }
-    // does a whole sector save for each byte sent to fdc controller, as there is no an end-of-sector-write signal 
+    // does a whole sector save for each byte sent to fdc controller, as there is no an end-of-sector-write signal
     // This is quite ineficient, but host is fast enought and has clever caching, so no worries
     sim_fseek(uptr->fileref, loc, SEEK_SET);
-    sim_fwrite(dsk_sect, 1, SECT_SIZE, uptr->fileref); 
+    sim_fwrite(dsk_sect, 1, SECT_SIZE, uptr->fileref);
     return 0;
 }
 
@@ -468,20 +468,20 @@ int32 fd400_data(int32 io, int32 data)
 
 int32 fd400_cursect(int32 io, int32 data)
 {
-    UNIT * uptr; 
+    UNIT * uptr;
 
-    uptr = &fd400_dsk_unit[fd400.cur_dsk]; 
+    uptr = &fd400_dsk_unit[fd400.cur_dsk];
     if ((uptr->flags & UNIT_ATT) == 0) return 0; // not attached
-    if (io==0) { 
+    if (io==0) {
         // io=0 when reading from io register (return data read from i/o device register)
         // return current sector
-        sim_debug (DEBUG_flow, &fd400_dsk_dev, "Current Drive %d TRK %d SECT %d \n", 
+        sim_debug (DEBUG_flow, &fd400_dsk_dev, "Current Drive %d TRK %d SECT %d \n",
             fd400.cur_dsk, TRK, SECT);
         return SECT;
     }
     // io=1 -> writing data to i/o register,
     // set fill char
-    fd400.FillChar=data; 
+    fd400.FillChar=data;
     return 0;
 }
 
@@ -489,13 +489,13 @@ int32 fd400_cursect(int32 io, int32 data)
 
 int32 fd400_startrw(int32 io, int32 data)
 {
-    UNIT * uptr; 
+    UNIT * uptr;
 
-    uptr = &fd400_dsk_unit[fd400.cur_dsk]; 
+    uptr = &fd400_dsk_unit[fd400.cur_dsk];
     if ((uptr->flags & UNIT_ATT) == 0) return 0; // not attached
-    if (io==0) { 
+    if (io==0) {
         // io=0 when reading from io register (return data read from i/o device register)
-        // start read from sector -> init received so it will return sync char and tracks 
+        // start read from sector -> init received so it will return sync char and tracks
         uptr->pos=0;
         return 0;
     }
@@ -507,12 +507,12 @@ int32 fd400_startrw(int32 io, int32 data)
 
 t_stat fd400_attach (UNIT * uptr, const char * file)
 {
-    t_stat r; 
+    t_stat r;
 
     if ((r = attach_unit(uptr, file)) != SCPE_OK) return r;
     uptr->u4 = uptr->u5 = 0;
     uptr->capac = sim_fsize(uptr->fileref);
-    uptr->pos = 0; 
+    uptr->pos = 0;
     return SCPE_OK;
 }
 

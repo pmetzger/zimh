@@ -408,7 +408,7 @@ else {                                                  /* receive */
     else CC = 0;
     }
 return 0;
-}    
+}
 
 /* Unit service - channel overhead
 

@@ -281,9 +281,9 @@ function (add_simulator _targ)
         list(APPEND _install_opts RUNTIME_DEPENDENCY_SET simhRuntime)
     endif ()
 
-    install(TARGETS ${_targ} 
+    install(TARGETS ${_targ}
         ${_install_opts}
-        RUNTIME 
+        RUNTIME
         COMPONENT ${pkg_family}
     )
 

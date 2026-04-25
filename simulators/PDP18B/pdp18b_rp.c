@@ -209,9 +209,9 @@ REG rp_reg[] = {
 MTAB rp_mod[] = {
     { UNIT_RP03, 0,         "RP02", "RP02", &rp_set_size },
     { UNIT_RP03, UNIT_RP03, "RP03", "RP03", &rp_set_size },
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable disk drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock disk drive" },
     { MTAB_XTD|MTAB_VDV, 0, "DEVNO", "DEVNO", &set_devno, &show_devno },
     { 0 }

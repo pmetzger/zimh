@@ -631,7 +631,7 @@ static void draw_characters (void)
             if (w & 0x0008) {
                 didstroke = TRUE;
                 DrawLine(x1, y1, x0, y0);
-            } 
+            }
         }
 
         if (dospace) {
@@ -1112,7 +1112,7 @@ static DWORD WINAPI GDUPump (LPVOID arg)
 
     ShowWindow(hwGDU, SW_SHOWNOACTIVATE);           /* display it */
     UpdateWindow(hwGDU);
-    
+
     while (GetMessage(&msg, hwGDU, 0, 0)) {         /* message pump - this basically loops forevermore */
         TranslateMessage(&msg);
         DispatchMessage(&msg);

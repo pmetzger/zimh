@@ -33,7 +33,7 @@
  * The paging system on Nord-100 have two modes; normal and extended.
  * In normal mode it is Nord-10-compatible (with a maximum of 512KW memory)
  * and in extended it can handle up to 16MW.
- * 
+ *
  * It is quite extensive with both individual page protection (RWX) and
  * ring protection, where it has four rings. Ring 0 has lowest prio, ring 3
  * has highest.
@@ -58,7 +58,7 @@
  *    Ring is the user ring.  Must always be >= the page ring.
  *
  * The page tables are located in "shadow memory".  Shadow memory is the
- * top pages (>= 177400 in normal mode and >= 177000 in extended) only 
+ * top pages (>= 177400 in normal mode and >= 177000 in extended) only
  * accessible when running as ring 3.
  * Page table for normal mode looks as below:
  *

@@ -194,7 +194,7 @@ while (reason == 0) {
         }
 
         /*
-         * ND100 manual clause 2.3.8.3 says that the instruction faults happens 
+         * ND100 manual clause 2.3.8.3 says that the instruction faults happens
          * after the P reg is incremented, hence will point to one instruction
          * past the instruction causing the fault.
          * But; if the fault is during fetch, P will not be incremented.
@@ -388,7 +388,7 @@ ins_andor(int IR, int off)
 #define BYTELN(x)       ((x) & 07777)
 /*
  * Byte fill (BFILL).
- * 
+ *
  * This instruction has only one operand. The destination operand is
  * specified in the X and T registers. The right-most byte in the A-reg
  * (bits 0-7) is filled into the destination field.
@@ -426,7 +426,7 @@ ins_bfill(int IR)
  * interrupt mark).
  * The instruction will always have a skip return (no error condition).
  *
- * Implementation note: Because this instruction can be interrupted (by a 
+ * Implementation note: Because this instruction can be interrupted (by a
  * page fault for example) byte for byte must be moved, and every state
  * will be stored in the registers (similar to the microcode implementation).
  * The usage is:
@@ -458,7 +458,7 @@ ins_movb(int IR)
                 }
                 regD &= 0140000;        /* Clear setup + count bits */
         } else {        /* copy top-bottom */
-                
+
         }
         regP++; /* skip return */
 }
@@ -622,7 +622,7 @@ ins_skip_ext(int IR)
  * If the current program level is specified, the stored P register points
  * to the instruction following SRB.
  *
- * Affected: (EL), +1 +2 +3 +4 +5 +6 +7 
+ * Affected: (EL), +1 +2 +3 +4 +5 +6 +7
  *             P    X  T  A  D  L STS B
  */
 static int s2r[] = { rnP, rnX, rnT, rnA, rnD, rnL, rnSTS, rnB };
@@ -648,10 +648,10 @@ ins_srb(int IR)
  * of the X register.
  * If the current program level is specified, the P register is not affected.
  * Affected: All the registers on specified program level are affected.
- * Note: If the current level is specified, the P register is not affected. 
+ * Note: If the current level is specified, the P register is not affected.
  */
-static void             
-ins_lrb(int IR)         
+static void
+ins_lrb(int IR)
 {
         int i, n = (IR >> 3) & 017;
 
@@ -861,8 +861,8 @@ ins_arg(int IR, int addr)
 }
 
 int
-ins_bop(int IR, int addr) 
-{                       
+ins_bop(int IR, int addr)
+{
 
         int rd, n, reason = 0;
 
@@ -874,7 +874,7 @@ ins_bop(int IR, int addr)
                 R[rd] &= ~(1 << n);
                 break;
 
-        case 001: 
+        case 001:
                 R[rd] |= (1 << n);
                 break;
 
@@ -889,7 +889,7 @@ ins_bop(int IR, int addr)
                 break;
 
         case 004: /* BSKP zero/one */
-        case 005: 
+        case 005:
                 if (((R[rd] >> n) & 1) == BIT7(IR))
                         regP++;
                 break;
@@ -918,7 +918,7 @@ ins_bop(int IR, int addr)
                 if (((R[rd] >> n) & 1) == 0)
                         regSTL |= STS_K;
                 break;
-                        
+
         case 013: /* BLDA load K */
                 regSTL &= ~STS_K;
                 if ((R[rd] >> n) & 1)
@@ -1011,7 +1011,7 @@ ins_dnz(int ins)
                 val = regA;
                 val >>= -sh;
         } else {
-                
+
         }
 #ifdef notyet
         if (val > 32767)
@@ -1031,7 +1031,7 @@ ins_dnz(int ins)
  * instruction as a scaling factor. For integers, the scaling factor
  * should be +16, a larger scaling factor will result in a higher floating,
  * point number. Because of the single precision fixed point number,
- * the D register will be cleared. 
+ * the D register will be cleared.
  */
 void
 ins_nlz(int ins)
@@ -1198,7 +1198,7 @@ done:   regT = (f1->e + 16384) | (f1->s << 15);
         regD = (uint16)m3;
 }
 
-/* 
+/*
  * Subtract two 48-bit numbers.
  * The numbers are of different sign.
  *
@@ -1206,7 +1206,7 @@ done:   regT = (f1->e + 16384) | (f1->s << 15);
  * are subtracted from the floating accumulator with the result
  * in the floating accumulator. The previous setting of the carry and
  * overflow indicators are lost.
- * Affected: (T), (A), (D), C, O, Q, TG 
+ * Affected: (T), (A), (D), C, O, Q, TG
  */
 static void
 sub48(struct fp *f1, struct fp *f2, int addr)
@@ -1249,7 +1249,7 @@ done:   regT = (f1->e + 16384) | (f1->s << 15);
 
 int
 ins_fad(int IR, int addr)
-{       
+{
         struct fp f1, f2;
         int pt = SELPT2(IR);
 
@@ -1265,7 +1265,7 @@ ins_fad(int IR, int addr)
 
 int
 ins_fsb(int IR, int addr)
-{       
+{
         struct fp f1, f2;
         int pt = SELPT2(IR);
 
@@ -1498,7 +1498,7 @@ nd_mst(int reg)
         case IR_PIE: /* PIE */
                 pie |= regA;
                 break;
-                
+
         default:
                 reason = STOP_UNHINS;
         }

@@ -128,7 +128,7 @@ DEVICE dh_dev = {
     NULL, NULL, &dh_reset,
     NULL, &dh_attach, &dh_detach,
     &dh_dib, DEV_DIS | DEV_DISABLE | DEV_UBUS | DEV_DEBUG | DEV_MUX,
-    0, dh_deb, NULL, NULL, NULL, NULL, NULL, 
+    0, dh_deb, NULL, NULL, NULL, NULL, NULL,
     &dh_description
 };
 

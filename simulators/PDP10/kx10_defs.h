@@ -32,7 +32,7 @@
 
 /* Rename of global PC variable to avoid namespace conflicts on some platforms */
 #define PC PC_Global
- 
+
 #if defined(USE_ADDR64)
 #error "PDP-10 does not support 64b addresses!"
 #endif

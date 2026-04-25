@@ -221,7 +221,7 @@ int32 idx, val;
 if (ADDR_IS_CQM (pa)) {                                /* Qbus memory? */
     cqm_rd (&val, pa, READ);
     return val;
-    }  
+    }
 idx = (pa & IOPAGEMASK) >> 1;
 if (iodispR[idx]) {
     iodispR[idx] (&val, pa, READ);

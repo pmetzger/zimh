@@ -220,9 +220,9 @@ MTAB                rs_mod[] = {
     {MTAB_XTD|MTAB_VDV, TYPE_RH20, "RH20", "RH20", &rh_set_type, &rh_show_type,
               NULL, "Sets controller to RH20"},
 #endif
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock drive" },
     {UNIT_DTYPE, (RS03_DTYPE << UNIT_V_DTYPE), "RS03", "RS03", &rs_set_type },
     {UNIT_DTYPE, (RS04_DTYPE << UNIT_V_DTYPE), "RS04", "RS04", &rs_set_type },
@@ -246,7 +246,7 @@ REG                 rsa_reg[] = {
     {ORDATA(BUF, rs_rh[0].buf, 36), REG_HRO},
     {BRDATA(BUFF, rs_buf[0], 16, 64, RS_NUMWD), REG_HRO},
     {0}
-};  
+};
 
 DEVICE              rsa_dev = {
     "FSA", rs_unit, rsa_reg, rs_mod,
@@ -277,7 +277,7 @@ rs_write(DEVICE *dptr, struct rh_if *rhc, int reg, uint32 data) {
     int            i;
     int            unit = rhc->drive;
     UNIT          *uptr = &dptr->units[unit];
- 
+
     if ((uptr->flags & UNIT_DIS) != 0)
         return 1;
     if ((uptr->CMD & CS1_GO) && reg != 04) {

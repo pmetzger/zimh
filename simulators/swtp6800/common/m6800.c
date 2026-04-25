@@ -280,7 +280,7 @@ REG m6800_reg[] = {
     { HRDATA (SP, SP, 16) },
     { HRDATA (CC, CC, 8) },
     { ORDATA (WRU, sim_int_char, 8) },
-    { NULL }  
+    { NULL }
 };
 
 MTAB m6800_mod[] = {
@@ -290,7 +290,7 @@ MTAB m6800_mod[] = {
     { UNIT_MSTOP, 0, "NOMTRAP", "NOMTRAP", NULL },
     { MTAB_XTD|MTAB_VDV|MTAB_NMO|MTAB_SHP|MTAB_NC, 0, "HISTORY", "HISTORY=n",
       &cpu_set_hist, &cpu_show_hist, NULL, "Enable/Display instruction history" },
-    { 0 }  
+    { 0 }
 };
 
 DEBTAB m6800_debug[] = {
@@ -1930,9 +1930,9 @@ int32 get_flag(int32 flg)
 void condevalVa(int32 op1, int32 op2)
 {
     if (((op1 & 0x80) == (op2 & 0x80)) &&
-        (((op1 + op2) & 0x80) != (op1 & 0x80))) 
+        (((op1 + op2) & 0x80) != (op1 & 0x80)))
         SET_FLAG(VF);
-    else 
+    else
         CLR_FLAG(VF);
 }
 
@@ -1943,7 +1943,7 @@ void condevalVs(int32 op1, int32 op2)
     if (((op1 & 0x80) != (op2 & 0x80)) &&
         (((op1 - op2) & 0x80) == (op2 & 0x80)))
         SET_FLAG(VF);
-    else 
+    else
         CLR_FLAG(VF);
 
 }
@@ -1951,9 +1951,9 @@ void condevalVs(int32 op1, int32 op2)
 /* test and set H for addition */
 void condevalHa(int32 op1, int32 op2)
 {
-    if (((op1 & 0x0f) + (op2 & 0x0f)) & 0x10) 
+    if (((op1 & 0x0f) + (op2 & 0x0f)) & 0x10)
         SET_FLAG(HF);
-    else 
+    else
         CLR_FLAG(HF);
 }
 
@@ -2022,7 +2022,7 @@ int32 sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
                         printf("-");
                 } else if (rtype == 9) {
                     printf("\n");
-                } else 
+                } else
                     return SCPE_ARG;
             }
         } else {                        //binary
@@ -2055,7 +2055,7 @@ int32 sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
                     chk += byte; chk &= BYTEMASK;
                     cnt++;
                 }
-                chk = (~chk) & BYTEMASK; 
+                chk = (~chk) & BYTEMASK;
                 fprintf(fileref,"%02X\n", chk);
                 addr += HLEN;
             }
@@ -2071,7 +2071,7 @@ int32 sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
                     chk += byte; chk &= BYTEMASK;
                     cnt++;
                 }
-                chk = (~chk) & BYTEMASK; 
+                chk = (~chk) & BYTEMASK;
                 fprintf(fileref, "%02X\n", chk);
                 addr = end;
             }
@@ -2228,9 +2228,9 @@ t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat m6800_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
-    if (addr >= MAXMEMSIZE) 
+    if (addr >= MAXMEMSIZE)
         return SCPE_NXM;
-    if (vptr != NULL) 
+    if (vptr != NULL)
         *vptr = CPU_BD_get_mbyte(addr);
     return SCPE_OK;
 }
@@ -2239,7 +2239,7 @@ t_stat m6800_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 
 t_stat m6800_dep(t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
-    if (addr >= MAXMEMSIZE) 
+    if (addr >= MAXMEMSIZE)
         return SCPE_NXM;
     CPU_BD_put_mbyte(addr, val);
     return SCPE_OK;

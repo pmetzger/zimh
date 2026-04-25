@@ -34,7 +34,7 @@
         as needed.  This device was replaced by the 8259.
 
         All I/O is via programmed I/O.  The i3214 has a status port
-        and two data port.    
+        and two data port.
 
 */
 
@@ -81,7 +81,7 @@ uint8 i3214_monitor_do_boot(t_bool io, uint8 data, uint8 devnum);
 /* i3214 Standard I/O Data Structures */
 /* 1 i3214 device */
 
-UNIT i3214_unit[] = { 
+UNIT i3214_unit[] = {
     { UDATA (&i3214_svc, 0, 0), KBD_POLL_WAIT }
 };
 
@@ -104,7 +104,7 @@ DEBTAB i3214_debug[] = {
 MTAB i3214_mod[] = {
     { UNIT_BOOT, 0, "BOOT", "BOOT", NULL },
     { UNIT_BOOT, UNIT_BOOT, "RUN", "RUN", NULL },
-    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, i3214_show_param, NULL, 
+    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, i3214_show_param, NULL,
         "show configured parameters for i3214" },
     { 0 }
 };
@@ -129,7 +129,7 @@ DEVICE i3214_dev = {
     NULL,               //attach
     NULL,               //detach
     NULL,               //ctxt
-    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags 
+    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags
     0,                  //dctrl
     i3214_debug,        //debflags
     NULL,               //msize
@@ -172,8 +172,8 @@ t_stat i3214_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
-    fprintf(st, "%s, Base port 0%04XH, Interrupt # %d, %s", 
-        ((i3214_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled", 
+    fprintf(st, "%s, Base port 0%04XH, Interrupt # %d, %s",
+        ((i3214_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled",
         i3214_baseport, i3214_intnum, i3214_verb ? "Verbose" : "Quiet");
     return SCPE_OK;
 }
@@ -192,7 +192,7 @@ t_stat i3214_svc (UNIT *uptr)
 t_stat i3214_reset (DEVICE *dptr)
 {
     uint8 devnum;
-    
+
     for (devnum=0; devnum<1; devnum++) {
         i3214_reset_dev(devnum);
         sim_activate (&i3214_unit[devnum], i3214_unit[devnum].wait); /* activate unit */
@@ -249,7 +249,7 @@ uint8 i3214_monitor_do_boot(t_bool io, uint8 data, uint8 devnum)
         if (uptr->flags & UNIT_BOOT) {  //toggle response
             monitor_boot = 0;
             printf("    Boot Switch set to BOOT\n");
-        } else {                           
+        } else {
             monitor_boot = 0x02;
             if (onetime) {
                 printf("    Boot Switch set to RUN\n");

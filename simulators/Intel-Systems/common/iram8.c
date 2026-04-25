@@ -36,7 +36,7 @@
 
 #include "system_defs.h"
 
-#define BASE_ADDR       u3    
+#define BASE_ADDR       u3
 #define iRAM_NAME    "Intel RAM Chip"
 
 /* function prototypes */
@@ -69,7 +69,7 @@ MTAB RAM_mod[] = {
         NULL, NULL, "Sets the base address for RAM"},
     { MTAB_XTD | MTAB_VDV, 0, NULL, "SIZE", &RAM_set_size,
         NULL, NULL, "Sets the size for RAM"},
-    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, RAM_show_param, NULL, 
+    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, RAM_show_param, NULL,
         "show configured parameters for RAM" },
     { 0 }
 };
@@ -101,7 +101,7 @@ DEVICE RAM_dev = {
     NULL,               //attach
     NULL,               //detach
     NULL,               //ctxt
-    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags 
+    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags
     0,                  //dctrl
     RAM_debug,          //debflags
     NULL,               //msize
@@ -150,7 +150,7 @@ t_stat RAM_reset (DEVICE *dptr)
 t_stat RAM_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result, i;
-    
+
     if (cptr == NULL)
         return SCPE_ARG;
     result = sscanf(cptr, "%i%n", &size, &i);
@@ -158,13 +158,13 @@ t_stat RAM_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
         ((cptr[i + 1] == 'B') && (cptr[i + 2] == 0)))) {
         if (size & 0xff8f) {
             sim_printf("RAM: Size error\n");
-            return SCPE_ARG;     
+            return SCPE_ARG;
         } else {
             RAM_unit.capac = (size * 1024) - 1;
             sim_printf("RAM: Size=%04XH\n", RAM_unit.capac);
             return SCPE_OK;
         }
-    }   
+    }
     return SCPE_ARG;
 }
 
@@ -173,7 +173,7 @@ t_stat RAM_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat RAM_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result, i;
-    
+
     if (cptr == NULL)
         return SCPE_ARG;
     result = sscanf(cptr, "%i%n", &size, &i);
@@ -181,13 +181,13 @@ t_stat RAM_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
         ((cptr[i + 1] == 'B') && (cptr[i + 2] == 0)))) {
         if (size & 0xff8f) {
             sim_printf("RAM: Base error\n");
-            return SCPE_ARG;     
+            return SCPE_ARG;
         } else {
             RAM_unit.BASE_ADDR = size * 1024;
             sim_printf("RAM: Base=%04XH\n", RAM_unit.BASE_ADDR);
             return SCPE_OK;
         }
-    }   
+    }
     return SCPE_ARG;
 }
 
@@ -197,8 +197,8 @@ t_stat RAM_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
-    fprintf(st, "%s at Base Address 0%04XH (%dD) for 0%04XH (%dD) Bytes ", 
-        ((RAM_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled", 
+    fprintf(st, "%s at Base Address 0%04XH (%dD) for 0%04XH (%dD) Bytes ",
+        ((RAM_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled",
         RAM_unit.u3, RAM_unit.u3, RAM_unit.capac, RAM_unit.capac);
     return SCPE_OK;
 }

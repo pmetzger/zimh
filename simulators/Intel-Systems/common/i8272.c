@@ -147,14 +147,14 @@ extern uint16 reg_dev(uint8 (*routine)(t_bool, uint8), uint16);
 extern void multibus_put_mbyte(uint16 addr, uint8 val);
 extern uint8 multibus_get_mbyte(uint16 addr);
 
-/* 8272 physical register definitions */ 
+/* 8272 physical register definitions */
 /* 8272 command register stack*/
 
-uint8 i8272_w0[4];                      // MT+MFM+SK+command 
+uint8 i8272_w0[4];                      // MT+MFM+SK+command
 uint8 i8272_w1[4];                      // HDS [HDS=H << 2] + DS1 + DS0
 uint8 i8272_w2[4];                      // cylinder # (0-XX)
 uint8 i8272_w3[4];                      // head # (0 or 1)
-uint8 i8272_w4[4];                      // sector # (1-XX)                         
+uint8 i8272_w4[4];                      // sector # (1-XX)
 uint8 i8272_w5[4];                      // number of bytes (128 << N)
 uint8 i8272_w6[4];                      // End of track (last sector # on cylinder)
 uint8 i8272_w7[4];                      // Gap length
@@ -162,8 +162,8 @@ uint8 i8272_w8[4];                      // Data length (when N=0, size to read o
 
 /* 8272 status register stack */
 
-uint8 i8272_msr[4];                     // main status                         
-uint8 i8272_r0[4];                      // ST 0                       
+uint8 i8272_msr[4];                     // main status
+uint8 i8272_r0[4];                      // ST 0
 uint8 i8272_r1[4];                      // ST 1
 uint8 i8272_r2[4];                      // ST 2
 uint8 i8272_r3[4];                      // ST 3
@@ -197,7 +197,7 @@ int32 fddst72[4][FDD_NUM] = {             // in ST3 format
     0                                   // status of FDD 3
 };
 
-int8 maxcyl72[4][FDD_NUM] = { 
+int8 maxcyl72[4][FDD_NUM] = {
     0,                                  // last cylinder + 1 of FDD 0
     0,                                  // last cylinder + 1 of FDD 1
     0,                                  // last cylinder + 1 of FDD 2
@@ -207,11 +207,11 @@ int8 maxcyl72[4][FDD_NUM] = {
 /* i8272 Standard I/O Data Structures */
 /* up to 4 i8272 devices */
 
-UNIT i8272_unit[] = { 
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_BUFABLE+UNIT_MUSTBUF, MDSDD), 20 }, 
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_BUFABLE+UNIT_MUSTBUF, MDSDD), 20 }, 
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_BUFABLE+UNIT_MUSTBUF, MDSDD), 20 }, 
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_BUFABLE+UNIT_MUSTBUF, MDSDD), 20 } 
+UNIT i8272_unit[] = {
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_BUFABLE+UNIT_MUSTBUF, MDSDD), 20 },
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_BUFABLE+UNIT_MUSTBUF, MDSDD), 20 },
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_BUFABLE+UNIT_MUSTBUF, MDSDD), 20 },
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_BUFABLE+UNIT_MUSTBUF, MDSDD), 20 }
 };
 
 REG i8272_reg[] = {
@@ -324,7 +324,7 @@ DEVICE i8272_dev = {
     NULL,               //deposit
     NULL,               //reset
     NULL,               //boot
-    &i8272_attach,      //attach  
+    &i8272_attach,      //attach
     NULL,               //detach
     NULL,               //ctxt
     0,                  //flags
@@ -353,8 +353,8 @@ t_stat i8272_svc(UNIT *uptr)
         switch (cmd[devnum]) {
         case READ:                  /* 0x06 */
 //            sim_printf("READ-e: fddst72=%02X", fddst72[devnum][uptr->u6]);
-            h[devnum] = i8272_w3[devnum];           // h = 0 or 1 
-            hed[devnum] = i8272_w3[devnum] << 2;    // hed = 0 or 4 [h << 2] 
+            h[devnum] = i8272_w3[devnum];           // h = 0 or 1
+            hed[devnum] = i8272_w3[devnum] << 2;    // hed = 0 or 4 [h << 2]
             sec[devnum] = i8272_w4[devnum];         // sector number (1-XX)
             secn[devnum] = i8272_w5[devnum];        // N (0-5)
             spt[devnum] = i8272_w6[devnum];         // sectors/track
@@ -362,10 +362,10 @@ t_stat i8272_svc(UNIT *uptr)
             bpt = ssize[devnum] * spt[devnum];      // bytes/track
             bpc = bpt * 2;          // bytes/cylinder
 //            sim_printf(" d=%d h=%d c=%d s=%d\n", drv[devnum], h[devnum], cyl[devnum], sec[devnum]);
-            sim_debug (DEBUG_flow, &i8272_dev, 
+            sim_debug (DEBUG_flow, &i8272_dev,
                 "8272_svc: FDC read: h=%d, hed=%d, sec=%d, secn=%d, spt=%d, ssize=%04X, bpt=%04X, bpc=%04X\n",
                     h[devnum], hed[devnum], sec[devnum], secn[devnum], spt[devnum], ssize[devnum], bpt, bpc);
-            sim_debug (DEBUG_flow, &i8272_dev, 
+            sim_debug (DEBUG_flow, &i8272_dev,
                 "8272_svc: FDC read: d=%d h=%d c=%d s=%d N=%d spt=%d fddst72=%02X\n",
                     drv[devnum], h[devnum], cyl[devnum], sec[devnum], secn[devnum], spt[devnum], fddst72[devnum][uptr->u6]);
             sim_debug (DEBUG_read, &i8272_dev, "8272_svc: FDC read of d=%d h=%d c=%d s=%d\n",
@@ -374,11 +374,11 @@ t_stat i8272_svc(UNIT *uptr)
                 i8272_r0[devnum] = IC_ABNORM + NR + hed[devnum] + drv[devnum]; /* command done - Not ready error*/
                 i8272_r3[devnum] = fddst72[devnum][uptr->u6];
                 i8272_msr[devnum] |= (RQM + DIO + CB); /* enter result phase */
-                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: FDC read: Not Ready\n"); 
-            } else {                // get image addr for this d, h, c, s    
+                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: FDC read: Not Ready\n");
+            } else {                // get image addr for this d, h, c, s
                 imgadr = (cyl[devnum] * bpc) + (h[devnum] * bpt) + ((sec[devnum] - 1) * ssize[devnum]);
-//                sim_debug (DEBUG_read, &i8272_dev, 
-//                    "8272_svc: FDC read: DMA addr=%04X cnt=%04X imgadr=%04X\n", 
+//                sim_debug (DEBUG_read, &i8272_dev,
+//                    "8272_svc: FDC read: DMA addr=%04X cnt=%04X imgadr=%04X\n",
 //                        i8237_r0, i8237_r1, imgadr);
                 for (i=0; i<=ssize[devnum]; i++) { /* copy selected sector to memory */
                     data = *(i8272_buf[devnum][uptr->u6] + (imgadr + i));
@@ -408,18 +408,18 @@ t_stat i8272_svc(UNIT *uptr)
             break;
         case WRITE:                 /* 0x05 */
 //                sim_printf("WRITE-e: fddst72=%02X\n", fddst72[devnum][uptr->u6]);
-            h[devnum] = i8272_w3[devnum];           // h = 0 or 1 
-            hed[devnum] = i8272_w3[devnum] << 2;    // hed = 0 or 4 [h << 2] 
+            h[devnum] = i8272_w3[devnum];           // h = 0 or 1
+            hed[devnum] = i8272_w3[devnum] << 2;    // hed = 0 or 4 [h << 2]
             sec[devnum] = i8272_w4[devnum];         // sector number (1-XX)
             secn[devnum] = i8272_w5[devnum];        // N (0-5)
             spt[devnum] = i8272_w6[devnum];         // sectors/track
             ssize[devnum] = 128 << secn[devnum];    // size of sector (bytes)
             bpt = ssize[devnum] * spt[devnum];      // bytes/track
             bpc = bpt * 2;          // bytes/cylinder
-            sim_debug (DEBUG_flow, &i8272_dev, 
+            sim_debug (DEBUG_flow, &i8272_dev,
                 "8272_svc: FDC write: hed=%d, sec=%d, secn=%d, spt=%d, ssize=%04X, bpt=%04X, bpc=%04X\n",
                     hed[devnum], sec[devnum], secn[devnum], spt[devnum], ssize[devnum], bpt, bpc);
-            sim_debug (DEBUG_flow, &i8272_dev, 
+            sim_debug (DEBUG_flow, &i8272_dev,
                 "8272_svc: FDC write: d=%d h=%d c=%d s=%d N=%d spt=%d fddst72=%02X\n",
                     drv[devnum], h[devnum], cyl[devnum], sec[devnum], secn[devnum], spt[devnum], fddst72[devnum][uptr->u6]);
             sim_debug (DEBUG_write, &i8272_dev, "8272_svc: FDC write of d=%d h=%d c=%d s=%d\n",
@@ -430,19 +430,19 @@ t_stat i8272_svc(UNIT *uptr)
                 i8272_r0[devnum] = IC_ABNORM + NR + hed[devnum] + drv[devnum]; /* Not ready error*/
                 i8272_r3[devnum] = fddst72[devnum][uptr->u6];
                 i8272_msr[devnum] |= (RQM + DIO + CB); /* enter result phase */
-                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: FDC write: Not Ready\n"); 
+                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: FDC write: Not Ready\n");
 //                } else if (fddst72[devnum][uptr->u6] & WP) {
 //                    i8272_r0[devnum] = IC_ABNORM + hed[devnum] + drv[devnum]; /* write protect error */
 //                    i8272_r1[devnum] = NW;      // set not writable in ST1
 //                    i8272_r3[devnum] = fddst72[devnum][uptr->u6] + WP;
 //                    i8272_msr[devnum] |= (RQM + DIO + CB); /* enter result phase */
-//                    sim_printf("\nWrite Protected fddst72[%d]=%02X\n", uptr->u6, fddst72[devnum][uptr->u6]); 
+//                    sim_printf("\nWrite Protected fddst72[%d]=%02X\n", uptr->u6, fddst72[devnum][uptr->u6]);
 //                    if (i8272_dev.dctrl & DEBUG_flow)
-//                        sim_printf("8272_svc: FDC write: Write Protected\n"); 
-            } else {                // get image addr for this d, h, c, s    
+//                        sim_printf("8272_svc: FDC write: Write Protected\n");
+            } else {                // get image addr for this d, h, c, s
                 imgadr = (cyl[devnum] * bpc) + (h[devnum] * bpt) + ((sec[devnum] - 1) * ssize[devnum]);
-//                sim_debug (DEBUG_write, &i8272_dev, 
-//                    "8272_svc: FDC write: DMA adr=%04X cnt=%04X imgadr=%04X\n", 
+//                sim_debug (DEBUG_write, &i8272_dev,
+//                    "8272_svc: FDC write: DMA adr=%04X cnt=%04X imgadr=%04X\n",
 //                        i8237_r0, i8237_r1, imgadr);
                 for (i=0; i<=ssize[devnum]; i++) { /* copy selected memory to image */
 //                    data = multibus_get_mbyte(i8237_r0 + i);
@@ -472,12 +472,12 @@ t_stat i8272_svc(UNIT *uptr)
             if ((fddst72[devnum][uptr->u6] & RDY) == 0) {
                 i8272_r0[devnum] = IC_ABNORM + NR + hed[devnum] + drv[devnum]; /* Not ready error*/
                 i8272_msr[devnum] |= (RQM + DIO + CB); /* enter result phase */
-                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: Not Ready\n"); 
+                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: Not Ready\n");
             } else if (fddst72[devnum][uptr->u6] & WP) {
                 i8272_r0[devnum] = IC_ABNORM + hed[devnum] + drv[devnum]; /* write protect error*/
                 i8272_r3[devnum] = fddst72[devnum][uptr->u6] + WP;
                 i8272_msr[devnum] |= (RQM + DIO + CB); /* enter result phase */
-                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: Write Protected\n"); 
+                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: Write Protected\n");
             } else {
                 ;                   /* do nothing for now */
                 i8272_msr[devnum] |= (RQM + DIO + CB); /* enter result phase */
@@ -510,7 +510,7 @@ t_stat i8272_svc(UNIT *uptr)
             if ((fddst72[devnum][uptr->u6] & RDY) == 0) {
                 i8272_r0[devnum] = IC_ABNORM + NR + hed[devnum] + drv[devnum]; /* Not ready error*/
                 i8272_r3[devnum] = fddst72[devnum][uptr->u6];
-                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: Not Ready\n"); 
+                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: Not Ready\n");
             } else {
                 cyl[devnum] = 0;            /* now on cylinder 0 */
                 fddst72[devnum][drv[devnum]] |= T0;   /* set status flag */
@@ -530,8 +530,8 @@ t_stat i8272_svc(UNIT *uptr)
             fddst72[devnum][2] |= TS;
             fddst72[devnum][3] |= TS;
 //                sim_printf("SPEC-e: fddst72[%d]=%02X\n", uptr->u6, fddst72[devnum][uptr->u6]);
-            sim_debug (DEBUG_flow, &i8272_dev, 
-                "8272_svc: FDC specify: SRT=%d ms HUT=%d ms HLT=%d ms ND=%d\n", 
+            sim_debug (DEBUG_flow, &i8272_dev,
+                "8272_svc: FDC specify: SRT=%d ms HUT=%d ms HLT=%d ms ND=%d\n",
                     16 - (drv[devnum] >> 4), 16 * (drv[devnum] & 0x0f), i8272_w2[devnum] & 0xfe, nd[devnum]);
             i8272_r0[devnum] = hed[devnum] + drv[devnum];   /* command done - no error */
             i8272_r1[devnum] = 0;
@@ -546,7 +546,7 @@ t_stat i8272_svc(UNIT *uptr)
             if ((fddst72[devnum][uptr->u6] & RDY) == 0) {
                 i8272_r0[devnum] = IC_RC + NR + hed[devnum] + drv[devnum]; /* Not ready error*/
                 i8272_r3[devnum] = fddst72[devnum][uptr->u6];
-                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: Not Ready\n"); 
+                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: Not Ready\n");
             } else {
                 i8272_w2[devnum] = cyl[devnum];     /* generate a valid address mark */
                 i8272_w3[devnum] = hed[devnum] >> 2;
@@ -567,10 +567,10 @@ t_stat i8272_svc(UNIT *uptr)
             if ((fddst72[devnum][uptr->u6] & RDY) == 0) { /* Not ready? */
                 i8272_r0[devnum] = IC_ABNORM + NR + hed[devnum] + drv[devnum]; /* error*/
                 i8272_r3[devnum] = fddst72[devnum][uptr->u6];
-                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: FDC seek: Not Ready\n"); 
+                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: FDC seek: Not Ready\n");
             } else if (i8272_w2[devnum] >= maxcyl72[devnum][uptr->u6]) {
                 i8272_r0[devnum] = IC_ABNORM + RDY + hed[devnum] + drv[devnum]; /* seek error*/
-                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: FDC seek: Invalid Cylinder %d\n", i8272_w2); 
+                sim_debug (DEBUG_flow, &i8272_dev, "8272_svc: FDC seek: Invalid Cylinder %d\n", i8272_w2);
             } else {
                 i8272_r0[devnum] |= SE + hed[devnum] + drv[devnum]; /* command done - no error */
                 cyl[devnum] = i8272_w2[devnum];         /* new cylinder number */
@@ -601,15 +601,15 @@ t_stat i8272_svc(UNIT *uptr)
         }
         pcmd[devnum] = cmd[devnum];                     /* save for result phase */
         cmd[devnum] = 0;                        /* reset command */
-        sim_debug (DEBUG_flow, &i8272_dev, 
+        sim_debug (DEBUG_flow, &i8272_dev,
             "8272_svc: Exit: msr=%02X ST0=%02X ST1=%02X ST2=%02X ST3=%02X\n",
-                i8272_msr[devnum], i8272_r0[devnum], i8272_r1[devnum], i8272_r2[devnum], i8272_r3); 
+                i8272_msr[devnum], i8272_r0[devnum], i8272_r1[devnum], i8272_r2[devnum], i8272_r3);
     }
     sim_activate (&i8272_unit[uptr->u6], i8272_unit[uptr->u6].wait);
     return SCPE_OK;
 }
 
-/* i8272 hardware reset routine */ 
+/* i8272 hardware reset routine */
 
 t_stat i8272_reset(DEVICE *dptr, uint16 base)
 {
@@ -620,9 +620,9 @@ t_stat i8272_reset(DEVICE *dptr, uint16 base)
     if (I8272_NUM) {
         sim_printf("   I8272-%d: Hardware Reset\n", i8272_devnum);
         sim_printf("   I8272-%d: Registered at %04X\n", i8272_devnum, base);
-        i8272_port[i8272_devnum] = reg_dev(i8272_r00, I8272_BASE + 0); 
-        reg_dev(i8272_r01, I8272_BASE + 1); 
-        if ((i8272_dev.flags & DEV_DIS) == 0) 
+        i8272_port[i8272_devnum] = reg_dev(i8272_r00, I8272_BASE + 0);
+        reg_dev(i8272_r01, I8272_BASE + 1);
+        if ((i8272_dev.flags & DEV_DIS) == 0)
             i8272_reset1(i8272_devnum);
         i8272_devnum++;
     } else {
@@ -631,7 +631,7 @@ t_stat i8272_reset(DEVICE *dptr, uint16 base)
     return SCPE_OK;
 }
 
-/* i8272 software reset routine */ 
+/* i8272 software reset routine */
 
 void i8272_reset1(uint8 devnum)
 {
@@ -650,9 +650,9 @@ void i8272_reset1(uint8 devnum)
 //                flag = 0;
 //            }
             uptr->capac = 0;            /* initialize unit */
-            uptr->u3 = 0; 
+            uptr->u3 = 0;
             uptr->u4 = 0;
-            uptr->u5 = devnum;          // i8272 device instance - only set here! 
+            uptr->u5 = devnum;          // i8272 device instance - only set here!
             uptr->u6 = i;               /* FDD number - only set here! */
             fddst72[devnum][i] = WP + T0 + i; /* initial drive status */
             uptr->flags |= UNIT_WPMODE; /* set WP in unit flags */
@@ -693,7 +693,7 @@ t_stat i8272_attach (UNIT *uptr, const char *cptr)
     long flen;
 
     sim_debug (DEBUG_flow, &i8272_dev, "   i8272_attach: Entered with cptr=%s\n", cptr);
-    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) { 
+    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) {
         sim_printf("   i8272_attach: Attach error\n");
         return r;
     }
@@ -718,9 +718,9 @@ t_stat i8272_attach (UNIT *uptr, const char *cptr)
             maxcyl72[devnum][uptr->u6] = 80;
             fddst72[devnum][uptr->u6] |= TS; // two sided
         }
-        sim_printf("   Drive-%d: %d bytes of disk image %s loaded, fddst72=%02X\n", 
+        sim_printf("   Drive-%d: %d bytes of disk image %s loaded, fddst72=%02X\n",
             uptr->u6, i, uptr->filename, fddst72[devnum][uptr->u6]);
-    }   
+    }
     sim_debug (DEBUG_flow, &i8272_dev, "   i8272_attach: Done\n");
     return SCPE_OK;
 }
@@ -732,7 +732,7 @@ t_stat i8272_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint8 devnum;
 
-    sim_debug (DEBUG_flow, &i8272_dev, "   i8272_set_mode: Entered with val=%08XH uptr->flags=%08X\n", 
+    sim_debug (DEBUG_flow, &i8272_dev, "   i8272_set_mode: Entered with val=%08XH uptr->flags=%08X\n",
         val, uptr->flags);
     devnum = uptr->u5;
     if (val & UNIT_WPMODE) {            /* write protect */
@@ -758,7 +758,7 @@ uint8 i8272_r00(t_bool io, uint8 data)
         if (io == 0) {                      /* read FDC status register */
             sim_debug (DEBUG_reg, &i8272_dev, "i8272_msr read as %02X\n", i8272_msr[devnum]);
             return i8272_msr[devnum];
-        } else { 
+        } else {
             sim_debug (DEBUG_reg, &i8272_dev, "Illegal write to i8272_r0\n");
             return 0;
         }
@@ -815,7 +815,7 @@ uint8 i8272_r01(t_bool io, uint8 data)
                 i8272_msr[devnum] = RQM;        /* result phase ALL OTHERS done */
                 return i8272_w5[devnum];        /* N  - sector size*/
             }
-        } else {                            /* write FDC data register */ 
+        } else {                            /* write FDC data register */
             rsp72[devnum] = 0;                        /* clear read stack index */
             switch (wsp72[devnum]) {                  /* write to next stack register */
             case 0:

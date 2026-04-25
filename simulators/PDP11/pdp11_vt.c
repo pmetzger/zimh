@@ -62,8 +62,8 @@
 /*
  * run a VT11/VS60 cycle every this many PDP-11 "cycle" times;
  *
- * this includes phosphor aging and polling for events (mouse movement) 
- * every refresh_interval (determined internally while processing the 
+ * this includes phosphor aging and polling for events (mouse movement)
+ * every refresh_interval (determined internally while processing the
  * VT11/VS60 cycle).
  */
 #define VT11_DELAY 1
@@ -194,7 +194,7 @@ DEVICE vt_dev = {
     NULL, NULL, &vt_reset,
     &vt_boot, NULL, NULL,
     &vt_dib, DEV_DIS | DEV_DISABLE | DEV_UBUS | DEV_Q18 | DEV_DEBUG,
-    0, vt_deb, NULL, NULL, &vt_help, NULL, NULL, 
+    0, vt_deb, NULL, NULL, &vt_help, NULL, NULL,
     &vt_description
 };
 
@@ -230,24 +230,24 @@ t_stat
 vt_rd(int32 *data, int32 PA, int32 access)
 {
     t_stat stat = SCPE_OK;
-    
+
     switch (PA & 036) {
-    case 000:             *data = vt11_get_dpc(); break; 
-    case 002:             *data = vt11_get_mpr(); break; 
+    case 000:             *data = vt11_get_dpc(); break;
+    case 002:             *data = vt11_get_mpr(); break;
     case 004:             *data = vt11_get_xpr(); break;
     case 006:             *data = vt11_get_ypr(); break;
-    case 010:   if (VS60) *data = vt11_get_rr();  else stat = SCPE_NXM; break; 
-    case 012:   if (VS60) *data = vt11_get_spr(); else stat = SCPE_NXM; break; 
-    case 014:   if (VS60) *data = vt11_get_xor(); else stat = SCPE_NXM; break; 
-    case 016:   if (VS60) *data = vt11_get_yor(); else stat = SCPE_NXM; break; 
-    case 020:   if (VS60) *data = vt11_get_anr(); else stat = SCPE_NXM; break; 
-    case 022:   if (VS60) *data = vt11_get_scr(); else stat = SCPE_NXM; break; 
-    case 024:   if (VS60) *data = vt11_get_nr();  else stat = SCPE_NXM; break; 
-    case 026:   if (VS60) *data = vt11_get_sdr(); else stat = SCPE_NXM; break; 
-    case 030:   if (VS60) *data = vt11_get_str(); else stat = SCPE_NXM; break; 
-    case 032:   if (VS60) *data = vt11_get_sar(); else stat = SCPE_NXM; break; 
-    case 034:   if (VS60) *data = vt11_get_zpr(); else stat = SCPE_NXM; break; 
-    case 036:   if (VS60) *data = vt11_get_zor(); else stat = SCPE_NXM; break; 
+    case 010:   if (VS60) *data = vt11_get_rr();  else stat = SCPE_NXM; break;
+    case 012:   if (VS60) *data = vt11_get_spr(); else stat = SCPE_NXM; break;
+    case 014:   if (VS60) *data = vt11_get_xor(); else stat = SCPE_NXM; break;
+    case 016:   if (VS60) *data = vt11_get_yor(); else stat = SCPE_NXM; break;
+    case 020:   if (VS60) *data = vt11_get_anr(); else stat = SCPE_NXM; break;
+    case 022:   if (VS60) *data = vt11_get_scr(); else stat = SCPE_NXM; break;
+    case 024:   if (VS60) *data = vt11_get_nr();  else stat = SCPE_NXM; break;
+    case 026:   if (VS60) *data = vt11_get_sdr(); else stat = SCPE_NXM; break;
+    case 030:   if (VS60) *data = vt11_get_str(); else stat = SCPE_NXM; break;
+    case 032:   if (VS60) *data = vt11_get_sar(); else stat = SCPE_NXM; break;
+    case 034:   if (VS60) *data = vt11_get_zpr(); else stat = SCPE_NXM; break;
+    case 036:   if (VS60) *data = vt11_get_zor(); else stat = SCPE_NXM; break;
     default: stat = SCPE_NXM;
     }
     sim_debug (DEB_RRD, &vt_dev, "vt_rd(%s-PA=0%o,data=0x%X(0%o),access=%d)\n", vt_regnam[(PA & 036)>>1], (int)PA, (int)*data, (int)*data, (int)access);
@@ -258,7 +258,7 @@ t_stat
 vt_wr(int32 data, int32 PA, int32 access)
 {
     uint16 d = data & 0177777;          /* mask just in case */
-    
+
     sim_debug (DEB_RWR, &vt_dev, "vt_wr(%s-PA=0%o,data=0x%X(0%o),access=%d)\n", vt_regnam[(PA & 036)>>1], (int)PA, (int)data, (int)data, (int)access);
 
     switch (PA & 037) {
@@ -294,18 +294,18 @@ vt_wr(int32 data, int32 PA, int32 access)
     case 002:                     vt11_set_mpr(d); return SCPE_OK;
     case 004:                     vt11_set_xpr(d); return SCPE_OK;
     case 006:                     vt11_set_ypr(d); return SCPE_OK;
-    case 010:   if (!VS60) break; vt11_set_rr(d);  return SCPE_OK; 
-    case 012:   if (!VS60) break; vt11_set_spr(d); return SCPE_OK; 
-    case 014:   if (!VS60) break; vt11_set_xor(d); return SCPE_OK; 
-    case 016:   if (!VS60) break; vt11_set_yor(d); return SCPE_OK; 
-    case 020:   if (!VS60) break; vt11_set_anr(d); return SCPE_OK; 
-    case 022:   if (!VS60) break; vt11_set_scr(d); return SCPE_OK; 
+    case 010:   if (!VS60) break; vt11_set_rr(d);  return SCPE_OK;
+    case 012:   if (!VS60) break; vt11_set_spr(d); return SCPE_OK;
+    case 014:   if (!VS60) break; vt11_set_xor(d); return SCPE_OK;
+    case 016:   if (!VS60) break; vt11_set_yor(d); return SCPE_OK;
+    case 020:   if (!VS60) break; vt11_set_anr(d); return SCPE_OK;
+    case 022:   if (!VS60) break; vt11_set_scr(d); return SCPE_OK;
     case 024:   if (!VS60) break; vt11_set_nr(d);  return SCPE_OK;
     case 026:   if (!VS60) break; vt11_set_sdr(d); return SCPE_OK;
-    case 030:   if (!VS60) break; vt11_set_str(d); return SCPE_OK; 
-    case 032:   if (!VS60) break; vt11_set_sar(d); return SCPE_OK; 
+    case 030:   if (!VS60) break; vt11_set_str(d); return SCPE_OK;
+    case 032:   if (!VS60) break; vt11_set_sar(d); return SCPE_OK;
     case 034:   if (!VS60) break; vt11_set_zpr(d); return SCPE_OK;
-    case 036:   if (!VS60) break; vt11_set_zor(d); return SCPE_OK; 
+    case 036:   if (!VS60) break; vt11_set_zor(d); return SCPE_OK;
     }
     return SCPE_NXM;
 }
@@ -333,7 +333,7 @@ vt_reset(DEVICE *dptr)
     DEVICE *ng_dptr;
 
     ng_dptr = find_dev ("NG");
-    if (!(dptr->flags & DEV_DIS) && 
+    if (!(dptr->flags & DEV_DIS) &&
         (ng_dptr != NULL) && !(ng_dptr->flags & DEV_DIS)) {
         dptr->flags |= DEV_DIS;
         return sim_messagef (SCPE_NOFNC, "VT and NG device can't both be enabled\n");
@@ -354,35 +354,35 @@ vt_reset(DEVICE *dptr)
 
 /*
  * GT4x/GT62 bootstrap (acts as remote terminal)
- * 
+ *
  */
 
 t_addr vt_rom_base = 017766000;
 
 uint16 vt_boot_rom[] = {
                                       //                                 ;       .ASECT
-                                      //                                 
+                                      //
                                       //                                 ;BOOTVT.S09  5/2/72
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
                                       //                                 ;       VT-40 BOOTSTRAP LOADER, VERSION S09, RELEASE R01, 5/2/72
-                                      //                                 
+                                      //
                                       //                                 ;       COPYRIGHT 1972, DIGITAL EQUIPMENT CORPORATION
                                       //                                 ;       146 MAIN STREET
                                       //                                 ;       MAYNARD, MASSACHUSSETTS
                                       //                                 ;                               01754
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
                                       //                                 ;       WRITTEN BY JACK BURNESS, SENIOR SYSTEMS ARCHITECT!
-                                      //                                 
-                                      //                                 
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
+                                      //
+                                      //
                                       //                                 ;       THIS ROUTINE IS INTENDED TO BE LOADED IN THE ROM PORTION OF THE VT-40.
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
                                       //                                 ;       REGISTER DEFINITIONS:
-                                      //                                 
+                                      //
                                       //         000000                          R0=%0
                                       //         000001                          R1=%1
                                       //         000002                          R2=%2
@@ -391,86 +391,86 @@ uint16 vt_boot_rom[] = {
                                       //         000005                          R5=%5
                                       //         000006                          R6=%6
                                       //         000007                          R7=%7
-                                      //                                 
+                                      //
                                       //         000006                          SP=R6
                                       //         000007                          PC=R7
-                                      //                                 
+                                      //
                                       //         000000                          RET1=R0                         ;RETURN OF VALUE REGISTER.
                                       //         000001                          INP1=R1                         ;ARGUMENT FOR CALLED FUNCTION
                                       //         000002                          INP2=R2                         ;SECOND ARGUMENT.
                                       //         000003                          WORK1=R3                        ;FIRST WORK REGISTER.
                                       //         000004                          WORK2=R4                        ;SECOND WORKING REGISTER.
                                       //         000005                          SCR1=R5                         ;SCRATCH REGISTER.
-                                      //                                 
+                                      //
                                       //         000003                          L.CKSM=WORK1                    ;OVERLAPPING DEFINITIONS FOR LOADER PORTION.
                                       //         000000                          L.BYT=RET1
                                       //         000005                          L.BC=SCR1
                                       //         000001                          L.ADR=INP1
-                                      //                                 
-                                      //                                 
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
+                                      //
+                                      //
                                       //         016000                          COREND=16000                    ;FIRST LOCATION OF NON-CORE.
-                                      //                                 
+                                      //
                                       //                                 ;       ROMORG=037000                   ;WHERE THE ROM PROGRAM SHOULD GO.
                                       //         166000                          ROMORG=166000                   ;WHERE THE ROM PROGRAM SHOULD GO.
                                       //         000000                          STARTX=0                        ;WHERE TO START DISPLAYING THE X POSITIONS.
                                       //         001360                          STARTY=1360                     ;WHERE TO START DISPLAYING THE Y.
-                                      //                                 
+                                      //
                                       //         172000                          VT40PC=172000                   ;VT40 PROGRAM COUNTER.
                                       //         177560                          KBDIS=177560                    ;TTY INPUT STATUS.
                                       //         175614                          P10OS=175614                    ;PDP-10 OUTPUT STATUS.
                                       //         175610                          P10IS=175610                    ;PDP-10 INPUT STATUS.
-                                      //                                 
+                                      //
                                       //         177562                          KBDIB=KBDIS+2                   ;TTY INPUT BUFFER.
                                       //         175612                          P10IB=P10IS+2                   ;PDP-10 INPUT CHARACTER.
                                       //         175616                          P10OB=P10OS+2                   ;PDP-10 OUTPUT BUFFER.
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
                                       //         015776                          P10OC=COREND-2                  ;CHARACTER TO BE SENT TO THE PDP-10
                                       //         015772                          P10IC=P10OC-4                   ;INPUT CHARACTER FROM 10 PLUS ONE SAVE CHARACTER
                                       //         015770                          STKSRT=P10IC-2                  ;FIRST LOCATION OF STACK.
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
                                       //         160000                          JMPDIS=160000                   ;THE VT-40 DISPLAY JUMP INSTRUCTION.
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
                                       //         000024                          PWRFAL=24                       ;POWER FAIL RESTART LOCATION.
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
                                       //         166000                          .=ROMORG                        ;SET THE ORIGIN NOW!!!!
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
     0012705, 0000026,                 // 166000  012705  000026          START:  MOV     #PWRFAL+2,SCR1          ;PICK UP POINTER TO P.F. STATUS.
     0005015,                          // 166004  005015                          CLR     @SCR1                   ;CLEAR IT OUT TO BE SURE.
     0010745,                          // 166006  010745                          MOV     PC,-(SCR1)              ;SET UP THE RESTART LOCATION.
-                                      //                                 
+                                      //
     0000005,                          // 166010  000005                          RESET                           ;RESET THE BUS.
-                                      //                                 
+                                      //
     0012767, 0000007, 0007570,        // 166012  012767  000007  007570          MOV     #7,P10IS                ;INITIALIZE PDP-10 INPUT
     0012767, 0000001, 0011532,        // 166020  012767  000001  011532          MOV     #1,KBDIS                ;INITIALIZE TTY INPUT.
     0012767, 0000201, 0007560,        // 166026  012767  000201  007560          MOV     #201,P10OS              ;INITIALIZE PDP-10 OUTPUT.
-                                      //                                 
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
+                                      //
     0012706, 0015770,                 // 166034  012706  015770          RESTRT: MOV     #STKSRT,SP              ;SET UP THE STACK NOW!
     0005001,                          // 166040  005001                          CLR     L.ADR                   ;CLEAR ADDRESS POINTER.
     0012702, 0160000,                 // 166042  012702  160000                  MOV     #JMPDIS,INP2            ;PLACE A DISPLAY JUMP INSTRUCTION IN A REGISTER.
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
     0010221,                          // 166046  010221                          MOV     INP2,(L.ADR)+           ;MOVE IT TO LOCATION 0.
     0012711, 0166756,                 // 166050  012711  166756                  MOV     #DISPRG,(L.ADR)         ;MOVE ADDRESS POINTER INTO 2.
     0012701, 0000030,                 // 166054  012701  000030                  MOV     #PWRFAL+4,L.ADR         ;SET UP WHERE WE WILL STORE CHARACTERS.
     0005000,                          // 166060  005000                          CLR     RET1                    ;PREPARE TO INSERT A ZERO CHARACTER.
     0004767, 0000022,                 // 166062  004767  000022                  JSR     PC,DOCHAR               ;INSERT IT NOW.
     0005067, 0003706,                 // 166066  005067  003706                  CLR     VT40PC                  ;CLEAR THE DISPLAY PROGRAM COUNTER AND START.
-                                      //                                 
+                                      //
     0004767, 0000210,                 // 166072  004767  000210          MAJOR:  JSR     PC,GETCHR               ;GET A CHARACTER NOW.
     0000240,                          // 166076  000240                          NOP
     0000240,                          // 166100  000240                          NOP
     0000240,                          // 166102  000240                          NOP
     0012746, 0166072,                 // 166104  012746  166072                  MOV     #MAJOR,-(SP)            ;INSERT IN DISPLAY BUFFER NOW.
-                                      //                                 
+                                      //
     0010105,                          // 166110  010105                  DOCHAR: MOV     L.ADR,SCR1              ;GET CURRENT BUFFER POSITION NOW.
     0022525,                          // 166112  022525                          CMP     (SCR1)+,(SCR1)+         ;BYPASS CURRENT DISPLAY JUMP.
     0005025,                          // 166114  005025                          CLR     (SCR1)+                 ;CLEAR FUTURE ADDRESS FOR JUMP.
@@ -480,17 +480,17 @@ uint16 vt_boot_rom[] = {
     0050021,                          // 166124  050021                          BIS     RET1,(L.ADR)+           ;IT'S DONE THIS WAY TO WASTE 2 CYCLES.
     0010211,                          // 166126  010211                          MOV     INP2,(L.ADR)            ;TO AVOID TIMING PROBLEMS WITH THE VT40.
     0000207,                          // 166130  000207                          RTS     PC                      ;AND FINALLY RETURN.
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
     0004767, 0000124,                 // 166132  004767  000124          GET8:   JSR     PC,GETSIX               ;GET SIX BITS NOW.
     0010046,                          // 166136  010046                          MOV     RET1,-(SP)              ;SAVE THE CHARACTER NOW.
     0000401,                          // 166140  000401                          BR      GETP84                  ;BYPASS THE 8'ER
     0005002,                          // 166142  005002                  GET84:  CLR     INP2                    ;RESET THE MAGIC REGISTER NOW.
     0005722,                          // 166144  005722                  GETP84: TST     (INP2)+                 ;INCREMENT WHERE TO GO.
     0066207, 0166250,                 // 166146  066207  166250                  ADD     GET8TB(INP2),PC         ;UPDATE PC NOW.
-                                      //                                 
+                                      //
                                       //         166152                  GET8P=.
-                                      //                                 
+                                      //
     0004767, 0000104,                 // 166152  004767  000104          GET81:  JSR     PC,GETSIX               ;GET A CHARACTER NOW.
     0010004,                          // 166156  010004                          MOV     RET1,WORK2              ;SAVE FOR A SECOND.
     0006300,                          // 166160  006300                          ASL     RET1
@@ -498,12 +498,12 @@ uint16 vt_boot_rom[] = {
     0106300,                          // 166164  106300                          ASLB    RET1
     0106116,                          // 166166  106116                          ROLB    @SP                     ;PACK THEM IN.
     0106300,                          // 166170  106300                          ASLB    RET1
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
     0106116,                          // 166172  106116                          ROLB    @SP                     ;A GOOD 8 BIT THING.
     0012600,                          // 166174  012600                          MOV     (SP)+,RET1              ;POP AND RETURN NOW.
     0000207,                          // 166176  000207                          RTS     PC
-                                      //                                 
+                                      //
     0006300,                          // 166200  006300                  GET82:  ASL     RET1                    ;WORST CASE, SHIFT 4
     0006300,                          // 166202  006300                          ASL     RET1
     0106300,                          // 166204  106300                          ASLB    RET1
@@ -517,7 +517,7 @@ uint16 vt_boot_rom[] = {
     0010400,                          // 166224  010400                          MOV     WORK2,RET1
     0012604,                          // 166226  012604                          MOV     (SP)+,WORK2
     0000207,                          // 166230  000207                          RTS     PC
-                                      //                                 
+                                      //
     0006100,                          // 166232  006100                  GET83:  ROL     RET1
     0006100,                          // 166234  006100                          ROL     RET1
     0006004,                          // 166236  006004                          ROR     WORK2
@@ -526,26 +526,26 @@ uint16 vt_boot_rom[] = {
     0106000,                          // 166244  106000                          RORB    RET1                    ;FINAL CHARACTER ASSEMBLED.
     0005726,                          // 166246  005726                          TST     (SP)+                   ;FUDGE STACK.
     0000207,                          // 166250  000207                          RTS     PC                      ;AND RETURN NOW.
-                                      //                                 
+                                      //
                                       //         166250                  GET8TB  =       .-2                     ;PUSH ZERO CONDITION BACK INTO NEVER-NEVER LAND.
-                                      //                                 
+                                      //
     0000000,                          // 166252  000000                          .WORD   GET81-GET8P
     0000026,                          // 166254  000026                          .WORD   GET82-GET8P
     0000060,                          // 166256  000060                          .WORD   GET83-GET8P
     0177770,                          // 166260  177770                          .WORD   GET84-GET8P
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
     0004767, 0000020,                 // 166262  004767  000020          GETSIX: JSR     PC,GETCHR
     0020027, 0000040,                 // 166266  020027  000040                  CMP     RET1,#40
     0002546,                          // 166272  002546                          BLT     L.BAD
     0020027, 0000137,                 // 166274  020027  000137                  CMP     RET1,#137
     0003143,                          // 166300  003143                          BGT     L.BAD
     0000207,                          // 166302  000207                          RTS     PC
-                                      //                                 
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
+                                      //
     0005726,                          // 166304  005726                  GETCHP: TST     (SP)+                   ;UPDATE THE STACK.
-                                      //                                 
+                                      //
     0012700, 0015772,                 // 166306  012700  015772          GETCHR: MOV     #P10IC,RET1             ;SET UP POINTER TO THE INPUT CHARACTER.
     0004767, 0000064,                 // 166312  004767  000064          GETCHL: JSR     PC,CHECK
     0005710,                          // 166316  005710                          TST     @RET1                   ;ANY CHARACTER THERE?
@@ -554,8 +554,8 @@ uint16 vt_boot_rom[] = {
     0005020,                          // 166324  005020                          CLR     (RET1)+                 ;CLEAR THE CHAR GOT FLAG NOW.
     0042716, 0177600,                 // 166326  042716  177600                  BIC     #-200,(SP)              ;CLEAR AWAY PARITY NOW.
     0001764,                          // 166332  001764                          BEQ     GETCHP                  ;IF ZERO, GET ANOTHER
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
     0022716, 0000177,                 // 166334  022716  000177                  CMP     #177,(SP)
     0001761,                          // 166340  001761                          BEQ     GETCHP                  ;ALSO IGNORE RUBOUTS.
     0022710, 0000175,                 // 166342  022710  000175                  CMP     #175,@RET1              ;WAS IT A "175"
@@ -565,53 +565,53 @@ uint16 vt_boot_rom[] = {
     0001626,                          // 166356  001626                          BEQ     RESTRT                  ;YEP. RESTART
     0021027, 0000114,                 // 166360  021027  000114                  CMP     @RET1,#114              ;IS IT AN L
     0001455,                          // 166364  001455                          BEQ     LOAD                    ;YEP. LOAD.
-                                      //                                 
+                                      //
     0011610,                          // 166366  011610                  GETNP:  MOV     (SP),@RET1              ;NOW DO THE FUDGING.
     0012600,                          // 166370  012600                          MOV     (SP)+,RET1
     0020027, 0000175,                 // 166372  020027  000175                  CMP     RET1,#175
     0001743,                          // 166376  001743                          BEQ     GETCHR                  ;IF ALTMODE, LOOP
     0000207,                          // 166400  000207                          RTS     PC
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
     0005767, 0027370,                 // 166402  005767  027370          CHECK:  TST     P10OC                   ;DO WE WANT TO OUTPUT?
     0001410,                          // 166406  001410                          BEQ     CHECK1                  ;NO.
     0105767, 0007200,                 // 166410  105767  007200                  TSTB    P10OS                   ;WE DO. IS THE 10 READY?
     0100005,                          // 166414  100005                          BPL     CHECK1                  ;NOT QUITE.
     0016767, 0027354, 0007172,        // 166416  016767  027354  007172          MOV     P10OC,P10OB             ;IT'S READY. SEND THE CHARACTER.
     0005067, 0027346,                 // 166424  005067  027346                  CLR     P10OC                   ;AND THE SAVED CHARACTER.
-                                      //                                 
+                                      //
     0105767, 0011124,                 // 166430  105767  011124          CHECK1: TSTB    KBDIS                   ;HEY, IS THE KEYBOARD READY?
     0100014,                          // 166434  100014                          BPL     CHECK3                  ;NOPE. NO LUCK.
     0116746, 0011120,                 // 166436  116746  011120                  MOVB    KBDIB,-(SP)             ;YEP. SAVE THE CHARACTER NOW.
     0012767, 0000001, 0011110,        // 166442  012767  000001  011110          MOV     #1,KBDIS                ;AND REENABLE THE COMMUNICATIONS DEVICE.
-                                      //                                 
+                                      //
     0004767, 0177726,                 // 166450  004767  177726          CHECK2: JSR     PC,CHECK                ;IS THE OUTPUT READY?
     0005767, 0027316,                 // 166454  005767  027316                  TST     P10OC
     0001373,                          // 166460  001373                          BNE     CHECK2                  ;IF NOT, WAIT TILL DONE.
     0012667, 0007130,                 // 166462  012667  007130                  MOV     (SP)+,P10OB             ;AND THEN SEND OUT THE CHARACTER.
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
     0105767, 0007116,                 // 166466  105767  007116          CHECK3: TSTB    P10IS                   ;IS THE 10 TALKING TO ME.
     0100011,                          // 166472  100011                          BPL     CHECK4                  ;NOPE. EXIT.
     0116767, 0007112, 0027270,        // 166474  116767  007112  027270          MOVB    P10IB,P10IC             ;GET THE CHARACTER NOW.
     0052767, 0177400, 0027262,        // 166502  052767  177400  027262          BIS     #-400,P10IC             ;MAKE SURE IT'S NONE ZERO.
     0012767, 0000007, 0007072,        // 166510  012767  000007  007072          MOV     #7,P10IS                ;REINITIALIZE COMMUNICATION LINE.
-                                      //                                 
+                                      //
     0000207,                          // 166516  000207                  CHECK4: RTS     PC                      ;AND RETURN.
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
                                       //                                 ;       THE   L  O  A  D  E  R
-                                      //                                 
+                                      //
     0005002,                          // 166520  005002                  LOAD:   CLR    INP2                     ;RESET TO FIRST 8 BIT CHARACTER.
     0012712, 0172000,                 // 166522  012712  172000                  MOV    #172000,(INP2)           ;AND ALSO CLEVERLY STOP THE VT40.
     0012706, 0015770,                 // 166526  012706  015770                  MOV    #STKSRT,SP               ;RESET STACK POINTER NOW.
-                                      //                                 
+                                      //
     0005003,                          // 166532  005003                  L.LD2:  CLR    L.CKSM                   ;CLEAR THE CHECKSUM
     0004767, 0000070,                 // 166534  004767  000070                  JSR    PC,L.PTR                 ;GET A BYTE NOW.
     0105300,                          // 166540  105300                          DECB   L.BYT                    ;IS IT ONE?
     0001373,                          // 166542  001373                          BNE    L.LD2                    ;NOPE. WAIT AWHILE
     0004767, 0000060,                 // 166544  004767  000060                  JSR    PC,L.PTR                 ;YEP. GET NEXT CHARACTER.
-                                      //                                 
+                                      //
     0004767, 0000072,                 // 166550  004767  000072                  JSR    PC,L.GWRD                ;GET A WORD.
     0010005,                          // 166554  010005                          MOV    L.BYT,L.BC               ;GET THE COUNTER NOW.
     0162705, 0000004,                 // 166556  162705  000004                  SUB    #4,L.BC                  ;CHOP OFF EXTRA STUFF.
@@ -619,36 +619,36 @@ uint16 vt_boot_rom[] = {
     0001437,                          // 166566  001437                          BEQ    L.JMP                    ;YEP. MUST BE END.
     0004767, 0000052,                 // 166570  004767  000052                  JSR    PC,L.GWRD                ;NOPE. GET THE ADDRESS.
     0010001,                          // 166574  010001                          MOV    L.BYT,L.ADR              ;AND REMEMBER FOR OLD TIMES SAKE.
-                                      //                                 
+                                      //
     0004767, 0000026,                 // 166576  004767  000026          L.LD3:  JSR    PC,L.PTR                 ;GET A BYTE (DATA)
     0002010,                          // 166602  002010                          BGE    L.LD4                    ;ALL DONE WITH THE COUNTER?
     0105703,                          // 166604  105703                          TSTB   L.CKSM                   ;YEP. GOOD CHECK SUM?
     0001751,                          // 166606  001751                          BEQ    L.LD2                    ;NOPE. LOAD ERROR.
-                                      //                                 
+                                      //
     0012700,                          // 166610  012700                  L.BAD:  MOV    (PC)+,RET1               ;SEND OUT SOME CHARACTERS NOW.
-    0041175,                          // 166612     175          
+    0041175,                          // 166612     175
                                       // 166613     102                          .BYTE  175,102                  ;"CTRL BAD"
     0004767, 0000110,                 // 166614  004767  000110                  JSR    PC,SENDIT
     0000167, 0177210,                 // 166620  000167  177210                  JMP    RESTRT
-                                      //                                 
+                                      //
     0110021,                          // 166624  110021                  L.LD4:  MOVB   L.BYT,(L.ADR)+           ;PLACE THE BYTE IN CORE.
     0000763,                          // 166626  000763                          BR     L.LD3                    ;GET ANOTHER ONE.
-                                      //                                 
+                                      //
     0004767, 0177276,                 // 166630  004767  177276          L.PTR:  JSR    PC,GET8                  ;GET 8 BITS NOW.
     0060003,                          // 166634  060003                          ADD    L.BYT,L.CKSM             ;UPDATE CHECKSUM
     0042700, 0177400,                 // 166636  042700  177400                  BIC    #177400,L.BYT            ;CLEAN UP THE BYTE NOW.
     0005305,                          // 166642  005305                          DEC    L.BC                     ;UPDATE THE COUNTER.
     0000207,                          // 166644  000207                          RTS    PC                       ;RETURN NOW.
-                                      //                                 
+                                      //
     0004767, 0177756,                 // 166646  004767  177756          L.GWRD: JSR    PC,L.PTR                 ;GET A CHARACTER.
     0010046,                          // 166652  010046                          MOV    L.BYT,-(SP)              ;SAVE FOR A SECOND.
     0004767, 0177750,                 // 166654  004767  177750                  JSR    PC,L.PTR                 ;GET ANOTHER CHARACTER.
     0000300,                          // 166660  000300                          SWAB   L.BYT                    ;NOW ASSEMBLE THE WORD.
     0052600,                          // 166662  052600                          BIS    (SP)+,L.BYT              ;AND RETURN WITH A 16 BITER.
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
     0000207,                          // 166664  000207                          RTS    PC
-                                      //                                 
+                                      //
     0004767, 0177754,                 // 166666  004767  177754          L.JMP:  JSR    PC,L.GWRD                ;GET A WORD
     0010046,                          // 166672  010046                          MOV    L.BYT,-(SP)              ;SAVE ON THE STACK.
     0004767, 0177730,                 // 166674  004767  177730                  JSR    PC,L.PTR                 ;GET A CHARACTER.
@@ -657,15 +657,15 @@ uint16 vt_boot_rom[] = {
     0032716, 0000001,                 // 166704  032716  000001                  BIT    #1,(SP)                  ;IS IT ODD?
     0001406,                          // 166710  001406                          BEQ    L.JMP1                   ;YEP. START PROGRAM GOING NOW.
     0012700,                          // 166712  012700                          MOV    (PC)+,RET1               ;TELL PDP-10 WE'VE LOADED OK.
-    0043575,                          // 166714     175          
+    0043575,                          // 166714     175
                                       // 166715     107                          .BYTE  175,107
     0004767, 0000006,                 // 166716  004767  000006                  JSR    PC,SENDIT
     0000000,                          // 166722  000000                          HALT
     0000776,                          // 166724  000776                          BR      .-2
-                                      //                                 
+                                      //
     0000136,                          // 166726  000136                  L.JMP1: JMP     @(SP)+                  ;AND AWAY WE GO.
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
     0004767, 0177446,                 // 166730  004767  177446          SENDIT: JSR     PC,CHECK                ;POLL THE OUTPUT DEVICE NOW.
     0005767, 0027036,                 // 166734  005767  027036                  TST     P10OC                   ;OUTPUT CLEAR?
     0001373,                          // 166740  001373                          BNE     SENDIT                  ;NOPE. LOOP AWHILE LONGER.
@@ -674,22 +674,22 @@ uint16 vt_boot_rom[] = {
     0000300,                          // 166750  000300                          SWAB    RET1                    ;AND SWAP THEM NOW.
     0001366,                          // 166752  001366                          BNE     SENDIT                  ;IF NOT EQUAL, REPEAT.
     0000207,                          // 166754  000207                          RTS     PC
-    0000000,                          // 166756  000000                                      //                                 
-    0000000,                          // 166760  000000                                      //                                 
-    0000000,                          // 166762  000000                                      //                                 
-    0000000,                          // 166764  000000                                      //                                 
-    0000000,                          // 166766  000000                                      //                                 
-    0000000,                          // 166770  000000                                      //                                 
-    0000000,                          // 166772  000000                                      //                                 
-    0000000,                          // 166774  000000                                      //                                 
-    0000000,                          // 166776  000000                                      //                                 
-                                      //                                 
+    0000000,                          // 166756  000000                                      //
+    0000000,                          // 166760  000000                                      //
+    0000000,                          // 166762  000000                                      //
+    0000000,                          // 166764  000000                                      //
+    0000000,                          // 166766  000000                                      //
+    0000000,                          // 166770  000000                                      //
+    0000000,                          // 166772  000000                                      //
+    0000000,                          // 166774  000000                                      //
+    0000000,                          // 166776  000000                                      //
+                                      //
                                       //                                 ;               THIS IS THE INITIALIZING VT40 PROGRAM WHICH WILL
                                       //                                 ;               JUMP TO THE PROGRAM AFTER THE POWER FAIL LOCATIONS
                                       //                                 ;               WHICH WILL JUMP TO ZERO WHICH WILL JUMP BACK TO HERE.
-                                      //                                 
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
+                                      //
     0170256,                          // 166756  170256                  DISPRG:         .WORD 170256            ;LOAD STATUS REGISTER FOR NORMAL OPERATION.
     0115124,                          // 166760  115124                                  .WORD 115124            ;SET POINT MODE. "NORMAL".
     0000000,                          // 166762  000000                                  .WORD STARTX            ;X COORDINATE
@@ -697,8 +697,8 @@ uint16 vt_boot_rom[] = {
     0100000,                          // 166766  100000                                  .WORD 100000            ;SET CHARACTER MODE.
     0160000,                          // 166770  160000                                  .WORD JMPDIS            ;THEN JUMP TO THE POWERFAIL LOCATION.
     0000030,                          // 166772  000030                                  .WORD PWRFAL+4          ;TO DISPLAY USERS CHARACTERS.
-                                      //                                 
-                                      //                                 
+                                      //
+                                      //
                                       //         000001                                  .END
     };
 
@@ -912,10 +912,10 @@ vt_fetch(uint32 addr, vt11word *wp)
 
     /* apply Unibus map, when appropriate */
 
-    /* 
-     * The Graphics processor only has a 16 bit program counter 
-     * (i.e. address register).  If this address happens to be >= 56Kb 
-     * then it is a reference to a graphics program running from 
+    /*
+     * The Graphics processor only has a 16 bit program counter
+     * (i.e. address register).  If this address happens to be >= 56Kb
+     * then it is a reference to a graphics program running from
      * ROM and in order for that to be found on an 18 bit Unibus
      * we need to sign extend the the address so it resides in
      * the I/O page.

@@ -35,7 +35,7 @@
    disk address.
 
    The RB730 has two regiter address spaces:
-   
+
    - One dummy 16-bit register in unibus I/O space to allow the controller to
      be detected by SYSGEN autoconfigure (and others).
    - Eight 32-bit registers in the unibus controller space for the actual
@@ -254,19 +254,19 @@ DEBTAB rb_debug[] = {
 };
 
 MTAB rb_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable disk drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock disk drive" },
-    { UNIT_DUMMY,      0, NULL,            "BADBLOCK", 
+    { UNIT_DUMMY,      0, NULL,            "BADBLOCK",
         &rb_set_bad, NULL, NULL, "write bad block table on last track" },
     { (UNIT_RB80+UNIT_ATT),             UNIT_ATT, "RB02", NULL, NULL },
     { (UNIT_RB80+UNIT_ATT), (UNIT_RB80+UNIT_ATT), "RB80", NULL, NULL },
     { (UNIT_RB80+UNIT_ATT),                    0, "RB02", NULL, NULL },
     { (UNIT_RB80+UNIT_ATT),            UNIT_RB80, "RB80", NULL, NULL },
-    { (UNIT_RB80),                             0, NULL, "RB02", 
+    { (UNIT_RB80),                             0, NULL, "RB02",
         &rb_set_size, NULL, NULL, "Set type to RB02" },
-    { (UNIT_RB80),                     UNIT_RB80, NULL, "RB80", 
+    { (UNIT_RB80),                     UNIT_RB80, NULL, "RB80",
         &rb_set_size, NULL, NULL, "Set type to RB80" },
     { MTAB_XTD|MTAB_VDV|MTAB_VALR, 0010, "ADDRESS", "ADDRESS",
       &set_addr, &show_addr, NULL, "Bus address" },
@@ -281,7 +281,7 @@ DEVICE rb_dev = {
     NULL, NULL, &rb_reset,
     NULL, &rb_attach, NULL,
     &rb_dib, DEV_DISABLE | DEV_UBUS | DEV_DEBUG, 0,
-    rb_debug, NULL, NULL, NULL, NULL, NULL, 
+    rb_debug, NULL, NULL, NULL, NULL, NULL,
     &rb_description
     };
 
@@ -373,7 +373,7 @@ switch ((PA >> 2) & 07) {
         rbcs = rbcs & ~(~data & RBCS_C0);
         rbcs = (rbcs & ~RBCS_RW) | (data & RBCS_RW);
         if (data & RBCS_ATN) CLR_INT (RB);
-        
+
         if ((data & CSR_DONE) || (sim_is_active (uptr))) /* ready set? */
             return SCPE_OK;
 

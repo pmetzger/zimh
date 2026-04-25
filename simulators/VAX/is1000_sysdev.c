@@ -184,7 +184,7 @@ DEVICE dz_dev = {
     2, 10, 31, 1, 16, 8,
     NULL, NULL, &dz_reset,
     NULL, NULL, NULL,
-    NULL, 0, 0, NULL, NULL, NULL, &dz_help, NULL, NULL, 
+    NULL, 0, 0, NULL, NULL, NULL, &dz_help, NULL, NULL,
     &dz_description
     };
 
@@ -220,7 +220,7 @@ DEVICE sysd_dev = {
     NULL, NULL, &sysd_reset,
     NULL, NULL, NULL,
     NULL, DEV_DEBUG,
-    0, sysd_debug, NULL, NULL, NULL, NULL, NULL, 
+    0, sysd_debug, NULL, NULL, NULL, NULL, NULL,
     &sysd_description
     };
 
@@ -487,7 +487,7 @@ switch (rg) {
     case 3:                                             /* XBUF */
         val = dz_unit[1].buf;
         break;
-        
+
     default:
         val = 0;
         break;
@@ -520,7 +520,7 @@ switch (rg) {
         CLR_INT (DZTX);
         sim_activate (&dz_unit[1], dz_unit[1].wait);
         break;
-        
+
     default:
         break;
         }
@@ -706,7 +706,7 @@ struct reglink *p;
 
 for (p = &regtable[0]; p->low != 0; p++) {
     if ((pa >= p->low) && (pa < p->high) && p->write) {
-        p->write (pa, val, lnt);  
+        p->write (pa, val, lnt);
         return;
         }
     }

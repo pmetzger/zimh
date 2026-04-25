@@ -70,7 +70,7 @@
 #define S1      0000120
 #define S2      0000140
 #define S3      0000160
- 
+
 /* intensity settings */
 #define IN0     0000010
 #define IN1     0000011
@@ -80,7 +80,7 @@
 #define IN5     0000015
 #define IN6     0000016
 #define IN7     0000017
- 
+
 /****************
  * Point Mode Words
  */
@@ -96,15 +96,15 @@
 #define S1ON    05000
 #define S1OFF   04000
 #define LP1ON   02000
- 
+
 #define S2ON     0500
 #define S2OFF    0400
 #define LP2ON    0200
- 
+
 #define S3ON      050
 #define S3OFF     040
 #define LP3ON     020
- 
+
 #define S4ON       05
 #define S4OFF      04
 #define LP4ON      02

@@ -134,7 +134,7 @@ tti_svc(UNIT *uptr)
                 if (tti_ctrl & TT_ICTRL_EIRDY)
                         extint(12, &tti_int);
         }
-        
+
         return SCPE_OK;
 }
 

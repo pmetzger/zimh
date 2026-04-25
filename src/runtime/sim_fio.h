@@ -55,7 +55,7 @@ int sim_rmdir(const char *path);
 t_stat sim_copyfile (const char *source_file, const char *dest_file, t_bool overwrite_existing);
 char *sim_filepath_parts (const char *pathname, const char *parts);
 char *sim_getcwd (char *buf, size_t buf_size);
-typedef void (*DIR_ENTRY_CALLBACK)(const char *directory, 
+typedef void (*DIR_ENTRY_CALLBACK)(const char *directory,
                                    const char *filename,
                                    t_offset FileSize,
                                    const struct stat *filestat,

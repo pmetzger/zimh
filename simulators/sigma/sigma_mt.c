@@ -206,7 +206,7 @@ REG mt_reg[] = {
 
 MTAB mt_mod[] = {
     { MTUF_WLK, 0, "write enabled", "WRITEENABLED", NULL },
-    { MTUF_WLK, MTUF_WLK, "write locked", "LOCKED", NULL }, 
+    { MTUF_WLK, MTUF_WLK, "write locked", "LOCKED", NULL },
     { MTAB_XTD|MTAB_VUN, 0, "FORMAT", "FORMAT",
       &sim_tape_set_fmt, &sim_tape_show_fmt, NULL },
     { MTAB_XTD|MTAB_VUN, 0, "CAPACITY", "CAPACITY",
@@ -451,7 +451,7 @@ switch (cmd) {                                          /* case on command */
             sim_activate (uptr, mt_time);               /* continue thread */
             return SCPE_OK;
             }
-        if (((st == CHS_ZBC) ^ (mt_bptr == mt_blim)) && /* length err? */ 
+        if (((st == CHS_ZBC) ^ (mt_bptr == mt_blim)) && /* length err? */
               chan_set_chf (dva, CHF_LNTE))             /* uend taken? */
             return SCPE_OK;                             /* finished */
         break;                                          /* normal end */
@@ -580,7 +580,7 @@ if (sim_is_active (uptr) ||                             /* unit busy */
     sim_is_active (uptr + MT_REW))                      /* or rewinding? */
     st |= DVS_DBUSY;
 else if ((uptr -> flags & UNIT_ATT) == 0)              /* not att => offl */
-    st |= DVS_DOFFL;                                 
+    st |= DVS_DOFFL;
 for (i = 0; i < MT_NUMDR; i++) {                        /* loop thru units */
     if (sim_is_active (&mt_unit[i])) {                  /* active? */
         st |= (DVS_CBUSY | (CC2 << DVT_V_CC));          /* ctrl is busy */
@@ -681,7 +681,7 @@ else if (chan_chk_chi (mt_dib.dva) < 0)                 /* any int? */
     chan_clr_chi (mt_dib.dva);                          /* clr INP */
 return;
 }
-    
+
 /* Reset routine */
 
 t_stat mt_reset (DEVICE *dptr)

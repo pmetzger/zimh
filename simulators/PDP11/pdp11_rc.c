@@ -218,7 +218,7 @@ static const REG rc_reg[] = {
 };
 
 static const MTAB rc_mod[] = {
-    { UNIT_PLAT, (0 << UNIT_V_PLAT), NULL, "1P", 
+    { UNIT_PLAT, (0 << UNIT_V_PLAT), NULL, "1P",
         &rc_set_size, NULL, NULL, "Set to 1 platter device" },
     { UNIT_PLAT, (1 << UNIT_V_PLAT), NULL, "2P",
         &rc_set_size, NULL, NULL, "Set to 2 platter device" },
@@ -228,9 +228,9 @@ static const MTAB rc_mod[] = {
         &rc_set_size, NULL, NULL, "Set to 4 platter device" },
     { MTAB_XTD|MTAB_VUN, 0, "PLATTERS", NULL,
         NULL, &rc_show_size, NULL, "Display Platters" },
-    { UNIT_NOAUTO, 0, "autosize", "AUTOSIZE", 
+    { UNIT_NOAUTO, 0, "autosize", "AUTOSIZE",
         NULL, NULL, NULL, "set platters based on file size at ATTACH" },
-    { UNIT_NOAUTO, UNIT_NOAUTO, "noautosize", "NOAUTOSIZE", 
+    { UNIT_NOAUTO, UNIT_NOAUTO, "noautosize", "NOAUTOSIZE",
         NULL, NULL, NULL, "set platters based explicit platter setting" },
     { MTAB_XTD|MTAB_VDV|MTAB_VALR, 0020, "ADDRESS", "ADDRESS",
       &set_addr, &show_addr, NULL, "Bus address" },
@@ -250,7 +250,7 @@ DEVICE rc_dev = {
     &sim_disk_detach,                                   /* detach */
     &rc_dib,
     DEV_DISABLE | DEV_DIS | DEV_UBUS | DEV_DEBUG | DEV_DISK, 0,
-    NULL, NULL, NULL, NULL, NULL, NULL, 
+    NULL, NULL, NULL, NULL, NULL, NULL,
     &rc_description
 };
 
@@ -326,7 +326,7 @@ static t_stat rc_wr (int32 data, int32 PA, int32 access)
 {
     int32       t;
 
-    switch ((PA >> 1) & 07) {                           /* decode PA<3:1> */ 
+    switch ((PA >> 1) & 07) {                           /* decode PA<3:1> */
 
         case 0:                                         /* RCLA */
             if (DEBUG_PRS (rc_dev))
@@ -517,7 +517,7 @@ static t_stat rc_svc (UNIT *uptr)
         ma = (ma + 2) & UNIMASK;                        /* incr mem addr */
     } while (rc_wc != 0);                               /* brk if wc */
     rc_ca = ma & DMASK;                                 /* split ma */
-    rc_cs = (rc_cs & ~RCCS_MEX) | ((ma >> (16 - RCCS_V_MEX)) & RCCS_MEX); 
+    rc_cs = (rc_cs & ~RCCS_MEX) | ((ma >> (16 - RCCS_V_MEX)) & RCCS_MEX);
     da += 31;
     rc_da = (da >> 5) & 017777;
     /* CRC of last 32W, if necessary */
@@ -575,7 +575,7 @@ static t_stat rc_attach (UNIT *uptr, const char *cptr)
 
     sprintf (plat, "%dP", UNIT_GETP (uptr->flags));
 
-    return sim_disk_attach_ex (uptr, cptr, RC_NUMWD * sizeof (uint16), sizeof (uint16), 
+    return sim_disk_attach_ex (uptr, cptr, RC_NUMWD * sizeof (uint16), sizeof (uint16),
                                     TRUE, 0, plat, FALSE, 0, (uptr->flags & UNIT_NOAUTO) ? NULL : platters);
 }
 

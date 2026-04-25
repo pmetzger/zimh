@@ -66,11 +66,11 @@ extern DEVICE isbc464_dev;
 
 /* multibus Standard SIMH Device Data Structures */
 
-UNIT multibus_unit = { 
+UNIT multibus_unit = {
     UDATA (&multibus_svc, 0, 0), 1
 };
 
-REG multibus_reg[] = { 
+REG multibus_reg[] = {
     { HRDATA (XACK, xack, 8) },
     { NULL }
 };
@@ -85,25 +85,25 @@ DEBTAB multibus_debug[] = {
 };
 
 DEVICE multibus_dev = {
-    "MBI",              //name 
-    &multibus_unit,     //units 
-    multibus_reg,       //registers 
+    "MBI",              //name
+    &multibus_unit,     //units
+    multibus_reg,       //registers
     NULL,               //modifiers
-    1,                  //numunits 
-    16,                 //aradix  
-    16,                 //awidth  
-    1,                  //aincr  
-    16,                 //dradix  
+    1,                  //numunits
+    16,                 //aradix
+    16,                 //awidth
+    1,                  //aincr
+    16,                 //dradix
     8,                  //dwidth
-    NULL,               //examine  
-    NULL,               //deposit  
-    &multibus_reset,    //reset 
+    NULL,               //examine
+    NULL,               //deposit
+    &multibus_reset,    //reset
     NULL,               //boot
-    NULL,               //attach  
+    NULL,               //attach
     NULL,               //detach
-    NULL,               //ctxt     
-    DEV_DEBUG,          //flags 
-    0,                  //dctrl 
+    NULL,               //ctxt
+    DEV_DEBUG,          //flags
+    0,                  //dctrl
     multibus_debug,     //debflags
     NULL,               //msize
     NULL,               //lname
@@ -119,7 +119,7 @@ DEVICE multibus_dev = {
 
 t_stat multibus_reset(DEVICE *dptr)
 {
-//    if (SBC_reset(NULL) == 0) { 
+//    if (SBC_reset(NULL) == 0) {
 //        sim_printf("  Multibus: Reset\n");
         sim_activate (&multibus_unit, multibus_unit.wait); /* activate unit */
         return SCPE_OK;
@@ -143,14 +143,14 @@ uint8 multibus_get_mbyte(uint16 addr)
 {
     SET_XACK(0);                        /* set no XACK */
     if ((isbc464_dev.flags & DEV_DIS) == 0) { //ROM is enabled
-        if (addr >= isbc464_dev.units->u3 && 
+        if (addr >= isbc464_dev.units->u3 &&
         addr < (isbc464_dev.units->u3 + isbc464_dev.units->capac)) {
             SET_XACK(1);            //set xack
             return(isbc464_get_mbyte(addr));
         }
     }
     if ((isbc064_dev.flags & DEV_DIS) == 0) { //iSBC 064 is enabled
-        if (addr >= isbc064_dev.units->u3 && 
+        if (addr >= isbc064_dev.units->u3 &&
         addr < (isbc064_dev.units->u3 + isbc064_dev.units->capac)) {
             SET_XACK(1);            //set xack
             return (isbc064_get_mbyte(addr));
@@ -163,7 +163,7 @@ void multibus_put_mbyte(uint16 addr, uint8 val)
 {
     SET_XACK(0);                        /* set no XACK */
     if ((isbc064_dev.flags & DEV_DIS) == 0) { //device is enabled
-        if (addr >= isbc064_dev.units->u3 && 
+        if (addr >= isbc064_dev.units->u3 &&
         addr < (isbc064_dev.units->u3 + isbc064_dev.units->capac)) {
             SET_XACK(1);            //set xack
             isbc064_put_mbyte(addr, val);

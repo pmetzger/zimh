@@ -83,7 +83,7 @@ const char *sim_stop_messages[SCPE_BASE] = {
     "HALT instruction",
     "Breakpoint",
     "Invalid Opcode",
-    "Invalid Memory" 
+    "Invalid Memory"
 };
 
 /* end of mp-a_sys.c */

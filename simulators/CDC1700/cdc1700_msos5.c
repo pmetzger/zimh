@@ -274,7 +274,7 @@ static char *cpabs(uint16 param, char *buf)
 {
   uint16 ca = M[param + 1];
 
-  /* 
+  /*
    * Only absolutize the completion address if one is specified.
    */
   if (ca != 0) {
@@ -358,7 +358,7 @@ char *textRep(uint16 start, uint16 len)
 }
 
 /*
- * Dump MSOS5 request information. 
+ * Dump MSOS5 request information.
  */
 void MSOS5request(uint16 param, uint16 depth)
 {

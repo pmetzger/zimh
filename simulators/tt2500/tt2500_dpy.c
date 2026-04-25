@@ -222,7 +222,7 @@ void dpy_magic (uint16 xr, uint16 *r2, uint16 *r3, uint16 r4, uint16 r5)
   y0 = y1 = YCOR;
   dx = (r4 & 0100000) ? -1 : 1;
   dy = (r5 & 0100000) ? -1 : 1;
-    
+
   flag_on (STAR_WRAP);
   while (xr & 04000) {
     sim_interval--;

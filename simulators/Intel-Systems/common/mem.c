@@ -64,7 +64,7 @@ extern uint8 i8255_C[4];                //port C byte I/O
 uint8 get_mbyte(uint16 addr)
 {
     uint8 val;
-    
+
     SET_XACK(0);                        /* clear xack */
     if ((mem_map <= 1) && (addr >= 0xF800)) { //monitor ROM - always there IPB/IPC/800
         SET_XACK(1);                    //set xack
@@ -92,19 +92,19 @@ uint8 get_mbyte(uint16 addr)
             if ((monitor_boot & 0x02) == 0)
                 return EPROM_get_mbyte(addr, 0);
             else
-                return multibus_get_mbyte(addr); 
+                return multibus_get_mbyte(addr);
         }
         if ((addr >= EPROM_unit[1].u3) && (addr <= (EPROM_unit[1].u3 + EPROM_unit[1].capac))) {
             return EPROM_get_mbyte(addr, 1);
         }
-    } 
+    }
     if (mem_map == 3) {                 //isdk80
         if ((addr >= EPROM_unit->u3) && ((uint16)addr <= (EPROM_unit->u3 + EPROM_unit->capac))) {
             return EPROM_get_mbyte(addr, 0);
         } /* if local RAM handle it */
         else if ((addr >= RAM_unit->u3) && ((uint16)addr <= (RAM_unit->u3 + RAM_unit->capac))) {
             return RAM_get_mbyte(addr);
-        } 
+        }
         else return 0xff;
     }
     if (mem_map == 4) {                 //isys80/XX
@@ -145,7 +145,7 @@ void put_mbyte(uint16 addr, uint8 val)
     if ((mem_map <= 1) && (addr >= 0xF800)) { //monitor ROM - always there IPB/IPC/800
         SET_XACK(1);                    //set xack
         return;                         //do nothing
-    } 
+    }
     if ((mem_map <= 1) && (addr < 0x1000) && ((ipc_cont_unit.u3 & 0x04) == 0)) { //startup IPB/IPC
         SET_XACK(1);                    //set xack
         return;                         //do nothing

@@ -114,7 +114,7 @@
 #define ENB_LIE         0100000  /* Load point */
 
 /* IRQ Masks in status */
-#define IRQ_ICE         001000000 
+#define IRQ_ICE         001000000
 #define IRQ_JNU         002000000
 #define IRQ_ERF         004000000
 #define IRQ_XNE         010000000
@@ -205,9 +205,9 @@ UNIT                mtc_unit[] = {
 DIB mtc_dib = {MTC_DEVCTL, 3, &mtc_devio, NULL};
 
 MTAB                mtc_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write ring in place" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "no Write ring in place" },
     {MTUF_7TRK, 0, "9T", "9T", NULL, NULL},
     {MTUF_7TRK, MTUF_7TRK, "7T", "7T", NULL, NULL},
@@ -310,7 +310,7 @@ mtc_devio(uint32 dev, uint64 *data) {
               if (*data & TAPE_RDY && (mtc_hold_cmd & FUNCTION) == 0) {
                  /* Switch to drive to check status */
                  mtc_sel_unit = (mtc_hold_cmd >> 4) & 07;
-              } 
+              }
               sim_debug(DEBUG_CONO, dptr, "MTC CONO %03o status %012llo %o %08o PC=%06o\n",
                           dev, *data, mtc_sel_unit, mtc_status, PC);
               uptr = &mtc_unit[mtc_sel_unit];
@@ -332,7 +332,7 @@ mtc_devio(uint32 dev, uint64 *data) {
               res = (mtc_sel_unit << 4) | (uptr->CNTRL & FUNC_FIN);
               if (mtc_sel_unit != ((mtc_hold_cmd & UNIT_NUM) >> 4))
                   res |= UNIT_SEL_NEW;
-              if (mtc_hold_cmd & CMD_FULL) 
+              if (mtc_hold_cmd & CMD_FULL)
                   res |= CMD_HOLD;
               sim_debug(DEBUG_CONI, dptr, "MTC CONI %03o status2 %012llo %o %08o PC=%06o\n",
                           dev, res, mtc_sel_unit, mtc_status, PC);
@@ -383,7 +383,7 @@ mtc_checkirq(UNIT * uptr)
        return;
     }
 #endif
-} 
+}
 
 /* Handle processing of tape requests. */
 t_stat
@@ -415,7 +415,7 @@ mtc_srv(UNIT * uptr)
             return SCPE_OK;
         }
         sim_debug(DEBUG_DETAIL, dptr, "MTC%o Done %08o %08o\n", unit, mtc_hold_cmd, mtc_status);
- 
+
         /* Check if command pending */
         if ((mtc_hold_cmd & CMD_FULL) != 0) {
             unsigned int u = (mtc_hold_cmd >> 4) & 07;
@@ -452,7 +452,7 @@ mtc_srv(UNIT * uptr)
        cc_max = 5;
     }
 
-    if (uptr->CNTRL & MTC_START) 
+    if (uptr->CNTRL & MTC_START)
        uptr->BPOS = 0;
 
 

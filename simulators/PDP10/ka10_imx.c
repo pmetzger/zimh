@@ -164,7 +164,7 @@ t_stat imx_reset (DEVICE *dptr)
           vid_register_gamepad_motion_callback (imx_joy_motion);
           init = 0;
         }
-    } 
+    }
     return SCPE_OK;
 }
 
@@ -275,14 +275,14 @@ t_stat imx_set_channel (UNIT *uptr, int32 val, const char *cptr, void *desc)
   chan = (int) get_uint (gbuf, 8, IMX_CHANNEL, &r);
   if (r != SCPE_OK)
     return r;
-  
+
   tptr = get_glyph (tptr, gbuf, ';');
   if (tptr == NULL || strncasecmp (gbuf, "unit", 4) != 0)
     return SCPE_ARG;
   unit = (int) get_uint (gbuf + 4, 10, JOY_MAX_UNITS - 1, &r);
   if (r != SCPE_OK)
     return r;
-  
+
   tptr = get_glyph (tptr, gbuf, ';');
   if (strncasecmp (gbuf, "axis", 4) != 0)
     return SCPE_ARG;

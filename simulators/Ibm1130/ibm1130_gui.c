@@ -63,7 +63,7 @@
 
 t_stat console_reset (DEVICE *dptr);
 
-/* ------------------------------------------------------------------------ 
+/* ------------------------------------------------------------------------
  * Console display - on Windows builds (only) this code displays the 1130 console
  * and toggle switches. It really enhances the experience.
  *
@@ -109,7 +109,7 @@ extern t_bool program_is_loaded;
     void keyboard_selected (int select)       {}
     void disk_ready (int ready)               {}
     void disk_unlocked (int unlocked)         {}
-    void gui_run (int running)                {} 
+    void gui_run (int running)                {}
 
     t_stat console_reset (DEVICE *dptr)                         {return SCPE_OK;}
     long   stuff_cmd (char *cmd)                                {return 0;}
@@ -287,8 +287,8 @@ static void tear_printer (void);
 
 #define NIXOBJECT(hObj) if (hObj != NULL) {DeleteObject(hObj); hObj = NULL;}
 
-/* ------------------------------------------------------------------------ 
- * init_console_window - display the 1130 console. Actually just creates a thread 
+/* ------------------------------------------------------------------------
+ * init_console_window - display the 1130 console. Actually just creates a thread
  * to run the Pump routine which does the actual work.
  * ------------------------------------------------------------------------ */
 
@@ -308,7 +308,7 @@ static void init_console_window (void)
     }
 }
 
-/* ------------------------------------------------------------------------ 
+/* ------------------------------------------------------------------------
  * destroy_console_window - delete GDI objects.
  * ------------------------------------------------------------------------ */
 
@@ -353,8 +353,8 @@ static void destroy_console_window (void)
 */
 }
 
-/* ------------------------------------------------------------------------ 
- * these variables hold the displayed versions of the system registers 
+/* ------------------------------------------------------------------------
+ * these variables hold the displayed versions of the system registers
  * ------------------------------------------------------------------------ */
 
 static int shown_iar = 0, shown_sar = 0, shown_sbr = 0, shown_afr = 0, shown_acc = 0, shown_ext  = 0;
@@ -362,7 +362,7 @@ static int shown_op  = 0, shown_tag = 0, shown_irq = 0, shown_ccc = 0, shown_cnd
 static int shown_ces = 0, shown_arf = 0, shown_runmode = MODE_RUN;
 static int CND;
 
-/* ------------------------------------------------------------------------ 
+/* ------------------------------------------------------------------------
  * RedrawRegion - mark a region for redrawing without background erase
  * ------------------------------------------------------------------------ */
 
@@ -378,7 +378,7 @@ static void RedrawRegion (HWND hWnd, int left, int top, int right, int bottom)
     InvalidateRect(hWnd, &r, FALSE);
 }
 
-/* ------------------------------------------------------------------------ 
+/* ------------------------------------------------------------------------
  * RepaintRegion - mark a region for redrawing with background erase
  * ------------------------------------------------------------------------ */
 
@@ -394,8 +394,8 @@ static void RepaintRegion (HWND hWnd, int left, int top, int right, int bottom)
     InvalidateRect(hWnd, &r, TRUE);
 }
 
-/* ------------------------------------------------------------------------ 
- * update_gui - sees if anything on the console display has changed, and invalidates 
+/* ------------------------------------------------------------------------
+ * update_gui - sees if anything on the console display has changed, and invalidates
  * the changed regions. Then it calls UpdateWindow to force an immediate repaint. This
  * function (update_gui) should probably not be called every time through the main
  * instruction loop but it should be called at least whenever wait_state or int_req change, and then
@@ -404,7 +404,7 @@ static void RepaintRegion (HWND hWnd, int left, int top, int right, int bottom)
  * ------------------------------------------------------------------------ */
 
 void update_gui (BOOL force)
-{   
+{
     int i;
     BOOL state;
     static int in_here = FALSE;
@@ -469,7 +469,7 @@ void update_gui (BOOL force)
             {shown_ext = EXT;        RedrawRegion(hConsoleWnd, 75,  174, 364, 197);}
     if (SBR != shown_sbr)
             {shown_sbr = SBR;        RedrawRegion(hConsoleWnd, 75,   77, 364,  97);}
-    if (OP  != shown_op)                     
+    if (OP  != shown_op)
             {shown_op  = OP;         RedrawRegion(hConsoleWnd, 501,   8, 595,  32);}
     if (TAG != shown_tag)
             {shown_tag = TAG;        RedrawRegion(hConsoleWnd, 501,  77, 595,  97);}
@@ -528,7 +528,7 @@ void update_gui (BOOL force)
 
     state = ((cr_unit.flags & UNIT_ATT) == 0) ? STATE_1442_EMPTY  :
              (cr_unit.flags & UNIT_PHYSICAL)  ? STATE_1442_HIDDEN :
-             (cr_unit.flags & UNIT_CR_EMPTY)  ? STATE_1442_EOF    : 
+             (cr_unit.flags & UNIT_CR_EMPTY)  ? STATE_1442_EOF    :
               cr_unit.pos                     ? STATE_1442_MIDDLE :
                                                 STATE_1442_FULL;
 
@@ -542,7 +542,7 @@ void update_gui (BOOL force)
             SendMessage(btn[IDC_1442].hBtn, STM_SETIMAGE, IMAGE_BITMAP,
                 (LPARAM) (
                     (state == STATE_1442_FULL)   ? hbm1442_full   :
-                    (state == STATE_1442_MIDDLE) ? hbm1442_middle : 
+                    (state == STATE_1442_MIDDLE) ? hbm1442_middle :
                     (state == STATE_1442_EOF)    ? hbm1442_eof    :
                     hbm1442_empty));
         }
@@ -575,7 +575,7 @@ void update_gui (BOOL force)
 
 WNDPROC oldButtonProc = NULL;
 
-/* ------------------------------------------------------------------------ 
+/* ------------------------------------------------------------------------
  * ------------------------------------------------------------------------ */
 
 LRESULT CALLBACK ButtonProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -596,7 +596,7 @@ LRESULT CALLBACK ButtonProc (HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return CallWindowProc(oldButtonProc, hWnd, uMsg, wParam, lParam);
 }
 
-/* ------------------------------------------------------------------------ 
+/* ------------------------------------------------------------------------
  * ------------------------------------------------------------------------ */
 
 static int occurs (char *txt, char ch)
@@ -610,7 +610,7 @@ static int occurs (char *txt, char ch)
     return count;
 }
 
-/* ------------------------------------------------------------------------ 
+/* ------------------------------------------------------------------------
  * turns out to get properly colored buttons you have to paint them yourself. Sheesh.
  * On the plus side, this lets do a better job of aligning the button text than
  * the button would by itself.
@@ -712,8 +712,8 @@ void PaintButton (LPDRAWITEMSTRUCT dis)
     SetBkMode(dis->hDC,    oldBk);
     SelectObject(dis->hDC, hOldFont);
 }
-    
-/* ------------------------------------------------------------------------ 
+
+/* ------------------------------------------------------------------------
  * ------------------------------------------------------------------------ */
 
 HWND CreateSubclassedButton (HWND hwParent, UINT_PTR i)
@@ -749,7 +749,7 @@ HWND CreateSubclassedButton (HWND hwParent, UINT_PTR i)
     return hBtn;
 }
 
-/* ------------------------------------------------------------------------ 
+/* ------------------------------------------------------------------------
  * Pump - thread that takes care of the console window. It has to be a separate thread so that it gets
  * execution time even when the simulator is compute-bound or IO-blocked. This routine creates the window
  * and runs a standard Windows message pump. The window function does the actual display work.
@@ -913,7 +913,7 @@ static DWORD WINAPI Pump (LPVOID arg)
         DispatchMessage(&msg);
     }
 
-    if (hConsoleWnd != NULL) { 
+    if (hConsoleWnd != NULL) {
         DragAcceptFiles(hConsoleWnd, FALSE);        /* unregister as drag/drop target */
         DestroyWindow(hConsoleWnd);                 /* but if a quit message got posted, clean up */
         hConsoleWnd = NULL;
@@ -923,7 +923,7 @@ static DWORD WINAPI Pump (LPVOID arg)
     return 0;
 }
 
-/* ------------------------------------------------------------------------ 
+/* ------------------------------------------------------------------------
  * DrawBits - starting at position (x,y), draw lamps for nbits bits of word 'bits', looking only at masked bits
  * ------------------------------------------------------------------------ */
 
@@ -952,7 +952,7 @@ static void DrawBits (HDC hDC, int x, int y, int bits, int nbits, int mask, char
     }
 }
 
-/* ------------------------------------------------------------------------ 
+/* ------------------------------------------------------------------------
  * DrawToggles - display the console sense switches
  * ------------------------------------------------------------------------ */
 
@@ -979,7 +979,7 @@ static void DrawToggles (HDC hDC, int bits)
     }
 }
 
-/* ------------------------------------------------------------------------ 
+/* ------------------------------------------------------------------------
  * DrawRunmode - draw the run mode rotary switch's little tip
  * ------------------------------------------------------------------------ */
 
@@ -1006,8 +1006,8 @@ void DrawRunmode (HDC hDC, int mode)
     SelectObject(hDC, hOldPen);
 }
 
-/* ------------------------------------------------------------------------ 
- * HandleClick - handle mouse clicks on the console window. Now we just 
+/* ------------------------------------------------------------------------
+ * HandleClick - handle mouse clicks on the console window. Now we just
  * look at the console sense switches.  Actual says this is a real click, rather
  * than a mouse-region test.  Return value TRUE means the cursor is over a hotspot.
  * ------------------------------------------------------------------------ */
@@ -1040,14 +1040,14 @@ static BOOL HandleClick (HWND hWnd, int xh, int yh, BOOL actual, BOOL rightclick
                     return TRUE;
                 }
             }
-            
+
         }
     }
 
     return FALSE;
 }
 
-/* ------------------------------------------------------------------------ 
+/* ------------------------------------------------------------------------
  * DrawConsole - refresh the console display. (This routine could be sped up by intersecting
  * the various components' bounding rectangles with the repaint rectangle.  The bounding rects
  * could be put into an array and used both here and in the refresh routine).
@@ -1116,7 +1116,7 @@ static void DrawConsole (HDC hDC, PAINTSTRUCT *ps)
                     if ((n = strlen(uptr->filename)) > 30) {
                         strcpy(nametemp, "...");
                         strcpy(nametemp+3, uptr->filename+n-30);
-                        dispname = nametemp;                        
+                        dispname = nametemp;
                     }
                     else
                         dispname = uptr->filename;
@@ -1139,12 +1139,12 @@ static void DrawConsole (HDC hDC, PAINTSTRUCT *ps)
     }
 }
 
-/* ------------------------------------------------------------------------ 
- * Handles button presses. Remember that this occurs in the context of 
+/* ------------------------------------------------------------------------
+ * Handles button presses. Remember that this occurs in the context of
  * the Pump thread, not the simulator thread.
  * ------------------------------------------------------------------------ */
 
-void flash_run (void)              
+void flash_run (void)
 {
     EnableWindow(btn[IDC_RUN].hBtn, TRUE);      /* enable the run lamp */
 
@@ -1164,7 +1164,7 @@ void gui_run (int running)
         hUpdateTimer = 0;
     }
     flash_run();                                /* keep run lamp active for a while after we stop running */
-} 
+}
 
 void HandleCommand (HWND hWnd, WORD wNotify, WORD idCtl, HWND hwCtl)
 {
@@ -1180,7 +1180,7 @@ void HandleCommand (HWND hWnd, WORD wNotify, WORD idCtl, HWND hwCtl)
  * the emulator thread when it calls gui_run(FALSE) which calls EnableWindow on the Run lamp
  *              while (running)
  *                  Sleep(10);
- */             
+ */
             }
             stuff_and_wait("reset", 0, 500);
 
@@ -1190,7 +1190,7 @@ void HandleCommand (HWND hWnd, WORD wNotify, WORD idCtl, HWND hwCtl)
             for (i = 0; i < NBUTTONS; i++)  /* repaint all of the lamps */
                 if (! btn[i].pushable)
                     InvalidateRect(btn[i].hBtn, NULL, TRUE);
-            if ((cr_unit.flags & UNIT_ATT) && 
+            if ((cr_unit.flags & UNIT_ATT) &&
                 (btn[IDC_1442].state!=STATE_1442_FULL)) {
                 stuff_and_wait("detach cr", 0, 500);
                 update_gui(TRUE);
@@ -1249,7 +1249,7 @@ void HandleCommand (HWND hWnd, WORD wNotify, WORD idCtl, HWND hwCtl)
 /* this prevents message pump from running, which unfortunately locks up
  * the emulator thread when it calls gui_run(FALSE) which calls EnableWindow on the Run lamp
  *              while (running)
- *                  Sleep(10);              
+ *                  Sleep(10);
  */
             }
             break;
@@ -1260,7 +1260,7 @@ void HandleCommand (HWND hWnd, WORD wNotify, WORD idCtl, HWND hwCtl)
                 forms_check(0);             /* clear forms-check status */
                 print_check(0);
             }
-            if ((cr_unit.flags & UNIT_ATT) && 
+            if ((cr_unit.flags & UNIT_ATT) &&
                 (btn[IDC_1442].state!=STATE_1442_FULL)) {
                 stuff_and_wait("detach cr", 0, 500);
                 update_gui(TRUE);
@@ -1312,12 +1312,12 @@ void HandleCommand (HWND hWnd, WORD wNotify, WORD idCtl, HWND hwCtl)
             }
             break;
     }
-    
+
     SetForegroundWindow(hConsoleWindow);
     update_gui(FALSE);
 }
 
-/* ------------------------------------------------------------------------ 
+/* ------------------------------------------------------------------------
  * ConsoleWndProc - window process for the console display
  * ------------------------------------------------------------------------ */
 
@@ -1506,8 +1506,8 @@ static BOOL is_scp_file(const char *filename)
             cptr++;
         ++lines;
         for (i = 0; i < strlen(cptr); i++)
-            if ((cptr[i] & 0x80) || 
-                ((!isprint(cptr[i])) && (!isspace(cptr[i])))) 
+            if ((cptr[i] & 0x80) ||
+                ((!isprint(cptr[i])) && (!isspace(cptr[i]))))
                 result = FALSE;                         /* SCP files only have printable ASCII */
         if ((*cptr == ';') || (*cptr == '#')) {         /* ignore comments */
             ++comment_lines;
@@ -1569,7 +1569,7 @@ static void accept_dropped_file (HANDLE hDrop)
     scp_file = is_scp_file(fname);
     if (cardreader) {
         if (scp_file) {
-            snprintf(msg, sizeof(msg)-1, "\"%s\"\r\n\r\nContains SCP commands (not card reader input).\r\n\r\nProcess as SCP commands?", fname); 
+            snprintf(msg, sizeof(msg)-1, "\"%s\"\r\n\r\nContains SCP commands (not card reader input).\r\n\r\nProcess as SCP commands?", fname);
             if (IDYES != MessageBox(hConsoleWnd, msg, "", MB_YESNO))
                 return;
             cardreader = FALSE;                 /* Process as SCP commands */
@@ -1683,7 +1683,7 @@ static DWORD WINAPI CmdThread (LPVOID arg)
         }
     }
     return 0;
-}                                   
+}
 
 static void read_atexit (void)
 {

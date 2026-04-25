@@ -89,7 +89,7 @@ t_stat sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
                             "Flag not understood. Use -r to load ROM "
                             "or -o to load RAM.\n");
     }
-    
+
     while ((i = Fgetc (fileref)) != EOF) {
         if (origin >= limit) {
             return SCPE_NXM;

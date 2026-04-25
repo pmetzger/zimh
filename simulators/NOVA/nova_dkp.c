@@ -197,7 +197,7 @@
    Diablo 44    12              4               408             no
    6099         32              4               192             yes
    6227         20              6               245             yes
-   6070         24              4               408             yes     
+   6070         24              4               408             yes
    Century 114  12              20              203             no
    4057 (same as Century 114)
    6103         32              8               192             yes
@@ -256,7 +256,7 @@
 #define SURF_6099       4
 #define CYL_6099        192
 #define SIZE_6099       (SECT_6099 * SURF_6099 * CYL_6099 * DKP_NUMWD)
-#define NFMT_6099       TRUE    
+#define NFMT_6099       TRUE
 
 #define TYPE_6227       7
 #define SECT_6227       20
@@ -392,9 +392,9 @@ REG dkp_reg[] = {
     };
 
 MTAB dkp_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock drive" },
     { (UNIT_DTYPE+UNIT_ATT), (TYPE_FLP << UNIT_V_DTYPE) + UNIT_ATT,
       "6030 (floppy)", NULL, NULL },
@@ -455,9 +455,9 @@ MTAB dkp_mod[] = {
     { (UNIT_AUTO+UNIT_DTYPE), (TYPE_DSDD << UNIT_V_DTYPE),
       NULL, "6097", &dkp_set_size },
     { (UNIT_AUTO+UNIT_DTYPE), (TYPE_D31 << UNIT_V_DTYPE),
-      NULL, "D31", &dkp_set_size }, 
+      NULL, "D31", &dkp_set_size },
     { (UNIT_AUTO+UNIT_DTYPE), (TYPE_D31 << UNIT_V_DTYPE),
-      NULL, "4047", &dkp_set_size }, 
+      NULL, "4047", &dkp_set_size },
     { (UNIT_AUTO+UNIT_DTYPE), (TYPE_D44 << UNIT_V_DTYPE),
       NULL, "D44", &dkp_set_size },
     { (UNIT_AUTO+UNIT_DTYPE), (TYPE_D44 << UNIT_V_DTYPE),
@@ -602,7 +602,7 @@ switch (pulse) {                                        /* decode IR<8:9> */
                 dkp_ussc = 010002;
             if (dtype == TYPE_6103)                     /* for certain types */
                 dkp_ussc = 010003;
-            } 
+            }
         else {                                          /* normal mode ... */
             if (dkp_go (pulse))                         /* do command    */
                 break ;                                 /* break if no error  */

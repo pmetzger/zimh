@@ -1335,9 +1335,9 @@ void consul_print (int dev_num, uint32 cmd)
     int line_num = dev_num + TTY_MAX + 1;
     if (tty_dev.dctrl)
         besm6_debug(">>> CONSUL%o: %03o", line_num, cmd & 0377);
-    
+
     READY2 &= ~CONS_READY[dev_num]; /* temporarily not ready  */
-    
+
     switch (tty_unit[line_num].flags & TTY_STATE_MASK) {
     case TTY_VT340_STATE:
         vt_send (line_num, cmd & 0177);

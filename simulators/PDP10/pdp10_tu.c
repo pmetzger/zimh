@@ -401,9 +401,9 @@ REG tu_reg[] = {
     };
 
 MTAB tu_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write ring in place" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "no Write ring in place" },
     { MTAB_XTD|MTAB_VUN, 0, "FORMAT", "FORMAT",
       &sim_tape_set_fmt, &sim_tape_show_fmt, NULL },
@@ -562,7 +562,7 @@ switch (j) {                                            /* decode PA<4:1> */
                     tu_go (drv);
                 }
             }
-        break;  
+        break;
 
     case 001:                                           /* MTWC */
         if (access == WRITEB)
@@ -703,7 +703,7 @@ switch (fnc) {                                          /* case on function */
         sim_activate (uptr, tu_time);
         tucs1 = tucs1 & ~CS1_GO;
         tufs = tufs & ~FS_TMK;
-        return; 
+        return;
 
     case FNC_REWIND:
         if ((tufs & FS_MOL) == 0) {                     /* unattached? */

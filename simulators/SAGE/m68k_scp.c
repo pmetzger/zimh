@@ -70,7 +70,7 @@ static void sym_clearall(void)
 {
     int i;
     SYMHASH *p,*n;
-    
+
     if (!symbyname) return;
     for (i=0; i<SYMHASHSIZE; i++) {
         p = symbyname[i].nnext;
@@ -92,7 +92,7 @@ void m68k_sim_init(void)
     sym_clearall();
     symbyname = (SYMHASH*)calloc(sizeof(SYMHASH),SYMHASHSIZE);
     symbyval = (SYMHASH*)calloc(sizeof(SYMHASH),SYMHASHSIZE);
-    for (i=0; i<SYMHASHSIZE; i++) 
+    for (i=0; i<SYMHASHSIZE; i++)
         symbyval[i].vnext = symbyname[i].nnext = 0;
 
     symtrace = TRUE;
@@ -135,7 +135,7 @@ static t_bool sym_enter(const char* name,t_addr val)
     int nhash = getnhash(name);
     int vhash = getvhash(val);
     SYMHASH *v, *n, *e;
-    
+
     if (sym_lookupname(name,&n) || sym_lookupval(val,&v)) return FALSE;
     n = symbyname[nhash].nnext;
     v = symbyval[vhash].vnext;
@@ -214,7 +214,7 @@ static t_stat symlist_cmd(int32 arg, const char* buf)
     char gbuf[2*CBUFSIZE];
     char *name;
     t_bool found = FALSE;
-    
+
     gbuf[sizeof(gbuf)-1] = '\0';
     strncpy(gbuf, buf, sizeof(gbuf)-1);
     name = strtok(gbuf," \t\n");
@@ -266,14 +266,14 @@ static t_stat hdump_cmd(int32 arg, const char* buf)
     uint32 byte[16];
     t_bool ascii = FALSE;
     t_bool first = TRUE;
-    
+
     if (buf[0]=='-' && buf[1]=='a') {
         ascii = TRUE;
         buf += 2;
         while (*buf && isspace(*buf)) buf++;
     }
     memset(byte,0,sizeof(uint32)*16);
-    
+
     gbuf[sizeof(gbuf)-1] = '\0';
     strncpy(gbuf, buf, sizeof(gbuf)-1);
     token = strtok(gbuf,"- \t\n");
@@ -282,7 +282,7 @@ static t_stat hdump_cmd(int32 arg, const char* buf)
     token = strtok(NULL,"- \t\n");
     if (!token) return SCPE_2FARG;
     high = strtol(token,0,16);
-    
+
     base = low - (low % 16);
     top = (high + 15) - ((high+15) % 16);
     for (; base<top; base++) {

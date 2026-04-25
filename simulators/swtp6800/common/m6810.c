@@ -28,7 +28,7 @@
     NOTES:
 
         These functions support a simulated m6810 RAM device on a CPU board.  The
-        byte get and put routines use an offset into the RAM image to locate the 
+        byte get and put routines use an offset into the RAM image to locate the
         proper byte.  This allows another device to set the base address for the
         M6810.
 */
@@ -44,7 +44,7 @@ void m6810_put_mbyte(int32 offset, int32 val);
 
 /* SIMH RAM Standard I/O Data Structures */
 
-UNIT m6810_unit = { 
+UNIT m6810_unit = {
     UDATA (NULL, UNIT_BINK, 128),
     0 };
 

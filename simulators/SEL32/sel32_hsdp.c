@@ -712,7 +712,7 @@ uint32 hsdpsec2star(uint32 daddr, int type)
     int32 sec = daddr % hsdp_type[type].spt;    /* get sector value */
     int32 spc = hsdp_type[type].nhds * hsdp_type[type].spt; /* sec per cyl */
     int32 cyl = daddr / spc;                    /* cylinders */
-    int32 hds = (daddr % spc) / hsdp_type[type].spt;    /* heads */ 
+    int32 hds = (daddr % spc) / hsdp_type[type].spt;    /* heads */
 
     /* now return the star value */
     return (CHS2STAR(cyl,hds,sec));             /* return STAR */
@@ -934,10 +934,10 @@ loop:
     switch (chp->ccw_cmd) {
     case DSK_WD: case DSK_RD: case DSK_INCH: case DSK_NOP: case DSK_INC:
     case DSK_SKC: case DSK_XEZ: case DSK_LMR: case DSK_WSL: case DSK_RSL:
-    case DSK_IHA: case DSK_WTL: case DSK_RTL: case DSK_RAP: case DSK_WTF:  
+    case DSK_IHA: case DSK_WTL: case DSK_RTL: case DSK_RAP: case DSK_WTF:
     case DSK_FMT: case DSK_RE: case DSK_RENO: case DSK_REL: case DSK_RES:
     case DSK_RVL: case DSK_POR: case DSK_REC: case DSK_TIC:
-    case DSK_SNS:   
+    case DSK_SNS:
         break;
     default:
         chp->chan_status |= STATUS_PCHK;        /* program check for invalid cmd */
@@ -1007,7 +1007,7 @@ loop:
     /* make a 24 bit address */
     chp->ccw_addr = word1 & MASK24;             /* set the data/seek address */
 
-    /* validate parts of IOCD2 that are reserved */    
+    /* validate parts of IOCD2 that are reserved */
     if (word2 & 0x0fff0000) {                   /* bits 4-15 must be zero */
         chp->chan_status |= STATUS_PCHK;        /* program check for invalid iocd */
         sim_debug(DEBUG_EXP, dptr,
@@ -1034,7 +1034,7 @@ loop:
 
     if (docmd) {                                /* see if we need to process a command */
         DIB *dibp = dib_unit[chp->chan_dev];    /* get the DIB pointer */
- 
+
         uptr = chp->unitptr;                    /* get the unit ptr */
         if (dibp == 0 || uptr == 0) {
             chp->chan_status |= STATUS_PCHK;    /* program check if it is */
@@ -3237,16 +3237,16 @@ int hsdp_format(UNIT *uptr) {
     sim_switches = oldsw;                       /* restore switches */
 
     /* get physical sector address of media defect table */
-    /* VDT  286965 (819/9/0) 0x460f5 for 8887 - 823/10/35 */ 
+    /* VDT  286965 (819/9/0) 0x460f5 for 8887 - 823/10/35 */
     /* MDT  286930 (819/8/0) 0x460d2 for 8887 - 823/10/35 Trk 0 ptr */
-    /* FMAP 286895 (819/7/0) 0x460af for 8887 - 823/10/35 */ 
-    /* UMAP 286860 (819/6/0) 0x4608c for 8887 - 823/10/35 */ 
+    /* FMAP 286895 (819/7/0) 0x460af for 8887 - 823/10/35 */
+    /* UMAP 286860 (819/6/0) 0x4608c for 8887 - 823/10/35 */
 
     /* get logical sector address of media defect table */
-    /* VDT  278766 (819/9/0) 0x440ee for 8887 - 823/10/34 */ 
-    /* MDT  278732 (819/8/0) 0x440cc for 8887 - 823/10/34 */ 
-    /* FMAP 278698 (819/7/0) 0x440aa for 8887 - 823/10/34 Sec 0 ptr */ 
-    /* UMAP 278664 (819/6/0) 0x44088 for 8887 - 823/10/34 Sec 0 ptr */ 
+    /* VDT  278766 (819/9/0) 0x440ee for 8887 - 823/10/34 */
+    /* MDT  278732 (819/8/0) 0x440cc for 8887 - 823/10/34 */
+    /* FMAP 278698 (819/7/0) 0x440aa for 8887 - 823/10/34 Sec 0 ptr */
+    /* UMAP 278664 (819/6/0) 0x44088 for 8887 - 823/10/34 Sec 0 ptr */
 
     /* seek to sector 0 */
     if ((sim_fseek(uptr->fileref, 0, SEEK_SET)) != 0) { /* seek home */
@@ -3427,7 +3427,7 @@ t_stat hsdp_attach(UNIT *uptr, const char *file)
 
     sim_debug(DEBUG_CMD, dptr,
         "Disk %s cyl %d hds %d sec %d ssiz %d capacity %d\n",
-        hsdp_type[type].name, hsdp_type[type].cyl, hsdp_type[type].nhds, 
+        hsdp_type[type].name, hsdp_type[type].cyl, hsdp_type[type].nhds,
         hsdp_type[type].spt, ssize, uptr->capac); /* hsdp capacity */
 
     printf("Disk %s cyl %d hds %d sec %d ssiz %d capacity %d\r\n",

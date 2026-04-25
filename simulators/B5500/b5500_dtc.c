@@ -548,7 +548,7 @@ dtco_srv(UNIT * uptr)
     /* For each line that is in idle state enable recieve */
     for (ln = 0; ln < dtc_desc.lines; ln++) {
            dtc_ldsc[ln].rcve = 0;
-        if (dtc_ldsc[ln].conn && 
+        if (dtc_ldsc[ln].conn &&
             (dtc_lstatus[ln] & BufSMASK) < BufWrite) {
            dtc_ldsc[ln].rcve = 1;
         }
@@ -609,7 +609,7 @@ dtco_srv(UNIT * uptr)
               t = 1;
               while (t) {
                  c = tmxr_getc_ln(&dtc_ldsc[ln]);         /* get char */
-                 if (c == 0) 
+                 if (c == 0)
                      break;
                  c &= 0x7f;
                  c1 = ascii_to_con[c];

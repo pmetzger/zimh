@@ -542,7 +542,7 @@ dd_svc (UNIT *uptr)
      } else {
         dd_decode (M[uptr->MA++]);
     }
- 
+
     if (uptr->STATUS & DD_HALT) {
         uptr->STATUS |= DD_INT;
         if (uptr->STATUS & DD_HALT_ENA) {

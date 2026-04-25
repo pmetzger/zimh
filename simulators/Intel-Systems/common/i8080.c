@@ -61,7 +61,7 @@
    A<0:7>               Accumulator
    BC<0:15>             BC Register Pair
    DE<0:15>             DE Register Pair
-   HL<0:15>             HL Register Pair 
+   HL<0:15>             HL Register Pair
    PSW<0:7>             Program Status Word (Flags)
    PC<0:15>             Program counter
    SP<0:15>             Stack Pointer
@@ -127,7 +127,7 @@
 #define ZF      0x40
 #define SF      0x80
 
-/* Macros to handle the flags in the PSW 
+/* Macros to handle the flags in the PSW
     8080 has bit #1 always set.  This is (not well) documented  behavior. */
 #define PSW_ALWAYS_ON       (0x02)        /* for 8080 */
 #define PSW_MSK (CF|PF|AF|ZF|SF)
@@ -243,7 +243,7 @@ extern int32 sim_int_char;
 extern uint32 sim_brk_types, sim_brk_dflt, sim_brk_summ; /* breakpoint info */
 
 struct idev {
-    uint8 (*routine)(t_bool io, uint8 data, uint8 devnum); 
+    uint8 (*routine)(t_bool io, uint8 data, uint8 devnum);
     uint16 port;
     uint16 devnum;
     uint8 dummy;
@@ -309,20 +309,20 @@ DEVICE i8080_dev = {
     i8080_reg,                          //registers
     i8080_mod,                          //modifiers
     1,                                  //numunits
-    16,                                 //aradix 
-    16,                                 //awidth 
-    1,                                  //aincr 
-    16,                                 //dradix 
+    16,                                 //aradix
+    16,                                 //awidth
+    1,                                  //aincr
+    16,                                 //dradix
     8,                                  //dwidth
-    &i8080_ex,                          //examine 
-    &i8080_dep,                         //deposit 
+    &i8080_ex,                          //examine
+    &i8080_dep,                         //deposit
     &i8080_reset,                       //reset
     NULL,                               //boot
-    NULL,                               //attach 
+    NULL,                               //attach
     NULL,                               //detach
     NULL,                               //context
-    DEV_DEBUG,                          //flags 
-    0,                                  //dctrl 
+    DEV_DEBUG,                          //flags
+    0,                                  //dctrl
     i8080_debug,                        //debflags
     NULL,                               //msize
     NULL,                               //lname
@@ -333,7 +333,7 @@ DEVICE i8080_dev = {
 };
 
 /* tables for the disassembler */
-const char *opcode[] = {                      
+const char *opcode[] = {
 "NOP", "LXI B,", "STAX B", "INX B",             /* 0x00 */
 "INR B", "DCR B", "MVI B,", "RLC",
 "???", "DAD B", "LDAX B", "DCX B",
@@ -416,7 +416,7 @@ int32 oplen[256] = {
 1,1,3,3,3,1,2,1,1,1,3,0,3,3,2,1,
 1,1,3,2,3,1,2,1,1,0,3,2,3,0,2,1,
 1,1,3,1,3,1,2,1,1,1,3,1,3,0,2,1,
-1,1,3,1,3,1,2,1,1,1,3,1,3,0,2,1 
+1,1,3,1,3,1,2,1,1,1,3,1,3,0,2,1
 };
 
 void set_cpuint(int32 int_num)
@@ -444,7 +444,7 @@ int32 sim_instr(void)
         else
             sim_printf("    CPU = 8080\n");
     }
-    
+
     /* Main instruction fetch/decode loop */
 
     while (reason == 0) {               /* loop until halted */
@@ -483,7 +483,7 @@ int32 sim_instr(void)
                         PC = 0x0038;
                         int_req &= ~INT_R;
                     }
-                } 
+                }
             } else {                    /* 8080 */
                 if (IM & IE) {          /* enabled? */
                     INTA = 1;
@@ -523,7 +523,7 @@ int32 sim_instr(void)
 
         sim_interval--;                 /* countdown clock */
         PCY = PCX = PC;
-        
+
         IR = OP = fetch_byte(0);        /* instruction fetch */
 
         if (uptr->flags & UNIT_XACK) {
@@ -947,7 +947,7 @@ int32 sim_instr(void)
             dev_table[port].routine(1, A, dev_table[port].devnum & BYTEMASK);
             break;
 
-        default:                    /* undefined opcode */ 
+        default:                    /* undefined opcode */
             if (i8080_unit.flags & UNIT_OPSTOP) {
                 reason = STOP_OPCODE;
                 PC--;
@@ -981,7 +981,7 @@ void dumpregs(void)
     sim_printf("  PC=%04X A=%02X BC=%04X DE=%04X HL=%04X SP=%04X IM=%02X XACK=%d",
         PCY, A, BC, DE, HL, SP, IM, xack);
     sim_printf(" IR=%02X addr=%04X", IR, addr);
-    sim_printf(" CF=%d ZF=%d AF=%d SF=%d PF=%d\n", 
+    sim_printf(" CF=%d ZF=%d AF=%d SF=%d PF=%d\n",
     GET_FLAG(CF) ? 1 : 0,
     GET_FLAG(ZF) ? 1 : 0,
     GET_FLAG(AF) ? 1 : 0,
@@ -1336,7 +1336,7 @@ int32 sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
                         printf("+");
                     else
                         printf("-");
-                } else 
+                } else
                     return SCPE_ARG;
             }
         } else {                        //binary
@@ -1597,7 +1597,7 @@ t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
         h = &hst[(di++) % hst_lnt];         /* entry pointer */
         ir = h->inst[0];
         fprintf (st, "%04X %04X %02X ", h->pc , h->sp, h->psw);
-        fprintf (st, "%02X %02X %02X %02X %02X %02X %02X ", 
+        fprintf (st, "%02X %02X %02X %02X %02X %02X %02X ",
             h->a, h->b, h->c, h->d, h->e, h->h, h->l);
         if ((fprint_sym (st, h->pc, h->inst, &i8080_unit, SWMASK ('M'))) > 0)
             fprintf (st, "(undefined) %02X", h->inst[0]);
@@ -1610,9 +1610,9 @@ t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat i8080_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
-    if (addr >= MEMSIZE) 
+    if (addr >= MEMSIZE)
         return SCPE_NXM;
-    if (vptr != NULL) 
+    if (vptr != NULL)
         *vptr = get_mbyte(addr);
     return SCPE_OK;
 }
@@ -1621,7 +1621,7 @@ t_stat i8080_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 
 t_stat i8080_dep(t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
-    if (addr >= MEMSIZE) 
+    if (addr >= MEMSIZE)
         return SCPE_NXM;
     put_mbyte(addr, val);
     return SCPE_OK;

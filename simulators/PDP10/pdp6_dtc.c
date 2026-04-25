@@ -292,9 +292,9 @@ REG dtc_reg[] = {
     };
 
 MTAB dtc_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable tape drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock tape drive" },
     { UNIT_8FMT + UNIT_11FMT, 0, "18b", NULL, NULL },
     { UNIT_8FMT + UNIT_11FMT, UNIT_8FMT, "12b", NULL, NULL },
@@ -1161,7 +1161,7 @@ dtc_attach (UNIT *uptr, const char *cptr)
     uint32 ba, sz, k, *fbuf;
     int32 u = uptr - dtc_dev.units;
     t_stat r;
-    
+
     r = attach_unit (uptr, cptr);                           /* attach */
     if (r != SCPE_OK)                                       /* error? */
         return r;
@@ -1244,7 +1244,7 @@ dtc_flush (UNIT* uptr)
     uint16 pdp8b[D8_NBSIZE];
     uint16 pdp11b[D18_BSIZE];
     uint32 ba, k, *fbuf;
-    
+
     if (uptr->WRITTEN && uptr->hwmark && ((uptr->flags & UNIT_RO) == 0)) {   /* any data? */
         sim_printf ("%s: writing buffer to file: %s\n", sim_uname (uptr), uptr->filename);
         fbuf = (uint32 *) uptr->filebuf;                        /* file buffer */

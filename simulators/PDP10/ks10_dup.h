@@ -1,4 +1,4 @@
-/* ks10_dup.h: PDP-11 DUP11 bit synchronous shared device packet interface interface 
+/* ks10_dup.h: PDP-11 DUP11 bit synchronous shared device packet interface interface
 
    Copyright (c) 2013, Mark Pizzolato
       Modified for KA10 simulator by Richard Cornwell, 2022

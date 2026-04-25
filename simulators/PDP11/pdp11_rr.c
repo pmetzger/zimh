@@ -156,7 +156,7 @@ static BITFIELD rp_er_bits[] = {
 #define RPER_FMTE       0001000                         /* format error */
     BIT(FMTE),
 #define RPER_PGE        0002000                         /* programming error */
-    BIT(PGE), 
+    BIT(PGE),
 #define RPER_NXS        0004000                         /* nx sector */
     BIT(NXS),
 #define RPER_NXT        0010000                         /* nx track */
@@ -453,15 +453,15 @@ static UNIT rr_unit[RP_NUMDR] = {
 
 static MTAB rr_mod[] = {
     { MTAB_VDV, 0,
-        "TYPE",         NULL, 
+        "TYPE",         NULL,
         NULL,           rr_show_ctrl,   NULL,
         "Display controller type" },
     { MTAB_VDV, 0/*RP11*/,
-        NULL,           RP_RP11, 
+        NULL,           RP_RP11,
         rr_set_ctrl,    NULL,           NULL,
         "Set " RP_RP11 " controller type" },
     { MTAB_VDV, DEV_RP11CE,
-        NULL,           "RP11CE", 
+        NULL,           "RP11CE",
         rr_set_ctrl,    NULL,           NULL,
         "Set " RP_RP11CE " controller type" },
     { MTAB_VDV | MTAB_VALR, 0,
@@ -469,11 +469,11 @@ static MTAB rr_mod[] = {
         rr_set_wloa,    NULL,           NULL,
         "Set write lockout mode/address" },
     { MTAB_VUN, 0,
-        "WRITEENABLED", "WRITEENABLED", 
+        "WRITEENABLED", "WRITEENABLED",
         set_writelock,  show_writelock, NULL,
         "Write enable disk drive" },
     { MTAB_VUN, 1,
-        NULL,           "LOCKED", 
+        NULL,           "LOCKED",
         set_writelock,  NULL,           NULL,
         "Write lock disk drive" },
     { MTAB_VUN, 0,
@@ -489,7 +489,7 @@ static MTAB rr_mod[] = {
         rr_set_type,    NULL,   NULL,
         "Set " RP_RP03 " disk type (only " RP_RP11CE ")"},
     { UNIT_NOAUTO, 0,
-        "autosize",     "AUTOSIZE", 
+        "autosize",     "AUTOSIZE",
         NULL,           NULL,           NULL,
         "Set type based on file size at attach" },
     { UNIT_NOAUTO, UNIT_NOAUTO,
@@ -599,7 +599,7 @@ static t_stat rr_rd (int32 *data, int32 PA, int32 access)
 
         /* RPER */
         rper &= RPER_REAL;
-        rper |= RPER_DKER(rpds); 
+        rper |= RPER_DKER(rpds);
 
         /* RPCS */
         rpcs &= RPCS_REAL;
@@ -630,7 +630,7 @@ static t_stat rr_rd (int32 *data, int32 PA, int32 access)
         uptr = rr_dev.units + GET_DRIVE(rpcs);
         if (uptr->flags & UNIT_ATT)
             rpda |= (rand() % RP_NUMSC) << RPDA_V_SOT;  /* inject a random sect */
-        *data = rpda;                
+        *data = rpda;
         break;
 
     case 10:                                            /* SUCA */

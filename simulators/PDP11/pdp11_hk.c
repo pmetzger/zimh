@@ -152,7 +152,7 @@ static struct drvtyp drv_tab[] = {
 #define PUT_UAE(x,n)    (((x) & ~ CS1_UAE) | (((n) << CS1_V_UAE) & CS1_UAE))
 
 static const char *hk_funcs[] = {
-    "NOP", "PACK", "DCLR", "UNLOAD", "START", "RECAL", "OFFSET", "SEEK", 
+    "NOP", "PACK", "DCLR", "UNLOAD", "START", "RECAL", "OFFSET", "SEEK",
     "READ", "WRITE", "READH", "WRITEH", "WCHK"};
 
 BITFIELD hk_cs1_bits[] = {
@@ -421,7 +421,7 @@ BITFIELD hk_ec2_bits[] = {
 #define A0_VV           0000100                         /* vol valid */
 #define A0_RDY          0000200                         /* drive ready */
 #define A0_DT           0000400                         /* drive type */
-#define A0_FMT          0001000                         /* format NI */ 
+#define A0_FMT          0001000                         /* format NI */
 #define A0_OF           0002000                         /* offset mode */
 #define A0_WRL          0004000                         /* write lock */
 #define A0_SPO          0010000                         /* spindle on */
@@ -660,11 +660,11 @@ REG hk_reg[] = {
     };
 
 MTAB hk_mod[] = {
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable tape drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock tape drive" },
-    { UNIT_DUMMY,      0, NULL,            "BADBLOCK", 
+    { UNIT_DUMMY,      0, NULL,            "BADBLOCK",
         &hk_set_bad, NULL, NULL, "write bad block table on last track" },
     { MTAB_XTD|MTAB_VUN, 0, NULL, "RK06",
       &hk_set_type, NULL, NULL, "Set RK06 Disk Type" },
@@ -672,9 +672,9 @@ MTAB hk_mod[] = {
       &hk_set_type, NULL, NULL, "Set RK07 Disk Type" },
     { MTAB_XTD|MTAB_VUN, 0, "TYPE", NULL,
       NULL, &hk_show_type, NULL, "Display device type" },
-    { UNIT_NOAUTO,       0, "autosize", "AUTOSIZE", 
+    { UNIT_NOAUTO,       0, "autosize", "AUTOSIZE",
       NULL, NULL, NULL, "Set type based on file size at attach" },
-    { UNIT_NOAUTO, UNIT_NOAUTO, "noautosize",   "NOAUTOSIZE",   
+    { UNIT_NOAUTO, UNIT_NOAUTO, "noautosize",   "NOAUTOSIZE",
       NULL, NULL, NULL, "Disable disk autosize on attach" },
     { MTAB_XTD|MTAB_VUN|MTAB_VALR, 0, "FORMAT", "FORMAT={AUTO|SIMH|VHD|RAW}",
       &sim_disk_set_fmt, &sim_disk_show_fmt, NULL, "Set/Display disk format" },
@@ -844,7 +844,7 @@ switch (j) {                                            /* decode PA<4:1> */
         if (((data & CS1_GO) != 0) && ((hkcs1 & CS1_ERR) == 0))
             hk_go (drv);                                /* go & ~err? */
         new_val = hkcs1;
-        break;  
+        break;
 
     case 001:                                           /* HKWC */
         old_val = hkwc;
@@ -1001,7 +1001,7 @@ switch (fnc) {                                          /* case on function */
         break;
 
     case FNC_DCLR:                                      /* drive clear */
-        hkds[drv] &= ~DS_ATA;                           /* clr ATA */        
+        hkds[drv] &= ~DS_ATA;                           /* clr ATA */
         hker[drv] = 0;                                  /* clr err */
         if (dte)                                        /* drive type err? */
             hk_err (CS1_ERR|CS1_DONE, 0, ER_DTY, drv);
@@ -1102,7 +1102,7 @@ switch (fnc) {                                          /* case on function */
             hk_off[drv] = hkof & AS_OF;                 /* save offset */
             sim_activate (uptr, hk_min2wait);           /* wait for compl */
             update_hkcs (CS1_DONE, drv);                /* done */
-            }           
+            }
         break;
 
     case FNC_RECAL:                                     /* recalibrate */
@@ -1119,7 +1119,7 @@ switch (fnc) {                                          /* case on function */
             t = abs (hk_dif[drv]) * hk_swait;           /* |cyl diff| */
             if (t < hk_min2wait)                        /* min time */
                 t = hk_min2wait;
-            uptr->CYL = dc;                             /* save cyl */          
+            uptr->CYL = dc;                             /* save cyl */
             sim_activate (uptr, t);                     /* schedule */
             update_hkcs (CS1_DONE, drv);                /* done */
             }
@@ -1202,7 +1202,7 @@ switch (fnc) {                                          /* case on function */
                 ba = ba + (wc << 1);                    /* adv ba */
                 }
             }                                           /* end if read */
-        else {                                          /* wchk */                  
+        else {                                          /* wchk */
             err = sim_disk_rdsect (uptr, da/HK_NUMWD, (uint8 *)hkxb, &sectsread, ((wc + (HK_NUMWD - 1)) & ~(HK_NUMWD - 1))/HK_NUMWD);
             if ((err == SCPE_OK) &&
                 (sectsread != (t_seccnt)((((wc + (HK_NUMWD - 1)) & ~(HK_NUMWD - 1))/HK_NUMWD))))
@@ -1341,7 +1341,7 @@ void hk_err (int32 cs1e, int32 cs2e, int32 drve, int32 drv)
 sim_debug (HKDEB_TRC, &hk_dev, "hk_err(drv=%d, cs1e=%d, cs2e=%d, drve=%d)\n", drv, cs1e, cs2e, drve);
 hker[drv] = hker[drv] | drve;                           /* set drv error */
 hkcs2 = hkcs2 | cs2e;                                   /* set cs2 err */
-if ((cs1e & CS1_ERR) != 0)                              /* set combined err? */                              
+if ((cs1e & CS1_ERR) != 0)                              /* set combined err? */
     hkei = 1;                                           /* then set EI */
 if ((cs1e & CS1_DONE) != 0)                             /* set done? */
     update_hkcs (CS1_ERR|CS1_DONE, drv);                /* stop now */
@@ -1506,8 +1506,8 @@ int32 old_hkds;
 static const char *drives[] = {"RK06", "RK07", NULL};
 
 uptr->capac = HK_SIZE (uptr);
-r = sim_disk_attach_ex (uptr, cptr, HK_NUMWD * sizeof (uint16), 
-                        sizeof (uint16), TRUE, 0, 
+r = sim_disk_attach_ex (uptr, cptr, HK_NUMWD * sizeof (uint16),
+                        sizeof (uint16), TRUE, 0,
                         (uptr->capac == RK06_SIZE) ? "RK06" : "RK07", HK_NUMSC, 0,
                         (uptr->flags & UNIT_NOAUTO) ? NULL : drives);
 if (r != SCPE_OK)                                       /* error? */

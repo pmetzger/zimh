@@ -278,7 +278,7 @@ static void dpk_output (int port, TMLN *lp)
     ch = ildb (&M[dpk_base + 2*port + 1]);
     ch = sim_tt_outcvt(ch & 0377, TT_GET_MODE (dpk_unit[0].flags));
     tmxr_putc_ln (lp, ch);
-            
+
     count = M[dpk_base + 2*port] - 1;
     M[dpk_base + 2*port] = count & 0777777777777LL;
 }

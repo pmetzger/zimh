@@ -31,7 +31,7 @@
    The host interface is one of the BBN engineered devices unique to the
    ARPAnet IMP.  This is the famous "1822" card which connected each IMP to a
    host computer - a DECSYSTEM-10, an SDS Sigma 7, an IBM 360/90, a CDC6600,
-   or any one of many other ARPAnet hosts.  The idea is to simulate this 
+   or any one of many other ARPAnet hosts.  The idea is to simulate this
    interface by using a TCP/UDP connection to another simh instance emulating
    the host machine and running the ARPAnet host software.
 
@@ -471,7 +471,7 @@ void hi_start_tx (uint16 line, uint16 flags)
     hi_rx_local(line, next, count);
   } else if (PHIDB(line)->link != NOLINK) {
 //for (int i = 0; i < count; i ++) fprintf (stderr, "%06o\r\n", M[next + i]);
-    // The host interface needs some out-of-band data bits. The format 
+    // The host interface needs some out-of-band data bits. The format
     // of the data going out over the wire is:
     // struct
     //   uint16 flags;
@@ -553,12 +553,12 @@ void hi_poll_rx (uint16 line)
     next = last = maxbuf = 0;  pdata = NULL;
   }
   // Try to read a packet.  If we get nothing then just return.
-  // The host interface needs some out-of-band data bits. The format 
+  // The host interface needs some out-of-band data bits. The format
   // of the data coming over the wire is:
   // struct
   //   uint16 flags;
   //   uint16 data [MAXDATA - 1];
-  
+
   if (PHIDB(line)->rxnext < PHIDB(line)->rxsize) {
     // There is data left from a previously recieved UDP packet.
     count = PHIDB(line)->rxsize - PHIDB(line)->rxnext;

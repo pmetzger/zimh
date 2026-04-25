@@ -513,10 +513,10 @@ loop:
     switch (chp->ccw_cmd) {
     case DSK_WD: case DSK_RD: case DSK_INCH: case DSK_NOP: case DSK_ICH:
     case DSK_SCK: case DSK_XEZ: case DSK_LMR: case DSK_WSL: case DSK_RSL:
-    case DSK_IHA: case DSK_WTL: case DSK_RTL: case DSK_RAP: case DSK_TESS:  
+    case DSK_IHA: case DSK_WTL: case DSK_RTL: case DSK_RAP: case DSK_TESS:
     case DSK_FNSK: case DSK_REL: case DSK_RES: case DSK_POR: case DSK_TIC:
     case DSK_REC:
-    case DSK_SNS:   
+    case DSK_SNS:
         break;
     default:
         chp->chan_status |= STATUS_PCHK;        /* program check for invalid cmd */
@@ -585,7 +585,7 @@ loop:
     /* make a 24 bit address */
     chp->ccw_addr = word1 & MASK24;             /* set the data/seek address */
 
-    /* validate parts of IOCD2 that are reserved */    
+    /* validate parts of IOCD2 that are reserved */
     if (word2 & 0x0fff0000) {                   /* bits 5-15 must be zero */
         chp->chan_status |= STATUS_PCHK;        /* program check for invalid iocd */
         sim_debug(DEBUG_EXP, dptr,
@@ -612,7 +612,7 @@ loop:
 
     if (docmd) {                                /* see if we need to process a command */
         DIB *dibp = dib_unit[chp->chan_dev];    /* get the DIB pointer */
- 
+
         uptr = chp->unitptr;                    /* get the unit ptr */
         if (dibp == 0 || uptr == 0) {
             chp->chan_status |= STATUS_PCHK;    /* program check if it is */

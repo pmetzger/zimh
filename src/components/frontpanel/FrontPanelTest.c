@@ -25,8 +25,8 @@
 
    05-Feb-15    MP      Initial implementation
 
-   This module demonstrates the use of the interface between a front panel 
-   application and a simh simulator.  Facilities provide ways to gather 
+   This module demonstrates the use of the interface between a front panel
+   application and a simh simulator.  Facilities provide ways to gather
    information from and to observe and control the state of a simulator.
 
 */
@@ -75,14 +75,14 @@ printw ("%s", buf);
 }
 #endif /* HAVE_NCURSES */
 #endif
-const char *sim_path = 
+const char *sim_path =
 #if defined(_WIN32)
             "vax.exe";
 #else
             "vax";
 #endif
 
-const char *sim_config = 
+const char *sim_config =
             "VAX-PANEL.ini";
 
 /* Registers visible on the Front Panel */
@@ -690,9 +690,9 @@ if (1) {
 
     sim_panel_debug (panel, "Testing sim_panel_exec_halt and sim_panel_destroy() () with simulator in Run State");
     for (i=0; long_running_program[i].instr; i++)
-        if (sim_panel_mem_deposit_instruction (panel, sizeof(long_running_program[i].addr), 
+        if (sim_panel_mem_deposit_instruction (panel, sizeof(long_running_program[i].addr),
                                                &long_running_program[i].addr, long_running_program[i].instr)) {
-            printf ("Error setting depositing instruction '%s' into memory at location %XR0: %s\n", 
+            printf ("Error setting depositing instruction '%s' into memory at location %XR0: %s\n",
                     long_running_program[i].instr, long_running_program[i].addr, sim_panel_get_error());
             goto Done;
             }

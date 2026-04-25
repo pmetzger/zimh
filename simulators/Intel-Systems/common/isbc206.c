@@ -29,8 +29,8 @@
 
     NOTES:
 
-        This controller will mount 1 removable Hard Disk (IBM 2315)and three Hard Disk fixed disk 
-        images on drives :F0: thru :F3: addressed at ports 068H to 06FH.  
+        This controller will mount 1 removable Hard Disk (IBM 2315)and three Hard Disk fixed disk
+        images on drives :F0: thru :F3: addressed at ports 068H to 06FH.
 
     Registers:
 
@@ -238,8 +238,8 @@ HDCDEF    hdc206;                       //indexed by the isbc-206 instance numbe
 
 
 UNIT isbc206_unit[] = {                 // 2 HDDs
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSHD) }, 
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSHD) }, 
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSHD) },
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSHD) },
     { NULL }
 };
 
@@ -261,7 +261,7 @@ MTAB isbc206_mod[] = {
         NULL, NULL, "Sets the base port for iSBC206"},
     { MTAB_XTD | MTAB_VDV, 0, NULL, "INT", &isbc206_set_int,
         NULL, NULL, "Sets the interrupt number for iSBC206"},
-    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, &isbc206_show_param, NULL, 
+    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, &isbc206_show_param, NULL,
         "show configured parameters for iSBC206" },
     { 0 }
 };
@@ -282,7 +282,7 @@ DEVICE isbc206_dev = {
     isbc206_unit,       //units
     isbc206_reg,        //registers
     isbc206_mod,        //modifiers
-    HDD_NUM,             //numunits 
+    HDD_NUM,             //numunits
     16,                 //aradix
     16,                 //awidth
     1,                  //aincr
@@ -292,11 +292,11 @@ DEVICE isbc206_dev = {
     NULL,               //deposit
     isbc206_reset,      //reset
     NULL,               //boot
-    &isbc206_attach,    //attach  
+    &isbc206_attach,    //attach
     NULL,               //detach
     NULL,               //ctxt
-    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags 
-    0,                  //dctrl 
+    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags
+    0,                  //dctrl
     isbc206_debug,      //debflags
     NULL,               //msize
     NULL,               //lname
@@ -312,9 +312,9 @@ t_stat isbc206_cfg(uint16 baseport, uint16 devnum, uint8 intnum)
 {
     int i;
     UNIT *uptr;
-    
+
     // one-time initialization for all FDDs for this FDC instance
-    for (i = 0; i < HDD_NUM; i++) { 
+    for (i = 0; i < HDD_NUM; i++) {
         uptr = isbc206_dev.units + i;
         uptr->u6 = i;               //fdd unit number
     }
@@ -323,8 +323,8 @@ t_stat isbc206_cfg(uint16 baseport, uint16 devnum, uint8 intnum)
     hdc206.verb = 0;                    //clear verb
     reg_dev(isbc206r0, hdc206.baseport, 0, 0); //read status
     reg_dev(isbc206r1, hdc206.baseport + 1, 0, 0); //read rslt type/write IOPB addr-l
-    reg_dev(isbc206r2, hdc206.baseport + 2, 0, 0); //write IOPB addr-h and start 
-    reg_dev(isbc206r3, hdc206.baseport + 3, 0, 0); //read rstl byte 
+    reg_dev(isbc206r2, hdc206.baseport + 2, 0, 0); //write IOPB addr-h and start
+    reg_dev(isbc206r3, hdc206.baseport + 3, 0, 0); //read rstl byte
     reg_dev(isbc206r7, hdc206.baseport + 7, 0, 0); //write reset fdc201
     isbc206_reset_dev();                //software reset
 //    if (hdc206.verb)
@@ -341,8 +341,8 @@ t_stat isbc206_clr(void)
     hdc206.verb = 0;                    //set verb = 0
     unreg_dev(hdc206.baseport);         //read status
     unreg_dev(hdc206.baseport + 1);     //read rslt type/write IOPB addr-l
-    unreg_dev(hdc206.baseport + 2);     //write IOPB addr-h and start 
-    unreg_dev(hdc206.baseport + 3);     //read rstl byte 
+    unreg_dev(hdc206.baseport + 2);     //write IOPB addr-h and start
+    unreg_dev(hdc206.baseport + 3);     //read rstl byte
     unreg_dev(hdc206.baseport + 7);     //write reset fdc201
 //    if (hdc206.verb)
         sim_printf("    sbc206: Disabled\n");
@@ -374,7 +374,7 @@ t_stat isbc206_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat isbc206_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result;
-    
+
     if (uptr == NULL)
         return SCPE_ARG;
     result = sscanf(cptr, "%02x", &size);
@@ -383,8 +383,8 @@ t_stat isbc206_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
         sim_printf("SBC206: Base port=%04X\n", hdc206.baseport);
     reg_dev(isbc206r0, hdc206.baseport, 0, 0); //read status
     reg_dev(isbc206r1, hdc206.baseport + 1, 0, 0); //read rslt type/write IOPB addr-l
-    reg_dev(isbc206r2, hdc206.baseport + 2, 0, 0); //write IOPB addr-h and start 
-    reg_dev(isbc206r3, hdc206.baseport + 3, 0, 0); //read rstl byte 
+    reg_dev(isbc206r2, hdc206.baseport + 2, 0, 0); //write IOPB addr-h and start
+    reg_dev(isbc206r3, hdc206.baseport + 3, 0, 0); //read rstl byte
     reg_dev(isbc206r7, hdc206.baseport + 7, 0, 0); //write reset fdc202
     return SCPE_OK;
 }
@@ -394,7 +394,7 @@ t_stat isbc206_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat isbc206_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result;
-    
+
     if (uptr == NULL)
         return SCPE_ARG;
     result = sscanf(cptr, "%02x", &size);
@@ -428,8 +428,8 @@ t_stat isbc206_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
-    fprintf(st, "%s Base port at %04X  Interrupt # is %i  %s", 
-        ((isbc206_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled", 
+    fprintf(st, "%s Base port at %04X  Interrupt # is %i  %s",
+        ((isbc206_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled",
         hdc206.baseport, hdc206.intnum,
         hdc206.verb ? "Verbose" : "Quiet"
         );
@@ -482,7 +482,7 @@ t_stat isbc206_attach (UNIT *uptr, const char *cptr)
     t_stat r;
     uint8 hddnum;
 
-    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) { 
+    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) {
         sim_printf("   isbc206_attach: Attach error %d\n", r);
         return r;
     }
@@ -579,7 +579,7 @@ void isbc206_diskio(void)
     UNIT *uptr;
     uint8 *fbuf;
 
-    //parse the IOPB 
+    //parse the IOPB
     cw = get_mbyte(hdc206.iopb);
     di = get_mbyte(hdc206.iopb + 1);
     nr = get_mbyte(hdc206.iopb + 2);
@@ -675,7 +675,7 @@ void isbc206_diskio(void)
                 //calculate offset into disk image
                 dskoff = ((ta * MAXSECHD) + (sa - 1)) * 128;
                 //copy sector from image to RAM
-                for (i=0; i<128; i++) { 
+                for (i=0; i<128; i++) {
                     data = *(fbuf + (dskoff + i));
                     put_mbyte(ba + i, data);
                 }
@@ -701,7 +701,7 @@ void isbc206_diskio(void)
                 //calculate offset into disk image
                 dskoff = ((ta * MAXSECHD) + (sa - 1)) * 128;
                 //copy sector from image to RAM
-                for (i=0; i<128; i++) { 
+                for (i=0; i<128; i++) {
                     data = get_mbyte(ba + i);
                     *(fbuf + (dskoff + i)) = data;
                 }

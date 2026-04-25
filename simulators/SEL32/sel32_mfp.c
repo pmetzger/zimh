@@ -25,7 +25,7 @@
    TIO instructions..
 
    Possible devices:
-   The f8iop communication controller (TY76A0), (TY76B0), (TY76C0) 
+   The f8iop communication controller (TY76A0), (TY76B0), (TY76C0)
    The ctiop console communications controller (CT76FC & CT76FD)
    The lpiop line printer controller (LP76F8), (LP76F9)
    The scsi  SCSI disk controller (DM7600), (DM7640)

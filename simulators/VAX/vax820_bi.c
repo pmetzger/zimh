@@ -48,7 +48,7 @@
 
 /* Accelerator control/status register */
 
-#define ACCS_ON         0x1                             /* enable F-chip */ 
+#define ACCS_ON         0x1                             /* enable F-chip */
 #define ACCS_RW         (ACCS_ON)
 
 /* KA820 boot device definitions */
@@ -527,7 +527,7 @@ for (p = &regtable[0]; p->low != 0; p++) {
     }
 MACH_CHECK (MCHK_BIERR);                                /* machine check */
 return 0;
-} 
+}
 
 /* WriteReg - write register space
 
@@ -554,7 +554,7 @@ if (ADDR_IS_REG (pa)) {                                 /* reg space? */
     }
 for (p = &regtable[0]; p->low != 0; p++) {
     if ((pa >= p->low) && (pa < p->high) && p->write) {
-        p->write (pa, val, lnt);  
+        p->write (pa, val, lnt);
         return;
         }
     }
@@ -601,7 +601,7 @@ return cc;
 int32 con_halt (int32 code, int32 cc)
 {
 if ((cpu_boot_cmd[0] == 0) ||                           /* saved boot cmd? */
-    (vax820_boot_parse (0, cpu_boot_cmd) != SCPE_OK) || /* reparse the boot cmd */ 
+    (vax820_boot_parse (0, cpu_boot_cmd) != SCPE_OK) || /* reparse the boot cmd */
     (reset_all (0) != SCPE_OK) ||                       /* reset the world */
     (cpu_boot (0, NULL) != SCPE_OK))                    /* set up boot code */
     ABORT (STOP_BOOT);                                  /* any error? */

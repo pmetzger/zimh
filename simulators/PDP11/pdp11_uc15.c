@@ -266,7 +266,7 @@ case 2:                                                 /* input buffer */
      }
 
 return SCPE_NXM;
-}     
+}
 
 t_stat ucb_wr (int32 data, int32 PA, int32 access)
 {

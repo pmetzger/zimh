@@ -153,7 +153,7 @@ MTAB                cdr_mod[] = {
 REG                 cdr_reg[] = {
     {CRDATA(BUFF, cdr_buffer, 16, 16, sizeof(cdr_buffer)/sizeof(uint16)), REG_HRO},
     {0}
-};  
+};
 
 DEVICE              cdr_dev = {
     "CR", cdr_unit, cdr_reg, cdr_mod,
@@ -180,7 +180,7 @@ MTAB                cdp_mod[] = {
 REG                 cdp_reg[] = {
     {CRDATA(BUFF, cdp_buffer, 16, 16, sizeof(cdp_buffer)/sizeof(uint16)), REG_HRO},
     {0}
-};  
+};
 
 DEVICE              cdp_dev = {
     "CP", cdp_unit, cdp_reg, cdp_mod,
@@ -211,7 +211,7 @@ MTAB                lpr_mod[] = {
 REG                 lpr_reg[] = {
     {CRDATA(BUFF, lpr_buffer, 16, 8, sizeof(lpr_buffer)), REG_HRO},
     {0}
-};  
+};
 
 DEVICE              lpr_dev = {
     "LP", lpr_unit, lpr_reg, lpr_mod,
@@ -231,7 +231,7 @@ UNIT                con_unit[] = {
 REG                 con_reg[] = {
     {SAVEDATA(BUFF, con_data) },
     {0}
-};  
+};
 
 DEVICE              con_dev = {
     "CON", con_unit, con_reg, NULL,
@@ -285,7 +285,7 @@ t_stat card_cmd(uint16 cmd, uint16 dev, uint8 chan, uint16 *wc)
         /* Check if we ran out of cards */
         if (uptr->CMD & URCSTA_EOF) {
             /* If end of file, return to system */
-            if (sim_card_input_hopper_count(uptr) != 0) 
+            if (sim_card_input_hopper_count(uptr) != 0)
                 uptr->CMD &= ~URCSTA_EOF;
             else {
                 /* Clear unit ready */
@@ -388,7 +388,7 @@ cdr_srv(UNIT *uptr) {
         } else {
             ch = sim_hol_to_bcd(image[uptr->POS]);
             /* Remap some characters from 029 to BCL */
-            /* Sim_hol_to_bcd translates cards by looking at the zones 
+            /* Sim_hol_to_bcd translates cards by looking at the zones
              *  12 - 11 and 10 and setting the two most significant
              * digits of the BCD word to 11xxxx, 10xxxx, 01xxxx
              * next if 8 is punched it add in 001000 then adds the one

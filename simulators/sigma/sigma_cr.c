@@ -1,62 +1,62 @@
 /* sigma_cr.c: Sigma 7120/7122/7140 card reader
- 
+
  Copyright (c) 2024, Ken Rector
- 
+
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
  the rights to use, copy, modify, merge, publish, distribute, sublicense,
  and/or sell copies of the Software, and to permit persons to whom the
  Software is furnished to do so, subject to the following conditions:
- 
+
  The above copyright notice and this permission notice shall be included in
  all copies or substantial portions of the Software.
- 
+
  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
  KEN RECTOR BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
  IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
  CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
- 
+
  Except as contained in this notice, the name of Ken Rector shall not be
  used in advertising or otherwise to promote the sale, use or other dealings
  in this Software without prior written authorization from Ken Rector.
- 
+
  cr      7120 card reader
- 
+
  27-Feb-2024       kenr      Initial version
- 
+
     The 7120, 7122 and 7140 card readers are described in the SDS
     reference manual, 900970C.
- 
+
     The simulator expects input data to be a file of 120 byte records with no control
     or other extraneous data, to simulate a punched card deck.  Each 120 byte record
     is translated to 80 16 bit columns with data in the loworder 12 bits.  In
     automatic mode each column (1-1/2 bytes) is translated from a hollerith code
     to an ebcdic character (1 byte).  In binary mode each pair of columns is
     translated to 3 data bytes.
- 
+
     A length error in the input data will not be detected until the end of file
     and results in an Invalid Length and Unusual End status.  CPV sets the ignore
     incorrect length flag so this can cause trouble in the symbiont input process.
- 
+
     Card reader speed for the 7120, 7122 and 7140 machines was 400, 400 and 1500
     cards per minute respectively, or 150, 150 and 40 msec per card.  The simulator
     runs much faster than this, transmitting 80 columns in ~400 instruction cycles,
     or 5 cycles per column.
- 
+
     The cr device capacity indicates the number of cards in the hopper and stacker.
     There is no limit on the number of records in the hopper or stacker.  The
     stacker is never emptied and the count can overflow.  The hopper counter is
     set when a file is attached and reduced as each card is read.
- 
+
     The cardreader is detached from the input file when the hopper count
     reaches zero.
- 
+
     The card reader reports a Data Transmission Error if an incorrect EBCDIC character
     is detected, (more than 1 punch in rows 1-7).
- 
+
  */
 
 #include <sys/stat.h>
@@ -151,7 +151,7 @@ DEVICE  cr_dev = {
 uint32 cr_disp (uint32 op, uint32 dva, uint32 *dvst)
 {
     switch (op) {                                       /* case on op */
-            
+
         case OP_SIO:                                    /* start I/O */
             *dvst = cr_tio_status ();                   /* get status */
             if ((*dvst & DVS_AUTO) && !sim_is_active(&cr_unit))  {
@@ -160,15 +160,15 @@ uint32 cr_disp (uint32 op, uint32 dva, uint32 *dvst)
                 sim_activate (&cr_unit, 0);
             }
             break;
-            
+
         case OP_TIO:                                    /* test status */
             *dvst = cr_tio_status ();                   /* return status */
             break;
-            
+
         case OP_TDV:                                    /* test status */
             *dvst = cr_tdv_status ();                   /* return status */
             break;
-            
+
         case OP_HIO:                                    /* halt I/O */
             chan_clr_chi (cr_dib.dva);                  /* clear int */
             *dvst = cr_tio_status ();
@@ -177,17 +177,17 @@ uint32 cr_disp (uint32 op, uint32 dva, uint32 *dvst)
                 chan_uen (cr_dib.dva);                  /* uend */
             }
             break;
-            
+
         case OP_AIO:                                    /* acknowledge int */
             chan_clr_chi (cr_dib.dva);                  /* clr int*/
             *dvst = 0;                                  /* no status */
             break;
-            
+
         default:
             *dvst = 0;
             return SCPE_IERR;
     }
-    
+
     return 0;
 }
 
@@ -198,7 +198,7 @@ t_stat cr_svc (UNIT *uptr)
     uint32 cmd = uptr->UCMD;
     t_stat st;
     char   c;
-    
+
     if (cmd == CRS_INIT) {                          /* init state */
         st = chan_get_cmd (cr_dib.dva, &cmd);       /* get order */
         if (CHS_IFERR (st))                         /* bad device id, inactive state */
@@ -238,7 +238,7 @@ t_stat cr_svc (UNIT *uptr)
         }
         return SCPE_OK;
     }
-    
+
     if (cr_blnt == 0) {                             /* card arriving? */
         if (cr_readrec (uptr) == 0) {               /* unexpected EOF, inv reclnt? */
             uptr->UCMD = CRS_END;                   /* end state */
@@ -291,7 +291,7 @@ t_stat cr_svc (UNIT *uptr)
     if (((st == CHS_ZBC) ^ (cr_bptr == cr_blnt)) && /* length err? */
         chan_set_chf (cr_dib.dva, CHF_LNTE))        /* Incorrect Length */
         return SCPE_OK;                             /* to operational status byte */
-    
+
     uptr->UCMD = CRS_END;                           /* end state */
     sim_activate (uptr, chan_ctl_time);             /* sched ctlr */
     return SCPE_OK;
@@ -301,14 +301,14 @@ t_stat cr_svc (UNIT *uptr)
 /*  get next record */
 
 t_stat cr_readrec (UNIT *uptr) {
-    
+
     int    col;
     FILE   *fp = uptr->fileref;
-    
+
     for (col = 0; col < 80; ) {
         int16    i;
         int    c1, c2, c3;
-        
+
         c1 = fgetc (fp);                            /* read 3 bytes */
         c2 = fgetc (fp);
         c3 = fgetc (fp);
@@ -335,7 +335,7 @@ t_stat cr_readrec (UNIT *uptr) {
 uint32 cr_tio_status (void)
 {
     uint32 st;
-    
+
     st = (cr_unit.flags & UNIT_ATT) ? DVS_AUTO: 0;  /* AUTO : MANUAL */
     if (sim_is_active (&cr_unit))                   /* dev busy? */
         st |= ( DVS_CBUSY | DVS_DBUSY | (CC2 << DVT_V_CC));
@@ -345,7 +345,7 @@ uint32 cr_tio_status (void)
 uint32 cr_tdv_status (void)
 {
     uint32 st;
-    
+
     if (cr_unit.flags & UNIT_ATT &&
         (cr_hopper > 0))                            /* rdr att? */
         st = cr_unit.UST;
@@ -420,7 +420,7 @@ t_stat cr_detach (UNIT *uptr)
 }
 
 t_stat cr_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc) {
-    
+
     if (cr_hopper == 0)
         fprintf(st,"hopper empty");
     else {

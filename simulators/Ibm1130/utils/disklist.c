@@ -67,7 +67,7 @@ typedef struct tag_filearg {                        // node in linked list of fi
 
 static char *progtype_nm[16] = {                    // DMS2 program types for DSF format files
     "Undefined",        "Mainline, absolute",   "Mainline, relocatable",    "LIBF Subprogram",
-    "CALL Subprogram",  "LIBF Interrupt Service Subroutine (ISS)",          
+    "CALL Subprogram",  "LIBF Interrupt Service Subroutine (ISS)",
                         "CALL Interrupt Service Subroutine (ISS)",  "Interrupt Level Subroutine (ILS)",
     "Undefined",        "Undefined",            "Undefined",                "Undefined",
     "Undefined",        "Undefined",            "Undefined",                "Undefined"
@@ -162,7 +162,7 @@ BOOL show_all = FALSE;                              // switch to display alterna
 BOOL dumpslet = FALSE;                              // dump SLET switch
 BOOL do_dump = FALSE;
 char *ftname[4] = {"DSF", "???", "DCI", "DDF"};     // DMS2 filetype names
-    
+
 LETENTRY *flet = NULL, *let = NULL;                 // pointers to contents of FLET and LET
 
 #pragma pack(1)                                     // (don't pad struct elements)
@@ -394,7 +394,7 @@ char *upcase (char *str)
     for (s = str; *s; s++) {
         if (*s >= 'a' && *s <= 'z')
             *s -= 32;
-    } 
+    }
 
     return str;
 }
@@ -808,14 +808,14 @@ void convert_namecode (uint16 *namecode, char *name)
             ch = ' ';                           // zero is a space
         else
             ch = ebcdic_to_ascii(ch | 0xC0);    // add assumed high bits and convert to ASCII
-        
+
         name[i] = ch;                           // save it
         val <<= 6;                              // shift next character into position
     }
 
     while (--i >= 0)                            // back up to last nonblank character
         if (name[i] != ' ')
-            break;      
+            break;
 
     name[i+1] = '\0';                           // terminate string
 }
@@ -974,7 +974,7 @@ char *astring (char *str)
 
     cpy = malloc(strlen(str)+1);
     strcpy(cpy, str);
-    
+
     return cpy;
 }
 
@@ -1218,7 +1218,7 @@ void print_dsf_info (LETENTRY *entry)
 //  if (hdr.zero2 != 0)                                                 // so is this word, but it turns out not to be reliably zero
 //      printf(INDENT "CORRUPT:      hdr word 7 should be 0, is %d\n", hdr.zero2);
 
-    printf(INDENT "Program type: %d=%s\n", progtype, progtype_nm[progtype]);    
+    printf(INDENT "Program type: %d=%s\n", progtype, progtype_nm[progtype]);
     if (progtype == 3 || progtype == 4 || progtype == 5 || progtype == 7) {
         nm = "Undefined";                                               // types 3, 4, 5 and 7 should have a subtype
         for (i = 0; i < N_SUBTYPE_NMS; i++) {
@@ -1234,7 +1234,7 @@ void print_dsf_info (LETENTRY *entry)
     printf(INDENT "Precision:    Real=%s Integer=%s\n",
         (real_precis == 0) ? "Unspecified" : (real_precis == 1) ? "Standard"     : (real_precis == 2) ? "Extended" : "invalid",
         (int_precis  == 0) ? "Unspecified" : (int_precis  == 8) ? "Matches Real" : (int_precis  == 9) ? "One word" : "invalid");
-    printf(INDENT "Prog length:  %d wd\n", hdr.proglen); 
+    printf(INDENT "Prog length:  %d wd\n", hdr.proglen);
     printf(INDENT "COMMON:       %d wd\n", hdr.commonlen);
     printf(INDENT "Fortran ind:  0x%02x, %d defined file%s\n",
         fortran_indicator, n_defined_files, (n_defined_files == 1) ? "" : "s");
@@ -1516,7 +1516,7 @@ char * file_progtype (LETENTRY *entry)                  // description of module
             subtype           = (hdr.type >> 12) & 0x0F;                        // extract file type and subtype
             progtype          = (hdr.type >>  8) & 0x0F;
 
-            strcpy(buf, progtype_nm[progtype]); 
+            strcpy(buf, progtype_nm[progtype]);
             if (progtype == 3 || progtype == 4 || progtype == 5 || progtype == 7) {
                 nm = NULL;
                 for (i = 0; i < N_SUBTYPE_NMS; i++) {

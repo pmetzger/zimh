@@ -67,7 +67,7 @@ extern DEVICE dup_dev;
 extern DEVICE ch_dev;
 extern DEVICE uw_dev;
 
-DEVICE *sim_devices[] = { 
+DEVICE *sim_devices[] = {
     &cpu_dev,
     &tlb_dev,
     &abus_dev,

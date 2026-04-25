@@ -549,7 +549,7 @@ t_stat con_srvi(UNIT *uptr) {
                 uptr->CMD |= CON_ATAT;      /* show getting @ */
             }
             if (ch == '\n')                 /* convert newline */
-                ch = '\r';                  /* make newline into carriage return */ 
+                ch = '\r';                  /* make newline into carriage return */
             if (isprint(ch))
                 sim_debug(DEBUG_CMD, dptr,
                 "con_srvi handle readch unit %02x: CMD %08x read %02x [%c] u4 %02x incnt %02x r %x\n",
@@ -583,7 +583,7 @@ t_stat con_srvi(UNIT *uptr) {
         if (ch == '?') {
             /* set ring bit? */
             set_devwake(chsa, SNS_ATTN|SNS_DEVEND|SNS_CHNEND);  /* tell user */
-        }     
+        }
         /* not wanting input, but we have a char, look for @@A */
         if (uptr->CMD & CON_ATAT) {         /* looking for @@A */
             /* we have at least one @, look for another */

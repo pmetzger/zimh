@@ -266,7 +266,7 @@ void ch_validate (const uint8 *p, int count)
   sim_debug (DBG_TRC, &ch_dev, "Source index: %02x\n", (p[10] << 8) + p[11]);
   sim_debug (DBG_TRC, &ch_dev, "Packet number: %02x\n", (p[12] << 8) + p[13]);
   sim_debug (DBG_TRC, &ch_dev, "Acknowledgement: %02x\n", (p[14] << 8) + p[15]);
-  
+
   if (p[1] != 0)
     sim_debug (DBG_ERR, &ch_dev, "Bad packet\n");
 
@@ -464,7 +464,7 @@ t_stat ch_reset (DEVICE *dptr)
 {
   DEVICE *ng_dptr = find_dev ("NG");
 
-  if ((ng_dptr != NULL) && 
+  if ((ng_dptr != NULL) &&
       !(ng_dptr->flags & DEV_DIS) &&
       !(dptr->flags & DEV_DIS)) {
     dptr->flags |= DEV_DIS;

@@ -472,7 +472,7 @@ loop:
     switch (chp->ccw_cmd) {
     case MT_WRITE: case MT_READ: case MT_NOP: case MT_SENSE:
     case MT_RDBK: case MT_RDCMP: case MT_REW: case MT_RUN: case MT_FSR:
-    case MT_BSR: case MT_FSF: case MT_BSF: case MT_SETM: case MT_WTM: case MT_ERG:  
+    case MT_BSR: case MT_FSF: case MT_BSF: case MT_SETM: case MT_WTM: case MT_ERG:
         /* the inch command must be first command issued */
         if ((!loading) && (pchp->chan_inch_addr == 0)) {
             chp->chan_status |= STATUS_PCHK;    /* program check for invalid cmd */
@@ -552,7 +552,7 @@ loop:
         irq_pend = 1;                           /* interrupt pending */
     }
 
-    /* validate parts of IOCD2 that are reserved */    
+    /* validate parts of IOCD2 that are reserved */
     if (word2 & 0x07ff0000) {                   /* bits 5-15 must be zero */
         chp->chan_status |= STATUS_PCHK;        /* program check for invalid iocd */
         sim_debug(DEBUG_EXP, dptr,
@@ -579,7 +579,7 @@ loop:
 
     if (docmd) {                                /* see if we need to process a command */
         DIB *dibp = dib_unit[chp->chan_dev];    /* get the DIB pointer */
- 
+
         uptr = chp->unitptr;                    /* get the unit ptr */
         if (dibp == 0 || uptr == 0) {
             chp->chan_status |= STATUS_PCHK;    /* program check if it is */

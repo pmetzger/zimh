@@ -102,7 +102,7 @@ DEVICE mb_dev = {
     NULL, NULL, &mb_reset,
     NULL, NULL, NULL,
     &mb_dib, DEV_DIS | DEV_DISABLE | DEV_UBUS | DEV_DEBUG,
-    0, mb_deb, NULL, NULL, NULL, NULL, NULL, 
+    0, mb_deb, NULL, NULL, NULL, NULL, NULL,
     &mb_description
 };
 

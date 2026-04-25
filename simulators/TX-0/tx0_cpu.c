@@ -41,7 +41,7 @@
 The original Lincoln Labs TX-0 had only two bits of opcode and no index
 register. The machine was moved to room 26-248 at MIT in July 1958 and
 after about a year and a half the opcode field was extended to four bits
-and an index register was added. 
+and an index register was added.
 
 (ref. Computer Museum Report Vol 8, Spring 1984)
 
@@ -63,7 +63,7 @@ from "A Functional Description of the TX-0 Computer" Oct, 1958
 
      0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17
    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
-   |  op |                       address                 |              
+   |  op |                       address                 |
    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
 
    This routine is the instruction decode routine for the TX-0.
@@ -186,8 +186,8 @@ See TX-0 memo M-5001-19 for a simple formula for cry, used in the code below.
   tac  --- -00 001 --- --- ---  1.1
   tbr  --- -00 010 --- --- ---  1.2
   pen  --- -00 011 --- --- ---  1.1
-  sel  --- -00 100 --- --- ---  
-  spare--- -00 101 --- --- ---  
+  sel  --- -00 100 --- --- ---
+  spare--- -00 101 --- --- ---
   rpf  --- -00 110 --- --- ---  1.2
   spf  --- -00 111 --- --- ---  1.6
   exN  --- -01 nnn --- --- ---  IOS
@@ -196,7 +196,7 @@ See TX-0 memo M-5001-19 for a simple formula for cry, used in the code below.
   dis  --- -10 010 --- --- ---  IOS
   r3l  --- -10 011 --- --- ---  IOS
   prt  --- -10 100 --- --- ---  IOS
-  spare--- -10 101 --- --- ---  
+  spare--- -10 101 --- --- ---
   p6h  --- -10 110 --- --- ---  IOS
   p7h  --- -10 111 --- --- ---  IOS
   hlt  --- -11 000 --- --- ---  1.8
@@ -344,7 +344,7 @@ MTAB cpu_mod[] = {
     { UNIT_MSIZE, 65536, NULL, "64K", &cpu_set_size },
     { UNIT_MODE, 0, "NORMAL", "NORMAL", &cpu_set_mode },
     { UNIT_MODE, UNIT_MODE_TEST, "TEST", "TEST", &cpu_set_mode },
-    { UNIT_MODE, UNIT_MODE_READIN, "READIN", "READIN", &cpu_set_mode }, 
+    { UNIT_MODE, UNIT_MODE_READIN, "READIN", "READIN", &cpu_set_mode },
     { MTAB_XTD|MTAB_VDV|MTAB_NMO|MTAB_SHP, 0, "HISTORY", "HISTORY",
       &cpu_set_hist, &cpu_show_hist },
     { 0 }
@@ -533,7 +533,7 @@ t_stat sim_instr (void)
         /* Fetch, decode instruction in NORMAL mode */
         MAR = PC;
         if (Read ()) break;                                 /* fetch inst */
-     
+
         IR = (MBR >> 13);                                   /* save in IR */
         inst_class = IR >> 3;
         op = MBR & AMASK;
@@ -561,7 +561,7 @@ t_stat sim_instr (void)
 #endif
 
         tx0_dump_regs("START");
-        
+
         switch (inst_class) {                               /* decode IR<0:1> */
 
         /* Logical, load, store instructions */
@@ -721,7 +721,7 @@ t_stat sim_instr (void)
                         PC = y;
                         XR &= 037777;
                         TRACE_PRINT(TRN_MSG, (" PC=%06o, XR=%05o\n", PC, XR));
-                        
+
                     }
                     inst_ctr.tix++;
                     break;
@@ -1043,7 +1043,7 @@ static t_stat cpu_reset (DEVICE *dptr)
     }
 
     sim_brk_types = sim_brk_dflt = SWMASK ('E');
-    
+
     return SCPE_OK;
 }
 

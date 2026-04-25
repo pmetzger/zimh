@@ -615,7 +615,7 @@ ipoint(int i, int n, unsigned char byte)
 }
 
 #if TYPE342
-/* 
+/*
  * 342 character generator - first 64 characters
  * 7-13_340_Display_Programming_Manual.pdf p.24
  * each char contains a vertical stripe of the matrix.

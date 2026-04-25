@@ -27,9 +27,9 @@
 
    13-Mar-17    RMS     Annotated intentional fall through in switch
    23-Oct-13    RMS     Revised for new boot setup routine
-   06-Mar-11    MP      Converted to using sim_disk library and refactored 
+   06-Mar-11    MP      Converted to using sim_disk library and refactored
                         for Asynch I/O.
-                        Set STIME value to default of 26 which allows VMS V4.x 
+                        Set STIME value to default of 26 which allows VMS V4.x
                         to boot.
    17-May-07    RMS     CS1 DVA resides in device, not MBA
    21-Nov-05    RMS     Enable/disable device also enables/disables Massbus adapter
@@ -443,7 +443,7 @@ BITFIELD *rp_reg_bits[] = {
     rp_er3_bits,
     rp_ec1_bits,
     rp_ec2_bits,
-    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 
+    NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
     rp_cs1_bits,
     rp_ds_bits,
     rp_er1_bits,
@@ -647,7 +647,7 @@ REG rp_reg[] = {
     { BRDATAD  (MR2,              rmmr2, DEV_RDX, 16, RP_NUMDR, "maintenance register 2 (RM only)") },
     { DRDATAD  (STIME,         rp_swait, 24,                    "seek time, per cylinder"), REG_NZ + PV_LEFT },
     { DRDATAD  (RTIME,         rp_rwait, 24,                    "rotational delay"), REG_NZ + PV_LEFT },
-    { URDATA   (CAPAC, rp_unit[0].capac, 10, T_ADDR_W, 0, 
+    { URDATA   (CAPAC, rp_unit[0].capac, 10, T_ADDR_W, 0,
               RP_NUMDR, PV_LEFT | REG_HRO) },
     { FLDATAD  (STOP_IOE,    rp_stopioe, 0,                     "stop on I/O error") },
     { GRDATA   (CTRLTYPE,    rp_dib.lnt, DEV_RDX, 16, 0), REG_HRO },
@@ -655,13 +655,13 @@ REG rp_reg[] = {
     };
 
 MTAB rp_mod[] = {
-    { MTAB_XTD|MTAB_VDV, 0, "MASSBUS", NULL, 
+    { MTAB_XTD|MTAB_VDV, 0, "MASSBUS", NULL,
         NULL, &mba_show_num, NULL, "Display Massbus number" },
-    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED", 
+    { MTAB_XTD|MTAB_VUN, 0, "write enabled", "WRITEENABLED",
         &set_writelock, &show_writelock,   NULL, "Write enable disk drive" },
-    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED", 
+    { MTAB_XTD|MTAB_VUN, 1, NULL, "LOCKED",
         &set_writelock, NULL,   NULL, "Write lock disk drive" },
-    { UNIT_DUMMY,      0, NULL,            "BADBLOCK", 
+    { UNIT_DUMMY,      0, NULL,            "BADBLOCK",
         &rp_set_bad, NULL, NULL, "write bad block table on last track" },
     { MTAB_XTD|MTAB_VUN, RM03_DTYPE, NULL, "RM03",
       &rp_set_type, NULL, NULL, "Set RM03 Disk Type" },
@@ -679,9 +679,9 @@ MTAB rp_mod[] = {
       &rp_set_type, NULL, NULL, "Set RP07 Disk Type" },
     { MTAB_XTD|MTAB_VUN, 0, "TYPE", NULL,
       NULL, &rp_show_type, NULL, "Display device type" },
-    { UNIT_AUTO, UNIT_AUTO, "autosize", "AUTOSIZE", 
+    { UNIT_AUTO, UNIT_AUTO, "autosize", "AUTOSIZE",
       NULL, NULL, NULL, "Set type based on file size at attach" },
-    { UNIT_AUTO,         0, "noautosize",   "NOAUTOSIZE",   
+    { UNIT_AUTO,         0, "noautosize",   "NOAUTOSIZE",
       NULL, NULL, NULL, "Disable disk autosize on attach" },
     { MTAB_XTD|MTAB_VUN|MTAB_VALR, 0, "FORMAT", "FORMAT={AUTO|SIMH|VHD|RAW}",
       &sim_disk_set_fmt, &sim_disk_show_fmt, NULL, "Set/Display disk format" },
@@ -710,11 +710,11 @@ DEVICE rp_dev = {
     NULL, NULL, &rp_reset,
     &rp_boot, &rp_attach, &rp_detach,
     &rp_dib, DEV_DISABLE | DEV_UBUS | DEV_QBUS | DEV_MBUS | DEV_DEBUG | DEV_DISK,
-    0, rp_debug, NULL, NULL, &rp_help, NULL, NULL, 
+    0, rp_debug, NULL, NULL, &rp_help, NULL, NULL,
     &rp_description
     };
 
-const char *rp_regnam[] = 
+const char *rp_regnam[] =
     {
     "RP_CS1",    /* 0 */
     "RP_DS",     /* 1 */
@@ -920,7 +920,7 @@ switch (ofs) {                                          /* decode PA<5:1> */
         sim_debug_bits(DBG_REG, &rp_dev, rp_reg_bits[ofs], old_reg, rpcs1[drv], 1);
         if (data & CS1_GO)                              /* start op */
             return rp_go (drv);
-        break;  
+        break;
 
     case RP_DA_OF: case RM_DA_OF:                       /* RPDA */
         old_reg = rpds[drv];
@@ -1151,7 +1151,7 @@ if (!uptr->io_complete) { /* Top End (I/O Initiation) Processing */
         case FNC_RETURN:                                /* return to centerline */
             rpds[drv] = rpds[drv] & ~DS_OFM;            /* clear offset, set attn */
             rp_update_ds (DS_ATA, drv);
-            break;  
+            break;
 
         case FNC_RECAL:                                 /* recalibrate */
         case FNC_SEARCH:                                /* search */
@@ -1374,10 +1374,10 @@ DEVICE *dptr = find_dev_from_unit (uptr);
 static const char *drives[] = {"RM03", "RP04", "RP05", "RM80", "RP06", "RM05", "RP07", NULL};
 
 uptr->capac = drv_tab[GET_DTYPE (uptr->flags)].size;
-r = sim_disk_attach_ex (uptr, cptr, RP_NUMWD * sizeof (uint16), 
-                        sizeof (uint16), TRUE, DBG_DSK, 
-                        drv_tab[GET_DTYPE (uptr->flags)].name, 
-                        drv_tab[GET_DTYPE (uptr->flags)].dec144 ? drv_tab[GET_DTYPE (uptr->flags)].sect : 0, 
+r = sim_disk_attach_ex (uptr, cptr, RP_NUMWD * sizeof (uint16),
+                        sizeof (uint16), TRUE, DBG_DSK,
+                        drv_tab[GET_DTYPE (uptr->flags)].name,
+                        drv_tab[GET_DTYPE (uptr->flags)].dec144 ? drv_tab[GET_DTYPE (uptr->flags)].sect : 0,
                         0, (uptr->flags & UNIT_AUTO) ? drives : NULL);
 if (r != SCPE_OK)                                       /* error? */
     return r;
@@ -1481,7 +1481,7 @@ WrMemW (BOOT_UNIT, unitno & (RP_NUMDR - 1));
 WrMemW (BOOT_CSR, mba_get_csr (rp_dib.ba) & DMASK);
 if (drv_tab[GET_DTYPE (uptr->flags)].ctrl == RP_CTRL)
     WrMemW (BOOT_START, 042102);                    /* "BD" */
-else 
+else
     WrMemW (BOOT_START, 042122);                    /* "RD" */
 cpu_set_boot (BOOT_ENTRY);
 return SCPE_OK;

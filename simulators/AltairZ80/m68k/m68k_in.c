@@ -3587,7 +3587,7 @@ M68KMAKE_OP(chk2cmp2, 8, ., pcdi)
 
 		if(!BIT_F(word2))
 			compare = (int32)(int8)compare;
-      
+
 		FLAG_Z = !((upper_bound==compare) || (lower_bound==compare));  // JFF: | => ||
 
     FLAG_C = (lower_bound <= upper_bound ? compare < lower_bound || compare > upper_bound : compare > upper_bound || compare < lower_bound) << 8;
@@ -3597,7 +3597,7 @@ M68KMAKE_OP(chk2cmp2, 8, ., pcdi)
 		return;
 	}
 
-      
+
 	m68ki_exception_illegal();
 }
 
@@ -3639,7 +3639,7 @@ M68KMAKE_OP(chk2cmp2, 8, ., .)
 
 		if(!BIT_F(word2))
 			compare = (int32)(int8)compare;
-      
+
  		FLAG_Z = !((upper_bound==compare) || (lower_bound==compare));  // JFF: | => ||
 
     FLAG_C = (lower_bound <= upper_bound ? compare < lower_bound || compare > upper_bound : compare > upper_bound || compare < lower_bound) << 8;
@@ -3737,7 +3737,7 @@ M68KMAKE_OP(chk2cmp2, 32, ., pcdi)
 		FLAG_Z = !((upper_bound==compare) || (lower_bound==compare));  // JFF: | => ||
 
     FLAG_C = (lower_bound <= upper_bound ? compare < lower_bound || compare > upper_bound : compare > upper_bound || compare < lower_bound) << 8;
-    
+
 		if(COND_CS() && BIT_B(word2))
 				m68ki_exception_trap(EXCEPTION_CHK);
 		return;
@@ -3759,7 +3759,7 @@ M68KMAKE_OP(chk2cmp2, 32, ., pcix)
 		FLAG_Z = !((upper_bound==compare) || (lower_bound==compare));  // JFF: | => ||
 
     FLAG_C = (lower_bound <= upper_bound ? compare < lower_bound || compare > upper_bound : compare > upper_bound || compare < lower_bound) << 8;
-    
+
 		if(COND_CS() && BIT_B(word2))
 				m68ki_exception_trap(EXCEPTION_CHK);
 		return;
@@ -3771,7 +3771,7 @@ M68KMAKE_OP(chk2cmp2, 32, ., pcix)
 M68KMAKE_OP(chk2cmp2, 32, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS(CPU_TYPE))
-	{   
+	{
 		uint word2 = OPER_I_16();
 		// JFF changed the logic. chk2/cmp2 uses signed values, not unsigned
 		sint compare = REG_DA[(word2 >> 12) & 15];
@@ -3782,7 +3782,7 @@ M68KMAKE_OP(chk2cmp2, 32, ., .)
 		FLAG_Z = !((upper_bound==compare) || (lower_bound==compare));  // JFF: | => ||
 
         FLAG_C = (lower_bound <= upper_bound ? compare < lower_bound || compare > upper_bound : compare > upper_bound || compare < lower_bound) << 8;
-    
+
 		if(COND_CS() && BIT_B(word2))
 				m68ki_exception_trap(EXCEPTION_CHK);
 		return;
@@ -4364,7 +4364,7 @@ M68KMAKE_OP(cptrapcc, 32, ., .)
 					 m68ki_cpu_names[CPU_TYPE], ADDRESS_68K(REG_PC - 2), REG_IR,
 					 m68k_disassemble_quick(ADDRESS_68K(REG_PC - 2))));
         // JFF: unsupported, but at least if the trap doesn't occur, app should still work, so at least PC increase is correct
-        REG_PC += 4;  
+        REG_PC += 4;
 		return;
 	}
 	m68ki_exception_1111();

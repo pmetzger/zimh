@@ -692,7 +692,7 @@ loop:
         irq_pend = 1;                           /* interrupt pending */
     }
 
-    /* validate parts of IOCD2 that is reserved, bits 5-15 */    
+    /* validate parts of IOCD2 that is reserved, bits 5-15 */
     if (word2 & 0x07ff0000) {
         chp->chan_status |= STATUS_PCHK;        /* program check for invalid iocd */
         sim_debug(DEBUG_EXP, &cpu_dev,
@@ -720,7 +720,7 @@ loop:
 
     if (docmd) {                                /* see if we need to process a command */
         DIB *dibp = dib_unit[chp->chan_dev];    /* get the DIB pointer */
- 
+
         uptr = chp->unitptr;                    /* get the unit ptr */
         if (dibp == 0 || uptr == 0) {
             chp->chan_status |= STATUS_PCHK;    /* program check if it is */
@@ -1080,7 +1080,7 @@ void chan_end(uint16 chsa, uint16 flags) {
             /* This causes an error for hsdp where we just finished the I/O */
             /* but the status has not been posted yet nor the interrupt */
             /* starting another I/O confuses the scan_chan code and ends up */
-            /* doing an extra interrupt for UTX 05/21/2021 */    
+            /* doing an extra interrupt for UTX 05/21/2021 */
             if ((dibp->ioclq_ptr != NULL) && (qp != NULL) && IOCLQ_Get(qp, &iocla) == SCPE_OK) {
                 /* channel not busy and ready to go, so start a new command */
                 chp->chan_status = 0;           /* no channel status yet */
@@ -1264,7 +1264,7 @@ nothere:
     dptr = get_dev(uptr);                       /* pointer to DEVICE structure */
 
     /* is device or unit marked disabled? */
-    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) && 
+    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) &&
         ((uptr->flags & UNIT_SUBCHAN) == 0))) {
         /* is device/unit disabled? */
         /* UTX wants CC1 on "mt offline" call.  If not, UTX loops forever */
@@ -1383,7 +1383,7 @@ missing:
 
     /* is device or unit marked disabled? */
     dptr = get_dev(uptr);
-    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) && 
+    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) &&
         ((uptr->flags & UNIT_SUBCHAN) == 0))) {
         sim_debug(DEBUG_EXP, &cpu_dev,
             "startxio chsa %04x device/unit disabled, CC3 returned flags %08x\n", chsa, uptr->flags);
@@ -1494,7 +1494,7 @@ missing:
 #ifdef TEST_FOR_IOCL_CHANGE
     chp->new_iocla = iocla;                     /* save iocla */
     chp->new_iocd1 = word1;                     /* save iocd word 1 */
-    chp->new_iocd2 = word2;                     /* save iocd word 2 */ 
+    chp->new_iocd2 = word2;                     /* save iocd word 2 */
 #endif
     sim_debug(DEBUG_XIO, &cpu_dev,
         "startxio test chsa %04x iocla %06x IOCD1 %08x IOCD2 %08x\n",
@@ -1693,7 +1693,7 @@ missing:
 
     /* is device or unit marked disabled? */
     dptr = get_dev(uptr);
-    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) && 
+    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) &&
         ((uptr->flags & UNIT_SUBCHAN) == 0))) {
         sim_debug(DEBUG_EXP, &cpu_dev,
             "TIO chsa %04x device/unit disabled, CC3 returned flags %08x\n", chsa, uptr->flags);
@@ -1816,7 +1816,7 @@ missing:
 
     /* is device or unit marked disabled? */
     dptr = get_dev(uptr);
-    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) && 
+    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) &&
         ((uptr->flags & UNIT_SUBCHAN) == 0))) {
         sim_debug(DEBUG_EXP, &cpu_dev,
             "STPIO chsa %04x device/unit disabled, CC3 returned flags %08x\n", chsa, uptr->flags);
@@ -1932,7 +1932,7 @@ missing:
             }
         }
     } else {
-        /* setting this to CC4 allows MPX mstrall to boot */ 
+        /* setting this to CC4 allows MPX mstrall to boot */
         /* having it set to CC1 allows diags to work, but not MPX 3X boot! */
         // This check allows DBUG2 and DIAGS to both work
         if (chp->chan_byte == BUFF_NEXT)
@@ -2012,7 +2012,7 @@ missing:
 
     /* is device or unit marked disabled? */
     dptr = get_dev(uptr);
-    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) && 
+    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) &&
         ((uptr->flags & UNIT_SUBCHAN) == 0))) {
         sim_debug(DEBUG_EXP, &cpu_dev,
             "RSCHNL chsa %04x device/unit disabled, CC3 returned flags %08x\n", chsa, uptr->flags);
@@ -2129,7 +2129,7 @@ missing:
 
     /* is device or unit marked disabled? */
     dptr = get_dev(uptr);
-    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) && 
+    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) &&
         ((uptr->flags & UNIT_SUBCHAN) == 0))) {
         sim_debug(DEBUG_EXP, &cpu_dev,
             "HIO chsa %04x device/unit disabled, CC3 returned flags %08x\n",
@@ -2349,7 +2349,7 @@ missing:
 
     /* is device or unit marked disabled? */
     dptr = get_dev(uptr);
-    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) && 
+    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) &&
         ((uptr->flags & UNIT_SUBCHAN) == 0))) {
         sim_debug(DEBUG_EXP, &cpu_dev,
             "GRIO chsa %04x device/unit disabled, CC3 returned flags %08x\n",
@@ -2451,7 +2451,7 @@ t_stat rsctlxio(uint16 lchsa, uint32 *status) { /* reset controller XIO */
     dptr = get_dev(uptr);                       /* get device ptr */
 
     /* is device/unit disabled? */
-    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) && 
+    if ((dptr->flags & DEV_DIS) || ((uptr->flags & UNIT_DIS) &&
         ((uptr->flags & UNIT_SUBCHAN) == 0))) {
         *status = CC3BIT;                       /* not enabled, so error CC3 */
         sim_debug(DEBUG_EXP, &cpu_dev,

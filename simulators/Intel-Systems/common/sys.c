@@ -175,7 +175,7 @@ SYS_MODEL models[SYS_NUM+1] = {
          { i8259,       "I8259",    2,  1, i8259_cfg,    i8259_clr,    0xFA,   0xFC },
          { IPC_CONT,    "IPC-CONT", 1,  1, ipc_cont_cfg, ipc_cont_clr, 0xFF },
          { EPROM,       "EPROM",    1,  2, EPROM_cfg,    EPROM_clr,    0x0000, 0x0FFF },
-         { RAM,         "RAM",      1,  2, RAM_cfg,      RAM_clr,      0x0000, 0x7FFF }} 
+         { RAM,         "RAM",      1,  2, RAM_cfg,      RAM_clr,      0x0000, 0x7FFF }}
          },
     {MDS_225, "MDS-225       ", 8,
         {{ IOC_CONT,    "IOC-CONT", 1,  1, ioc_cont_cfg, ioc_cont_clr, 0xC0 },
@@ -188,7 +188,7 @@ SYS_MODEL models[SYS_NUM+1] = {
          { RAM,         "RAM",      1,  2, RAM_cfg,      RAM_clr,      0x0000, 0xFFFF }},
          },
     {MDS_230, "MDS-230       ", 9,
-        {{ IOC_CONT,    "IOC-CONT", 1,  1, ioc_cont_cfg, ioc_cont_clr, 0xC0 },   
+        {{ IOC_CONT,    "IOC-CONT", 1,  1, ioc_cont_cfg, ioc_cont_clr, 0xC0 },
          { i8255,       "I8255",    2,  1, i8255_cfg,    i8255_clr,    0xE4,   0xE8 },
          { i8253,       "I8253",    1,  1, i8253_cfg,    i8253_clr,    0xF0 },
          { i8251,       "I8251",    2,  1, i8251_cfg,    i8251_clr,    0xF4,   0xF6 },
@@ -215,7 +215,7 @@ SYS_MODEL models[SYS_NUM+1] = {
          },
     {SDK_80, "SDK-80         ", 4,
         {{ i8255,       "I8255",    2,  1, i8255_cfg,    i8255_clr,    0xEC,   0xF4 },
-         { i8251,       "I8251",    1,  1, i8251_cfg,    i8251_clr,    0xFA },       
+         { i8251,       "I8251",    1,  1, i8251_cfg,    i8251_clr,    0xFA },
          { EPROM,       "EPROM",    1,  2, EPROM_cfg,    EPROM_clr,    0x0000, 0x0FFF },
          { RAM,         "RAM",      1,  2, RAM_cfg,      RAM_clr,      0x1000, 0x03FF }},
          },
@@ -310,9 +310,9 @@ REG sys_reg[] = {
 };
 
 MTAB sys_mod[] = {
-    { MTAB_XTD | MTAB_VDV, 0, NULL, "MODEL", &sys_set_model, NULL, NULL, 
+    { MTAB_XTD | MTAB_VDV, 0, NULL, "MODEL", &sys_set_model, NULL, NULL,
         "Sets the system model" },
-    { MTAB_XTD  | MTAB_VDV, 0, "MODEL", NULL, NULL, &sys_show_model, NULL,  
+    { MTAB_XTD  | MTAB_VDV, 0, "MODEL", NULL, NULL, &sys_show_model, NULL,
         "Shows the system devices" },
     { 0 }
 };
@@ -365,7 +365,7 @@ t_stat sys_cfg(uint16 base, uint16 devnum, uint8 dummy)
 {
     int i, j;
     DEVICE *dptr;
-    
+
     if (model == (-1)) return SCPE_ARG; //no valid config
     sim_printf("sys_cfg: Configuring an %s:\n", models[model].name);
     switch (model) {                    //set memory map type
@@ -437,11 +437,11 @@ t_stat sys_cfg(uint16 base, uint16 devnum, uint8 dummy)
                     models[model].devices[i].cfg_routine (models[model].devices[i].val[j], j, 0);
                     break;
                 case 2:                 //two arguments
-                    models[model].devices[i].cfg_routine (models[model].devices[i].val[j], 
+                    models[model].devices[i].cfg_routine (models[model].devices[i].val[j],
                         models[model].devices[i].val[j+1], j);
                     break;
                 case 3:                 //three arguments
-                    models[model].devices[i].cfg_routine (models[model].devices[i].val[j], 
+                    models[model].devices[i].cfg_routine (models[model].devices[i].val[j],
                         models[model].devices[i].val[j+1], models[model].devices[i].val[j+1] & BYTEMASK);
                     break;
                 default:
@@ -457,7 +457,7 @@ t_stat sys_clr(void)
 {
     int i, j;
     DEVICE *dptr;
-    
+
     printf("sys_clr: Unconfiguring %s\n", models[model].name);
     for (i=0; i<models[model].num; i++) { //for each device in model
         dptr = find_dev (models[model].devices[i].name);
@@ -491,7 +491,7 @@ t_stat sys_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int i, j;
     DEVICE *dptr;
-    
+
     if (cptr == NULL)
         return SCPE_ARG;
     if (model != -1) sys_clr();
@@ -569,11 +569,11 @@ t_stat sys_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
                             models[model].devices[i].cfg_routine (models[model].devices[i].val[j], j, 0);
                             break;
                         case 2:         //two arguments
-                            models[model].devices[i].cfg_routine (models[model].devices[i].val[j], 
+                            models[model].devices[i].cfg_routine (models[model].devices[i].val[j],
                                 models[model].devices[i].val[j+1], j);
                             break;
                         case 3:         //three arguments
-                            models[model].devices[i].cfg_routine (models[model].devices[i].val[j], 
+                            models[model].devices[i].cfg_routine (models[model].devices[i].val[j],
                                 models[model].devices[i].val[j+1], models[model].devices[i].val[j+1] & BYTEMASK);
                             break;
                         default:
@@ -592,7 +592,7 @@ t_stat sys_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat sys_show_model (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int i, j;
-    
+
     if (uptr == NULL)
         return SCPE_ARG;
     fprintf(st, "%s:%d devices\n", models[model].name, models[model].num);
@@ -602,7 +602,7 @@ t_stat sys_show_model (FILE *st, UNIT *uptr, int32 val, const void *desc)
         fprintf(st, " %d args", models[model].devices[i].args);
         for (j=0; j<models[model].devices[i].num; j++) {
             if (models[model].devices[i].args == 2)
-                fprintf(st, " 0%04XH 0%04XH", models[model].devices[i].val[j], 
+                fprintf(st, " 0%04XH 0%04XH", models[model].devices[i].val[j],
                     models[model].devices[i].val[j+1]);
             else
                 fprintf(st, " 0%04XH", models[model].devices[i].val[j]);

@@ -30,7 +30,7 @@
     NOTES:
 
         This controller will mount 2 SD disk images on drives :F0: and :F1: addressed
-        at ports 088H to 08FH.  
+        at ports 088H to 08FH.
 
     Registers:
 
@@ -141,7 +141,7 @@
 
  SSSD - Bootable
     This is actually an IBM 3740 format disk.  It has 77 tracks of 26 SD
-    sectors of 128 bytes each for a total of 2002 sectors.  The disk layout 
+    sectors of 128 bytes each for a total of 2002 sectors.  The disk layout
     of the first 6 tracks of the SSSD 256256 byte disk image is as follows:
 
     File        Link Blk Addr     Data Blk Addr
@@ -164,7 +164,7 @@
 #define UNIT_WPMODE     (1 << UNIT_V_WPMODE)
 
 #define FDD_NUM         2
-#define SECSIZ          128                     
+#define SECSIZ          128
 
 //disk controoler operations
 #define DNOP            0x00            //disk no operation
@@ -262,13 +262,13 @@ typedef    struct    {                  //FDC board definition
     FDDDEF  fdd[FDD_NUM];               //indexed by the FDD number
     }    FDCDEF;
 
-FDCDEF    fdc201;                       //indexed by the isbc-201 instance number  
+FDCDEF    fdc201;                       //indexed by the isbc-201 instance number
 
 /* isbc201 Standard I/O Data Structures */
 
 UNIT isbc201_unit[] = {                 //2 FDDs
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSSD) }, 
-    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSSD) } 
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSSD) },
+    { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSSD) }
 };
 
 REG isbc201_reg[] = {
@@ -289,7 +289,7 @@ MTAB isbc201_mod[] = {
         NULL, NULL, "Sets the base port for iSBC201"},
     { MTAB_XTD | MTAB_VDV, 0, NULL, "INT", &isbc201_set_int,
         NULL, NULL, "Sets the interrupt number for iSBC201"},
-    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, &isbc201_show_param, NULL, 
+    { MTAB_XTD | MTAB_VDV, 0, "PARAM", NULL, NULL, &isbc201_show_param, NULL,
         "show configured parameters for iSBC201" },
     { 0 }
 };
@@ -310,7 +310,7 @@ DEVICE isbc201_dev = {
     isbc201_unit,       //units
     isbc201_reg,        //registers
     isbc201_mod,        //modifiers
-    FDD_NUM,            //numunits 
+    FDD_NUM,            //numunits
     16,                 //aradix
     16,                 //awidth
     1,                  //aincr
@@ -320,11 +320,11 @@ DEVICE isbc201_dev = {
     NULL,               //deposit
     isbc201_reset,      //reset
     NULL,               //boot
-    &isbc201_attach,    //attach  
+    &isbc201_attach,    //attach
     NULL,               //detach
     NULL,               //ctxt
-    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags 
-    0,                  //dctrl 
+    DEV_DEBUG+DEV_DISABLE+DEV_DIS, //flags
+    0,                  //dctrl
     isbc201_debug,      //debflags
     NULL,               //msize
     NULL,               //lname
@@ -340,9 +340,9 @@ t_stat isbc201_cfg(uint16 baseport, uint16 devnum, uint8 intnum)
 {
     int i;
     UNIT *uptr;
-    
+
     // one-time initialization for all FDDs for this FDC instance
-    for (i = 0; i < FDD_NUM; i++) { 
+    for (i = 0; i < FDD_NUM; i++) {
         uptr = isbc201_dev.units + i;
         uptr->u6 = i;               //fdd unit number
         uptr->flags &= ~UNIT_ATT;
@@ -352,8 +352,8 @@ t_stat isbc201_cfg(uint16 baseport, uint16 devnum, uint8 intnum)
     fdc201.verb = 0;                    //clear verb
     reg_dev(isbc201r0, fdc201.baseport, 0, 0); //read status
     reg_dev(isbc201r1, fdc201.baseport + 1, 0, 0); //read rslt type/write IOPB addr-l
-    reg_dev(isbc201r2, fdc201.baseport + 2, 0, 0); //write IOPB addr-h and start 
-    reg_dev(isbc201r3, fdc201.baseport + 3, 0, 0); //read rstl byte 
+    reg_dev(isbc201r2, fdc201.baseport + 2, 0, 0); //write IOPB addr-h and start
+    reg_dev(isbc201r3, fdc201.baseport + 3, 0, 0); //read rstl byte
     reg_dev(isbc201r7, fdc201.baseport + 7, 0, 0); //write reset fdc201
     isbc201_reset_dev();                //software reset
 //    if (fdc201.verb)
@@ -370,8 +370,8 @@ t_stat isbc201_clr(void)
     fdc201.verb = 0;                    //set verb = 0
     unreg_dev(fdc201.baseport);         //read status
     unreg_dev(fdc201.baseport + 1);     //read rslt type/write IOPB addr-l
-    unreg_dev(fdc201.baseport + 2);     //write IOPB addr-h and start 
-    unreg_dev(fdc201.baseport + 3);     //read rstl byte 
+    unreg_dev(fdc201.baseport + 2);     //write IOPB addr-h and start
+    unreg_dev(fdc201.baseport + 3);     //read rstl byte
     unreg_dev(fdc201.baseport + 7);     //write reset fdc201
 //    if (fdc201.verb)
         sim_printf("    sbc201: Disabled\n");
@@ -385,7 +385,7 @@ t_stat isbc201_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
     if (uptr == NULL)
         return SCPE_ARG;
     if (uptr->flags & UNIT_ATT)
-        return sim_messagef (SCPE_ALATT, "%s is already attached to %s\n", 
+        return sim_messagef (SCPE_ALATT, "%s is already attached to %s\n",
             sim_uname(uptr), uptr->filename);
     if (val & UNIT_WPMODE) {            /* write protect */
         uptr->flags |= val;
@@ -404,7 +404,7 @@ t_stat isbc201_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat isbc201_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result;
-    
+
     if (uptr == NULL)
         return SCPE_ARG;
     result = sscanf(cptr, "%02x", &size);
@@ -413,8 +413,8 @@ t_stat isbc201_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
         sim_printf("SBC201: Installed at base port=%04X\n", fdc201.baseport);
     reg_dev(isbc201r0, fdc201.baseport, 0, 0); //read status
     reg_dev(isbc201r1, fdc201.baseport + 1, 0, 0); //read rslt type/write IOPB addr-l
-    reg_dev(isbc201r2, fdc201.baseport + 2, 0, 0); //write IOPB addr-h and start 
-    reg_dev(isbc201r3, fdc201.baseport + 3, 0, 0); //read rstl byte 
+    reg_dev(isbc201r2, fdc201.baseport + 2, 0, 0); //write IOPB addr-h and start
+    reg_dev(isbc201r3, fdc201.baseport + 3, 0, 0); //read rstl byte
     reg_dev(isbc201r7, fdc201.baseport + 7, 0, 0); //write reset fdc201
     return SCPE_OK;
 }
@@ -424,7 +424,7 @@ t_stat isbc201_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat isbc201_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     uint32 size, result;
-    
+
     if (uptr == NULL)
         return SCPE_ARG;
     result = sscanf(cptr, "%02x", &size);
@@ -457,8 +457,8 @@ t_stat isbc201_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     if (uptr == NULL)
         return SCPE_ARG;
-    fprintf(st, "%s Base port at %04X  Interrupt # is %i  %s", 
-        ((isbc201_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled", 
+    fprintf(st, "%s Base port at %04X  Interrupt # is %i  %s",
+        ((isbc201_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled",
         fdc201.baseport, fdc201.intnum,
         fdc201.verb ? "Verbose" : "Quiet"
         );
@@ -512,7 +512,7 @@ t_stat isbc201_attach (UNIT *uptr, const char *cptr)
     uint8 fddnum;
 
     fddnum = uptr->u6;
-    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) { 
+    if ((r = attach_unit (uptr, cptr)) != SCPE_OK) {
         sim_printf("   SBC201_attach: Attach error %d\n", r);
         return r;
     }
@@ -617,7 +617,7 @@ void isbc201_diskio(void)
     nr = get_mbyte(fdc201.iopb + 2);    //Number of Records
     ta = get_mbyte(fdc201.iopb + 3);    //Track Address
     sa = get_mbyte(fdc201.iopb + 4) & 0x1f; //Sector Address - without bank/fddnum
-    ba = get_mbyte(fdc201.iopb + 5);    
+    ba = get_mbyte(fdc201.iopb + 5);
     ba |= (get_mbyte(fdc201.iopb + 6) << 8); //Buffer Address
     bn = get_mbyte(fdc201.iopb + 7);    //Block Number
     ni = get_mbyte(fdc201.iopb + 8);
@@ -714,7 +714,7 @@ void isbc201_diskio(void)
                 //calculate offset into disk image
                 dskoff = ((ta * MAXSECSD) + (sa - 1)) * SECSIZ;
                 //copy sector from disk image to RAM
-                for (i=0; i<SECSIZ; i++) { 
+                for (i=0; i<SECSIZ; i++) {
                     data = *(fbuf + (dskoff + i));
                     put_mbyte(ba + i, data);
                 }
@@ -740,7 +740,7 @@ void isbc201_diskio(void)
                 //calculate offset into disk image
                 dskoff = ((ta * MAXSECSD) + (sa - 1)) * SECSIZ;
                 //copy sector from RAM to disk image
-                for (i=0; i<SECSIZ; i++) { 
+                for (i=0; i<SECSIZ; i++) {
                     data = get_mbyte(ba + i);
                     *(fbuf + (dskoff + i)) = data;
                 }

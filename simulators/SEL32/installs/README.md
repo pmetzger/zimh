@@ -168,5 +168,5 @@ or MPX 3.X systems.  I have a 1600/6250 BPI tape drive that can read
 SDT, I would be very thankfull.  Please keep looking.
 
 James C. Bevier
-02/27/2022 
+02/27/2022
 

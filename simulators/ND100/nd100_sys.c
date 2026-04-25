@@ -76,7 +76,7 @@ gw(FILE *f)
 
 /*
  * Bootable (BPUN) tape format.
- * Disks can use it as well with a max of 64 words data.  In this case 
+ * Disks can use it as well with a max of 64 words data.  In this case
  * the bytes are stored in the LSB of the words from beginning of disk.
  * 1kw block should be read at address 0 in memory.
  *
@@ -120,8 +120,8 @@ sim_load(FILE *f, const char *buf, const char *fnam, t_bool flag)
                 case '\r':
                         B = C, C = 0;
                         break;
-                case '0': case '1': case '2': case '3': 
-                case '4': case '5': case '6': case '7': 
+                case '0': case '1': case '2': case '3':
+                case '4': case '5': case '6': case '7':
                         C = (C << 3) | (w - '0');
                         break;
                 default:
@@ -160,9 +160,9 @@ static char *argtab[] =
         { "sab", "saa", "sat", "sax", "aab", "aaa", "aat", "aax" };
 
 static char *boptab[] = {
-        "bset zro", "bset one", "bset bcm", "bset bac", 
-        "bskp zro", "bskp one", "bskp bcm", "bskp bac", 
-        "bstc", "bsta", "bldc", "blda", "banc", "band", "borc", "bora", 
+        "bset zro", "bset one", "bset bcm", "bset bac",
+        "bskp zro", "bskp one", "bskp bcm", "bskp bac",
+        "bstc", "bsta", "bldc", "blda", "banc", "band", "borc", "bora",
 };
 
 static char *dactab[] = { "", "d", "p", "b", "l", "a", "t", "x" };
@@ -311,7 +311,7 @@ fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
                         break;
                 }
                 if (op)
-                        fprintf(of, " s%s to d%s", 
+                        fprintf(of, " s%s to d%s",
                             dactab[(op & 070) >> 3], dactab[op & 07]);
         } else if (ins == ND_SKP) {
                 if (op & 0300) {

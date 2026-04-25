@@ -99,7 +99,7 @@ DEVICE sysd_dev = {
     1, 16, 16, 1, 16, 8,
     NULL, NULL, &sysd_reset,
     NULL, NULL, NULL,
-    NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL, 
+    NULL, 0, 0, NULL, NULL, NULL, NULL, NULL, NULL,
     &sysd_description
     };
 
@@ -320,7 +320,7 @@ struct reglink *p;
 
 for (p = &regtable[0]; p->low != 0; p++) {
     if ((pa >= p->low) && (pa < p->high) && p->write) {
-        p->write (pa, val, lnt);  
+        p->write (pa, val, lnt);
         return;
         }
     }
@@ -401,7 +401,7 @@ else {                                                  /* handle "BOOT DEV /R5:
     }
 /* parse R5 parameter value */
 r5v = 0;
-/* coverity[NULL_RETURNS] */ 
+/* coverity[NULL_RETURNS] */
 if ((strncmp (regptr, "/R5:", 4) == 0) ||
     (strncmp (regptr, "/R5=", 4) == 0) ||
     (strncmp (regptr, "/r5:", 4) == 0) ||
@@ -427,7 +427,7 @@ if (gbuf[0]) {
                 return SCPE_ARG;
             unitno = (int32) (uptr - dptr->units);
             }
-        if ((unitno == -1) && 
+        if ((unitno == -1) &&
             (memcmp (gbuf, boot_tab[i].devname, strlen(boot_tab[i].devname)) == 0)) {
             sprintf(dbuf, "%s%s", boot_tab[i].devname, gbuf + strlen(boot_tab[i].devname));
             dptr = find_unit (dbuf, &uptr);
@@ -488,7 +488,7 @@ return cc;
 
 int32 con_halt (int32 code, int32 cc)
 {
-if ((vax610_boot_parse (0, cpu_boot_cmd) != SCPE_OK) || /* reparse the boot cmd */ 
+if ((vax610_boot_parse (0, cpu_boot_cmd) != SCPE_OK) || /* reparse the boot cmd */
     (reset_all (0) != SCPE_OK) ||                       /* reset the world */
     (cpu_boot (0, NULL) != SCPE_OK))                    /* set up boot code */
     ABORT (STOP_BOOT);                                  /* any error? */

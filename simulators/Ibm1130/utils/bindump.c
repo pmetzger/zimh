@@ -149,7 +149,7 @@ void process (char *nm)
                 strcpy(buf + (c-nm+1), fd.cFileName);
                 dump(buf);
             }
-                        
+
         } while (FindNextFile(hFind, &fd));
 
         FindClose(hFind);
@@ -276,7 +276,7 @@ void sort_phases (char *fname)
         if (cardtype != CARDTYPE_END || (i == (ncards-1)))          // don't write embedded END cards
             fxwrite(deck[i].card, sizeof(deck[i].card[0]), 80, stdout);
     }
-    
+
     if (cardtype != CARDTYPE_END) {                                 // fudge an end card
         memset(buf, 0, sizeof(buf));
         buf[2] = CARDTYPE_END;
@@ -298,7 +298,7 @@ void dump_phids (char *fname)
         perror(fname);
         return;
     }
-    
+
     printf("\n%s:\n", fname);
 
     while (fxread(card, sizeof(card[0]), 80, fp) > 0) {
@@ -359,7 +359,7 @@ void dump_data (char *fname)
         perror(fname);
         return;
     }
-    
+
     printf("\n%s:\n", fname);
 
     while (fxread(card, sizeof(card[0]), 80, fp) > 0) {
@@ -774,7 +774,7 @@ void trim (char *s)
     nb[1] = '\0';
 }
 
-int ascii_to_ebcdic_table[128] = 
+int ascii_to_ebcdic_table[128] =
 {
     0x00,0x01,0x02,0x03,0x37,0x2d,0x2e,0x2f, 0x16,0x05,0x25,0x0b,0x0c,0x0d,0x0e,0x0f,
     0x10,0x11,0x12,0x13,0x3c,0x3d,0x32,0x26, 0x18,0x19,0x3f,0x27,0x1c,0x1d,0x1e,0x1f,
@@ -822,7 +822,7 @@ int type_of_card (unsigned short *buf, PACKMODE packed)
     if (packed == PACKED) {
         unpack(buf, unp, 3);        // unpack the first 3 words only
         buf = unp;
-    } 
+    }
 
     return (buf[2] >> 8) & 0xFF;
 }

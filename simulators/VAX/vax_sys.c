@@ -111,7 +111,7 @@ const char *sim_stop_messages[SCPE_BASE] = {
         - FPD legal flag (DR_F)
         - number of specifiers for decode bits <2:0>
         - number of specifiers for unimplemented instructions bits<6:4>
-        - ONLY for simulator instruction history bits 11:8 reflect where 
+        - ONLY for simulator instruction history bits 11:8 reflect where
           results are recorded from
  */
 
@@ -890,7 +890,7 @@ for (i = 0; i < numspec; i++) {                         /* loop thru spec */
             break;
 
         case BDD:                                       /* @b^d(r),@b^n */
-            fputc ('@', of);                            
+            fputc ('@', of);
             /* fall through */
         case BDP:                                       /* b^d(r), b^n */
             GETNUM (num, 1);
@@ -914,7 +914,7 @@ for (i = 0; i < numspec; i++) {                         /* loop thru spec */
             break;
 
         case LDD:                                       /* @l^d(r),@l^n */
-            fputc ('@', of);                            
+            fputc ('@', of);
             /* fall through */
         case LDP:                                       /* l^d(r),l^n */
             GETNUM (num, 4);
@@ -1235,7 +1235,7 @@ if (*cptr == '(') {                                     /* look for (Rn) */
     fl = fl | SP_IDX;
     }
 M1C ('+', SP_POSTP);                                    /* look for + */
-if (*cptr == '[') {                                     /* look for [Rx] */     
+if (*cptr == '[') {                                     /* look for [Rx] */
     cptr = parse_rnum (++cptr, &index);
     if ((cptr == NULL) || (*cptr++ != ']'))
         PARSE_LOSE;
@@ -1276,7 +1276,7 @@ switch (fl) {                                           /* case on state */
         disp = disp & DR_LNMASK;
         switch (disp) {                                 /* case spec lnt */
         case 00:                                        /* check fit */
-            if ((litsize > 0) || (lit[0] < 0) || 
+            if ((litsize > 0) || (lit[0] < 0) ||
                 (lit[0] > SEL_LIM (0x7F, 0x80, 0xFF)))
                 PARSE_LOSE;
             SPUTNUM (lit[0], 1);                        /* store */
@@ -1344,7 +1344,7 @@ switch (fl) {                                           /* case on state */
     case SP_IND|SP_FB|SP_NUM|SP_IDX:                    /* @B^d(rn) */
     case SP_IND|SP_FB|SP_PLUS|SP_NUM|SP_IDX:            /* @B^+d(rn) */
     case SP_IND|SP_FB|SP_MINUS|SP_NUM|SP_IDX:           /* @B^-d(rn) */
-        if ((litsize > 0) || (lit[0] < 0) || 
+        if ((litsize > 0) || (lit[0] < 0) ||
             (lit[0] > SEL_LIM (0x7F, 0x80, 0xFF)))
             PARSE_LOSE;
         val[vp++] = rn | BDP | ((fl & SP_IND)? 0x10: 0);

@@ -606,7 +606,7 @@ if ((uptr->flags & UNIT_ASCII) != 0) {                  /* ASCII mode? */
         uptr->pos = uptr->pos + 1;
         }
     }
-else c = uptr->buf;        
+else c = uptr->buf;
 if (putc (c, uptr->fileref) == EOF) {                   /* I/O error? */
     sim_perror ("PTP I/O error");
     clearerr (uptr->fileref);

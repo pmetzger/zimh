@@ -15,7 +15,7 @@
 #
 # "scooter me fecit"
 
-find_path(PCAP_INCLUDE_DIR 
+find_path(PCAP_INCLUDE_DIR
     NAMES
         pcap.h
     HINTS

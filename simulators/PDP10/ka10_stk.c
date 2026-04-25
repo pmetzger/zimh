@@ -326,7 +326,7 @@ static int stk_keyboard (SIM_KEY_EVENT *kev)
 {
     if (stk_modifiers (kev))
       return 0;
-    
+
     if (stk_keys (kev)) {
       status |= STK_DONE;
       set_interrupt(STK_DEVNUM, status & STK_PIA);

@@ -72,7 +72,7 @@ LPFCTBL  EQU       $
   30     DATAB     C'0'    0x30    FORMS CONTROL FOR 2 LF'S THEN PRINT
   20     DATAB     C' '    0x20    FORMS CONTROL FOR LF THEN PRINT
 */
-  
+
 #if NUM_DEVS_LPR > 0
 
 #define UNIT_LPR    UNIT_ATTABLE|UNIT_DISABLE|UNIT_SEQ
@@ -484,7 +484,7 @@ t_stat lpr_srv(UNIT *uptr) {
     }
 
     /* process any CC after printing buffer */
-    if ((uptr->CMD & LPR_FULL) && (uptr->CMD & LPR_POST) && 
+    if ((uptr->CMD & LPR_FULL) && (uptr->CMD & LPR_POST) &&
         ((cmd & 0x0f) == 0x05)) {
         /* we have CC to do */
         uptr->CMD &= ~LPR_POST;             /* remove post flag */

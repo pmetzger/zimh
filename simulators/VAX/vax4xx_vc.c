@@ -169,7 +169,7 @@ DEVICE vc_dev = {
     NULL, NULL, &vc_reset,
     NULL, NULL, &vc_detach,
     NULL, DEV_DEBUG | DEV_DIS, 0,
-    vc_debug, NULL, NULL, &vc_help, NULL, NULL, 
+    vc_debug, NULL, NULL, &vc_help, NULL, NULL,
     &vc_description
     };
 
@@ -413,7 +413,7 @@ lines = 0;
 for (ln = 0; ln < VC_YSIZE; ln++) {
     if (vc_updated[ln]) {                               /* line invalid? */
         off = ((ln + (vc_org << VC_ORSC)) << 5) & VC_BUFMASK; /* get video buf offet */
-        for (col = 0; col < VC_XSIZE; col++)  
+        for (col = 0; col < VC_XSIZE; col++)
             vc_lines[ln*VC_XSIZE + col] = vc_palette[(vc_buf[off + (col >> 5)] >> (col & 0x1F)) & 1];
                                                         /* 1bpp to 32bpp */
         if (CUR_V &&                                    /* cursor visible && need to draw cursor? */

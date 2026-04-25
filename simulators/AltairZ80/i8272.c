@@ -753,7 +753,7 @@ uint8 I8272_Write(const uint32 Addr, uint8 cData)
 
                         case I8272_READ_DATA:
                             /* fall through */
-                            
+
                         case I8272_READ_DELETED_DATA:
                             disk_read = 1;
                             /* fall through */

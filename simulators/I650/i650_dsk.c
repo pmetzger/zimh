@@ -19,7 +19,7 @@
    IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-   
+
 */
 
 #include "i650_defs.h"
@@ -59,10 +59,10 @@ DEVICE              dsk_dev = {
 
 
 // array for disc units (4) arm's positions (3 arms per unit)
-struct armrec {    
+struct armrec {
     int current_disk, current_track;        // current disk plate/track where the arm is positioned
     int dest_disk, dest_track;              // destination position where the arm should go
-    int cmd;                                // opcode being executed (OP_SDS, OP_RDS, OP_WDS) 
+    int cmd;                                // opcode being executed (OP_SDS, OP_RDS, OP_WDS)
     t_int64 InitTime;                       // timestamp using global wordTime counter when operation starts
     struct armmov {
         int disk, track;                    // disk plate/track where the arm is positioned in this point of movement sequence
@@ -73,7 +73,7 @@ struct armrec {
 
 int dsk_read_numeric_word(char * buf, t_int64 * d, int * ZeroNeg)
 {
-    int i, neg; 
+    int i, neg;
     char c;
 
     neg = 0;
@@ -94,7 +94,7 @@ int dsk_read_numeric_word(char * buf, t_int64 * d, int * ZeroNeg)
 
 void dsk_write_numeric_word(char * buf, t_int64 d, int ZeroNeg)
 {
-    int i, neg; 
+    int i, neg;
     char c;
 
     neg = 0;
@@ -110,13 +110,13 @@ void dsk_write_numeric_word(char * buf, t_int64 d, int ZeroNeg)
 
 // perform the operation (Read, Write) on RAMAC unit file
 // init file if len=0 (flat format)
-// 
+//
 t_stat dsk_operation(int cmd, int unit, int arm, int disk, int track)
 {
 
     FILE *f;
     int flen, i, ic, ZeroNeg;
-    char buf[DISK_SIZE+1]; 
+    char buf[DISK_SIZE+1];
     t_int64 d;
     char s[6];
                            // buf holds a full disk
@@ -126,7 +126,7 @@ t_stat dsk_operation(int cmd, int unit, int arm, int disk, int track)
     if ((disk < 0) || (disk > 99)) return 0;
     if ((track < 0) || (track > 99)) return 0;
 
-    f = dsk_unit[unit].fileref; // get disk file from unit; 
+    f = dsk_unit[unit].fileref; // get disk file from unit;
 
     flen = sim_fsize(f);
     if (flen == 0) {
@@ -147,8 +147,8 @@ t_stat dsk_operation(int cmd, int unit, int arm, int disk, int track)
             // store into IAS
             IAS[i] = d;
             IAS_NegativeZeroFlag[i] = ZeroNeg;
-            sim_debug(DEBUG_DETAIL, &cpu_dev, "... RAMAC to IAS %04d: %06d%04d%c '%s'\n", 
-                        i+9000, printfw(d,ZeroNeg), 
+            sim_debug(DEBUG_DETAIL, &cpu_dev, "... RAMAC to IAS %04d: %06d%04d%c '%s'\n",
+                        i+9000, printfw(d,ZeroNeg),
                         word_to_ascii(s, 1, 5, d));
         }
         // set IAS_TimingRing. Nothing said in RAMAC manual, but needed to make supersoap CDD pseudo op work properly
@@ -158,8 +158,8 @@ t_stat dsk_operation(int cmd, int unit, int arm, int disk, int track)
             // read IAS
             d = IAS[i];
             ZeroNeg = IAS_NegativeZeroFlag[i];
-            sim_debug(DEBUG_DETAIL, &cpu_dev, "... IAS %04d to RAMAC: %06d%04d%c '%s'\n", 
-                        i+9000, printfw(d,ZeroNeg), 
+            sim_debug(DEBUG_DETAIL, &cpu_dev, "... IAS %04d to RAMAC: %06d%04d%c '%s'\n",
+                        i+9000, printfw(d,ZeroNeg),
                         word_to_ascii(s, 1, 5, d));
             // write numeric to disk buf
             dsk_write_numeric_word(&buf[ic], d, ZeroNeg);
@@ -191,7 +191,7 @@ void dsk_set_mov_seq(int unit,int arm)
     // set arm movement sequence to its destination
     //
     // arm timing
-    //    seek: 50 msec setup time 
+    //    seek: 50 msec setup time
     //          on same disk:
     //              2 msec per track in same disk (0-99)
     //              25 msec  sensing track gap (that identifies the start of track pos) a mean between 0-50 msec or
@@ -200,7 +200,7 @@ void dsk_set_mov_seq(int unit,int arm)
     //               200 msec start arm vertical motion
     //                9  msec per physical disk (0 to 49)
     //               200 msec stop arm vertical motion
-    //               
+    //
     //   read: 110 msec
     //   write: 135 msec
     //
@@ -210,9 +210,9 @@ void dsk_set_mov_seq(int unit,int arm)
     cmd = Arm[unit][arm].cmd;
     nseq = 0;
 
-    // seek or read/write but current arm pos not the addr selected for 
-    // read/write -> must do a seek cycle 
-    if ((cmd == OP_SDS) || 
+    // seek or read/write but current arm pos not the addr selected for
+    // read/write -> must do a seek cycle
+    if ((cmd == OP_SDS) ||
         (Arm[unit][arm].current_disk  != Arm[unit][arm].dest_disk) ||
         (Arm[unit][arm].current_track != Arm[unit][arm].dest_track)) {
         // start seek sequence at current arm pos
@@ -229,13 +229,13 @@ void dsk_set_mov_seq(int unit,int arm)
                 for (i=Arm[unit][arm].current_track;i>=0;i--) {
                     Arm[unit][arm].seq[nseq].disk = Arm[unit][arm].current_disk;
                     Arm[unit][arm].seq[nseq].track = i;
-                    Arm[unit][arm].seq[nseq++].msec = 2; // msec needed for horizontal arm movement of 1 track                    
+                    Arm[unit][arm].seq[nseq++].msec = 2; // msec needed for horizontal arm movement of 1 track
                 }
             }
             // now arm is outside disk stack, can move up and down
             Arm[unit][arm].seq[nseq].disk = Arm[unit][arm].current_disk;
             Arm[unit][arm].seq[nseq].track = -1;
-            Arm[unit][arm].seq[nseq++].msec = 200; // msec needed to setup vertical arm movement 
+            Arm[unit][arm].seq[nseq++].msec = 200; // msec needed to setup vertical arm movement
             // move out up/down on disk stack up to destination disk
             dy = (d1 < d2) ? +1:-1;
             i = Arm[unit][arm].current_disk;
@@ -249,7 +249,7 @@ void dsk_set_mov_seq(int unit,int arm)
             // stop motion and select destination disk (not physical disk)
             Arm[unit][arm].seq[nseq].disk = Arm[unit][arm].dest_disk;
             Arm[unit][arm].seq[nseq].track = tr = -1;
-            Arm[unit][arm].seq[nseq++].msec = 200; // msec needed to stop vertical arm movement 
+            Arm[unit][arm].seq[nseq++].msec = 200; // msec needed to stop vertical arm movement
         }
            // now arm accessing physical destination disk
         // is arm at destination track?
@@ -260,7 +260,7 @@ void dsk_set_mov_seq(int unit,int arm)
                 if (tr == d2) break;
                 Arm[unit][arm].seq[nseq].disk = Arm[unit][arm].dest_disk;
                 Arm[unit][arm].seq[nseq].track = tr;
-                Arm[unit][arm].seq[nseq++].msec = 2; // msec needed for horizontal arm movement of 1 track                    
+                Arm[unit][arm].seq[nseq++].msec = 2; // msec needed for horizontal arm movement of 1 track
                 tr=tr+dy;
             }
         }
@@ -292,14 +292,14 @@ uint32 dsk_cmd(int cmd, int32 addr, uint16 fast)
 {
     DEVICE             *dptr;
     UNIT               *uptr;
-    int                 unit, disk, track, arm; 
-    int                    time; 
-    int                    bFastMode; 
+    int                 unit, disk, track, arm;
+    int                    time;
+    int                    bFastMode;
 
     unit =(addr / 100000) % 10;
-    disk =(addr / 1000)   % 100,     
-    track=(addr /   10)   % 100,     
-    arm  =(addr %   10);          
+    disk =(addr / 1000)   % 100,
+    track=(addr /   10)   % 100,
+    arm  =(addr %   10);
 
     time = 0;
     /* Make sure addr unit number */
@@ -308,7 +308,7 @@ uint32 dsk_cmd(int cmd, int32 addr, uint16 fast)
 
     uptr = &dsk_unit[unit];
     dptr = find_dev_from_unit(uptr);
-    
+
     // init IBM 652 Control Unit internal registers
     bFastMode = fast;
 
@@ -317,7 +317,7 @@ uint32 dsk_cmd(int cmd, int32 addr, uint16 fast)
         sim_debug(DEBUG_EXP, dptr, "RAMAC command attempted on disabled unit %d\n", unit);
         // not stated in manual: what happends if command to non existant disk?
         // option 1 -> cpu halt (used this)
-        // option 2 -> indictor flag set 
+        // option 2 -> indictor flag set
         return STOP_IO;
     }
     /* If disk unit has no file attached return error */
@@ -329,14 +329,14 @@ uint32 dsk_cmd(int cmd, int32 addr, uint16 fast)
     Arm[unit][arm].cmd = cmd;        // the command to execute: can be OP_SDS, OP_RDS, OP_WDS
     Arm[unit][arm].dest_disk  = disk;   // the destination address
     Arm[unit][arm].dest_track = track;
-    sim_debug(DEBUG_CMD, dptr, "RAMAC unit %d, arm %d: %s on disk %d, track %d started\n", 
-                                unit, arm, 
+    sim_debug(DEBUG_CMD, dptr, "RAMAC unit %d, arm %d: %s on disk %d, track %d started\n",
+                                unit, arm,
                                 (cmd == OP_SDS) ? "SEEK" : (cmd == OP_RDS) ? "READ" : "WRITE",
                                 Arm[unit][arm].dest_disk, Arm[unit][arm].dest_track);
 
     if (bFastMode) {
         time = 0; // no movement sequence. Just go to destination pos inmediatelly and exec command
-        Arm[unit][arm].InitTime = -1; 
+        Arm[unit][arm].InitTime = -1;
     } else {
         time = msec_to_wordtime(UPDATE_RAMAC); // sampling disk arm movement sequence each 10 msec
         Arm[unit][arm].InitTime = GlobalWordTimeCount; // when the movement sequence starts (in word time counts)
@@ -355,9 +355,9 @@ t_stat dsk_srv(UNIT * uptr)
     DEVICE             *dptr = find_dev_from_unit(uptr);
     int                 unit = (uptr - dptr->units);
     int                 time, msec, arm, cmd, nseq;
-    t_int64                InitTime; 
-    int                    bSequenceInProgress=0; 
-    int                    bFastMode; 
+    t_int64                InitTime;
+    int                    bSequenceInProgress=0;
+    int                    bFastMode;
     t_stat                r;
 
     // init IBM 652 Control Unit internal registers
@@ -365,7 +365,7 @@ t_stat dsk_srv(UNIT * uptr)
     // update arm movement for this unit
     for (arm=0;arm<3;arm++) {
         cmd = Arm[unit][arm].cmd;
-        if (cmd == 0) continue; // RAMAC arm for this disk unit is stoped (=ready). 
+        if (cmd == 0) continue; // RAMAC arm for this disk unit is stoped (=ready).
                                 // continue to Process next arm of this unit
 
         // arm in movement (=busy)
@@ -374,8 +374,8 @@ t_stat dsk_srv(UNIT * uptr)
         if (InitTime<0) {
             bFastMode=1;
         } else {
-            time=msec_elapsed(Arm[unit][arm].InitTime); 
-               // examine sequence of arm movements to determine what is the current position 
+            time=msec_elapsed(Arm[unit][arm].InitTime);
+               // examine sequence of arm movements to determine what is the current position
             // or arm at this point of time
             nseq=0;
             for(;;) {
@@ -383,33 +383,33 @@ t_stat dsk_srv(UNIT * uptr)
                 if (msec==0) break; // exit beacuse end of sequence
                 time=time-msec;
                 if (time<0) break; // exit beacuse we are at this point of sequence
-                nseq++; 
+                nseq++;
             }
             if (time <0) {
-                // sequence not finisehd: set current arm pos 
+                // sequence not finisehd: set current arm pos
                 Arm[unit][arm].current_disk=Arm[unit][arm].seq[nseq].disk;
                 Arm[unit][arm].current_track=Arm[unit][arm].seq[nseq].track;
                 bSequenceInProgress=1; // there is an arm in movement
                 // arm not arrived to its destination yet. contiinue proceed with next arm
-                sim_debug(DEBUG_CMD, dptr, "RAMAC unit %d, arm %d: now at disk %d, track %d\n", 
-                                unit, arm, 
+                sim_debug(DEBUG_CMD, dptr, "RAMAC unit %d, arm %d: now at disk %d, track %d\n",
+                                unit, arm,
                                 Arm[unit][arm].current_disk, Arm[unit][arm].current_track);
-                continue; 
+                continue;
             }
         }
         // arm arrived to its destination position
         Arm[unit][arm].current_disk=Arm[unit][arm].dest_disk;
         Arm[unit][arm].current_track=Arm[unit][arm].dest_track;
         // execute command
-        sim_debug(DEBUG_DETAIL, &cpu_dev, "... RAMAC unit %d, arm %d: %s on disk %d, track %d start execution \n", 
-                                    unit, arm, 
+        sim_debug(DEBUG_DETAIL, &cpu_dev, "... RAMAC unit %d, arm %d: %s on disk %d, track %d start execution \n",
+                                    unit, arm,
                                     (cmd == OP_SDS) ? "SEEK" : (cmd == OP_RDS) ? "READ" : "WRITE",
                                     Arm[unit][arm].dest_disk, Arm[unit][arm].dest_track);
         r = dsk_operation(cmd, unit, arm, Arm[unit][arm].dest_disk, Arm[unit][arm].dest_track);
         if (r != SCPE_OK) return STOP_IO;
-        // cmd execution finished, can free IAS interlock 
-        sim_debug(DEBUG_DETAIL, &cpu_dev, "... RAMAC unit %d, arm %d: %s on disk %d, track %d finished\n", 
-                                    unit, arm, 
+        // cmd execution finished, can free IAS interlock
+        sim_debug(DEBUG_DETAIL, &cpu_dev, "... RAMAC unit %d, arm %d: %s on disk %d, track %d finished\n",
+                                    unit, arm,
                                     (cmd == OP_SDS) ? "SEEK" : (cmd == OP_RDS) ? "READ" : "WRITE",
                                     Arm[unit][arm].dest_disk, Arm[unit][arm].dest_track);
         if (((cmd==OP_RDS) || (cmd==OP_WDS)) && (InterLockCount[IL_IAS])) {
@@ -421,7 +421,7 @@ t_stat dsk_srv(UNIT * uptr)
         Arm[unit][arm].cmd = 0;
         sim_debug(DEBUG_CMD, dptr, "RAMAC unit %d, arm %d READY\n", unit, arm);
     }
-    // if there is any arm in movement, re-schedulle event 
+    // if there is any arm in movement, re-schedulle event
     sim_cancel(uptr);
     if (bSequenceInProgress) {
         if (bFastMode) {
@@ -440,7 +440,7 @@ void dsk_ini(UNIT * uptr, t_bool f)
     int                 unit = (uptr - dptr->units);
 
     memset(&Arm[unit], 0, sizeof(Arm[unit])); // zeroes arm info for this unit
-} 
+}
 
 t_stat dsk_reset(DEVICE * dptr)
 {
@@ -460,7 +460,7 @@ t_stat dsk_attach(UNIT * uptr, const char *file)
     flen=sim_fsize(uptr->fileref);
     if ((flen > 0) && (flen != DISK_SIZE * 100)) {
         sim_messagef (SCPE_IERR, "Invalid RAMAC Unit file size\n");
-        detach_unit (uptr); 
+        detach_unit (uptr);
     }
     dsk_ini(uptr, 0);
     return SCPE_OK;

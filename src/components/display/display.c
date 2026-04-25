@@ -151,8 +151,8 @@ static struct display displays[] = {
      * TX-0
      *
      * Unknown manufacturer
-     * 
-     * 12" tube, 
+     *
+     * 12" tube,
      * maximum dot size ???
      * 50us point plot time (20,000 points/sec)
      * P7 Phosphor??? Two phosphor layers:
@@ -160,7 +160,7 @@ static struct display displays[] = {
      */
     { DIS_TX0, "MIT TX-0", &color_p7, NULL, 512, 512 },
 
-    
+
     /*
      * Type 30
      * PDP-1/4/5/8/9/10 "Precision CRT" display system
@@ -612,7 +612,7 @@ display_delay(int t, int slowdown)
 #endif /* DEBUG_DELAY defined */
             }
         }
-    else 
+    else
         if ((elapsed < MINELAPSED) || (slowdown && (delay < MINDELAY))) {
             /* too little elapsed time passed, or delta very small */
             int gain = delay_check>>GAINSHIFT;
@@ -763,8 +763,8 @@ intensify(int x,            /* 0..xpixels */
 
     /* EXP: doesn't work... yet */
     /* if "recently" drawn, same or brighter, same color, make even brighter */
-    if (p->ttl >= MAXTTL*2/3 && 
-        level >= p->level && 
+    if (p->ttl >= MAXTTL*2/3 &&
+        level >= p->level &&
         p->color == color &&
         level < MAXLEVEL)
         level++;
@@ -848,7 +848,7 @@ xline (int x, int y, int x2, int dx, int dy, int level)
         x += ix;
     }
 }
-  
+
 static void
 yline (int x, int y, int y2, int dx, int dy, int level)
 {

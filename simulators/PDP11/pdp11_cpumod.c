@@ -258,7 +258,7 @@ CNFTAB cnf_tab[] = {
 static const char *opt_name[] = {
     "Unibus", "Qbus", "EIS", "NOEIS", "FIS", "NOFIS",
     "FPP", "NOFPP", "CIS", "NOCIS", "MMU", "NOMMU",
-    "RH11", "RH70", "PARITY", "NOPARITY", "Unibus map", "No map", 
+    "RH11", "RH70", "PARITY", "NOPARITY", "Unibus map", "No map",
     "BEVENT enabled", "BEVENT disabled", NULL
     };
 
@@ -868,7 +868,7 @@ return SCPE_NXM;
 t_stat CTLJB_rd (int32 *data, int32 pa, int32 access)
 {
 switch ((pa >> 1) & 03) {                               /* decode pa<2:1> */
- 
+
    case 0:                                              /* CSR */
     *data = JCSR & CSRJB_RD;
     return SCPE_OK;
@@ -969,7 +969,7 @@ switch ((pa >> 1) & 03) {                               /* decode pa<2:1> */
 
     case 3:                                             /* ASR */
         JASR = (JASR & ~ASRJE_TOY) | (toy_read () << ASRJE_V_TOY);
-        *data = JASR & ASRJE_RW;            
+        *data = JASR & ASRJE_RW;
         return SCPE_OK;
         }
 
@@ -1192,7 +1192,7 @@ for (i = 0; opt_name[2 * i] != NULL; i++) {
     if ((all_opt >> i) & 1)
         fprintf (st, ", %s",
                 ((cpu_opt >> i) & 1)? opt_name[2 * i]: opt_name[(2 * i) + 1]);
-    }   
+    }
 return SCPE_OK;
 }
 
@@ -1209,8 +1209,8 @@ if ((val & cpu_tab[cpu_model].opt) == 0) {
         if ((val >> i) & 1)
             break;
         }
-    return sim_messagef (SCPE_ARG, "The %s option can't be enabled on a %s CPU\n", 
-                                ((val >> i) & 1)? opt_name[2 * i] : "unknown", 
+    return sim_messagef (SCPE_ARG, "The %s option can't be enabled on a %s CPU\n",
+                                ((val >> i) & 1)? opt_name[2 * i] : "unknown",
                                 cpu_tab[cpu_model].name);
     }
 cpu_opt = cpu_opt | val;
@@ -1228,8 +1228,8 @@ if ((val & cpu_tab[cpu_model].opt) == 0) {
         if ((val >> i) & 1)
             break;
         }
-    return sim_messagef (SCPE_ARG, "The %s option can't be disabled on a %s CPU\n", 
-                                ((val >> i) & 1)? opt_name[2 * i] : "unknown", 
+    return sim_messagef (SCPE_ARG, "The %s option can't be disabled on a %s CPU\n",
+                                ((val >> i) & 1)? opt_name[2 * i] : "unknown",
                                 cpu_tab[cpu_model].name);
     }
 cpu_opt = cpu_opt & ~val;

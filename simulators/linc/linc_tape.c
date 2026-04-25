@@ -178,7 +178,7 @@ static void write_word(FILE *fileref, t_addr block, t_addr offset, uint16 word)
             263
       --------------------------
             268
-         
+
 
   start - 100 ms
   stop - 300 ms
@@ -397,7 +397,7 @@ static t_stat tape_boot(int32 unit_num, DEVICE *dptr)
     return SCPE_ARG;
   if (blocks == 0)
     return SCPE_ARG;
-    
+
   if (blocks == 1)
     LSW = RDC;
   else
@@ -452,7 +452,7 @@ static t_stat tape_attach(UNIT *uptr, const char *cptr)
   if (forward_offset != reverse_offset)
     return SCPE_FMT;
   uptr->OFFSET = forward_offset;
-    
+
   uptr->POS = -2 * START_POS;
   uptr->SPEED = 0;
   return SCPE_OK;

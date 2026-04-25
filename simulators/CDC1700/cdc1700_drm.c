@@ -62,7 +62,7 @@
  *    2. Current track address
  *
  *       This will be the last track address referenced by an I/O request.
- * 
+ *
  *    3. Core address compare
  *
  *       This bit is set when the current/next DMA request is to the last
@@ -792,13 +792,13 @@ enum IOstatus DRMin(IO_DEVICE *iod, uint8 reg)
    * and the Sector Address Status register so that we can return values
    * which are dependent on the rotational position of the drum.
    */
-  
+
   /*
    * Update the current sector value.
    */
   if (DRMdev.iod_state == DRM_IDLE) {
     t_uint64 sectors = (Instructions - DRMdev.iod_event) / DRM_SECTOR_WAIT;
-    
+
     if (sectors != 0) {
       DRMdev.iod_sec = (DRMdev.iod_sec + sectors) & DRM_SEC_MASK;
       DRMdev.iod_event += sectors * DRM_SECTOR_WAIT;

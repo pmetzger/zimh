@@ -319,7 +319,7 @@ t_stat mg_attach (UNIT *u, const char *cptr)
         controller[ctrl].status |= MG_READONLY << num;
     else
         controller[ctrl].status &= ~(MG_READONLY << num);
-    
+
     /* ready */
     controller[ctrl].status &= ~(MG_OFFLINE << num);
     GRP |= controller[ctrl].mask_free;
@@ -334,7 +334,7 @@ t_stat mg_detach (UNIT *u)
     /* Set RO, not ready */
     controller[ctrl].status |= (1 << (16 + num));
     controller[ctrl].status |= (1 << (8 + num));
-    
+
     return sim_tape_detach (u);
 }
 
