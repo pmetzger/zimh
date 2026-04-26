@@ -29,6 +29,7 @@ Thumbs.db
 
 # Ignore local build and install trees.
 /build/
+/vcpkg_installed/
 SIMH-install
 
 # Temporary files during work
