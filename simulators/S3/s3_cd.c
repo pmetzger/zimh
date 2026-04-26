@@ -44,7 +44,7 @@ extern uint8 M[];
 extern unsigned char ebcdic_to_ascii[];
 extern unsigned char ascii_to_ebcdic[];
 int32 s1sel, s2sel;
-char rbuf[CBUFSIZE];                                    /* > CDR_WIDTH */
+uint8 rbuf[CBUFSIZE];                                   /* > CDR_WIDTH */
 t_stat cdr_svc (UNIT *uptr);
 t_stat cdr_boot (int32 unitno, DEVICE *dptr);
 t_stat cdr_attach (UNIT *uptr, const char *cptr);
@@ -304,7 +304,7 @@ if (mod) {
         rbuf[i] = fgetc(cdr_unit.fileref);              /* Read EBCDIC */
     }
 } else {
-    if (fgets (rbuf, CBUFSIZE, cdr_unit.fileref)) {};   /* read Ascii */
+    if (fgets ((char *)rbuf, CBUFSIZE, cdr_unit.fileref)) {}; /* read Ascii */
 }
 if (feof (cdr_unit.fileref)) {                          /* eof? */
     notready = 1;
@@ -349,7 +349,7 @@ if ((uptr -> flags & UNIT_ATT) == 0) return SCPE_OK;    /* attached? */
 for (i = 0; (size_t)i < CDR_WIDTH; i++) rbuf[i] = ebcdic_to_ascii[rbuf[i]];
 for (i = CDR_WIDTH - 1; (i >= 0) && (rbuf[i] == ' '); i--) rbuf[i] = 0;
 rbuf[CDR_WIDTH] = 0;                                    /* null at end */
-fputs (rbuf, uptr -> fileref);                          /* write card */
+fputs ((char *)rbuf, uptr -> fileref);                  /* write card */
 fputc ('\n', uptr -> fileref);                          /* plus new line */
 if (ferror (uptr -> fileref)) {                         /* error? */
     sim_perror ("Card stacker I/O error");
