@@ -356,6 +356,7 @@
 /* Internal routine - forward declaration */
 static int _eth_get_system_id (char *buf, size_t buf_size);
 static void eth_get_nic_hw_addr(ETH_DEV* dev, const char *devname, int set_on);
+t_stat eth_test_dev_command_format (void);
 
 static const unsigned char framer_oui[3] = { 0xaa, 0x00, 0x03 };
        const ETH_MAC eth_mac_any         = {0, 0, 0, 0, 0, 0};
@@ -1613,6 +1614,56 @@ static int pcap_mac_if_win32(const char *AdapterName, unsigned char MACAddress[6
 
 #endif  /* defined(_WIN32) */
 
+#define ETH_MAC_FIXED_PATTERN \
+  "[0-9a-fA-F][0-9a-fA-F]:" \
+  "[0-9a-fA-F][0-9a-fA-F]:" \
+  "[0-9a-fA-F][0-9a-fA-F]:" \
+  "[0-9a-fA-F][0-9a-fA-F]:" \
+  "[0-9a-fA-F][0-9a-fA-F]:" \
+  "[0-9a-fA-F][0-9a-fA-F]"
+
+#define ETH_MAC_EXTENDED_PATTERN \
+  "[0-9a-fA-F]?[0-9a-fA-F]:" \
+  "[0-9a-fA-F]?[0-9a-fA-F]:" \
+  "[0-9a-fA-F]?[0-9a-fA-F]:" \
+  "[0-9a-fA-F]?[0-9a-fA-F]:" \
+  "[0-9a-fA-F]?[0-9a-fA-F]:" \
+  "[0-9a-fA-F]?[0-9a-fA-F]"
+
+typedef struct {
+  const char *prefix;
+  const char *suffix;
+} ETH_DEV_COMMAND;
+
+static const ETH_DEV_COMMAND eth_turnon_commands[] = {
+    {"ip link set dev ", " up 2>/dev/null"},
+    {"ifconfig ", " up 2>/dev/null"},
+    {NULL, NULL}};
+
+static const ETH_DEV_COMMAND eth_mac_lookup_commands[] = {
+    {"ip link show ", " 2>/dev/null | grep " ETH_MAC_FIXED_PATTERN},
+    {"ip link show ", " 2>/dev/null | grep -E " ETH_MAC_EXTENDED_PATTERN},
+    {"ifconfig ", " 2>/dev/null | grep " ETH_MAC_FIXED_PATTERN},
+    {"ifconfig ", " 2>/dev/null | grep -E " ETH_MAC_EXTENDED_PATTERN},
+    {NULL, NULL}};
+
+/* Build a shell command using a literal snprintf format for compiler checks. */
+static void eth_format_dev_command(char *command, size_t command_size,
+                                   const ETH_DEV_COMMAND *cmd,
+                                   const char *devname)
+{
+  size_t format_len;
+  int devname_len;
+
+  format_len = strlen(cmd->prefix) + strlen("%.*s") + strlen(cmd->suffix);
+  if (command_size <= format_len + 2)
+    devname_len = 0;
+  else
+    devname_len = (int)(command_size - (2 + format_len));
+  snprintf(command, command_size, "%s%.*s%s", cmd->prefix, devname_len,
+           devname, cmd->suffix);
+}
+
 static void eth_get_nic_hw_addr(ETH_DEV* dev, const char *devname, int set_on)
 {
   memset(&dev->host_nic_phy_hw_addr, 0, sizeof(dev->host_nic_phy_hw_addr));
@@ -1628,22 +1679,13 @@ static void eth_get_nic_hw_addr(ETH_DEV* dev, const char *devname, int set_on)
     FILE *f;
     int i;
     char tool[CBUFSIZE];
-    const char *turnon[] = {
-        "ip link set dev %.*s up 2>/dev/null",
-        "ifconfig %.*s up 2>/dev/null",
-        NULL};
-    const char *patterns[] = {
-        "ip link show %.*s 2>/dev/null | grep [0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]",
-        "ip link show %.*s 2>/dev/null | grep -E [0-9a-fA-F]?[0-9a-fA-F]:[0-9a-fA-F]?[0-9a-fA-F]:[0-9a-fA-F]?[0-9a-fA-F]:[0-9a-fA-F]?[0-9a-fA-F]:[0-9a-fA-F]?[0-9a-fA-F]:[0-9a-fA-F]?[0-9a-fA-F]",
-        "ifconfig %.*s 2>/dev/null | grep [0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]:[0-9a-fA-F][0-9a-fA-F]",
-        "ifconfig %.*s 2>/dev/null | grep -E [0-9a-fA-F]?[0-9a-fA-F]:[0-9a-fA-F]?[0-9a-fA-F]:[0-9a-fA-F]?[0-9a-fA-F]:[0-9a-fA-F]?[0-9a-fA-F]:[0-9a-fA-F]?[0-9a-fA-F]:[0-9a-fA-F]?[0-9a-fA-F]",
-        NULL};
 
     memset(command, 0, sizeof(command));
     if (set_on) {
       /* try to force an otherwise unused interface to be turned on */
-      for (i=0; turnon[i]; ++i) {
-        snprintf(command, sizeof(command), turnon[i], (int)(sizeof(command) - (2 + strlen(patterns[i]))), devname);
+      for (i=0; eth_turnon_commands[i].prefix; ++i) {
+        eth_format_dev_command(command, sizeof(command),
+                               &eth_turnon_commands[i], devname);
         get_glyph_nc (command, tool, 0);
         if (sim_get_tool_path (tool)[0]) {
           if (NULL != (f = popen(command, "r")))
@@ -1651,8 +1693,10 @@ static void eth_get_nic_hw_addr(ETH_DEV* dev, const char *devname, int set_on)
           }
         }
       }
-    for (i=0; patterns[i] && (0 == dev->have_host_nic_phy_addr); ++i) {
-      snprintf(command, sizeof(command), patterns[i], (int)(sizeof(command) - (2 + strlen(patterns[i]))), devname);
+    for (i=0; eth_mac_lookup_commands[i].prefix &&
+             (0 == dev->have_host_nic_phy_addr); ++i) {
+      eth_format_dev_command(command, sizeof(command),
+                             &eth_mac_lookup_commands[i], devname);
       get_glyph_nc (command, tool, 0);
       if (sim_get_tool_path (tool)[0]) {
         if (NULL != (f = popen(command, "r"))) {
@@ -2708,14 +2752,18 @@ eth_filter(dev, 1, (ETH_MAC *)mac, 0, 0);
 /* send the packet */
 status = _eth_write (dev, &send, NULL);
 if (status != SCPE_OK) {
-  const char *msg;
-  msg = (dev->eth_api == ETH_API_PCAP) ?
-      "%s: Eth: Error Transmitting packet: %s\n"
-        "You may need to run as root, or install a libpcap version\n"
-        "which is at least 0.9 from your OS vendor or www.tcpdump.org\n" :
-      "%s: Eth: Error Transmitting packet: %s\n"
-        "You may need to run as root.\n";
-  return sim_messagef (SCPE_ARG, msg, sim_dname (dev->dptr), strerror(errno));
+  if (dev->eth_api == ETH_API_PCAP)
+    return sim_messagef (SCPE_ARG,
+                         "%s: Eth: Error Transmitting packet: %s\n"
+                         "You may need to run as root, or install a libpcap "
+                         "version\n"
+                         "which is at least 0.9 from your OS vendor or "
+                         "www.tcpdump.org\n",
+                         sim_dname (dev->dptr), strerror(errno));
+  return sim_messagef (SCPE_ARG,
+                       "%s: Eth: Error Transmitting packet: %s\n"
+                       "You may need to run as root.\n",
+                       sim_dname (dev->dptr), strerror(errno));
   }
 
 sim_os_ms_sleep (300);   /* time for a conflicting host to respond */
@@ -4178,6 +4226,59 @@ for (val=0; val <= 0xFF; val++) {
 return (errors == 0) ? SCPE_OK : SCPE_IERR;
 }
 
+t_stat eth_test_dev_command_format (void)
+{
+int errors = 0;
+char command[256];
+struct {
+  const ETH_DEV_COMMAND *cmd;
+  const char *devname;
+  const char *expected;
+  } tests[] = {
+    {&eth_turnon_commands[0], "en0",
+     "ip link set dev en0 up 2>/dev/null"},
+    {&eth_turnon_commands[1], "en0",
+     "ifconfig en0 up 2>/dev/null"},
+    {&eth_mac_lookup_commands[0], "en0",
+     "ip link show en0 2>/dev/null | grep " ETH_MAC_FIXED_PATTERN},
+    {&eth_mac_lookup_commands[1], "en0",
+     "ip link show en0 2>/dev/null | grep -E " ETH_MAC_EXTENDED_PATTERN},
+    {&eth_mac_lookup_commands[2], "en0",
+     "ifconfig en0 2>/dev/null | grep " ETH_MAC_FIXED_PATTERN},
+    {&eth_mac_lookup_commands[3], "en0",
+     "ifconfig en0 2>/dev/null | grep -E " ETH_MAC_EXTENDED_PATTERN},
+    {&eth_turnon_commands[1], "en%0x",
+     "ifconfig en%0x up 2>/dev/null"},
+    {NULL, NULL, NULL}
+  };
+int i;
+
+for (i = 0; tests[i].cmd; ++i) {
+  memset(command, 0, sizeof(command));
+  eth_format_dev_command(command, sizeof(command), tests[i].cmd,
+                         tests[i].devname);
+  if (strcmp(command, tests[i].expected) != 0) {
+    sim_printf("Eth: Expected command '%s', got '%s'\n",
+               tests[i].expected, command);
+    ++errors;
+    }
+  }
+
+memset(command, 0xA5, sizeof(command));
+eth_format_dev_command(command, 48, &eth_turnon_commands[1],
+                       "abcdefghijklmnopqrstuvwxyz");
+if (strcmp(command, "ifconfig abcdefghijklmnopqr up 2>/dev/null") != 0) {
+  sim_printf("Eth: Expected truncated command, got '%s'\n", command);
+  ++errors;
+  }
+if ((unsigned char)command[48] != 0xA5) {
+  sim_printf("Eth: Command formatting wrote past the output buffer\n");
+  ++errors;
+  }
+
+return (errors == 0) ? SCPE_OK : SCPE_IERR;
+}
+
 static
 t_stat eth_test_bpf (DEVICE *dptr)
 {
@@ -4331,6 +4432,7 @@ SIM_TEST_INIT;
 sim_printf ("Testing %s device sim_ether APIs\n", dptr->name);
 
 SIM_TEST(eth_test_crc32 (dptr));
+SIM_TEST(eth_test_dev_command_format ());
 SIM_TEST(eth_test_bpf (dptr));
 return stat;
 }

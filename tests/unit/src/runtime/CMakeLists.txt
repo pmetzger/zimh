@@ -70,6 +70,14 @@ add_unit_test(unit-sim-sock
         ${PROJECT_SOURCE_DIR}/tests/unit/support
 )
 
+add_unit_test(unit-sim-ether
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_sim_ether.c
+    INCLUDES
+        ${PROJECT_SOURCE_DIR}/tests/unit/support
+)
+
 add_unit_test(unit-sim-tmxr
     LABEL unit
     SOURCES
