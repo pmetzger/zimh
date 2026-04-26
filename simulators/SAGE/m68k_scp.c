@@ -304,14 +304,13 @@ static t_stat hdump_cmd(int32 arg, const char* buf)
     return SCPE_OK;
 }
 
-char* m68k_getsym(t_addr val,const char* fmt, char* outbuf)
+char* m68k_getsym(t_addr val, char* outbuf)
 {
     SYMHASH *v;
     if (symtrace && sym_lookupval(val,&v))
         return v->name;
     else {
-        sprintf(outbuf,fmt,val);
+        sprintf(outbuf, "0x%08x", val);
         return outbuf;
     }
 }
-

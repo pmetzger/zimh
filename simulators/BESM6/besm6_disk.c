@@ -544,7 +544,7 @@ void disk_format (UNIT *u)
     if (u->dptr->dctrl & DEB_TRC) {
         if (IS_29MB(u))
             besm6_debug ("::: формат МД %02o зона %04o память %05o skip %02o и-а-кса %010o %010o",
-                         c->dev, c->zone, c->memory, ptr - memory -c ->memory,
+                         c->dev, c->zone, c->memory, (uint32) (ptr - memory -c ->memory),
                          (int) (fmtbuf[0] >> 8 & BITS(30)),
                          (int) (fmtbuf[2] >> 14 & BITS(30)));
         else

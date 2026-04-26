@@ -209,9 +209,7 @@ extern t_stat m68k_alloc_mem(void);
 extern t_stat m68k_raise_vectorint(int level,int vector);
 extern t_stat m68k_raise_autoint(int level);
 
-#define XFMT "0x%08x"
-#define SFMT "$%x"
-extern char*  m68k_getsym(t_addr val,const char* fmt, char* outbuf);
+extern char*  m68k_getsym(t_addr val, char* outbuf);
 
 /* overloadable callbacks */
 extern void (*m68kcpu_trapcallback)(DEVICE* cpudev,int trapnum);

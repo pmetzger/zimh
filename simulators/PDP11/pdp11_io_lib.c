@@ -453,14 +453,11 @@ int32 maxvec, vecwid;
 int32 brbase = 0;
 uint32 rdx = DEV_RDX;
 char valbuf[40];
-const char *vec_fmt = NULL;
-char vec_fmt_buf[16];
 
 if ((sim_switches & SWMASK('O')) || (sim_switch_number == 8))
     rdx = 8;
 if ((sim_switches & SWMASK('H')) || (sim_switch_number == 16))
     rdx = 16;
-vec_fmt = (rdx == 16) ? "X" : "o";
 
 if (build_dib_tab ())                                   /* build IO page */
     return SCPE_OK;
@@ -492,8 +489,7 @@ for (i = 0, dibp = NULL; i < (IOPAGESIZE >> 1); i++) {  /* loop thru entries */
         }                                               /* end if */
     }                                                   /* end for i */
 maxaddr = fprint_val (NULL, (t_value) dibp->ba, rdx, 32, PV_LEFT);
-sprintf (vec_fmt_buf, "%s%s", "%03", vec_fmt);
-sprintf (valbuf, vec_fmt_buf, maxvec);
+sprintf (valbuf, (rdx == 16) ? "%03X" : "%03o", maxvec);
 vecwid = maxvec = (int32) strlen (valbuf);
 if (vecwid < 3)
     vecwid = 3;
@@ -551,13 +547,14 @@ for (i = 0, dibp = NULL; i < (IOPAGESIZE >> 1); i++) {  /* loop thru entries */
         if (dibp->vec == 0)
             fprintf (st, "%*s", ((vecwid*2)+1+1), " ");
         else {
-            sprintf (vec_fmt_buf, "%s%s", "%0*", vec_fmt);
-            fprintf (st, vec_fmt_buf, vecwid, dibp->vec);
+            fprintf (st, (rdx == 16) ? "%0*X" : "%0*o", vecwid, dibp->vec);
             if (dibp->vnum > 1) {
-                sprintf (vec_fmt_buf, "%s%s", "-%0*", vec_fmt);
-                fprintf (st, vec_fmt_buf, vecwid, dibp->vec + (4 *
-                (dibp->ulnt? dibp->lnt/dibp->ulnt:
-                                            (dptr? dptr->numunits: 1)) * dibp->vnum) - 4);
+                uint32 vec_end = dibp->vec + (4 *
+                    (dibp->ulnt? dibp->lnt/dibp->ulnt:
+                                  (dptr? dptr->numunits: 1)) *
+                    dibp->vnum) - 4;
+
+                fprintf (st, (rdx == 16) ? "-%0*X" : "-%0*o", vecwid, vec_end);
                 }
             else
                 fprintf (st, " %*s", vecwid, " ");

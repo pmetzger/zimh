@@ -1128,7 +1128,7 @@ t_stat m68k_gen_exception(int vecno,t_addr* pc)
 
     /* set the new PC */
     ASSERT_OKRET(ReadPL(vecno<<2,pc));
-    IFDEBUG(DBG_CPU_EXC,fprintf(sim_deb,"CPU : [0x%08x] Exception: vec=%d to %s\n",oldpc,vecno,m68k_getsym(*pc,XFMT,out)));
+    IFDEBUG(DBG_CPU_EXC,fprintf(sim_deb,"CPU : [0x%08x] Exception: vec=%d to %s\n",oldpc,vecno,m68k_getsym(*pc,out)));
     return ReadInstr(*pc,&dummy); /* fill prefetch cache */
 }
 
@@ -2086,7 +2086,7 @@ do_neg32:       res = m68k_sub32(0,srcx1,0,TRUE);
                 ASSERT_OK(ea_src_l_nd(IR_EAMOD,IR_EAREG,&srca,&PC));
                 ASSERT_OK(m68k_cpush32(PC));
                 IFDEBUG(DBG_CPU_CTRACE,fprintf(sim_deb,"CPU : [0x%08x] >>> JSR %s (level=%d)\n",
-                        oldpc-2,m68k_getsym(srca,XFMT,out),m68k_sublevel));
+                        oldpc-2,m68k_getsym(srca,out),m68k_sublevel));
                 PC = srca;
                 m68k_sublevel++;
                 tracet0 = SR_T0;
@@ -2095,7 +2095,7 @@ do_neg32:       res = m68k_sub32(0,srcx1,0,TRUE);
                 oldpc = PC;
                 ASSERT_OK(ea_src_l_nd(IR_EAMOD,IR_EAREG,&srca,&PC));
                 IFDEBUG(DBG_CPU_BTRACE,fprintf(sim_deb,"CPU : [0x%08x] ||| JMP %s\n",
-                        oldpc-2,m68k_getsym(srca,XFMT,out)));
+                        oldpc-2,m68k_getsym(srca,out)));
                 PC = srca;
                 tracet0 = SR_T0;
                 break;
@@ -2189,12 +2189,12 @@ do_neg32:       res = m68k_sub32(0,srcx1,0,TRUE);
                 if (iscond) {
                     if (isbsr) {
                         IFDEBUG(DBG_CPU_CTRACE,fprintf(sim_deb,"CPU : [0x%08x] >>> BSR %s (level=%d\n",
-                                PC-2,m68k_getsym(PC+EXTB(IR_DISP),XFMT,out),m68k_sublevel));
+                                PC-2,m68k_getsym(PC+EXTB(IR_DISP),out),m68k_sublevel));
                         ASSERT_OK(m68k_cpush32(PC)); /* save PC for BSR */
                         m68k_sublevel++;
                     } else {
                         IFDEBUG(DBG_CPU_BTRACE,fprintf(sim_deb,"CPU : [0x%08x] ||| B%s %s\n",
-                                PC-2,condnames[IR_COND>>8],m68k_getsym(PC+EXTB(IR_DISP),XFMT,out)));
+                                PC-2,condnames[IR_COND>>8],m68k_getsym(PC+EXTB(IR_DISP),out)));
                     }
                     PC += EXTB(IR_DISP); /* go to new location */
                 } /* else condition not matched */
@@ -2203,12 +2203,12 @@ do_neg32:       res = m68k_sub32(0,srcx1,0,TRUE);
                     ASSERT_OK(ReadInstr(PC,&IRE)); /* get extension word */
                     if (isbsr) {
                         IFDEBUG(DBG_CPU_CTRACE,fprintf(sim_deb,"CPU : [0x%08x] >>> BSR %s (level=%d)\n",
-                                PC-2,m68k_getsym(PC+EXTW(IRE),XFMT,out),m68k_sublevel));
+                                PC-2,m68k_getsym(PC+EXTW(IRE),out),m68k_sublevel));
                         ASSERT_OK(m68k_cpush32(PC+2)); /* save PC for BSR */
                         m68k_sublevel++;
                     } else {
                         IFDEBUG(DBG_CPU_BTRACE,fprintf(sim_deb,"CPU : [0x%08x] ||| B%s %s\n",
-                                PC-2,condnames[IR_COND>>8],m68k_getsym(PC+EXTW(IRE),XFMT,out)));
+                                PC-2,condnames[IR_COND>>8],m68k_getsym(PC+EXTW(IRE),out)));
                     }
                     PC += EXTW(IRE); /* go to new location */
                 } else {

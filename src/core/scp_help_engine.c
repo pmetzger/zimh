@@ -1447,7 +1447,7 @@ t_stat scp_vhelpFromFile(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
 
         if (argv0 && *argv0) {
             char fbuf[(4 * PATH_MAX) + 1];
-            const char *d = NULL;
+            const char *separator = NULL;
 
             fbuf[sizeof(fbuf) - 1] = '\0';
             strlcpy(fbuf, argv0, sizeof(fbuf));
@@ -1455,11 +1455,11 @@ t_stat scp_vhelpFromFile(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                 *p = '\0';
             if ((p = strrchr(fbuf, '\\'))) {
                 p[1] = '\0';
-                d = "%s\\";
+                separator = "\\";
             } else {
                 if ((p = strrchr(fbuf, '/'))) {
                     p[1] = '\0';
-                    d = "%s/";
+                    separator = "/";
                 }
             }
             if (p && (strlen(fbuf) + strlen(helpfile) + 1) <= sizeof(fbuf)) {
@@ -1467,9 +1467,10 @@ t_stat scp_vhelpFromFile(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                 fp = sim_fopen(fbuf, "r");
             }
             if (!fp && p &&
-                (strlen(fbuf) + strlen(d) + sizeof("help") + strlen(helpfile) +
-                 1) <= sizeof(fbuf)) {
-                snprintf(p + 1, sizeof(fbuf) - ((p + 1) - fbuf), d, "help");
+                (strlen(fbuf) + strlen(separator) + sizeof("help") +
+                 strlen(helpfile) + 1) <= sizeof(fbuf)) {
+                snprintf(p + 1, sizeof(fbuf) - ((p + 1) - fbuf), "help%s",
+                         separator);
                 strlcat(p + 1, helpfile, sizeof(fbuf) - ((p + 1) - fbuf));
                 fp = sim_fopen(fbuf, "r");
             }
