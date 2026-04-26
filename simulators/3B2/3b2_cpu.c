@@ -3559,7 +3559,7 @@ t_stat sim_instr(void)
             R[NUM_SP] = a;       /* Restore SP */
             break;
         case RGTRU:
-            if (!cpu_c_flag() || !cpu_z_flag()) {
+            if (!cpu_c_flag() && !cpu_z_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
