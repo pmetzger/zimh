@@ -94,9 +94,9 @@ static int   giPlainTabWidth = 0;
  * ExpandTabs: Expand tabs to spaces
  */
 
-char* ExpandTabs(char*  p_szInbuf,                      /* expand tabs .. input buffer */
-                 char*  p_szOutbuf,                     /* .. output buffer */
-                 short* p_aiTabs)                       /* .. array of tab stops (1 based) -- 0 end of array */
+static char* ExpandTabs(char*  p_szInbuf,                /* expand tabs .. input buffer */
+                        char*  p_szOutbuf,               /* .. output buffer */
+                        short* p_aiTabs)                 /* .. array of tab stops (1 based) -- 0 end of array */
 {
 short   iI,                                                 /* input position */
         iO,                                                 /* output position */
@@ -139,9 +139,9 @@ char    cX;                                                 /* character to test
  * extract next token, modify pointer
  */
 
-char* GetToken(char* p_szOut,                           /* output location */
-               int   p_iLen,                            /* max output length */
-               char**p_pszToken)                        /* pointer to input token */
+static char* GetToken(char* p_szOut,                     /* output location */
+                      int   p_iLen,                      /* max output length */
+                      char**p_pszToken)                  /* pointer to input token */
 {
 int     iI;                                                 /* work integer */
 char*   pszX;                                               /* work pointer */

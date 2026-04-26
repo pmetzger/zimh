@@ -102,20 +102,71 @@ extern int boot_drive;
 extern t_bool program_is_loaded;
 
 #ifndef GUI_SUPPORT
-    void update_gui (int force)               {}        /* stubs for non-GUI builds */
-    void forms_check (int set)                {}
-    void print_check (int set)                {}
-    void keyboard_select (int select)         {}
-    void keyboard_selected (int select)       {}
-    void disk_ready (int ready)               {}
-    void disk_unlocked (int unlocked)         {}
-    void gui_run (int running)                {}
+    /* Non-GUI stubs keep the GUI-facing API available to the simulator.
+       These implementations do not use every parameter. */
+    void update_gui (int force)
+    {
+        (void) force;
+    }
 
-    t_stat console_reset (DEVICE *dptr)                         {return SCPE_OK;}
-    long   stuff_cmd (char *cmd)                                {return 0;}
-    t_bool stuff_and_wait (char *cmd, int timeout, int delay)   {return FALSE;}
-    char  *read_cmdline (char *ptr, int size, FILE *stream)     {return read_line(ptr, size, stream);}
-    void   remark_cmd (char *remark)                            {sim_printf("%s\n", remark);}
+    void forms_check (int set)
+    {
+        (void) set;
+    }
+
+    void print_check (int set)
+    {
+        (void) set;
+    }
+
+    void keyboard_selected (int select)
+    {
+        (void) select;
+    }
+
+    void disk_ready (int ready)
+    {
+        (void) ready;
+    }
+
+    void disk_unlocked (int unlocked)
+    {
+        (void) unlocked;
+    }
+
+    void gui_run (int running)
+    {
+        (void) running;
+    }
+
+    t_stat console_reset (DEVICE *dptr)
+    {
+        (void) dptr;
+        return SCPE_OK;
+    }
+
+    long stuff_cmd (char *cmd)
+    {
+        (void) cmd;
+        return 0;
+    }
+
+    t_bool stuff_and_wait (char *cmd, int timeout, int delay)
+    {
+        (void) cmd;
+        (void) timeout;
+        (void) delay;
+        return FALSE;
+    }
+    char *read_cmdline (char *ptr, int size, FILE *stream)
+    {
+        return read_line(ptr, size, stream);
+    }
+
+    void remark_cmd (char *remark)
+    {
+        sim_printf("%s\n", remark);
+    }
 #else
 
 static HWND hConsoleWindow = NULL;

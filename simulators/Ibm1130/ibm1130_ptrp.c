@@ -165,6 +165,10 @@ static t_stat ptp_svc (UNIT *uptr)
 
 static t_stat ptr_reset (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     sim_cancel(ptr_unit);
 
     CLRBIT(ptr_dsw, PTR1134_DSW_READER_BUSY | PTR1134_DSW_READER_RESPONSE);
@@ -185,6 +189,10 @@ static t_stat ptr_reset (DEVICE *dptr)
 
 static t_stat ptp_reset (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     sim_cancel(ptp_unit);
 
     CLRBIT(ptr_dsw, PTR1134_DSW_PUNCH_BUSY | PTR1134_DSW_PUNCH_RESPONSE);
@@ -234,6 +242,11 @@ static t_stat ptr_boot (int32 unitno, DEVICE *dptr)
     int ch, nch, val, addr;
     t_bool leader = TRUE, start = FALSE;
     t_stat rval;
+
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+    (void) dptr;
 
     addr = 0;
     nch  = 0;

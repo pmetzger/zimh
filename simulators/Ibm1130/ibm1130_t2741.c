@@ -248,6 +248,10 @@ static t_stat t2741_detach (UNIT *uptr)
 
 static t_stat t2741_reset  (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     sim_cancel(t2741_unit);
 
     CLRBIT(t2741_unit->flags, UNIT_SENDING|UNIT_RECEIVING|UNIT_UPCASE);

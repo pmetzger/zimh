@@ -32,6 +32,12 @@
 
     void xio_1627_plotter   (int32 addr, int32 func, int32 modify)
     {
+        /* Device dispatch signature.
+           This implementation does not use every parameter. */
+        (void) addr;
+        (void) func;
+        (void) modify;
+
         /* silently eat any plotter commands */
     }
 
@@ -791,4 +797,3 @@ static t_stat plot_validate_change (UNIT *uptr, int32 set, const char *ptr, void
 }
 
 #endif /* ENABLE_PLOT_SUPPORT */
-

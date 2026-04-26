@@ -180,8 +180,6 @@ static struct tag_dsk_action {              /* stores data needed for pending IO
  * 15-16: number of next sector spinning into position.
  */
 
-extern void void_backtrace (int afrom, int ato);
-
 extern int boot_drive;
 
 void xio_disk (int32 iocc_addr, int32 func, int32 modify, int drv)
@@ -472,6 +470,10 @@ static t_stat dsk_reset (DEVICE *dptr)
     int drv;
     UNIT *uptr;
 
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
 #ifdef TRACE_DMS_IO
     /* add the WHERE command. It finds the phase that was loaded at given address and indicates */
     /* the offset in the phase */
@@ -578,6 +580,10 @@ static t_stat dsk_boot (int32 unitno, DEVICE *dptr)
 {
     t_stat rval;
 
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     if ((rval = reset_all(0)) != SCPE_OK)
         return rval;
 
@@ -651,6 +657,10 @@ static t_stat phdebug_cmd (int32 flag, const char *ptr)
 {
     int val1, val2;
 
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) flag;
+
     if (strcmpi(ptr, "off") == 0)
         phdebug_lo = phdebug_hi = -1;
     else {
@@ -678,6 +688,10 @@ static t_stat where_cmd (int32 flag, const char *ptr)
 {
     int addr;
     const char *where;
+
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) flag;
 
     if (! trace_dms) {
         printf("Tracing is disabled. To enable, attach disk with -d switch\n");
@@ -844,6 +858,11 @@ static t_stat fdump_cmd (int32 flags, const char *cptr)
     int addr = 0x7a24;                              /* address of next statement */
     int sofst = 0x7a26, symaddr;
     int cword, nwords, stype, has_stnum, strel = 1, laststno = 0;
+
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) flags;
+    (void) cptr;
 
     addr = M[addr & mem_mask] & mem_mask;           /* get address of first statement */
     sofst = M[sofst & mem_mask] & mem_mask  ;       /* get address of symbol table */

@@ -346,8 +346,6 @@ static void flush_prt_line (FILE *fd, int spacemode, t_bool physical_printer)
 
 #define PRT_CMD_MASK                0x00C7
 
-extern const char * saywhere (int addr);
-
 static void mytrace (int start, const char *what)
 {
     const char *where;
@@ -503,7 +501,7 @@ static t_stat prt1132_svc (UNIT *uptr)
     return SCPE_OK;
 }
 
-void save_1403_prt_line (int32 addr)
+static void save_1403_prt_line (int32 addr)
 {
     size_t j;
     int i, r, ch, even = TRUE;
@@ -654,6 +652,10 @@ static t_stat prt_reset (DEVICE *dptr)
 {
     UNIT *uptr = &prt_unit[0];
     size_t i;
+
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
 
     sim_cancel(uptr);
 
@@ -808,4 +810,3 @@ static t_stat prt_detach (UNIT *uptr)
     forms_check(FALSE);
     return SCPE_OK;
 }
-

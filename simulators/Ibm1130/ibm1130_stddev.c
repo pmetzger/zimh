@@ -91,14 +91,35 @@
 
 static void badio (const char *dev)
 {
+    (void) dev;
+
 /* the real 1130 just ignores attempts to use uninstalled devices. They get tested
  * at times, so it's best to just be quiet about this
  * printf("%s I/O is not yet supported", dev);
  */
 }
 
-void xio_1231_optical   (int32 addr, int32 func, int32 modify)          {badio("optical mark");}
-void xio_system7        (int32 addr, int32 func, int32 modify)          {badio("System 7");}
+void xio_1231_optical (int32 addr, int32 func, int32 modify)
+{
+    /* Device dispatch signature.
+       This implementation does not use every parameter. */
+    (void) addr;
+    (void) func;
+    (void) modify;
+
+    badio("optical mark");
+}
+
+void xio_system7 (int32 addr, int32 func, int32 modify)
+{
+    /* Device dispatch signature.
+       This implementation does not use every parameter. */
+    (void) addr;
+    (void) func;
+    (void) modify;
+
+    badio("System 7");
+}
 
 /* ---------------------------------------------------------------------------- */
 
@@ -140,7 +161,7 @@ static void   reset_mapping (void);
 static void   set_conout_mapping(int32 flags);
 static t_stat validate_conout_mapping(UNIT *uptr, int32 match, const char *cvptr, void *desc);
 static void   set_default_mapping(int32 flags);
-static void   finish_conout_mapping(int32 flags);
+static void   finish_conout_mapping(void);
 static void   strsort (int n, unsigned char *s);        /* sorts an array of n characters */
 static int    os_map_comp (OS_MAP *a, OS_MAP *b);       /* compares two mapping entries */
 static t_stat font_cmd(int32 flag, const char *cptr);           /* handles font command */
@@ -346,6 +367,10 @@ static t_stat tti_svc (UNIT *uptr)
 {
     int32 temp;
 
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     if (cgi)                                        /* if running in CGI mode, no keyboard and no keyboard polling! */
         return SCPE_OK;
                                                     /* otherwise, so ^E can interrupt the simulator, */
@@ -422,6 +447,10 @@ static t_stat tti_svc (UNIT *uptr)
 
 static t_stat tti_reset (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     tti_unit.buf = 0;
     tti_dsw = 0;
 
@@ -477,6 +506,10 @@ t_bool keyboard_is_busy (void)                  /* return TRUE if keyboard is no
 
 static t_stat tto_svc (UNIT *uptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     CLRBIT(tto_dsw, TT_DSW_PRINTER_BUSY);
     SETBIT(tto_dsw, TT_DSW_PRINTER_RESPONSE);
 
@@ -490,6 +523,10 @@ static t_stat tto_svc (UNIT *uptr)
 
 static t_stat tto_reset (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     tto_unit.buf = 0;
     tto_dsw = 0;
 
@@ -740,7 +777,7 @@ static void set_conout_mapping (int32 flags)
 
 /* finish_conout_mapping - sort the finalized overstrike mapping */
 
-static void finish_conout_mapping (int32 flags)
+static void finish_conout_mapping (void)
 {
     int i, n, big;
     OS_MAP temp;
@@ -765,6 +802,12 @@ static void finish_conout_mapping (int32 flags)
 
 static t_stat validate_conout_mapping (UNIT *uptr, int32 match, const char *cvptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cvptr;
+    (void) desc;
+
     set_conout_mapping(match);
     return SCPE_OK;
 }
@@ -815,12 +858,12 @@ static void set_default_mapping (int32 flags)
             break;
     }
 
-    finish_conout_mapping(flags);               /* sort conout mapping if necessary */
+    finish_conout_mapping();                    /* sort conout mapping if necessary */
 }
 
 /* sim_putstr - write a string to the console */
 
-t_stat sim_putstr (char *s)
+static t_stat sim_putstr (char *s)
 {
     t_stat status;
 
@@ -936,6 +979,10 @@ static t_stat font_cmd (int32 flag, const char *iptr)
         char gbuf[4*CBUFSIZE], *cptr = gbuf;
     FILE *fd;
 
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) flag;
+
     gbuf[sizeof(gbuf)-1] = '\0';
     strncpy(gbuf, iptr, sizeof(gbuf)-1);
     while (*cptr && (*cptr <= ' ')) cptr++;         /* skip blanks */
@@ -963,7 +1010,7 @@ static t_stat font_cmd (int32 flag, const char *iptr)
     read_map_file(fd);
     fclose(fd);
 
-    finish_conout_mapping(tto_unit.flags);
+    finish_conout_mapping();
     return SCPE_OK;
 }
 

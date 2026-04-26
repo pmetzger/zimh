@@ -790,7 +790,7 @@ static t_bool lookup_codetable (int32 match, CPCODE **pcode, size_t *pncode)
     return TRUE;
 }
 
-t_stat set_active_cr_code (int match)
+static t_stat set_active_cr_code (int match)
 {
     CPCODE *code;
     size_t ncode;
@@ -814,6 +814,12 @@ t_stat set_active_cr_code (int match)
 
 static t_stat cr_set_code (UNIT *uptr, int32 match, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
+
     if (match == CODE_AUTO)
         match = guess_cr_code();
 
@@ -884,6 +890,12 @@ static t_stat cp_set_code (UNIT *uptr, int32 match, const char *cptr, void *desc
 {
     CPCODE *code;
     size_t ncode;
+
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
 
     if (! lookup_codetable(match, &code, &ncode))
         return SCPE_ARG;
@@ -984,6 +996,11 @@ t_stat cr_boot (int32 unitno, DEVICE *dptr)
     t_stat rval;
     int i;
 
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+    (void) dptr;
+
     if ((rval = reset_all(0)) != SCPE_OK)
         return rval;
 
@@ -1020,7 +1037,7 @@ t_stat cr_boot (int32 unitno, DEVICE *dptr)
     return SCPE_OK;
 }
 
-char card_to_ascii (uint16 hol)
+static char card_to_ascii (uint16 hol)
 {
     size_t i;
 
@@ -1224,7 +1241,7 @@ static char * skipbl (char *str)
     return str;
 }
 
-#if THIS_IS_EVER_NEEDED
+#if 0
 /* This function is never called. Leaving it in if the IBM-1130 author
  * deems it significant. */
 static char * trim (char *str)
@@ -1508,6 +1525,10 @@ static t_bool nextdeck (void)
 
 static t_stat cr_reset (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     if (GET_ACTCODE(cr_unit) == CODE_AUTO)
         SET_ACTCODE(cr_unit, CODE_029);         /* if actual code is not yet set, select 029 for now*/
 
@@ -1533,6 +1554,10 @@ static t_stat cr_reset (DEVICE *dptr)
 
 static t_stat cp_reset (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     if (GET_CODE(cp_unit) == CODE_AUTO)
         SET_CODE(cp_unit, CODE_BINARY);             /* punch is never in auto mode; turn it to binary on startup */
 
@@ -2116,13 +2141,41 @@ void xio_1442_card (int32 addr, int32 func, int32 modify)
 
     /* stub out the physical card reader routines */
 
-    static t_stat pcr_attach        (UNIT *uptr, const char *devname) {return SCPE_ARG;}
-    static t_stat pcr_detach        (UNIT *uptr)                {return detach_unit(uptr);}
-    static t_stat pcr_svc           (UNIT *uptr)                {return SCPE_OK;}
-    static void   pcr_xio_sense     (int modify) {}
-    static void   pcr_xio_feedcycle (void) {}
-    static void   pcr_xio_startread (void) {}
-    static void   pcr_reset         (void) {}
+    /* Physical-reader stubs keep the callback API available. */
+    static t_stat pcr_attach (UNIT *uptr, const char *devname)
+    {
+        (void) uptr;
+        (void) devname;
+        return SCPE_ARG;
+    }
+
+    static t_stat pcr_detach (UNIT *uptr)
+    {
+        return detach_unit(uptr);
+    }
+
+    static t_stat pcr_svc (UNIT *uptr)
+    {
+        (void) uptr;
+        return SCPE_OK;
+    }
+
+    static void pcr_xio_sense (int modify)
+    {
+        (void) modify;
+    }
+
+    static void pcr_xio_feedcycle (void)
+    {
+    }
+
+    static void pcr_xio_startread (void)
+    {
+    }
+
+    static void pcr_reset (void)
+    {
+    }
 
 #else
 
@@ -2705,4 +2758,3 @@ static void end_pcr_critical_section (void)
 }
 
 #endif
-

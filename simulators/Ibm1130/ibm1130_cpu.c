@@ -248,7 +248,7 @@ extern UNIT cr_unit, prt_unit[];
 
 static t_stat view_cmd (int32 flag, const char *cptr);
 static t_stat cpu_attach (UNIT *uptr, const char *cptr);
-static t_bool bsctest (int32 DSPLC, t_bool reset_V);
+static t_bool bsctest (int32 DSPLC);
 static void   exit_irq (void);
 static void   trace_instruction (void);
 
@@ -496,8 +496,10 @@ t_stat sim_instr (void)
     int32 i, eaddr, INDIR, IR, F, DSPLC, word2 = 0, oldval, newval, src, src2, dst, abit, xbit;
     int32 iocc_addr, iocc_op, iocc_dev, iocc_func, iocc_mod, result;
     char msg[50];
-    int cwincount = 0, status;
-    static long ninstr = 0;
+    int status;
+#ifdef GUI_SUPPORT
+    int cwincount = 0;
+#endif
     static const char *intlabel[] = {"INT0","INT1","INT2","INT3","INT4","INT5"};
 
     /* the F bit indicates a two-word instruction for most instructions except the ones marked FALSE below */
@@ -620,11 +622,12 @@ t_stat sim_instr (void)
             ibkpt_addr = ibkpt_addr | ILL_ADR_FLAG;     /* disable */
             sim_activate(&cpu_unit, 1);                 /* sched re-enable after next instruction */
             reason = STOP_IBKPT;                        /* stop simulation */
+#ifdef GUI_SUPPORT
             cwincount = 0;
+#endif
             continue;
         }
 
-        ninstr++;
         if ((cpu_unit.flags & (UNIT_ATT|UNIT_TRACE_INSTR)) == (UNIT_ATT|UNIT_TRACE_INSTR))
             trace_instruction();            /* log CPU details if logging is enabled */
 
@@ -790,6 +793,7 @@ t_stat sim_instr (void)
                             break;
                         }
                         /* if TAG == 0, fall through and treat like normal shift SLA */
+                        FALLTHROUGH;
 
                     case 0x0000:                    /* SLA  */
                         while (CCC > 0) {
@@ -812,6 +816,7 @@ t_stat sim_instr (void)
                             break;
                         }
                         /* if TAG == 0, fall through and treat like normal shift SLT */
+                        FALLTHROUGH;
 
                     case 0x0080:                    /* SLT  */
                         while (CCC > 0) {
@@ -907,7 +912,7 @@ t_stat sim_instr (void)
 
             case 0x08:                      /* --- BSI - Branch and store IAR --- */
                 if (F) {
-                    if (bsctest(IR, F))             /* do standard BSC long format testing */
+                    if (bsctest(IR))                /* do standard BSC long format testing */
                         break;                      /* if any condition is true, do nothing */
                 }
                 WriteW(eaddr, IAR);                 /* do subroutine call */
@@ -917,14 +922,14 @@ t_stat sim_instr (void)
 
             case 0x09:                      /* --- BSC - Branch and skip on Condition --- */
                 if (F) {
-                    if (bsctest(IR, F))             /* long format; any indicator cancels branch */
+                    if (bsctest(IR))                /* long format; any indicator cancels branch */
                         break;
 
                     archive_backtrace((DSPLC & 0x40) ? "BOSC" : "BSC"); /* save info in back-trace buffer */
                     IAR = eaddr;                    /* no indicator means branch taken */
                 }
                 else {                              /* short format: skip if any indicator hits */
-                    if (bsctest(IR, F)) {
+                    if (bsctest(IR)) {
                         archive_backtrace((DSPLC & 0x40) ? "BOSC" : "BSC");     /* save info in back-trace buffer */
                         INCREMENT_IAR;
                     }
@@ -935,7 +940,9 @@ t_stat sim_instr (void)
 
                 if (DSPLC & 0x40) {     /* BOSC = exit from interrupt handler */
                     exit_irq();
+#ifdef GUI_SUPPORT
                     cwincount = 0;
+#endif
                 }
                 break;
 
@@ -1152,6 +1159,7 @@ t_stat sim_instr (void)
                 }
 #endif
                 /* 1130: these are not legal instructions, fall through */
+                FALLTHROUGH;
 
             default:
 /* all invalid instructions act like waits */
@@ -1223,18 +1231,16 @@ static int simh_status_to_stopcode (int status)
 /* ------------------------------------------------------------------------
  * bsctest - perform standard set of condition tests. We return TRUE if any
  * of the condition bits specified in DSPLC test positive, FALSE if none are true.
- * If reset_V is TRUE, we reset the oVerflow flag after testing it.
- * 24-Mar-11: no, we reset the oVerflow flag no matter what reset_V is
+ * Testing overflow resets the flag in both long and short forms.
  * ------------------------------------------------------------------------ */
 
-static t_bool bsctest (int32 DSPLC, t_bool reset_V)
+static t_bool bsctest (int32 DSPLC)
 {
     if (DSPLC & 0x01) {                     /* Overflow off (note inverted sense) */
         if (! V)
             return TRUE;
-// 24-Mar-11 - V is always reset when tested, in both the long and short forms of the instructions
-//      else if (reset_V)                   /* reset after testing */
-            V = 0;
+        /* IBM diagnostics showed both long and short forms reset overflow. */
+        V = 0;
     }
 
     if (DSPLC & 0x02) {                     /* Carry off (note inverted sense) */
@@ -1312,6 +1318,10 @@ void break_simulation (t_stat stopreason)
 
 t_stat cpu_reset (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     sim_init();
     wait_state = 0;                     /* cancel wait */
     wait_lamp  = TRUE;                  /* but keep the wait lamp lit on the GUI */
@@ -1355,6 +1365,11 @@ t_stat cpu_reset (DEVICE *dptr)
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     if (vptr == NULL) return SCPE_ARG;
 
     /* check this out -- save command hits it in weird way */
@@ -1372,6 +1387,11 @@ t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     if (addr < MEMSIZE) {
         M[addr] = (uint16) (val & 0xFFFF);
         return SCPE_OK;
@@ -1385,6 +1405,10 @@ t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 
 t_stat cpu_svc (UNIT *uptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     if ((ibkpt_addr & ~ILL_ADR_FLAG) == save_ibkpt)
         ibkpt_addr = save_ibkpt;
 
@@ -1400,6 +1424,12 @@ t_stat cpu_set_size (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
     t_bool used;
     int32 i;
+
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
 
     if ((value <= 0) || (value > MAXMEMSIZE) || ((value & 0xFFF) != 0))
         return SCPE_ARG;
@@ -1429,6 +1459,12 @@ t_stat cpu_set_type (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
     REG *r;
 
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
+
     is_1800 = (value & UNIT_1800) != 0;                 /* set is_1800 mode flag */
 
     for (r = cpu_reg; r->name != NULL; r++) {           /* unhide or hide 1800-specific registers & state */
@@ -1450,6 +1486,10 @@ t_stat cpu_set_type (UNIT *uptr, int32 value, const char *cptr, void *desc)
 void xio_1131_switches (int32 addr, int32 func, int32 modify)
 {
     char msg[80];
+
+    /* Device dispatch signature.
+       This implementation does not use every parameter. */
+    (void) modify;
 
     switch (func) {
         case XIO_READ:
@@ -1618,6 +1658,10 @@ static void show_backtrace (int nshow)
 static t_stat backtrace_cmd (int32 flag, const char *cptr)
 {
     int n;
+
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) flag;
 
     if ((n = atoi(cptr)) <= 0)
         n = 6;
@@ -1901,6 +1945,7 @@ void trace_both (const char *fmt, ...)
 void debug_print (const char *fmt, ...)
 {
     va_list args;
+    va_list file_args;
     FILE *fout = stdout;
     t_bool binarymode = FALSE;
 
@@ -1914,9 +1959,13 @@ void debug_print (const char *fmt, ...)
 #endif
 
     va_start(args, fmt);
-    vfprintf(fout, fmt, args);
     if (cpu_unit.flags & UNIT_ATT)
-        vfprintf(cpu_unit.fileref, fmt, args);
+        va_copy(file_args, args);
+    vfprintf(fout, fmt, args);
+    if (cpu_unit.flags & UNIT_ATT) {
+        vfprintf(cpu_unit.fileref, fmt, file_args);
+        va_end(file_args);
+    }
     va_end(args);
 
     if (strchr(fmt, '\n') == NULL) {        /* be sure to emit a newline */
@@ -1938,6 +1987,13 @@ void debug_print (const char *fmt, ...)
 
 static t_stat view_cmd (int32 flag, const char *cptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) flag;
+#ifndef _WIN32
+    (void) cptr;
+#endif
+
 #ifdef _WIN32
     char cmdline[256];
 
@@ -1960,6 +2016,8 @@ static void cgi_start (void)
 
 static void cgi_stop (t_stat reason)
 {
+    (void) reason;
+
     if (cgi_end_hook != NULL)
         (*cgi_end_hook)();
 }

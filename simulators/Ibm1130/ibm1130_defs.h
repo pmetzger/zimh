@@ -18,6 +18,12 @@
 #include <setjmp.h>
 #include <stdlib.h>
 
+#if defined(__GNUC__) || defined(__clang__)
+#define IBM1130_PRINTF_FORMAT __attribute__((format(printf, 1, 2)))
+#else
+#define IBM1130_PRINTF_FORMAT
+#endif
+
 #ifndef _WIN32
    int strnicmp (const char *a, const char *b, size_t n);
    int strcmpi  (const char *a, const char *b);
@@ -97,7 +103,11 @@ extern t_stat reason;                       /* CPU execution loop control */
 #  endif
 #endif
 
-void debug_print(const char *fmt, ...);
+void debug_print(const char *fmt, ...) IBM1130_PRINTF_FORMAT;
+void void_backtrace (int afrom, int ato);
+const char *saywhere (int addr);
+t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw);
+t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw);
 
 /* ------------------------------------------------------------------------ */
 /* memory IO routines */
@@ -265,8 +275,8 @@ t_stat cr_boot (int32 unitno, DEVICE *dptr);
 t_stat cr_rewind (void);
 t_stat cr_detach (UNIT *uptr);
 void   calc_ints (void);                            /* recalculate interrupt bitmask */
-void   trace_io (const char *fmt, ...);             /* debugging printout */
-void   trace_both (const char *fmt, ...);           /* debugging printout */
+void   trace_io (const char *fmt, ...) IBM1130_PRINTF_FORMAT;           /* debugging printout */
+void   trace_both (const char *fmt, ...) IBM1130_PRINTF_FORMAT;         /* debugging printout */
 void   scp_panic (const char *msg);                 /* bail out of simulator */
 char  *upcase(char *str);
 void   break_simulation (t_stat reason);            /* let a device halt the simulation */

@@ -109,10 +109,15 @@ const char *sim_stop_messages[SCPE_BASE] = {
  * but the asm1130 cross assembler may put them there.
  */
 
-t_stat my_load (FILE *fileref, const char *cptr, const char *fnam)
+static t_stat my_load (FILE *fileref, const char *cptr, const char *fnam)
 {
     char line[150], *c;
     int iaddr = -1, runaddr = -1, val, nwords;
+
+    /* Shared helper signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) fnam;
 
     while (fgets(line, sizeof(line), fileref) != NULL) {
         for (c = line; *c && *c <= ' '; c++)            /* find first nonblank */
@@ -167,9 +172,14 @@ t_stat my_load (FILE *fileref, const char *cptr, const char *fnam)
     return SCPE_OK;
 }
 
-t_stat my_save (FILE *fileref, const char *cptr, const char *fnam)
+static t_stat my_save (FILE *fileref, const char *cptr, const char *fnam)
 {
     int iaddr, nzeroes = 0, nwords = (int) (MEMSIZE/2), val;
+
+    /* Shared helper signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) fnam;
 
     fprintf(fileref, "=%04x\r\n", IAR);
     fprintf(fileref, "@0000\r\n");
@@ -295,6 +305,10 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
     const char *mnem;
     char tst[12];
 
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
 /*  if (sw & SWMASK ('A')) {                    // ASCII? not useful
         fprintf (of, (c1 < 040)? "<%03o>": "%c", c1);
         return SCPE_OK;
@@ -396,52 +410,6 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
     return F ? -1 : SCPE_OK;            /* inform how many words we read */
 }
 
-int32 get_reg (char *cptr, const char *strings[], char mchar)
-{
-return -1;
-}
-
-/* Number or memory address
-
-   Inputs:
-    *cptr   =   pointer to input string
-    *dptr   =   pointer to output displacement
-    *pflag  =   pointer to accumulating flags
-   Outputs:
-    cptr    =   pointer to next character in input string
-            NULL if parsing error
-
-   Flags: 0 (no result), A_NUM (number), A_REL (relative)
-*/
-
-char *get_addr (char *cptr, int32 *dptr, int32 *pflag)
-{
-    return 0;
-}
-
-/* Specifier decode
-
-   Inputs:
-    *cptr   =   pointer to input string
-    addr    =   current PC
-    n1  =   0 if no extra word used
-            -1 if extra word used in prior decode
-    *sptr   =   pointer to output specifier
-    *dptr   =   pointer to output displacement
-    cflag   =   true if parsing for the CPU
-    iflag   =   true if integer specifier
-   Outputs:
-    status  =   = -1 extra word decoded
-            =  0 ok
-            = +1 error
-*/
-
-t_stat get_spec (char *cptr, t_addr addr, int32 n1, int32 *sptr, t_value *dptr,
-    int32 cflag, int32 iflag)
-{
-    return -1;
-}
-
 /* Symbolic input
 
    Inputs:
@@ -457,6 +425,14 @@ t_stat get_spec (char *cptr, t_addr addr, int32 n1, int32 *sptr, t_value *dptr,
 
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) addr;
+    (void) uptr;
+    (void) val;
+    (void) sw;
+
     return SCPE_ARG;
 }
 

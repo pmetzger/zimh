@@ -104,11 +104,21 @@ DEVICE gdu_dev = {
 
 static t_stat gdu_reset (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return SCPE_OK;
 }
 
 void xio_2250_display (int32 addr, int32 func, int32 modify)
 {
+    /* Device dispatch signature.
+       This implementation does not use every parameter. */
+    (void) addr;
+    (void) func;
+    (void) modify;
+
     /* ignore commands if device is nonexistent */
 }
 

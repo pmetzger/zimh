@@ -144,6 +144,8 @@ static t_stat sca_svc           (UNIT *uptr);               /* prototypes */
 static t_stat sca_reset         (DEVICE *dptr);
 static t_stat sca_attach        (UNIT *uptr, const char *cptr);
 static t_stat sca_detach        (UNIT *uptr);
+static t_stat sca_set_baud      (UNIT *uptr, int32 value, const char *cptr, void *desc);
+static void sca_start_transmit  (int32 iocc_addr, int32 modify);
 static void sca_start_timer     (int n, int msec_now);
 static void sca_halt_timer      (int n);
 static void sca_toggle_timer    (int n, int msec_now);
@@ -202,8 +204,6 @@ static int    sca_rcvptr = 0;                               /* index of next byt
 #define UNIT_AUTOANSWER   (1u << UNIT_V_AUTOANSWER)
 #define UNIT_LISTEN       (1u << UNIT_V_LISTEN)
 
-t_stat sca_set_baud (UNIT *uptr, int32 value, const char *cptr, void *desc);
-
 UNIT sca_unit = {                                                       /* default settings */
     UDATA (sca_svc, UNIT_ATTABLE|UNIT_BISYNC|UNIT_BAUD4800|UNIT_FULLDUPLEX, 0),
 };
@@ -243,9 +243,15 @@ DEVICE sca_dev = {
  * sca_set_baud - set baud rate handler (SET SCA.BAUD nnn)
  *********************************************************************************************/
 
-t_stat sca_set_baud (UNIT *uptr, int32 value, const char *cptr, void *desc)
+static t_stat sca_set_baud (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
     uint32 newbits;
+
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
 
     switch (value) {
         case 600:       newbits = UNIT_BAUD600;     break;
@@ -275,7 +281,7 @@ t_stat sca_set_baud (UNIT *uptr, int32 value, const char *cptr, void *desc)
  * mstring - allocate a copy of a string
  *********************************************************************************************/
 
-char *mstring (const char *str)
+static char *mstring (const char *str)
 {
     int len;
     char *m;
@@ -427,6 +433,10 @@ static void sca_interrupt (int bit)
 
 static t_stat sca_reset (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     /* flush any pending data */
     sca_flush();
     sca_nrcvd = sca_rcvptr = sca_n2send = sca_nsyns = 0;
@@ -454,6 +464,10 @@ static t_stat sca_attach (UNIT *uptr, const char *cptr)
     t_bool do_listen;
     char name[4*CBUFSIZE];
     t_stat r;
+
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
 
     do_listen = sim_switches & SWMASK('L');     /* -l means listen mode */
 
@@ -549,6 +563,10 @@ static t_stat sca_attach (UNIT *uptr, const char *cptr)
 
 static t_stat sca_detach (UNIT *uptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     if ((sca_unit.flags & UNIT_ATT) == 0)
         return SCPE_OK;
 
@@ -647,6 +665,10 @@ static t_stat sca_svc (UNIT *uptr)
     t_bool timeout;
     int msec_now;
     int i;
+
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
 
     /* if not connected, and if in wait-for-connection mode, check for connection attempt */
     if ((sca_unit.flags & UNIT_LISTEN) && ! (sca_dsw & SCA_DSW_READY))
@@ -836,7 +858,7 @@ static void sca_halt_timer (int n)
  * sca_start_transmit - initiate transmit mode, from XIO_INITR or XIO_CONTROL (sync mode)
  *********************************************************************************************/
 
-void sca_start_transmit (int32 iocc_addr, int32 modify)
+static void sca_start_transmit (int32 iocc_addr, int32 modify)
 {
     sca_flush();
     sca_nsyns = 0;                          /* reset SYN suppression */
