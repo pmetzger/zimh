@@ -141,11 +141,9 @@ int32 con_halt (int32 code, int32 cc);
 extern int32 iccs_rd (void);
 extern int32 rom_rd (int32 pa);
 extern int32 nvr_rd (int32 pa);
-extern int32 rz_rd (int32 pa);
 extern int32 xs_rd (int32 pa);
 extern void iccs_wr (int32 dat);
 extern void nvr_wr (int32 pa, int32 val, int32 lnt);
-extern void rz_wr (int32 pa, int32 val, int32 lnt);
 extern void xs_wr (int32 pa, int32 val, int32 lnt);
 
 /* TTI data structures

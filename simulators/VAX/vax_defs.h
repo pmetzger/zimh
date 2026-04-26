@@ -1088,6 +1088,8 @@ extern int32 con_halt (int32 code, int32 cc);
 extern t_stat cpu_boot (int32 unitno, DEVICE *dptr);
 extern t_stat build_dib_tab (void);
 extern void rom_wr_B (int32 pa, int32 val);
+extern int32 rz_rd (int32 pa);
+extern void rz_wr (int32 pa, int32 val, int32 lnt);
 extern int32 cpu_instruction_set;
 
 #if defined (VAX_780)

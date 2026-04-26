@@ -162,12 +162,10 @@ extern int32 nvr_rd (int32 pa);
 extern int32 nar_rd (int32 pa);
 extern int32 dz_rd (int32 pa);
 extern int32 or_rd (int32 pa);
-extern int32 rz_rd (int32 pa);
 extern int32 xs_rd (int32 pa);
 extern void iccs_wr (int32 dat);
 extern void nvr_wr (int32 pa, int32 val, int32 lnt);
 extern void dz_wr (int32 pa, int32 val, int32 lnt);
-extern void rz_wr (int32 pa, int32 val, int32 lnt);
 extern void xs_wr (int32 pa, int32 val, int32 lnt);
 
 UNIT sysd_unit = { UDATA (NULL, 0, 0) };
