@@ -70,24 +70,58 @@
                           b[x+3])
 #define GETW(b,x)       ((b[x] << 8)|b[x+1])
 
-static void _scsi_vdebug (uint32 dbits, SCSI_BUS *bus, const char* fmt, va_list arglist)
+static void PRINTF_FMT(4, 5)
+_scsi_debug_formatted (uint32 dbits, SCSI_BUS *bus, UNIT *uptr,
+                       const char *fmt, ...)
 {
-UNIT *uptr = bus->dev[bus->target];
-size_t tfmt_size = strlen (fmt) + strlen (sim_uname (uptr)) + 3;
-char *tfmt = (char *)malloc (tfmt_size);
+    va_list arglist;
 
-snprintf (tfmt, tfmt_size, "%s: %s", sim_uname (uptr), fmt);
-_sim_vdebug (dbits, bus->dptr, uptr, tfmt, arglist);
-free (tfmt);
+    va_start (arglist, fmt);
+    _sim_vdebug (dbits, bus->dptr, uptr, fmt, arglist);
+    va_end (arglist);
 }
 
-static void scsi_debug_cmd (SCSI_BUS *bus, const char* fmt, ...)
+static void PRINTF_FMT(3, 0)
+_scsi_vdebug (uint32 dbits, SCSI_BUS *bus, const char *fmt, va_list arglist)
 {
-va_list arglist;
+    UNIT *uptr = bus->dev[bus->target];
+    char stackbuf[STACKBUFSIZE];
+    int32 bufsize = sizeof (stackbuf);
+    char *buf = stackbuf;
+    int32 len;
+    va_list args;
 
-va_start (arglist, fmt);
-_scsi_vdebug (SCSI_DBG_CMD, bus, fmt, arglist);
-va_end (arglist);
+    while (1) {
+        va_copy (args, arglist);
+        len = vsnprintf (buf, bufsize, fmt, args);
+        va_end (args);
+
+        if ((len < 0) || (len >= bufsize)) {
+            if (buf != stackbuf)
+                free (buf);
+            bufsize = (len < 0) ? bufsize * 2 : len + 1;
+            buf = (char *) malloc (bufsize);
+            if (buf == NULL)
+                return;
+            }
+        else {
+            break;
+            }
+        }
+
+    _scsi_debug_formatted (dbits, bus, uptr, "%s: %s", sim_uname (uptr), buf);
+    if (buf != stackbuf)
+        free (buf);
+}
+
+static void PRINTF_FMT(2, 3)
+scsi_debug_cmd (SCSI_BUS *bus, const char *fmt, ...)
+{
+    va_list arglist;
+
+    va_start (arglist, fmt);
+    _scsi_vdebug (SCSI_DBG_CMD, bus, fmt, arglist);
+    va_end (arglist);
 }
 
 static const char *scsi_phases[] = {
