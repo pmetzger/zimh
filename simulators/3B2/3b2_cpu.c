@@ -2569,53 +2569,53 @@ t_stat sim_instr(void)
             break;
         case BEH:
         case BEH_D:
-            if (cpu_z_flag() == 1) {
+            if (cpu_z_flag()) {
                 pc_incr = sign_extend_h(dst->embedded.h);
             }
             break;
         case BEB:
         case BEB_D:
-            if (cpu_z_flag() == 1) {
+            if (cpu_z_flag()) {
                 pc_incr = sign_extend_b(dst->embedded.b);
             }
             break;
         case BGH:
-            if ((cpu_n_flag() | cpu_z_flag()) == 0) {
+            if (!cpu_n_flag() && !cpu_z_flag()) {
                 pc_incr = sign_extend_h(dst->embedded.h);
             }
             break;
         case BGB:
-            if ((cpu_n_flag() | cpu_z_flag()) == 0) {
+            if (!cpu_n_flag() && !cpu_z_flag()) {
                 pc_incr = sign_extend_b(dst->embedded.b);
             }
             break;
         case BGEH:
-            if ((cpu_n_flag() == 0) | (cpu_z_flag() == 1)) {
+            if (!cpu_n_flag() || cpu_z_flag()) {
                 pc_incr = sign_extend_h(dst->embedded.h);
             }
             break;
         case BGEB:
-            if ((cpu_n_flag() == 0) | (cpu_z_flag() == 1)) {
+            if (!cpu_n_flag() || cpu_z_flag()) {
                 pc_incr = sign_extend_b(dst->embedded.b);
             }
             break;
         case BGEUH:
-            if (cpu_c_flag() == 0) {
+            if (!cpu_c_flag()) {
                 pc_incr = sign_extend_h(dst->embedded.h);
             }
             break;
         case BGEUB:
-            if (cpu_c_flag() == 0) {
+            if (!cpu_c_flag()) {
                 pc_incr = sign_extend_b(dst->embedded.b);
             }
             break;
         case BGUH:
-            if ((cpu_c_flag() | cpu_z_flag()) == 0) {
+            if (!cpu_c_flag() && !cpu_z_flag()) {
                 pc_incr = sign_extend_h(dst->embedded.h);
             }
             break;
         case BGUB:
-            if ((cpu_c_flag() | cpu_z_flag()) == 0) {
+            if (!cpu_c_flag() && !cpu_z_flag()) {
                 pc_incr = sign_extend_b(dst->embedded.b);
             }
             break;
@@ -2630,54 +2630,54 @@ t_stat sim_instr(void)
             cpu_set_v_flag(0);
             break;
         case BLH:
-            if ((cpu_n_flag() == 1) && (cpu_z_flag() == 0)) {
+            if (cpu_n_flag() && !cpu_z_flag()) {
                 pc_incr = sign_extend_h(dst->embedded.h);
             }
             break;
         case BLB:
-            if ((cpu_n_flag() == 1) && (cpu_z_flag() == 0)) {
+            if (cpu_n_flag() && !cpu_z_flag()) {
                 pc_incr = sign_extend_b(dst->embedded.b);
             }
             break;
         case BLEH:
-            if ((cpu_n_flag() | cpu_z_flag()) == 1) {
+            if (cpu_n_flag() || cpu_z_flag()) {
                 pc_incr = sign_extend_h(dst->embedded.h);
             }
             break;
         case BLEB:
-            if ((cpu_n_flag() | cpu_z_flag()) == 1) {
+            if (cpu_n_flag() || cpu_z_flag()) {
                 pc_incr = sign_extend_b(dst->embedded.b);
             }
             break;
         case BLEUH:
-            if ((cpu_c_flag() | cpu_z_flag()) == 1) {
+            if (cpu_c_flag() || cpu_z_flag()) {
                 pc_incr = sign_extend_h(dst->embedded.h);
             }
             break;
         case BLEUB:
-            if ((cpu_c_flag() | cpu_z_flag()) == 1) {
+            if (cpu_c_flag() || cpu_z_flag()) {
                 pc_incr = sign_extend_b(dst->embedded.b);
             }
             break;
         case BLUH:
-            if (cpu_c_flag() == 1) {
+            if (cpu_c_flag()) {
                 pc_incr = sign_extend_h(dst->embedded.h);
             }
             break;
         case BLUB:
-            if (cpu_c_flag() == 1) {
+            if (cpu_c_flag()) {
                 pc_incr = sign_extend_b(dst->embedded.b);
             }
             break;
         case BNEH:
         case BNEH_D:
-            if (cpu_z_flag() == 0) {
+            if (!cpu_z_flag()) {
                 pc_incr = sign_extend_h(dst->embedded.h);
             }
             break;
         case BNEB:
         case BNEB_D:
-            if (cpu_z_flag() == 0) {
+            if (!cpu_z_flag()) {
                 pc_incr = sign_extend_b(dst->embedded.b);
             }
             break;
@@ -2704,22 +2704,22 @@ t_stat sim_instr(void)
             pc_incr = sign_extend_b(dst->embedded.b);
             break;
         case BVCH:
-            if (cpu_v_flag() == 0) {
+            if (!cpu_v_flag()) {
                 pc_incr = sign_extend_h(dst->embedded.h);
             }
             break;
         case BVCB:
-            if (cpu_v_flag() == 0) {
+            if (!cpu_v_flag()) {
                 pc_incr = sign_extend_b(dst->embedded.b);
             }
             break;
         case BVSH:
-            if (cpu_v_flag() == 1) {
+            if (cpu_v_flag()) {
                 pc_incr = sign_extend_h(dst->embedded.h);
             }
             break;
         case BVSB:
-            if (cpu_v_flag() == 1) {
+            if (cpu_v_flag()) {
                 pc_incr = sign_extend_b(dst->embedded.b);
             }
             break;
@@ -3371,26 +3371,26 @@ t_stat sim_instr(void)
             cpu_set_v_flag(0);
             break;
         case RGEQ:
-            if (cpu_n_flag() == 0 || cpu_z_flag() == 1) {
+            if (!cpu_n_flag() || cpu_z_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
             break;
         case RGEQU:
-            if (cpu_c_flag() == 0) {
+            if (!cpu_c_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
             break;
         case RGTR:
-            if ((cpu_n_flag() | cpu_z_flag()) == 0) {
+            if (!cpu_n_flag() && !cpu_z_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
             break;
         case RNEQ:
         case RNEQU:
-            if (cpu_z_flag() == 0) {
+            if (!cpu_z_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
@@ -3559,43 +3559,43 @@ t_stat sim_instr(void)
             R[NUM_SP] = a;       /* Restore SP */
             break;
         case RGTRU:
-            if ((cpu_c_flag() & cpu_z_flag()) == 0) {
+            if (!cpu_c_flag() || !cpu_z_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
             break;
         case RLEQ:
-            if ((cpu_n_flag() | cpu_z_flag()) == 1) {
+            if (cpu_n_flag() || cpu_z_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
             break;
         case RLEQU:
-            if ((cpu_c_flag() | cpu_z_flag()) == 1) {
+            if (cpu_c_flag() || cpu_z_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
             break;
         case RLSS:
-            if ((cpu_n_flag() == 1) & (cpu_z_flag() == 0)) {
+            if (cpu_n_flag() && !cpu_z_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
             break;
         case RLSSU:
-            if (cpu_c_flag() == 1) {
+            if (cpu_c_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
             break;
         case REQL:
-            if (cpu_z_flag() == 1) {
+            if (cpu_z_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
             break;
         case REQLU:
-            if (cpu_z_flag() == 1) {
+            if (cpu_z_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
@@ -3605,13 +3605,13 @@ t_stat sim_instr(void)
             pc_incr = 0;
             break;
         case RVC:
-            if (cpu_v_flag() == 0) {
+            if (!cpu_v_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
             break;
         case RVS:
-            if (cpu_v_flag() == 1) {
+            if (cpu_v_flag()) {
                 R[NUM_PC] = cpu_pop_word();
                 pc_incr = 0;
             }
@@ -3726,7 +3726,7 @@ t_stat sim_instr(void)
                       R[NUM_PC], a, (uint32)(result & WORD_MASK), src1->embedded.h);
             break;
         case TEDTB:
-            if (cpu_z_flag() == 0) {
+            if (!cpu_z_flag()) {
                 a = cpu_read_op(dst);
                 result = a - 1;
                 cpu_write_op(dst, (uint32)(result & WORD_MASK));
@@ -3736,7 +3736,7 @@ t_stat sim_instr(void)
             }
             break;
         case TEDTH:
-            if (cpu_z_flag() == 0) {
+            if (!cpu_z_flag()) {
                 a = cpu_read_op(dst);
                 result = a - 1;
                 cpu_write_op(dst, (uint32)(result & WORD_MASK));
@@ -3746,7 +3746,7 @@ t_stat sim_instr(void)
             }
             break;
         case TGDTB:
-            if ((cpu_n_flag() | cpu_z_flag()) == 1) {
+            if (cpu_n_flag() || cpu_z_flag()) {
                 a = cpu_read_op(dst);
                 result = a - 1;
                 cpu_write_op(dst, (uint32)(result & WORD_MASK));
@@ -3756,7 +3756,7 @@ t_stat sim_instr(void)
             }
             break;
         case TGDTH:
-            if ((cpu_n_flag() | cpu_z_flag()) == 1) {
+            if (cpu_n_flag() || cpu_z_flag()) {
                 a = cpu_read_op(dst);
                 result = a - 1;
                 cpu_write_op(dst, (uint32)(result & WORD_MASK));
@@ -3766,7 +3766,7 @@ t_stat sim_instr(void)
             }
             break;
         case TGEDTB:
-            if ((cpu_n_flag() == 1) & (cpu_z_flag() == 0)) {
+            if (cpu_n_flag() && !cpu_z_flag()) {
                 a = cpu_read_op(dst);
                 result = a - 1;
                 cpu_write_op(dst, (uint32)(result & WORD_MASK));
@@ -3776,7 +3776,7 @@ t_stat sim_instr(void)
             }
             break;
         case TGEDTH:
-            if ((cpu_n_flag() == 1) & (cpu_z_flag() == 0)) {
+            if (cpu_n_flag() && !cpu_z_flag()) {
                 a = cpu_read_op(dst);
                 result = a - 1;
                 cpu_write_op(dst, (uint32)(result & WORD_MASK));
@@ -3786,7 +3786,7 @@ t_stat sim_instr(void)
             }
             break;
         case TNEDTB:
-            if (cpu_z_flag() == 1) {
+            if (cpu_z_flag()) {
                 a = cpu_read_op(dst);
                 result = a - 1;
                 cpu_write_op(dst, (uint32)(result & WORD_MASK));
@@ -3796,7 +3796,7 @@ t_stat sim_instr(void)
             }
             break;
         case TNEDTH:
-            if (cpu_z_flag() == 1) {
+            if (cpu_z_flag()) {
                 a = cpu_read_op(dst);
                 result = a - 1;
                 cpu_write_op(dst, (uint32)(result & WORD_MASK));
