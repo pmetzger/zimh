@@ -34,6 +34,12 @@ When creating a new source file, run `clang-format` on that new file
 before finishing the change. Do not run `clang-format` across existing
 legacy files just to normalize formatting.
 
+When modifying old source files, try not to mess up the location
+column of trailing comments on the same line when there is a series of
+lined up comments. When adding brand new functions to old source
+files, it is preferred to use sane code formatting and indentation
+even if the old file has weird formatting.
+
 When adding new functions or other new code to an existing file, write
 the new code so that it roughly follows the style in `.clang-format`
 without reformatting unrelated older code around it. The goal is for new
