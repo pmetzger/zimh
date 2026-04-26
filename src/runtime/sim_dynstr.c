@@ -24,7 +24,7 @@ static sim_dynstr_realloc_fn sim_dynstr_realloc_impl(void)
 }
 
 /* Use the host formatter for normal dynamic-string formatted append. */
-static int sim_dynstr_default_vsnprintf(
+static int PRINTF_FMT(3, 0) sim_dynstr_default_vsnprintf(
     char *buf, size_t size, const char *fmt, va_list args)
 {
     return vsnprintf(buf, size, fmt, args);

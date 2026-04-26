@@ -5,6 +5,7 @@
 #if defined(_WIN32)
 #include <winsock2.h>
 #endif
+#include "qemu/compiler.h"
 
 typedef char gchar;
 typedef unsigned int guint;
@@ -64,7 +65,8 @@ typedef enum {
     G_IO_HUP    GLIB_SYSDEF_POLLHUP,   /* Hung up (the connection has been broken, usually for pipes and sockets). */
     G_IO_NVAL   GLIB_SYSDEF_POLLNVAL   /* Invalid request. The file descriptor is not open. */
     } GIOCondition;
-void g_log (const gchar *log_domain, GLogLevelFlags log_level, const gchar *format, ...);
+void g_log (const gchar *log_domain, GLogLevelFlags log_level,
+            const gchar *format, ...) GCC_FMT_ATTR(3, 4);
 #if !defined(G_LOG_DOMAIN)
 #define G_LOG_DOMAIN ((gchar *)NULL)
 #endif

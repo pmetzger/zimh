@@ -23,7 +23,7 @@ static void *simh_test_dynstr_realloc_fail(void *ptr, size_t size)
 }
 
 /* Force formatted append down the negative-return path when requested. */
-static int simh_test_dynstr_vsnprintf_fail_hook(
+static int PRINTF_FMT(3, 0) simh_test_dynstr_vsnprintf_fail_hook(
     char *buf, size_t size, const char *fmt, va_list args)
 {
     if (simh_test_dynstr_vsnprintf_fail)

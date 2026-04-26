@@ -19,8 +19,8 @@ typedef struct sim_dynstr {
 typedef void *(*sim_dynstr_realloc_fn)(void *ptr, size_t size);
 
 /* Test hook for formatted output sizing and rendering. */
-typedef int (*sim_dynstr_vsnprintf_fn)(
-    char *buf, size_t size, const char *fmt, va_list args);
+typedef int (*sim_dynstr_vsnprintf_fn)(char *buf, size_t size, const char *fmt,
+                                       va_list args) PRINTF_FMT(3, 0);
 
 /* Initialize one empty dynamic string. */
 void sim_dynstr_init(sim_dynstr_t *ds);
@@ -32,7 +32,8 @@ void sim_dynstr_free(sim_dynstr_t *ds);
 t_bool sim_dynstr_append(sim_dynstr_t *ds, const char *text);
 
 /* Append one formatted string fragment. */
-t_bool sim_dynstr_appendf(sim_dynstr_t *ds, const char *fmt, ...);
+t_bool sim_dynstr_appendf(sim_dynstr_t *ds, const char *fmt,
+                          ...) PRINTF_FMT(2, 3);
 
 /* Append one single character. */
 t_bool sim_dynstr_append_ch(sim_dynstr_t *ds, char ch);

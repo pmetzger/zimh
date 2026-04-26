@@ -41,6 +41,7 @@
 #endif
 #include "qemu/compiler.h"
 #include "qemu/typedefs.h"
+#include "qemu/monitor/monitor.h"
 #include <sockets.h>
 #include <stdarg.h>
 #include "glib.h"

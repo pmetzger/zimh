@@ -3,7 +3,15 @@
 #include <stdarg.h>
 #include <stdlib.h>
 
-static void fatalerror(const char *format, ...) {
+#ifndef PRINTF_FMT
+#if defined(__GNUC__) || defined(__clang__)
+#define PRINTF_FMT(n, m) __attribute__ ((format (__printf__, n, m)))
+#else
+#define PRINTF_FMT(n, m)
+#endif
+#endif
+
+static void PRINTF_FMT(1, 2) fatalerror(const char *format, ...) {
       va_list ap;
       va_start(ap,format);
       vfprintf(stderr,format,ap);  // JFF: fixed. Was using fprintf and arguments were wrong
@@ -1765,6 +1773,3 @@ void m68040_fpu_op1(void)
         default:    fatalerror("m68040_fpu_op1: unimplemented op %d at %08X\n", (REG_IR >> 6) & 0x3, REG_PC-2);
     }
 }
-
-
-

@@ -108,6 +108,14 @@
 #include <errno.h>
 #include <limits.h>
 #include <ctype.h>
+
+/* Allow the compiler to validate printf-style format arguments. */
+#if defined(__GNUC__) || defined(__clang__)
+#define PRINTF_FMT(n, m) __attribute__ ((format (__printf__, n, m)))
+#else
+#define PRINTF_FMT(n, m)
+#endif
+
 #include <math.h>
 #include <setjmp.h>
 #include <stdint.h>

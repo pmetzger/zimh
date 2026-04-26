@@ -390,9 +390,9 @@ int pi_read (int num);
  * Отладочная выдача.
  */
 void besm6_fprint_cmd (FILE *of, uint32 cmd);
-void besm6_log (const char *fmt, ...);
-void besm6_log_cont (const char *fmt, ...);
-void besm6_debug (const char *fmt, ...);
+void besm6_log (const char *fmt, ...) PRINTF_FMT(1, 2);
+void besm6_log_cont (const char *fmt, ...) PRINTF_FMT(1, 2);
+void besm6_debug (const char *fmt, ...) PRINTF_FMT(1, 2);
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
                    UNIT *uptr, int32 sw);
 void besm6_draw_panel (int force);

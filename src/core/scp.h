@@ -125,14 +125,6 @@ t_stat tar_cmd (int32 flag, const char *ptr);
 t_stat curl_cmd (int32 flag, const char *ptr);
 t_stat test_lib_cmd (int32 flag, const char *ptr);
 
-/* Allow compiler to help validate printf style format arguments */
-#if !defined __GNUC__
-#define GCC_FMT_ATTR(n, m)
-#endif
-#if !defined(GCC_FMT_ATTR)
-#define GCC_FMT_ATTR(n, m) __attribute__ ((format (__printf__, n, m)))
-#endif
-
 /* Utility routines */
 
 t_stat sim_process_event (void);
@@ -181,7 +173,7 @@ char *sim_encode_quoted_string (const uint8 *iptr, size_t size);
 void fprint_buffer_string (FILE *st, const uint8 *buf, size_t size);
 t_value strtotv (const char *cptr, const char **endptr, uint32 radix);
 t_svalue strtotsv (const char *inptr, const char **endptr, uint32 radix);
-int Fprintf (FILE *f, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+int Fprintf (FILE *f, const char *fmt, ...) PRINTF_FMT(2, 3);
 /* Use scp.c provided fprintf function */
 #define fprintf Fprintf
 #define fputs(_s,_f) Fprintf(_f,"%s",_s)
@@ -225,18 +217,21 @@ t_stat sim_sched_step (void);
 t_stat sim_cancel_step (void);
 int scp_main (int argc, char *argv[]);
 const char *sim_get_tool_path (const char *tool);
-void sim_printf (const char *fmt, ...) GCC_FMT_ATTR(1, 2);
+void sim_printf (const char *fmt, ...) PRINTF_FMT(1, 2);
 void sim_perror (const char *msg);
 t_stat sim_call_argv (int (*main_like)(int argc, char *argv[]), const char *cptr);
-t_stat sim_messagef (t_stat stat, const char *fmt, ...) GCC_FMT_ATTR(2, 3);
+t_stat sim_messagef (t_stat stat, const char *fmt, ...) PRINTF_FMT(2, 3);
 void sim_data_trace(DEVICE *dptr, UNIT *uptr, const uint8 *data, const char *position, size_t len, const char *txt, uint32 reason);
 void sim_debug_bits_hdr (uint32 dbits, DEVICE* dptr, const char *header,
     BITFIELD* bitdefs, uint32 before, uint32 after, int terminate);
 void sim_debug_bits (uint32 dbits, DEVICE* dptr, BITFIELD* bitdefs,
     uint32 before, uint32 after, int terminate);
-void _sim_vdebug (uint32 dbits, DEVICE* dptr, UNIT *uptr, const char* fmt, va_list arglist);
-void _sim_debug_unit (uint32 dbits, UNIT *uptr, const char* fmt, ...) GCC_FMT_ATTR(3, 4);
-void _sim_debug_device (uint32 dbits, DEVICE* dptr, const char* fmt, ...) GCC_FMT_ATTR(3, 4);
+void _sim_vdebug (uint32 dbits, DEVICE* dptr, UNIT *uptr, const char* fmt,
+    va_list arglist) PRINTF_FMT(4, 0);
+void _sim_debug_unit (uint32 dbits, UNIT *uptr, const char* fmt, ...)
+    PRINTF_FMT(3, 4);
+void _sim_debug_device (uint32 dbits, DEVICE* dptr, const char* fmt, ...)
+    PRINTF_FMT(3, 4);
 #define sim_debug(dbits, dptr, ...) do { if ((sim_deb != NULL) && ((dptr) != NULL) && ((dptr)->dctrl & (dbits))) _sim_debug_device (dbits, dptr, __VA_ARGS__);} while (0)
 #define sim_debug_unit(dbits, uptr, ...) do { if ((sim_deb != NULL) && ((uptr) != NULL) && (uptr->dptr != NULL) && (((uptr)->dctrl | (uptr)->dptr->dctrl) & (dbits))) _sim_debug_unit (dbits, uptr, __VA_ARGS__);} while (0)
 void sim_flush_buffered_files (void);
