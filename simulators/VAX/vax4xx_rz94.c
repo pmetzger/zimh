@@ -246,7 +246,7 @@ static const char *rz_wr_regs[] =
      "CFG1", "CLK ", "TEST", "CFG2",
      "CFG3", "RSVD", "RSVD", "FFOB" };
 
-uint8 rz_fifo_rd (void)
+static uint8 rz_fifo_rd (void)
 {
 if (rz_fifo_c) {
     rz_fifo_t &= 0xF;
@@ -257,7 +257,7 @@ else
     return rz_fifo[rz_fifo_b];
 }
 
-void rz_fifo_wr (uint8 data)
+static void rz_fifo_wr (uint8 data)
 {
 if (rz_fifo_c < 16) {
     rz_fifo[rz_fifo_b++] = data;
@@ -270,7 +270,7 @@ else {
     }
 }
 
-void rz_fifo_reset (void)
+static void rz_fifo_reset (void)
 {
 rz_fifo_c = 0;
 rz_fifo_t = rz_fifo_b = 0;
@@ -427,12 +427,16 @@ SET_IRQL;
 
 t_stat rz_svc (UNIT *uptr)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 rz_stat |= STS_INT;
 SET_INT (SC);
 return SCPE_OK;
 }
 
-void rz_setint (uint32 flag)
+static void rz_setint (uint32 flag)
 {
 rz_int |= flag;
 sim_activate (&rz_unit[8], 50);
@@ -771,8 +775,7 @@ switch (cmd & 0x7f) {
         else {
             if (rz_bus.req)
                 rz_int |= INT_BUSSV;
-            /* if (rz_bus.phase == SCSI_MSGI) */
-                rz_int |= INT_FC;
+            rz_int |= INT_FC;
             }
             sim_activate (&rz_unit[8], 50);
         break;
@@ -840,6 +843,10 @@ uint32 cap;
 uint32 max = sim_toffset_64? RZU_EMAXC: RZU_MAXC;
 t_stat r;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 if ((val < 0) || ((val != RZU_DTYPE) && cptr))
     return SCPE_ARG;
 if (uptr->flags & UNIT_ATT)
@@ -863,6 +870,11 @@ return SCPE_OK;
 
 t_stat rz_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 fprintf (st, "%s", rzdev_tab[GET_DTYPE (uptr->flags)].name);
 return SCPE_OK;
 }
@@ -894,5 +906,9 @@ return scsi_attach_ex (uptr, cptr, drv_types);
 
 const char *rz_description (DEVICE *dptr)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "NCR 53C94 SCSI controller";
 }
