@@ -30,7 +30,7 @@ Configure and build simh simulators on Linux and *nix-like platforms.
 --config (-c)     Specifies the build configuration: 'Release' or 'Debug'
 
 --target          Build a specific simulator or simulators. Separate multiple
-                  targets with a comma, e.g. "--target pdp8,pdp11,vax750,altairz80,3b2"
+                  targets with a comma, e.g. "--target pdp8,pdp11,vax750,altairz80,3b2-400"
 --lto             Enable Link Time Optimization (LTO) in Release builds
 --debugWall       Enable maximal warnings in Debug builds
 --cppcheck        Enable cppcheck static code analysis rules

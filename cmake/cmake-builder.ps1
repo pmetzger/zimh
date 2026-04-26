@@ -95,7 +95,7 @@ param (
     [string] $cpack_suffix = "",
 
     ## (optional) Build a specific simulator or simulators. Separate multiple
-    ## targets with a comma, ## e.g. "--target pdp8,pdp11,vax750,altairz80,3b2"
+    ## targets with a comma, ## e.g. "--target pdp8,pdp11,vax750,altairz80,3b2-400"
     [Parameter(Mandatory=$false)]
     [string[]] $target     = "",
 

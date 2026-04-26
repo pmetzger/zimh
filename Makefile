@@ -54,7 +54,7 @@ microvax3900: $(BUILD_DIR)/CMakeCache.txt
 	$(CMAKE) --build "$(BUILD_DIR)" --target vax $(CMAKE_BUILD_ARGS)
 
 3b2-400: $(BUILD_DIR)/CMakeCache.txt
-	$(CMAKE) --build "$(BUILD_DIR)" --target 3b2 $(CMAKE_BUILD_ARGS)
+	$(CMAKE) --build "$(BUILD_DIR)" --target 3b2-400 $(CMAKE_BUILD_ARGS)
 
 stub: $(BUILD_DIR)/CMakeCache.txt
 	$(CMAKE) --build "$(BUILD_DIR)" --target stub $(CMAKE_BUILD_ARGS)

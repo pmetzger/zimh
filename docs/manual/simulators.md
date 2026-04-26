@@ -112,8 +112,7 @@ cmake --build build/release --target <target>
 
 ## AT&T
 
-- `3b2`: AT&T 3B2/400.
-- `3b2-400`: Alias name for the `3b2` executable.
+- `3b2-400`: AT&T 3B2/400.
 - `3b2-700`: AT&T 3B2/700.
 
 ## Norsk Data

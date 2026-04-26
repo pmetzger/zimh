@@ -19,7 +19,7 @@ cpack_add_component(altairz80_family
 )
 cpack_add_component(att3b2_family
     DISPLAY_NAME "ATT&T 3b2 collection"
-    DESCRIPTION "The AT&T 3b2 simulator family. Simulators: 3b2, 3b2-700"
+    DESCRIPTION "The AT&T 3b2 simulator family. Simulators: 3b2-400, 3b2-700"
 )
 cpack_add_component(b5500_family
     DISPLAY_NAME "Burroughs 5500"

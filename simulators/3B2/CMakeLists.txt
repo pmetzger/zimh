@@ -6,7 +6,7 @@
 ## Not yet: if this directory later gets a local unit-test subtree, declare
 ## it explicitly here with add_subdirectory(unit-tests).
 
-add_simulator(3b2
+add_simulator(3b2-400
     SOURCES
         3b2_cpu.c
         3b2_sys.c
@@ -34,7 +34,7 @@ add_simulator(3b2
     USES_AIO
     LABEL 3B2
     PKG_FAMILY att3b2_family
-    TEST 3b2)
+    TEST 3b2-400)
 
 add_simulator(3b2-700
     SOURCES
