@@ -126,9 +126,26 @@ static getaddrinfo_func p_getaddrinfo;
 #define EAI_OVERFLOW EAI_FAIL
 #endif
 
-typedef int (WSAAPI *getnameinfo_func) (const struct sockaddr *sa, socklen_t salen, char *host, size_t hostlen, char *serv, size_t servlen, int flags);
+#if defined (_WIN32)
+typedef DWORD getnameinfo_len_t;
+#else
+typedef socklen_t getnameinfo_len_t;
+#endif
+
+typedef int (WSAAPI *getnameinfo_func) (const struct sockaddr *sa,
+                                        socklen_t salen,
+                                        char *host,
+                                        getnameinfo_len_t hostlen,
+                                        char *serv,
+                                        getnameinfo_len_t servlen,
+                                        int flags);
 static getnameinfo_func p_getnameinfo;
 
+#if defined (_WIN32) || !defined (AF_INET6) || defined (TEST_INFO_STUBS)
+#define NEED_ADDRINFO_STUBS 1
+#endif
+
+#if defined (NEED_ADDRINFO_STUBS)
 static void    WSAAPI s_freeaddrinfo (struct addrinfo *ai)
 {
 struct addrinfo *a, *an;
@@ -295,13 +312,17 @@ return 0;
 #endif
 
 static int     WSAAPI s_getnameinfo (const struct sockaddr *sa, socklen_t salen,
-                                     char *host, size_t hostlen,
-                                     char *serv, size_t servlen,
+                                     char *host, getnameinfo_len_t hostlen,
+                                     char *serv, getnameinfo_len_t servlen,
                                      int flags)
 {
 struct hostent *he;
 struct servent *se = NULL;
 const struct sockaddr_in *sin = (const struct sockaddr_in *)sa;
+
+/* Generic function signature.
+   This implementation does not use every parameter. */
+(void) salen;
 
 if (sin->sin_family != PF_INET)
     return EAI_FAMILY;
@@ -349,6 +370,7 @@ if ((host) && (hostlen > 0)) {
     }
 return 0;
 }
+#endif                                                  /* NEED_ADDRINFO_STUBS */
 
 #if defined(_WIN32)
 
@@ -647,13 +669,15 @@ if (validate_addr == NULL)
 
 c = strchr (validate_addr, '/');
 if (c != NULL) {
+    size_t validate_len = (size_t)(c - validate_addr);
+
     bits = strtoul (c + 1, &c1, 10);
     if ((bits == 0) || (bits > 128) || (*c1 != '\0'))
         return status;
-    if ((c - validate_addr) > sizeof (v_cpy) - 1)
+    if (validate_len > sizeof (v_cpy) - 1)
         return status;
-    memcpy (v_cpy, validate_addr, c - validate_addr);   /* Copy everything before the / */
-    v_cpy[c - validate_addr] = '\0';                    /* NUL terminate the result */
+    memcpy (v_cpy, validate_addr, validate_len);        /* Copy everything before the / */
+    v_cpy[validate_len] = '\0';                         /* NUL terminate the result */
     validate_addr = v_cpy;                              /* Use the original string minus the prefix specifier */
     }
 if (p_getaddrinfo(validate_addr, NULL, NULL, &ai_validate))
@@ -676,10 +700,12 @@ while ((*acl != '\0') && !done) {
     permit = (*acl == '+');
     cc = strchr (acl, ',');
     if (cc != NULL) {
-        if ((cc - acl) > sizeof (rule))
+        size_t rule_len = (size_t)(cc - (acl + 1));
+
+        if (rule_len >= sizeof (rule))
             break;                  /* Too big - error */
-        memcpy (rule, acl + 1, cc - (acl + 1));
-        rule[cc - (acl + 1)] = '\0';
+        memcpy (rule, acl + 1, rule_len);
+        rule[rule_len] = '\0';
         }
     else {
         if (strlen (acl) >= sizeof (rule))

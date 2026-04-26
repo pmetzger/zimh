@@ -127,6 +127,23 @@ static void test_sim_addr_acl_check_validates_and_matches_rules(void **state)
         sim_addr_acl_check("127.0.0.1", "+192.0.2.0/24,+198.51.100.0/24"), -1);
 }
 
+static void test_sim_addr_acl_check_rejects_oversized_segments(void **state)
+{
+    char validate_addr[270];
+    char acl[280];
+
+    (void)state;
+
+    memset(validate_addr, '1', 256);
+    strcpy(validate_addr + 256, "/24");
+    assert_int_equal(sim_addr_acl_check(validate_addr, NULL), -1);
+
+    acl[0] = '+';
+    memset(acl + 1, '1', 260);
+    strcpy(acl + 261, ",+127.0.0.0/24");
+    assert_int_equal(sim_addr_acl_check("127.0.0.1", acl), -1);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -137,6 +154,8 @@ int main(void)
         cmocka_unit_test(
             test_sim_parse_addr_ex_extracts_local_and_remote_ports),
         cmocka_unit_test(test_sim_addr_acl_check_validates_and_matches_rules),
+        cmocka_unit_test(
+            test_sim_addr_acl_check_rejects_oversized_segments),
     };
 
     return cmocka_run_group_tests(tests, setup_sock_group, teardown_sock_group);
