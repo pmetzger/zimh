@@ -138,7 +138,7 @@ BITFIELD dz_csr_bits[] = {
 #define RBUF_MBZ        0004000
 
 BITFIELD dz_rbuf_bits[] = {
-  BITFFMT(RBUF,8,"%02X"),                   /* Received Character */
+  BITF_QHEX2(RBUF,8),                       /* Received Character */
   BITF(RLINE,3),                            /* receive line */
   BITNCF(1),                                /* not used */
   BIT(PARE),                                /* parity error */
@@ -190,8 +190,8 @@ BITFIELD dz_lpr_bits[] = {
 #define TCR_V_DTR       8                               /* DTRs */
 
 BITFIELD dz_tcr_bits[] = {
-  BITFFMT(XMTE,8,%02X),                     /* Transmit enable */
-  BITFFMT(DTR, 8,%02X),                     /* Data Terminal Ready */
+  BITF_HEX2(XMTE,8),                        /* Transmit enable */
+  BITF_HEX2(DTR, 8),                        /* Data Terminal Ready */
   ENDBITS
 };
 
@@ -201,8 +201,8 @@ BITFIELD dz_tcr_bits[] = {
 #define MSR_V_CD        8                               /* carrier detect */
 
 BITFIELD dz_msr_bits[] = {
-  BITFFMT(RI,8,%02X),                       /* ring indicators */
-  BITFFMT(CD,8,%02X),                       /* carrier detects */
+  BITF_HEX2(RI,8),                          /* ring indicators */
+  BITF_HEX2(CD,8),                          /* carrier detects */
   ENDBITS
 };
 
@@ -212,8 +212,8 @@ BITFIELD dz_msr_bits[] = {
 #define TDR_V_TBR       8                               /* xmit break - NI */
 
 BITFIELD dz_tdr_bits[] = {
-  BITFFMT(CHAR,8,%02X),                     /* xmit char */
-  BITFFMT(TBR, 8,%02X),                     /* xmit break - NI */
+  BITF_HEX2(CHAR,8),                        /* xmit char */
+  BITF_HEX2(TBR, 8),                        /* xmit break - NI */
   ENDBITS
 };
 

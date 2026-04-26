@@ -84,7 +84,7 @@ BITFIELD wtc_csrd_bits[] = {
 };
 
 BITFIELD wtc_value_bits[] = {
-    BITFFMT(VALUE,8,%d),                    /* Decimal Value */
+    BITF_SIGNED(VALUE,8),                   /* Decimal Value */
     ENDBITS
 };
 BITFIELD* wtc_bitdefs[] = {wtc_value_bits, wtc_value_bits, wtc_value_bits, wtc_value_bits,

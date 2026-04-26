@@ -191,15 +191,15 @@ static BITFIELD kg_bcc_bits[] = {
     BITF(CRC12-2,6),                        /* CRC-12 (2nd char) */
     BITNCF(2),                              /* not used */
     STARTBIT,                               /* restart Bits */
-    BITFFMT(CRC16-1,8,0x%02X),              /* CRC-16 (1st char) */
-    BITFFMT(CRC16-2,8,0x%02X),              /* CRC-16 (2nd char) */
+    BITF_HEX2P(CRC16-1,8),                  /* CRC-16 (1st char) */
+    BITF_HEX2P(CRC16-2,8),                  /* CRC-16 (2nd char) */
     STARTBIT,                               /* restart Bits */
-    BITFFMT(LRC16,16,0x%04X),               /* LRC-16 */
+    BITF_HEX4P(LRC16,16),                   /* LRC-16 */
     ENDBITS
     };
 
 static BITFIELD kg_dr_bits[] = {
-    BITFFMT(DR,16,0x%04X),                  /* Data Register */
+    BITF_HEX4P(DR,16),                      /* Data Register */
     ENDBITS
     };
 

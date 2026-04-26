@@ -1420,7 +1420,7 @@ the `BIT` macros to declare the bits and bitfields.
 | `BITNC`                  | Don't care Bit definition                  |
 | `BITF(nm, sz)`           | Bit Field definition                       |
 | `BITNCF(sz)`             | Don't care Bit Field definition            |
-| `BITFFMT(nm, sz, fmt)`   | Bit Field definition with Output format    |
+| `BITF_*(nm, sz)`         | Bit Field definition with chosen display   |
 | `BITFNAM(nm, sz, names)` | Bit Field definition with value-\>name map |
 | `ENDBITS`                |                                            |
 
@@ -1867,7 +1867,7 @@ struct BITFIELD {
     uint32 offset; /* starting bit */
     uint32 width; /* width */
     const char **valuenames; /* map of values to strings */
-    const char *format; /* value format string */
+    BITF_FMT format; /* value display style */
 };
 ```
 
@@ -1878,30 +1878,53 @@ The fields are the following:
 | `name` | field name, string of alphanumeric characters. |
 | `offset` | starting bit (normally populated automatically). |
 | `width` | width in bits of data, 1 to 32 inclusive. |
-| `valuenames` | pointer to a string array which maps fields values |
-| `format` | value format string |
+| `valuenames` | pointer to a string array which maps field values |
+| `format` | value display style selected by the `BITF_*` macros |
 
 Macros `BIT` and `BITF` define single bit and multi-bit fields,
 respectively. They are invoked by:
 
 - `BIT(name)`
-- `BITF (name, width)`
+- `BITF(name, width)`
 
 Macros `BITNC` and `BITNCF` define single bit and multi-bit don’t care
 fields, respectively. They are invoked by:
 
 - `BITNC`
-- `BITFNCF(width)`
+- `BITNCF(width)`
 
-Macro `BITFFMT` defines a bit fields with an output format
-specifier. It is invoked by:
+The `BITF_*` macros define bit fields with specific display styles.
+Prefer these named helpers instead of raw printf format strings.
+They are invoked by:
 
-- `BITFFMT(name, width, fmt)`
+- `BITF_SIGNED(name, width)`
+- `BITF_UNSIGNED(name, width)`
+- `BITF_HEX2(name, width)`
+- `BITF_HEX2P(name, width)`
+- `BITF_HEX4P(name, width)`
+- `BITF_QHEX2(name, width)`
+- `BITF_QOCTAL(name, width)`
+- `BITF_QUNSIGNED(name, width)`
+- `BITF_QHEXP(name, width)`
 
-Macro `BITFNAM` defines a bit fields with a value to name string
+The helpers display values as follows:
+
+| helper | example output |
+|--------|----------------|
+| `BITF_SIGNED` | `NAME=-1` |
+| `BITF_UNSIGNED` | `NAME=255` |
+| `BITF_HEX2` | `NAME=FF` |
+| `BITF_HEX2P` | `NAME=0xFF` |
+| `BITF_HEX4P` | `NAME=0x00FF` |
+| `BITF_QHEX2` | `NAME="FF"` |
+| `BITF_QOCTAL` | `NAME="377"` |
+| `BITF_QUNSIGNED` | `NAME="255"` |
+| `BITF_QHEXP` | `NAME="0xFF"` |
+
+Macro `BITFNAM` defines a bit field with a value to name string
 map. It is invoked by:
 
-- `BITFFMT(name, width, maparray)`
+- `BITFNAM(name, width, maparray)`
 
 Macro `STARTBIT` resets fields to the beginning of the register. This
 is useful when other conditions redefine the structure of a register’s

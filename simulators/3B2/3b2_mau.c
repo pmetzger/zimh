@@ -229,7 +229,7 @@ MAU_STATE mau_state;
 BITFIELD asr_bits[] = {
 #if defined(REV3)
     BIT(FE),
-    BITFFMT(VER,3,%d),
+    BITF_SIGNED(VER,3),
     BIT(UW),
 #else
     BITNCF(5),
@@ -255,7 +255,7 @@ BITFIELD asr_bits[] = {
     BIT(IO),
     BIT(Z),
     BIT(N),
-    BITFFMT(RC,2,%d),
+    BITF_SIGNED(RC,2),
     BIT(NTNC),
     BIT(ECP),
     BITNCF(5),

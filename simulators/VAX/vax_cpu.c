@@ -361,7 +361,7 @@ BITFIELD cpu_psl_bits[] = {
     BIT(FU),                                /* Floating underflow */
     BIT(DV),                                /* Decimal overflow */
     BITNCF(8),                              /* MBZ */
-    BITFFMT(IPL,5,%d),                      /* IPL */
+    BITF_SIGNED(IPL,5),                     /* IPL */
     BITNCF(1),                              /* MBZ */
     BITFNAM(PRVMOD,2,psl_modes),            /* Previous Access Mode */
     BITFNAM(CURMOD,2,psl_modes),            /* Current Access Mode */

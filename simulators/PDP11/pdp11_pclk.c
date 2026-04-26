@@ -146,21 +146,21 @@ BITFIELD pclk_csr_bits[] = {
 /* BUF - 17772542 */
 
 BITFIELD pclk_buf_bits[] = {
-  BITFFMT(BUF,16,"%0o"),                    /* buf */
+  BITF_QOCTAL(BUF,16),                      /* buf */
   ENDBITS
 };
 
 /* CTR - 17772544 */
 
 BITFIELD pclk_ctr_bits[] = {
-  BITFFMT(CTR,16,"%0o"),                    /* ctr */
+  BITF_QOCTAL(CTR,16),                      /* ctr */
   ENDBITS
 };
 
 /* NOTUSED - 17772546 */
 
 BITFIELD pclk_notused_bits[] = {
-  BITFFMT(NOTUSED,16,"%0o"),                /* not used */
+  BITF_QOCTAL(NOTUSED,16),                  /* not used */
   ENDBITS
 };
 

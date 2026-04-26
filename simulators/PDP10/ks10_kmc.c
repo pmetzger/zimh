@@ -578,7 +578,7 @@ static BITFIELD kmc_sel2_decoder[] = {
     BIT (RDI),
     BITNCF (2),
     BIT (RDO),
-    BITFFMT (LINE,7,"%u"),
+    BITF_QUNSIGNED(LINE,7),
     BIT (CQOVF),
     ENDBITS
 };

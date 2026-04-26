@@ -209,7 +209,7 @@ static BITFIELD rp_cs_bits[] = {
 #define RPCS_V_DRV      8
 #define RPCS_M_DRV      7
 #define RPCS_DRV        (RPCS_M_DRV << RPCS_V_DRV)      /* drive id */
-    BITFFMT(DRV,3,%u),
+    BITF_UNSIGNED(DRV,3),
 #define RPCS_HDR        0004000                         /* header operation */
     BIT(HDR),
 #define RPCS_MODE       0010000                         /* 0=PDP-11; 1=PDP-10/-15 or format */
@@ -231,7 +231,7 @@ static BITFIELD rp_cs_bits[] = {
 /* For PDP-11 must be even for data, and in multiples of 3 for format */
 static BITFIELD rp_wc_bits[] = {
 #define RPWC_IMP        0177777                         /* implemented */
-    BITFFMT(WC,16,%u),
+    BITF_UNSIGNED(WC,16),
     ENDBITS
 };
 
@@ -246,16 +246,16 @@ static BITFIELD rp_ba_bits[] = {
 static BITFIELD rp_ca_bits[] = {
 #define RPCA_IMP        0177777                         /* implemented */
 #define RPCA_RW         0000777                         /* RP11: 0377 */
-    BITFFMT(CYL,9,%u),
+    BITF_UNSIGNED(CYL,9),
     ENDBITS
 };
 static BITFIELD rp_ca11_bits[] = {                      /* RP11 version */
 #define RPCA_M_CYL      0000377
-    BITFFMT(CYL,8,%u),
+    BITF_UNSIGNED(CYL,8),
 #define RPCA_V_SUCA     8
 #define RPCA_M_SUCA     0000377
 #define RPCA_SUCA       (RPCA_M_SUCA << RPCA_V_SUCA)
-    BITFFMT(SUCA,8,%u),
+    BITF_UNSIGNED(SUCA,8),
     ENDBITS
 };
 
@@ -265,14 +265,14 @@ static BITFIELD rp_da_bits[] = {
 #define RPDA_RW         0017417                         /* bits here */
 #define RPDA_M_SECT     017
 #define RPDA_SECT       RPDA_M_SECT                     /* sector */
-    BITFFMT(SECT,4,%u),
+    BITF_UNSIGNED(SECT,4),
 #define RPDA_V_SOT      4
 #define RPDA_SOT        (RPDA_M_SECT << RPDA_V_SOT)     /* current sect on track */
-    BITFFMT(SOT,4,%u),
+    BITF_UNSIGNED(SOT,4),
 #define RPDA_V_TRACK    8
 #define RPDA_M_TRACK    037
 #define RPDA_TRACK      (RPDA_M_TRACK << RPDA_V_TRACK)  /* track */
-    BITFFMT(SURF,5,%u),
+    BITF_UNSIGNED(SURF,5),
 #define GET_SECT(x)     ((x) & RPDA_SECT)
 #define GET_TRACK(x)    (((x) & RPDA_TRACK) >> RPDA_V_TRACK)
     ENDBITS
@@ -287,7 +287,7 @@ static BITFIELD rp_da_bits[] = {
 /* SUCA 776734 selected unit cylinder address, read-only */
 static BITFIELD rp_suca_bits[] = {
 #define SUCA_IMP        0000777                         /* RP11: 0377 */
-    BITFFMT(CYL,9,%u),                                  /* RP11: RPCA<15:08> */
+    BITF_UNSIGNED(CYL,9),                               /* RP11: RPCA<15:08> */
     ENDBITS
 };
 
@@ -298,11 +298,11 @@ static const char* offon[] = { "OFF", "ON" };
 static BITFIELD rp_wloa_bits[] = {
 #define RPWLOA_IMP      03777
 #define RPWLOA_CYL      0377                            /* cyls locked */
-    BITFFMT(CYL,8,%u),
+    BITF_UNSIGNED(CYL,8),
 #define RPWLOA_V_DRV    8
 #define RPWLOA_M_DRV    7
 #define RPWLOA_DRV      (RPWLOA_M_DRV << RPWLOA_V_DRV)  /* drives locked */
-    BITFFMT(DRV,3,%u),
+    BITF_UNSIGNED(DRV,3),
 #define GET_WLOACYL(x)  (rr_dev.flags & DEV_RP11CE                          \
                          ? (((x) & RPWLOA_CYL) << 1) | 1 /* x2 + 1 */       \
                          :  ((x) & RPWLOA_CYL))

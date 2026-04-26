@@ -71,6 +71,14 @@ add_unit_test(unit-scp-breakpoint
         ${PROJECT_SOURCE_DIR}/tests/unit/support
 )
 
+add_unit_test(unit-scp-bitfield
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_scp_bitfield.c
+    INCLUDES
+        ${PROJECT_SOURCE_DIR}/tests/unit/support
+)
+
 add_unit_test(unit-scp-help-engine
     LABEL unit
     SOURCES

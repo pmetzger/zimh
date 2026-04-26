@@ -154,7 +154,7 @@ BITFIELD xs_tdes_w1[] = {
   ENDBITS
 };
 BITFIELD xs_tdes_w2[] = {
-  BITFFMT(mlen,12,"0x%X"),
+  BITF_QHEXP(mlen,12),
   ENDBITS
 };
 
@@ -163,11 +163,11 @@ BITFIELD xs_rdes_w1[] = {
   ENDBITS
 };
 BITFIELD xs_rdes_w2[] = {
-  BITFFMT(blen,12,"0x%X"),
+  BITF_QHEXP(blen,12),
   ENDBITS
 };
 BITFIELD xs_rdes_w3[] = {
-  BITFFMT(mlen,12,"0x%X"),
+  BITF_QHEXP(mlen,12),
   ENDBITS
 };
 

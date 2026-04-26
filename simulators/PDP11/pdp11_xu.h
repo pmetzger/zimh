@@ -306,7 +306,7 @@ BITFIELD xu_rdes_w2[] = {
   ENDBITS
 };
 BITFIELD xu_rdes_w3[] = {
-  BITFFMT(mlen,12,"0x%X"), BITNC, BIT(NCHN), BIT(UBTO), BIT(BUFL),
+  BITF_QHEXP(mlen,12), BITNC, BIT(NCHN), BIT(UBTO), BIT(BUFL),
   ENDBITS
 };
 

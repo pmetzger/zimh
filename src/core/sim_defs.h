@@ -617,12 +617,25 @@ struct UNIT {
 #define UNIT_S_TAPE_ANSI    4               /* Bits Reserved for ANSI Tape Type */
 #define UNIT_M_TAPE_ANSI    (((1 << UNIT_S_TAPE_ANSI) - 1) << UNIT_V_TAPE_ANSI)
 
+typedef enum {
+    BITF_FMT_DEFAULT,
+    BITF_FMT_SIGNED,
+    BITF_FMT_UNSIGNED,
+    BITF_FMT_HEX2,
+    BITF_FMT_HEX2_PREFIX,
+    BITF_FMT_HEX4_PREFIX,
+    BITF_FMT_QUOTED_HEX2,
+    BITF_FMT_QUOTED_OCTAL,
+    BITF_FMT_QUOTED_UNSIGNED,
+    BITF_FMT_QUOTED_HEX_PREFIX
+} BITF_FMT;
+
 struct BITFIELD {
     const char      *name;                              /* field name */
     uint32          offset;                             /* starting bit */
     uint32          width;                              /* width */
     const char      **valuenames;                       /* map of values to strings */
-    const char      *format;                            /* value format string */
+    BITF_FMT        format;                             /* value display format */
     };
 
 /* Register data structure */
@@ -1048,13 +1061,62 @@ struct MEMFILE {
 /* Hidden Blob of Data - Only used for SAVE/RESTORE */
 #define SAVEDATA(nm,loc) \
     _RegCheck(#nm,&(loc),0,8,0,1,NULL,NULL,0,sizeof(loc),sizeof(loc),SAVEDATA),(REG_HRO)
-#define STARTBIT             {"",  0x00000000, 0,  NULL, NULL}  /* Start at beginning bit */
-#define BIT(nm)              {#nm, 0xffffffff, 1,  NULL, NULL}  /* Single Bit definition */
-#define BITNC                {"",  0xffffffff, 1,  NULL, NULL}  /* Don't care Bit definition */
-#define BITF(nm,sz)          {#nm, 0xffffffff, sz, NULL, NULL}  /* Bit Field definition */
-#define BITNCF(sz)           {"",  0xffffffff, sz, NULL, NULL}  /* Don't care Bit Field definition */
-#define BITFFMT(nm,sz,fmt)   {#nm, 0xffffffff, sz, NULL, #fmt}  /* Bit Field definition with Output format */
-#define BITFNAM(nm,sz,names) {#nm, 0xffffffff, sz, names,NULL}  /* Bit Field definition with value->name map */
+#define BITF_INIT(nm,off,sz,names,fmt) \
+    {nm, off, sz, names, fmt}
+
+/* Start at beginning bit */
+#define STARTBIT \
+    BITF_INIT ("", 0x00000000, 0, NULL, BITF_FMT_DEFAULT)
+
+/* Single Bit definition */
+#define BIT(nm) \
+    BITF_INIT (#nm, 0xffffffff, 1, NULL, BITF_FMT_DEFAULT)
+
+/* Don't care Bit definition */
+#define BITNC \
+    BITF_INIT ("", 0xffffffff, 1, NULL, BITF_FMT_DEFAULT)
+
+/* Bit Field definition */
+#define BITF(nm,sz) \
+    BITF_INIT (#nm, 0xffffffff, sz, NULL, BITF_FMT_DEFAULT)
+
+/* Don't care Bit Field definition */
+#define BITNCF(sz) \
+    BITF_INIT ("", 0xffffffff, sz, NULL, BITF_FMT_DEFAULT)
+
+/* Bit field definitions with non-default value display styles. */
+/* Display the value as signed decimal, as in NAME=-1. */
+#define BITF_SIGNED(nm,sz) \
+    BITF_INIT (#nm, 0xffffffff, sz, NULL, BITF_FMT_SIGNED)
+/* Display the value as unsigned decimal, as in NAME=255. */
+#define BITF_UNSIGNED(nm,sz) \
+    BITF_INIT (#nm, 0xffffffff, sz, NULL, BITF_FMT_UNSIGNED)
+/* Display the value as two-digit uppercase hexadecimal, as in NAME=FF. */
+#define BITF_HEX2(nm,sz) \
+    BITF_INIT (#nm, 0xffffffff, sz, NULL, BITF_FMT_HEX2)
+/* Display the value as 0x-prefixed two-digit hex, as in NAME=0xFF. */
+#define BITF_HEX2P(nm,sz) \
+    BITF_INIT (#nm, 0xffffffff, sz, NULL, BITF_FMT_HEX2_PREFIX)
+/* Display the value as 0x-prefixed four-digit hex, as in NAME=0x00FF. */
+#define BITF_HEX4P(nm,sz) \
+    BITF_INIT (#nm, 0xffffffff, sz, NULL, BITF_FMT_HEX4_PREFIX)
+/* Display the value as quoted two-digit hex, as in NAME="FF". */
+#define BITF_QHEX2(nm,sz) \
+    BITF_INIT (#nm, 0xffffffff, sz, NULL, BITF_FMT_QUOTED_HEX2)
+/* Display the value as quoted octal, as in NAME="377". */
+#define BITF_QOCTAL(nm,sz) \
+    BITF_INIT (#nm, 0xffffffff, sz, NULL, BITF_FMT_QUOTED_OCTAL)
+/* Display the value as quoted unsigned decimal, as in NAME="255". */
+#define BITF_QUNSIGNED(nm,sz) \
+    BITF_INIT (#nm, 0xffffffff, sz, NULL, BITF_FMT_QUOTED_UNSIGNED)
+/* Display the value as quoted 0x-prefixed hex, as in NAME="0xFF". */
+#define BITF_QHEXP(nm,sz) \
+    BITF_INIT (#nm, 0xffffffff, sz, NULL, \
+               BITF_FMT_QUOTED_HEX_PREFIX)
+
+/* Bit Field definition with value->name map */
+#define BITFNAM(nm,sz,names) \
+    BITF_INIT (#nm, 0xffffffff, sz, names, BITF_FMT_DEFAULT)
 #define ENDBITS {NULL}  /* end of bitfield list */
 
 

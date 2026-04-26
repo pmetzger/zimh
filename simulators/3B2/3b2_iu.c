@@ -142,7 +142,7 @@ BITFIELD isr_bits[] = {
 
 BITFIELD acr_bits[] = {
     BIT(BRG_SET),
-    BITFFMT(TMR_MODE,3,%d),
+    BITF_SIGNED(TMR_MODE,3),
     BIT(DLTA_IP3),
     BIT(DLTA_IP2),
     BIT(DLTA_IP1),

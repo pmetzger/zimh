@@ -174,14 +174,14 @@ CTAB sys_cmd[] = {
 };
 
 BITFIELD psw_bits[] = {
-    BITFFMT(ET,2,%d),    /* Exception Type */
+    BITF_SIGNED(ET,2),   /* Exception Type */
     BIT(TM),             /* Trace Mask */
-    BITFFMT(ISC,4,%d),   /* Internal State Code */
+    BITF_SIGNED(ISC,4),  /* Internal State Code */
     BIT(I),              /* Register Initial Context (I) */
     BIT(R),              /* Register Initial Context (R) */
-    BITFFMT(PM,2,%d),    /* Previous Execution Level */
-    BITFFMT(CM,2,%d),    /* Current Execution Level */
-    BITFFMT(IPL,4,%d),   /* Interrupt Priority Level */
+    BITF_SIGNED(PM,2),   /* Previous Execution Level */
+    BITF_SIGNED(CM,2),   /* Current Execution Level */
+    BITF_SIGNED(IPL,4),  /* Interrupt Priority Level */
     BIT(TE),             /* Trace Enable */
     BIT(C),              /* Carry */
     BIT(V),              /* Overflow */

@@ -437,7 +437,7 @@ BITFIELD psw_bits[] = {
     BIT(Z),                                 /* Zero */
     BIT(N),                                 /* Negative */
     BIT(TBIT),                              /* trace trap */
-    BITFFMT(IPL,3,%d),                      /* IPL */
+    BITF_SIGNED(IPL,3),                     /* IPL */
     BIT(FPD),                               /* First Part Done */
     BITNCF(2),                              /* MBZ */
     BIT(RS),                                /* Register Set */

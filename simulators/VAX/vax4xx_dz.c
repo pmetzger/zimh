@@ -93,7 +93,7 @@ BITFIELD dz_csr_bits[] = {
 #define RBUF_PUTRL(x,y)  x = ((x) & ~RBUF_RLINE) | (((y) & DZ_LNOMASK) << RBUF_V_RLINE)
 
 BITFIELD dz_rbuf_bits[] = {
-    BITFFMT(RBUF,8,"%02X"),                             /* Received Character */
+    BITF_QHEX2(RBUF,8),                                 /* Received Character */
     BITF(RLINE,2),                                      /* receive line */
     BITNCF(2),                                          /* not used */
     BIT(PARE),                                          /* parity error */
@@ -149,7 +149,7 @@ BITFIELD dz_lpr_bits[] = {
 #define TCR_MBZ         0xF0F0
 
 BITFIELD dz_tcr_bits[] = {
-    BITFFMT(XMTE,8,%02X),                               /* Transmit enable */
+    BITF_HEX2(XMTE,8),                                  /* Transmit enable */
     BIT(RTS2),                                          /* RTS (line 2) */
     BIT(DSRS2),                                         /* DSRS (line 2) */
     BIT(DTR2),                                          /* DTR (line 2) */
@@ -184,8 +184,8 @@ BITFIELD dz_msr_bits[] = {
 #define TDR_V_TBR       8                               /* xmit break - NI */
 
 BITFIELD dz_tdr_bits[] = {
-    BITFFMT(CHAR,8,%02X),                               /* xmit char */
-    BITFFMT(TBR, 4,%02X),                               /* xmit break - NI */
+    BITF_HEX2(CHAR,8),                                  /* xmit char */
+    BITF_HEX2(TBR, 4),                                  /* xmit break - NI */
     BITNCF(4),
     ENDBITS
     };

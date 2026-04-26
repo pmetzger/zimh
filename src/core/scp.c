@@ -10495,6 +10495,52 @@ sprintf(debug_line_prefix, "DBG(%s%s%.0f%s)%s> %s %s: ", tim_t, tim_a, sim_gtime
 return debug_line_prefix;
 }
 
+static void
+sim_fprint_bitfield_value (FILE *stream, BITF_FMT format, uint32 value)
+{
+    switch (format) {
+    case BITF_FMT_SIGNED:
+        fprintf (stream, "%d", (int32) value);
+        break;
+
+    case BITF_FMT_UNSIGNED:
+        fprintf (stream, "%u", value);
+        break;
+
+    case BITF_FMT_HEX2:
+        fprintf (stream, "%02X", value);
+        break;
+
+    case BITF_FMT_HEX2_PREFIX:
+        fprintf (stream, "0x%02X", value);
+        break;
+
+    case BITF_FMT_HEX4_PREFIX:
+        fprintf (stream, "0x%04X", value);
+        break;
+
+    case BITF_FMT_QUOTED_HEX2:
+        fprintf (stream, "\"%02X\"", value);
+        break;
+
+    case BITF_FMT_QUOTED_OCTAL:
+        fprintf (stream, "\"%0o\"", value);
+        break;
+
+    case BITF_FMT_QUOTED_UNSIGNED:
+        fprintf (stream, "\"%u\"", value);
+        break;
+
+    case BITF_FMT_QUOTED_HEX_PREFIX:
+        fprintf (stream, "\"0x%X\"", value);
+        break;
+
+    case BITF_FMT_DEFAULT:
+        fprintf (stream, "0x%X", value);
+        break;
+    }
+}
+
 void fprint_fields (FILE *stream, t_value before, t_value after, BITFIELD* bitdefs)
 {
 int32 i, fields, offset;
@@ -10529,7 +10575,7 @@ for (i = fields-1; i >= 0; i--) {                   /* print xlation, transition
         else
             if (bitdefs[i].format) {
                 fprintf(stream, "%s=%s", bitdefs[i].name, delta);
-                fprintf(stream, bitdefs[i].format, value);
+                sim_fprint_bitfield_value(stream, bitdefs[i].format, value);
                 fprintf(stream, " ");
                 }
             else
@@ -11062,7 +11108,7 @@ typedef struct MFILE {
     size_t size;
     } MFILE;
 
-static int Mprintf (MFILE *f, const char* fmt, ...)
+static int PRINTF_FMT(2, 3) Mprintf (MFILE *f, const char* fmt, ...)
 {
     va_list arglist;
     int len;
