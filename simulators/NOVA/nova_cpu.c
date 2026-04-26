@@ -633,6 +633,7 @@ while (reason == 0) {                                   /* loop until halted */
         switch (I_GETOPAC (IR)) {                       /* decode op + AC */
         case 001:                                       /* JSR */
             AC[3] = PC;
+            FALLTHROUGH;
         case 000:                                       /* JMP */
             PCQ_ENTRY;
             PC = MA;
@@ -974,16 +975,14 @@ while (reason == 0) {                                   /* loop until halted */
             switch (code) {                             /* decode IR<5:7> */
 
         case ioNIO:                                     /* NIOP <x> CPU ? */
-            if ( pulse == iopP )
-                if ( MODE_64K )
-                    {
-                    /*  Keronix/Point4/SCI/INI/IDP (and others)    */
-                    /*  64 KW memory extension:                    */
-                    /*  NIOP - set memory mode (32/64 KW) per AC:  */
-                    /*  B15: 0 = 32 KW, 1 = 64 KW mode             */
-                    AMASK = (AC[dstAC] & 0x0001) ? 0177777 : 077777 ;
-                    }
-                break ;
+            if (pulse == iopP && MODE_64K) {
+                /*  Keronix/Point4/SCI/INI/IDP (and others)    */
+                /*  64 KW memory extension:                    */
+                /*  NIOP - set memory mode (32/64 KW) per AC:  */
+                /*  B15: 0 = 32 KW, 1 = 64 KW mode             */
+                AMASK = (AC[dstAC] & 0x0001) ? 0177777 : 077777 ;
+            }
+            break;
 
             case ioDIA:                                 /* read switches */
                 AC[dstAC] = SR;
@@ -1108,6 +1107,11 @@ return SCPE_OK;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE)
     return SCPE_NXM;
 if (vptr != NULL)
@@ -1119,6 +1123,11 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE)
     return SCPE_NXM;
 M[addr] = val & DMASK;
@@ -1131,6 +1140,12 @@ t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 int32 mc = 0;
 t_addr i;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
 
 if ((val <= 0) || (val > MAXMEMSIZE) || ((val & 07777) != 0))
     return SCPE_ARG;
@@ -1248,6 +1263,11 @@ t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
 size_t i;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 for (i = 0; i < BOOT_LEN; i++) M[BOOT_START + i] = boot_rom[i];
 saved_PC = BOOT_START;
 return SCPE_OK;
@@ -1257,6 +1277,10 @@ return SCPE_OK;
 
 int32 MapAddr (int32 map, int32 addr)
 {
+/* Shared helper signature.
+   This simulator does not use the map selector. */
+(void) map;
+
 return addr;
 }
 
@@ -1336,6 +1360,12 @@ t_stat hist_set( UNIT * uptr, int32 val, const char * cptr, void * desc )
 int32   i, lnt ;
 t_stat  r ;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if ( cptr == NULL )
     {
     for (i = 0 ; i < hist_cnt ; ++i )
@@ -1371,7 +1401,7 @@ return ( SCPE_OK ) ;
 }   /*  end of 'hist_set'  */
 
 
-int hist_fprintf( FILE * fp, int itemNum, Hist_entry * hptr )
+static int hist_fprintf( FILE * fp, int itemNum, Hist_entry * hptr )
 {
 if ( hptr )
     {
@@ -1426,6 +1456,10 @@ const char *    cptr = (const char *) desc ;
 t_stat          r ;
 Hist_entry *    hptr ;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
 
 if (hist_cnt == 0)
     {
