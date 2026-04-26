@@ -110,15 +110,17 @@
  * source, read from a file, or simply entered as a string in the help routine.  To facilitate the latter,
  * this file defines two convenience macros:
  *
- *   L(text)     - provides a string with a leading space and a trailing \n.  Enter a line of topic text.
- *   T(n, NAME)  - provides a string with the topic level n and the topic name NAME, and a trailing \n.
+ *   SCP_HELP_L(text)     - provides a string with a leading space and a
+ *                          trailing \n.  Enter a line of topic text.
+ *   SCP_HELP_T(n, NAME)  - provides a string with the topic level n and
+ *                          the topic name NAME, and a trailing \n.
  *
  * These are concatenated normally, e.g.
    const char *const help =
-    L (The %D device is interesting)
-    L (It has lots of help options)
-    T (1, TOPIC 1)
-    L (And this is topic 1)
+    SCP_HELP_L (The %D device is interesting)
+    SCP_HELP_L (It has lots of help options)
+    SCP_HELP_T (1, TOPIC 1)
+    SCP_HELP_L (And this is topic 1)
     ;
  *
  * API:
@@ -230,7 +232,7 @@
  *
  */
 
-#define T(level, text) #level " " #text "\n"
-#define L(text) " " #text "\n"
+#define SCP_HELP_T(level, text) #level " " #text "\n"
+#define SCP_HELP_L(text) " " #text "\n"
 
 #endif

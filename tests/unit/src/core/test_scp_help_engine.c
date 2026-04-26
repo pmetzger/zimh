@@ -102,7 +102,10 @@ static void test_fprint_reg_help_lists_device_registers(void **state)
 static void test_scp_help_flattens_simple_help_text(void **state)
 {
     struct scp_help_engine_fixture *fixture = *state;
-    const char *help = L(Main topic summary) T(1, DETAILS) L(Detail topic text);
+    const char *help =
+        SCP_HELP_L(Main topic summary)
+        SCP_HELP_T(1, DETAILS)
+        SCP_HELP_L(Detail topic text);
     FILE *stream;
     char *text;
     size_t size;
