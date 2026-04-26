@@ -1410,14 +1410,6 @@ DEVICE cpu_dev = {
 
 t_stat sim_instr (void)
 {
-static const char *const stack_formats [] = {           /* stack register display formats, indexed by SR */
-    BOV_FORMAT "  ",                                    /*   SR = 0 format */
-    BOV_FORMAT "  A %06o, ",                            /*   SR = 1 format */
-    BOV_FORMAT "  A %06o, B %06o, ",                    /*   SR = 2 format */
-    BOV_FORMAT "  A %06o, B %06o, C %06o, ",            /*   SR = 3 format */
-    BOV_FORMAT "  A %06o, B %06o, C %06o, D %06o, "     /*   SR = 4 format */
-    };
-
 int        abortval;
 HP_WORD    label, parameter;
 TRAP_CLASS trap;
@@ -1638,9 +1630,37 @@ while (status == SCPE_OK) {                             /* execute until simulat
                     }
 
                 if (cpu_dev.dctrl & DEB_REG) {              /* if register tracing is enabled */
-                    hp_debug (&cpu_dev, DEB_REG,            /*   then output the active TOS registers */
-                              stack_formats [SR],
-                              SBANK, SM, SR, RA, RB, RC, RD);
+                    switch (SR) {                           /* then output the active TOS registers */
+                    case 0:
+                        hp_debug (&cpu_dev, DEB_REG, BOV_FORMAT "  ",
+                                  SBANK, SM, SR);
+                        break;
+
+                    case 1:
+                        hp_debug (&cpu_dev, DEB_REG,
+                                  BOV_FORMAT "  A %06o, ",
+                                  SBANK, SM, SR, RA);
+                        break;
+
+                    case 2:
+                        hp_debug (&cpu_dev, DEB_REG,
+                                  BOV_FORMAT "  A %06o, B %06o, ",
+                                  SBANK, SM, SR, RA, RB);
+                        break;
+
+                    case 3:
+                        hp_debug (&cpu_dev, DEB_REG,
+                                  BOV_FORMAT "  A %06o, B %06o, C %06o, ",
+                                  SBANK, SM, SR, RA, RB, RC);
+                        break;
+
+                    default:
+                        hp_debug (&cpu_dev, DEB_REG,
+                                  BOV_FORMAT "  A %06o, B %06o, "
+                                  "C %06o, D %06o, ",
+                                  SBANK, SM, SR, RA, RB, RC, RD);
+                        break;
+                    }
 
                     fprintf (sim_deb, "X %06o, %s\n",       /* output the index and status registers */
                              X, fmt_status (STA));

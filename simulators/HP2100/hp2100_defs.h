@@ -930,7 +930,8 @@ extern const char *fmt_char   (uint32 charval);
 extern const char *fmt_bitset (uint32 bitset, const BITSET_FORMAT bitfmt);
 
 extern void   hp_initialize_trace (uint32 device_max, uint32 flag_max);
-extern void   hp_trace            (DEVICE *dptr, uint32 flag, ...);
+extern void   hp_trace            (DEVICE *dptr, uint32 flag,
+                                   const char *format, ...) PRINTF_FMT(3, 4);
 extern void   hp_enbdis_pair      (DEVICE *ccptr, DEVICE *dcptr);
 extern int32  hp_sync_poll        (POLLMODE poll_mode);
 

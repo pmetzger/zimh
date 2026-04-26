@@ -2214,7 +2214,7 @@ static t_stat activate_unit (UNIT *uptr)
 {
 t_stat result;
 
-tprintf (da_dev, DEB_SERV, "Unit %d state %s delay %d service scheduled\n",
+tprintf (da_dev, DEB_SERV, "Unit %td state %s delay %d service scheduled\n",
          uptr - da_unit, if_state_name [if_state [uptr - da_unit]], uptr->wait);
 
 result = sim_activate (uptr, uptr->wait);               /* activate the unit */

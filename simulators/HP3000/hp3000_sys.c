@@ -2427,26 +2427,21 @@ return fmtptr;                                          /* return a pointer to t
    will align for easier reading.
 
 
-   Implementation notes:
+   Implementation note:
 
-    1. ISO C99 allows assignment expressions as the bounds for array
-       declarators.  VC++ 2008 requires constant expressions.  To accommodate
-       the latter, we must allocate "sufficiently large" arrays for the flag
-       name and format, rather than arrays of the exact size required by the
-       call parameters.
+    The debug flag name buffer is "sufficiently large" rather than sized
+    from the configured flag name width.
 */
 
 #define FLAG_SIZE           32                          /* sufficiently large to accommodate all flag names */
-#define FORMAT_SIZE         1024                        /* sufficiently large to accommodate all format strings */
 
-void hp_debug (DEVICE *dptr, uint32 flag, ...)
+void hp_debug (DEVICE *dptr, uint32 flag, const char *format, ...)
 {
 va_list argptr;
 DEBTAB  *debptr;
-char    *format, *fptr;
+char    *fptr;
 const char *nptr;
 char    flag_name [FLAG_SIZE];                          /* desired size is [flag_size + 1] */
-char    header_fmt [FORMAT_SIZE];                       /* desired size is [device_size + flag_size + format_size + 6] */
 
 if (sim_deb != NULL && dptr != NULL) {                  /* if the output stream and device pointer are valid */
     debptr = dptr->debflags;                            /*   then get a pointer to the debug flags table */
@@ -2461,16 +2456,13 @@ if (sim_deb != NULL && dptr != NULL) {                  /* if the output stream 
                     *fptr++ = (char) tolower (*nptr);   /* copy and downshift the flag name */
                 while (*nptr++ != '\0');
 
-                sprintf (header_fmt, ">>%-*s %*s: ",            /* format the prefix and store it */
-                         (int) device_size, sim_dname (dptr),   /*   while padding the device and flag names */
-                         (int) flag_size, flag_name);           /*     as needed for proper alignment */
+                fprintf (sim_deb, ">>%-*s %*s: ",              /* format and print the prefix */
+                         (int) device_size, sim_dname (dptr),  /*   while padding the device and flag names */
+                         (int) flag_size, flag_name);          /*     as needed for proper alignment */
 
-                va_start (argptr, flag);                        /* set up the argument list */
+                va_start (argptr, format);                      /* set up the argument list */
 
-                format = va_arg (argptr, char *);               /* get the format string parameter */
-                strcat (header_fmt, format);                    /* append the supplied format */
-
-                vfprintf (sim_deb, header_fmt, argptr);         /* format and print to the debug stream */
+                vfprintf (sim_deb, format, argptr);             /* format and print to the debug stream */
 
                 va_end (argptr);                                /* clean up the argument list */
                 break;                                          /*   and exit with the job complete */

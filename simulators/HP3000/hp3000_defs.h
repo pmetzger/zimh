@@ -702,7 +702,8 @@ extern const char *fmt_status (uint32 status);
 extern const char *fmt_char   (uint32 charval);
 extern const char *fmt_bitset (uint32 bitset, const BITSET_FORMAT bitfmt);
 
-extern void   hp_debug           (DEVICE *dptr, uint32 flag, ...);
+extern void   hp_debug           (DEVICE *dptr, uint32 flag,
+                                  const char *format, ...) PRINTF_FMT(3, 4);
 extern t_bool hp_device_conflict (void);
 
 extern void hp_one_time_init (void);    /* One time initialization activities now called in cpu_reset() */

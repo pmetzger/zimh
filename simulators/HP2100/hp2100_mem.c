@@ -336,17 +336,6 @@ static const char mp_value [] = {               /* memory protection value, inde
     'P'                                         /*   MP is on */
     };
 
-static const char * const register_formats [] = {       /* CPU register formats, indexed by is_1000 */
-    REGA_FORMAT "  A %06o, B %06o, ",                   /*   is_1000 = FALSE format */
-    REGA_FORMAT "  A %06o, B %06o, X %06o, Y %06o, "    /*   is_1000 = TRUE  format */
-    };
-
-static const char * const mp_mem_formats [] = {                 /* MP/MEM register formats, indexed by is_1000 */
-    REGB_FORMAT "  MPF %06o, MPV %06o\n",                       /*   is_1000 = FALSE format */
-    REGB_FORMAT "  MPF %06o, MPV %06o, MES %06o, MEV %06o\n"    /*   is_1000 = TRUE  format */
-    };
-
-
 /* Main memory global state declarations */
 
 uint32 mem_size = 0;                            /* size of main memory in words */
@@ -1255,20 +1244,33 @@ else                                                    /* otherwise */
 
 void mem_trace_registers (FLIP_FLOP interrupt_system)
 {
-hp_trace (&cpu_dev, TRACE_REG,              /* output the working registers */
-          register_formats [is_1000],       /*   using a format appropriate for the CPU model */
-          mp_value [mp_control],
-          meu_status & MEST_FENCE_MASK,
-          SR, AR, BR, XR, YR);
+if (is_1000)                                /* output the working registers */
+    hp_trace (&cpu_dev, TRACE_REG,          /*   using a format appropriate for the CPU model */
+              REGA_FORMAT "  A %06o, B %06o, X %06o, Y %06o, ",
+              mp_value [mp_control],
+              meu_status & MEST_FENCE_MASK,
+              SR, AR, BR, XR, YR);
+else
+    hp_trace (&cpu_dev, TRACE_REG,
+              REGA_FORMAT "  A %06o, B %06o, ",
+              mp_value [mp_control],
+              meu_status & MEST_FENCE_MASK,
+              SR, AR, BR);
 
 fputs (register_values [E << 2 | O << 1 | interrupt_system], sim_deb);  /* output E, O, and interrupt system */
 fputc ('\n', sim_deb);
 
 if (mp_mem_changed) {                       /* if the MP/MEM registers have been altered */
-    hp_trace (&cpu_dev, TRACE_REG,          /*   then output the register values */
-              mp_mem_formats [is_1000],     /*     using a format appropriate for the CPU model */
-              mp_value [mp_control],
-              mp_fence, mp_VR, meu_status, meu_violation);
+    if (is_1000)                            /*   then output the register values */
+        hp_trace (&cpu_dev, TRACE_REG,      /*     using a format appropriate for the CPU model */
+                  REGB_FORMAT "  MPF %06o, MPV %06o, MES %06o, MEV %06o\n",
+                  mp_value [mp_control],
+                  mp_fence, mp_VR, meu_status, meu_violation);
+    else
+        hp_trace (&cpu_dev, TRACE_REG,
+                  REGB_FORMAT "  MPF %06o, MPV %06o\n",
+                  mp_value [mp_control],
+                  mp_fence, mp_VR);
 
     mp_mem_changed = FALSE;                 /* clear the MP/MEM registers changed flag */
     }

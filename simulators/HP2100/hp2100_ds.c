@@ -837,16 +837,16 @@ if (mac_cntlr.state != cntlr_busy) {                            /* is the comman
 
 
 if (result == SCPE_IERR)                                    /* did an internal error occur? */
-    tprintf (ds_dev, DEB_RWSC, "Unit %d %s command %s phase service not handled\n",
+    tprintf (ds_dev, DEB_RWSC, "Unit %td %s command %s phase service not handled\n",
              uptr - ds_unit, dl_opcode_name (MAC, (CNTLR_OPCODE) uptr->OP),
              dl_phase_name ((CNTLR_PHASE) uptr->PHASE));
 
 else if (seek_completion)                                           /* if a seek has completed */
-    tprintf (ds_dev, DEB_RWSC, "Unit %d %s command completed\n",    /*   report the unit command */
+    tprintf (ds_dev, DEB_RWSC, "Unit %td %s command completed\n",   /*   report the unit command */
              uptr - ds_unit, dl_opcode_name (MAC, (CNTLR_OPCODE) uptr->OP));
 
 else if (mac_cntlr.state == cntlr_wait)                             /* if the controller has stopped */
-    tprintf (ds_dev, DEB_RWSC, "Unit %d %s command completed\n",    /*   report the controller command */
+    tprintf (ds_dev, DEB_RWSC, "Unit %td %s command completed\n",   /*   report the controller command */
              uptr - ds_unit, dl_opcode_name (MAC, mac_cntlr.opcode));
 
 return result;                                              /* return the result of the service */
@@ -1485,14 +1485,14 @@ if (uptr) {                                             /* did the command start
         activate_unit (uptr);                           /* activate it (and clear the "wait" field) */
 
     if (time == 0)                                  /* was the unit busy? */
-        tprintf (ds_dev, DEB_RWSC, "Unit %d %s in progress\n",
+        tprintf (ds_dev, DEB_RWSC, "Unit %td %s in progress\n",
                  uptr - ds_unit, dl_opcode_name (MAC, drive_command));
 
     if (uptr - ds_unit > DL_MAXDRIVE)
         tprintf (ds_dev, DEB_RWSC, "Controller %s command initiated\n",
                  dl_opcode_name (MAC, mac_cntlr.opcode));
     else
-        tprintf (ds_dev, DEB_RWSC, "Unit %d position %" T_ADDR_FMT "d %s command initiated\n",
+        tprintf (ds_dev, DEB_RWSC, "Unit %td position %" T_ADDR_FMT "d %s command initiated\n",
                  uptr - ds_unit, uptr->pos, dl_opcode_name (MAC, mac_cntlr.opcode));
     }
 
@@ -1674,7 +1674,7 @@ if (uptr == &ds_cntlr)
     tprintf (ds_dev, DEB_SERV, "Controller delay %d service scheduled\n",
              uptr->wait);
 else
-    tprintf (ds_dev, DEB_SERV, "Unit %d delay %d service scheduled\n",
+    tprintf (ds_dev, DEB_SERV, "Unit %td delay %d service scheduled\n",
              uptr - ds_unit, uptr->wait);
 
 result = sim_activate (uptr, uptr->wait);               /* activate the unit */
