@@ -334,7 +334,7 @@ static const char *tu_fname[CS1_N_FNC] = {
     "NOP", "UNLD", "2", "REW", "FCLR", "5", "6", "7",
     "RIP", "11", "ERASE", "WREOF", "SPCF", "SPCR", "16", "17",
     "20", "21", "22", "23", "WRCHKF", "25", "26", "WRCHKR",
-    "WRITE", "31", "32", "33", "READF", "35", "36" "READR"
+    "WRITE", "31", "32", "33", "READF", "35", "36", "READR"
     };
 static uint8 *xbuf = NULL;                              /* xfer buffer */
 
@@ -429,6 +429,10 @@ DEVICE tu_dev = {
 t_stat tu_rd (int32 *data, int32 PA, int32 access)
 {
 int32 fmtr, drv, j;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) access;
 
 fmtr = GET_FMTR (tucs2);                                /* get current fmtr */
 drv = GET_DRV (tutc);                                   /* get current drive */
@@ -676,7 +680,7 @@ switch (fnc) {                                          /* case on function */
         if (!(uptr->TU_STATEFLAGS & TUS_ATTPENDING))
             sim_cancel (uptr);                          /* stop motion, not on-line delay */
         uptr->USTAT = 0;
-        /* fall through */
+        FALLTHROUGH;
     case FNC_NOP:
         tucs1 = tucs1 & ~CS1_GO;                        /* no operation */
         return;
@@ -773,6 +777,7 @@ switch (fnc) {                                          /* case on function */
             set_tuer (ER_NXF);
             break;
             }
+        FALLTHROUGH;
     case FNC_WCHKF:                                     /* wchk = read */
     case FNC_READF:                                     /* read */
     DATA_XFER:
@@ -1010,8 +1015,8 @@ if (fnc >= FNC_XFER)                                    /* data xfer? */
     update_tucs (CS1_DONE, drv);
 else update_tucs (CS1_SC, drv);                         /* no, set attn */
 if (DEBUG_PRS (tu_dev))
-    fprintf (sim_deb, ">>TU%d DONE: fnc=%s, cs1=%06o, cs2=%06o, ba=%06o, wc=%06o, fc=%06o, fs=%06o, er=%06o, pos=%d\n",
-             drv, tu_fname[fnc], tucs1, tucs2, tuba, tuwc, tufc, tufs, tuer, uptr->pos);
+    fprintf (sim_deb, ">>TU%d DONE: fnc=%s, cs1=%06o, cs2=%06o, ba=%06o, wc=%06o, fc=%06o, fs=%06o, er=%06o, pos=%d, r=%d\n",
+             drv, tu_fname[fnc], tucs1, tucs2, tuba, tuwc, tufc, tufs, tuer, uptr->pos, r);
 return SCPE_OK;
 }
 
@@ -1092,6 +1097,10 @@ return VEC_TU;                                          /* acknowledge */
 
 t_stat tu_map_err (UNIT *uptr, t_stat st, t_bool qdt)
 {
+/* Generic helper signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 switch (st) {
 
     case MTSE_FMT:                                      /* illegal fmt */
@@ -1100,6 +1109,7 @@ switch (st) {
         set_tuer (ER_NXF);                              /* can't execute */
         if (qdt)                                        /* data xfr? set TRE */
             tucs1 = tucs1 | CS1_TRE;
+        FALLTHROUGH;
     case MTSE_OK:                                       /* no error */
         return SCPE_IERR;
 
@@ -1156,6 +1166,10 @@ t_stat tu_reset (DEVICE *dptr)
 {
 int32 u;
 UNIT *uptr;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) dptr;
 
 tucs1 = CS1_DVA | CS1_DONE;
 tucs2 = CS2_IR | CS2_OR;
@@ -1378,6 +1392,10 @@ t_stat tu_boot (int32 unitno, DEVICE *dptr)
 size_t i;
 extern a10 saved_PC;
 UNIT *uptr;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) dptr;
 
 unitno &= TC_M_UNIT;
 uptr = tu_unit + unitno;

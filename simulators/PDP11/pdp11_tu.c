@@ -239,7 +239,7 @@ static const char *tu_fname[CS1_N_FNC] = {
     "NOP", "UNLD", "2", "REW", "FCLR", "5", "6", "7",
     "RIP", "11", "ERASE", "WREOF", "SPCF", "SPCR", "16", "17",
     "20", "21", "22", "23", "WRCHKF", "25", "26", "WRCHKR",
-    "WRITE", "31", "32", "33", "READF", "35", "36" "READR"
+    "WRITE", "31", "32", "33", "READF", "35", "36", "READR"
     };
 
 t_stat tu_mbrd (int32 *data, int32 PA, int32 fmtr);
@@ -503,7 +503,7 @@ switch (fnc) {                                          /* case on function */
         tufs = tufs & ~(FS_SAT | FS_SSC | FS_ID | FS_ERR);
         sim_cancel (uptr);                              /* reset drive */
         uptr->USTAT = 0;
-        /* fall through */
+        FALLTHROUGH;
     case FNC_NOP:
         tucs1 = tucs1 & ~CS1_GO;                        /* no operation */
         return SCPE_OK;
@@ -577,12 +577,14 @@ switch (fnc) {                                          /* case on function */
             tu_set_er (ER_NXF);
             break;
             }
+        FALLTHROUGH;
     case FNC_WREOF:                                     /* write tape mark */
     case FNC_ERASE:                                     /* erase */
         if (sim_tape_wrp (uptr)) {                      /* write locked? */
             tu_set_er (ER_NXF);
             break;
             }
+        FALLTHROUGH;
     case FNC_WCHKF:                                     /* wchk = read */
     case FNC_READF:                                     /* read */
     DATA_XFER:
@@ -862,6 +864,10 @@ return;
 
 t_stat tu_map_err (int32 drv, t_stat st, t_bool qdt)
 {
+/* Generic helper signature.
+   This implementation does not use every parameter. */
+(void) drv;
+
 switch (st) {
 
     case MTSE_FMT:                                      /* illegal fmt */
@@ -989,6 +995,10 @@ t_stat tu_set_fmtr (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 DEVICE *dptr = find_dev_from_unit (uptr);
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 if (cptr != NULL)
     return SCPE_ARG;
 if (dptr == NULL)
@@ -1002,6 +1012,11 @@ return SCPE_OK;
 t_stat tu_show_fmtr (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 DEVICE *dptr = find_dev_from_unit (uptr);
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
 
 if (dptr == NULL)
     return SCPE_IERR;
@@ -1053,6 +1068,10 @@ t_stat tu_boot (int32 unitno, DEVICE *dptr)
 {
 size_t i;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 for (i = 0; i < BOOT_LEN; i++)
     WrMemW (BOOT_START + (2 * i), boot_rom[i]);
 WrMemW (BOOT_UNIT, unitno & (TU_NUMDR - 1));
@@ -1061,17 +1080,30 @@ cpu_set_boot (BOOT_ENTRY);
 return SCPE_OK;
 }
 
-#else
+#elif defined (VM_VAX)
 
 t_stat tu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 return SCPE_NOFNC;
 }
 
+#else
+#error "unsupported TU bootstrap target"
 #endif
 
 t_stat tu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "TM02/TM03/TE16/TU45/TU77 Magnetic Tapes\n\n");
 fprintf (st, "The TU controller implements the Massbus family of 800/1600bpi magnetic tape\n");
 fprintf (st, "drives.  TU options include the ability to set the drive type to one of three\n");
@@ -1096,5 +1128,9 @@ return SCPE_OK;
 
 const char *tu_description (DEVICE *dptr)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "TM03 tape formatter";
 }
