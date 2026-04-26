@@ -393,23 +393,27 @@ t_stat xu_set_stats (UNIT* uptr, int32 val, const char* cptr, void* desc)
   return SCPE_OK;
 }
 
+static void xu_fprint_stat (FILE* st, const char* label, int value)
+{
+  fprintf(st, "  %-26s%d\n", label, value);
+}
+
 t_stat xu_show_stats (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
-  const char* fmt = "  %-26s%d\n";
   CTLR* xu = xu_unit2ctlr(uptr);
   struct xu_stats* stats = &xu->var->stats;
 
   fprintf(st, "Ethernet statistics:\n");
-  fprintf(st, fmt, "Seconds since cleared:",   stats->secs);
-  fprintf(st, fmt, "Recv frames:",             stats->frecv);
-  fprintf(st, fmt, "Recv dbytes:",             stats->rbytes);
-  fprintf(st, fmt, "Xmit frames:",             stats->ftrans);
-  fprintf(st, fmt, "Xmit dbytes:",             stats->tbytes);
-  fprintf(st, fmt, "Recv frames(multicast):",  stats->mfrecv);
-  fprintf(st, fmt, "Recv dbytes(multicast):",  stats->mrbytes);
-  fprintf(st, fmt, "Xmit frames(multicast):",  stats->mftrans);
-  fprintf(st, fmt, "Xmit dbytes(multicast):",  stats->mtbytes);
-  fprintf(st, fmt, "Loopback forward Frames:", stats->loopf);
+  xu_fprint_stat(st, "Seconds since cleared:",   stats->secs);
+  xu_fprint_stat(st, "Recv frames:",             stats->frecv);
+  xu_fprint_stat(st, "Recv dbytes:",             stats->rbytes);
+  xu_fprint_stat(st, "Xmit frames:",             stats->ftrans);
+  xu_fprint_stat(st, "Xmit dbytes:",             stats->tbytes);
+  xu_fprint_stat(st, "Recv frames(multicast):",  stats->mfrecv);
+  xu_fprint_stat(st, "Recv dbytes(multicast):",  stats->mrbytes);
+  xu_fprint_stat(st, "Xmit frames(multicast):",  stats->mftrans);
+  xu_fprint_stat(st, "Xmit dbytes(multicast):",  stats->mtbytes);
+  xu_fprint_stat(st, "Loopback forward Frames:", stats->loopf);
   return SCPE_OK;
 }
 

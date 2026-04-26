@@ -716,24 +716,29 @@ t_stat xq_set_stats (UNIT* uptr, int32 val, const char* cptr, void* desc)
   return SCPE_OK;
 }
 
+static void xq_fprint_stat (FILE* st, const char* label, int value)
+{
+  fprintf(st, "  %-15s%d\n", label, value);
+}
+
 t_stat xq_show_stats (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
-  const char* fmt = "  %-15s%d\n";
   CTLR* xq = xq_unit2ctlr(uptr);
 
   fprintf(st, "XQ Ethernet statistics:\n");
-  fprintf(st, fmt, "Recv:",        xq->var->stats.recv);
-  fprintf(st, fmt, "Dropped:",     xq->var->stats.dropped + xq->var->ReadQ.loss);
-  fprintf(st, fmt, "Xmit:",        xq->var->stats.xmit);
-  fprintf(st, fmt, "Xmit Fail:",   xq->var->stats.fail);
-  fprintf(st, fmt, "Runts:",       xq->var->stats.runt);
-  fprintf(st, fmt, "Oversize:",    xq->var->stats.giant);
-  fprintf(st, fmt, "SW Reset:",    xq->var->stats.reset);
-  fprintf(st, fmt, "Setup:",       xq->var->stats.setup);
-  fprintf(st, fmt, "Loopback:",    xq->var->stats.loop);
-  fprintf(st, fmt, "Recv Overrun:",xq->var->stats.recv_overrun);
-  fprintf(st, fmt, "ReadQ count:", xq->var->ReadQ.count);
-  fprintf(st, fmt, "ReadQ high:",  xq->var->ReadQ.high);
+  xq_fprint_stat(st, "Recv:",        xq->var->stats.recv);
+  xq_fprint_stat(st, "Dropped:",
+                 xq->var->stats.dropped + xq->var->ReadQ.loss);
+  xq_fprint_stat(st, "Xmit:",        xq->var->stats.xmit);
+  xq_fprint_stat(st, "Xmit Fail:",   xq->var->stats.fail);
+  xq_fprint_stat(st, "Runts:",       xq->var->stats.runt);
+  xq_fprint_stat(st, "Oversize:",    xq->var->stats.giant);
+  xq_fprint_stat(st, "SW Reset:",    xq->var->stats.reset);
+  xq_fprint_stat(st, "Setup:",       xq->var->stats.setup);
+  xq_fprint_stat(st, "Loopback:",    xq->var->stats.loop);
+  xq_fprint_stat(st, "Recv Overrun:",xq->var->stats.recv_overrun);
+  xq_fprint_stat(st, "ReadQ count:", xq->var->ReadQ.count);
+  xq_fprint_stat(st, "ReadQ high:",  xq->var->ReadQ.high);
   eth_show_dev(st, xq->var->etherface);
   return SCPE_OK;
 }

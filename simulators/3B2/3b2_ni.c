@@ -1022,20 +1022,23 @@ t_stat ni_set_stats(UNIT* uptr, int32 val, const char* cptr, void* desc)
     return SCPE_OK;
 }
 
+static void ni_fprint_stat(FILE *st, const char *label, int value)
+{
+    fprintf(st, "  %-15s%d\n", label, value);
+}
+
 t_stat ni_show_stats(FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
-    const char *fmt = "  %-15s%d\n";
-
     UNUSED(uptr);
     UNUSED(val);
     UNUSED(desc);
 
     fprintf(st, "NI Ethernet statistics:\n");
-    fprintf(st, fmt, "Recv:",          ni.stats.rx_pkt);
-    fprintf(st, fmt, "Recv Bytes:",    ni.stats.rx_bytes);
-    fprintf(st, fmt, "Xmit:",          ni.stats.tx_pkt);
-    fprintf(st, fmt, "Xmit Bytes:",    ni.stats.tx_bytes);
-    fprintf(st, fmt, "Xmit Fail:",     ni.stats.tx_fail);
+    ni_fprint_stat(st, "Recv:",          ni.stats.rx_pkt);
+    ni_fprint_stat(st, "Recv Bytes:",    ni.stats.rx_bytes);
+    ni_fprint_stat(st, "Xmit:",          ni.stats.tx_pkt);
+    ni_fprint_stat(st, "Xmit Bytes:",    ni.stats.tx_bytes);
+    ni_fprint_stat(st, "Xmit Fail:",     ni.stats.tx_fail);
 
     eth_show_dev(st, ni.eth);
 
