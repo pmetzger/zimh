@@ -58,6 +58,16 @@
 #define ASC_INVCDB      0x24                            /* invalid field in cdb */
 #define ASC_NOMEDIA     0x3A                            /* media not present */
 
+/* SCSI messages */
+
+#define MSG_EXTENDED    0x01                            /* extended message */
+#define MSG_SAVE_PTRS   0x02                            /* save data pointers */
+#define MSG_RESTORE     0x03                            /* restore pointers */
+#define MSG_ABORT       0x06                            /* abort */
+#define MSG_REJECT      0x07                            /* message reject */
+#define MSG_NOOP        0x08                            /* no operation */
+#define MSG_BUS_RESET   0x0C                            /* bus device reset */
+
 #define PUTL(b,x,v)     b[x] = (v >> 24) & 0xFF; \
                         b[x+1] = (v >> 16) & 0xFF; \
                         b[x+2] = (v >> 8) & 0xFF; \
@@ -261,7 +271,7 @@ if (data[0] & 0x80) {                                   /* identify */
     scsi_set_req (bus);                                 /* request data */
     used = 1;                                           /* message length */
     }
-else if (data[0] == 0x1) {                              /* extended message */
+else if (data[0] == MSG_EXTENDED) {                     /* extended message */
     if (len < 2)
         return 0;                                       /* need more */
     if (len < (data[1] + 2u))
@@ -271,13 +281,37 @@ else if (data[0] == 0x1) {                              /* extended message */
     scsi_set_req (bus);                                 /* request data */
     used = data[1] + 2;                                 /* extended message length */
     }
-else if (data[0] == 0x6) {                              /* abort */
+else if (data[0] == MSG_SAVE_PTRS) {
+    sim_debug (SCSI_DBG_MSG, bus->dptr,
+        "Save data pointers\n");
+    scsi_set_req (bus);                                 /* request data */
+    used = 1;
+    }
+else if (data[0] == MSG_RESTORE) {
+    sim_debug (SCSI_DBG_MSG, bus->dptr,
+        "Restore pointers\n");
+    scsi_set_req (bus);                                 /* request data */
+    used = 1;
+    }
+else if (data[0] == MSG_ABORT) {                        /* abort */
     sim_debug (SCSI_DBG_MSG, bus->dptr,
         "Abort\n");
     scsi_release (bus);                                 /* disconnect */
     used = 1;
     }
-else if (data[0] == 0xc) {
+else if (data[0] == MSG_REJECT) {
+    sim_debug (SCSI_DBG_MSG, bus->dptr,
+        "Message reject\n");
+    scsi_set_req (bus);                                 /* request data */
+    used = 1;
+    }
+else if (data[0] == MSG_NOOP) {
+    sim_debug (SCSI_DBG_MSG, bus->dptr,
+        "No operation\n");
+    scsi_set_req (bus);                                 /* request data */
+    used = 1;
+    }
+else if (data[0] == MSG_BUS_RESET) {
     sim_debug (SCSI_DBG_MSG, bus->dptr,
         "Bus device reset\n");
     scsi_release (bus);                                 /* disconnect */
