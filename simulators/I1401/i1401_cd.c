@@ -532,7 +532,7 @@ extern int32 saved_IS;
 
 for (i = 0; i < CDR_WIDTH; i++)                         /* clear buffer */
     M[CDR_BUF + i] = 0;
-for (i = 0; i < BOOT_LEN; i++)
+for (i = 0; i < (int32) BOOT_LEN; i++)
     M[BOOT_START + i] = boot_rom[i];
 saved_IS = BOOT_START;
 return SCPE_OK;

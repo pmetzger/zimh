@@ -252,7 +252,7 @@ if ((sw & SWMASK ('C')) || ((*cptr == '"') && cptr++)) { /* ASCII string? */
    or numeric (including spaces).
 */
 
-while (i < sizeof (gbuf) - 4) {
+while (i < (int32)(sizeof (gbuf) - 4)) {
     if (*cptr == ',' || *cptr == '\0' ||
          sim_isdigit(*cptr))
             break;

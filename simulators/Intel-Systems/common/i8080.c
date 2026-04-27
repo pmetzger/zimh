@@ -1480,7 +1480,7 @@ t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 
    or numeric (including spaces).
 */
 
-    while (i < sizeof (gbuf) - 4) {
+    while (i < (int32)(sizeof (gbuf) - 4)) {
         if (*cptr == ',' || *cptr == '\0' ||
              isdigit(*cptr))
                 break;
