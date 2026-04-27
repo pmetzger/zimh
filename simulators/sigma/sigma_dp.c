@@ -1346,32 +1346,37 @@ return SCPE_OK;
 
 t_stat dp_set_ctl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
-uint32 i, new_dtyp, cidx = uptr->UCTX;
-DP_CTX *ctx = &dp_ctx[cidx];
-UNIT *dp_unit = dp_dev[cidx].units;
+uint32 i, new_dtyp, cidx = uptr->UCTX, ctl_type;
+DP_CTX *ctx;
+UNIT *dp_unit;
 
-if ((cidx >= DP_NUMCTL) || (val >= DP_CTYPE))           /* valid ctrl idx? */
+if (cidx >= DP_NUMCTL)                                  /* valid ctrl idx? */
     return SCPE_IERR;
-if (val == dp_ctx[cidx].dp_ctype)                       /* no change? */
+if ((val < 0) || (val >= DP_CTYPE))                     /* valid ctrl type? */
+    return SCPE_IERR;
+ctx = &dp_ctx[cidx];
+dp_unit = dp_dev[cidx].units;
+ctl_type = (uint32) val;
+if (ctl_type == ctx->dp_ctype)                          /* no change? */
     return SCPE_OK;
 for (i = 0; i < DP_NUMDR; i++) {                        /* all units detached? */
     if ((dp_unit[i].flags & UNIT_ATT) != 0)
         return SCPE_ALATT;
     }
 for (i = new_dtyp = 0; dp_tab[i].sc != 0; i++) {        /* find default capac */
-    if (dp_tab[i].ctype == val) {
+    if (dp_tab[i].ctype == ctl_type) {
         new_dtyp = i;
         break;
         }
     }
 if (dp_tab[new_dtyp].sc == 0)
     return SCPE_IERR;
-ctx->dp_ctype = val;                                    /* new ctrl type */
+ctx->dp_ctype = ctl_type;                               /* new ctrl type */
 for (i = 0; i < DP_NUMDR_16B; i++) {
     if (i >= DP_NUMDR)
         dp_unit[i].flags = (dp_unit[i].flags & ~UNIT_DISABLE) | UNIT_DIS;
     else dp_unit[i].flags = (dp_unit[i].flags | UNIT_DISABLE) & ~UNIT_DIS;
-    if (val != DP_C3281)
+    if (ctl_type != DP_C3281)
         dp_unit[i].flags &= ~UNIT_AUTO;
     dp_unit[i].flags = (dp_unit[i].flags & ~UNIT_DTYPE) |
            (new_dtyp << UNIT_V_DTYPE);

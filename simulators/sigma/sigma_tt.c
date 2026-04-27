@@ -191,7 +191,7 @@ if (c & SCPE_BREAK) {                                   /* break? */
     return SCPE_OK;
     }
 c = c & 0x7F;
-if (c == tti_panel)                                     /* panel interrupt? */
+if (c == (int32) tti_panel)                             /* panel interrupt? */
     return io_set_pint ();
 uptr->pos = uptr->pos + 1;                              /* incr count */
 if (c == '\r')                                          /* map CR to NL */
