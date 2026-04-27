@@ -1570,12 +1570,12 @@ IO_RESOURCE_LIST IBC_SCC_RESOURCES[] = {
 static t_stat ibc_set_model(UNIT* uptr, int32 value, const char* cptr, void* desc) {
     IO_RESOURCE_LIST* resources;
 
-    if (value == ibc_info->model) {
+    if (value == (int32)ibc_info->model) {
         sim_printf("IBC model unchanged\n");
         return SCPE_OK;
     }
 
-    if (value > ibc_scc) {
+    if ((value < ibc_mcc) || (value > ibc_scc)) {
         return SCPE_ARG;
     }
 
@@ -1588,7 +1588,7 @@ static t_stat ibc_set_model(UNIT* uptr, int32 value, const char* cptr, void* des
         resources++;
     }
 
-    ibc_info->model = value;
+    ibc_info->model = (ibc_model_t)value;
 
     /* Map new model I/O ports */
     resources = (ibc_info->model == ibc_mcc) ? IBC_MCC_RESOURCES : IBC_SCC_RESOURCES;

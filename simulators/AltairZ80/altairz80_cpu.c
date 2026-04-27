@@ -7011,7 +7011,7 @@ static int32 bankseldev(const int32 port, const int32 io, const int32 data) {
 }
 
 static void cpu_set_chiptype_short(const int32 value) {
-    if ((chiptype == value) || (value < 0) || (value >= NUM_CHIP_TYPE))
+    if ((value < 0) || (value >= NUM_CHIP_TYPE) || (chiptype == (ChipType)value))
         return; /* nothing to do */
     if (((chiptype == CHIP_TYPE_8080) && (value == CHIP_TYPE_Z80)) ||
         ((chiptype == CHIP_TYPE_Z80) && (value == CHIP_TYPE_8080))) {
@@ -7243,13 +7243,16 @@ static t_stat cpu_resize_memory(UNIT *uptr, int32 value, const char *cptr, void 
 
 static t_stat m68k_set_chiptype(UNIT* uptr, int32 value, const char* cptr, void* desc) {
 
-    if (value == m68kvariant) {
+    if (value < 0)
+        return SCPE_ARG;
+
+    if ((uint32)value == m68kvariant) {
         if (cpu_unit.flags & UNIT_CPU_VERBOSE)
             sim_printf("M68K Variant unchanged\n");
         return SCPE_OK;
     }
 
-    m68kvariant = value;
+    m68kvariant = (uint32)value;
     return SCPE_OK;
 }
 
