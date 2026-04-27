@@ -757,6 +757,7 @@ switch (uptr->UCMD) {
             return SCPE_OK;
             }
         dc = DPA_GETCY (da);                            /* desired cyl */
+        FALLTHROUGH;
     case DPS_RECAL:
     case DPS_RECALI:
         t = abs (DPA_GETCY (uptr->UDA) - dc);           /* get cyl diff */

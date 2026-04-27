@@ -160,6 +160,7 @@ switch (op) {                                           /* case on op */
 
     case OP_AIO:                                        /* acknowledge int */
         chan_clr_chi (tt_dib.dva);                      /* clr int*/
+        FALLTHROUGH;
     case OP_TDV:                                        /* test status */
         *dvst = 0;                                      /* no status */
         break;
