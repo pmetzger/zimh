@@ -20,6 +20,10 @@
 #define CMD_LOADUNLOAD  0x1B                            /* load/unload unit */
 #define CMD_PREVALLOW   0x1E                            /* prevent/allow medium removal */
 #define CMD_RDCAP       0x25                            /* read capacity */
+#define CMD_SYNCCACHE   0x35                            /* synchronize cache */
+#define CMD_READTOC     0x43                            /* read TOC/PMA/ATIP */
+#define CMD_READDISCINFO 0x51                           /* read disc info */
+#define CMD_READTRACKINFO 0x52                          /* read track info */
 #define CMD_READ6       0x08                            /* read (6 bytes) */
 #define CMD_READ10      0x28                            /* read (10 bytes) */
 #define CMD_RDLONG      0x3E                            /* read long */
@@ -791,6 +795,14 @@ scsi_debug_cmd (bus, "Prevent/Allow Medium Removal\n");
 scsi_status (bus, STS_OK, KEY_OK, ASC_OK);
 }
 
+/* Command - Synchronize Cache */
+
+void scsi_sync_cache (SCSI_BUS *bus, uint8 *data, uint32 len)
+{
+scsi_debug_cmd (bus, "Synchronize Cache\n");
+scsi_status (bus, STS_OK, KEY_OK, ASC_OK);
+}
+
 /* Command - Read Capacity */
 
 void scsi_read_capacity (SCSI_BUS *bus, uint8 *data, uint32 len)
@@ -809,6 +821,155 @@ PUTL (bus->buf, 0, (uptr->capac - 1));                  /* # blocks */
 PUTL (bus->buf, 4, dev->block_size);                    /* block size */
 
 bus->buf_b = 8;
+scsi_set_phase (bus, SCSI_DATI);                        /* data in phase next */
+scsi_set_req (bus);                                     /* request to send data */
+}
+
+/* Command - Read TOC/PMA/ATIP.
+
+   This currently models attached CD-ROM media as a single-session data disc.
+ */
+
+void scsi_read_toc (SCSI_BUS *bus, uint8 *data, uint32 len)
+{
+UNIT *uptr = bus->dev[bus->target];
+uint32 format;
+
+scsi_debug_cmd (bus, "Read TOC/PMA/ATIP\n");
+
+if ((uptr->flags & UNIT_ATT) == 0) {
+    scsi_status (bus, STS_CHK, KEY_NOTRDY, ASC_NOMEDIA);
+    return;
+    }
+
+format = data[2] & 0x0F;
+switch (format) {
+    case 0:                                             /* formatted TOC */
+        PUTW (bus->buf, 0, 18);                         /* TOC data length */
+        bus->buf[2] = 1;                                /* first track */
+        bus->buf[3] = 1;                                /* last track */
+        bus->buf[4] = 0;                                /* reserved */
+        bus->buf[5] = 0x14;                             /* data track */
+        bus->buf[6] = 1;                                /* track number */
+        bus->buf[7] = 0;                                /* reserved */
+        PUTL (bus->buf, 8, 0);                          /* track 1 LBA */
+        bus->buf[12] = 0;                               /* reserved */
+        bus->buf[13] = 0x14;                            /* data track */
+        bus->buf[14] = 0xAA;                            /* lead-out */
+        bus->buf[15] = 0;                               /* reserved */
+        PUTL (bus->buf, 16, uptr->capac);               /* lead-out LBA */
+        bus->buf_b = 20;
+        break;
+
+    case 1:                                             /* session info */
+        PUTW (bus->buf, 0, 10);                         /* TOC data length */
+        bus->buf[2] = 1;                                /* first session */
+        bus->buf[3] = 1;                                /* last session */
+        bus->buf[4] = 0;                                /* reserved */
+        bus->buf[5] = 0x14;                             /* data track */
+        bus->buf[6] = 1;                                /* first track */
+        bus->buf[7] = 0;                                /* reserved */
+        PUTL (bus->buf, 8, 0);                          /* session LBA */
+        bus->buf_b = 12;
+        break;
+
+    default:
+        scsi_status (bus, STS_CHK, KEY_ILLREQ, ASC_INVCDB);
+        return;
+        }
+scsi_check_alloc (bus, GETW (data, 7));
+scsi_set_phase (bus, SCSI_DATI);                        /* data in phase next */
+scsi_set_req (bus);                                     /* request to send data */
+}
+
+/* Command - Read Disc Information.
+
+   This currently models attached CD-ROM media as a single-session data disc.
+ */
+
+void scsi_read_disc_info (SCSI_BUS *bus, uint8 *data, uint32 len)
+{
+UNIT *uptr = bus->dev[bus->target];
+
+scsi_debug_cmd (bus, "Read Disc Information\n");
+
+if ((uptr->flags & UNIT_ATT) == 0) {
+    scsi_status (bus, STS_CHK, KEY_NOTRDY, ASC_NOMEDIA);
+    return;
+    }
+
+PUTW (bus->buf, 0, 32);                                 /* disc info length */
+bus->buf[2] = 0x0E;                                     /* complete CD-ROM */
+bus->buf[3] = 1;                                        /* first track */
+bus->buf[4] = 1;                                        /* sessions */
+bus->buf[5] = 1;                                        /* first track in last session */
+bus->buf[6] = 1;                                        /* last track in last session */
+bus->buf[7] = 0;                                        /* no optional fields valid */
+bus->buf[8] = 0;                                        /* CD-DA or CD-ROM */
+bus->buf[9] = 0;                                        /* sessions MSB */
+bus->buf[10] = 0;                                       /* first track MSB */
+bus->buf[11] = 0;                                       /* last track MSB */
+PUTL (bus->buf, 12, 0);                                 /* disc id */
+PUTL (bus->buf, 16, 0xFFFFFF00);                        /* complete disc */
+PUTL (bus->buf, 20, 0xFFFFFF00);                        /* complete disc */
+PUTL (bus->buf, 24, 0);                                 /* bar code */
+PUTL (bus->buf, 28, 0);                                 /* bar code */
+bus->buf[32] = 0;                                       /* reserved */
+bus->buf[33] = 0;                                       /* no OPC entries */
+
+bus->buf_b = 34;
+scsi_check_alloc (bus, GETW (data, 7));
+scsi_set_phase (bus, SCSI_DATI);                        /* data in phase next */
+scsi_set_req (bus);                                     /* request to send data */
+}
+
+/* Command - Read Track Information.
+
+   This currently models attached CD-ROM media as a single-session data disc.
+ */
+
+void scsi_read_track_info (SCSI_BUS *bus, uint8 *data, uint32 len)
+{
+UNIT *uptr = bus->dev[bus->target];
+uint32 addr_type;
+uint32 lba_or_track;
+
+scsi_debug_cmd (bus, "Read Track Information\n");
+
+if ((uptr->flags & UNIT_ATT) == 0) {
+    scsi_status (bus, STS_CHK, KEY_NOTRDY, ASC_NOMEDIA);
+    return;
+    }
+
+addr_type = data[1] & 0x03;
+lba_or_track = GETL (data, 2);
+if ((addr_type > 1) ||
+    ((addr_type == 1) && (lba_or_track != 1)) ||
+    ((addr_type == 0) && (lba_or_track >= uptr->capac))) {
+    scsi_status (bus, STS_CHK, KEY_ILLREQ, ASC_INVCDB);
+    return;
+    }
+
+PUTW (bus->buf, 0, 34);                                 /* track info length */
+bus->buf[2] = 1;                                        /* track */
+bus->buf[3] = 1;                                        /* session */
+bus->buf[4] = 0;                                        /* reserved */
+bus->buf[5] = 0x04;                                     /* data track mode */
+bus->buf[6] = 0x01;                                     /* mode 1 data */
+bus->buf[7] = 0x02;                                     /* last recorded valid */
+PUTL (bus->buf, 8, 0);                                  /* track start */
+PUTL (bus->buf, 12, 0);                                 /* next writable */
+PUTL (bus->buf, 16, 0);                                 /* free blocks */
+PUTL (bus->buf, 20, 0);                                 /* packet size */
+PUTL (bus->buf, 24, uptr->capac);                       /* track size */
+PUTL (bus->buf, 28, (uptr->capac - 1));                 /* last recorded block */
+bus->buf[32] = 0;                                       /* track MSB */
+bus->buf[33] = 0;                                       /* session MSB */
+bus->buf[34] = 0;                                       /* reserved */
+bus->buf[35] = 0;                                       /* reserved */
+
+bus->buf_b = 36;
+scsi_check_alloc (bus, GETW (data, 7));
 scsi_set_phase (bus, SCSI_DATI);                        /* data in phase next */
 scsi_set_req (bus);                                     /* request to send data */
 }
@@ -1489,6 +1650,10 @@ switch (data[0]) {
         scsi_read10_disk (bus, data, len);
         break;
 
+    case CMD_READTOC:
+        scsi_read_toc (bus, data, len);
+        break;
+
     case CMD_RDCAP:                                     /* mandatory */
         scsi_read_capacity (bus, data, len);
         break;
@@ -1517,8 +1682,20 @@ switch (data[0]) {
         scsi_start_stop (bus, data, len);
         break;
 
+    case CMD_SYNCCACHE:
+        scsi_sync_cache (bus, data, len);
+        break;
+
     case CMD_TESTRDY:                                   /* mandatory */
         scsi_test_ready (bus, data, len);
+        break;
+
+    case CMD_READDISCINFO:
+        scsi_read_disc_info (bus, data, len);
+        break;
+
+    case CMD_READTRACKINFO:
+        scsi_read_track_info (bus, data, len);
         break;
 
     default:
