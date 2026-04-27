@@ -302,7 +302,7 @@ static void ctc_cmd(uint8 slot,
         /* If the currently running program is a diagnostic program,
          * we are expected to write results into memory at address
          * 0x200f000 */
-        for (i = 0; i < (sizeof(diag_crc) / sizeof(diag_crc[0])); i++) {
+        for (i = 0; i < (int32)(sizeof(diag_crc) / sizeof(diag_crc[0])); i++) {
             if (ctc_crc == diag_crc[i]) {
                 sim_debug(TRACE_DBG, &ctc_dev,
                          "[ctc_cmd] CIO_FCF found CRC==%08x\n", ctc_crc);

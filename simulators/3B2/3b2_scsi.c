@@ -838,7 +838,7 @@ static void ha_cmd(uint8 op, uint8 subdev, uint32 addr, int32 len, t_bool expres
         sim_debug(HA_TRACE, &ha_dev,
                   "[ha_cmd] SCSI Force Function Call. (CRC=%08x)\n",
                   ha_crc);
-        for (i = 0; i < sizeof(diag_crc) / sizeof(diag_crc[0]); i++) {
+        for (i = 0; i < (int32)(sizeof(diag_crc) / sizeof(diag_crc[0])); i++) {
             if (ha_crc == diag_crc[i]) {
                 sim_debug(HA_TRACE, &ha_dev,
                           "[ha_cmd] Found matching diagnostics CRC at position %d (%08x==%08x).\n",
