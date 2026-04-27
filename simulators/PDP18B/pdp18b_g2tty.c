@@ -150,7 +150,7 @@ TMLN g2_ldsc = { 0 };                   /* line descriptor */
 TMXR g2_desc = { 1, 0, 0, &g2_ldsc };   /* mux descriptor */
 
 /* kernel display lists always start like this: */
-static const int32 g2_expect[3] = {
+static const uint32 g2_expect[3] = {
     0065057, /* PARAM: clear blink, clear light pen, scale=1, intensity=3 */
     0147740, /* X-Y: invisible, no delay, Y=01740 (992) */
     0160000  /* X-Y: invisible, settling delay, X=0 */
@@ -495,7 +495,7 @@ static void g2out_process_display_list(void) {
             return;
 
         /* check first three words for expected setup commands */
-        if (offset < sizeof(g2_expect)/sizeof(g2_expect[0])) {
+        if (offset < (int)(sizeof(g2_expect)/sizeof(g2_expect[0]))) {
             if (w != g2_expect[offset])
                 return;
             continue;

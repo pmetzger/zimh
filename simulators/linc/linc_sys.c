@@ -679,7 +679,7 @@ t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr,
   }
 
   cptr = get_glyph(cptr, gbuf, 0);
-  for (i = 0; i < sizeof symbols / sizeof symbols[0]; i++) {
+  for (i = 0; i < (int)(sizeof symbols / sizeof symbols[0]); i++) {
     if (strcmp(gbuf, symbols[i].name) != 0)
       continue;
     *val = symbols[i].value;
