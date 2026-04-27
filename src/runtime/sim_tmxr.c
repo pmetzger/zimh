@@ -6260,9 +6260,9 @@ while (attempt < 5) {
         flen  = framer_rpkt.msg[14] + (framer_rpkt.msg[15] << 8);
         if (framer_rpkt.msg[18] == 021) {
             /* DC1, so it's a framer status message.  Save it. */
-            if (flen > sizeof (struct status_msg_t))
-                flen = sizeof (struct status_msg_t);
-            memcpy (&line->framer->status, framer_rpkt.msg + 18, flen);
+            if ((size_t)flen > sizeof (struct status_msg_t))
+                flen = (int)sizeof (struct status_msg_t);
+            memcpy (&line->framer->status, framer_rpkt.msg + 18, (size_t)flen);
             line->framer->status_cnt++;
             continue;
             }
@@ -6364,12 +6364,15 @@ while (1) {
     /* Size reported by framer includes status, subtract that */
     flen  = (framer_rpkt.msg[14] + (framer_rpkt.msg[15] << 8)) - 2;
     fstat = framer_rpkt.msg[16] + (framer_rpkt.msg[17] << 8);
+    /* Ignore malformed frames shorter than the status field. */
+    if (flen < 0)
+        continue;
     if (framer_rpkt.msg[18] == 021) {
         /* DC1, so it's a framer status message.  Save it. */
-        if (flen > sizeof (struct status_msg_t))
-            flen = sizeof (struct status_msg_t);
+        if ((size_t)flen > sizeof (struct status_msg_t))
+            flen = (int)sizeof (struct status_msg_t);
         memcpy (&line->framer->status,
-                framer_rpkt.msg + 18, flen);
+                framer_rpkt.msg + 18, (size_t)flen);
         /* report interesting bits */
         sim_debug (TMXR_DBG_RCV, line->dptr,
                    "framer status, on %d, last_cmd_sts %d\n",
@@ -6383,7 +6386,7 @@ while (1) {
         /* Real DDCMP packet.  Pass the buffer pointer/len */
         if (flen > nbytes)
             flen = nbytes;
-        memcpy (buf, framer_rpkt.msg + 18, flen);
+        memcpy (buf, framer_rpkt.msg + 18, (size_t)flen);
         return flen;
         }
     }

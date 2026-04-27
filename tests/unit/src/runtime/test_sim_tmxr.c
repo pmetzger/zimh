@@ -471,6 +471,16 @@ static char *capture_tmxr_debug_output(uint32 dbits, TMLN *line,
     return output;
 }
 
+static void set_test_framer_packet_header(ETH_PACK *packet, uint16 frame_len,
+                                          uint8 first_payload)
+{
+    memset(packet, 0, sizeof(*packet));
+    packet->len = 60;
+    packet->msg[14] = (uint8)(frame_len & 0xFF);
+    packet->msg[15] = (uint8)(frame_len >> 8);
+    packet->msg[18] = first_payload;
+}
+
 static void register_and_open_test_tmxr(struct sim_tmxr_fixture *fixture)
 {
     assert_int_equal(sim_register_internal_device(&fixture->device), SCPE_OK);
@@ -1035,6 +1045,76 @@ static void test_tmxr_open_master_translates_sync_aliases_via_eth_inventory(
 
     assert_int_equal(tmxr_detach_ln(line), SCPE_OK);
     assert_int_equal(fixture->io.eth_close_calls, 1);
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
+/* Verify malformed status frames from a synchronous framer are ignored rather
+   than being copied as a negative-length status message. */
+static void test_tmxr_poll_rx_ignores_short_framer_status_frame(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[1];
+
+    install_tmxr_test_io_hooks();
+    fixture->io.eth_devices_result = 1;
+    snprintf(fixture->io.eth_devices_list[0].name,
+             sizeof(fixture->io.eth_devices_list[0].name), "%s", "framer0");
+    fixture->io.eth_devices_list[0].eth_api = ETH_API_PCAP;
+
+    assert_int_equal(
+        tmxr_open_master(&fixture->mux, "Line=1,SYNC=sync0:integral:56000"),
+        SCPE_OK);
+
+    set_test_framer_packet_header(&fixture->io.eth_read_packets[0], 1, 021);
+    fixture->io.eth_read_results[0] = 1;
+    fixture->io.eth_read_results[1] = 0;
+    fixture->io.next_eth_read_result = 0;
+    line->rcve = 1;
+
+    tmxr_poll_rx(&fixture->mux);
+
+    assert_int_equal(fixture->io.eth_read_calls, 2);
+    assert_int_equal(tmxr_rqln(line), 0);
+
+    assert_int_equal(tmxr_detach_ln(line), SCPE_OK);
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
+/* Verify malformed data frames from a synchronous framer are discarded and do
+   not prevent a later valid frame from being received. */
+static void test_tmxr_poll_rx_skips_short_framer_data_frame(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[1];
+    int32 value;
+
+    install_tmxr_test_io_hooks();
+    fixture->io.eth_devices_result = 1;
+    snprintf(fixture->io.eth_devices_list[0].name,
+             sizeof(fixture->io.eth_devices_list[0].name), "%s", "framer0");
+    fixture->io.eth_devices_list[0].eth_api = ETH_API_PCAP;
+
+    assert_int_equal(
+        tmxr_open_master(&fixture->mux, "Line=1,SYNC=sync0:integral:56000"),
+        SCPE_OK);
+
+    set_test_framer_packet_header(&fixture->io.eth_read_packets[0], 1, 'X');
+    set_test_framer_packet_header(&fixture->io.eth_read_packets[1], 3, 'A');
+    fixture->io.eth_read_results[0] = 1;
+    fixture->io.eth_read_results[1] = 1;
+    fixture->io.next_eth_read_result = 0;
+    line->rcve = 1;
+    line->conn = TRUE;
+    line->rxbps = 0;
+
+    tmxr_poll_rx(&fixture->mux);
+    value = tmxr_getc_ln(line);
+
+    assert_int_equal(fixture->io.eth_read_calls, 2);
+    assert_true(value & TMXR_VALID);
+    assert_int_equal(value & 0xFF, 'A');
+
+    assert_int_equal(tmxr_detach_ln(line), SCPE_OK);
     assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
 }
 
@@ -2988,6 +3068,12 @@ int main(void)
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
             test_tmxr_open_master_translates_sync_aliases_via_eth_inventory,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_poll_rx_ignores_short_framer_status_frame,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_poll_rx_skips_short_framer_data_frame,
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
             test_tmxr_show_sync_lists_framer_aliases,
