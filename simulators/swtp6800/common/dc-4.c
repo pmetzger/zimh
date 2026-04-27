@@ -613,7 +613,7 @@ int32 fdcdata(int32 io, int32 data)
         if (dsk_unit[cur_dsk].pos < (t_addr) sectsize) { /* copy bytes to buffer */
             *((uint8 *)(dsk_unit[cur_dsk].filebuf) + dsk_unit[cur_dsk].pos) = data; /* byte into buffer */
             dsk_unit[cur_dsk].pos++;    /* step counter */
-            if (dsk_unit[cur_dsk].pos == sectsize) {
+            if (dsk_unit[cur_dsk].pos == (t_addr) sectsize) {
                 dsk_unit[cur_dsk].u3 &= ~(BUSY | DRQ);
                 if (wrt_flag) {         /* if initiated by FDC write command */
                     sim_fwrite(dsk_unit[cur_dsk].filebuf, sectsize, 1, dsk_unit[cur_dsk].fileref); /* write it */
@@ -626,7 +626,7 @@ int32 fdcdata(int32 io, int32 data)
         if (dsk_unit[cur_dsk].pos < (t_addr) sectsize) { /* copy bytes from buffer */
             val = *((uint8 *)(dsk_unit[cur_dsk].filebuf) + dsk_unit[cur_dsk].pos) & BYTEMASK;
             dsk_unit[cur_dsk].pos++;    /* step counter */
-            if (dsk_unit[cur_dsk].pos == sectsize) { // sector finished
+            if (dsk_unit[cur_dsk].pos == (t_addr) sectsize) { // sector finished
                 if ((multiple_sector) && (dsk_unit[cur_dsk].u5-sector_base < spt-1)) { // read multiple in progress
                     dsk_unit[cur_dsk].u5++;
                     err = sim_fread(dsk_unit[cur_dsk].filebuf, sectsize, 1, dsk_unit[cur_dsk].fileref); /* read in buffer */
