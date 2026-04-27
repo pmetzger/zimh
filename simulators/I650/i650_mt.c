@@ -168,7 +168,8 @@ int mt_read_alpha_word(uint8 * buf, t_int64 * d)
 
 int mt_transfer_tape_rec_to_IAS(uint8 * buf, t_mtrlnt reclen, char mode)
 {
-    int n,ic,r, ZeroNeg;
+    int n, r, ZeroNeg;
+    t_mtrlnt ic;
     t_int64 d, CtrlWord;
     char s[6];
     t_mtrlnt expected_reclen;
@@ -206,7 +207,7 @@ int mt_transfer_tape_rec_to_IAS(uint8 * buf, t_mtrlnt reclen, char mode)
     ic = 0;
     while(1) {
         // get control word
-        if (ic + 10 > (int)reclen) return MT_IND_SHORT_REC;
+        if (ic + 10 > reclen) return MT_IND_SHORT_REC;
         r = mt_read_numeric_word(&buf[ic], &CtrlWord, NULL);
         if (r) return r;
         ic += 10;
@@ -218,13 +219,13 @@ int mt_transfer_tape_rec_to_IAS(uint8 * buf, t_mtrlnt reclen, char mode)
         for (n=0;n<9;n++) {
             if ((CtrlWord % 10) != 8) {
                 // read a numeric word form tape
-                if (ic + 10 > (int)reclen) return MT_IND_SHORT_REC;
+                if (ic + 10 > reclen) return MT_IND_SHORT_REC;
                 r = mt_read_numeric_word(&buf[ic], &d, &ZeroNeg);
                 if (r) return r;
                 ic += 10;
             } else {
                 // read alphanumeric word from tape
-                if (ic + 5 > (int)reclen) return MT_IND_SHORT_REC;
+                if (ic + 5 > reclen) return MT_IND_SHORT_REC;
                 r = mt_read_alpha_word(&buf[ic], &d); ZeroNeg=0;
                 if (r) return r;
                 ic += 5;
@@ -351,7 +352,8 @@ uint32 mt_cmd(UNIT * uptr, uint16 cmd, uint16 fast)
 {
     DEVICE             *dptr = find_dev_from_unit(uptr);
     int                 unit = uptr - &mt_unit[0];
-    int                 i, ic, time;
+    int                 i, time;
+    t_mtrlnt            ic;
     t_stat              r;
     uint8               buf[1024];
     char                cbuf[100];
