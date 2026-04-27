@@ -903,7 +903,7 @@ if ((!sim_oline) && (sim_log)) {
 sim_oline = NULL;
 if ((rem->act == NULL) &&
     (!tmxr_input_pending_ln (lp))) {
-    size_t unwritten;
+    int32 unwritten;
 
     do {
         unwritten = tmxr_send_buffered_data (lp);
