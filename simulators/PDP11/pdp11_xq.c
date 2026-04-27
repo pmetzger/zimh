@@ -758,7 +758,7 @@ t_stat xq_show_filters (FILE* st, UNIT* uptr, int32 val, const void* desc)
     }
     if (xq->var->etherface->hash_filter) {
       fprintf(st, "Multicast Hash: ");
-      for (i=0; i<sizeof(xq->var->etherface->hash); ++i)
+      for (i=0; i<(int)sizeof(xq->var->etherface->hash); ++i)
         fprintf(st, "%02X ", xq->var->etherface->hash[i]);
       fprintf(st, "\n");
     }

@@ -945,7 +945,7 @@ static void rr_seek_done (UNIT *uptr, t_bool cancel)
 static t_stat rr_svc (UNIT *uptr)
 {
     int32 n, cyl, head, sect, da, wc;
-    int16 func = uptr->FUNC;
+    int32 func = uptr->FUNC;
     t_seccnt todo, done;
     t_stat ioerr;
     uint32 ma;
@@ -955,7 +955,7 @@ static t_stat rr_svc (UNIT *uptr)
     uptr->FUNC = 0;                                     /* idle */
 
     rr_seek_done(uptr, 0);                              /* complete seek, if any */
-    assert(0 < func  &&  func < sizeof(rp_funcs)/sizeof(rp_funcs[0]));
+    assert(func > 0  &&  func < (int32)(sizeof(rp_funcs)/sizeof(rp_funcs[0])));
     assert(!uptr->SEEKING  &&  !(uptr->STATUS & RPDS_SEEK));
     if (func == RPCS_HOME  ||  func == RPCS_SEEK)
         return SCPE_OK;                                 /* all done */
