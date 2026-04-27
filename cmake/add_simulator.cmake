@@ -444,6 +444,8 @@ if (WITH_ROMS)
             ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka750_bin_new.h
             ${SIMH_SIMULATOR_ROOT}/VAX/vax_ka750_bin_old.h
             ${SIMH_SIMULATOR_ROOT}/VAX/vax_vcb02_bin.h
+            ${SIMH_SIMULATOR_ROOT}/3B2/roms/3b2_400_bin.h
+            ${SIMH_SIMULATOR_ROOT}/3B2/roms/3b2_700_bin.h
             ${SIMH_SIMULATOR_ROOT}/VAX/vax_vmb_exe.h
             ${SIMH_SIMULATOR_ROOT}/PDP11/pdp11_vt_lunar_rom.h
             ${SIMH_SIMULATOR_ROOT}/PDP11/pdp11_dazzle_dart_rom.h

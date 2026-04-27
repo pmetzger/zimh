@@ -48,6 +48,8 @@
  *
  */
 
+#include <string.h>
+
 #include "3b2_cpu.h"
 
 #if defined(REV3)
@@ -65,6 +67,14 @@
 #include "3b2_mmu.h"
 #include "3b2_stddev.h"
 #include "3b2_timer.h"
+
+#if !defined(DONT_USE_INTERNAL_ROM)
+#if defined(REV3)
+#include "roms/3b2_700_bin.h"
+#else
+#include "roms/3b2_400_bin.h"
+#endif /* defined(REV3) */
+#endif /* !defined(DONT_USE_INTERNAL_ROM) */
 
 /* Up to 128KB ROM allowed */
 #define MAX_SUB_RETURN_SKIP 9
@@ -107,6 +117,7 @@ static inline void cpu_push_word(uint32 val);
 static inline uint32 cpu_pop_word(void);
 static inline void irq_push_word(uint32 val);
 static inline uint32 irq_pop_word(void);
+static t_stat cpu_load_builtin_rom(void);
 static inline void cpu_context_switch_1(uint32 pcbp);
 static inline void cpu_context_switch_2(uint32 pcbp);
 static inline void cpu_context_switch_3(uint32 pcbp);
@@ -881,7 +892,6 @@ t_stat sys_boot(int32 flag, const char *ptr)
 t_stat sys_boot(int32 flag, const char *ptr)
 {
     char gbuf[CBUFSIZE];
-    size_t len = ROM_SIZE;
 
     if ((ptr = get_sim_sw(ptr)) == NULL) {
         return SCPE_INVSW;
@@ -898,6 +908,32 @@ t_stat sys_boot(int32 flag, const char *ptr)
     return run_cmd(flag, "CPU");
 }
 #endif /* Rev 2 boot */
+
+static t_stat cpu_load_builtin_rom(void)
+{
+#if defined(DONT_USE_INTERNAL_ROM)
+    sim_messagef(SCPE_NXM, "Cannot boot, ROM not loaded.\n");
+    return SCPE_STOP;
+#else
+    if (BOOT_CODE_SIZE > ROM_SIZE) {
+        sim_messagef(SCPE_NXM,
+                     "Internal ROM %s is larger than ROM memory.\n",
+                     BOOT_CODE_FILENAME);
+        return SCPE_STOP;
+    }
+
+    if (ROM == NULL) {
+        ROM = (uint8 *)calloc((size_t)ROM_SIZE, sizeof(uint8));
+        if (ROM == NULL) {
+            return SCPE_MEM;
+        }
+    }
+
+    memcpy(ROM, BOOT_CODE_ARRAY, BOOT_CODE_SIZE);
+    rom_loaded = TRUE;
+    return SCPE_OK;
+#endif /* defined(DONT_USE_INTERNAL_ROM) */
+}
 
 t_stat cpu_boot(int32 unit_num, DEVICE *dptr)
 {
@@ -918,8 +954,11 @@ t_stat cpu_boot(int32 unit_num, DEVICE *dptr)
      */
 
     if (!rom_loaded) {
-        sim_messagef(SCPE_NXM, "Cannot boot, ROM not loaded.\n");
-        return SCPE_STOP;
+        t_stat r = cpu_load_builtin_rom();
+
+        if (r != SCPE_OK) {
+            return r;
+        }
     }
 
     sim_debug(EXECUTE_MSG, &cpu_dev,
