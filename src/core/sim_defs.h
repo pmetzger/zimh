@@ -739,8 +739,8 @@ struct MTAB {
 /* Search table */
 
 struct SCHTAB {
-    size_t              logic;                          /* logical operator */
-    size_t              boolop;                         /* boolean operator */
+    int                 logic;                          /* logical operator */
+    int                 boolop;                         /* boolean operator */
     uint32              count;                          /* value count in mask and comp arrays */
     t_value             *mask;                          /* mask for logical */
     t_value             *comp;                          /* comparison for boolean */
