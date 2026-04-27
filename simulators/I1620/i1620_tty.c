@@ -306,7 +306,8 @@ return SCPE_OK;
 t_stat tti_svc (UNIT *uptr)
 {
 int32 temp;
-int8 raw, c;
+uint8 raw;
+int8 c;
 const char *cp;
 
 DEFIO_ACTIVATE (uptr);                                  /* continue poll */
