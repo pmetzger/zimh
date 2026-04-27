@@ -487,6 +487,7 @@ static tmxr_ms_sleep_fn tmxr_ms_sleep_hook = sim_os_ms_sleep;
 static tmxr_open_serial_fn tmxr_open_serial_hook = sim_open_serial;
 static tmxr_eth_devices_fn tmxr_eth_devices_hook = eth_devices;
 static tmxr_eth_open_fn tmxr_eth_open_hook = eth_open;
+static tmxr_eth_read_fn tmxr_eth_read_hook = eth_read;
 static tmxr_eth_close_fn tmxr_eth_close_hook = eth_close;
 static tmxr_eth_filter_fn tmxr_eth_filter_hook = eth_filter;
 
@@ -507,6 +508,7 @@ tmxr_ms_sleep_hook = sim_os_ms_sleep;
 tmxr_open_serial_hook = sim_open_serial;
 tmxr_eth_devices_hook = eth_devices;
 tmxr_eth_open_hook = eth_open;
+tmxr_eth_read_hook = eth_read;
 tmxr_eth_close_hook = eth_close;
 tmxr_eth_filter_hook = eth_filter;
 }
@@ -547,6 +549,8 @@ tmxr_eth_devices_hook = hooks->eth_devices ?
     hooks->eth_devices : eth_devices;
 tmxr_eth_open_hook = hooks->eth_open ?
     hooks->eth_open : eth_open;
+tmxr_eth_read_hook = hooks->eth_read ?
+    hooks->eth_read : eth_read;
 tmxr_eth_close_hook = hooks->eth_close ?
     hooks->eth_close : eth_close;
 tmxr_eth_filter_hook = hooks->eth_filter ?
@@ -6251,7 +6255,7 @@ ETH_PACK framer_rpkt;
 i = line->framer->status_cnt;
 attempt = 0;
 while (attempt < 5) {
-    stat = eth_read (line->framer->eth, &framer_rpkt, NULL);
+    stat = tmxr_eth_read_hook (line->framer->eth, &framer_rpkt, NULL);
     if (stat) {
         flen  = framer_rpkt.msg[14] + (framer_rpkt.msg[15] << 8);
         if (framer_rpkt.msg[18] == 021) {
@@ -6354,7 +6358,7 @@ int stat, flen, fstat;
 ETH_PACK framer_rpkt;
 
 while (1) {
-    stat = eth_read (line->framer->eth, &framer_rpkt, NULL);
+    stat = tmxr_eth_read_hook (line->framer->eth, &framer_rpkt, NULL);
     if (!stat)
         return 0;
     /* Size reported by framer includes status, subtract that */

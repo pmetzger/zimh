@@ -132,6 +132,8 @@ typedef SERHANDLE (*tmxr_open_serial_fn)(char *name, TMLN *lp,
 typedef int (*tmxr_eth_devices_fn)(int max, ETH_LIST *dev, ETH_BOOL framers);
 typedef t_stat (*tmxr_eth_open_fn)(ETH_DEV *dev, const char *name,
                                    DEVICE *dptr, uint32 dbit);
+typedef int (*tmxr_eth_read_fn)(ETH_DEV *dev, ETH_PACK *packet,
+                                ETH_PCALLBACK routine);
 typedef t_stat (*tmxr_eth_close_fn)(ETH_DEV *dev);
 typedef t_stat (*tmxr_eth_filter_fn)(ETH_DEV *dev, int addr_count,
                                      const ETH_MAC addresses[],
@@ -153,6 +155,7 @@ typedef struct {
     tmxr_open_serial_fn open_serial;
     tmxr_eth_devices_fn eth_devices;
     tmxr_eth_open_fn eth_open;
+    tmxr_eth_read_fn eth_read;
     tmxr_eth_close_fn eth_close;
     tmxr_eth_filter_fn eth_filter;
 } TMXR_IO_HOOKS;

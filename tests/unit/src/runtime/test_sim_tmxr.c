@@ -98,6 +98,11 @@ struct sim_tmxr_fixture {
         ETH_DEV *last_eth_open_dev;
         t_stat eth_open_result;
 
+        int eth_read_calls;
+        ETH_PACK eth_read_packets[4];
+        int eth_read_results[4];
+        int next_eth_read_result;
+
         int eth_filter_calls;
         ETH_DEV *last_eth_filter_dev;
         t_stat eth_filter_result;
@@ -328,6 +333,30 @@ static t_stat test_tmxr_eth_open(ETH_DEV *dev, const char *name, DEVICE *dptr,
     return tmxr_io_fixture->io.eth_open_result;
 }
 
+static int test_tmxr_eth_read(ETH_DEV *dev, ETH_PACK *packet,
+                              ETH_PCALLBACK routine)
+{
+    int result;
+
+    assert_non_null(tmxr_io_fixture);
+    (void)dev;
+    (void)routine;
+
+    tmxr_io_fixture->io.eth_read_calls++;
+    if (tmxr_io_fixture->io.next_eth_read_result >= 4)
+        return 0;
+
+    result =
+        tmxr_io_fixture->io
+            .eth_read_results[tmxr_io_fixture->io.next_eth_read_result];
+    if (result && packet != NULL)
+        *packet =
+            tmxr_io_fixture->io
+                .eth_read_packets[tmxr_io_fixture->io.next_eth_read_result];
+    tmxr_io_fixture->io.next_eth_read_result++;
+    return result;
+}
+
 static t_stat test_tmxr_eth_filter(ETH_DEV *dev, int addr_count,
                                    const ETH_MAC addresses[],
                                    ETH_BOOL all_multicast,
@@ -369,6 +398,7 @@ static void install_tmxr_test_io_hooks(void)
         test_tmxr_open_serial,
         test_tmxr_eth_devices,
         test_tmxr_eth_open,
+        test_tmxr_eth_read,
         test_tmxr_eth_close,
         test_tmxr_eth_filter,
     };
@@ -474,6 +504,7 @@ static int setup_sim_tmxr_fixture(void **state)
     fixture->io.open_serial_result = INVALID_HANDLE;
     fixture->io.open_serial_status = SCPE_OPENERR;
     fixture->io.eth_open_result = SCPE_OK;
+    fixture->io.next_eth_read_result = 4;
     fixture->io.eth_filter_result = SCPE_OK;
     snprintf(fixture->io.sockname, sizeof(fixture->io.sockname), "%s",
              "127.0.0.1:1000");
