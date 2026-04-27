@@ -412,7 +412,7 @@ return;
 int32 ttx_getln (int32 inst)
 {
 int32 i;
-int32 device = (inst >> 3) & 077;                       /* device = IR<3:8> */
+uint32 device = (inst >> 3) & 077;                      /* device = IR<3:8> */
 
 for (i = 0; i < (ttx_lines * 2); i++) {                 /* loop thru disp tbl */
     if (device == ttx_dsp[i].dev)                       /* dev # match? */
