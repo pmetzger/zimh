@@ -1800,7 +1800,7 @@ sim_instr(void)
         GlobalWordTimeCount++;
 
         // if any interlock set, decrease it
-        for (il=0;il < sizeof(InterLockCount)/ sizeof(InterLockCount[0]) ;il++) {
+        for (il=0;il < (int)(sizeof(InterLockCount)/ sizeof(InterLockCount[0])) ;il++) {
             if (InterLockCount[il] > 0) InterLockCount[il]--;
         }
         // decrease pending to execute step intruction count
