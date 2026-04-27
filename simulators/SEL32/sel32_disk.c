@@ -2794,7 +2794,7 @@ int disk_label(UNIT *uptr) {
         label[2] = trk & 0xff;                  /* ltkn  trk */
         label[3] = sec & 0xff;                  /* lid   sector ID */
         label[4] = 0x80;                        /* show good sector */
-        if (i == (tot_tracks-1)) {              /* last track? */
+        if (i == ((int)tot_tracks-1)) {         /* last track? */
             label[3] = 0xff;                    /* lid   show as last track label */
             label[4] |= 0x04;                   /* set last track flag */
         }

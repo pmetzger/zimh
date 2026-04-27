@@ -230,7 +230,7 @@ int32 itm_run = 0;                          /* itm is running */
 int32 itm_cmd = 0;                          /* itm last user cmd */
 int32 itm_cnt = 0;                          /* itm reload pulse count */
 int32 itm_tick_size_x_100 = 3840;           /* itm 26042 ticks/sec = 38.4 us per tic */
-int32 itm_lvl = 0x5f;                       /* itm interrupt level */
+uint32 itm_lvl = 0x5f;                      /* itm interrupt level */
 int32 itm_strt = 0;                         /* clock start time in usec */
 int32 itm_load = 0;                         /* clock loaded */
 int32 itm_big = 26042 * 6000;               /* about 100 minutes */
