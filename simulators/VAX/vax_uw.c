@@ -122,7 +122,7 @@ DEBTAB uw_debug[] = {
 
 TMLN uw_ldsc[UW_UNITS] = { 0 };
 TMXR uw_desc = { UW_UNITS, 0, 0, uw_ldsc };
-UNIT uw_unit[UW_UNITS] = { UDATA (uw_svc, UNIT_IDLE|UNIT_ATTABLE, 0) };
+UNIT uw_unit[UW_UNITS] = { { UDATA (uw_svc, UNIT_IDLE|UNIT_ATTABLE, 0) } };
 
 REG uw_reg[] = {
     { BRDATAD (CSR, uw_csr, 16, IOLN_UW, 16, "Control and status registers") },
