@@ -944,7 +944,7 @@ static void rr_seek_done (UNIT *uptr, t_bool cancel)
 
 static t_stat rr_svc (UNIT *uptr)
 {
-    int32 n, cyl, head, sect, da, wc;
+    int32 n, cyl, head, sect, da, wc, new_cyl;
     int32 func = uptr->FUNC;
     t_seccnt todo, done;
     t_stat ioerr;
@@ -1168,14 +1168,14 @@ static t_stat rr_svc (UNIT *uptr)
     assert(da <= drv_tab[n].size);
     sect = da % RP_NUMSC;                               /* new sector */
     head = da / RP_NUMSC;                               /* new head (w/cyl) */
-    todo = head / RP_NUMSF;                             /* new cyl (tentative) */
-    if (todo == drv_tab[n].cyl) {                       /* at the end? */
+    new_cyl = head / RP_NUMSF;                          /* new cyl (tentative) */
+    if (new_cyl == drv_tab[n].cyl) {                    /* at the end? */
         cyl   = drv_tab[n].cyl - 1;                     /* keep on last cyl */
-        todo  = 0;                                      /* wrap cyl for rpda... */
+        new_cyl = 0;                                    /* wrap cyl for rpda... */
         head  = 0;                                      /* ...and head, too */
         assert(!sect);
     } else {
-        cyl   = todo;                                   /* new cyl */
+        cyl   = new_cyl;                                /* new cyl */
         head %= RP_NUMSF;                               /* isolate head */
     }
     if ((func == RPCS_RD_NOSEEK  ||  func == RPCS_WR_NOSEEK) /* no SEEK I/O... */
@@ -1192,7 +1192,7 @@ static t_stat rr_svc (UNIT *uptr)
     uptr->HEAD = head;                                  /* update head */
     uptr->CYL = cyl;                                    /* update cyl */
     rpda = (head << RPDA_V_TRACK) | sect;               /* updated head / sect */
-    rpca = todo;                                        /* wrapped up cyl */
+    rpca = new_cyl;                                     /* wrapped up cyl */
     suca = cyl;                                         /* updated real cyl */
 
     rr_set_done(0);                                     /* all done here */

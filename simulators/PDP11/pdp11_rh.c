@@ -641,7 +641,7 @@ for (i = 0; i < bc; i = i + pbc) {                      /* loop by pages */
         pbc = bc - i;
     for (j = 0; j < pbc; j = j + 2) {                   /* loop by words */
         massbus[mb].db = *buf++;                        /* get dev word */
-        if (RdMemW (pa) != massbus[mb].db) {            /* miscompare? */
+        if ((uint32) RdMemW (pa) != massbus[mb].db) {   /* miscompare? */
             mba_set_cs2 (CS2_WCE, mb);                  /* set error */
             massbus[mb].cs3 = massbus[mb].cs3 |         /* set even/odd */
                 ((pa & 1)? CS3_WCO: CS3_WCE);
