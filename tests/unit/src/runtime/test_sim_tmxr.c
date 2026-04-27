@@ -490,7 +490,7 @@ static void register_and_open_test_tmxr(struct sim_tmxr_fixture *fixture)
 static int setup_sim_tmxr_fixture(void **state)
 {
     struct sim_tmxr_fixture *fixture;
-    size_t i;
+    int32 i;
 
     simh_test_reset_simulator_state();
     fixture = calloc(1, sizeof(*fixture));
@@ -556,7 +556,7 @@ static int setup_sim_tmxr_fixture(void **state)
 static int teardown_sim_tmxr_fixture(void **state)
 {
     struct sim_tmxr_fixture *fixture = *state;
-    size_t i;
+    int32 i;
 
     for (i = 0; i < fixture->mux.lines; i++) {
         sim_send_clear(&fixture->lines[i].send);
@@ -732,7 +732,7 @@ static void test_tmxr_modem_control_passthru_toggles_and_rejects_attached_mux(
     void **state)
 {
     struct sim_tmxr_fixture *fixture = *state;
-    size_t i;
+    int32 i;
 
     assert_int_equal(tmxr_set_modem_control_passthru(&fixture->mux), SCPE_OK);
     assert_true(fixture->mux.modem_control);
@@ -842,7 +842,7 @@ static void test_tmxr_set_config_line_rejects_invalid_config(void **state)
 static void test_tmxr_open_master_buffered_defaults_to_32768(void **state)
 {
     struct sim_tmxr_fixture *fixture = *state;
-    size_t i;
+    int32 i;
 
     assert_int_equal(tmxr_open_master(&fixture->mux, "BUFFERED"), SCPE_OK);
     assert_int_equal(fixture->mux.buffered, 32768);
@@ -893,7 +893,7 @@ static void test_tmxr_open_master_listener_sets_mux_listener_state(
 static void test_tmxr_open_master_buffered_accepts_explicit_size(void **state)
 {
     struct sim_tmxr_fixture *fixture = *state;
-    size_t i;
+    int32 i;
 
     assert_int_equal(tmxr_open_master(&fixture->mux, "BUFFERED=128"), SCPE_OK);
     assert_int_equal(fixture->mux.buffered, 128);
@@ -1689,7 +1689,7 @@ static void test_tmxr_poll_conn_reports_mux_listener_all_busy(void **state)
 {
     struct sim_tmxr_fixture *fixture = *state;
     int32 result;
-    size_t i;
+    int32 i;
 
     install_tmxr_test_io_hooks();
     fixture->mux.master = (SOCKET)(uintptr_t)90;
@@ -1719,7 +1719,7 @@ static void test_tmxr_poll_conn_rings_mux_listener_line_with_dtr_low(
     struct sim_tmxr_fixture *fixture = *state;
     TMLN *ringing_line = &fixture->lines[1];
     int32 result;
-    size_t i;
+    int32 i;
 
     install_tmxr_test_io_hooks();
     fixture->mux.master = (SOCKET)(uintptr_t)92;
@@ -1751,7 +1751,7 @@ static void test_tmxr_poll_conn_times_out_ringing_mux_listener(void **state)
     struct sim_tmxr_fixture *fixture = *state;
     TMLN *ringing_line = &fixture->lines[0];
     int32 result;
-    size_t i;
+    int32 i;
 
     install_tmxr_test_io_hooks();
     fixture->mux.master = (SOCKET)(uintptr_t)97;
@@ -1932,7 +1932,7 @@ static void test_tmxr_detach_clears_attached_state_and_line_poll_flags(
     void **state)
 {
     struct sim_tmxr_fixture *fixture = *state;
-    size_t i;
+    int32 i;
 
     fixture->unit.flags = UNIT_ATT;
     fixture->unit.filename = strdup("attached");
