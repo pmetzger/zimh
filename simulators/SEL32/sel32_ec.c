@@ -231,7 +231,7 @@ t_stat      ec_rec_srv(UNIT *uptr);
 t_stat      ec_srv(UNIT *uptr);
 t_stat      ec_haltio(UNIT *uptr);
 t_stat      ec_iocl(CHANP *chp, int32 tic_ok);
-void        ec_packet_debug(struct ec_device *ec, const char *action, ETH_PACK *packet);
+void        ec_packet_debug(const char *action, ETH_PACK *packet);
 t_stat      ec_reset (DEVICE *dptr);
 void        ec_ini(UNIT *, t_bool);
 t_stat      ec_rsctrl(UNIT *uptr);
@@ -643,6 +643,10 @@ loop:
 
 /* start an ethernet operation */
 t_stat ec_preio(UNIT *uptr, uint16 chan) {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) chan;
+
     DEVICE      *dptr = get_dev(uptr);
     int         unit = (uptr - dptr->units);
     uint16      chsa = GET_UADDR(uptr->CMD);
@@ -663,6 +667,10 @@ t_stat ec_preio(UNIT *uptr, uint16 chan) {
 /* Start ethernet command */
 t_stat ec_startcmd(UNIT *uptr, uint16 chan,  uint8 cmd)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) chan;
+
     DEVICE      *dptr = get_dev(uptr);
     uint16      chsa = GET_UADDR(uptr->CMD);
     CHANP       *chp = find_chanp_ptr(chsa);    /* find the chanp pointer */
@@ -689,6 +697,7 @@ t_stat ec_startcmd(UNIT *uptr, uint16 chan,  uint8 cmd)
         return 0;
     case EC_INCH:                               /* INCH cmd 0x0 */
         cmd = EC_INCH2;                         /* set dummy INCH cmd 0xf0 */
+        FALLTHROUGH;
     case EC_READ:                               /* Read command 0x02 */
     case EC_TIC:                                /* Transfer in channel */
     case EC_CGA:                                /* Disable multicast address */
@@ -801,7 +810,7 @@ t_stat ec_srv(UNIT *uptr)
 
     case EC_LIA:                                /* 0x07 Load individual address */
         uptr->CMD &= LMASK;                     /* remove old status bits & cmd */
-        for (i = 0; i < sizeof (ETH_MAC); i++) {
+        for (i = 0; i < (int)sizeof (ETH_MAC); i++) {
             if (chan_read_byte(chsa, &buf[i])) {
                 chan_end(chsa, SNS_CHNEND|SNS_DEVEND|SNS_UNITCHK);
                 return SCPE_OK;
@@ -839,12 +848,12 @@ t_stat ec_srv(UNIT *uptr)
         ec_data.macs_n = 0;
         len = 2;
         for (n = 2; n < (int)(sizeof(ec_data.macs) / sizeof (ETH_MAC)); n++) {
-            for (i = 0; i < sizeof (ETH_MAC); i++) {
+            for (i = 0; i < (int)sizeof (ETH_MAC); i++) {
                 if (chan_read_byte(chsa, &buf[i])) {
                     break;
                 }
             }
-            if (i != sizeof (ETH_MAC))
+            if (i != (int)sizeof (ETH_MAC))
                 break;
             eth_copy_mac(ec_data.macs[len++], &buf[0]);
         }
@@ -886,7 +895,7 @@ t_stat ec_srv(UNIT *uptr)
             /* create packet: destination(6)/source(6)/type(2) or len(2)/ data 46-1500 */
 
             /* copy users header unchanged */
-            for (i = 0; i < sizeof(struct ec_eth_hdr); i++) {
+            for (i = 0; i < (int)sizeof(struct ec_eth_hdr); i++) {
                 if (chan_read_byte(chsa, &pck[i])) {
                     pirq = 1;
                     n = i;
@@ -937,7 +946,7 @@ t_stat ec_srv(UNIT *uptr)
             /* copy in user dest/type/data */
 
             /* get 6 byte destination from user */
-            for (i = 0; i < sizeof(ETH_MAC); i++) {
+            for (i = 0; i < (int)sizeof(ETH_MAC); i++) {
                 if (chan_read_byte(chsa, &pck[i])) {
                     pirq = 1;
                     n = i;
@@ -949,7 +958,8 @@ t_stat ec_srv(UNIT *uptr)
             eth_copy_mac(hdr->src, ec_data.mac);
 
             /* copy two byte type/len from user buffer */
-            for (i = sizeof(ETH_MAC) * 2; i < sizeof(struct ec_eth_hdr); i++) {
+            for (i = (int)(sizeof(ETH_MAC) * 2);
+                 i < (int)sizeof(struct ec_eth_hdr); i++) {
                 if (chan_read_byte(chsa, &pck[i])) {
                     pirq = 1;
                     n = i;
@@ -1014,7 +1024,7 @@ t_stat ec_srv(UNIT *uptr)
             /* create packet: destination(6)/source(6)/type(2) or len(2)/ data 46-1500 */
 
             /* copy destination(6) from user buffer */
-            for (i = 0; i < sizeof(ETH_MAC); i++) {
+            for (i = 0; i < (int)sizeof(ETH_MAC); i++) {
                 if (chan_read_byte(chsa, &pck[i])) {
                     pirq = 1;
                     n = i;
@@ -1097,7 +1107,7 @@ t_stat ec_srv(UNIT *uptr)
         }
 wr_end:
         ec_data.snd_buff.len = i;               /* set actual count */
-        ec_packet_debug(&ec_data, "send", &ec_data.snd_buff);
+        ec_packet_debug("send", &ec_data.snd_buff);
         sim_debug(DEBUG_DETAIL, dptr,
             "ec_srv @wr_end count 0x%x i 0x%04x SNS 0x%04x pktlen 0x%x type 0x%x\n",
             chp->ccw_count, i, uptr->SNS, pktlen, ntohs(hdr->type));
@@ -1121,7 +1131,7 @@ wr_end:
                 "ec_srv @wr_end2 count 0x%x i 0x%04x n 0x%04x SNS 0x%04x\n",
                 chp->ccw_count, i, n, uptr->SNS);
             if (i <= ETH_MIN_PACKET) {
-                ec_packet_debug(&ec_data, "send", &ec_data.snd_buff);
+                ec_packet_debug("send", &ec_data.snd_buff);
             }
         }
         /* see if too many bytes, did not get channel end before packet filled */
@@ -1216,7 +1226,7 @@ wr_end:
 
         uptr->SNS &= LMASK;                     /* remove old count */
         ec_master_uptr->SNS |= SNS_RCV_RDY;
-        ec_packet_debug(&ec_data, "recv", &ec_data.rec_buff[ec_data.xtr_ptr]);
+        ec_packet_debug("recv", &ec_data.rec_buff[ec_data.xtr_ptr]);
         pck = (uint8 *)(&ec_data.rec_buff[ec_data.xtr_ptr].msg[0]);
         len = (int)(ec_data.rec_buff[ec_data.xtr_ptr].len);
         n = sizeof(struct ec_eth_hdr);
@@ -1228,7 +1238,7 @@ wr_end:
             case 0:
             /* create output: destination(6)/source(6)/type(2) or len(2)/ data 46-1500 */
             /* user buffer: destination(6)/source(6)/type(2) or len)2) */
-            for (i = 0; i < sizeof(struct ec_eth_hdr); i++) {
+            for (i = 0; i < (int)sizeof(struct ec_eth_hdr); i++) {
                 if (chan_write_byte(chsa, &pck[i])) {
                     pirq = 1;
                     break;
@@ -1244,7 +1254,7 @@ wr_end:
             /* create output: destination(6)/len(2)/source(6)/type(2) or len(2)/ data 46-1500 */
             /* destination / len / source / type or len */
             /* copy 6 byte destination */
-            for (i = 0; i < sizeof(ETH_MAC); i++) {
+            for (i = 0; i < (int)sizeof(ETH_MAC); i++) {
                 if (chan_write_byte(chsa, &pck[i])) {
                     pirq = 1;
                     break;
@@ -1263,7 +1273,7 @@ wr_end:
                 break;
             }
             /* copy in source(6)/type(2) 6 + 2 = 8 = 14 - 6 */
-            for (; i < sizeof(struct ec_eth_hdr); i++) {
+            for (; i < (int)sizeof(struct ec_eth_hdr); i++) {
                 if (chan_write_byte(chsa, &pck[i])) {
                     pirq = 1;
                     break;
@@ -1279,7 +1289,7 @@ wr_end:
         case 3:
             /* create output: destination(6)/len(2)/source(6)/len(2)/ data 46-1500 */
             /* copy 6 byte destination */
-            for (i = 0; i < sizeof(ETH_MAC); i++) {
+            for (i = 0; i < (int)sizeof(ETH_MAC); i++) {
                 if (chan_write_byte(chsa, &pck[i])) {
                     pirq = 1;
                     break;
@@ -1298,7 +1308,7 @@ wr_end:
                 break;
             }
             /* copy in 6 byte source */
-            for (; i < sizeof(ETH_MAC) * 2; i++) {
+            for (; i < (int)(sizeof(ETH_MAC) * 2); i++) {
                 if (chan_write_byte(chsa, &pck[i])) {
                     pirq = 1;
                     break;
@@ -1540,6 +1550,10 @@ t_stat  ec_haltio(UNIT *uptr) {
 /* initialize the ethernet */
 void ec_ini(UNIT *uptr, t_bool f)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) f;
+
     DEVICE  *dptr = get_dev(uptr);
 
     uptr->CMD &= LMASK;                         /* remove old status bits & cmd */
@@ -1620,8 +1634,7 @@ ipv4_inet_ntoa(struct in_addr ip)
 /*
  * Pretty print a packet for debugging.
  */
-void ec_packet_debug(struct ec_device *ec, const char *action,
-     ETH_PACK *packet) {
+void ec_packet_debug(const char *action, ETH_PACK *packet) {
     struct ec_eth_hdr *eth = (struct ec_eth_hdr *)&packet->msg[0];
     struct arp_hdr     *arp = (struct arp_hdr *)eth;
     struct ip          *ip = (struct ip *)&packet->msg[sizeof(struct ec_eth_hdr)];
@@ -1778,12 +1791,22 @@ void ec_packet_debug(struct ec_device *ec, const char *action,
 
 t_stat ec_show_mode (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     fprintf(st, "MODE=%d", GET_MODE(uptr->flags));
     return SCPE_OK;
 }
 
 t_stat ec_set_mode (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     t_stat r;
     int    newmode;
 
@@ -1805,6 +1828,12 @@ t_stat ec_set_mode (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat ec_show_mac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     char buffer[20];
     eth_mac_fmt(ec_data.mac, buffer);
     fprintf(st, "MAC=%s", buffer);
@@ -1813,6 +1842,11 @@ t_stat ec_show_mac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat ec_set_mac (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     t_stat status;
 
     if (!cptr) return SCPE_IERR;
@@ -1829,11 +1863,11 @@ t_stat ec_reset (DEVICE *dptr)
 {
     int  i;
 
-    for (i = 0; i < sizeof(ETH_MAC); i++) {
+    for (i = 0; i < (int)sizeof(ETH_MAC); i++) {
         if (ec_data.mac[i] != 0)
             break;
     }
-    if (i == 6) {   /* First call to reset? */
+    if (i == (int)sizeof(ETH_MAC)) {   /* First call to reset? */
     /* Set a default MAC address in a BBN assigned OID range no longer in use */
         ec_set_mac (dptr->units, 0, "00:00:02:00:00:00/24", NULL);
     }
@@ -1932,6 +1966,10 @@ t_stat ec_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr
 
 const char *ec_description (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "SEL32 8516 Ethernet interface";
 }
 #endif
