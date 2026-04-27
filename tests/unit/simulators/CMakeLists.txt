@@ -2,3 +2,4 @@
 # tree as coverage expands beyond the shared src/ code.
 add_subdirectory(S3)
 add_subdirectory(sigma)
+add_subdirectory(VAX)

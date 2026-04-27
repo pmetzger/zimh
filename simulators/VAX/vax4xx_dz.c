@@ -401,6 +401,8 @@ switch ((pa >> 2) & 03) {                               /* case on PA<2:1> */
         else
             dz_csr &= ~(CSR_SA | CSR_RDONE | CSR_TRDY);
         dz_csr = (dz_csr & ~CSR_RW) | (data & CSR_RW);
+        dz_update_rcvi ();
+        dz_update_xmti ();
         break;
 
     case 01:                                            /* LPR */
@@ -449,12 +451,12 @@ switch ((pa >> 2) & 03) {                               /* case on PA<2:1> */
         dz_tdr = data;
         if (dz_csr & CSR_MSE) {                         /* enabled? */
             line = CSR_GETTL (dz_csr);
+            dz_csr &= ~CSR_TRDY;
             if (dz_csr & CSR_MAINT) {                   /* test mode? */
                 dz_char[line] = (dz_tdr & BMASK) | RBUF_VALID;/* loop data back */
                 dz_char[line] |= (line << RBUF_V_RLINE);
                 if (dz_tdr & (1u << (TDR_V_TBR + line)))
                     dz_char[line] = dz_char[line] | RBUF_FRME;
-                dz_csr &= ~CSR_TRDY;
                 sim_debug(DBG_REG, &dz_dev, "maint char for line %d : %X\n", line, dz_char[line]);
                 break;
                 }
@@ -570,8 +572,11 @@ return ret;
 void dz_update_rcvi (void)
 {
 int32 line, c;
+uint16 old_signal;
+uint16 new_signal;
 TMLN *lp;
 
+old_signal = (dz_csr & CSR_SAE) ? (dz_csr & CSR_SA) : (dz_csr & CSR_RDONE);
 if (dz_csr & CSR_MSE) {                                 /* enabled? */
     for (line = 0; line < DZ_LINES; line++) {           /* poll lines */
         if (dz_scnt >= DZ_SILO_ALM)
@@ -636,11 +641,9 @@ if (dz_scnt && (dz_csr & CSR_MSE)) {                    /* input & enabled? */
     }
 else
     dz_csr &= ~CSR_RDONE;                               /* no, clear done */
-if (((dz_csr & CSR_SAE)?
-     (dz_csr & CSR_SA): (dz_csr & CSR_RDONE)))
+new_signal = (dz_csr & CSR_SAE) ? (dz_csr & CSR_SA) : (dz_csr & CSR_RDONE);
+if (new_signal && !old_signal)
     SET_INT (DZRX);                                     /* alm/done? */
-else
-    CLR_INT (DZRX);                                     /* no, clear int */
 return;
 }
 
@@ -649,9 +652,13 @@ return;
 void dz_update_xmti (void)
 {
 int32 linemask, i, line;
+uint16 old_csr;
 
+old_csr = dz_csr;
 linemask = dz_tcr & DZ_LMASK;                           /* enabled lines */
 dz_csr &= ~CSR_TRDY;                                    /* assume not rdy */
+if ((dz_csr & CSR_MSE) == 0)                            /* scanner stopped? */
+    return;
 line = CSR_GETTL (dz_csr);                              /* start at current */
 for (i = 0; i < DZ_LINES; i++) {                        /* loop thru lines */
     line = (line + 1) & DZ_LNOMASK;                     /* next line */
@@ -661,10 +668,8 @@ for (i = 0; i < DZ_LINES; i++) {                        /* loop thru lines */
         break;
         }
     }
-if (dz_csr & CSR_TRDY)                                  /* ready? */
+if ((dz_csr & CSR_TRDY) && ((old_csr & CSR_TRDY) == 0)) /* ready edge? */
     SET_INT (DZTX);
-else
-    CLR_INT (DZTX);                                     /* no int req */
 return;
 }
 
@@ -683,8 +688,10 @@ else dz_tcr &= ~0377;                                   /* else save dtr */
 dz_tdr = 0;
 dz_sae = 1;                                             /* alarm on */
 dz_scnt = 0;
-CLR_INT (DZRX);                                         /* clear int */
-CLR_INT (DZTX);
+if (flag) {                                             /* INIT? clr int */
+    CLR_INT (DZRX);
+    CLR_INT (DZTX);
+    }
 for (i = 0; i < DZ_LINES; i++) {                        /* loop thru lines */
     if (!dz_ldsc[i].conn)                               /* set xmt enb */
         dz_ldsc[i].xmte = 1;
