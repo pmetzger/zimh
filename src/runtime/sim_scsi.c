@@ -297,7 +297,7 @@ else if (data[0] == MSG_ABORT) {                        /* abort */
     sim_debug (SCSI_DBG_MSG, bus->dptr,
         "Abort\n");
     scsi_release (bus);                                 /* disconnect */
-    used = 1;
+    return 1;
     }
 else if (data[0] == MSG_REJECT) {
     sim_debug (SCSI_DBG_MSG, bus->dptr,
@@ -315,7 +315,7 @@ else if (data[0] == MSG_BUS_RESET) {
     sim_debug (SCSI_DBG_MSG, bus->dptr,
         "Bus device reset\n");
     scsi_release (bus);                                 /* disconnect */
-    used = 1;
+    return 1;
     }
 else {
     sim_printf ("SCSI: Unknown Message %02X\n", data[0]);

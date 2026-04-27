@@ -84,7 +84,7 @@ static void assert_message_disconnects_silently(uint8 message)
                      0);
     assert_string_equal(output, "");
     assert_int_equal(output_size, 0);
-    assert_int_equal(message_case.bus.phase, SCSI_CMD);
+    assert_int_equal(message_case.bus.phase, SCSI_DATO);
     assert_int_equal(message_case.bus.initiator, -1);
     assert_int_equal(message_case.bus.target, -1);
 
