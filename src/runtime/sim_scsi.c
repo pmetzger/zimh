@@ -1842,9 +1842,9 @@ return i;
 
 uint32 scsi_state (SCSI_BUS *bus, uint32 id)
 {
-if (bus->initiator == id)
+if ((bus->initiator >= 0) && ((uint32)bus->initiator == id))
     return SCSI_INIT;                                   /* device is initiator */
-if (bus->target == id)
+if ((bus->target >= 0) && ((uint32)bus->target == id))
     return SCSI_TARG;                                   /* device is target */
 return SCSI_DISC;                                       /* device is disconnected */
 }
