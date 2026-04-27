@@ -1251,7 +1251,7 @@ return;
 
 /* Reset routines */
 
-void dp_reset_unit (UNIT *uptr, uint32 cidx)
+static void dp_reset_unit (UNIT *uptr, uint32 cidx)
 {
 sim_cancel (uptr);                                      /* stop dev thread */
 uptr->UDA = 0;
@@ -1317,6 +1317,11 @@ t_stat dp_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 uint32 dtype = GET_DTYPE (val);
 uint32 cidx = uptr->UCTX;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (cidx >= DP_NUMCTL)                                  /* valid ctrl idx? */
     return SCPE_IERR;
 if (uptr->flags & UNIT_ATT)                             /* unattached? */
@@ -1332,6 +1337,12 @@ return SCPE_OK;
 t_stat dp_set_auto (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 cidx = uptr->UCTX;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) cptr;
+(void) desc;
 
 if (cidx >= DP_NUMCTL)                                  /* valid ctrl idx? */
     return SCPE_IERR;
@@ -1349,6 +1360,11 @@ t_stat dp_set_ctl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 uint32 i, new_dtyp, cidx = uptr->UCTX, ctl_type;
 DP_CTX *ctx;
 UNIT *dp_unit;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
 
 if (cidx >= DP_NUMCTL)                                  /* valid ctrl idx? */
     return SCPE_IERR;
@@ -1388,6 +1404,11 @@ return SCPE_OK;
 t_stat dp_show_ctl (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 uint32 cidx = uptr->UCTX;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
 
 if (cidx >= DP_NUMCTL)                                 /* valid ctrl idx? */
     return SCPE_IERR;

@@ -317,6 +317,10 @@ return SCPE_OK;
 
 t_stat tt_reset (DEVICE *dptr)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 rtc_register (RTC_TTI, tti_tps, &tt_unit[TTI]);         /* register timer */
 sim_cancel (&tt_unit[TTO]);                             /* stop dev thread */
 tt_cmd = TTS_IDLE;                                      /* idle */
@@ -329,6 +333,12 @@ return SCPE_OK;
 
 t_stat tt_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 tt_unit[TTO].flags = (tt_unit[TTO].flags & ~TT_MODE) | val;
 if (val == TT_MODE_7P)
     val = TT_MODE_7B;
