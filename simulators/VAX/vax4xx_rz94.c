@@ -277,6 +277,14 @@ rz_fifo_t = rz_fifo_b = 0;
 rz_fifo[rz_fifo_b] = 0;
 }
 
+static t_bool rz_message_accepted (void)
+{
+if ((rz_bus.phase == SCSI_MSGI) && (rz_bus.buf_t != rz_bus.buf_b))
+    return FALSE;
+scsi_release (&rz_bus);
+return TRUE;
+}
+
 /* IO dispatch routines, I/O addresses 177601x0 - 177601x7 */
 
 int32 rz_rd (int32 pa)
@@ -644,10 +652,33 @@ switch (cmd & 0x7f) {
 
     case 0x46:                                          /* select with ATN3 */
         sim_debug (DBG_CMD, &rz_dev, "select with atn3\n");
+        rz_seq = 0;
+        if (!scsi_arbitrate (&rz_bus, ini)) {
+            rz_int |= INT_DIS;                          /* disconnect */
+            sim_activate (&rz_unit[8], 100);
+            break;
+            }
         scsi_set_atn (&rz_bus);
         if (!scsi_select (&rz_bus, tgt)) {
             rz_int |= INT_DIS;                          /* disconnect */
             scsi_release (&rz_bus);
+            sim_activate (&rz_unit[8], 100);
+            break;
+            }
+        for (i = 0; (i < 3) && (rz_fifo_c > 0); i++)
+            rz_buf[i] = rz_fifo_rd ();
+        scsi_write (&rz_bus, &rz_buf[0], i);
+        scsi_release_atn (&rz_bus);
+        for (i = 0; rz_fifo_c > 0; i++)
+            rz_buf[i] = rz_fifo_rd ();
+        scsi_write (&rz_bus, &rz_buf[0], i);
+        rz_seq = 4;
+        if (scsi_state (&rz_bus, tgt) == SCSI_DISC) {
+            rz_seq = 3;
+            rz_int |= INT_DIS;
+            }
+        else {
+            rz_int |= (INT_BUSSV | INT_FC);
             }
         sim_activate (&rz_unit[8], 50);
         break;
@@ -738,9 +769,14 @@ switch (cmd & 0x7f) {
 
     case 0x12:
         sim_debug (DBG_CMD, &rz_dev, "message accepted\n");
-        scsi_release (&rz_bus);
         rz_seq = 0;
-        rz_int |= INT_DIS;
+        if (rz_message_accepted ())
+            rz_int |= INT_DIS;
+        else {
+            if (rz_bus.req)
+                rz_int |= INT_BUSSV;
+            rz_int |= INT_FC;
+            }
         sim_activate (&rz_unit[8], 50);
         break;
 

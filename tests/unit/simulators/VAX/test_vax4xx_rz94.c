@@ -9,6 +9,8 @@
 #include "sim_scsi.h"
 
 #define RZ_INT_ILLCMD 0x40
+#define RZ_INT_DIS 0x20
+#define RZ_INT_BUSSV 0x10
 #define RZ_INT_FC 0x08
 
 extern DEVICE rz_dev;
@@ -21,6 +23,7 @@ extern uint8 rz_dest;
 extern uint8 rz_int;
 extern uint8 rz_seq;
 extern uint8 rz_stat;
+extern uint8 *rz_buf;
 extern uint8 rz_fifo[];
 extern uint32 rz_fifo_b;
 extern uint32 rz_fifo_c;
@@ -35,6 +38,9 @@ uint32 trpirq;
 uint32 fault_PC;
 int32 hlt_pin;
 jmp_buf save_env;
+
+static uint8 rz_test_scsi_buffer[256];
+static uint8 rz_test_transfer_buffer[256];
 
 int32 Map_ReadB(uint32 ba, int32 bc, uint8 *buf)
 {
@@ -56,10 +62,23 @@ int32 eval_int(void)
     return 0;
 }
 
+static void load_rz_fifo(const uint8 *data, uint32 len)
+{
+    assert_true(len <= 16);
+    memcpy(rz_fifo, data, len);
+    rz_fifo_t = 0;
+    rz_fifo_b = len;
+    rz_fifo_c = len;
+}
+
 static void reset_rz_command_state(void)
 {
+    size_t i;
+
     memset(&rz_bus, 0, sizeof(rz_bus));
     rz_bus.dptr = &rz_dev;
+    rz_bus.buf = rz_test_scsi_buffer;
+    rz_buf = rz_test_transfer_buffer;
     rz_bus.initiator = -1;
     rz_bus.target = -1;
     rz_cfg1 = RZ_SCSI_ID;
@@ -70,6 +89,10 @@ static void reset_rz_command_state(void)
     memset(rz_fifo, 0, 16);
     int_req[IPL_SC] = 0;
     sim_cancel(&rz_unit[8]);
+    for (i = 0; i < 8; i++) {
+        rz_unit[i].flags |= UNIT_DIS;
+        rz_unit[i].up7 = NULL;
+    }
 }
 
 static void test_flush_fifo_does_not_set_interrupt(void **state)
@@ -155,12 +178,97 @@ static void test_reset_chip_disconnects_without_bus_reset(void **state)
     assert_int_equal(rz_bus.sense_info, 0x12345678);
 }
 
+static void test_message_accepted_keeps_bus_for_pending_message(void **state)
+{
+    (void)state;
+
+    reset_rz_command_state();
+    rz_bus.initiator = RZ_SCSI_ID;
+    rz_bus.target = 4;
+    rz_bus.phase = SCSI_MSGI;
+    rz_bus.req = TRUE;
+    rz_bus.buf[0] = 0x04;
+    rz_bus.buf[1] = 0x00;
+    rz_bus.buf_t = 1;
+    rz_bus.buf_b = 2;
+
+    rz_cmd(0x12);
+
+    assert_int_equal(rz_bus.phase, SCSI_MSGI);
+    assert_int_equal(rz_bus.initiator, RZ_SCSI_ID);
+    assert_int_equal(rz_bus.target, 4);
+    assert_true(rz_bus.req);
+    assert_true(rz_int & RZ_INT_FC);
+    assert_true(rz_int & RZ_INT_BUSSV);
+    assert_false(rz_int & RZ_INT_DIS);
+}
+
+static void test_message_accepted_disconnects_after_last_message(void **state)
+{
+    (void)state;
+
+    reset_rz_command_state();
+    rz_bus.initiator = RZ_SCSI_ID;
+    rz_bus.target = 4;
+    rz_bus.phase = SCSI_MSGI;
+    rz_bus.req = FALSE;
+    rz_bus.buf_t = 0;
+    rz_bus.buf_b = 0;
+
+    rz_cmd(0x12);
+
+    assert_int_equal(rz_bus.phase, SCSI_DATO);
+    assert_int_equal(rz_bus.initiator, -1);
+    assert_int_equal(rz_bus.target, -1);
+    assert_true(rz_int & RZ_INT_DIS);
+    assert_false(rz_int & RZ_INT_BUSSV);
+}
+
+static void test_select_with_atn3_sends_three_messages_then_command(
+    void **state)
+{
+    static SCSI_DEV disk = {
+        .devtype = SCSI_DISK,
+    };
+    const uint8 select_bytes[] = {
+        0x80,       /* identify LUN 0 */
+        0x20, 0x44, /* simple queue tag 0x44 */
+        0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* test unit ready */
+    };
+
+    (void)state;
+
+    reset_rz_command_state();
+    rz_bus.dev[4] = &rz_unit[4];
+    rz_unit[4].flags &= ~UNIT_DIS;
+    rz_unit[4].up7 = &disk;
+    rz_dest = 4;
+    load_rz_fifo(select_bytes, sizeof(select_bytes));
+
+    rz_cmd(0x46);
+
+    assert_int_equal(rz_bus.phase, SCSI_STS);
+    assert_int_equal(rz_bus.initiator, RZ_SCSI_ID);
+    assert_int_equal(rz_bus.target, 4);
+    assert_false(rz_bus.atn);
+    assert_true(rz_bus.req);
+    assert_int_equal(rz_bus.lun, 0);
+    assert_int_equal(rz_fifo_c, 0);
+    assert_true(rz_int & RZ_INT_FC);
+    assert_true(rz_int & RZ_INT_BUSSV);
+    assert_false(rz_int & RZ_INT_DIS);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_flush_fifo_does_not_set_interrupt),
         cmocka_unit_test(test_disable_selection_reselection_completes),
         cmocka_unit_test(test_reset_chip_disconnects_without_bus_reset),
+        cmocka_unit_test(test_message_accepted_keeps_bus_for_pending_message),
+        cmocka_unit_test(test_message_accepted_disconnects_after_last_message),
+        cmocka_unit_test(
+            test_select_with_atn3_sends_three_messages_then_command),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

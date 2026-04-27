@@ -71,6 +71,9 @@
 #define MSG_REJECT      0x07                            /* message reject */
 #define MSG_NOOP        0x08                            /* no operation */
 #define MSG_BUS_RESET   0x0C                            /* bus device reset */
+#define MSG_SIMPLE_QTAG 0x20                            /* simple queue tag */
+#define MSG_HEAD_QTAG   0x21                            /* head of queue tag */
+#define MSG_ORDER_QTAG  0x22                            /* ordered queue tag */
 
 #define PUTL(b,x,v)     b[x] = (v >> 24) & 0xFF; \
                         b[x+1] = (v >> 16) & 0xFF; \
@@ -148,6 +151,13 @@ static const char *scsi_phases[] = {
     "MSGO",                                             /* message out */
     "MSGI"                                              /* message in */
     };
+
+static t_bool scsi_is_queue_tag (uint8 msg)
+{
+return ((msg == MSG_SIMPLE_QTAG) ||
+        (msg == MSG_HEAD_QTAG) ||
+        (msg == MSG_ORDER_QTAG));
+}
 
 /* Arbitrate for control of the bus */
 
@@ -269,7 +279,15 @@ uint32 scsi_message (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 uint32 used;
 
-if (data[0] & 0x80) {                                   /* identify */
+if ((data[0] & 0x80) && (len == 3) &&
+    scsi_is_queue_tag (data[1])) {                      /* identify + tag */
+    bus->lun = (data[0] & 0xF);
+    sim_debug (SCSI_DBG_MSG, bus->dptr,
+        "Identify, LUN = %d, queue tag %02X\n", bus->lun, data[2]);
+    scsi_set_req (bus);                                 /* request data */
+    used = 3;                                           /* message length */
+    }
+else if (data[0] & 0x80) {                              /* identify */
     bus->lun = (data[0] & 0xF);
     sim_debug (SCSI_DBG_MSG, bus->dptr,
         "Identify, LUN = %d\n", bus->lun);

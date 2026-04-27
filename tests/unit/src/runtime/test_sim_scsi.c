@@ -229,6 +229,33 @@ static void test_scsi_message_accepts_no_operation(void **state)
     assert_standard_message_is_accepted_silently(0x08);
 }
 
+static void test_scsi_message_accepts_identify_with_simple_queue_tag(
+    void **state)
+{
+    SCSI_BUS bus;
+    UNIT unit;
+    SCSI_DEV scsi_device;
+    uint8 messages[] = {0x80, 0x20, 0x44};
+
+    (void)state;
+
+    setup_message_bus(&bus);
+    memset(&unit, 0, sizeof(unit));
+    memset(&scsi_device, 0, sizeof(scsi_device));
+    unit.up7 = &scsi_device;
+    bus.dev[4] = &unit;
+
+    assert_int_equal(scsi_write(&bus, messages, sizeof(messages)),
+                     sizeof(messages));
+    assert_int_equal(bus.phase, SCSI_CMD);
+    assert_int_equal(bus.initiator, 6);
+    assert_int_equal(bus.target, 4);
+    assert_int_equal(bus.lun, 0);
+    assert_true(bus.req);
+
+    teardown_message_bus(&bus);
+}
+
 static void test_scsi_message_unknown_still_reports_diagnostic(void **state)
 {
     struct scsi_message_case message_case = {
@@ -607,6 +634,8 @@ int main(void)
         cmocka_unit_test(test_scsi_message_accepts_restore_pointers),
         cmocka_unit_test(test_scsi_message_accepts_message_reject),
         cmocka_unit_test(test_scsi_message_accepts_no_operation),
+        cmocka_unit_test(
+            test_scsi_message_accepts_identify_with_simple_queue_tag),
         cmocka_unit_test(test_scsi_message_unknown_still_reports_diagnostic),
         cmocka_unit_test(test_scsi_message_abort_disconnects),
         cmocka_unit_test(test_scsi_message_bus_device_reset_disconnects),
