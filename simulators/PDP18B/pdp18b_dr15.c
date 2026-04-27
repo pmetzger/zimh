@@ -167,7 +167,7 @@ if (pulse & 02) {
         dr15_set_clr_ie (AC & 1);
     }
 if (pulse & 04) {                                       /* CAPI */
-    int32 old_int_req = dr15_int_req;
+    uint32 old_int_req = dr15_int_req;
     dr15_int_req &= ~(1 << subdev);                     /* clear local req */
     int_hwre[subdev] &= ~INT_DR;                        /* clear hwre req */
     if (dr15_int_req != old_int_req)                    /* state change? */
