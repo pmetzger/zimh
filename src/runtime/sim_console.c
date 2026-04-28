@@ -138,7 +138,9 @@
 /* Forward declarations of platform specific routines */
 
 static t_stat sim_os_poll_kbd (void);
+#if defined(SIM_ASYNCH_IO) && defined(SIM_ASYNCH_MUX)
 static t_bool sim_os_poll_kbd_ready (int ms_timeout);
+#endif
 static t_stat sim_os_putchar (int32 out);
 static t_stat sim_os_ttinit (void);
 static t_stat sim_os_ttrun (void);
@@ -230,6 +232,10 @@ static MTAB sim_con_mod[] = {
 
 static const char *sim_con_telnet_description (DEVICE *dptr)
 {
+/* Device description callback signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Console telnet support";
 }
 
@@ -312,11 +318,19 @@ return sim_con_poll_svc (&dptr->units[0]);              /* establish polling as 
 
 static t_stat sim_con_attach (UNIT *uptr, const char *ptr)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 return tmxr_attach (&sim_con_tmxr, &sim_con_unit, ptr);
 }
 
 static t_stat sim_con_detach (UNIT *uptr)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 return sim_set_notelnet (0, NULL);
 }
 
@@ -420,6 +434,10 @@ char *cvptr, gbuf[CBUFSIZE];
 CTAB *ctptr;
 t_stat r;
 
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 if ((cptr == NULL) || (*cptr == 0))
     return SCPE_2FARG;
 while (*cptr != 0) {                                    /* do all mods */
@@ -444,6 +462,10 @@ t_stat sim_show_console (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const c
 char gbuf[CBUFSIZE];
 SHTAB *shptr;
 int32 i;
+
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) flag;
 
 if (*cptr == 0) {                                       /* show all */
     for (i = 0; show_con_tab[i].name; i++)
@@ -496,6 +518,10 @@ MTAB sim_rem_con_mod[] = {
 
 static const char *sim_rem_con_description (DEVICE *dptr)
 {
+/* Device description callback signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Remote Console Facility";
 }
 
@@ -591,6 +617,10 @@ char *cvptr, gbuf[CBUFSIZE];
 CTAB *ctptr;
 t_stat r;
 
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 if ((cptr == NULL) || (*cptr == 0))
     return SCPE_2FARG;
 while (*cptr != 0) {                                    /* do all mods */
@@ -614,6 +644,12 @@ t_stat sim_show_remote_console (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, 
 {
 int32 i, connections;
 REMOTE *rem;
+
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
 
 if (*cptr != 0)
     return SCPE_NOPARAM;
@@ -720,36 +756,71 @@ return SCPE_OK;
 
 static t_stat x_continue_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This sentinel implementation does not use every parameter. */
+(void) flag;
+(void) cptr;
+
 return 1+SCPE_IERR;         /* This routine should never be called */
 }
 
 static t_stat x_repeat_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This sentinel implementation does not use every parameter. */
+(void) flag;
+(void) cptr;
+
 return 2+SCPE_IERR;         /* This routine should never be called */
 }
 
 static t_stat x_collect_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This sentinel implementation does not use every parameter. */
+(void) flag;
+(void) cptr;
+
 return 3+SCPE_IERR;         /* This routine should never be called */
 }
 
 static t_stat x_sampleout_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This sentinel implementation does not use every parameter. */
+(void) flag;
+(void) cptr;
+
 return 4+SCPE_IERR;         /* This routine should never be called */
 }
 
 static t_stat x_execute_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This sentinel implementation does not use every parameter. */
+(void) flag;
+(void) cptr;
+
 return 5+SCPE_IERR;         /* This routine should never be called */
 }
 
 static t_stat x_step_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This sentinel implementation does not use every parameter. */
+(void) flag;
+(void) cptr;
+
 return 6+SCPE_IERR;         /* This routine should never be called */
 }
 
 static t_stat x_run_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This sentinel implementation does not use every parameter. */
+(void) flag;
+(void) cptr;
+
 return 7+SCPE_IERR;         /* This routine should never be called */
 }
 
@@ -1887,6 +1958,10 @@ else
 
 t_stat sim_rem_con_reset (DEVICE *dptr)
 {
+/* Generic reset callback signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (sim_rem_con_tmxr.lines) {
     int32 i;
 
@@ -1961,6 +2036,10 @@ REMOTE *rem;
 t_stat r;
 int32 i;
 
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 if (cptr == NULL)
     return SCPE_ARG;
 lines = (int32) get_uint (cptr, 10, MAX_REMOTE_SESSIONS, &r);
@@ -2013,6 +2092,10 @@ static t_stat sim_set_rem_timeout (int32 flag, const char *cptr)
 int32 timeout;
 t_stat r;
 
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 if (cptr == NULL)
     return SCPE_ARG;
 timeout = (int32) get_uint (cptr, 10, 3600, &r);
@@ -2030,6 +2113,10 @@ static t_stat sim_set_rem_bufsize (int32 flag, const char *cptr)
 char cmdbuf[CBUFSIZE];
 int32 bufsize;
 t_stat r;
+
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
 
 if (cptr == NULL)
     return SCPE_ARG;
@@ -2155,6 +2242,12 @@ t_stat sim_show_kmap (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char
 {
 int32 kmap_char = *(cons_kmap[flag & KMAP_MASK]);
 
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) cptr;
+
 if (sim_devices[0]->dradix == 16)
     fprintf (st, "%s = 0x%X", show_con_tab[flag].name, kmap_char);
 else
@@ -2177,6 +2270,10 @@ DEVICE *dptr = sim_devices[0];
 uint32 val, rdx;
 t_stat r;
 
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 if ((cptr == NULL) || (*cptr == 0))
     return SCPE_2FARG;
 if (dptr->dradix == 16) rdx = 16;
@@ -2193,6 +2290,13 @@ return SCPE_OK;
 
 t_stat sim_show_pchar (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 if (sim_devices[0]->dradix == 16)
     fprintf (st, "pchar mask = %X", sim_tt_pchar);
 else
@@ -2223,6 +2327,10 @@ t_stat sim_set_cons_speed (int32 flag, const char *cptr)
 {
 t_stat r = tmxr_set_line_speed (&sim_con_ldsc, cptr);
 
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 if ((r == SCPE_OK) && (sim_con_ldsc.uptr != NULL))
     sim_con_ldsc.uptr->wait = sim_con_ldsc.rxdeltausecs;
 return r;
@@ -2230,6 +2338,13 @@ return r;
 
 t_stat sim_show_cons_speed (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 if (sim_con_ldsc.rxbps) {
     fprintf (st, "Speed = %d", sim_con_ldsc.rxbps);
     if (sim_con_ldsc.bpsfactor != 1.0)
@@ -2245,6 +2360,10 @@ t_stat sim_set_logon (int32 flag, const char *cptr)
 {
 char gbuf[CBUFSIZE];
 t_stat r;
+
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
 
 if ((cptr == NULL) || (*cptr == 0))                     /* need arg */
     return SCPE_2FARG;
@@ -2275,6 +2394,10 @@ return SCPE_OK;
 
 t_stat sim_set_logoff (int32 flag, const char *cptr)
 {
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 if (cptr && (*cptr != 0))                               /* now eol? */
     return SCPE_2MARG;
 if (sim_log == NULL)                                    /* no log? */
@@ -2291,6 +2414,12 @@ return SCPE_OK;
 
 t_stat sim_show_log (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
 if (sim_log)
@@ -2323,6 +2452,10 @@ t_stat sim_set_debon (int32 flag, const char *cptr)
 char gbuf[CBUFSIZE];
 t_stat r;
 size_t buffer_size = 0;
+
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
 
 if ((cptr == NULL) || (*cptr == 0))                     /* need arg */
     return SCPE_2FARG;
@@ -2394,6 +2527,10 @@ return SCPE_OK;
 
 t_stat sim_set_deboff (int32 flag, const char *cptr)
 {
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 if (cptr && (*cptr != 0))                               /* now eol? */
     return SCPE_2MARG;
 if (sim_deb == NULL)                                    /* no debug? */
@@ -2428,6 +2565,11 @@ return sim_messagef (SCPE_OK, "Debug output disabled\n");
 t_stat sim_show_debug (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 int32 i;
+
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
 
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
@@ -2492,6 +2634,10 @@ char *cvptr, gbuf[CBUFSIZE];
 CTAB *ctptr;
 t_stat r;
 
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 if ((cptr == NULL) || (*cptr == 0))
     return SCPE_2FARG;
 while (*cptr != 0) {                                    /* do all mods */
@@ -2523,6 +2669,10 @@ return SCPE_OK;
 
 t_stat sim_set_notelnet (int32 flag, const char *cptr)
 {
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 if (cptr && (*cptr != 0))                               /* too many arguments? */
     return SCPE_2MARG;
 if (sim_con_tmxr.master == 0)                           /* ignore if already closed */
@@ -2534,6 +2684,12 @@ return tmxr_close_master (&sim_con_tmxr);               /* close master socket *
 
 t_stat sim_show_telnet (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, const char *cptr)
 {
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) dunused;
+(void) uunused;
+(void) flag;
+
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
 if ((sim_con_tmxr.master == 0) &&
@@ -2563,6 +2719,10 @@ t_stat sim_set_cons_buff (int32 flg, const char *cptr)
 {
 char cmdbuf[CBUFSIZE];
 
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flg;
+
 sprintf(cmdbuf, "BUFFERED%c%s", cptr ? '=' : '\0', cptr ? cptr : "");
 return tmxr_open_master (&sim_con_tmxr, cmdbuf);      /* open master socket */
 }
@@ -2572,6 +2732,10 @@ return tmxr_open_master (&sim_con_tmxr, cmdbuf);      /* open master socket */
 t_stat sim_set_cons_unbuff (int32 flg, const char *cptr)
 {
 char cmdbuf[CBUFSIZE];
+
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flg;
 
 sprintf(cmdbuf, "UNBUFFERED%c%s", cptr ? '=' : '\0', cptr ? cptr : "");
 return tmxr_open_master (&sim_con_tmxr, cmdbuf);      /* open master socket */
@@ -2583,6 +2747,10 @@ t_stat sim_set_cons_log (int32 flg, const char *cptr)
 {
 char cmdbuf[CBUFSIZE];
 
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flg;
+
 sprintf(cmdbuf, "LOG%c%s", cptr ? '=' : '\0', cptr ? cptr : "");
 return tmxr_open_master (&sim_con_tmxr, cmdbuf);      /* open master socket */
 }
@@ -2593,12 +2761,22 @@ t_stat sim_set_cons_nolog (int32 flg, const char *cptr)
 {
 char cmdbuf[CBUFSIZE];
 
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flg;
+
 sprintf(cmdbuf, "NOLOG%c%s", cptr ? '=' : '\0', cptr ? cptr : "");
 return tmxr_open_master (&sim_con_tmxr, cmdbuf);      /* open master socket */
 }
 
 t_stat sim_show_cons_log (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, const char *cptr)
 {
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) dunused;
+(void) uunused;
+(void) flag;
+
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
 if (sim_con_tmxr.ldsc->txlog)
@@ -2610,6 +2788,12 @@ return SCPE_OK;
 
 t_stat sim_show_cons_buff (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, const char *cptr)
 {
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) dunused;
+(void) uunused;
+(void) flag;
+
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
 if (!sim_con_tmxr.ldsc->txbfd)
@@ -2628,6 +2812,11 @@ return set_dev_debug (&sim_con_telnet, &sim_con_unit, flg, cptr);
 
 t_stat sim_show_cons_debug (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, const char *cptr)
 {
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) dunused;
+(void) uunused;
+
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
 return show_dev_debug (st, &sim_con_telnet, &sim_con_unit, flag, cptr);
@@ -2640,6 +2829,10 @@ t_stat sim_set_serial (int32 flag, const char *cptr)
 char *cvptr, gbuf[CBUFSIZE], ubuf[CBUFSIZE];
 CTAB *ctptr;
 t_stat r;
+
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
 
 if ((cptr == NULL) || (*cptr == 0))
     return SCPE_2FARG;
@@ -2681,6 +2874,10 @@ return SCPE_OK;
 
 t_stat sim_set_noserial (int32 flag, const char *cptr)
 {
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 if (cptr && (*cptr != 0))                               /* too many arguments? */
     return SCPE_2MARG;
 if (sim_con_ldsc.serport == 0)                          /* ignore if already closed */
@@ -2692,6 +2889,12 @@ return tmxr_close_master (&sim_con_tmxr);               /* close master socket *
 
 t_stat sim_show_cons_expect (FILE *st, DEVICE *dunused, UNIT *uunused, int32 flag, const char *cptr)
 {
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) dunused;
+(void) uunused;
+(void) flag;
+
 fprintf (st, "Console Expect processing:\n");
 return sim_exp_show (st, &sim_con_expect, cptr);
 }
@@ -2887,6 +3090,13 @@ return &sim_con_expect;
 
 t_stat sim_show_cons_send_input (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Console Send processing:\n");
 return sim_show_send_input (st, &sim_con_send);
 }
@@ -3059,6 +3269,10 @@ int32 i, d;
 t_stat r;
 char gbuf[CBUFSIZE];
 
+/* Generic modifier validation signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if ((cptr == NULL) || (tabs == NULL) || (val <= 1))
     return SCPE_IERR;
 if (*cptr == 0)
@@ -3087,6 +3301,10 @@ t_stat sim_tt_showtabs (FILE *st, UNIT *uptr, int32 val, const void *desc)
 const uint8 *tabs = (const uint8 *) desc;
 int32 i, any;
 
+/* Generic modifier display signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if ((st == NULL) || (val == 0) || (desc == NULL))
     return SCPE_IERR;
 for (i = any = 0; i < val; i++) {
@@ -3103,6 +3321,11 @@ t_stat sim_tt_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 par_mode = (TT_GET_MODE (uptr->flags) >> TTUF_W_MODE) & TTUF_M_PAR;
 
+/* Generic modifier validation signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 uptr->flags = uptr->flags & ~((TTUF_M_MODE << TTUF_V_MODE) | (TTUF_M_PAR << TTUF_V_PAR) | TTUF_KSR);
 uptr->flags |= val;
 if (val != TT_MODE_8B)
@@ -3112,6 +3335,11 @@ return SCPE_OK;
 
 t_stat sim_tt_set_parity (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier validation signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 uptr->flags = uptr->flags & ~(TTUF_M_MODE | TTUF_M_PAR);
 uptr->flags |= TT_MODE_7B | val;
 return SCPE_OK;
@@ -3123,6 +3351,11 @@ uint32 md = (TT_GET_MODE (uptr->flags) & TTUF_M_MODE);
 static const char *modes[] = {"7b", "8b", "UC", "7p"};
 uint32 par_mode = (TT_GET_MODE (uptr->flags) >> TTUF_W_MODE) & TTUF_M_PAR;
 static const char *parity[] = {"SPACE", "MARK", "EVEN", "ODD"};
+
+/* Generic modifier display signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
 
 if ((md == TTUF_MODE_UC) && (par_mode == TTUF_PAR_MARK))
     fprintf (st, "KSR (UC, MARK parity)");
@@ -3493,6 +3726,7 @@ if ((sim_brk_char && ((c & 0177) == sim_brk_char)) || (c & SCPE_BREAK))
 return c | SCPE_KFLAG;
 }
 
+#if defined(SIM_ASYNCH_IO) && defined(SIM_ASYNCH_MUX)
 static t_bool sim_os_poll_kbd_ready (int ms_timeout)
 {
 sim_debug (DBG_TRC, &sim_con_telnet, "sim_os_poll_kbd_ready()\n");
@@ -3503,6 +3737,7 @@ if ((std_input == NULL) ||                              /* No keyboard for */
     }
 return (WAIT_OBJECT_0 == WaitForSingleObject (std_input, ms_timeout));
 }
+#endif
 
 
 #define BELL_CHAR           7       /* Bell Character */
@@ -3707,6 +3942,7 @@ if (sim_int_char && (buf[0] == sim_int_char))
 return (buf[0] | SCPE_KFLAG);
 }
 
+#if defined(SIM_ASYNCH_IO) && defined(SIM_ASYNCH_MUX)
 static t_bool sim_os_poll_kbd_ready (int ms_timeout)
 {
 fd_set readfds;
@@ -3722,6 +3958,7 @@ timeout.tv_sec = (ms_timeout*1000)/1000000;
 timeout.tv_usec = (ms_timeout*1000)%1000000;
 return (1 == select (1, &readfds, NULL, NULL, &timeout));
 }
+#endif
 
 static t_stat sim_os_putchar (int32 out)
 {
@@ -3877,6 +4114,7 @@ if (sim_int_char && (buf[0] == sim_int_char))
 return (buf[0] | SCPE_KFLAG);
 }
 
+#if defined(SIM_ASYNCH_IO) && defined(SIM_ASYNCH_MUX)
 static t_bool sim_os_poll_kbd_ready (int ms_timeout)
 {
 fd_set readfds;
@@ -3892,6 +4130,7 @@ timeout.tv_sec = (ms_timeout*1000)/1000000;
 timeout.tv_usec = (ms_timeout*1000)%1000000;
 return (1 == select (1, &readfds, NULL, NULL, &timeout));
 }
+#endif
 
 static t_stat sim_os_putchar (int32 out)
 {
@@ -3994,6 +4233,10 @@ static t_stat sim_set_delay (int32 flag, const char *cptr)
 {
 int32 val;
 t_stat r;
+
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
+(void) flag;
 
 if (cptr == NULL || *cptr == 0)                         /* no argument string? */
     return SCPE_2FARG;                                  /* need an argument */
