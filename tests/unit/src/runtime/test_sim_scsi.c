@@ -11,8 +11,13 @@
 
 #define TEST_SCSI_STATUS_GOOD 0
 #define TEST_SCSI_STATUS_CHECK 2
+#define TEST_SCSI_SENSE_MEDIUM_ERROR 3
 #define TEST_SCSI_SENSE_ILLEGAL_REQUEST 5
+#define TEST_SCSI_ASC_UNRECOVERED_READ_ERROR 0x11
 #define TEST_SCSI_ASC_INVALID_FIELD_IN_CDB 0x24
+#define TEST_SCSI_ASC_WRITE_ERROR 0x0c
+#define TEST_MODE_SENSE6_PAGE_OFFSET 12
+#define TEST_MODE_SENSE10_PAGE_OFFSET 16
 
 struct scsi_message_case {
     uint8 message;
@@ -103,6 +108,7 @@ static void record_disk_flush(UNIT *unit)
 static void setup_disk_bus(struct scsi_disk_case *disk_case)
 {
     memset(disk_case, 0, sizeof(*disk_case));
+    sim_disk_clear_all_test_backends();
 
     simh_test_init_device_unit(&disk_case->device, &disk_case->unit, "SCSI",
                                "SCSI0", DEV_SECTORS,
@@ -133,7 +139,84 @@ static void setup_disk_bus(struct scsi_disk_case *disk_case)
 
 static void teardown_disk_bus(struct scsi_disk_case *disk_case)
 {
+    sim_disk_clear_all_test_backends();
     free(disk_case->bus.buf);
+}
+
+static t_stat failing_disk_read(UNIT *unit, t_lba lba, uint8 *buf,
+                                t_seccnt *sectsread, t_seccnt sects)
+{
+    (void)unit;
+    (void)lba;
+    (void)buf;
+    (void)sects;
+
+    if (sectsread != NULL)
+        *sectsread = 0;
+    return SCPE_IOERR;
+}
+
+static t_stat partial_disk_read(UNIT *unit, t_lba lba, uint8 *buf,
+                                t_seccnt *sectsread, t_seccnt sects)
+{
+    (void)unit;
+    (void)lba;
+    (void)buf;
+    (void)sects;
+
+    if (sectsread != NULL)
+        *sectsread = 0;
+    return SCPE_OK;
+}
+
+static t_stat failing_disk_write(UNIT *unit, t_lba lba, uint8 *buf,
+                                 t_seccnt *sectswritten, t_seccnt sects)
+{
+    (void)unit;
+    (void)lba;
+    (void)buf;
+    (void)sects;
+
+    if (sectswritten != NULL)
+        *sectswritten = 0;
+    return SCPE_IOERR;
+}
+
+static t_stat partial_disk_write(UNIT *unit, t_lba lba, uint8 *buf,
+                                 t_seccnt *sectswritten, t_seccnt sects)
+{
+    (void)unit;
+    (void)lba;
+    (void)buf;
+    (void)sects;
+
+    if (sectswritten != NULL)
+        *sectswritten = 0;
+    return SCPE_OK;
+}
+
+static void set_disk_read_backend(
+    struct scsi_disk_case *disk_case,
+    t_stat (*rdsect)(UNIT *, t_lba, uint8 *, t_seccnt *, t_seccnt))
+{
+    SIM_DISK_TEST_BACKEND backend = {
+        .rdsect = rdsect,
+    };
+
+    assert_int_equal(sim_disk_set_test_backend(&disk_case->unit, &backend),
+                     SCPE_OK);
+}
+
+static void set_disk_write_backend(
+    struct scsi_disk_case *disk_case,
+    t_stat (*wrsect)(UNIT *, t_lba, uint8 *, t_seccnt *, t_seccnt))
+{
+    SIM_DISK_TEST_BACKEND backend = {
+        .wrsect = wrsect,
+    };
+
+    assert_int_equal(sim_disk_set_test_backend(&disk_case->unit, &backend),
+                     SCPE_OK);
 }
 
 static void write_scsi_message(void *context)
@@ -207,6 +290,14 @@ static void assert_scsi_data_in(const struct scsi_cdrom_case *cdrom_case,
     assert_memory_equal(data, expected, expected_size);
 }
 
+static void read_scsi_bus_data(SCSI_BUS *bus, uint8 *data, uint32 data_size,
+                               uint32 expected_size)
+{
+    assert_int_equal(bus->phase, SCSI_DATI);
+    assert_true(expected_size <= data_size);
+    assert_int_equal(scsi_read(bus, data, data_size), expected_size);
+}
+
 static void assert_scsi_bus_good_status(SCSI_BUS *bus)
 {
     uint8 status;
@@ -221,16 +312,31 @@ static void assert_scsi_good_status(struct scsi_cdrom_case *cdrom_case)
     assert_scsi_bus_good_status(&cdrom_case->bus);
 }
 
-static void assert_scsi_check_status(struct scsi_cdrom_case *cdrom_case,
-                                     uint32 sense_key, uint32 sense_code)
+static void assert_scsi_bus_check_status(SCSI_BUS *bus, uint32 sense_key,
+                                         uint32 sense_code)
 {
     uint8 status;
 
-    assert_int_equal(cdrom_case->bus.phase, SCSI_STS);
-    assert_int_equal(scsi_read(&cdrom_case->bus, &status, 1), 1);
+    assert_int_equal(bus->phase, SCSI_STS);
+    assert_int_equal(scsi_read(bus, &status, 1), 1);
     assert_int_equal(status, TEST_SCSI_STATUS_CHECK);
-    assert_int_equal(cdrom_case->bus.sense_key, sense_key);
-    assert_int_equal(cdrom_case->bus.sense_code, sense_code);
+    assert_int_equal(bus->sense_key, sense_key);
+    assert_int_equal(bus->sense_code, sense_code);
+}
+
+static void assert_scsi_check_status(struct scsi_cdrom_case *cdrom_case,
+                                     uint32 sense_key, uint32 sense_code)
+{
+    assert_scsi_bus_check_status(&cdrom_case->bus, sense_key, sense_code);
+}
+
+static void write_scsi_disk_data(void *context)
+{
+    struct scsi_disk_case *disk_case = context;
+    uint8 data[512] = {0};
+
+    assert_int_equal(scsi_write(&disk_case->bus, data, sizeof(data)),
+                     sizeof(data));
 }
 
 static void assert_standard_message_is_accepted_silently(uint8 message)
@@ -493,6 +599,399 @@ static void test_disk_synchronize_cache_flushes_backing_store(void **state)
     teardown_disk_bus(&disk_case);
 }
 
+static void test_disk_read6_failure_reports_medium_error(void **state)
+{
+    struct scsi_disk_case disk_case;
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    set_disk_read_backend(&disk_case, failing_disk_read);
+    disk_case.command[0] = 0x08;
+    disk_case.command[4] = 1;
+    disk_case.command_len = 6;
+
+    assert_disk_command_writes_silently(&disk_case);
+    assert_scsi_bus_check_status(&disk_case.bus, TEST_SCSI_SENSE_MEDIUM_ERROR,
+                                 TEST_SCSI_ASC_UNRECOVERED_READ_ERROR);
+
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_read10_failure_reports_medium_error(void **state)
+{
+    struct scsi_disk_case disk_case;
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    set_disk_read_backend(&disk_case, failing_disk_read);
+    disk_case.command[0] = 0x28;
+    disk_case.command[8] = 1;
+    disk_case.command_len = 10;
+
+    assert_disk_command_writes_silently(&disk_case);
+    assert_scsi_bus_check_status(&disk_case.bus, TEST_SCSI_SENSE_MEDIUM_ERROR,
+                                 TEST_SCSI_ASC_UNRECOVERED_READ_ERROR);
+
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_read_long_failure_reports_medium_error(void **state)
+{
+    struct scsi_disk_case disk_case;
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    set_disk_read_backend(&disk_case, failing_disk_read);
+    disk_case.command[0] = 0x3e;
+    disk_case.command[7] = 0x02;
+    disk_case.command[8] = 0x00;
+    disk_case.command_len = 10;
+
+    assert_disk_command_writes_silently(&disk_case);
+    assert_scsi_bus_check_status(&disk_case.bus, TEST_SCSI_SENSE_MEDIUM_ERROR,
+                                 TEST_SCSI_ASC_UNRECOVERED_READ_ERROR);
+
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_read6_short_read_reports_medium_error(void **state)
+{
+    struct scsi_disk_case disk_case;
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    set_disk_read_backend(&disk_case, partial_disk_read);
+    disk_case.command[0] = 0x08;
+    disk_case.command[4] = 1;
+    disk_case.command_len = 6;
+
+    assert_disk_command_writes_silently(&disk_case);
+    assert_scsi_bus_check_status(&disk_case.bus, TEST_SCSI_SENSE_MEDIUM_ERROR,
+                                 TEST_SCSI_ASC_UNRECOVERED_READ_ERROR);
+
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_read10_short_read_reports_medium_error(void **state)
+{
+    struct scsi_disk_case disk_case;
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    set_disk_read_backend(&disk_case, partial_disk_read);
+    disk_case.command[0] = 0x28;
+    disk_case.command[8] = 1;
+    disk_case.command_len = 10;
+
+    assert_disk_command_writes_silently(&disk_case);
+    assert_scsi_bus_check_status(&disk_case.bus, TEST_SCSI_SENSE_MEDIUM_ERROR,
+                                 TEST_SCSI_ASC_UNRECOVERED_READ_ERROR);
+
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_read_long_short_read_reports_medium_error(void **state)
+{
+    struct scsi_disk_case disk_case;
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    set_disk_read_backend(&disk_case, partial_disk_read);
+    disk_case.command[0] = 0x3e;
+    disk_case.command[7] = 0x02;
+    disk_case.command[8] = 0x00;
+    disk_case.command_len = 10;
+
+    assert_disk_command_writes_silently(&disk_case);
+    assert_scsi_bus_check_status(&disk_case.bus, TEST_SCSI_SENSE_MEDIUM_ERROR,
+                                 TEST_SCSI_ASC_UNRECOVERED_READ_ERROR);
+
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_write6_failure_reports_medium_error(void **state)
+{
+    struct scsi_disk_case disk_case;
+    char *output = NULL;
+    size_t output_size = 0;
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    set_disk_write_backend(&disk_case, failing_disk_write);
+    disk_case.command[0] = 0x0a;
+    disk_case.command[4] = 1;
+    disk_case.command_len = 6;
+
+    assert_disk_command_writes_silently(&disk_case);
+    assert_int_equal(disk_case.bus.phase, SCSI_DATO);
+    assert_int_equal(simh_test_capture_stdout(write_scsi_disk_data,
+                                              &disk_case, &output,
+                                              &output_size),
+                     0);
+    assert_string_equal(output, "");
+    assert_int_equal(output_size, 0);
+    assert_scsi_bus_check_status(&disk_case.bus, TEST_SCSI_SENSE_MEDIUM_ERROR,
+                                 TEST_SCSI_ASC_WRITE_ERROR);
+
+    free(output);
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_write10_failure_reports_medium_error(void **state)
+{
+    struct scsi_disk_case disk_case;
+    char *output = NULL;
+    size_t output_size = 0;
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    set_disk_write_backend(&disk_case, failing_disk_write);
+    disk_case.command[0] = 0x2a;
+    disk_case.command[8] = 1;
+    disk_case.command_len = 10;
+
+    assert_disk_command_writes_silently(&disk_case);
+    assert_int_equal(disk_case.bus.phase, SCSI_DATO);
+    assert_int_equal(simh_test_capture_stdout(write_scsi_disk_data,
+                                              &disk_case, &output,
+                                              &output_size),
+                     0);
+    assert_string_equal(output, "");
+    assert_int_equal(output_size, 0);
+    assert_scsi_bus_check_status(&disk_case.bus, TEST_SCSI_SENSE_MEDIUM_ERROR,
+                                 TEST_SCSI_ASC_WRITE_ERROR);
+
+    free(output);
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_write6_short_write_reports_medium_error(void **state)
+{
+    struct scsi_disk_case disk_case;
+    char *output = NULL;
+    size_t output_size = 0;
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    set_disk_write_backend(&disk_case, partial_disk_write);
+    disk_case.command[0] = 0x0a;
+    disk_case.command[4] = 1;
+    disk_case.command_len = 6;
+
+    assert_disk_command_writes_silently(&disk_case);
+    assert_int_equal(disk_case.bus.phase, SCSI_DATO);
+    assert_int_equal(simh_test_capture_stdout(write_scsi_disk_data,
+                                              &disk_case, &output,
+                                              &output_size),
+                     0);
+    assert_string_equal(output, "");
+    assert_int_equal(output_size, 0);
+    assert_scsi_bus_check_status(&disk_case.bus, TEST_SCSI_SENSE_MEDIUM_ERROR,
+                                 TEST_SCSI_ASC_WRITE_ERROR);
+
+    free(output);
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_write10_short_write_reports_medium_error(void **state)
+{
+    struct scsi_disk_case disk_case;
+    char *output = NULL;
+    size_t output_size = 0;
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    set_disk_write_backend(&disk_case, partial_disk_write);
+    disk_case.command[0] = 0x2a;
+    disk_case.command[8] = 1;
+    disk_case.command_len = 10;
+
+    assert_disk_command_writes_silently(&disk_case);
+    assert_int_equal(disk_case.bus.phase, SCSI_DATO);
+    assert_int_equal(simh_test_capture_stdout(write_scsi_disk_data,
+                                              &disk_case, &output,
+                                              &output_size),
+                     0);
+    assert_string_equal(output, "");
+    assert_int_equal(output_size, 0);
+    assert_scsi_bus_check_status(&disk_case.bus, TEST_SCSI_SENSE_MEDIUM_ERROR,
+                                 TEST_SCSI_ASC_WRITE_ERROR);
+
+    free(output);
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_mode_sense6_current_page_reports_values(void **state)
+{
+    struct scsi_disk_case disk_case;
+    uint8 data[64];
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    disk_case.command[0] = 0x1a;
+    disk_case.command[2] = 0x01;
+    disk_case.command[4] = sizeof(data);
+    disk_case.command_len = 6;
+
+    assert_disk_command_writes_silently(&disk_case);
+    read_scsi_bus_data(&disk_case.bus, data, sizeof(data), 24);
+    assert_int_equal(data[TEST_MODE_SENSE6_PAGE_OFFSET], 0x01);
+    assert_int_equal(data[TEST_MODE_SENSE6_PAGE_OFFSET + 1], 0x0a);
+    assert_int_equal(data[TEST_MODE_SENSE6_PAGE_OFFSET + 2], 0x26);
+    assert_int_equal(data[TEST_MODE_SENSE6_PAGE_OFFSET + 3], 0x08);
+
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_mode_sense6_changeable_page_returns_zero_mask(
+    void **state)
+{
+    struct scsi_disk_case disk_case;
+    uint8 data[64];
+    const uint8 zeros[10] = {0};
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    disk_case.command[0] = 0x1a;
+    disk_case.command[2] = 0x40 | 0x01;
+    disk_case.command[4] = sizeof(data);
+    disk_case.command_len = 6;
+
+    assert_disk_command_writes_silently(&disk_case);
+    read_scsi_bus_data(&disk_case.bus, data, sizeof(data), 24);
+    assert_memory_equal(&data[4], zeros, 8);
+    assert_int_equal(data[TEST_MODE_SENSE6_PAGE_OFFSET], 0x01);
+    assert_int_equal(data[TEST_MODE_SENSE6_PAGE_OFFSET + 1], 0x0a);
+    assert_memory_equal(&data[TEST_MODE_SENSE6_PAGE_OFFSET + 2], zeros,
+                        sizeof(zeros));
+
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_mode_sense6_default_page_reports_values(void **state)
+{
+    struct scsi_disk_case disk_case;
+    uint8 data[64];
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    disk_case.command[0] = 0x1a;
+    disk_case.command[2] = 0x80 | 0x01;
+    disk_case.command[4] = sizeof(data);
+    disk_case.command_len = 6;
+
+    assert_disk_command_writes_silently(&disk_case);
+    read_scsi_bus_data(&disk_case.bus, data, sizeof(data), 24);
+    assert_int_equal(data[TEST_MODE_SENSE6_PAGE_OFFSET], 0x01);
+    assert_int_equal(data[TEST_MODE_SENSE6_PAGE_OFFSET + 1], 0x0a);
+    assert_int_equal(data[TEST_MODE_SENSE6_PAGE_OFFSET + 2], 0x26);
+    assert_int_equal(data[TEST_MODE_SENSE6_PAGE_OFFSET + 3], 0x08);
+
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_mode_sense10_default_page_reports_values(void **state)
+{
+    struct scsi_disk_case disk_case;
+    uint8 data[64];
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    disk_case.command[0] = 0x5a;
+    disk_case.command[2] = 0x80 | 0x01;
+    disk_case.command[8] = sizeof(data);
+    disk_case.command_len = 10;
+
+    assert_disk_command_writes_silently(&disk_case);
+    read_scsi_bus_data(&disk_case.bus, data, sizeof(data), 28);
+    assert_int_equal(data[TEST_MODE_SENSE10_PAGE_OFFSET], 0x01);
+    assert_int_equal(data[TEST_MODE_SENSE10_PAGE_OFFSET + 1], 0x0a);
+    assert_int_equal(data[TEST_MODE_SENSE10_PAGE_OFFSET + 2], 0x26);
+    assert_int_equal(data[TEST_MODE_SENSE10_PAGE_OFFSET + 3], 0x08);
+
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_mode_sense10_changeable_page_returns_zero_mask(
+    void **state)
+{
+    struct scsi_disk_case disk_case;
+    uint8 data[64];
+    const uint8 zeros[10] = {0};
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    disk_case.command[0] = 0x5a;
+    disk_case.command[2] = 0x40 | 0x01;
+    disk_case.command[8] = sizeof(data);
+    disk_case.command_len = 10;
+
+    assert_disk_command_writes_silently(&disk_case);
+    read_scsi_bus_data(&disk_case.bus, data, sizeof(data), 28);
+    assert_memory_equal(&data[8], zeros, 8);
+    assert_int_equal(data[TEST_MODE_SENSE10_PAGE_OFFSET], 0x01);
+    assert_int_equal(data[TEST_MODE_SENSE10_PAGE_OFFSET + 1], 0x0a);
+    assert_memory_equal(&data[TEST_MODE_SENSE10_PAGE_OFFSET + 2], zeros,
+                        sizeof(zeros));
+
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_mode_sense6_saved_values_are_rejected(void **state)
+{
+    struct scsi_disk_case disk_case;
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    disk_case.command[0] = 0x1a;
+    disk_case.command[2] = 0xc0 | 0x01;
+    disk_case.command[4] = 64;
+    disk_case.command_len = 6;
+
+    assert_disk_command_writes_silently(&disk_case);
+    assert_scsi_bus_check_status(&disk_case.bus,
+                                 TEST_SCSI_SENSE_ILLEGAL_REQUEST,
+                                 TEST_SCSI_ASC_INVALID_FIELD_IN_CDB);
+
+    teardown_disk_bus(&disk_case);
+}
+
+static void test_disk_mode_sense10_saved_values_are_rejected(void **state)
+{
+    struct scsi_disk_case disk_case;
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    disk_case.command[0] = 0x5a;
+    disk_case.command[2] = 0xc0 | 0x01;
+    disk_case.command[8] = 64;
+    disk_case.command_len = 10;
+
+    assert_disk_command_writes_silently(&disk_case);
+    assert_scsi_bus_check_status(&disk_case.bus,
+                                 TEST_SCSI_SENSE_ILLEGAL_REQUEST,
+                                 TEST_SCSI_ASC_INVALID_FIELD_IN_CDB);
+
+    teardown_disk_bus(&disk_case);
+}
+
 static void test_cdrom_read_toc_returns_single_data_track(void **state)
 {
     struct scsi_cdrom_case cdrom_case;
@@ -741,6 +1240,25 @@ int main(void)
         cmocka_unit_test(test_scsi_reset_clears_bus_signals_and_sense),
         cmocka_unit_test(test_cdrom_synchronize_cache_returns_good_status),
         cmocka_unit_test(test_disk_synchronize_cache_flushes_backing_store),
+        cmocka_unit_test(test_disk_read6_failure_reports_medium_error),
+        cmocka_unit_test(test_disk_read10_failure_reports_medium_error),
+        cmocka_unit_test(test_disk_read_long_failure_reports_medium_error),
+        cmocka_unit_test(test_disk_read6_short_read_reports_medium_error),
+        cmocka_unit_test(test_disk_read10_short_read_reports_medium_error),
+        cmocka_unit_test(test_disk_read_long_short_read_reports_medium_error),
+        cmocka_unit_test(test_disk_write6_failure_reports_medium_error),
+        cmocka_unit_test(test_disk_write10_failure_reports_medium_error),
+        cmocka_unit_test(test_disk_write6_short_write_reports_medium_error),
+        cmocka_unit_test(test_disk_write10_short_write_reports_medium_error),
+        cmocka_unit_test(test_disk_mode_sense6_current_page_reports_values),
+        cmocka_unit_test(
+            test_disk_mode_sense6_changeable_page_returns_zero_mask),
+        cmocka_unit_test(
+            test_disk_mode_sense10_changeable_page_returns_zero_mask),
+        cmocka_unit_test(test_disk_mode_sense6_default_page_reports_values),
+        cmocka_unit_test(test_disk_mode_sense10_default_page_reports_values),
+        cmocka_unit_test(test_disk_mode_sense6_saved_values_are_rejected),
+        cmocka_unit_test(test_disk_mode_sense10_saved_values_are_rejected),
         cmocka_unit_test(test_cdrom_read_toc_returns_single_data_track),
         cmocka_unit_test(test_cdrom_read_toc_obeys_allocation_length),
         cmocka_unit_test(test_cdrom_read_toc_format_one_returns_session_info),

@@ -50,6 +50,7 @@
 
 #define KEY_OK          0                               /* no sense */
 #define KEY_NOTRDY      2                               /* not ready */
+#define KEY_MEDIUM      3                               /* medium error */
 #define KEY_ILLREQ      5                               /* illegal request */
 #define KEY_PROT        7                               /* data protect */
 #define KEY_BLANK       8                               /* blank check */
@@ -58,9 +59,26 @@
 /* Additional sense codes */
 
 #define ASC_OK          0                               /* no additional sense information */
+#define ASC_WRERR       0x0C                            /* write error */
+#define ASC_UNRDR       0x11                            /* unrecovered read error */
 #define ASC_INVCOM      0x20                            /* invalid command operation code */
 #define ASC_INVCDB      0x24                            /* invalid field in cdb */
 #define ASC_NOMEDIA     0x3A                            /* media not present */
+
+#define MODE_SENSE_PC_CURRENT      0
+#define MODE_SENSE_PC_CHANGEABLE   1
+#define MODE_SENSE_PC_DEFAULT      2
+#define MODE_SENSE_PC_SAVED        3
+
+static void PRINTF_FMT(2, 3) scsi_debug_cmd (SCSI_BUS *bus, const char *fmt,
+                                             ...);
+static void scsi_status (SCSI_BUS *bus, uint32 sts, uint32 key, uint32 asc);
+
+static void scsi_disk_io_error (SCSI_BUS *bus, t_stat status, uint32 asc)
+{
+    scsi_debug_cmd (bus, "Disk I/O error, r = %d\n", status);
+    scsi_status (bus, STS_CHK, KEY_MEDIUM, asc);
+}
 
 /* SCSI messages */
 
@@ -635,121 +653,137 @@ else if (bus->phase == SCSI_DATO) {
 
 /* Mode Sense common fields */
 
-static void scsi_mode_sense (SCSI_BUS *bus, uint8 *data, uint32 len)
+static t_bool scsi_mode_sense_accept_page_control (SCSI_BUS *bus, uint32 pctl)
+{
+    switch (pctl) {
+    case MODE_SENSE_PC_CURRENT:
+    case MODE_SENSE_PC_CHANGEABLE:
+    case MODE_SENSE_PC_DEFAULT:
+        return TRUE;
+    case MODE_SENSE_PC_SAVED:
+        scsi_status (bus, STS_CHK, KEY_ILLREQ, ASC_INVCDB);
+        return FALSE;
+    default:
+        break;
+        }
+    scsi_status (bus, STS_CHK, KEY_ILLREQ, ASC_INVCDB);
+    return FALSE;
+}
+
+static void scsi_mode_sense_copy_values (SCSI_BUS *bus, uint32 pctl,
+                                         const uint8 *values, size_t len)
+{
+size_t i;
+
+for (i = 0; i < len; i++)
+    bus->buf[bus->buf_b++] =
+        (pctl == MODE_SENSE_PC_CHANGEABLE) ? 0 : values[i];
+}
+
+static void scsi_mode_sense (SCSI_BUS *bus, uint32 pc, uint32 pctl)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
-uint32 pc, pctl;
+const uint8 block_descriptor[] = {
+    0x00,                                               /* density code */
+    ((uptr->capac - 1) >> 16) & 0xFF,                   /* # blocks (23:16) */
+    ((uptr->capac - 1) >> 8) & 0xFF,                    /* # blocks (15:8) */
+    (uptr->capac - 1) & 0xFF,                           /* # blocks (7:0) */
+    0x00,                                               /* reserved */
+    (dev->block_size >> 16) & 0xFF,
+    (dev->block_size >> 8) & 0xFF,
+    (dev->block_size >> 0) & 0xFF,
+    };
+const uint8 rw_error_recovery_page[] = {
+    0x26,                                               /* TB, PER, DTE */
+    0x8,                                                /* read retry count */
+    0x78,                                               /* correction span */
+    0,
+    0,
+    0,
+    0x8,                                                /* write retry count */
+    0,
+    0,
+    0,
+    };
+const uint8 disconnect_reconnect_page[] = {
+    0x10,                                               /* buffer full ratio */
+    0x10,                                               /* buffer empty ratio */
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    };
+const uint8 format_device_page[] = {
+    0, 1,                                               /* tracks per zone */
+    0, 1,                                               /* alt sectors per zone */
+    0, 0,                                               /* alt tracks per zone */
+    0, 0,                                               /* alt tracks per unit */
+    0, 0x21,                                            /* sectors per track */
+    0x2, 0,                                             /* bytes per sector */
+    0, 0,                                               /* interleave */
+    0, 0,                                               /* track skew factor */
+    0, 0,                                               /* cylinder skew factor */
+    0x40,                                               /* flags */
+    0, 0, 0,                                            /* reserved */
+    };
+const uint8 rigid_disk_geometry_page[] = {
+    0, 0x4, 0,                                          /* # cylinders */
+    0x2,                                                /* # heads */
+    0, 0x4, 0,                                          /* start cyl write precomp */
+    0, 0x4, 0,                                          /* start cyl reduced current */
+    0, 0x1,                                             /* drive step rate */
+    0, 0x4, 0,                                          /* landing zone cylinder */
+    0,                                                  /* reserved, RPL */
+    0,                                                  /* rotational offset */
+    0,                                                  /* reserved */
+    0x1C, 0x20,                                         /* medium rotation rate */
+    0, 0,                                               /* reserved */
+    };
+const uint8 control_mode_page[] = {
+    0, 0, 0, 0, 0, 0,
+    };
 
-/* Generic command signature.
-   This implementation does not use every parameter. */
-(void) len;
-
-pc = data[2] & 0x3F;                                    /* page code */
-pctl = (data[2] >> 6) & 0x3F;                           /* page control */
-
-bus->buf[bus->buf_b++] = 0x00;                          /* density code */
-bus->buf[bus->buf_b++] = ((uptr->capac - 1) >> 16) & 0xFF; /* # blocks (23:16) */
-bus->buf[bus->buf_b++] = ((uptr->capac - 1) >> 8) & 0xFF; /* # blocks (15:8) */
-bus->buf[bus->buf_b++] = (uptr->capac - 1) & 0xFF;      /* # blocks (7:0) */
-bus->buf[bus->buf_b++] = 0x00;                          /* reserved */
-bus->buf[bus->buf_b++] = (dev->block_size >> 16) & 0xFF;
-bus->buf[bus->buf_b++] = (dev->block_size >> 8) & 0xFF;
-bus->buf[bus->buf_b++] = (dev->block_size >> 0) & 0xFF;
+scsi_mode_sense_copy_values (bus, pctl, block_descriptor,
+                             sizeof (block_descriptor));
 
 if ((pc == 0x1) || (pc == 0x3F)) {
     bus->buf[bus->buf_b++] = 0x1;                       /* R/W error recovery page */
-    bus->buf[bus->buf_b++] = 0xA;                       /* page length */
-    bus->buf[bus->buf_b++] = 0x26;                      /* TB, PER, DTE */
-    bus->buf[bus->buf_b++] = 0x8;                       /* read retry count */
-    bus->buf[bus->buf_b++] = 0x78;                      /* correction span */
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0x8;                       /* write retry count */
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
+    bus->buf[bus->buf_b++] = sizeof (rw_error_recovery_page);
+    scsi_mode_sense_copy_values (bus, pctl, rw_error_recovery_page,
+                                 sizeof (rw_error_recovery_page));
     }
 if ((pc == 0x2) || (pc == 0x3F)) {
     bus->buf[bus->buf_b++] = 0x2;                       /* disconnect-reconnect page */
-    bus->buf[bus->buf_b++] = 0xE;                       /* page length */
-    bus->buf[bus->buf_b++] = 0x10;                      /* buffer full ratio */
-    bus->buf[bus->buf_b++] = 0x10;                      /* buffer empty ratio */
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
+    bus->buf[bus->buf_b++] = sizeof (disconnect_reconnect_page);
+    scsi_mode_sense_copy_values (bus, pctl, disconnect_reconnect_page,
+                                 sizeof (disconnect_reconnect_page));
     }
 if ((pc == 0x3) || (pc == 0x3F)) {
     bus->buf[bus->buf_b++] = 0x3;                       /* format device page */
-    bus->buf[bus->buf_b++] = 0x16;                      /* page length */
-    bus->buf[bus->buf_b++] = 0;                         /* tracks per zone (15:8) */
-    bus->buf[bus->buf_b++] = 1;                         /* tracks per zone (7:0) */
-    bus->buf[bus->buf_b++] = 0;                         /* alt sectors per zone (15:8) */
-    bus->buf[bus->buf_b++] = 1;                         /* alt sectors per zone (7:0) */
-    bus->buf[bus->buf_b++] = 0;                         /* alt tracks per zone (15:8) */
-    bus->buf[bus->buf_b++] = 0;                         /* alt tracks per zone (7:0) */
-    bus->buf[bus->buf_b++] = 0;                         /* alt tracks per unit (15:8) */
-    bus->buf[bus->buf_b++] = 0;                         /* alt tracks per unit (7:0) */
-    bus->buf[bus->buf_b++] = 0;                         /* sectors per track (15:8) */
-    bus->buf[bus->buf_b++] = 0x21;                      /* sectors per track (7:0) */
-    bus->buf[bus->buf_b++] = 0x2;                       /* bytes per sector (15:8) */
-    bus->buf[bus->buf_b++] = 0;                         /* bytes per sector (7:0) */
-    bus->buf[bus->buf_b++] = 0;                         /* interleave (15:8) */
-    bus->buf[bus->buf_b++] = 0;                         /* interleave (7:0) */
-    bus->buf[bus->buf_b++] = 0;                         /* track skew factor (15:8) */
-    bus->buf[bus->buf_b++] = 0;                         /* track skew factor (7:0) */
-    bus->buf[bus->buf_b++] = 0;                         /* cyl skew factor (15:8) */
-    bus->buf[bus->buf_b++] = 0;                         /* cyl skew factor (7:0) */
-    bus->buf[bus->buf_b++] = 0x40;                      /* flags */
-    bus->buf[bus->buf_b++] = 0;                         /* reserved */
-    bus->buf[bus->buf_b++] = 0;                         /* reserved */
-    bus->buf[bus->buf_b++] = 0;                         /* reserved */
+    bus->buf[bus->buf_b++] = sizeof (format_device_page);
+    scsi_mode_sense_copy_values (bus, pctl, format_device_page,
+                                 sizeof (format_device_page));
     }
 if ((pc == 0x4) || (pc == 0x3F)) {
     bus->buf[bus->buf_b++] = 0x4;                       /* rigid disk geometry page */
-    bus->buf[bus->buf_b++] = 0x16;                      /* page length */
-    bus->buf[bus->buf_b++] = 0;                         /* # cyls (23:16) */
-    bus->buf[bus->buf_b++] = 0x4;                       /* # cyls (15:8) */
-    bus->buf[bus->buf_b++] = 0;                         /* # cyls (7:0) */
-    bus->buf[bus->buf_b++] = 0x2;                       /* # heads */
-    bus->buf[bus->buf_b++] = 0;                         /* start cyl for write precomp (23:16) */
-    bus->buf[bus->buf_b++] = 0x4;                       /* start cyl for write precomp (15:8) */
-    bus->buf[bus->buf_b++] = 0;                         /* start cyl for write precomp (7:0) */
-    bus->buf[bus->buf_b++] = 0;                         /* start cyl for reduced write current (23:16) */
-    bus->buf[bus->buf_b++] = 0x4;                       /* start cyl for reduced write current (15:8) */
-    bus->buf[bus->buf_b++] = 0;                         /* start cyl for reduced write current (7:0) */
-    bus->buf[bus->buf_b++] = 0;                         /* drive step rate (15:8) */
-    bus->buf[bus->buf_b++] = 0x1;                       /* drive step rate (7:0) */
-    bus->buf[bus->buf_b++] = 0;                         /* landing zone cyl (23:16) */
-    bus->buf[bus->buf_b++] = 0x4;                       /* landing zone cyl (15:8) */
-    bus->buf[bus->buf_b++] = 0;                         /* landing zone cyl (7:0) */
-    bus->buf[bus->buf_b++] = 0;                         /* reserved, RPL */
-    bus->buf[bus->buf_b++] = 0;                         /* rotational offset */
-    bus->buf[bus->buf_b++] = 0;                         /* reserved */
-    bus->buf[bus->buf_b++] = 0x1C;                      /* medium rotation rate (15:8) */
-    bus->buf[bus->buf_b++] = 0x20;                      /* medium rotation rate (7:0) */
-    bus->buf[bus->buf_b++] = 0;                         /* reserved */
-    bus->buf[bus->buf_b++] = 0;                         /* reserved */
+    bus->buf[bus->buf_b++] = sizeof (rigid_disk_geometry_page);
+    scsi_mode_sense_copy_values (bus, pctl, rigid_disk_geometry_page,
+                                 sizeof (rigid_disk_geometry_page));
     }
 if ((pc == 0xA) || (pc == 0x3F)) {
     bus->buf[bus->buf_b++] = 0xA;                       /* control mode page */
-    bus->buf[bus->buf_b++] = 0x6;                       /* page length */
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
-    bus->buf[bus->buf_b++] = 0;
+    bus->buf[bus->buf_b++] = sizeof (control_mode_page);
+    scsi_mode_sense_copy_values (bus, pctl, control_mode_page,
+                                 sizeof (control_mode_page));
     }
 }
 
@@ -763,8 +797,15 @@ uint32 pc, pctl;
 
 scsi_debug_cmd (bus, "Mode Sense(6)\n");
 
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
+
 pc = data[2] & 0x3F;                                    /* page code */
-pctl = (data[2] >> 6) & 0x3F;                           /* page control */
+pctl = (data[2] >> 6) & 0x03;                           /* page control */
+
+if (!scsi_mode_sense_accept_page_control (bus, pctl))
+    return;
 
 if (pc == 0x8) {
     scsi_status (bus, STS_CHK, KEY_ILLREQ, ASC_INVCDB);
@@ -780,7 +821,7 @@ else
     bus->buf[bus->buf_b++] = 0x0;                       /* dev specific param */
 bus->buf[bus->buf_b++] = 0x8;                           /* block descriptor len */
 
-scsi_mode_sense (bus, data, len);                        /* get common data */
+scsi_mode_sense (bus, pc, pctl);                         /* get common data */
 
 bus->buf[0] = bus->buf_b - 1;                           /* mode data length */
 
@@ -797,8 +838,15 @@ uint32 pc, pctl;
 
 scsi_debug_cmd (bus, "Mode Sense(10)\n");
 
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
+
 pc = data[2] & 0x3F;                                    /* page code */
-pctl = (data[2] >> 6) & 0x3F;                           /* page control */
+pctl = (data[2] >> 6) & 0x03;                           /* page control */
+
+if (!scsi_mode_sense_accept_page_control (bus, pctl))
+    return;
 
 if (pc == 0x8) {
     scsi_status (bus, STS_CHK, KEY_ILLREQ, ASC_INVCDB);
@@ -815,7 +863,7 @@ bus->buf[bus->buf_b++] = 0x0;                           /* reserved */
 bus->buf[bus->buf_b++] = 0x0;                           /* block descriptor len (15:8) */
 bus->buf[bus->buf_b++] = 0x8;                           /* block descriptor len (7:0) */
 
-scsi_mode_sense (bus, data, len);                        /* get common data */
+scsi_mode_sense (bus, pc, pctl);                         /* get common data */
 
 PUTW (bus->buf, 0, (bus->buf_b - 1));                   /* mode data length */
 
@@ -1079,8 +1127,15 @@ if (sects == 0)
 
 scsi_debug_cmd (bus, "Read(6) lba %d blks %d\n", lba, sects);
 
-if (uptr->flags & UNIT_ATT)
+sectsread = 0;
+if (uptr->flags & UNIT_ATT) {
     r = sim_disk_rdsect (uptr, lba, &bus->buf[0], &sectsread, sects);
+    if ((r != SCPE_OK) || (sectsread != sects)) {
+        scsi_disk_io_error (bus, (r != SCPE_OK) ? r : SCPE_IOERR,
+                            ASC_UNRDR);
+        return;
+        }
+    }
 else {
     memset (&bus->buf[0], 0, (sects * dev->block_size));
     sectsread = sects;
@@ -1227,8 +1282,15 @@ if (sects == 0) {                                       /* no data to read */
     return;
     }
 
-if (uptr->flags & UNIT_ATT)
+sectsread = 0;
+if (uptr->flags & UNIT_ATT) {
     r = sim_disk_rdsect (uptr, lba, &bus->buf[0], &sectsread, sects);
+    if ((r != SCPE_OK) || (sectsread != sects)) {
+        scsi_disk_io_error (bus, (r != SCPE_OK) ? r : SCPE_IOERR,
+                            ASC_UNRDR);
+        return;
+        }
+    }
 else {
     memset (&bus->buf[0], 0, (sects * dev->block_size));
     sectsread = sects;
@@ -1247,7 +1309,7 @@ static void scsi_read_long (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 t_lba lba;
-t_seccnt sects, sectsread;
+t_seccnt sects, sectsread, requested_sects;
 t_stat r;
 
 /* Generic command signature.
@@ -1259,8 +1321,17 @@ sects = GETW (data, 7);
 
 scsi_debug_cmd (bus, "Read Long lba %d bytes %d\n", lba, sects);
 
-if (uptr->flags & UNIT_ATT)
-    r = sim_disk_rdsect (uptr, lba, &bus->buf[0], &sectsread, ((sects >> 9) + 1));
+sectsread = 0;
+if (uptr->flags & UNIT_ATT) {
+    requested_sects = ((sects >> 9) + 1);
+    r = sim_disk_rdsect (uptr, lba, &bus->buf[0], &sectsread,
+                          requested_sects);
+    if ((r != SCPE_OK) || (sectsread != requested_sects)) {
+        scsi_disk_io_error (bus, (r != SCPE_OK) ? r : SCPE_IOERR,
+                            ASC_UNRDR);
+        return;
+        }
+    }
 else {
     memset (&bus->buf[0], 0, sects);
     }
@@ -1299,8 +1370,16 @@ else if (bus->phase == SCSI_DATO) {
     lba = GETW (bus->cmd, 2) | ((bus->cmd[1] & 0x1F) << 16);
     scsi_debug_cmd (bus, "Write(6) - DATO, lba %d bytes %d\n", lba, sects);
 
-    if (uptr->flags & UNIT_ATT)
+    sectswritten = 0;
+    if (uptr->flags & UNIT_ATT) {
         r = sim_disk_wrsect (uptr, lba, &bus->buf[0], &sectswritten, sects);
+        if ((r != SCPE_OK) || (sectswritten != sects)) {
+            memset (&bus->cmd[0], 0, 10);
+            scsi_disk_io_error (bus, (r != SCPE_OK) ? r : SCPE_IOERR,
+                                ASC_WRERR);
+            return;
+            }
+        }
 
     memset (&bus->cmd[0], 0, 10);
     scsi_status (bus, STS_OK, KEY_OK, ASC_OK);
@@ -1380,8 +1459,16 @@ else if (bus->phase == SCSI_DATO) {
     lba = GETL (bus->cmd, 2);
     scsi_debug_cmd (bus, "Write(10) - DATO, lba %d bytes %d\n", lba, sects);
 
-    if (uptr->flags & UNIT_ATT)
+    sectswritten = 0;
+    if (uptr->flags & UNIT_ATT) {
         r = sim_disk_wrsect (uptr, lba, &bus->buf[0], &sectswritten, sects);
+        if ((r != SCPE_OK) || (sectswritten != sects)) {
+            memset (&bus->cmd[0], 0, 10);
+            scsi_disk_io_error (bus, (r != SCPE_OK) ? r : SCPE_IOERR,
+                                ASC_WRERR);
+            return;
+            }
+        }
 
     memset (&bus->cmd[0], 0, 10);
     scsi_status (bus, STS_OK, KEY_OK, ASC_OK);
