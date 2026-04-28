@@ -168,14 +168,15 @@ return FALSE;                                           /* lost arbitration */
 
 void scsi_release (SCSI_BUS *bus)
 {
-if (bus->initiator < 0)                                 /* already free? */
-    return;
-sim_debug (SCSI_DBG_BUS, bus->dptr,
-   "Initiator %d released bus\n", bus->initiator);
+if (bus->initiator >= 0)
+    sim_debug (SCSI_DBG_BUS, bus->dptr,
+       "Initiator %d released bus\n", bus->initiator);
 bus->phase = SCSI_DATO;                                 /* bus free state */
 bus->initiator = -1;
 bus->target = -1;
 bus->buf_t = bus->buf_b = 0;
+bus->atn = FALSE;
+bus->req = FALSE;
 }
 
 /* Assert the attention signal */
@@ -1895,6 +1896,7 @@ sim_debug (SCSI_DBG_BUS, bus->dptr, "Bus reset\n");
 bus->phase = SCSI_DATO;
 bus->buf_t = bus->buf_b = 0;
 bus->atn = FALSE;
+bus->req = FALSE;
 bus->initiator = -1;
 bus->target = -1;
 bus->lun = 0;

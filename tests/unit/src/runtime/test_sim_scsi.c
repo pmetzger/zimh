@@ -269,6 +269,90 @@ static void test_scsi_message_bus_device_reset_disconnects(void **state)
     assert_message_disconnects_silently(0x0c);
 }
 
+static void test_scsi_release_clears_bus_signals_not_sense(void **state)
+{
+    SCSI_BUS bus;
+
+    (void)state;
+
+    setup_message_bus(&bus);
+    bus.atn = TRUE;
+    bus.sense_key = 0x05;
+    bus.sense_code = 0x24;
+    bus.sense_qual = 0x01;
+    bus.sense_info = 0x12345678;
+
+    scsi_release(&bus);
+
+    assert_int_equal(bus.phase, SCSI_DATO);
+    assert_int_equal(bus.initiator, -1);
+    assert_int_equal(bus.target, -1);
+    assert_false(bus.atn);
+    assert_false(bus.req);
+    assert_int_equal(bus.sense_key, 0x05);
+    assert_int_equal(bus.sense_code, 0x24);
+    assert_int_equal(bus.sense_qual, 0x01);
+    assert_int_equal(bus.sense_info, 0x12345678);
+
+    teardown_message_bus(&bus);
+}
+
+static void test_scsi_release_cleans_already_free_bus(void **state)
+{
+    SCSI_BUS bus;
+
+    (void)state;
+
+    setup_message_bus(&bus);
+    bus.initiator = -1;
+    bus.target = -1;
+    bus.phase = SCSI_MSGI;
+    bus.atn = TRUE;
+    bus.req = TRUE;
+    bus.buf_b = 2;
+    bus.buf_t = 4;
+
+    scsi_release(&bus);
+
+    assert_int_equal(bus.phase, SCSI_DATO);
+    assert_int_equal(bus.initiator, -1);
+    assert_int_equal(bus.target, -1);
+    assert_false(bus.atn);
+    assert_false(bus.req);
+    assert_int_equal(bus.buf_b, 0);
+    assert_int_equal(bus.buf_t, 0);
+
+    teardown_message_bus(&bus);
+}
+
+static void test_scsi_reset_clears_bus_signals_and_sense(void **state)
+{
+    SCSI_BUS bus;
+
+    (void)state;
+
+    setup_message_bus(&bus);
+    bus.atn = TRUE;
+    bus.sense_key = 0x05;
+    bus.sense_code = 0x24;
+    bus.sense_qual = 0x01;
+    bus.sense_info = 0x12345678;
+
+    scsi_reset(&bus);
+
+    assert_int_equal(bus.phase, SCSI_DATO);
+    assert_int_equal(bus.initiator, -1);
+    assert_int_equal(bus.target, -1);
+    assert_false(bus.atn);
+    assert_false(bus.req);
+    assert_int_equal(bus.sense_key, 0);
+    assert_int_equal(bus.sense_code, 0);
+    assert_int_equal(bus.sense_qual, 0);
+    assert_int_equal(bus.sense_info, 0);
+
+    teardown_message_bus(&bus);
+}
+
 static void test_cdrom_synchronize_cache_returns_good_status(void **state)
 {
     struct scsi_cdrom_case cdrom_case;
@@ -526,6 +610,9 @@ int main(void)
         cmocka_unit_test(test_scsi_message_unknown_still_reports_diagnostic),
         cmocka_unit_test(test_scsi_message_abort_disconnects),
         cmocka_unit_test(test_scsi_message_bus_device_reset_disconnects),
+        cmocka_unit_test(test_scsi_release_clears_bus_signals_not_sense),
+        cmocka_unit_test(test_scsi_release_cleans_already_free_bus),
+        cmocka_unit_test(test_scsi_reset_clears_bus_signals_and_sense),
         cmocka_unit_test(test_cdrom_synchronize_cache_returns_good_status),
         cmocka_unit_test(test_cdrom_read_toc_returns_single_data_track),
         cmocka_unit_test(test_cdrom_read_toc_obeys_allocation_length),

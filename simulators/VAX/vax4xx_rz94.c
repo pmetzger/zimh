@@ -808,7 +808,7 @@ rz_int = 0;
 rz_dest = 0;
 rz_fifo_reset ();
 CLR_INT (SC);
-scsi_reset (&rz_bus);
+scsi_release (&rz_bus);
 }
 
 t_stat rz_reset (DEVICE *dptr)
