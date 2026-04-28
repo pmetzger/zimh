@@ -211,7 +211,7 @@ bus->atn = FALSE;                                       /* release ATN */
 
 /* Assert the request signal */
 
-void scsi_set_req (SCSI_BUS *bus)
+static void scsi_set_req (SCSI_BUS *bus)
 {
 if (bus->req == FALSE) {
     sim_debug (SCSI_DBG_BUS, bus->dptr,
@@ -222,7 +222,7 @@ if (bus->req == FALSE) {
 
 /* Clear the attention signal */
 
-void scsi_release_req (SCSI_BUS *bus)
+static void scsi_release_req (SCSI_BUS *bus)
 {
 if (bus->req == TRUE) {
     sim_debug (SCSI_DBG_BUS, bus->dptr,
@@ -231,7 +231,7 @@ if (bus->req == TRUE) {
     }
 }
 
-void scsi_set_phase (SCSI_BUS *bus, uint32 phase)
+static void scsi_set_phase (SCSI_BUS *bus, uint32 phase)
 {
 if (bus->phase != phase) {
     sim_debug (SCSI_DBG_BUS, bus->dptr,
@@ -275,7 +275,7 @@ return FALSE;
 
 /* Process a SCSI message */
 
-uint32 scsi_message (SCSI_BUS *bus, uint8 *data, uint32 len)
+static uint32 scsi_message (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 uint32 used;
 
@@ -350,7 +350,7 @@ return used;
 
 /* Send status to the initiator immediately */
 
-void scsi_status (SCSI_BUS *bus, uint32 sts, uint32 key, uint32 asc)
+static void scsi_status (SCSI_BUS *bus, uint32 sts, uint32 key, uint32 asc)
 {
 bus->sense_key = key;
 bus->sense_code = asc;
@@ -362,7 +362,7 @@ scsi_set_req (bus);                                     /* request to send data 
 
 /* Send status to the initiator at the end of transaction */
 
-void scsi_status_deferred (SCSI_BUS *bus, uint32 sts, uint32 key, uint32 asc)
+static void scsi_status_deferred (SCSI_BUS *bus, uint32 sts, uint32 key, uint32 asc)
 {
 bus->status = sts;
 bus->sense_key = key;
@@ -371,7 +371,7 @@ bus->sense_code = asc;
 
 /* Decode the command group to get the command length */
 
-uint32 scsi_decode_group (uint8 data)
+static uint32 scsi_decode_group (uint8 data)
 {
 uint32 group = (data >> 5) & 0x7;
 
@@ -393,7 +393,7 @@ switch (group) {
 
 /* Translate sim_tape status to SCSI status */
 
-void scsi_tape_status (SCSI_BUS *bus, t_stat st)
+static void scsi_tape_status (SCSI_BUS *bus, t_stat st)
 {
 switch (st) {
 
@@ -433,7 +433,7 @@ return;
 /* Limit the transfer count to the allocation specified
    by the SCSI command */
 
-void scsi_check_alloc (SCSI_BUS *bus, uint32 alloc)
+static void scsi_check_alloc (SCSI_BUS *bus, uint32 alloc)
 {
 if (bus->buf_b > alloc)                                 /* check allocation */
     bus->buf_b = alloc;
@@ -441,9 +441,14 @@ if (bus->buf_b > alloc)                                 /* check allocation */
 
 /* Command - Test Unit Ready */
 
-void scsi_test_ready (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_test_ready (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) data;
+(void) len;
 
 scsi_debug_cmd (bus, "Test Unit Ready\n");
 
@@ -455,10 +460,14 @@ else
 
 /* Command - Inquiry */
 
-void scsi_inquiry (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_inquiry (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 scsi_debug_cmd (bus, "Inquiry\n");
 
@@ -522,8 +531,12 @@ scsi_set_req (bus);                                     /* request to send data 
 
 /* Command - Request Sense */
 
-void scsi_req_sense (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_req_sense (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
+
 scsi_debug_cmd (bus, "Request Sense\n");
 
 bus->buf[bus->buf_b++] = (0x70 | 0x80);                 /* current error, valid */
@@ -557,11 +570,16 @@ scsi_set_req (bus);                                     /* request to send data 
 
 /* Command - Mode Select (6 byte command) */
 
-void scsi_mode_sel6 (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_mode_sel6 (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
 uint32 blk_size;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
+
 if (bus->phase == SCSI_CMD) {
     scsi_debug_cmd (bus, "Mode Select(6) - CMD\n");
     memcpy (&bus->cmd[0], &data[0], 6);
@@ -594,8 +612,12 @@ else if (bus->phase == SCSI_DATO) {
 
 /* Command - Mode Select (10 byte command) */
 
-void scsi_mode_sel10 (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_mode_sel10 (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
+
 if (bus->phase == SCSI_CMD) {
     scsi_debug_cmd (bus, "Mode Select(10) - CMD\n");
     memcpy (&bus->cmd[0], &data[0], 10);
@@ -613,11 +635,15 @@ else if (bus->phase == SCSI_DATO) {
 
 /* Mode Sense common fields */
 
-void scsi_mode_sense (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_mode_sense (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
 uint32 pc, pctl;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 pc = data[2] & 0x3F;                                    /* page code */
 pctl = (data[2] >> 6) & 0x3F;                           /* page control */
@@ -729,7 +755,7 @@ if ((pc == 0xA) || (pc == 0x3F)) {
 
 /* Command - Mode Sense (6 byte command) */
 
-void scsi_mode_sense6 (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_mode_sense6 (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
@@ -765,7 +791,7 @@ scsi_set_req (bus);                                     /* request to send data 
 
 /* Command - Mode Sense (10 byte command) */
 
-void scsi_mode_sense10 (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_mode_sense10 (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 uint32 pc, pctl;
 
@@ -800,26 +826,41 @@ scsi_set_req (bus);                                     /* request to send data 
 
 /* Command - Start/Stop Unit */
 
-void scsi_start_stop (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_start_stop (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) data;
+(void) len;
+
 scsi_debug_cmd (bus, "Start/Stop Unit\n");
 scsi_status (bus, STS_OK, KEY_OK, ASC_OK);
 }
 
 /* Command - Prevent/Allow Medium Removal */
 
-void scsi_prev_allow (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_prev_allow (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) data;
+(void) len;
+
 scsi_debug_cmd (bus, "Prevent/Allow Medium Removal\n");
 scsi_status (bus, STS_OK, KEY_OK, ASC_OK);
 }
 
 /* Command - Synchronize Cache */
 
-void scsi_sync_cache (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_sync_cache (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) data;
+(void) len;
 
 scsi_debug_cmd (bus, "Synchronize Cache\n");
 
@@ -832,10 +873,14 @@ scsi_status (bus, STS_OK, KEY_OK, ASC_OK);
 
 /* Command - Read Capacity */
 
-void scsi_read_capacity (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_read_capacity (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 scsi_debug_cmd (bus, "Read Capacity, pmi = %d\n", (data[8] & 0x1));
 
@@ -857,10 +902,14 @@ scsi_set_req (bus);                                     /* request to send data 
    This currently models attached CD-ROM media as a single-session data disc.
  */
 
-void scsi_read_toc (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_read_toc (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 uint32 format;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 scsi_debug_cmd (bus, "Read TOC/PMA/ATIP\n");
 
@@ -914,9 +963,13 @@ scsi_set_req (bus);                                     /* request to send data 
    This currently models attached CD-ROM media as a single-session data disc.
  */
 
-void scsi_read_disc_info (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_read_disc_info (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 scsi_debug_cmd (bus, "Read Disc Information\n");
 
@@ -955,11 +1008,15 @@ scsi_set_req (bus);                                     /* request to send data 
    This currently models attached CD-ROM media as a single-session data disc.
  */
 
-void scsi_read_track_info (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_read_track_info (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 uint32 addr_type;
 uint32 lba_or_track;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 scsi_debug_cmd (bus, "Read Track Information\n");
 
@@ -1003,13 +1060,17 @@ scsi_set_req (bus);                                     /* request to send data 
 
 /* Command - Read (6 byte command), disk version */
 
-void scsi_read6_disk (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_read6_disk (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
 t_lba lba;
 t_seccnt sects, sectsread;
 t_stat r;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 lba = GETW (data, 2) | ((data[1] & 0x1F) << 16);
 sects = data[4];
@@ -1032,13 +1093,17 @@ scsi_set_req (bus);                                     /* request to send data 
 
 /* Command - Read (6 byte command), tape version */
 
-void scsi_read6_tape (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_read6_tape (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
 t_seccnt sects, sectsread, new_buf_b;
 t_stat r;
 uint32 i;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 if ((data[1] & 0x3) == 0x3) {                           /* SILI and FIXED? */
     scsi_status (bus, STS_CHK, KEY_ILLREQ, ASC_INVCDB);
@@ -1140,13 +1205,17 @@ scsi_set_req (bus);                                     /* request to send data 
 
 /* Command - Read (10 byte command), disk version */
 
-void scsi_read10_disk (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_read10_disk (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
 t_lba lba;
 t_seccnt sects, sectsread;
 t_stat r;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 lba = GETL (data, 2);
 sects = GETW (data, 7);
@@ -1174,12 +1243,16 @@ scsi_set_req (bus);                                     /* request to send data 
 /* This command is needed by VMS for host-based volume shadowing */
 /* See DKDRIVER */
 
-void scsi_read_long (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_read_long (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 t_lba lba;
 t_seccnt sects, sectsread;
 t_stat r;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 lba = GETL (data, 2);
 sects = GETW (data, 7);
@@ -1199,13 +1272,17 @@ scsi_set_req (bus);                                     /* request to send data 
 
 /* Command - Write (6 byte command), disk version */
 
-void scsi_write6_disk (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_write6_disk (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
 t_lba lba;
 t_seccnt sects, sectswritten;
 t_stat r;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 if (bus->phase == SCSI_CMD) {
     scsi_debug_cmd (bus, "Write(6) - CMD\n");
@@ -1232,12 +1309,16 @@ else if (bus->phase == SCSI_DATO) {
 
 /* Command - Write (6 byte command), tape version */
 
-void scsi_write6_tape (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_write6_tape (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
 t_seccnt sects;
 t_stat r;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 if (bus->phase == SCSI_CMD) {
     scsi_debug_cmd (bus, "Write(6) - CMD\n");
@@ -1270,13 +1351,17 @@ else if (bus->phase == SCSI_DATO) {
 
 /* Command - Write (10 byte command), disk version */
 
-void scsi_write10_disk (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_write10_disk (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
 t_lba lba;
 t_seccnt sects, sectswritten;
 t_stat r;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 if (bus->phase == SCSI_CMD) {
     scsi_debug_cmd (bus, "Write(10) - CMD\n");
@@ -1305,11 +1390,15 @@ else if (bus->phase == SCSI_DATO) {
 
 /* Command - Erase */
 
-void scsi_erase (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_erase (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
 t_stat r;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 scsi_debug_cmd (bus, "Erase\n");
 
@@ -1324,26 +1413,41 @@ scsi_status (bus, bus->status, bus->sense_key, bus->sense_code);
 
 /* Command - Reserve Unit */
 
-void scsi_reserve_unit (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_reserve_unit (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) data;
+(void) len;
+
 scsi_debug_cmd (bus, "Reserve Unit\n");
 scsi_status (bus, STS_OK, KEY_OK, ASC_OK);              /* GOOD status */
 }
 
 /* Command - Release Unit */
 
-void scsi_release_unit (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_release_unit (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) data;
+(void) len;
+
 scsi_debug_cmd (bus, "Release Unit\n");
 scsi_status (bus, STS_OK, KEY_OK, ASC_OK);              /* GOOD status */
 }
 
 /* Command - Rewind */
 
-void scsi_rewind (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_rewind (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 t_stat r;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) data;
+(void) len;
 
 scsi_debug_cmd (bus, "Rewind\n");
 
@@ -1355,8 +1459,12 @@ scsi_status (bus, bus->status, bus->sense_key, bus->sense_code);
 
 /* Command - Send Diagnostic */
 
-void scsi_send_diag (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_send_diag (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
+
 scsi_debug_cmd (bus, "Send Diagnostic\n");
 
 if (data[1] & 0x4)                                      /* selftest */
@@ -1367,12 +1475,16 @@ else
 
 /* Command - Space */
 
-void scsi_space (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_space (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 uint32 code, skipped;
 t_seccnt sects;
 t_stat r = 0;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 code = data[1] & 0x7;
 sects = GETW (data, 3) | (data[2] << 16);
@@ -1408,12 +1520,16 @@ scsi_set_req (bus);                                     /* request to send data 
 
 /* Command - Write Filemarks */
 
-void scsi_wrfmark (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_wrfmark (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 uint32 i;
 t_seccnt sects;
 t_stat r;
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 scsi_debug_cmd (bus, "Write Filemarks\n");
 
@@ -1432,8 +1548,13 @@ scsi_set_req (bus);                                     /* request to send data 
 
 /* Command - Read Block Limits */
 
-void scsi_read_blklim (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_read_blklim (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) data;
+(void) len;
+
 scsi_debug_cmd (bus, "Read Block Limits\n");
 
 bus->buf[bus->buf_b++] = 0x00;                          /* reserved */
@@ -1448,9 +1569,13 @@ scsi_set_req (bus);                                     /* request to send data 
 
 /* Command Load/Unload Unit */
 
-void scsi_load_unload (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_load_unload (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
+
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) len;
 
 scsi_debug_cmd (bus, "Load/Unload\n");
 
@@ -1465,7 +1590,7 @@ scsi_status (bus, STS_OK, KEY_OK, ASC_OK);              /* GOOD status */
 
 /* Process a SCSI command for a direct-access device */
 
-void scsi_disk_command (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_disk_command (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 switch (data[0]) {
 
@@ -1556,7 +1681,7 @@ switch (data[0]) {
 
 /* Process a SCSI command for a sequential-access device */
 
-void scsi_tape_command (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_tape_command (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 switch (data[0]) {
 
@@ -1645,7 +1770,7 @@ switch (data[0]) {
 
 /* Process a SCSI command for a CD-ROM device */
 
-void scsi_cdrom_command (SCSI_BUS *bus, uint8 *data, uint32 len)
+static void scsi_cdrom_command (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 switch (data[0]) {
 
@@ -1738,7 +1863,7 @@ switch (data[0]) {
 
 /* Process data for CMD phase */
 
-uint32 scsi_command (SCSI_BUS *bus, uint8 *data, uint32 len)
+static uint32 scsi_command (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 UNIT *uptr = bus->dev[bus->target];
 SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
@@ -1775,7 +1900,7 @@ return cmd_len;
 
 /* Process data for DATO phase */
 
-uint32 scsi_data (SCSI_BUS *bus, uint8 *data, uint32 len)
+static uint32 scsi_data (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
 uint32 i;
 
@@ -1891,6 +2016,10 @@ bus->dev[id] = uptr;
 
 void scsi_set_unit (SCSI_BUS *bus, UNIT *uptr, SCSI_DEV *dev)
 {
+/* Generic setup signature.
+   This implementation does not use every parameter. */
+(void) bus;
+
 uptr->up7 = (void *)dev;
 
 if (dev->devtype == SCSI_CDROM)
