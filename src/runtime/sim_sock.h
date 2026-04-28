@@ -79,6 +79,7 @@ int sim_parse_addr (const char *cptr, char *host, size_t hostlen, const char *de
 int sim_parse_addr_ex (const char *cptr, char *host, size_t hostlen, const char *default_host,
                                          char *port, size_t port_len, char *localport, size_t local_port_len, const char *default_port);
 int sim_addr_acl_check (const char *validate_addr, const char *acl);
+void sim_sock_convert_ipv4_mapped_ipv6(char *hostnamebuf);
 #define SIM_SOCK_OPT_REUSEADDR      0x0001
 #define SIM_SOCK_OPT_DATAGRAM       0x0002
 #define SIM_SOCK_OPT_NODELAY        0x0004

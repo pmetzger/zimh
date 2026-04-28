@@ -1146,6 +1146,19 @@ if (sta == SOCKET_ERROR) {
 return newsock;                                         /* got it! */
 }
 
+/* Convert getnameinfo's IPv4-mapped IPv6 spelling to a bare IPv4 address. */
+void sim_sock_convert_ipv4_mapped_ipv6(char *hostnamebuf)
+{
+    static const char prefix[] = "::ffff:";
+    const size_t prefix_len = sizeof(prefix) - 1;
+
+    if (strncmp(hostnamebuf, prefix, prefix_len) != 0)
+        return;
+
+    memmove(hostnamebuf, hostnamebuf + prefix_len,
+            strlen(hostnamebuf + prefix_len) + 1);
+}
+
 SOCKET sim_accept_conn_ex (SOCKET master, char **connectaddr, int opt_flags)
 {
 int sta = 0, err;
@@ -1172,9 +1185,7 @@ if (newsock == INVALID_SOCKET) {                        /* error? */
 if (connectaddr != NULL) {
     *connectaddr = (char *)calloc(1, NI_MAXHOST+1);
     p_getnameinfo((struct sockaddr *)&clientname, size, *connectaddr, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-    if (0 == memcmp("::ffff:", *connectaddr, 7))        /* is this a IPv4-mapped IPv6 address? */
-        memmove(*connectaddr, 7+*connectaddr,           /* prefer bare IPv4 address */
-                strlen(*connectaddr) - 7 + 1);          /* length to include terminating \0 */
+    sim_sock_convert_ipv4_mapped_ipv6(*connectaddr);
     }
 
 if (!(opt_flags & SIM_SOCK_OPT_BLOCKING)) {
@@ -1242,9 +1253,7 @@ int ret = 0;
 *hostnamebuf = '\0';
 *portnamebuf = '\0';
 ret = p_getnameinfo(addr, size, hostnamebuf, NI_MAXHOST, NULL, 0, NI_NUMERICHOST);
-if (0 == memcmp("::ffff:", hostnamebuf, 7))        /* is this a IPv4-mapped IPv6 address? */
-    memmove(hostnamebuf, 7+hostnamebuf,            /* prefer bare IPv4 address */
-            strlen(hostnamebuf) + 7 - 1);          /* length to include terminating \0 */
+sim_sock_convert_ipv4_mapped_ipv6(hostnamebuf);
 if (!ret)
     ret = p_getnameinfo(addr, size, NULL, 0, portnamebuf, NI_MAXSERV, NI_NUMERICSERV);
 return ret;

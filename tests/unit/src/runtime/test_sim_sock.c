@@ -144,6 +144,29 @@ static void test_sim_addr_acl_check_rejects_oversized_segments(void **state)
     assert_int_equal(sim_addr_acl_check("127.0.0.1", acl), -1);
 }
 
+static void
+test_sim_sock_convert_ipv4_mapped_ipv6_copies_through_nul(void **state)
+{
+    char hostname[64];
+    static const char mapped[] = "::ffff:198.51.100.42";
+    static const char trailer[] = "overread";
+    static const char expected_tail[] = "100.42";
+    const size_t mapped_len = strlen(mapped);
+    const size_t bare_len = strlen("198.51.100.42");
+
+    (void)state;
+
+    memset(hostname, 'Z', sizeof(hostname));
+    memcpy(hostname, mapped, mapped_len + 1);
+    memcpy(hostname + mapped_len + 1, trailer, sizeof(trailer));
+
+    sim_sock_convert_ipv4_mapped_ipv6(hostname);
+
+    assert_string_equal(hostname, "198.51.100.42");
+    assert_memory_equal(hostname + bare_len + 1, expected_tail,
+                        sizeof(expected_tail) - 1);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -156,6 +179,8 @@ int main(void)
         cmocka_unit_test(test_sim_addr_acl_check_validates_and_matches_rules),
         cmocka_unit_test(
             test_sim_addr_acl_check_rejects_oversized_segments),
+        cmocka_unit_test(
+            test_sim_sock_convert_ipv4_mapped_ipv6_copies_through_nul),
     };
 
     return cmocka_run_group_tests(tests, setup_sock_group, teardown_sock_group);
