@@ -478,7 +478,6 @@ switch (cmd & 0x7f) {
     case 1:                                         /* flush FIFO */
         sim_debug (DBG_CMD, &rz_dev, "flush fifo\n");
         rz_fifo_reset ();
-        rz_int |= INT_FC;
         break;
 
     case 2:                                         /* reset chip */
@@ -636,6 +635,11 @@ switch (cmd & 0x7f) {
 
     case 0x44:                                          /* enable selection/reselection */
         sim_debug (DBG_CMD, &rz_dev, "enable selection/reselection\n");
+        break;
+
+    case 0x45:                                      /* disable sel/resel */
+        sim_debug (DBG_CMD, &rz_dev, "disable selection/reselection\n");
+        rz_setint (INT_FC);
         break;
 
     case 0x46:                                          /* select with ATN3 */
