@@ -49,6 +49,13 @@ const char *sim_stop_messages[SCPE_BASE] = {
 t_stat
 sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+  /* Generic loader callback signature.
+     This implementation does not use every parameter. */
+  (void) fileref;
+  (void) cptr;
+  (void) fnam;
+  (void) flag;
+
   return SCPE_OK;
 }
 
@@ -60,11 +67,27 @@ t_bool build_dev_tab (void)
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
                    UNIT *uptr, int32 sw)
 {
+  /* Generic symbolic-print callback signature.
+     This implementation does not use every parameter. */
+  (void) of;
+  (void) addr;
+  (void) val;
+  (void) uptr;
+  (void) sw;
+
   return SCPE_OK;
 }
 
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr,
                   t_value *val, int32 sw)
 {
+  /* Generic symbolic-parse callback signature.
+     This implementation does not use every parameter. */
+  (void) cptr;
+  (void) addr;
+  (void) uptr;
+  (void) val;
+  (void) sw;
+
   return SCPE_OK;
 }

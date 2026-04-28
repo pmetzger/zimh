@@ -409,6 +409,11 @@ char **filelist = *(char ***)context;
 char FullPath[PATH_MAX + 1];
 int listcount = 0;
 
+/* Generic directory-scan callback signature.
+   This implementation does not use every parameter. */
+(void) FileSize;
+(void) filestat;
+
 snprintf (FullPath, sizeof (FullPath), "%s%s", directory, filename);
 if (filelist != NULL) {
     while (filelist[listcount++] != NULL);

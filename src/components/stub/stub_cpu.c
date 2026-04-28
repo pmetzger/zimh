@@ -90,6 +90,11 @@ t_stat sim_instr (void)
 
 static t_stat cpu_ex (t_value *vptr, t_addr ea, UNIT *uptr, int32 sw)
 {
+  /* Generic examine callback signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) sw;
+
   if (vptr == NULL)
     return SCPE_ARG;
   if (ea >= 040000)
@@ -100,6 +105,11 @@ static t_stat cpu_ex (t_value *vptr, t_addr ea, UNIT *uptr, int32 sw)
 
 static t_stat cpu_dep (t_value val, t_addr ea, UNIT *uptr, int32 sw)
 {
+  /* Generic deposit callback signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) sw;
+
   if (ea >= 040000)
     return SCPE_NXM;
   M[ea] = val & 0177777;
@@ -108,12 +118,20 @@ static t_stat cpu_dep (t_value val, t_addr ea, UNIT *uptr, int32 sw)
 
 static t_bool pc_is_a_subroutine_call (t_addr **ret_addrs)
 {
+  /* Generic subroutine-detection callback signature.
+     This implementation does not use every parameter. */
+  (void) ret_addrs;
+
   return FALSE;
 }
 
 static t_stat
 cpu_reset (DEVICE *dptr)
 {
+  /* Generic reset callback signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   sim_brk_types = SWMASK('D') | SWMASK('E');
   sim_brk_dflt = SWMASK ('E');
   sim_vm_is_subroutine_call = &pc_is_a_subroutine_call;
