@@ -818,7 +818,15 @@ scsi_status (bus, STS_OK, KEY_OK, ASC_OK);
 
 void scsi_sync_cache (SCSI_BUS *bus, uint8 *data, uint32 len)
 {
+UNIT *uptr = bus->dev[bus->target];
+SCSI_DEV *dev = (SCSI_DEV *)uptr->up7;
+
 scsi_debug_cmd (bus, "Synchronize Cache\n");
+
+if (((dev->devtype == SCSI_DISK) || (dev->devtype == SCSI_WORM)) &&
+    (uptr->flags & UNIT_ATT) && (uptr->io_flush != NULL))
+    uptr->io_flush (uptr);
+
 scsi_status (bus, STS_OK, KEY_OK, ASC_OK);
 }
 
@@ -1521,6 +1529,10 @@ switch (data[0]) {
 
     case CMD_STARTSTOP:                                 /* optional */
         scsi_start_stop (bus, data, len);
+        break;
+
+    case CMD_SYNCCACHE:                                 /* optional */
+        scsi_sync_cache (bus, data, len);
         break;
 
     case CMD_TESTRDY:                                   /* mandatory */

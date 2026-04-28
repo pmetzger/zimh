@@ -28,6 +28,15 @@ struct scsi_cdrom_case {
     SCSI_DEV scsi_device;
 };
 
+struct scsi_disk_case {
+    uint8 command[10];
+    uint32 command_len;
+    SCSI_BUS bus;
+    DEVICE device;
+    UNIT unit;
+    SCSI_DEV scsi_device;
+};
+
 static DEVICE test_scsi_device = {
     .name = "SCSITEST",
 };
@@ -86,6 +95,47 @@ static void teardown_cdrom_bus(struct scsi_cdrom_case *cdrom_case)
     free(cdrom_case->bus.buf);
 }
 
+static void record_disk_flush(UNIT *unit)
+{
+    unit->u3++;
+}
+
+static void setup_disk_bus(struct scsi_disk_case *disk_case)
+{
+    memset(disk_case, 0, sizeof(*disk_case));
+
+    simh_test_init_device_unit(&disk_case->device, &disk_case->unit, "SCSI",
+                               "SCSI0", DEV_SECTORS,
+                               UNIT_ATTABLE | UNIT_ATT, 16, 1);
+
+    disk_case->scsi_device.devtype = SCSI_DISK;
+    disk_case->scsi_device.pqual = 0;
+    disk_case->scsi_device.scsiver = 2;
+    disk_case->scsi_device.block_size = 512;
+    disk_case->scsi_device.manufacturer = "SIMH";
+    disk_case->scsi_device.product = "DISK";
+    disk_case->scsi_device.rev = "0001";
+
+    disk_case->unit.up7 = &disk_case->scsi_device;
+    disk_case->unit.capac = 0x12345;
+    disk_case->unit.io_flush = record_disk_flush;
+
+    disk_case->bus.dptr = &disk_case->device;
+    assert_int_equal(scsi_init(&disk_case->bus, 4096), SCPE_OK);
+    scsi_reset(&disk_case->bus);
+    scsi_add_unit(&disk_case->bus, 0, &disk_case->unit);
+
+    disk_case->bus.initiator = 6;
+    disk_case->bus.target = 0;
+    disk_case->bus.phase = SCSI_CMD;
+    disk_case->bus.req = TRUE;
+}
+
+static void teardown_disk_bus(struct scsi_disk_case *disk_case)
+{
+    free(disk_case->bus.buf);
+}
+
 static void write_scsi_message(void *context)
 {
     struct scsi_message_case *message_case = context;
@@ -103,6 +153,15 @@ static void write_scsi_cdrom_command(void *context)
                      cdrom_case->command_len);
 }
 
+static void write_scsi_disk_command(void *context)
+{
+    struct scsi_disk_case *disk_case = context;
+
+    assert_int_equal(scsi_write(&disk_case->bus, disk_case->command,
+                                disk_case->command_len),
+                     disk_case->command_len);
+}
+
 static void assert_cdrom_command_writes_silently(
     struct scsi_cdrom_case *cdrom_case)
 {
@@ -111,6 +170,22 @@ static void assert_cdrom_command_writes_silently(
 
     assert_int_equal(simh_test_capture_stdout(write_scsi_cdrom_command,
                                               cdrom_case, &output,
+                                              &output_size),
+                     0);
+    assert_string_equal(output, "");
+    assert_int_equal(output_size, 0);
+
+    free(output);
+}
+
+static void assert_disk_command_writes_silently(
+    struct scsi_disk_case *disk_case)
+{
+    char *output = NULL;
+    size_t output_size = 0;
+
+    assert_int_equal(simh_test_capture_stdout(write_scsi_disk_command,
+                                              disk_case, &output,
                                               &output_size),
                      0);
     assert_string_equal(output, "");
@@ -132,13 +207,18 @@ static void assert_scsi_data_in(const struct scsi_cdrom_case *cdrom_case,
     assert_memory_equal(data, expected, expected_size);
 }
 
-static void assert_scsi_good_status(struct scsi_cdrom_case *cdrom_case)
+static void assert_scsi_bus_good_status(SCSI_BUS *bus)
 {
     uint8 status;
 
-    assert_int_equal(cdrom_case->bus.phase, SCSI_STS);
-    assert_int_equal(scsi_read(&cdrom_case->bus, &status, 1), 1);
+    assert_int_equal(bus->phase, SCSI_STS);
+    assert_int_equal(scsi_read(bus, &status, 1), 1);
     assert_int_equal(status, TEST_SCSI_STATUS_GOOD);
+}
+
+static void assert_scsi_good_status(struct scsi_cdrom_case *cdrom_case)
+{
+    assert_scsi_bus_good_status(&cdrom_case->bus);
 }
 
 static void assert_scsi_check_status(struct scsi_cdrom_case *cdrom_case,
@@ -396,6 +476,23 @@ static void test_cdrom_synchronize_cache_returns_good_status(void **state)
     teardown_cdrom_bus(&cdrom_case);
 }
 
+static void test_disk_synchronize_cache_flushes_backing_store(void **state)
+{
+    struct scsi_disk_case disk_case;
+
+    (void)state;
+
+    setup_disk_bus(&disk_case);
+    disk_case.command[0] = 0x35;
+    disk_case.command_len = 10;
+
+    assert_disk_command_writes_silently(&disk_case);
+    assert_int_equal(disk_case.unit.u3, 1);
+    assert_scsi_bus_good_status(&disk_case.bus);
+
+    teardown_disk_bus(&disk_case);
+}
+
 static void test_cdrom_read_toc_returns_single_data_track(void **state)
 {
     struct scsi_cdrom_case cdrom_case;
@@ -643,6 +740,7 @@ int main(void)
         cmocka_unit_test(test_scsi_release_cleans_already_free_bus),
         cmocka_unit_test(test_scsi_reset_clears_bus_signals_and_sense),
         cmocka_unit_test(test_cdrom_synchronize_cache_returns_good_status),
+        cmocka_unit_test(test_disk_synchronize_cache_flushes_backing_store),
         cmocka_unit_test(test_cdrom_read_toc_returns_single_data_track),
         cmocka_unit_test(test_cdrom_read_toc_obeys_allocation_length),
         cmocka_unit_test(test_cdrom_read_toc_format_one_returns_session_info),
