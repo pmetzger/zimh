@@ -4538,7 +4538,7 @@ return SCPE_OK;
 }
 
 
-t_stat tmxr_show_open_device (FILE* st, TMXR *mp)
+static t_stat tmxr_show_open_device (FILE* st, TMXR *mp)
 {
 int j;
 TMLN *lp;

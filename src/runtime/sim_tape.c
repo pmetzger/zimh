@@ -522,6 +522,10 @@ static int tape_classify_file_contents (FILE *f, size_t *max_record_size, t_bool
 t_stat sim_tape_set_async (UNIT *uptr, int latency)
 {
 #if !defined(SIM_ASYNCH_IO)
+/* Parameters are used only when async I/O support is compiled in. */
+(void) uptr;
+(void) latency;
+
 return sim_messagef (SCPE_NOFNC, "Tape: can't operate asynchronously\r\n");
 #else
 struct tape_context *ctx = (struct tape_context *)uptr->tape_ctx;
@@ -555,6 +559,9 @@ return SCPE_OK;
 t_stat sim_tape_clr_async (UNIT *uptr)
 {
 #if !defined(SIM_ASYNCH_IO)
+/* Parameter is used only when async I/O support is compiled in. */
+(void) uptr;
+
 return SCPE_NOFNC;
 #else
 struct tape_context *ctx = (struct tape_context *)uptr->tape_ctx;
@@ -627,6 +634,11 @@ t_bool had_debug = (sim_deb != NULL);
 uint32 starting_dctrl = uptr->dctrl;
 int32 saved_switches = sim_switches;
 MEMORY_TAPE *tape = NULL;
+
+/* completion_delay is used only when async I/O support is compiled in. */
+#if !defined (SIM_ASYNCH_IO)
+(void) completion_delay;
+#endif
 
 if ((dptr = find_dev_from_unit (uptr)) == NULL)
     return SCPE_NOATT;
@@ -1015,6 +1027,11 @@ return SCPE_OK;
 
 t_stat sim_tape_attach_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) flag;
+(void) cptr;
+
 fprintf (st, "%s Tape Attach Help\n\n", dptr->name);
 if (0 == (uptr - dptr->units)) {
     if (dptr->numunits > 1) {
@@ -3330,6 +3347,11 @@ t_stat sim_tape_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 f;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 if (uptr == NULL)
     return SCPE_IERR;
 if (uptr->flags & UNIT_ATT)
@@ -3363,6 +3385,11 @@ return sim_messagef (SCPE_ARG, "Unknown tape format: %s\n", cptr);
 
 t_stat sim_tape_show_fmt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 fprintf (st, "%s format", _sim_tape_format_name (uptr));
 return SCPE_OK;
 }
@@ -3683,6 +3710,11 @@ t_stat sim_tape_set_capac (UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_addr cap;
 t_stat r;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 if ((cptr == NULL) || (*cptr == 0))
     return SCPE_ARG;
 if (uptr->flags & UNIT_ATT)
@@ -3698,6 +3730,11 @@ return SCPE_OK;
 
 t_stat sim_tape_show_capac (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 if (uptr->capac) {
     if (uptr->capac >= (t_addr) 1000000)
         fprintf (st, "capacity=%dMB", (uint32) (uptr->capac / ((t_addr) 1000000)));
@@ -3775,6 +3812,11 @@ return result;                                                  /* return the re
 t_stat sim_tape_show_dens (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 uint32 tape_density;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
 
 if (uptr == NULL)                                       /* if the unit pointer is null */
     return SCPE_IERR;                                   /*   then the caller has screwed up */
@@ -4145,7 +4187,7 @@ sim_switches = 0;
 return SCPE_OK;
 }
 
-static t_stat sim_tape_test_remove_tape_files (UNIT *uptr, const char *filename)
+static t_stat sim_tape_test_remove_tape_files (const char *filename)
 {
 char name[256];
 
@@ -4311,6 +4353,10 @@ t_stat sim_tape_test (DEVICE *dptr, const char *cptr)
 int32 saved_switches = sim_switches;
 SIM_TEST_INIT;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+
 if (dptr->units->flags & UNIT_ATT)
     return sim_messagef (SCPE_ALATT, "The %s device must be detached to run the sim_tape library API tests.\n",
                                      sim_uname(dptr->units));
@@ -4321,7 +4367,7 @@ SIM_TEST(sim_tape_test_density_string ());
 
 SIM_TEST(sim_tape_test_classify_file_contents (dptr->units));
 
-SIM_TEST(sim_tape_test_remove_tape_files (dptr->units, "TapeTestFile1"));
+SIM_TEST(sim_tape_test_remove_tape_files ("TapeTestFile1"));
 
 SIM_TEST(sim_tape_test_create_tape_files (dptr->units, "TapeTestFile1", 2, 5, 4096));
 
@@ -4378,7 +4424,7 @@ SIM_TEST(sim_tape_test_process_tape_file (dptr->units, "TapeTestFile1", "simh", 
 
 sim_switches = saved_switches;
 if ((sim_switches & SWMASK ('D')) == 0)
-    SIM_TEST(sim_tape_test_remove_tape_files (dptr->units, "TapeTestFile1"));
+    SIM_TEST(sim_tape_test_remove_tape_files ("TapeTestFile1"));
 
 return SCPE_OK;
 }
@@ -4710,6 +4756,10 @@ time_t filetime;
 uint16 fileday;
 int year;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) FileSize;
+
 /*
  * Compute a suitable year for file creation date. This year will have the
  * same calendar as the current year but will be in the 20th century so that
@@ -5033,6 +5083,11 @@ static void sim_tape_add_ansi_entry (const char *directory,
 {
 MEMORY_TAPE *tape = (MEMORY_TAPE *)context;
 char FullPath[PATH_MAX + 1];
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) FileSize;
+(void) filestat;
 
 sprintf (FullPath, "%s%s", directory, filename);
 

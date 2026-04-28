@@ -665,7 +665,7 @@ static int _cmpcard(const uint8 *p, const char *s) {
    return 1;
 }
 
-t_stat
+static t_stat
 _sim_parse_card(UNIT *uptr, DEVICE *dptr, struct _card_buffer *buf, uint16 (*image)[80]) {
     unsigned int          mode;
     uint16                temp;
@@ -952,7 +952,7 @@ _sim_parse_card(UNIT *uptr, DEVICE *dptr, struct _card_buffer *buf, uint16 (*ima
     return SCPE_OK;
 }
 
-t_stat
+static t_stat
 _sim_read_deck(UNIT * uptr, int eof)
 {
     struct _card_buffer   buf;
@@ -1199,6 +1199,11 @@ t_stat sim_card_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int f;
 
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     if (uptr == NULL) return SCPE_IERR;
     if (cptr == NULL) return SCPE_ARG;
     for (f = 0; fmts[f].name != 0; f++) {
@@ -1215,6 +1220,11 @@ t_stat sim_card_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat sim_card_show_fmt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int f;
+
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
 
     for (f = 0; fmts[f].name != 0; f++) {
         if ((uptr->flags & UNIT_CARD_MODE) == fmts[f].mode) {
@@ -1413,6 +1423,11 @@ t_stat sim_card_attach_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, cons
 {
     uint32 i, readers = 0, punches = 0;
 
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void) flag;
+    (void) cptr;
+
     for (i=0; i < dptr->numunits; ++i)
         if (dptr->units[i].flags & UNIT_ATTABLE) {
             readers += ((dptr->units[i].flags & UNIT_RO) != 0);
@@ -1469,6 +1484,11 @@ return SCPE_OK;
 t_stat sim_card_test (DEVICE *dptr, const char *cptr)
 {
 t_stat stat = SCPE_OK;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+
 #if defined(USE_SIM_CARD) && defined(SIM_CARD_API)
 char cmd[CBUFSIZE];
 char saved_filename[4*CBUFSIZE];

@@ -329,6 +329,7 @@ t_stat tmxr_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat tmxr_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat tmxr_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat tmxr_dscln (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat tmxr_close_ln (TMLN *lp);
 int32 tmxr_rqln (const TMLN *lp);
 int32 tmxr_tqln (const TMLN *lp);
 int32 tmxr_tpqln (const TMLN *lp);

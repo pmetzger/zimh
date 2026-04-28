@@ -291,7 +291,7 @@ for (i=0; i<count && !found; i++) {
 return (found ? temp : NULL);
 }
 
-char* sim_serial_getdesc_byname (char* name, char* temp)
+static char* sim_serial_getdesc_byname (char* name, char* temp)
 {
 SERIAL_LIST  list[SER_MAX_DEVICE];
 int count = sim_serial_devices(SER_MAX_DEVICE, list);
@@ -314,6 +314,13 @@ t_stat sim_show_serial (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, const cha
 {
 SERIAL_LIST  list[SER_MAX_DEVICE];
 int number = sim_serial_devices(SER_MAX_DEVICE, list);
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) val;
+(void) desc;
 
 fprintf(st, "Serial devices:\n");
 if (number == -1)

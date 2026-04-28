@@ -16,8 +16,6 @@
 #include "test_simh_personality.h"
 #include "test_support.h"
 
-extern t_stat tmxr_close_ln(TMLN *lp);
-
 struct sim_tmxr_fixture {
     DEVICE device;
     UNIT unit;

@@ -358,6 +358,11 @@ t_stat sim_disk_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
 uint32 f;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 if (uptr == NULL)
     return SCPE_IERR;
 if ((cptr == NULL) || (*cptr == '\0'))
@@ -390,6 +395,11 @@ return "invalid";
 
 t_stat sim_disk_show_fmt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 fprintf (st, "%s format", sim_disk_fmt (uptr));
 return SCPE_OK;
 }
@@ -401,6 +411,11 @@ t_stat sim_disk_set_capac (UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_offset cap;
 t_stat r;
 DEVICE *dptr = find_dev_from_unit (uptr);
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
 
 if ((cptr == NULL) || (*cptr == 0))
     return SCPE_ARG;
@@ -420,6 +435,11 @@ t_stat sim_disk_show_capac (FILE *st, UNIT *uptr, int32 val, const void *desc)
 const char *cap_units = "B";
 DEVICE *dptr = find_dev_from_unit (uptr);
 t_offset capac = ((t_offset)uptr->capac)*((dptr->flags & DEV_SECTORS) ? 512 : 1);
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
 
 if ((dptr->dwidth / dptr->aincr) == 16)
     cap_units = "W";
@@ -497,6 +517,10 @@ t_stat sim_disk_set_noautosize (int32 flag, const char *cptr)
 DEVICE *dptr;
 uint32 dev, unit, count = 0;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+
 if (flag == sim_disk_no_autosize)
     return sim_messagef (SCPE_ARG, "Autosizing is already %sabled!\n",
                                     sim_disk_no_autosize ? "dis" : "en");
@@ -554,6 +578,11 @@ t_stat sim_disk_set_async (UNIT *uptr, int latency)
 {
 #if !defined(SIM_ASYNCH_IO)
 char *msg = "Disk: cannot operate asynchronously\r\n";
+
+/* Parameters are used only when async I/O support is compiled in. */
+(void) uptr;
+(void) latency;
+
 sim_printf ("%s", msg);
 return SCPE_NOFNC;
 #else
@@ -590,6 +619,9 @@ return SCPE_OK;
 t_stat sim_disk_clr_async (UNIT *uptr)
 {
 #if !defined(SIM_ASYNCH_IO)
+/* Parameter is used only when async I/O support is compiled in. */
+(void) uptr;
+
 return SCPE_NOFNC;
 #else
 struct disk_context *ctx = (struct disk_context *)uptr->disk_ctx;
@@ -1492,6 +1524,10 @@ t_offset cur_pos = 32768;           /* Beyond the boot area of an ISO 9660 image
 t_seccnt sectsread;
 int read_count = 0;
 
+/* Filesystem size probe signature.
+   This implementation does not use every parameter. */
+(void) physsectsz;
+
 if ((dptr = find_dev_from_unit (uptr)) == NULL)
     return ret_val;
 saved_capac = uptr->capac;
@@ -1943,6 +1979,10 @@ t_addr temp_capac = (sim_toffset_64 ? (t_addr)0xFFFFFFFFu : (t_addr)0x7FFFFFFFu)
 uint8 buf[512];
 t_offset ret_val = (t_offset)-1;
 rstsContext context;
+
+/* Filesystem size probe signature.
+   This implementation does not use every parameter. */
+(void) physsectsz;
 
 if ((dptr = find_dev_from_unit (uptr)) == NULL)
     return ret_val;
@@ -2935,7 +2975,6 @@ if ((DK_GET_FMT (uptr) == DKUF_F_VHD) || (ctx->footer)) {
                     }
                 }
             else { /* Type already matches, Need to confirm compatibility */
-                t_addr saved_capac = uptr->capac;
                 t_lba current_unit_sectors = (t_lba)((dptr->flags & DEV_SECTORS) ? uptr->capac : (uptr->capac*ctx->capac_factor)/ctx->sector_size);
 
                 if ((container_sector_size != 0) && (sector_size != container_sector_size))
@@ -3411,6 +3450,12 @@ static struct example_fields {
         {"RP", "RM03",  "39MW", "RM03",  "39MW", "RP07", "110MW", "RM03",  "15MW"},
     };
 struct example_fields *ex = &ex_data[0];
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
 
 if (strcmp (dptr->name, "RP") == 0)
     ex = &ex_data[1];
@@ -4334,6 +4379,11 @@ return size;
 
 static t_stat sim_os_disk_unload_raw (FILE *f)
 {
+/* f is used only when the CD-ROM eject ioctl path is compiled in. */
+#if !(defined(CDROM_GET_CAPABILITY) && defined(CDROMEJECT) && defined(CDROMEJECT_SW))
+(void) f;
+#endif
+
 #if defined(CDROM_GET_CAPABILITY) && defined(CDROMEJECT) && defined(CDROMEJECT_SW)
 if (ioctl ((int)((long)f), CDROM_GET_CAPABILITY, NULL) < 0)
     return SCPE_OK;
@@ -4347,6 +4397,11 @@ return SCPE_OK;
 
 static t_bool sim_os_disk_isavailable_raw (FILE *Disk)
 {
+/* Disk is used only when the CD-ROM status ioctl path is compiled in. */
+#if !(defined(CDROMSTART) && defined(CDROM_GET_CAPABILITY))
+(void) Disk;
+#endif
+
 #if defined(CDROMSTART) && defined(CDROM_GET_CAPABILITY)
 if (ioctl ((int)((long)Disk), CDROM_GET_CAPABILITY, NULL) < 0)
     return TRUE;
@@ -4465,6 +4520,11 @@ return SCPE_OK;
 
 static t_stat sim_os_disk_info_raw (FILE *f, uint32 *sector_size, uint32 *removable, uint32 *is_cdrom)
 {
+/* f is used only when raw disk geometry/status ioctls are compiled in. */
+#if !defined(BLKSSZGET) && !defined(CDROM_GET_CAPABILITY)
+(void) f;
+#endif
+
 if (sector_size) {
 #if defined(BLKSSZGET)
     if (ioctl ((int)((long)f), BLKSSZGET, sector_size) < 0)
@@ -6441,6 +6501,11 @@ struct simh_disk_footer *f = &footer;
 FILE *container;
 t_offset container_size;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void) FileSize;
+(void) filestat;
+
 sprintf (FullPath, "%s%s", directory, filename);
 
 if (info->flag) {        /* zap type */
@@ -6756,7 +6821,7 @@ return r;
 /*   RL  - 2 different disk sizes to autosize between */
 /*   RQ  - Arbitrary disk size change supported */
 /*   RK  - 1 sized disk with reserved cylinders */
-t_stat sim_disk_sizing_test (DEVICE *dptr, const char *cptr)
+static t_stat sim_disk_sizing_test (DEVICE *dptr, const char *cptr)
 {
 char filename[256] = "TestFile.dsk";
 UNIT *uptr = &dptr->units[0];
@@ -6866,7 +6931,7 @@ if ((0 == strcmp ("RL", dptr->name)) ||
 return r;
 }
 
-t_stat sim_disk_meta_attach_test (DEVICE *dptr, const char *cptr)
+static t_stat sim_disk_meta_attach_test (DEVICE *dptr, const char *cptr)
 {
 char **tarfiles = sim_get_filelist ("../Test-Disks/*.tar.gz");
 char cmd[CBUFSIZE];
