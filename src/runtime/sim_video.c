@@ -67,6 +67,10 @@ t_stat vid_register_gamepad_button_callback (VID_GAMEPAD_CALLBACK callback)
 
 t_stat vid_show (FILE* st, DEVICE *dptr,  UNIT* uptr, int32 val, const char* desc)
 {
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return vid_show_video (st, uptr, val, desc);
 }
 
@@ -2765,10 +2769,20 @@ SDL_Delay (vid_beep_duration + 100);/* Wait for sound to finish */
 }
 
 #else /* !(defined(USE_SIM_VIDEO) && defined(HAVE_LIBSDL)) */
-/* Non-implemented versions */
+/* Non-implemented versions.
+
+   These functions preserve the public video API when the build has no
+   SDL-backed video support.  Their parameters intentionally match the real
+   implementation even though the stubs do not need most of them. */
 
 t_stat vid_open (DEVICE *dptr, const char *title, uint32 width, uint32 height, int flags)
 {
+(void) dptr;
+(void) title;
+(void) width;
+(void) height;
+(void) flags;
+
 return SCPE_NOFNC;
 }
 
@@ -2784,31 +2798,56 @@ return SCPE_OK;
 
 t_stat vid_poll_kb (SIM_KEY_EVENT *ev)
 {
+(void) ev;
+
 return SCPE_EOF;
 }
 
 t_stat vid_poll_mouse (SIM_MOUSE_EVENT *ev)
 {
+(void) ev;
+
 return SCPE_EOF;
 }
 
 uint32 vid_map_rgb (uint8 r, uint8 g, uint8 b)
 {
+(void) r;
+(void) g;
+(void) b;
+
 return 0;
 }
 
 void vid_draw (int32 x, int32 y, int32 w, int32 h, uint32 *buf)
 {
+(void) x;
+(void) y;
+(void) w;
+(void) h;
+(void) buf;
+
 return;
 }
 
 t_stat vid_set_cursor (t_bool visible, uint32 width, uint32 height, uint8 *data, uint8 *mask, uint32 hot_x, uint32 hot_y)
 {
+(void) visible;
+(void) width;
+(void) height;
+(void) data;
+(void) mask;
+(void) hot_x;
+(void) hot_y;
+
 return SCPE_NOFNC;
 }
 
 void vid_set_cursor_position (int32 x, int32 y)
 {
+(void) x;
+(void) y;
+
 return;
 }
 
@@ -2829,23 +2868,38 @@ return "No Video Support";
 
 t_stat vid_set_release_key (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+(void) st;
+(void) uptr;
+(void) val;
+(void) desc;
+
 return SCPE_NOFNC;
 }
 
 t_stat vid_show_release_key (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "no release key");
 return SCPE_OK;
 }
 
 t_stat vid_show_video (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "video support unavailable\n");
 return SCPE_OK;
 }
 
 t_stat vid_screenshot (const char *filename)
 {
+(void) filename;
+
 sim_printf ("video support unavailable\n");
 return SCPE_NOFNC|SCPE_NOMESSAGE;
 }
@@ -2858,70 +2912,122 @@ return FALSE;
 
 t_stat vid_set_fullscreen (t_bool flag)
 {
+(void) flag;
+
 sim_printf ("video support unavailable\n");
 return SCPE_OK;
 }
 
 t_stat vid_open_window (VID_DISPLAY **vptr, DEVICE *dptr, const char *title, uint32 width, uint32 height, int flags)
 {
+(void) dptr;
+(void) title;
+(void) width;
+(void) height;
+(void) flags;
+
 *vptr = NULL;
 return SCPE_NOFNC;
 }
 
 t_stat vid_close_window (VID_DISPLAY *vptr)
 {
+(void) vptr;
+
 return SCPE_OK;
 }
 
 uint32 vid_map_rgb_window (VID_DISPLAY *vptr, uint8 r, uint8 g, uint8 b)
 {
+(void) vptr;
+(void) r;
+(void) g;
+(void) b;
+
 return 0;
 }
 
 void vid_draw_window (VID_DISPLAY *vptr, int32 x, int32 y, int32 w, int32 h, uint32 *buf)
 {
+(void) vptr;
+(void) x;
+(void) y;
+(void) w;
+(void) h;
+(void) buf;
+
 return;
 }
 
 void vid_refresh_window (VID_DISPLAY *vptr)
 {
+(void) vptr;
+
 return;
 }
 
 t_stat vid_set_cursor_window (VID_DISPLAY *vptr, t_bool visible, uint32 width, uint32 height, uint8 *data, uint8 *mask, uint32 hot_x, uint32 hot_y)
 {
+(void) vptr;
+(void) visible;
+(void) width;
+(void) height;
+(void) data;
+(void) mask;
+(void) hot_x;
+(void) hot_y;
+
 return SCPE_NOFNC;
 }
 
 t_bool vid_is_fullscreen_window (VID_DISPLAY *vptr)
 {
+(void) vptr;
+
 sim_printf ("video support unavailable\n");
 return FALSE;
 }
 
 t_stat vid_set_fullscreen_window (VID_DISPLAY *vptr, t_bool flag)
 {
+(void) vptr;
+(void) flag;
+
 sim_printf ("video support unavailable\n");
 return SCPE_OK;
 }
 
 void vid_set_cursor_position_window (VID_DISPLAY *vptr, int32 x, int32 y)
 {
+(void) vptr;
+(void) x;
+(void) y;
+
 return;
 }
 
 void vid_set_window_size (VID_DISPLAY *vptr, int32 w, int32 h)
 {
+(void) vptr;
+(void) w;
+(void) h;
+
 return;
 }
 
 void vid_render_set_logical_size (VID_DISPLAY *vptr, int32 w, int32 h)
 {
+(void) vptr;
+(void) w;
+(void) h;
+
 return;
 }
 
 const char *vid_key_name (uint32 key)
 {
+(void) key;
+
 return "";
 }
 
