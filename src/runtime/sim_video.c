@@ -2769,14 +2769,12 @@ SDL_Delay (vid_beep_duration + 100);/* Wait for sound to finish */
 }
 
 #else /* !(defined(USE_SIM_VIDEO) && defined(HAVE_LIBSDL)) */
-/* Non-implemented versions.
-
-   These functions preserve the public video API when the build has no
-   SDL-backed video support.  Their parameters intentionally match the real
-   implementation even though the stubs do not need most of them. */
+/* Non-implemented versions. */
 
 t_stat vid_open (DEVICE *dptr, const char *title, uint32 width, uint32 height, int flags)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) dptr;
 (void) title;
 (void) width;
@@ -2798,6 +2796,8 @@ return SCPE_OK;
 
 t_stat vid_poll_kb (SIM_KEY_EVENT *ev)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) ev;
 
 return SCPE_EOF;
@@ -2805,6 +2805,8 @@ return SCPE_EOF;
 
 t_stat vid_poll_mouse (SIM_MOUSE_EVENT *ev)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) ev;
 
 return SCPE_EOF;
@@ -2812,6 +2814,8 @@ return SCPE_EOF;
 
 uint32 vid_map_rgb (uint8 r, uint8 g, uint8 b)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) r;
 (void) g;
 (void) b;
@@ -2821,6 +2825,8 @@ return 0;
 
 void vid_draw (int32 x, int32 y, int32 w, int32 h, uint32 *buf)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) x;
 (void) y;
 (void) w;
@@ -2832,6 +2838,8 @@ return;
 
 t_stat vid_set_cursor (t_bool visible, uint32 width, uint32 height, uint8 *data, uint8 *mask, uint32 hot_x, uint32 hot_y)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) visible;
 (void) width;
 (void) height;
@@ -2845,6 +2853,8 @@ return SCPE_NOFNC;
 
 void vid_set_cursor_position (int32 x, int32 y)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) x;
 (void) y;
 
@@ -2868,6 +2878,8 @@ return "No Video Support";
 
 t_stat vid_set_release_key (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic SET command signature.
+   This implementation does not use every parameter. */
 (void) st;
 (void) uptr;
 (void) val;
@@ -2878,6 +2890,8 @@ return SCPE_NOFNC;
 
 t_stat vid_show_release_key (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
 (void) uptr;
 (void) val;
 (void) desc;
@@ -2888,6 +2902,8 @@ return SCPE_OK;
 
 t_stat vid_show_video (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic SHOW command signature.
+   This implementation does not use every parameter. */
 (void) uptr;
 (void) val;
 (void) desc;
@@ -2898,6 +2914,8 @@ return SCPE_OK;
 
 t_stat vid_screenshot (const char *filename)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) filename;
 
 sim_printf ("video support unavailable\n");
@@ -2912,6 +2930,8 @@ return FALSE;
 
 t_stat vid_set_fullscreen (t_bool flag)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) flag;
 
 sim_printf ("video support unavailable\n");
@@ -2920,6 +2940,8 @@ return SCPE_OK;
 
 t_stat vid_open_window (VID_DISPLAY **vptr, DEVICE *dptr, const char *title, uint32 width, uint32 height, int flags)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) dptr;
 (void) title;
 (void) width;
@@ -2932,6 +2954,8 @@ return SCPE_NOFNC;
 
 t_stat vid_close_window (VID_DISPLAY *vptr)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) vptr;
 
 return SCPE_OK;
@@ -2939,6 +2963,8 @@ return SCPE_OK;
 
 uint32 vid_map_rgb_window (VID_DISPLAY *vptr, uint8 r, uint8 g, uint8 b)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) vptr;
 (void) r;
 (void) g;
@@ -2949,6 +2975,8 @@ return 0;
 
 void vid_draw_window (VID_DISPLAY *vptr, int32 x, int32 y, int32 w, int32 h, uint32 *buf)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) vptr;
 (void) x;
 (void) y;
@@ -2961,6 +2989,8 @@ return;
 
 void vid_refresh_window (VID_DISPLAY *vptr)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) vptr;
 
 return;
@@ -2968,6 +2998,8 @@ return;
 
 t_stat vid_set_cursor_window (VID_DISPLAY *vptr, t_bool visible, uint32 width, uint32 height, uint8 *data, uint8 *mask, uint32 hot_x, uint32 hot_y)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) vptr;
 (void) visible;
 (void) width;
@@ -2982,6 +3014,8 @@ return SCPE_NOFNC;
 
 t_bool vid_is_fullscreen_window (VID_DISPLAY *vptr)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) vptr;
 
 sim_printf ("video support unavailable\n");
@@ -2990,6 +3024,8 @@ return FALSE;
 
 t_stat vid_set_fullscreen_window (VID_DISPLAY *vptr, t_bool flag)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) vptr;
 (void) flag;
 
@@ -2999,6 +3035,8 @@ return SCPE_OK;
 
 void vid_set_cursor_position_window (VID_DISPLAY *vptr, int32 x, int32 y)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) vptr;
 (void) x;
 (void) y;
@@ -3008,6 +3046,8 @@ return;
 
 void vid_set_window_size (VID_DISPLAY *vptr, int32 w, int32 h)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) vptr;
 (void) w;
 (void) h;
@@ -3017,6 +3057,8 @@ return;
 
 void vid_render_set_logical_size (VID_DISPLAY *vptr, int32 w, int32 h)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) vptr;
 (void) w;
 (void) h;
@@ -3026,6 +3068,8 @@ return;
 
 const char *vid_key_name (uint32 key)
 {
+/* Generic video API signature.
+   This implementation does not use every parameter. */
 (void) key;
 
 return "";
