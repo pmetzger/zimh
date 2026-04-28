@@ -3269,10 +3269,10 @@ emulated disk drives. These are declared in include file `sim_disk.h`.
 
 - `t_stat sim_disk_unload(UNIT *uptr)` – Unload or detach a disk as needed.
 
-- `t_stat sim_disk_set_asynch(UNIT *uptr, int latency)` – Enable
+- `t_stat sim_disk_set_async(UNIT *uptr, int latency)` – Enable
   asynchronous operation for I/O to disk unit `uptr`.
 
-- `t_stat sim_disk_clr_asynch(UNIT *uptr, int latency)` – Disable
+- `t_stat sim_disk_clr_async(UNIT *uptr, int latency)` – Disable
   asynchronous operation for I/O to disk unit `uptr`.
 
 - `t_stat sim_disk_reset(UNIT *uptr)` – Reset unit `uptr`. This
