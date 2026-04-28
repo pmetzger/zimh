@@ -43,9 +43,36 @@ static int teardown_sim_disk_fixture(void **state)
 {
     struct sim_disk_fixture *fixture = *state;
 
+    sim_disk_clear_all_test_backends();
     free(fixture);
     *state = NULL;
     return 0;
+}
+
+static t_stat test_backend_read(UNIT *uptr, t_lba lba, uint8 *buf,
+                                t_seccnt *sectsread, t_seccnt sects)
+{
+    (void)buf;
+
+    uptr->u3++;
+    assert_int_equal(lba, 7);
+    assert_int_equal(sects, 3);
+    if (sectsread != NULL)
+        *sectsread = sects;
+    return SCPE_OK;
+}
+
+static t_stat test_backend_write(UNIT *uptr, t_lba lba, uint8 *buf,
+                                 t_seccnt *sectswritten, t_seccnt sects)
+{
+    (void)buf;
+
+    uptr->u3++;
+    assert_int_equal(lba, 11);
+    assert_int_equal(sects, 5);
+    if (sectswritten != NULL)
+        *sectswritten = sects;
+    return SCPE_OK;
 }
 
 static void assert_disk_show_output(t_stat (*show_fn)(FILE *, UNIT *, int32,
@@ -124,6 +151,60 @@ static void test_sim_disk_status_predicates_use_unit_flags(void **state)
     assert_true(sim_disk_wrp(&fixture->byte_unit));
 }
 
+/* Verify the process-local test backend intercepts sector reads before the
+   normal disk context is required. */
+static void test_sim_disk_test_backend_intercepts_read(void **state)
+{
+    struct sim_disk_fixture *fixture = *state;
+    SIM_DISK_TEST_BACKEND backend = {
+        .rdsect = test_backend_read,
+    };
+    uint8 data[1] = {0};
+    t_seccnt sectsread = 0;
+
+    assert_int_equal(sim_disk_set_test_backend(&fixture->byte_unit, &backend),
+                     SCPE_OK);
+    assert_int_equal(sim_disk_rdsect(&fixture->byte_unit, 7, data, &sectsread,
+                                     3),
+                     SCPE_OK);
+    assert_int_equal(sectsread, 3);
+    assert_int_equal(fixture->byte_unit.u3, 1);
+}
+
+/* Verify the process-local test backend intercepts sector writes before the
+   normal disk context is required. */
+static void test_sim_disk_test_backend_intercepts_write(void **state)
+{
+    struct sim_disk_fixture *fixture = *state;
+    SIM_DISK_TEST_BACKEND backend = {
+        .wrsect = test_backend_write,
+    };
+    uint8 data[1] = {0};
+    t_seccnt sectswritten = 0;
+
+    assert_int_equal(sim_disk_set_test_backend(&fixture->sector_unit,
+                                               &backend),
+                     SCPE_OK);
+    assert_int_equal(sim_disk_wrsect(&fixture->sector_unit, 11, data,
+                                     &sectswritten, 5),
+                     SCPE_OK);
+    assert_int_equal(sectswritten, 5);
+    assert_int_equal(fixture->sector_unit.u3, 1);
+}
+
+static void test_sim_disk_test_backend_rejects_null_unit(void **state)
+{
+    SIM_DISK_TEST_BACKEND backend = {
+        .rdsect = test_backend_read,
+    };
+
+    (void)state;
+
+    assert_int_equal(sim_disk_set_test_backend(NULL, &backend), SCPE_ARG);
+    sim_disk_clear_test_backend(NULL);
+    sim_disk_clear_all_test_backends();
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -139,6 +220,13 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_sim_disk_status_predicates_use_unit_flags,
             setup_sim_disk_fixture, teardown_sim_disk_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_disk_test_backend_intercepts_read,
+            setup_sim_disk_fixture, teardown_sim_disk_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_disk_test_backend_intercepts_write,
+            setup_sim_disk_fixture, teardown_sim_disk_fixture),
+        cmocka_unit_test(test_sim_disk_test_backend_rejects_null_unit),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

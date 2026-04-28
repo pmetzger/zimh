@@ -47,6 +47,25 @@ typedef uint32          t_lba;                          /* disk logical block ad
 
 typedef void (*DISK_PCALLBACK)(UNIT *unit, t_stat status);
 
+/*
+ * In-process test backend replacement hook.
+ *
+ * This is intended for controller and storage-layer tests that need to force
+ * disk I/O behavior that is hard to create portably with host files, such as
+ * read errors, write errors, or short transfers.
+ *
+ * This is not a stable storage plugin API. Overrides are process-local, are
+ * not saved/restored, and are not safe to change while a UNIT has outstanding
+ * asynchronous I/O. Any NULL operation falls through to the normal sim_disk
+ * implementation. Tests should clear overrides during teardown.
+ */
+typedef struct sim_disk_test_backend {
+    t_stat (*rdsect)(UNIT *uptr, t_lba lba, uint8 *buf,
+                     t_seccnt *sectsread, t_seccnt sects);
+    t_stat (*wrsect)(UNIT *uptr, t_lba lba, uint8 *buf,
+                     t_seccnt *sectswritten, t_seccnt sects);
+} SIM_DISK_TEST_BACKEND;
+
 /* Prototypes */
 
 t_stat sim_disk_init (void);
@@ -82,6 +101,10 @@ t_stat sim_disk_attach_ex2 (UNIT *uptr,
                             const char **drivetypes,    /* list of drive types (from smallest to largest) */
                                                         /* to try and fit the container/file system into */
                              size_t reserved_sectors);  /* Unused sectors beyond the file system */
+t_stat sim_disk_set_test_backend (UNIT *uptr,
+                                  const SIM_DISK_TEST_BACKEND *backend);
+void sim_disk_clear_test_backend (UNIT *uptr);
+void sim_disk_clear_all_test_backends (void);
 t_stat sim_disk_detach (UNIT *uptr);
 t_stat sim_disk_attach_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 t_stat sim_disk_rdsect (UNIT *uptr, t_lba lba, uint8 *buf, t_seccnt *sectsread, t_seccnt sects);

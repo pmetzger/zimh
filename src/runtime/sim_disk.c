@@ -165,6 +165,82 @@ struct disk_context {
 
 #define disk_ctx up8                        /* Field in Unit structure which points to the disk_context */
 
+struct sim_disk_test_backend_entry {
+    UNIT *unit;
+    SIM_DISK_TEST_BACKEND backend;
+    struct sim_disk_test_backend_entry *next;
+};
+
+static struct sim_disk_test_backend_entry *sim_disk_test_backends;
+
+static struct sim_disk_test_backend_entry *
+sim_disk_find_test_backend (UNIT *uptr)
+{
+    struct sim_disk_test_backend_entry *entry;
+
+    for (entry = sim_disk_test_backends; entry != NULL; entry = entry->next) {
+        if (entry->unit == uptr)
+            return entry;
+    }
+    return NULL;
+}
+
+t_stat
+sim_disk_set_test_backend (UNIT *uptr, const SIM_DISK_TEST_BACKEND *backend)
+{
+    struct sim_disk_test_backend_entry *entry;
+
+    if (uptr == NULL)
+        return SCPE_ARG;
+    if (backend == NULL) {
+        sim_disk_clear_test_backend (uptr);
+        return SCPE_OK;
+    }
+
+    entry = sim_disk_find_test_backend (uptr);
+    if (entry == NULL) {
+        entry = (struct sim_disk_test_backend_entry *)malloc (sizeof (*entry));
+        if (entry == NULL)
+            return SCPE_MEM;
+        entry->unit = uptr;
+        entry->next = sim_disk_test_backends;
+        sim_disk_test_backends = entry;
+    }
+    entry->backend = *backend;
+    return SCPE_OK;
+}
+
+void
+sim_disk_clear_test_backend (UNIT *uptr)
+{
+    struct sim_disk_test_backend_entry **entryp;
+    struct sim_disk_test_backend_entry *entry;
+
+    if (uptr == NULL)
+        return;
+    for (entryp = &sim_disk_test_backends; *entryp != NULL;
+         entryp = &(*entryp)->next) {
+        if ((*entryp)->unit == uptr) {
+            entry = *entryp;
+            *entryp = entry->next;
+            free (entry);
+            return;
+        }
+    }
+}
+
+void
+sim_disk_clear_all_test_backends (void)
+{
+    struct sim_disk_test_backend_entry *entry;
+
+    while (sim_disk_test_backends != NULL) {
+        entry = sim_disk_test_backends;
+        sim_disk_test_backends = entry->next;
+        free (entry);
+    }
+}
+
 #if defined SIM_ASYNCH_IO
 #define AIO_CALLSETUP                                               \
 struct disk_context *ctx = (struct disk_context *)uptr->disk_ctx;   \
@@ -693,10 +769,17 @@ return SCPE_OK;
 t_stat sim_disk_rdsect (UNIT *uptr, t_lba lba, uint8 *buf, t_seccnt *sectsread, t_seccnt sects)
 {
 t_stat r;
-struct disk_context *ctx = (struct disk_context *)uptr->disk_ctx;
-uint32 f = DK_GET_FMT (uptr);
+struct sim_disk_test_backend_entry *test_backend;
+struct disk_context *ctx;
+uint32 f;
 t_seccnt sread = 0;
 
+test_backend = sim_disk_find_test_backend (uptr);
+if ((test_backend != NULL) && (test_backend->backend.rdsect != NULL))
+    return test_backend->backend.rdsect (uptr, lba, buf, sectsread, sects);
+
+ctx = (struct disk_context *)uptr->disk_ctx;
+f = DK_GET_FMT (uptr);
 sim_debug_unit (ctx->dbit, uptr, "sim_disk_rdsect(unit=%d, lba=0x%X, sects=%d)\n", (int)(uptr - ctx->dptr->units), lba, sects);
 
 ctx->read_count++;                                      /* record read operation */
@@ -792,12 +875,19 @@ return SCPE_OK;
 
 t_stat sim_disk_wrsect (UNIT *uptr, t_lba lba, uint8 *buf, t_seccnt *sectswritten, t_seccnt sects)
 {
-struct disk_context *ctx = (struct disk_context *)uptr->disk_ctx;
-uint32 f = DK_GET_FMT (uptr);
+struct sim_disk_test_backend_entry *test_backend;
+struct disk_context *ctx;
+uint32 f;
 t_stat r;
 uint8 *tbuf = NULL;
 t_seccnt written = 0;
 
+test_backend = sim_disk_find_test_backend (uptr);
+if ((test_backend != NULL) && (test_backend->backend.wrsect != NULL))
+    return test_backend->backend.wrsect (uptr, lba, buf, sectswritten, sects);
+
+ctx = (struct disk_context *)uptr->disk_ctx;
+f = DK_GET_FMT (uptr);
 sim_debug_unit (ctx->dbit, uptr, "sim_disk_wrsect(unit=%d, lba=0x%X, sects=%d)\n", (int)(uptr - ctx->dptr->units), lba, sects);
 
 if (sectswritten)
