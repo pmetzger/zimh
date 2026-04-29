@@ -11,6 +11,8 @@
 #include "test_simh_personality.h"
 #include "test_support.h"
 
+t_stat set_dev_enbdis(DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
+
 struct scp_unit_fixture {
     char temp_dir[1024];
     char file_path[1024];
@@ -40,8 +42,8 @@ static int setup_scp_unit_fixture(void **state)
 
     devices[0] = &fixture->device;
     devices[1] = NULL;
-    assert_int_equal(
-        simh_test_install_devices("simh-unit-scp-unit", devices), 0);
+    assert_int_equal(simh_test_install_devices("simh-unit-scp-unit", devices),
+                     0);
 
     *state = fixture;
     return 0;
@@ -51,6 +53,7 @@ static int teardown_scp_unit_fixture(void **state)
 {
     struct scp_unit_fixture *fixture = *state;
 
+    sim_cancel(&fixture->unit);
     if ((fixture->unit.flags & UNIT_ATT) != 0)
         assert_int_equal(detach_unit(&fixture->unit), SCPE_OK);
 
@@ -213,6 +216,61 @@ static void test_detach_unit_rejects_null_and_unattached_units(void **state)
     assert_int_equal(detach_unit(&fixture->unit), SCPE_OK);
 }
 
+/* Verify active units still block a normal device disable. */
+static void test_set_device_disabled_rejects_active_units(void **state)
+{
+    struct scp_unit_fixture *fixture = *state;
+
+    fixture->device.flags = DEV_DISABLE;
+    sim_switches = 0;
+
+    assert_int_equal(sim_activate(&fixture->unit, 100), SCPE_OK);
+    assert_true(sim_is_active(&fixture->unit));
+
+    assert_int_equal(
+        SCPE_BARE_STATUS(set_dev_enbdis(&fixture->device, NULL, 0, NULL)),
+        SCPE_NOFNC);
+    assert_false((fixture->device.flags & DEV_DIS) != 0);
+    assert_true(sim_is_active(&fixture->unit));
+}
+
+/* Verify -F cancels active units before disabling a device. */
+static void test_set_device_disabled_force_cancels_active_units(void **state)
+{
+    struct scp_unit_fixture *fixture = *state;
+
+    fixture->device.flags = DEV_DISABLE;
+    sim_switches = SWMASK('F');
+
+    assert_int_equal(sim_activate(&fixture->unit, 100), SCPE_OK);
+    assert_true(sim_is_active(&fixture->unit));
+
+    assert_int_equal(set_dev_enbdis(&fixture->device, NULL, 0, NULL), SCPE_OK);
+    assert_true((fixture->device.flags & DEV_DIS) != 0);
+    assert_false(sim_is_active(&fixture->unit));
+}
+
+/* Verify -F detaches attached units before disabling a device. */
+static void test_set_device_disabled_force_detaches_attached_units(void **state)
+{
+    struct scp_unit_fixture *fixture = *state;
+
+    fixture->device.flags = DEV_DISABLE;
+    fixture->unit.flags = UNIT_ATTABLE;
+    sim_switches = SWMASK('N');
+
+    assert_int_equal(attach_unit(&fixture->unit, fixture->file_path), SCPE_OK);
+    assert_true((fixture->unit.flags & UNIT_ATT) != 0);
+
+    sim_switches = SWMASK('F');
+
+    assert_int_equal(set_dev_enbdis(&fixture->device, NULL, 0, NULL), SCPE_OK);
+    assert_true((fixture->device.flags & DEV_DIS) != 0);
+    assert_false((fixture->unit.flags & UNIT_ATT) != 0);
+    assert_null(fixture->unit.fileref);
+    assert_null(fixture->unit.filename);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -239,6 +297,15 @@ int main(void)
             teardown_scp_unit_fixture),
         cmocka_unit_test_setup_teardown(
             test_detach_unit_rejects_null_and_unattached_units,
+            setup_scp_unit_fixture, teardown_scp_unit_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_set_device_disabled_rejects_active_units,
+            setup_scp_unit_fixture, teardown_scp_unit_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_set_device_disabled_force_cancels_active_units,
+            setup_scp_unit_fixture, teardown_scp_unit_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_set_device_disabled_force_detaches_attached_units,
             setup_scp_unit_fixture, teardown_scp_unit_fixture),
     };
 

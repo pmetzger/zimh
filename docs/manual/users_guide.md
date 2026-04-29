@@ -1246,6 +1246,12 @@ invisible to running programs. The device can still be `RESET`, but it
 cannot be `ATTACH`ed, `DETACH`ed, or `BOOT`ed. `SET <device> ENABLED`
 restores a disabled device to a configuration.
 
+The normal `SET <device> DISABLED` command fails if any unit is
+attached or has pending activity. `SET -F <device> DISABLED` forces the
+disable by detaching attached units and canceling pending unit
+activity. If forced disable fails while detaching units, some units may
+already have been detached or canceled.
+
 Most multi-unit devices allow units to be enabled or disabled:
 
 ```

@@ -1435,7 +1435,7 @@ static const char simh_help1[] =
       "3Device and Unit\n"
       "+SET <dev> OCT|DEC|HEX|BIN   set device display radix\n"
       "+SET <dev> ENABLED           enable device\n"
-      "+SET <dev> DISABLED          disable device\n"
+      "+SET [-F] <dev> DISABLED     disable device; -F forces detach/cancel\n"
       "+SET <dev> DEBUG{=arg}       set device debug flags\n"
       "+SET <dev> NODEBUG={arg}     clear device debug flags\n"
       "+SET <dev> arg{,arg...}      set device parameters (see show modifiers)\n"
@@ -1530,7 +1530,10 @@ static const char simh_help2[] =
       " specified device from the configuration.  A DISABLED device is invisible\n"
       " to running programs.  The device can still be RESET, but it cannot be\n"
       " ATTAChed, DETACHed, or BOOTed.  SET <device> ENABLED restores a disabled\n"
-      " device to a configuration.\n\n"
+      " device to a configuration.  The normal SET <device> DISABLED command\n"
+      " fails if any unit is attached or has pending activity.  SET -F <device>\n"
+      " DISABLED forces the disable by detaching attached units and canceling\n"
+      " pending unit activity.\n\n"
       " Most multi-unit devices allow units to be enabled or disabled:\n\n"
       "++SET <unit> ENABLED\n"
       "++SET <unit> DISABLED\n\n"
@@ -4531,9 +4534,19 @@ else {
     if (dptr->flags & DEV_DIS)                          /* already dsb? ok */
         return SCPE_OK;
     for (i = 0; i < dptr->numunits; i++) {              /* check units */
+        t_stat stat;
+
         up = (dptr->units) + i;                         /* att or active? */
-        if ((up->flags & UNIT_ATT) || sim_is_active (up))
-            return sim_messagef (SCPE_NOFNC, "%s has attached or busy units\n", sim_dname (dptr));                          /* can't do it */
+        if ((up->flags & UNIT_ATT) || sim_is_active (up)) {
+            if ((sim_switches & SWMASK ('F')) == 0)
+                return sim_messagef (SCPE_NOFNC, "%s has attached or busy units\n", sim_dname (dptr));
+            sim_cancel (up);
+            if (up->flags & UNIT_ATT) {
+                stat = scp_detach_unit (dptr, up);
+                if (stat != SCPE_OK)
+                    return stat;
+                }
+            }
         }
     dptr->flags = dptr->flags | DEV_DIS;                /* disable */
     }
@@ -11657,11 +11670,14 @@ for (i = 0; (dptr = sim_devices[i]) != NULL; i++) {
             default:
                 break;
             }
-        if (was_disabled)
+        if (was_disabled) {
+            sim_switches |= SWMASK ('F');   /* force complete disable */
             set_dev_enbdis (dptr, NULL, 0, NULL);
+            }
         }
     else
         tstat = SCPE_OK;        /* can't enable, just skip device */
+    sim_switches = saved_switches;
     if (tstat != SCPE_OK) {
         stat = tstat;
         sim_printf ("%s device tests returned: %d - %s\n", dptr->name, SCPE_BARE_STATUS (tstat), sim_error_text (tstat));
