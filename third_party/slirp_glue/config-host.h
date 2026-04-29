@@ -11,8 +11,8 @@ typedef int SOCKET;
 #define SOCKET_ERROR (-1)
 #endif
 
-#ifndef  __cplusplus
-typedef int bool;
+#ifndef __cplusplus
+#include <stdbool.h>
 #endif
 #ifdef _MSC_VER
 #include <win32/stdint.h>
