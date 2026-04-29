@@ -94,6 +94,19 @@ add_unit_test(unit-sim-video
         ${PROJECT_SOURCE_DIR}/tests/unit/support
 )
 
+if (WITH_VIDEO)
+    add_unit_test(unit-sim-video-sdl
+        LABEL unit
+        FEATURE_INT64
+        FEATURE_VIDEO
+        BESM6_SDL_HACK
+        SOURCES
+            ${CMAKE_CURRENT_SOURCE_DIR}/test_sim_video_sdl.c
+        INCLUDES
+            ${PROJECT_SOURCE_DIR}/tests/unit/support
+    )
+endif ()
+
 add_unit_test(unit-sim-tmxr
     LABEL unit
     SOURCES
