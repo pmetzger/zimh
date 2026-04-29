@@ -146,6 +146,9 @@
 #include <setjmp.h>
 #include <time.h>
 #include <ctype.h>
+#ifndef _WIN32
+#include <unistd.h>
+#endif
 #include "util_io.h"
 
 /********************************************************************************************
