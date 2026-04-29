@@ -386,7 +386,7 @@ if (ENABLE_CPPCHECK)
              "--enable=warning,style,performance,portability,information,missingInclude"
              "--suppress=missingIncludeSystem"
              "--inline-suppr"
-             "--std=c99"
+             "--std=c${ZIMH_C_STANDARD}"
              "--force")
         set(CPPCHECK_STATUS "found and enabled.")
         if (WIN32)
