@@ -1004,16 +1004,10 @@ interpreted as a regular expression applied to the output data
 stream. This regular expression may contain parentheses delimited
 sub-groups.
 
-The syntax of the regular expressions available are those supported by
-the Perl Compatible Regular Expression package (aka PCRE). As the name
-implies, the syntax is generally the same as Perl regular
-expressions. See <https://perldoc.perl.org/perlre.html> for more
-details.
-
-If the PCRE package isn’t available in the environment when a
-simulator is built, the local system’s regular expression package (if
-available) is used and the regular expression syntax is limited to
-what may be provided there.
+The regular expression syntax is that of the PCRE2 library, which is
+nearly the same as Perl’s regular expressions. See
+[the PCRE2 syntax manual](https://pcre2project.github.io/pcre2/doc/pcre2pattern/)
+for details.
 
 #### `-i`
 
