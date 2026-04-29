@@ -10388,36 +10388,18 @@ static void _sim_debug_write (const char *buf, size_t len)
 _sim_debug_write_flush (buf, len, FALSE);
 }
 
+/* Flush pending debug output. */
 static t_stat _sim_debug_flush (void)
 {
-int32 saved_quiet = sim_quiet;
-int32 saved_sim_switches = sim_switches;
-int32 saved_deb_switches = sim_deb_switches;
-struct timespec saved_deb_basetime = sim_deb_basetime;
-char saved_debug_filename[CBUFSIZE];
+    if (sim_deb == NULL)                                /* no debug? */
+        return SCPE_OK;
 
-if (sim_deb == NULL)                                    /* no debug? */
+    _sim_debug_write_flush ("", 0, TRUE);
+
+    if (fflush (sim_deb) != 0)
+        return SCPE_IOERR;
+
     return SCPE_OK;
-
-_sim_debug_write_flush ("", 0, TRUE);
-
-if (sim_deb == sim_log) {                               /* debug is log */
-    fflush (sim_deb);                                   /* fflush is the best we can do */
-    return SCPE_OK;
-    }
-
-if (!(saved_deb_switches & SWMASK ('B'))) {
-    strcpy (saved_debug_filename, sim_logfile_name (sim_deb, sim_deb_ref));
-
-    sim_quiet = 1;
-    sim_set_deboff (0, NULL);
-    sim_switches = saved_deb_switches;
-    sim_set_debon (0, saved_debug_filename);
-    sim_deb_basetime = saved_deb_basetime;
-    sim_switches = saved_sim_switches;
-    sim_quiet = saved_quiet;
-    }
-return SCPE_OK;
 }
 
 
