@@ -22,6 +22,14 @@ add_unit_test(unit-scp-unit
         ${PROJECT_SOURCE_DIR}/tests/unit/support
 )
 
+add_unit_test(unit-scp-register
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_scp_register.c
+    INCLUDES
+        ${PROJECT_SOURCE_DIR}/tests/unit/support
+)
+
 add_unit_test(unit-scp-context
     LABEL unit
     SOURCES

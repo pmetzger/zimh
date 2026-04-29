@@ -82,6 +82,8 @@
 
 t_stat reset_cmd (int32 flag, const char *ptr);
 t_stat exdep_cmd (int32 flag, const char *ptr);
+t_stat exdep_reg_loop (FILE *ofile, SCHTAB *schptr, int32 flag,
+    const char *cptr, REG *lowr, REG *highr, uint32 lows, uint32 highs);
 t_stat eval_cmd (int32 flag, const char *ptr);
 t_stat load_cmd (int32 flag, const char *ptr);
 t_stat run_cmd (int32 flag, const char *ptr);
