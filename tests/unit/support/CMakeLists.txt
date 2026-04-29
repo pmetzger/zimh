@@ -5,7 +5,9 @@ add_library(simh_unit_support STATIC
 )
 
 set_target_properties(simh_unit_support PROPERTIES
-    C_STANDARD 99
+    C_STANDARD ${ZIMH_C_STANDARD}
+    C_STANDARD_REQUIRED ON
+    C_EXTENSIONS OFF
 )
 
 target_include_directories(simh_unit_support PUBLIC

@@ -1,5 +1,5 @@
-## Note: pthreads4w requires 3.14 or better.
-cmake_minimum_required(VERSION 3.14)
+## Note: C_STANDARD 17 and C_STANDARD 23 require CMake 3.21 or better.
+cmake_minimum_required(VERSION 3.21)
 
 if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR
@@ -13,19 +13,6 @@ if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
         "  $ cmake -G \"your generator here\" ../..\n"
         ""
         "Preventing in-tree source build.")
-endif ()
-
-if (CMAKE_VERSION VERSION_LESS "3.21" AND NOT DEFINED SIMH_INSTALLER_WARNING)
-    message(WARNING "!!! DO NOT CREATE INSTALLERS WITH THIS VERSION OF CMAKE (${CMAKE_VERSION}) !!!"
-        "\n"
-        "Do not create a release or installers with this version of CMake. It does not have "
-        "the required install(RUNTIME_DEPENDENCY_SET) or install(IMPORTED_RUNTIME_ARTIFACTS) "
-        "functionality to collect runtime executable dependencies as part of the installation"
-        " packages, such as Mac OS bundles or Windows DLLs."
-        "\n"
-        "Minimum version for creating installers with CPack is 3.21."
-    )
-    set(SIMH_INSTALLER_WARNING TRUE CACHE BOOL "Installer/CPack warning issued when CMAKE_VERSION < 3.21" FORCE)
 endif ()
 
 set(SIMH_CORE_ROOT ${CMAKE_SOURCE_DIR}/src/core)
@@ -109,6 +96,21 @@ if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.15)
 endif()
 
 project(zimh VERSION "${ZIMH_VERSION}" LANGUAGES C)
+
+# zimh actively supports C11 and above. C99 is not supported,
+# but we try not to break C99 unnecessarily.
+if (DEFINED CMAKE_C_STANDARD)
+    set(ZIMH_DEFAULT_C_STANDARD "${CMAKE_C_STANDARD}")
+else ()
+    set(ZIMH_DEFAULT_C_STANDARD "17")
+endif ()
+set(ZIMH_C_STANDARD "${ZIMH_DEFAULT_C_STANDARD}" CACHE STRING
+    "C language standard for zimh-owned targets.")
+unset(ZIMH_DEFAULT_C_STANDARD)
+
+set(CMAKE_C_STANDARD "${ZIMH_C_STANDARD}")
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
 
 include(vcpkg-setup)
 include(GNUInstallDirs)
@@ -591,6 +593,7 @@ else ()
             -DDO_DEPENDENCY_BUILD:BOOL=OFF
             -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
             -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
+            -DZIMH_C_STANDARD=${ZIMH_C_STANDARD}
         INSTALL_COMMAND ""
         BINARY_DIR
             ${CMAKE_BINARY_DIR}

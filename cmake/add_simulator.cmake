@@ -56,7 +56,9 @@ function(build_simcore _targ)
     # don't export out to the dependencies (hence PRIVATE.)
     foreach (lib IN ITEMS "${_targ}" "${sim_aio_lib}")
         set_target_properties(${lib} PROPERTIES
-            C_STANDARD 99
+            C_STANDARD ${ZIMH_C_STANDARD}
+            C_STANDARD_REQUIRED ON
+            C_EXTENSIONS OFF
             EXCLUDE_FROM_ALL True
         )
         target_compile_definitions(${lib} PRIVATE USE_SIM_CARD USE_SIM_IMD)
@@ -192,7 +194,9 @@ function (simh_executable_template _targ)
 
     add_executable("${_targ}" "${SIMH_SOURCES}")
     set_target_properties(${_targ} PROPERTIES
-        C_STANDARD 99
+        C_STANDARD ${ZIMH_C_STANDARD}
+        C_STANDARD_REQUIRED ON
+        C_EXTENSIONS OFF
         RUNTIME_OUTPUT_DIRECTORY "${SIMH_RUNTIME_OUTPUT_DIR}"
     )
     foreach (_cfg IN ITEMS Debug Release RelWithDebInfo MinSizeRel)
