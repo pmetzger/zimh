@@ -10,11 +10,31 @@ The top-level `Makefile` is a thin compatibility wrapper over the
 `build/release` CMake build. The native interface is still CMake and
 CTest; the `make` entry points simply forward into that configured tree.
 
+## Compiler Support and OS Support
+
+We support builds for machines running recent vintage POSIX operating
+systems and recent vintage Microsoft Windows. We support builds for
+relatively recent compilers on those operating systems.
+
+Unlike the SIMH project, we do not support building on very old
+operating systems and compilers. Our goal is to have clean,
+supportable code that can be maintained into the very far future, and
+unfortunately, support for building on very old configurations (say
+VMS) is too difficult, both because we cannot set up continuous
+integration for such systems and because they complicate the code
+significantly.
+
+We currently aim at code supporting the C17 standard, but we have
+checked that the code will build and run with the C standard set
+anywhere from C99 to C23 successfully. We do not explicitly support
+compilers from before C11, and will not take patches to fix problems
+on very old toolchains.
+
 ## What you need installed
 
 At minimum:
 
-- a C compiler toolchain with at least C11 support
+- a C compiler toolchain
 - `cmake`
 - `ninja`
 - `git`
