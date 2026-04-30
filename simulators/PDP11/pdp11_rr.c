@@ -34,19 +34,22 @@
 #include "sim_disk.h"
 
 /* const_assert() */
-
-#define _Cx(a, b)        a ## b
-#define _Ax(x)           _Cx(_assert, x)
-#define _Sx(n)           (((n) << 1) - 1)
-#define const_assert(c)  do { static const char _Ax(__LINE__)[-_Sx(!(c))] \
-                              = {!(c)};  (void) _Ax(__LINE__); } while (0)
+#ifndef NDEBUG
+#  define _Cx(a, b)        a ## b
+#  define _Ax(x)           _Cx(_assert, x)
+#  define _Sx(n)           (((n) << 1) - 1)
+#  define const_assert(c)  do { static const char _Ax(__LINE__)[-_Sx(!(c))] \
+                                = {!(c)};  (void) _Ax(__LINE__); } while (0)
+#else
+#  define const_assert(c)  (void) 0
+#endif
 
 /* Constants */
 
 #define RPCONTR         uint16
 #define RPWRDSZ         16
-#define MAP_RDW(a,c,b)  (Map_ReadW (a, (c) << 1, b) >> 1)
-#define MAP_WRW(a,c,b)  (Map_WriteW(a, (c) << 1, b) >> 1)
+#define MAP_RDW(a,c,b)  (Map_ReadW ((a), (c) << 1, (b)) >> 1)
+#define MAP_WRW(a,c,b)  (Map_WriteW((a), (c) << 1, (b)) >> 1)
 
 /* RP02/RPR02 parameters; RP03 doubles # of cylinders (both total and spare) */
 #define RP_NUMWD        256                             /* words/sector */
@@ -93,7 +96,7 @@
 /* 12 real UNIBUS registers, so 16 registers total: 32 addresses */
 #define RP_IOLN         040
 
-/* RP(R)02/RP03 particulars (all disks rotated at 2400rpm) */
+/* RP(R)02/RP03(RP02P) particulars (all disks rotated at 2400rpm) */
 static struct drv_typ {
     const char*         name;                           /* device type name */
     int32               cyl;                            /* cylinders */
@@ -103,8 +106,8 @@ static struct drv_typ {
     int32               seek_ave;                       /* average seek, 0.1ms */
     int32               seek_max;                       /* maximal seek, 0.1ms */
 } drv_tab[] = {
-    { RP_RP02, RP_NUMCY,   RP_NUMBL,   RP_SPARE,   200, 500, 800 },
-    { RP_RP03, RP_NUMCY*2, RP_NUMBL*2, RP_SPARE*2,  75, 290, 550 }
+    { RP_RP02, RP_NUMCY,   RP_NUMBL,   RP_SPARE,  200, 500, 800 },
+    { RP_RP03, RP_NUMCY*2, RP_NUMBL*2, RP_SPARE*2, 75, 290, 550 }
 };
 
 /* RPDS 776710, selected drive status, read-only except for the attention bits */
@@ -129,7 +132,7 @@ static BITFIELD rp_ds_bits[] = {
     BIT(RDY),
     ENDBITS
 };
-#define RPDS_REAL       0017400                         /* bits stored */
+#define RPDS_REAL       0017000                         /* bits stored */
 #define RPDS_DKER       (RPDS_HNF | RPDS_INC)           /* drive error */
 #define RPER_DKER(x)    ((x) & RPDS_DKER ? RPER_DRE : 0)/* DRE for RPER */
 
@@ -244,7 +247,6 @@ static BITFIELD rp_ba_bits[] = {
 
 /* RPCA 776722, cylinder address */
 static BITFIELD rp_ca_bits[] = {
-#define RPCA_IMP        0177777                         /* implemented */
 #define RPCA_RW         0000777                         /* RP11: 0377 */
     BITF_UNSIGNED(CYL,9),
     ENDBITS
@@ -253,16 +255,14 @@ static BITFIELD rp_ca11_bits[] = {                      /* RP11 version */
 #define RPCA_M_CYL      0000377
     BITF_UNSIGNED(CYL,8),
 #define RPCA_V_SUCA     8
-#define RPCA_M_SUCA     0000377
-#define RPCA_SUCA       (RPCA_M_SUCA << RPCA_V_SUCA)
+#define RPCA_SUCA       (RPCA_M_CYL << RPCA_V_SUCA)
     BITF_UNSIGNED(SUCA,8),
+#define RPCA_IMP        0177777                         /* implemented */
     ENDBITS
 };
 
 /* RPDA 776724, disk address (track/sector) */
 static BITFIELD rp_da_bits[] = {
-#define RPDA_IMP        0017777                         /* implemented */
-#define RPDA_RW         0017417                         /* bits here */
 #define RPDA_M_SECT     017
 #define RPDA_SECT       RPDA_M_SECT                     /* sector */
     BITF_UNSIGNED(SECT,4),
@@ -273,6 +273,8 @@ static BITFIELD rp_da_bits[] = {
 #define RPDA_M_TRACK    037
 #define RPDA_TRACK      (RPDA_M_TRACK << RPDA_V_TRACK)  /* track */
     BITF_UNSIGNED(SURF,5),
+#define RPDA_RW         0017417                         /* read/write */
+#define RPDA_IMP        0017777                         /* implemented */
 #define GET_SECT(x)     ((x) & RPDA_SECT)
 #define GET_TRACK(x)    (((x) & RPDA_TRACK) >> RPDA_V_TRACK)
     ENDBITS
@@ -296,19 +298,17 @@ static BITFIELD rp_suca_bits[] = {
 /* Maintenance Write Lockout Address (LOA) (the switches on the maint. panel) */
 static const char* offon[] = { "OFF", "ON" };
 static BITFIELD rp_wloa_bits[] = {
-#define RPWLOA_IMP      03777
-#define RPWLOA_CYL      0377                            /* cyls locked */
+#define RPWLOA_CYL      0000377                         /* cyls locked */
     BITF_UNSIGNED(CYL,8),
 #define RPWLOA_V_DRV    8
 #define RPWLOA_M_DRV    7
 #define RPWLOA_DRV      (RPWLOA_M_DRV << RPWLOA_V_DRV)  /* drives locked */
     BITF_UNSIGNED(DRV,3),
-#define GET_WLOACYL(x)  (rr_dev.flags & DEV_RP11CE                          \
-                         ? (((x) & RPWLOA_CYL) << 1) | 1 /* x2 + 1 */       \
-                         :  ((x) & RPWLOA_CYL))
-#define GET_WLOADRV(x)  (((x) & RPWLOA_DRV) >> RPWLOA_V_DRV)
+#define RPWLOA_IMP      0003777                         /* implemented */
+#define GET_WLOA(n, c)  (((n) << RPWLOA_V_DRV) |                            \
+                         (rr_dev.flags & DEV_RP11CE ? (c) >> 1 : (c)))
     BITNCF(4),
-#define RPWLOA_ON       0100000
+#define RPWLOA_ON       0100000                         /* sw on/off switch */
     BITFNAM(PROTECT,1,offon),
     ENDBITS
 };
@@ -583,7 +583,7 @@ static t_stat rr_rd (int32 *data, int32 PA, int32 access)
         rpds &= RPDS_ATTN;                              /* attention bits */
         if (!(uptr->flags & UNIT_DIS)) {                /* not disabled? */
             rpds |= RPDS_ONLN;
-            if (GET_DTYPE(uptr->flags))
+            if (GET_DTYPE(uptr->flags))                 /* RP03? */
                 rpds |= RPDS_RP03;
             if (uptr->flags & UNIT_ATT) {               /* attached? */
                 rpds |= uptr->STATUS & RPDS_REAL;
@@ -609,28 +609,29 @@ static t_stat rr_rd (int32 *data, int32 PA, int32 access)
         break;
 
     case 3:                                             /* RPWC */
-        *data = rpwc;
+        *data = rpwc & RPWC_IMP;
         break;
 
     case 4:                                             /* RPBA */
-        *data = rpba;
+        *data = rpba & RPBA_IMP;
         break;
 
     case 5:                                             /* RPCA */
-        *data = rpca;
-        if (!(rr_dev.flags & DEV_RP11CE)) {
-            assert(!(suca & ~RPCA_M_SUCA));
-            *data |= suca << RPCA_V_SUCA;
-            bits = rp_ca11_bits;
-        }
+        const_assert(RPCA_M_CYL == (RPCA_RW >> 1));
+        if (!(rr_dev.flags & DEV_RP11CE)) {             /* RP11? */
+            *data = (suca << RPCA_V_SUCA) | (rpca & RPCA_M_CYL);
+            bits = rp_ca11_bits;                        /* RP11 */
+        } else
+            *data = rpca & RPCA_RW;
         break;
 
     case 6:                                             /* RPDA */
-        rpda &= RPDA_RW;
         uptr = rr_dev.units + GET_DRIVE(rpcs);
-        if (uptr->flags & UNIT_ATT)
+        if (uptr->flags & UNIT_ATT) {
+            rpda &= ~RPDA_SOT;
             rpda |= (rand() % RP_NUMSC) << RPDA_V_SOT;  /* inject a random sect */
-        *data = rpda;
+        }
+        *data = rpda & RPDA_IMP;
         break;
 
     case 10:                                            /* SUCA */
@@ -657,6 +658,7 @@ static t_stat rr_wr (int32 data, int32 PA, int32 access)
     int32 n, oval = rn < 0 ? 0 : *rr_regs[rn].valp;
     int16 func;
 
+    assert(rn < (int32)(sizeof(rr_regs)/sizeof(rr_regs[0])));
     if (access == WRITEB  &&  2 <= rn  &&  rn <= 6)
         data = RR_DATOB(oval, data);
     switch (rn) {
@@ -685,7 +687,7 @@ static t_stat rr_wr (int32 data, int32 PA, int32 access)
             sim_debug(RRDEB_INT, &rr_dev, "rr_wr(CSR:CLR_INT)\n");
             CLR_INT(RR);                                /* clr int request */
         }
-        rpcs &= ~RPCS_RW;
+        rpcs &= ~(RPCS_RW | CSR_GO);
         rpcs |= data & RPCS_RW;
         n = GET_DRIVE(rpcs);                            /* get drive no */
         if (n != GET_DRIVE(oval)) {
@@ -713,11 +715,12 @@ static t_stat rr_wr (int32 data, int32 PA, int32 access)
         break;
 
     case 5:                                             /* RPCA */
-        const_assert(RPCA_M_CYL == (RPCA_RW >> 1));
+        const_assert((RPCA_RW >> 1) == RPCA_M_CYL);
         rpca = data & (rr_dev.flags & DEV_RP11CE ? RPCA_RW : RPCA_M_CYL);
         break;
 
     case 6:                                             /* RPDA */
+        rpda &= RPDA_IMP;
         rpda &= ~RPDA_RW;
         rpda |= data & RPDA_RW;
         break;
@@ -792,7 +795,7 @@ static void rr_go (int16 func)
     uptr = rr_dev.units + i;                            /* selected unit */
     assert(uptr->action == rr_svc);
     assert(uptr->SEEKING  ||  !uptr->FUNC);             /* SEEK underway or idle */
-    uptr->STATUS &= ~(RPDS_DKER | RPDS_WLK);            /* clear drive errors */
+    uptr->STATUS &= ~RPDS_DKER;                         /* clear drive errors */
 
     if (!(uptr->flags & UNIT_ATT)) {                    /* not attached? */
         rr_set_done(RPER_PGE);                          /* unit offline */
@@ -821,30 +824,31 @@ static void rr_go (int16 func)
     rd = func == RPCS_READ   ||  func == RPCS_RD_NOSEEK  ||  func == RPCS_WCHK;
     wr = func == RPCS_WRITE  ||  func == RPCS_WR_NOSEEK;
 
+    if (wr  &&  (uptr->flags & UNIT_WPRT))              /* write and locked? */
+        rper |= RPER_WPV;
+
+    type = GET_DTYPE(uptr->flags);                      /* get drive type */
+
+    if (func == RPCS_HOME) {
+        cyl  = 0;
+        head = 0;
+    } else if (func == RPCS_RD_NOSEEK  ||  func == RPCS_WR_NOSEEK) {
+        cyl  = uptr->CYL;
+        head = uptr->HEAD;
+        assert(head < RP_NUMSF  &&  cyl < drv_tab[type].cyl);
+    } else {
+        cyl  = rpca;
+        head = GET_TRACK(rpda);
+        if (cyl >= drv_tab[type].cyl)                   /* bad cyl? */
+            rper |= RPER_NXC;
+        if (head >= RP_NUMSF)                           /* bad head? */
+            rper |= RPER_NXT;
+    }
     if (rd | wr) {
         int32 sect = GET_SECT(rpda);                    /* get sect */
         if (sect >= RP_NUMSC)                           /* sect out of range? */
             rper |= RPER_NXS;
     }
-    type = GET_DTYPE(uptr->flags);                      /* get drive type */
-    if (func == RPCS_HOME) {
-        head = 0;
-        cyl  = 0;
-    } else if (func == RPCS_RD_NOSEEK  ||  func == RPCS_WR_NOSEEK) {
-        head = uptr->HEAD;
-        cyl  = uptr->CYL;
-        assert(uptr->CYL < drv_tab[type].cyl  &&  uptr->HEAD < RP_NUMSF);
-    } else {
-        head = GET_TRACK(rpda);
-        cyl  = rpca;
-        if (head >= RP_NUMSF)                           /* bad head? */
-            rper |= RPER_NXT;
-        if (cyl >= drv_tab[type].cyl)                   /* bad cyl? */
-            rper |= RPER_NXC;
-    }
-
-    if (wr  &&  (uptr->flags & UNIT_WPRT))              /* write and locked? */
-        rper |= RPER_WPV;
 
     if (rper) {                                         /* any errors? */
         rr_set_done(0);                                 /* set done (w/errors) */
@@ -881,7 +885,7 @@ static void rr_go (int16 func)
          * just prior to when the test clears it.  Thus, the test is unable to
          * confirm the interrupt for all remaining cylinders.  ZRPB-E fixes both
          * bugs by initializing INTFLG before firing up SEEK/AIE, and also by
-         * using the more correct "MOVB @#RPDS, @#RPDS", instead of BIC. */
+         * using a more correct "MOVB @#RPDS, @#RPDS", instead of the BIC. */
     } else {
         if (cyl != uptr->CYL  ||  head != uptr->HEAD) {
             assert(func != RPCS_RD_NOSEEK  &&  func != RPCS_WR_NOSEEK);
@@ -889,7 +893,7 @@ static void rr_go (int16 func)
         }
         i += RP_ROT_12;                                 /* I/O takes longer */
         assert(i);
-        /* XXDP ZRPB-E / ZRPF-B have two data race conditions in Test 5 (data
+        /* XXDP ZRPF-B / ZRPB-E have two data race conditions in Test 5 (data
          * reliability), which in ZRPB-E can be worked around with the following
          * multiplier for all 15 steady patterns, but it does not help eliminate
          * the second race in the last (random) pattern test, despite showing no
@@ -904,7 +908,7 @@ static void rr_go (int16 func)
     assert(suca == uptr->CYL);                          /* actually */
     uptr->FUNC = func;                                  /* save new func */
     uptr->HEAD = head;                                  /* save head too */
-    uptr->CYL  = cyl;                                   /* put on cylinder */
+    uptr->CYL = cyl;                                    /* put on cylinder */
     suca += n >> 2;                                     /* show motion */
     return;
 }
@@ -958,7 +962,7 @@ static t_stat rr_svc (UNIT *uptr)
     assert(func > 0  &&  func < (int32)(sizeof(rp_funcs)/sizeof(rp_funcs[0])));
     assert(!uptr->SEEKING  &&  !(uptr->STATUS & RPDS_SEEK));
     if (func == RPCS_HOME  ||  func == RPCS_SEEK)
-        return SCPE_OK;                                 /* all done */
+        return SCPE_OK;                                 /* all done with seeks! */
 
     assert(~(rpcs & CSR_DONE));
 
@@ -975,20 +979,17 @@ static t_stat rr_svc (UNIT *uptr)
 
     n = (int32)(uptr - rr_dev.units);                   /* get drive no */
 
+    cyl  = uptr->CYL;
+    if (wr                                              /* write and ... */
+        &&  (((wloa & RPWLOA_ON)  &&
+              GET_WLOA(n, cyl) <= (wloa & RPWLOA_IMP))  /* DA write-protected? */
+             ||  (uptr->flags & UNIT_WPRT))) {          /* unit write-locked? */
+        rper |= RPER_WPV;
+    }
+    head = uptr->HEAD;
     sect = GET_SECT(rpda);                              /* get sect */
     if (sect >= RP_NUMSC)                               /* sect out of range? */
         rper |= RPER_NXS;
-    head = uptr->HEAD;
-    cyl  = uptr->CYL;
-
-    if (wr) {
-        if ((wloa & RPWLOA_ON)  &&  !rper/*valid DA*/
-            &&  (n <= GET_WLOADRV(wloa)  ||  cyl <= GET_WLOACYL(wloa))) {
-            uptr->STATUS |= RPDS_WLK;                   /* DA write-locked */
-            rper |= RPER_WPV;
-        } else if (uptr->flags & UNIT_WPRT)
-            rper |= RPER_WPV;                           /* unit write-locked */
-    }
 
     if (rper) {                                         /* control in error? */
         rr_set_done(0);
@@ -1011,14 +1012,14 @@ static t_stat rr_svc (UNIT *uptr)
         else if ((!wr  &&  wc != 3)  ||  (wr  &&  wc % 3)) /* DEC-11-HRPCA-C-D 3.8 */
             rper |= RPER_PGE;
         else if (wr)
-            n *= 3;                                     /* 3 wds per sector */
-        else                                            /* a typo in doc??? */
-            n  = 3;                                     /* can only read 3 wds */
+            n *= 3;                                     /* 3 wds of HDR per sector */
+        else
+            n  = 3;                                     /* can only read 3 wds of HDR */
     } else {                                            /* no: regular R/W */
         /* RP11 can actually handle the PDP-10/-15 (18b) mode on PDP-11 using 3
-         * words per transfer, combined as two 18b words in a disk sector (for
-         * the bit assignments in the triplet, see rr_svc() for format reading).
-         * However, a sector written in this mode is marked as such and cannot be
+         * words per transfer, combined as two 18b words on a disk sector (for
+         * bit assignments in the triplet, see below BR<35:0> in format reading).
+         * However, a sector written in 18b mode is marked as such and cannot be
          * read back in the PDP-11 (16b) mode (but only in the 18b mode).  Since
          * the disk containers do not have sector format information, this mode
          * cannot be supported (and for all intents and purposes it's not needed
@@ -1067,8 +1068,10 @@ static t_stat rr_svc (UNIT *uptr)
 
     if (!wr) {                                          /* read: */
         if (rpcs & RPCS_HDR) {                          /* format? */
+            assert(wc <= 3);
             /* Sector header is loaded in the 36-bit Buffer Register(BR):
-               17 0-bits, 9-bit cyl, 5-bit track, a spare bit, 4-bit sect */
+               17 0-bits, 9-bit cyl, 5-bit track, a spare bit, 4-bit sect;
+               which is then split into 3 PDP-11 (16b) words as following */
             rpxb[0] = 0;                                /* BR<35:20> */
             rpxb[1] = (cyl << 6) | (head << 1);         /* BR<19:04> */
             rpxb[2] = sect;                             /* BR<03:00> */
@@ -1082,7 +1085,7 @@ static t_stat rr_svc (UNIT *uptr)
             sim_disk_data_trace(uptr, (uint8*) rpxb, da, n * sizeof(*rpxb), "rr_read",
                                 RRDEB_DAT & (dptr->dctrl | uptr->dctrl), RRDEB_OPS);
             assert(done <= todo);
-            if (done >= todo)
+            if (done >= todo)                           /* NB: done == todo */
                 ioerr = 0;                              /* good stuff */
             else if (ioerr)
                 wc = n;                                 /* short, adj wd cnt */
@@ -1125,6 +1128,7 @@ static t_stat rr_svc (UNIT *uptr)
         if (wc  &&  !(rpcs & RPCS_HDR)) {               /* regular write? */
             DEVICE* dptr = find_dev_from_unit(uptr);
             int32 m = (wc + (RP_NUMWD - 1)) & ~(RP_NUMWD - 1); /* clr to... */
+            assert(m <= RP_MAXFR);
             memset(rpxb + wc, 0, (m - wc) * sizeof(*rpxb)); /* ...end of sect */
             sim_disk_data_trace(uptr, (uint8*) rpxb, da, m * sizeof(*rpxb), "rr_write",
                                 RRDEB_DAT & (dptr->dctrl | uptr->dctrl), RRDEB_OPS);
@@ -1145,7 +1149,7 @@ static t_stat rr_svc (UNIT *uptr)
                 ioerr = 0;                              /* good stuff */
         } else {
             ioerr = 0;                                  /* good stuff */
-            done = wc / 3;
+            done = (wc + 2) / 3;
             if (n)
                 rper |= RPER_NXM;                       /* NXM? set flg */
         }
@@ -1309,19 +1313,20 @@ static t_stat rr_attach (UNIT *uptr, const char *cptr)
 
 static t_stat rr_detach (UNIT *uptr)
 {
-    int16 func = uptr->FUNC;
+    int16 func;
+    sim_cancel(uptr);
+    func = uptr->FUNC;
     rr_seek_done(uptr, 1/*cancel*/);
-    if (func) {
+    if (func) {                                         /* anything unfinished? */
         uptr->FUNC = 0;                                 /* idle now */
-        sim_cancel(uptr);
         if (func == RPCS_SEEK)
             uptr->STATUS |= RPDS_INC;                   /* seek incomplete */
         else if (func != RPCS_HOME) {
             uptr->STATUS |= RPDS_HNF;                   /* sector not found */
-            rr_set_done(RPER_TE);
+            rr_set_done(RPER_TE);                       /* ...and timing error */
         }
+        uptr->STATUS |= RPDS_UNSAFE;                    /* must reset before use */
     }
-    uptr->STATUS |= RPDS_UNSAFE;                        /* must reset before use */
     assert(!sim_is_active(uptr));
     assert(!uptr->SEEKING);
     uptr->action = rr_svc;
@@ -1396,7 +1401,7 @@ static t_stat rr_set_wloa (UNIT *uptr, int32 val, const char *cptr, void *desc)
 #define BOOT_ENTRY      (BOOT_START + 002)              /* entry */
 #define BOOT_UNIT       (BOOT_START + 010)              /* unit number */
 #define BOOT_CSR        (BOOT_START + 014)              /* CSR + 12 */
-#define BOOT_LEN        (sizeof (rr_boot_rom) / sizeof (rr_boot_rom[0]))
+#define BOOT_LEN        (sizeof(rr_boot_rom)/sizeof(rr_boot_rom[0]))
 
 static const uint16 rr_boot_rom[] = {
 /* EXPECTED M9312 REGISTER USE FOR BOOT PROMS (IN THE BOOTED SOFTWARE):                                *
@@ -1462,7 +1467,7 @@ static t_stat rr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const cha
     "In default configuration " RP_RP11 " responds to the range 17776700 - 17776736\n"
     "with the first 4 word locations not occupied by any device registers (and\n"
     "so 17776710 is the first used location).  Some operating systems want you\n"
-    "to specify the extended range (e.g. RSTS/E), but some -- the relevant range\n"
+    "to specify the extended range (e.g. RSTS), but some -- the relevant range\n"
     "(17776710 - 17776736), yet some just want to know where the CSR is located\n"
     "(17776714 by default), so they can auto-calculate the range on their own.\n\n"
     "Disk drive parameters (all decimal):\n\n"
@@ -1481,13 +1486,23 @@ static t_stat rr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const cha
     }
     fputs("\n"
     "The implementation does not include any maintenance registers or disk/sector\n"
-    "formatting operations yet supports the Write Lockout Address (LOA) register,\n"
-    "which can be set with a PROTECT command:\n\n"
-    "    sim> set RR PROTECT=ON;0407\n\n"
-    "to turn the protection on (in this case, the entire units 0 and 1, and\n", st);
-    fprintf(st, "cylinders 0 thru 7%s in unit 2 will become write-locked).\n",
+    "formatting operations yet supports the Write Lockout Address (LOA) register.\n"
+    "It can be set with the PROTECT command using the keyword \"ON\" followed by a\n"
+    "value representing the number of continuously protected drives and cylinders:\n"
+    "  bits <10:8> represent the highest protected unit number;\n"
+    "  bits <07:0> encode the last protected cylinder on the unit number specified\n"
+    "above (all units preceding that unit become fully write-protected).\n"
+    "For example,\n\n"
+    "    sim> set RR PROTECT=ON;0407\n\n", st);
+    fprintf(st,
+    "write-protects the entire drive unit 0 and cylinders 0 thru 7%s\n",
             dptr->flags & DEV_RP11CE ? " x 2 + 1 = 15(10)" : "");
     fputs(
+    "on drive unit 1.  The value is accepted in either decimal, octal (if it starts\n"
+    "with 0), or hexadecimal (if it starts with 0x) notation (so \"0x107\" in the\n"
+    "above example effects the same setting).  Alternatively, a deposit command\n"
+    "can be used, but it only allows native (octal) values:\n\n"
+    "    sim> deposit RR WLOA 100407\n\n"
     "The current setting can be obtained by examining the WLOA register in\n"
     "the device (the sign bit not present in hardware controls the feature):\n\n"
     "    sim> examine RR WLOA\n"
@@ -1496,8 +1511,8 @@ static t_stat rr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const cha
     "    sim> set RR PROTECT=OFF\n"
     "    sim> examine RR WLOA\n"
     "    WLOA:   000407  PROTECT=OFF DRV=1 CYL=7\n\n"
-    "Note that it does not clear the address but turns the feature off.  Also,\n"
-    "the WLOA register is unaffected by the device RESET.\n", st);
+    "Note that it does not clear the address but turns the feature off.\n"
+    "The WLOA register is unaffected by the device RESET.\n", st);
     fprint_set_help (st, dptr);
     fprint_show_help(st, dptr);
     fprintf(st,
