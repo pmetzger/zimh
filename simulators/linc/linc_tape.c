@@ -114,7 +114,7 @@ void tape_op(void)
   case RDC: case RDE: case WRC: case WRI: case CHK:
     S = 256 * (B >> 9);
     TAPE_GROUP = 0;
-    sim_debug(DBG, &tape_dev, "Single tranfer: S=%04o, BN=%03o\n",
+    sim_debug(DBG, &tape_dev, "Single transfer: S=%04o, BN=%03o\n",
               S, WANTED_BLOCK);
     break;
   case RCG: case WCG:
