@@ -138,6 +138,12 @@
 #include <process.h>
 #endif
 
+#include "sim_string_compat.h"
+
+#if defined(_WIN32)
+#include "sim_win32_compat.h"
+#endif
+
 /* avoid macro names collisions */
 #ifdef PMASK
 #undef PMASK

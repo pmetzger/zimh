@@ -29,12 +29,9 @@ set(SIM_SOURCES
     ${SIMH_RUNTIME_ROOT}/sim_tmxr.c
     ${SIMH_RUNTIME_ROOT}/sim_video.c)
 
-if (WIN32)
+if (SIMH_COMPAT_SOURCES)
     list(APPEND SIM_SOURCES
-        ${SIMH_COMPAT_ROOT}/gmtime_r.c
-        ${SIMH_COMPAT_ROOT}/localtime_r.c
-        ${SIMH_COMPAT_ROOT}/strlcat.c
-        ${SIMH_COMPAT_ROOT}/strlcpy.c)
+        ${SIMH_COMPAT_SOURCES})
 endif ()
 
 set(SIM_VIDEO_SOURCES

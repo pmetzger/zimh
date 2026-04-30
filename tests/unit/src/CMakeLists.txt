@@ -1,5 +1,3 @@
 add_subdirectory(core)
-if (WIN32)
-    add_subdirectory(compat)
-endif ()
+add_subdirectory(compat)
 add_subdirectory(runtime)

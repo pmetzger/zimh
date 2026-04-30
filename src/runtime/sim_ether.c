@@ -348,7 +348,6 @@
 #include "sim_timer.h"
 #if defined(_WIN32)
 #include <direct.h>
-#include "sim_compat.h"
 #else
 #include <unistd.h>
 #endif

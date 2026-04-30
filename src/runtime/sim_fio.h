@@ -142,9 +142,6 @@ int sim_tolower (int c);
 #define tolower(chr) sim_tolower(chr)
 int sim_strncasecmp (const char *string1, const char *string2, size_t len);
 int sim_strcasecmp (const char *string1, const char *string2);
-#if defined(_WIN32)
-#include "sim_compat.h"
-#endif
 #ifndef strncasecmp
 #define strncasecmp(str1, str2, len) sim_strncasecmp((str1), (str2), (len))
 #endif

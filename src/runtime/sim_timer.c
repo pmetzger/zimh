@@ -70,7 +70,6 @@
 
 #define NOT_MUX_USING_CODE /* sim_tmxr library provider or agnostic */
 
-#include "sim_compat.h"
 #include "sim_defs.h"
 #include "sim_time.h"
 #include <ctype.h>

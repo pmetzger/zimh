@@ -131,10 +131,6 @@
 #include <ctype.h>
 #include <math.h>
 
-#if defined(_WIN32)
-#include "sim_compat.h"
-#endif
-
 /* Forward declarations of platform specific routines */
 
 static t_stat sim_os_poll_kbd (void);

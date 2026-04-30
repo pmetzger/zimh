@@ -82,6 +82,40 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES ".*Clang")
     target_compile_definitions(os_features INTERFACE _GNU_SOURCE)
 endif ()
 
+cmake_push_check_state()
+if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES ".*Clang")
+    list(APPEND CMAKE_REQUIRED_DEFINITIONS -D_GNU_SOURCE)
+endif ()
+check_symbol_exists(strlcpy string.h HAVE_STRLCPY)
+check_symbol_exists(strlcat string.h HAVE_STRLCAT)
+cmake_pop_check_state()
+
+set(SIMH_COMPAT_SOURCES)
+
+if (NOT HAVE_STRLCPY)
+    set(SIMH_NEED_STRLCPY TRUE)
+    list(APPEND SIMH_COMPAT_SOURCES ${SIMH_COMPAT_ROOT}/strlcpy.c)
+    target_compile_definitions(os_features INTERFACE SIMH_NEED_STRLCPY)
+endif ()
+
+if (NOT HAVE_STRLCAT)
+    set(SIMH_NEED_STRLCAT TRUE)
+    list(APPEND SIMH_COMPAT_SOURCES ${SIMH_COMPAT_ROOT}/strlcat.c)
+    target_compile_definitions(os_features INTERFACE SIMH_NEED_STRLCAT)
+endif ()
+
+if (WIN32)
+    list(APPEND SIMH_COMPAT_SOURCES
+        ${SIMH_COMPAT_ROOT}/localtime_r.c
+        ${SIMH_COMPAT_ROOT}/gmtime_r.c
+        ${SIMH_COMPAT_ROOT}/setenv.c
+        ${SIMH_COMPAT_ROOT}/tempfile.c)
+endif ()
+
+if (SIMH_COMPAT_SOURCES)
+    list(REMOVE_DUPLICATES SIMH_COMPAT_SOURCES)
+endif ()
+
 ## <sys/ioctl.h>
 check_include_file(sys/ioctl.h have_sys_ioctl_h)
 if (have_sys_ioctl_h)
