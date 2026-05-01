@@ -82,6 +82,9 @@ For networking, you will need the libraries for the backends you enable:
   external libslirp backend. POSIX builds require libslirp 4.7.0 or
   newer. Windows builds require libslirp 4.9.0 or newer because older
   releases do not expose the socket-handle callbacks needed on Win64.
+- `libvdeplug`
+  Provides the VDE2/VDE4 backend when VDE support is enabled. VDE
+  support is not available on Windows.
 
 Notes:
 
@@ -99,6 +102,8 @@ Notes:
   port of the library to Windows exists.
 - SLIRP/NAT builds using the external backend require `libslirp`; on
   Debian and Ubuntu this is normally provided by `libslirp-dev`.
+- VDE builds require `libvdeplug`; on Debian and Ubuntu this is
+  normally provided by `libvdeplug-dev`.
 - Some networking features may also use additional system libraries,
   depending on the platform and enabled options.
 
@@ -275,6 +280,9 @@ Some useful CMake options:
   Disable SDL-based graphics support. Default: `On`.
 - `-DWITH_NETWORK=Off`
   Disable optional networking features. Default: `On`.
+- `-DWITH_VDE=Off`
+  Disable VDE2/VDE4 networking support. Default: `On` on non-Windows
+  builds. VDE support is always disabled on Windows.
 - `-DWARNINGS_FATAL=On`
   Treat warnings as errors. Default: `Off`.
 - `-DRELEASE_LTO=On`

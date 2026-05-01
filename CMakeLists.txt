@@ -216,9 +216,14 @@ option(WITH_PCAP
 option(WITH_SLIRP
        "Enable (=1)/disable (=0) SLIRP network support. (def: enabled)"
        TRUE)
-option(WITH_VDE
-       "Enable (=1)/disable (=0) VDE2/VDE4 network support. (def: enabled)"
-       TRUE)
+if (WIN32)
+    set(WITH_VDE FALSE CACHE INTERNAL
+        "VDE2/VDE4 network support is not available on Windows.")
+else ()
+    option(WITH_VDE
+           "Enable (=1)/disable (=0) VDE2/VDE4 network support. (def: enabled)"
+           TRUE)
+endif ()
 option(WITH_TAP
        "Enable (=1)/disable (=0) TAP/TUN device network support. (def: enabled)"
        TRUE)
