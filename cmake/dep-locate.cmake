@@ -86,7 +86,32 @@ endif ()
 ##-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 
 if (NOT ENABLE_DEP_BUILD)
-    ## Not going to build dependencies...
+    ## Not going to build dependencies.  Still record missing packages so the
+    ## top-level configuration can fail before partially configured targets
+    ## reach compile-time missing-header errors.
+    if (NOT ZLIB_FOUND)
+        list(APPEND SIMH_BUILD_DEPS zlib)
+    endif ()
+
+    if (NOT PCRE2_FOUND)
+        list(APPEND SIMH_BUILD_DEPS pcre)
+    endif ()
+
+    if (WITH_VIDEO)
+        if (NOT PNG_FOUND)
+            list(APPEND SIMH_BUILD_DEPS png)
+        endif ()
+        if (NOT SDL2_FOUND)
+            list(APPEND SIMH_BUILD_DEPS SDL2)
+        endif ()
+        if (NOT FREETYPE_FOUND)
+            list(APPEND SIMH_BUILD_DEPS Freetype)
+        endif ()
+        if (NOT SDL2_ttf_FOUND)
+            list(APPEND SIMH_BUILD_DEPS SDL2_ttf)
+        endif ()
+    endif ()
+
     return ()
 endif ()
 

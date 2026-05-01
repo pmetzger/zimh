@@ -38,6 +38,15 @@ if (WITH_NETWORK)
           HAVE_SLIRP_NETWORK
           USE_SIMH_SLIRP_DEBUG)
 
+  # Slirp uses legacy BSD/GNU libc names such as u_int and caddr_t.
+  # In strict C17 mode, glibc hides those unless a feature-test macro
+  # requests the extended namespace.
+  if (NOT WIN32 AND
+      (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR
+       CMAKE_C_COMPILER_ID MATCHES ".*Clang"))
+    target_compile_definitions(slirp PRIVATE _GNU_SOURCE)
+  endif ()
+
   target_include_directories(slirp
       PRIVATE
           "${SIMH_COMPAT_ROOT}"
