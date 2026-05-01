@@ -75,6 +75,14 @@ static void assert_ipv4_equal(struct in_addr actual, const char *expected)
     assert_int_equal((uint32_t)actual.s_addr, ipv4_addr(expected));
 }
 
+static void assert_ipv6_equal(struct in6_addr actual, const char *expected)
+{
+    struct in6_addr parsed;
+
+    assert_int_equal(inet_pton(AF_INET6, expected, &parsed), 1);
+    assert_memory_equal(&actual, &parsed, sizeof(actual));
+}
+
 static void parse_config(sim_slirp_config *config, const char *args)
 {
     char errbuf[256];
@@ -426,6 +434,11 @@ static void test_slirp_parse_default_config(void **state)
     assert_ipv4_equal(config.netmask, "255.255.255.0");
     assert_ipv4_equal(config.network, "10.0.2.0");
     assert_int_equal(config.maskbits, 24);
+    assert_int_equal(config.ipv6_enabled, 1);
+    assert_ipv6_equal(config.ipv6_prefix, "fd00::");
+    assert_int_equal(config.ipv6_prefix_len, 64);
+    assert_ipv6_equal(config.ipv6_gateway, "fd00::2");
+    assert_ipv6_equal(config.ipv6_nameserver, "fd00::3");
     assert_int_equal(config.dhcp_enabled, 1);
     assert_ipv4_equal(config.dhcp_start, "10.0.2.15");
     assert_ipv4_equal(config.nameserver, "10.0.2.3");
@@ -470,6 +483,34 @@ static void test_slirp_parse_adjusts_network_address_gateway(void **state)
     parse_config(&config, "GATEWAY=203.0.113.0/24");
     assert_ipv4_equal(config.gateway, "203.0.113.2");
     assert_ipv4_equal(config.network, "203.0.113.0");
+    sim_slirp_config_free(&config);
+}
+
+/* Verify IPv6 NAT options are parsed and derive useful defaults. */
+static void test_slirp_parse_ipv6_options(void **state)
+{
+    sim_slirp_config config;
+
+    (void)state;
+
+    parse_config(&config, "IPV6PREFIX=fd42:1234:5678::99/64");
+    assert_int_equal(config.ipv6_enabled, 1);
+    assert_ipv6_equal(config.ipv6_prefix, "fd42:1234:5678::");
+    assert_int_equal(config.ipv6_prefix_len, 64);
+    assert_ipv6_equal(config.ipv6_gateway, "fd42:1234:5678::2");
+    assert_ipv6_equal(config.ipv6_nameserver, "fd42:1234:5678::3");
+    sim_slirp_config_free(&config);
+
+    parse_config(&config, "IPV6PREFIX=fd42:1234::/64,"
+                          "IPV6GATEWAY=fd42:1234::99,"
+                          "IPV6DNS=fd42:1234::53");
+    assert_int_equal(config.ipv6_enabled, 1);
+    assert_ipv6_equal(config.ipv6_gateway, "fd42:1234::99");
+    assert_ipv6_equal(config.ipv6_nameserver, "fd42:1234::53");
+    sim_slirp_config_free(&config);
+
+    parse_config(&config, "NOIPV6");
+    assert_int_equal(config.ipv6_enabled, 0);
     sim_slirp_config_free(&config);
 }
 
@@ -577,6 +618,10 @@ static void test_slirp_parse_reports_invalid_values(void **state)
     assert_parse_fails("UNKNOWN=1", "Unexpected NAT argument: UNKNOWN");
     assert_parse_fails("GATEWAY=10.0.2.1/33", "Invalid network mask length");
     assert_parse_fails("GATEWAY=999.0.2.1", "Invalid host");
+    assert_parse_fails("IPV6PREFIX=fd00::/127", "Invalid IPv6 prefix length");
+    assert_parse_fails("IPV6PREFIX=not-ipv6/64", "Invalid IPv6 prefix");
+    assert_parse_fails("IPV6GATEWAY=not-ipv6", "Invalid IPv6 gateway");
+    assert_parse_fails("IPV6DNS=not-ipv6", "Invalid IPv6 nameserver");
     assert_parse_fails("DHCP=bad", "Invalid DHCP start address");
     assert_parse_fails("TCP=0:10.0.2.15:23", "Invalid port number");
     assert_parse_fails("UDP=8053:bad:53", "Invalid redirect IP address");
@@ -604,6 +649,8 @@ static void test_slirp_open_configures_backend_and_forwards(void **state)
     assert_ipv4_equal(fake_backend_state.open_config.network, "192.0.2.0");
     assert_ipv4_equal(fake_backend_state.open_config.netmask,
                       "255.255.255.128");
+    assert_int_equal(fake_backend_state.open_config.ipv6_enabled, 1);
+    assert_ipv6_equal(fake_backend_state.open_config.ipv6_gateway, "fd00::2");
 
     assert_int_equal(fake_backend_state.add_count, 2);
     assert_int_equal(fake_backend_state.add_calls[0].protocol,
@@ -897,6 +944,7 @@ int main(void)
         cmocka_unit_test(test_slirp_parse_default_config),
         cmocka_unit_test(test_slirp_parse_gateway_and_network_config),
         cmocka_unit_test(test_slirp_parse_adjusts_network_address_gateway),
+        cmocka_unit_test(test_slirp_parse_ipv6_options),
         cmocka_unit_test(test_slirp_parse_dhcp_options),
         cmocka_unit_test(test_slirp_parse_dns_tftp_and_boot_options),
         cmocka_unit_test(test_slirp_parse_forwarding_rules),

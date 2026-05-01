@@ -79,7 +79,9 @@ For networking, you will need the libraries for the backends you enable:
   optional network backends.
 - `libslirp`
   Provides the SLIRP/NAT backend when SLIRP support is enabled with the
-  external libslirp backend.
+  external libslirp backend. POSIX builds require libslirp 4.7.0 or
+  newer. Windows builds require libslirp 4.9.0 or newer because older
+  releases do not expose the socket-handle callbacks needed on Win64.
 
 Notes:
 

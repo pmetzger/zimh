@@ -12,6 +12,12 @@
 
 find_package(PCRE2)
 
+if (WIN32)
+    set(LIBSLIRP_MIN_VERSION 4.9.0)
+else ()
+    set(LIBSLIRP_MIN_VERSION 4.7.0)
+endif ()
+
 if (NOT ZLIB_FOUND)
     set(ZLIB_USE_STATIC_LIBS ON)
     find_package(ZLIB)
@@ -79,7 +85,8 @@ if (NOT WIN32 OR MINGW)
             endif ()
             if (WITH_SLIRP AND (NOT LIBSLIRP_FOUND OR
                                 NOT TARGET PkgConfig::LIBSLIRP))
-                pkg_check_modules(LIBSLIRP IMPORTED_TARGET slirp)
+                pkg_check_modules(LIBSLIRP IMPORTED_TARGET
+                                  "slirp>=${LIBSLIRP_MIN_VERSION}")
             endif ()
         endif (WITH_NETWORK)
     endif ()
@@ -118,7 +125,13 @@ if (NOT ENABLE_DEP_BUILD)
 
     if (WITH_NETWORK AND WITH_SLIRP AND
         (NOT LIBSLIRP_FOUND OR NOT TARGET PkgConfig::LIBSLIRP))
-        list(APPEND SIMH_BUILD_DEPS "libslirp (pkg-config package slirp)")
+        if (WIN32)
+            list(APPEND SIMH_BUILD_DEPS
+                 "libslirp >= 4.9.0 (pkg-config package slirp)")
+        else ()
+            list(APPEND SIMH_BUILD_DEPS
+                 "libslirp >= 4.7.0 (pkg-config package slirp)")
+        endif ()
     endif ()
 
     return ()
@@ -128,8 +141,9 @@ if (WITH_NETWORK AND WITH_SLIRP AND
     (NOT LIBSLIRP_FOUND OR NOT TARGET PkgConfig::LIBSLIRP))
     message(FATAL_ERROR
         "WITH_SLIRP=ON requires external libslirp "
-        "(pkg-config package 'slirp'). Install libslirp-dev, libslirp, "
-        "or libslirp-devel, or configure with -DWITH_SLIRP=OFF. "
+        "(pkg-config package 'slirp') version ${LIBSLIRP_MIN_VERSION} "
+        "or newer. Install libslirp-dev, libslirp, or libslirp-devel, "
+        "or configure with -DWITH_SLIRP=OFF. "
         "The dependency superbuild does not build libslirp.")
 endif ()
 

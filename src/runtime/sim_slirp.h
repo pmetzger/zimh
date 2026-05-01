@@ -32,6 +32,11 @@ typedef struct sim_slirp_config {
     struct in_addr netmask;                /* guest virtual netmask */
     int maskbits;                          /* CIDR prefix length */
     struct in_addr gateway;                /* guest-visible host address */
+    int ipv6_enabled;                      /* nonzero when IPv6 is enabled */
+    struct in6_addr ipv6_prefix;           /* guest virtual IPv6 prefix */
+    int ipv6_prefix_len;                   /* IPv6 prefix length */
+    struct in6_addr ipv6_gateway;          /* guest-visible IPv6 host address */
+    struct in6_addr ipv6_nameserver;       /* guest-visible IPv6 DNS address */
     int dhcp_enabled;                      /* nonzero when DHCP is enabled */
     struct in_addr dhcp_start;             /* first DHCP lease address */
     struct in_addr nameserver;             /* guest-visible DNS address */

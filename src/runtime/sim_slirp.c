@@ -33,6 +33,9 @@
 
 /* Display names indexed by sim_slirp_forward_protocol values. */
 static const char default_ip_addr[] = "10.0.2.2";
+static const char default_ipv6_prefix[] = "fd00::";
+static const char default_ipv6_gateway[] = "fd00::2";
+static const char default_ipv6_nameserver[] = "fd00::3";
 static const char *forward_protocol_names[] = {"TCP", "UDP"};
 
 /* Report only non-retryable doorbell socket failures as fatal. */
@@ -58,7 +61,11 @@ struct slirp_write_request {
 
 /* Poll record used to translate libslirp socket interests to select(). */
 typedef struct sim_slirp_pollfd {
+#if SLIRP_CONFIG_VERSION_MAX >= 6
     slirp_os_socket fd; /* socket supplied by libslirp */
+#else
+    int fd;             /* socket supplied by libslirp */
+#endif
     int events;         /* requested SLIRP_POLL_* events */
     int revents;        /* ready SLIRP_POLL_* events */
 } sim_slirp_pollfd;
@@ -148,6 +155,26 @@ static int parse_maskbits(const char *text, int *maskbits, char *errbuf,
     return 0;
 }
 
+/* Parse an IPv6 prefix length in the inclusive range 0..126. */
+static int parse_ipv6_prefix_len(const char *text, int *prefix_len,
+                                 char *errbuf, size_t errbuf_size)
+{
+    char *endptr;
+    long parsed;
+
+    if ((text == NULL) || (*text == '\0')) {
+        set_parse_error(errbuf, errbuf_size, "Missing IPv6 prefix length");
+        return -1;
+    }
+    parsed = strtol(text, &endptr, 10);
+    if ((*endptr != '\0') || (parsed < 0) || (parsed > 126)) {
+        set_parse_error(errbuf, errbuf_size, "Invalid IPv6 prefix length");
+        return -1;
+    }
+    *prefix_len = (int)parsed;
+    return 0;
+}
+
 /* Convert a CIDR prefix length to a network-order IPv4 netmask. */
 static struct in_addr netmask_from_bits(int maskbits)
 {
@@ -158,6 +185,43 @@ static struct in_addr netmask_from_bits(int maskbits)
     else
         mask.s_addr = htonl(0xFFFFFFFFu << (32 - maskbits));
     return mask;
+}
+
+/* Parse an IPv6 address and report the caller-supplied diagnostic on error. */
+static int parse_ipv6(const char *text, struct in6_addr *addr, char *errbuf,
+                      size_t errbuf_size, const char *error)
+{
+    if ((text == NULL) || (*text == '\0') ||
+        (inet_pton(AF_INET6, text, addr) != 1)) {
+        set_parse_error(errbuf, errbuf_size, error);
+        return -1;
+    }
+    return 0;
+}
+
+/* Clear host bits beyond prefix_len in an IPv6 prefix. */
+static void mask_ipv6_prefix(struct in6_addr *addr, int prefix_len)
+{
+    int byte = prefix_len / 8;
+    int bits = prefix_len % 8;
+
+    if (byte < 16) {
+        if (bits != 0) {
+            addr->s6_addr[byte] &= (uint8_t)(0xff << (8 - bits));
+            ++byte;
+        }
+        while (byte < 16)
+            addr->s6_addr[byte++] = 0;
+    }
+}
+
+/* Derive small host IDs inside an IPv6 prefix. */
+static struct in6_addr ipv6_addr_from_prefix(struct in6_addr prefix,
+                                             int host_id)
+{
+    mask_ipv6_prefix(&prefix, 126);
+    prefix.s6_addr[15] = (uint8_t)((prefix.s6_addr[15] & 0xfc) | host_id);
+    return prefix;
 }
 
 /* Parse a TCP or UDP port number in the inclusive range 1..65535. */
@@ -236,8 +300,13 @@ void sim_slirp_config_init(sim_slirp_config *config)
 {
     memset(config, 0, sizeof(*config));
     config->maskbits = 24;
+    config->ipv6_enabled = 1;
+    config->ipv6_prefix_len = 64;
     config->dhcp_enabled = 1;
     inet_aton(default_ip_addr, &config->gateway);
+    inet_pton(AF_INET6, default_ipv6_prefix, &config->ipv6_prefix);
+    inet_pton(AF_INET6, default_ipv6_gateway, &config->ipv6_gateway);
+    inet_pton(AF_INET6, default_ipv6_nameserver, &config->ipv6_nameserver);
 }
 
 /* Release all dynamic fields owned by a NAT configuration. */
@@ -259,7 +328,8 @@ void sim_slirp_config_free(sim_slirp_config *config)
 }
 
 /* Fill in derived network, mask, DHCP, and DNS defaults after parsing. */
-static void finalize_config(sim_slirp_config *config, int network_set)
+static void finalize_config(sim_slirp_config *config, int network_set,
+                            int ipv6_gateway_set, int ipv6_dns_set)
 {
     config->netmask = netmask_from_bits(config->maskbits);
     if (!network_set)
@@ -275,6 +345,11 @@ static void finalize_config(sim_slirp_config *config, int network_set)
         config->dhcp_start.s_addr = 0;
     if (config->nameserver.s_addr == 0)
         config->nameserver.s_addr = htonl(ntohl(config->network.s_addr) | 3);
+    mask_ipv6_prefix(&config->ipv6_prefix, config->ipv6_prefix_len);
+    if (!ipv6_gateway_set)
+        config->ipv6_gateway = ipv6_addr_from_prefix(config->ipv6_prefix, 2);
+    if (!ipv6_dns_set)
+        config->ipv6_nameserver = ipv6_addr_from_prefix(config->ipv6_prefix, 3);
 }
 
 /* Parse a comma-separated NAT option string into structured config data. */
@@ -286,6 +361,8 @@ int sim_slirp_config_parse(sim_slirp_config *config, const char *args,
     const char *cptr;
     char tbuf[CBUFSIZE], gbuf[CBUFSIZE], abuf[CBUFSIZE];
     int network_set = 0;
+    int ipv6_gateway_set = 0;
+    int ipv6_dns_set = 0;
     int err = 0;
 
     if (targs == NULL)
@@ -391,6 +468,52 @@ int sim_slirp_config_parse(sim_slirp_config *config, const char *args,
             }
             continue;
         }
+        if (0 == MATCH_CMD(gbuf, "IPV6")) {
+            config->ipv6_enabled = 1;
+            continue;
+        }
+        if (0 == MATCH_CMD(gbuf, "NOIPV6")) {
+            config->ipv6_enabled = 0;
+            continue;
+        }
+        if (0 == MATCH_CMD(gbuf, "IPV6PREFIX")) {
+            if (cptr && *cptr) {
+                cptr = get_glyph(cptr, abuf, '/');
+                if (cptr && *cptr)
+                    err = parse_ipv6_prefix_len(cptr, &config->ipv6_prefix_len,
+                                                errbuf, errbuf_size);
+                if (!err)
+                    err = parse_ipv6(abuf, &config->ipv6_prefix, errbuf,
+                                     errbuf_size, "Invalid IPv6 prefix");
+            } else {
+                set_parse_error(errbuf, errbuf_size, "Missing IPv6 prefix");
+                err = 1;
+            }
+            continue;
+        }
+        if (0 == MATCH_CMD(gbuf, "IPV6GATEWAY")) {
+            if (cptr && *cptr) {
+                err = parse_ipv6(cptr, &config->ipv6_gateway, errbuf,
+                                 errbuf_size, "Invalid IPv6 gateway");
+                ipv6_gateway_set = 1;
+            } else {
+                set_parse_error(errbuf, errbuf_size, "Missing IPv6 gateway");
+                err = 1;
+            }
+            continue;
+        }
+        if ((0 == MATCH_CMD(gbuf, "IPV6NAMESERVER")) ||
+            (0 == MATCH_CMD(gbuf, "IPV6DNS"))) {
+            if (cptr && *cptr) {
+                err = parse_ipv6(cptr, &config->ipv6_nameserver, errbuf,
+                                 errbuf_size, "Invalid IPv6 nameserver");
+                ipv6_dns_set = 1;
+            } else {
+                set_parse_error(errbuf, errbuf_size, "Missing IPv6 nameserver");
+                err = 1;
+            }
+            continue;
+        }
         if (0 == MATCH_CMD(gbuf, "NODHCP")) {
             config->dhcp_enabled = 0;
             continue;
@@ -423,7 +546,7 @@ int sim_slirp_config_parse(sim_slirp_config *config, const char *args,
         err = 1;
     }
     if (!err)
-        finalize_config(config, network_set);
+        finalize_config(config, network_set, ipv6_gateway_set, ipv6_dns_set);
     free(targs);
     return err ? -1 : 0;
 }
@@ -464,6 +587,23 @@ static void libslirp_notify(void *opaque)
     if ((slirp != NULL) && (slirp->db_chime != INVALID_SOCKET))
         sim_write_sock(slirp->db_chime, "", 0);
 }
+
+#if SLIRP_CONFIG_VERSION_MAX < 6
+/* Accept legacy libslirp fd registrations.
+   Select interests are polled later. */
+static void libslirp_register_poll_fd(int fd, void *opaque)
+{
+    (void)fd;
+    (void)opaque;
+}
+
+/* Accept legacy libslirp fd unregistrations; no registration is kept. */
+static void libslirp_unregister_poll_fd(int fd, void *opaque)
+{
+    (void)fd;
+    (void)opaque;
+}
+#endif
 
 #if SLIRP_CONFIG_VERSION_MAX >= 6
 /* Accept libslirp socket registrations; select interests are polled later. */
@@ -572,6 +712,10 @@ static SlirpCb sim_slirp_callbacks = {
     .clock_get_ns = libslirp_clock_get_ns,
     .timer_free = libslirp_timer_free,
     .timer_mod = libslirp_timer_mod,
+#if SLIRP_CONFIG_VERSION_MAX < 6
+    .register_poll_fd = libslirp_register_poll_fd,
+    .unregister_poll_fd = libslirp_unregister_poll_fd,
+#endif
     .notify = libslirp_notify,
     .timer_new_opaque = libslirp_timer_new,
 #if SLIRP_CONFIG_VERSION_MAX >= 6
@@ -592,11 +736,15 @@ static void *real_backend_open(const sim_slirp_config *config, void *opaque)
     cfg.vnetwork = config->network;
     cfg.vnetmask = config->netmask;
     cfg.vhost = config->gateway;
-    cfg.in6_enabled = false;
+    cfg.in6_enabled = config->ipv6_enabled != 0;
+    cfg.vprefix_addr6 = config->ipv6_prefix;
+    cfg.vprefix_len = (uint8_t)config->ipv6_prefix_len;
+    cfg.vhost6 = config->ipv6_gateway;
     cfg.tftp_path = config->tftp_path;
     cfg.bootfile = config->boot_file;
     cfg.vdhcp_start = config->dhcp_start;
     cfg.vnameserver = config->nameserver;
+    cfg.vnameserver6 = config->ipv6_nameserver;
     cfg.vdnssearch = (const char **)config->dns_search_domains;
     cfg.disable_dhcp = !config->dhcp_enabled;
     return slirp_new(&cfg, &sim_slirp_callbacks, opaque);
@@ -631,6 +779,7 @@ static void real_backend_input(void *state, const uint8 *packet,
     slirp_input((Slirp *)state, packet, packet_size);
 }
 
+#if SLIRP_CONFIG_VERSION_MAX >= 6
 /* Record a libslirp socket interest and return its poll index. */
 static int add_poll_socket(slirp_os_socket fd, int events, void *opaque)
 {
@@ -652,6 +801,29 @@ static int add_poll_socket(slirp_os_socket fd, int events, void *opaque)
     slirp->pollfds[slirp->poll_count].revents = 0;
     return (int)slirp->poll_count++;
 }
+#else
+/* Record a legacy libslirp fd interest and return its poll index. */
+static int add_poll_fd(int fd, int events, void *opaque)
+{
+    sim_slirp_handle *slirp = (sim_slirp_handle *)opaque;
+    sim_slirp_pollfd *new_pollfds;
+
+    if (slirp->poll_count == slirp->poll_capacity) {
+        size_t capacity = slirp->poll_capacity ? slirp->poll_capacity * 2 : 8;
+
+        new_pollfds = (sim_slirp_pollfd *)realloc(
+            slirp->pollfds, capacity * sizeof(*new_pollfds));
+        if (new_pollfds == NULL)
+            return -1;
+        slirp->pollfds = new_pollfds;
+        slirp->poll_capacity = capacity;
+    }
+    slirp->pollfds[slirp->poll_count].fd = fd;
+    slirp->pollfds[slirp->poll_count].events = events;
+    slirp->pollfds[slirp->poll_count].revents = 0;
+    return (int)slirp->poll_count++;
+}
+#endif
 
 /* Return readiness bits for the poll index previously handed to libslirp. */
 static int get_revents(int idx, void *opaque)
@@ -670,7 +842,11 @@ static void real_backend_pollfds_fill(void *state, void *pollfds,
     sim_slirp_handle *slirp = (sim_slirp_handle *)pollfds;
 
     slirp->poll_count = 0;
+#if SLIRP_CONFIG_VERSION_MAX >= 6
     slirp_pollfds_fill_socket((Slirp *)state, timeout, add_poll_socket, slirp);
+#else
+    slirp_pollfds_fill((Slirp *)state, timeout, add_poll_fd, slirp);
+#endif
 }
 
 /* Report host socket readiness back to upstream libslirp. */
@@ -748,6 +924,11 @@ int sim_slirp_callbacks_are_complete_for_test(void)
         (sim_slirp_callbacks.timer_mod == NULL) ||
         (sim_slirp_callbacks.notify == NULL))
         return 0;
+#if SLIRP_CONFIG_VERSION_MAX < 6
+    if ((sim_slirp_callbacks.register_poll_fd == NULL) ||
+        (sim_slirp_callbacks.unregister_poll_fd == NULL))
+        return 0;
+#endif
 #if SLIRP_CONFIG_VERSION_MAX >= 4
     if (sim_slirp_callbacks.timer_new_opaque == NULL)
         return 0;
@@ -924,6 +1105,15 @@ t_stat sim_slirp_attach_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
         "address\n"
         "    NETWORK=network_ipaddress{/masklen} specifies LAN network "
         "address\n"
+        "    IPV6                                enables IPv6\n"
+        "    NOIPV6                              disables IPv6\n"
+        "    IPV6PREFIX=prefix{/prefixlen}       specifies IPv6 network "
+        "prefix\n"
+        "    IPV6GATEWAY=host_ipv6address        specifies IPv6 gateway\n"
+        "    IPV6DNS=nameserver_ipv6address      specifies IPv6 DNS "
+        "address\n"
+        "    IPV6NAMESERVER=nameserver_ipv6address specifies IPv6 DNS "
+        "address\n"
         "    UDP=port:address:address's-port     maps host UDP port to guest "
         "port\n"
         "    TCP=port:address:address's-port     maps host TCP port to guest "
@@ -932,6 +1122,8 @@ t_stat sim_slirp_attach_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
         "Default NAT Options: GATEWAY=10.0.2.2, masklen=24(netmask is "
         "255.255.255.0)\n"
         "                     DHCP=10.0.2.15, NAMESERVER=10.0.2.3\n"
+        "                     IPV6PREFIX=fd00::/64, IPV6GATEWAY=fd00::2, "
+        "IPV6DNS=fd00::3\n"
         "    Nameserver defaults to proxy traffic to host system's active "
         "nameserver\n\n");
     return SCPE_OK;
@@ -997,6 +1189,22 @@ void sim_slirp_show(sim_slirp_handle *slirp, FILE *st)
     if (slirp->config.dhcp_start.s_addr != 0)
         fprintf(st, "        dhcp_start    =%s\n",
                 inet_ntoa(slirp->config.dhcp_start));
+    if (slirp->config.ipv6_enabled) {
+        char addrbuf[INET6_ADDRSTRLEN];
+
+        inet_ntop(AF_INET6, &slirp->config.ipv6_prefix, addrbuf,
+                  sizeof(addrbuf));
+        fprintf(st, "        IPv6 prefix   =%s/%d\n", addrbuf,
+                slirp->config.ipv6_prefix_len);
+        inet_ntop(AF_INET6, &slirp->config.ipv6_gateway, addrbuf,
+                  sizeof(addrbuf));
+        fprintf(st, "        IPv6 gateway  =%s\n", addrbuf);
+        inet_ntop(AF_INET6, &slirp->config.ipv6_nameserver, addrbuf,
+                  sizeof(addrbuf));
+        fprintf(st, "        IPv6 DNS      =%s\n", addrbuf);
+    } else {
+        fprintf(st, "        IPv6          =disabled\n");
+    }
     if (slirp->config.boot_file)
         fprintf(st, "        dhcp bootfile =%s\n", slirp->config.boot_file);
     if (slirp->config.dns_search_domains) {

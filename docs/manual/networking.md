@@ -133,6 +133,33 @@ Typical built-in addresses are:
 - gateway: `10.0.2.2`
 - DNS server: `10.0.2.3`
 - netmask: `255.255.255.0`
+- IPv6 prefix: `fd00::/64`
+- IPv6 gateway: `fd00::2`
+- IPv6 DNS server: `fd00::3`
+
+IPv6 is enabled by default when `nat:` is backed by external libslirp.
+The IPv6 options are:
+
+- `ipv6`: enable IPv6.
+- `noipv6`: disable IPv6.
+- `ipv6prefix=prefix/prefixlen`: set the guest IPv6 prefix.
+- `ipv6gateway=address`: set the guest-visible IPv6 gateway address.
+- `ipv6dns=address`: set the guest-visible IPv6 DNS proxy address.
+- `ipv6nameserver=address`: synonym for `ipv6dns`.
+
+For example, use `noipv6` to disable IPv6:
+
+```text
+sim> ATTACH XQ nat:noipv6
+```
+
+To choose a different guest IPv6 prefix or virtual IPv6 service
+addresses, use:
+
+```text
+sim> ATTACH XQ nat:ipv6prefix=fd42:1234::/64
+sim> ATTACH XQ nat:ipv6gateway=fd42:1234::2,ipv6dns=fd42:1234::3
+```
 
 If you want the host to reach a guest service while still using NAT,
 forward a host TCP port:
