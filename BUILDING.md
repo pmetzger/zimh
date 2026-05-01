@@ -40,31 +40,32 @@ At minimum:
 - `git`
 - `pkg-config`
 - `bison`
-
-For the normal default build, install these additional libraries:
-
 - `libpcre2`
-  Provides the regular expression backend used by SCP EXPECT commands.
+
+PCRE2 provides the regular expression backend used by SCP EXPECT
+commands, and is required for build.
 
 For the full feature build, install the libraries used by optional
 features:
 
 - `SDL2`
   Provides the windowing, input, and rendering layer used by the
-  project’s video/graphics support.
+  project’s video/graphics support, and is required for video-enabled
+  builds.
 - `SDL2_ttf`
-  Adds text rendering for SDL-based displays and is required for the
-  normal video-enabled build.
+  Adds text rendering for SDL-based displays and is required for
+  video-enabled builds.
 - `freetype`
   Supplies font loading and glyph rasterization used by the SDL display
-  stack.
+  stack. Freetype is required for video-enabled builds.
 - `libpng`
   Adds PNG image support used by graphics and image-loading paths.
 - `zlib`
   Provides compression support used by image and related file-handling
   code.
 - `libedit`
-  Enables SCP command-line editing and history support
+  Enables SCP command-line editing and history support. Unfortunately,
+  libedit is not available for Windows.
 
 For testing, you will need:
 
