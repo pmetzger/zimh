@@ -700,6 +700,14 @@ static void test_slirp_backend_output_reaches_packet_callback(void **state)
     sim_slirp_close(slirp);
 }
 
+/* Verify the production callback table covers the compiled libslirp ABI. */
+static void test_slirp_real_backend_callbacks_match_libslirp_abi(void **state)
+{
+    (void)state;
+
+    assert_true(sim_slirp_callbacks_are_complete_for_test());
+}
+
 /* Verify libslirp answers ARP for the virtual gateway without host network. */
 static void test_slirp_real_backend_answers_local_arp(void **state)
 {
@@ -898,6 +906,7 @@ int main(void)
         cmocka_unit_test(test_slirp_select_uses_backend_poll_fill),
         cmocka_unit_test(test_slirp_dispatch_sends_queued_packets_to_backend),
         cmocka_unit_test(test_slirp_backend_output_reaches_packet_callback),
+        cmocka_unit_test(test_slirp_real_backend_callbacks_match_libslirp_abi),
         cmocka_unit_test(test_slirp_real_backend_answers_local_arp),
         cmocka_unit_test(test_slirp_real_backend_answers_dhcp_discover),
         cmocka_unit_test(test_slirp_real_backend_answers_gateway_ping),

@@ -465,6 +465,23 @@ static void libslirp_notify(void *opaque)
         sim_write_sock(slirp->db_chime, "", 0);
 }
 
+#if SLIRP_CONFIG_VERSION_MAX >= 6
+/* Accept libslirp socket registrations; select interests are polled later. */
+static void libslirp_register_poll_socket(slirp_os_socket socket, void *opaque)
+{
+    (void)socket;
+    (void)opaque;
+}
+
+/* Accept libslirp socket unregistrations; no persistent registration is kept. */
+static void libslirp_unregister_poll_socket(slirp_os_socket socket,
+                                            void *opaque)
+{
+    (void)socket;
+    (void)opaque;
+}
+#endif
+
 /* Allocate a libslirp timer wrapper owned by the SLIRP adapter. */
 static void *libslirp_timer_new(SlirpTimerId id, void *cb_opaque, void *opaque)
 {
@@ -549,13 +566,19 @@ static void apply_timer_timeout(sim_slirp_handle *slirp, uint32 *timeout)
 }
 
 /* Callback table passed to each upstream libslirp instance. */
-static SlirpCb sim_slirp_callbacks = {.send_packet = libslirp_send_packet,
-                                      .guest_error = libslirp_guest_error,
-                                      .clock_get_ns = libslirp_clock_get_ns,
-                                      .timer_free = libslirp_timer_free,
-                                      .timer_mod = libslirp_timer_mod,
-                                      .notify = libslirp_notify,
-                                      .timer_new_opaque = libslirp_timer_new};
+static SlirpCb sim_slirp_callbacks = {
+    .send_packet = libslirp_send_packet,
+    .guest_error = libslirp_guest_error,
+    .clock_get_ns = libslirp_clock_get_ns,
+    .timer_free = libslirp_timer_free,
+    .timer_mod = libslirp_timer_mod,
+    .notify = libslirp_notify,
+    .timer_new_opaque = libslirp_timer_new,
+#if SLIRP_CONFIG_VERSION_MAX >= 6
+    .register_poll_socket = libslirp_register_poll_socket,
+    .unregister_poll_socket = libslirp_unregister_poll_socket,
+#endif
+};
 
 /* Create the upstream libslirp instance from parsed simulator NAT options. */
 static void *real_backend_open(const sim_slirp_config *config, void *opaque)
@@ -713,6 +736,28 @@ void sim_slirp_deliver_packet_for_test(sim_slirp_handle *slirp,
 {
     if ((slirp != NULL) && (slirp->callback != NULL))
         slirp->callback(slirp->opaque, packet, packet_size);
+}
+
+/* Verify the callback table has every callback required by this ABI version. */
+int sim_slirp_callbacks_are_complete_for_test(void)
+{
+    if ((sim_slirp_callbacks.send_packet == NULL) ||
+        (sim_slirp_callbacks.guest_error == NULL) ||
+        (sim_slirp_callbacks.clock_get_ns == NULL) ||
+        (sim_slirp_callbacks.timer_free == NULL) ||
+        (sim_slirp_callbacks.timer_mod == NULL) ||
+        (sim_slirp_callbacks.notify == NULL))
+        return 0;
+#if SLIRP_CONFIG_VERSION_MAX >= 4
+    if (sim_slirp_callbacks.timer_new_opaque == NULL)
+        return 0;
+#endif
+#if SLIRP_CONFIG_VERSION_MAX >= 6
+    if ((sim_slirp_callbacks.register_poll_socket == NULL) ||
+        (sim_slirp_callbacks.unregister_poll_socket == NULL))
+        return 0;
+#endif
+    return 1;
 }
 
 /* Apply parsed TCP/UDP host-forwarding rules in original argument order. */

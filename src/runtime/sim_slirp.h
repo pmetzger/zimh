@@ -86,6 +86,9 @@ int sim_slirp_set_doorbell_enabled_for_test(int enabled);
 void sim_slirp_deliver_packet_for_test(sim_slirp_handle *slirp,
                                        const uint8 *packet, int packet_size);
 
+/* Verify the libslirp callback table matches the compiled libslirp ABI. */
+int sim_slirp_callbacks_are_complete_for_test(void);
+
 /* Open a NAT adapter using the supplied option string and packet callback. */
 sim_slirp_handle *sim_slirp_open(const char *args, void *opaque,
                                  packet_callback callback, DEVICE *dptr,
