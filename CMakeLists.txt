@@ -492,9 +492,25 @@ endif ()
 
 if (NOT DO_DEPENDENCY_BUILD)
     include (add_simulator)
-    if (WITH_SLIRP)
-      add_subdirectory(third_party/slirp)
-    endif (WITH_SLIRP)
+    if (WITH_NETWORK AND WITH_SLIRP)
+        add_library(slirp STATIC "${SIMH_RUNTIME_ROOT}/sim_slirp.c")
+        target_compile_definitions(slirp
+          PRIVATE
+            HAVE_SLIRP_NETWORK
+            USE_SIMH_SLIRP_DEBUG
+          INTERFACE
+            HAVE_SLIRP_NETWORK
+            USE_SIMH_SLIRP_DEBUG)
+        target_include_directories(slirp
+          PRIVATE
+            "${SIMH_COMPAT_ROOT}"
+            "${SIMH_CORE_ROOT}"
+          PUBLIC
+            "${SIMH_RUNTIME_ROOT}")
+        target_compile_options(slirp PRIVATE ${EXTRA_TARGET_CFLAGS})
+        target_link_options(slirp PRIVATE ${EXTRA_TARGET_LFLAGS})
+        target_link_libraries(slirp PUBLIC PkgConfig::LIBSLIRP)
+    endif (WITH_NETWORK AND WITH_SLIRP)
 
 ## Don't delete yet ##    set(Python_ADDITIONAL_VERSIONS 3)
 ## Don't delete yet ##    include(FindPythonInterp)

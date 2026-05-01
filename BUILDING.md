@@ -72,11 +72,14 @@ For testing, you will need:
 - `cmocka`
   Provides the host-side C unit-test framework used under `tests/unit/`.
 
-For networking, you will need:
+For networking, you will need the libraries for the backends you enable:
 
 - `libpcap`
   Enables direct host-interface packet capture and injection for the
   optional network backends.
+- `libslirp`
+  Provides the SLIRP/NAT backend when SLIRP support is enabled with the
+  external libslirp backend.
 
 Notes:
 
@@ -92,8 +95,10 @@ Notes:
   console input without interactive line-editing support.
   `libedit` support is not currently available for Windows because no
   port of the library to Windows exists.
+- SLIRP/NAT builds using the external backend require `libslirp`; on
+  Debian and Ubuntu this is normally provided by `libslirp-dev`.
 - Some networking features may also use additional system libraries,
-  such as `libpcap`, depending on the platform and enabled options.
+  depending on the platform and enabled options.
 
 ## Installing dependencies
 
@@ -331,6 +336,7 @@ pkg-config --modversion freetype2
 pkg-config --modversion libpng
 pkg-config --modversion zlib
 pkg-config --modversion libedit
+pkg-config --modversion slirp
 bison --version
 ```
 

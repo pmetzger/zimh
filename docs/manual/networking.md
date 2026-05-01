@@ -122,7 +122,9 @@ sim> ATTACH XQ nat:
 ```
 
 This gives the guest a private virtual network with outbound access
-through the host.  It is intended for IP traffic.
+through the host.  It is intended for IP traffic.  The `nat:` backend is
+available only when the simulator was built with SLIRP support; builds
+using the external SLIRP backend require `libslirp`.
 
 Typical built-in addresses are:
 
@@ -258,6 +260,7 @@ Possible causes include:
 
 - the simulator was built without networking support
 - the required host libraries are missing
+- SLIRP support, or `libslirp` for an external SLIRP build, is missing
 - the host packet-capture layer is not installed or not usable
 - the current account lacks the required privilege
 

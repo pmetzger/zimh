@@ -1878,7 +1878,7 @@ while (dev->handle) {
     if (do_select) {
 #ifdef HAVE_SLIRP_NETWORK
       if (dev->eth_api == ETH_API_NAT) {
-        sel_ret = sim_slirp_select ((SLIRP*)dev->handle, 250);
+        sel_ret = sim_slirp_select ((sim_slirp_handle *)dev->handle, 250);
         }
       else
 #endif
@@ -1956,7 +1956,7 @@ while (dev->handle) {
 #endif /* HAVE_VDE_NETWORK */
 #ifdef HAVE_SLIRP_NETWORK
       case ETH_API_NAT:
-        sim_slirp_dispatch ((SLIRP*)dev->handle);
+        sim_slirp_dispatch ((sim_slirp_handle *)dev->handle);
         status = 1;
         break;
 #endif /* HAVE_SLIRP_NETWORK */
@@ -2528,7 +2528,7 @@ switch (eth_api) {
 #endif
 #ifdef HAVE_SLIRP_NETWORK
   case ETH_API_NAT:
-    sim_slirp_close((SLIRP*)pcap);
+    sim_slirp_close((sim_slirp_handle *)pcap);
     break;
 #endif
   case ETH_API_UDP:
@@ -2976,7 +2976,8 @@ if ((packet->len >= ETH_MIN_PACKET) && (packet->len <= ETH_MAX_PACKET)) {
 #endif
 #ifdef HAVE_SLIRP_NETWORK
     case ETH_API_NAT:
-      status = sim_slirp_send((SLIRP*)dev->handle, (char *)packet->msg, (size_t)packet->len, 0);
+      status = sim_slirp_send((sim_slirp_handle *)dev->handle,
+                              (char *)packet->msg, (size_t)packet->len, 0);
       if ((status == (int)packet->len) || (status == 0))
         status = 0;
       else
@@ -4170,7 +4171,7 @@ if (dev->bpf_filter)
   fprintf(st, "  BPF Filter: %s\n", dev->bpf_filter);
 #if defined(HAVE_SLIRP_NETWORK)
 if (dev->eth_api == ETH_API_NAT)
-  sim_slirp_show ((SLIRP *)dev->handle, st);
+  sim_slirp_show ((sim_slirp_handle *)dev->handle, st);
 #endif
 }
 

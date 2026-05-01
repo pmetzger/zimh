@@ -88,6 +88,16 @@ if (WITH_NETWORK)
     )
 endif ()
 
+if (WITH_NETWORK AND WITH_SLIRP)
+    add_unit_test(unit-sim-slirp
+        LABEL unit
+        SOURCES
+            ${CMAKE_CURRENT_SOURCE_DIR}/test_sim_slirp.c
+        INCLUDES
+            ${PROJECT_SOURCE_DIR}/tests/unit/support
+    )
+endif ()
+
 add_unit_test(unit-sim-video
     LABEL unit
     SOURCES

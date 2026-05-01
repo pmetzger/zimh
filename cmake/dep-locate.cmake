@@ -77,6 +77,10 @@ if (NOT WIN32 OR MINGW)
             if (WITH_VDE AND NOT VDE_FOUND)
                 pkg_check_modules(VDE IMPORTED_TARGET vdeplug)
             endif ()
+            if (WITH_SLIRP AND (NOT LIBSLIRP_FOUND OR
+                                NOT TARGET PkgConfig::LIBSLIRP))
+                pkg_check_modules(LIBSLIRP IMPORTED_TARGET slirp)
+            endif ()
         endif (WITH_NETWORK)
     endif ()
 endif ()
@@ -112,7 +116,21 @@ if (NOT ENABLE_DEP_BUILD)
         endif ()
     endif ()
 
+    if (WITH_NETWORK AND WITH_SLIRP AND
+        (NOT LIBSLIRP_FOUND OR NOT TARGET PkgConfig::LIBSLIRP))
+        list(APPEND SIMH_BUILD_DEPS "libslirp (pkg-config package slirp)")
+    endif ()
+
     return ()
+endif ()
+
+if (WITH_NETWORK AND WITH_SLIRP AND
+    (NOT LIBSLIRP_FOUND OR NOT TARGET PkgConfig::LIBSLIRP))
+    message(FATAL_ERROR
+        "WITH_SLIRP=ON requires external libslirp "
+        "(pkg-config package 'slirp'). Install libslirp-dev, libslirp, "
+        "or libslirp-devel, or configure with -DWITH_SLIRP=OFF. "
+        "The dependency superbuild does not build libslirp.")
 endif ()
 
 include (ExternalProject)
