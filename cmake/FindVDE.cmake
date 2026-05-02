@@ -6,7 +6,7 @@
 ## "scooter me fecit"
 
 if (WITH_VDE)
-    find_package(PkgConfig)
+    find_package(PkgConfig QUIET)
     if (PKG_CONFIG_FOUND)
         pkg_check_modules(PC_VDE QUIET VDEPLUG)
 
@@ -55,8 +55,8 @@ if (WITH_VDE)
 
     include(FindPackageHandleStandardArgs)
 
-    FIND_PACKAGE_HANDLE_STANDARD_ARGS(VDE
-        REQUIRED
+    find_package_handle_standard_args(VDE
+        REQUIRED_VARS
             VDEPLUG_LIBRARY
             VDEPLUG_INCLUDE_DIR
         # VERSION_VAR VDEPLUG_VERSION_STRING

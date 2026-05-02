@@ -9,6 +9,7 @@
         "freetype",
         "libpcap",
         "libpng",
+        "libslirp",
         "pcre2",
         "pthreads",
         "sdl2",

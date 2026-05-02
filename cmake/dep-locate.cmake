@@ -40,7 +40,7 @@ endif ()
 
 if (WITH_NETWORK)
     if (WITH_VDE)
-        find_package(VDE)
+        find_package(VDE QUIET)
     endif ()
 
     ## pcap is special: Headers only and dynamically loaded.
@@ -50,7 +50,7 @@ if (WITH_NETWORK)
 endif (WITH_NETWORK)
 
 if (NOT WIN32 OR MINGW)
-    find_package(PkgConfig)
+    find_package(PkgConfig QUIET)
     if (PKG_CONFIG_FOUND)
         if (NOT PCRE2_FOUND)
             pkg_check_modules(PCRE2 IMPORTED_TARGET libpcre2-8)
@@ -81,7 +81,7 @@ if (NOT WIN32 OR MINGW)
 
         if (WITH_NETWORK)
             if (WITH_VDE AND NOT VDE_FOUND)
-                pkg_check_modules(VDE IMPORTED_TARGET vdeplug)
+                pkg_check_modules(VDE QUIET IMPORTED_TARGET vdeplug)
             endif ()
             if (WITH_SLIRP AND (NOT LIBSLIRP_FOUND OR
                                 NOT TARGET PkgConfig::LIBSLIRP))
@@ -101,37 +101,65 @@ if (NOT ENABLE_DEP_BUILD)
     ## top-level configuration can fail before partially configured targets
     ## reach compile-time missing-header errors.
     if (NOT ZLIB_FOUND)
-        list(APPEND SIMH_BUILD_DEPS zlib)
+        zimh_record_missing_dependency(
+            NAME "zlib"
+            REASON "compressed file support requires it"
+            PROBE "CMake package ZLIB or pkg-config package zlib"
+            PACKAGE_KEY ZLIB)
     endif ()
 
     if (NOT PCRE2_FOUND)
-        list(APPEND SIMH_BUILD_DEPS pcre)
+        zimh_record_missing_dependency(
+            NAME "libpcre2"
+            REASON "regular expression support requires it"
+            PROBE "CMake package PCRE2 or pkg-config package libpcre2-8"
+            PACKAGE_KEY PCRE2)
     endif ()
 
     if (WITH_VIDEO)
         if (NOT PNG_FOUND)
-            list(APPEND SIMH_BUILD_DEPS png)
+            zimh_record_missing_dependency(
+                NAME "libpng"
+                REASON "WITH_VIDEO=ON"
+                PROBE "CMake package PNG or pkg-config package libpng16"
+                DISABLE "-DWITH_VIDEO=OFF"
+                PACKAGE_KEY PNG)
         endif ()
         if (NOT SDL2_FOUND)
-            list(APPEND SIMH_BUILD_DEPS SDL2)
+            zimh_record_missing_dependency(
+                NAME "SDL2"
+                REASON "WITH_VIDEO=ON"
+                PROBE "CMake package SDL2 or pkg-config package sdl2"
+                DISABLE "-DWITH_VIDEO=OFF"
+                PACKAGE_KEY SDL2)
         endif ()
         if (NOT FREETYPE_FOUND)
-            list(APPEND SIMH_BUILD_DEPS Freetype)
+            zimh_record_missing_dependency(
+                NAME "freetype"
+                REASON "WITH_VIDEO=ON"
+                PROBE "CMake package Freetype or pkg-config package freetype2"
+                DISABLE "-DWITH_VIDEO=OFF"
+                PACKAGE_KEY FREETYPE)
         endif ()
         if (NOT SDL2_ttf_FOUND)
-            list(APPEND SIMH_BUILD_DEPS SDL2_ttf)
+            zimh_record_missing_dependency(
+                NAME "SDL2_ttf"
+                REASON "WITH_VIDEO=ON"
+                PROBE "CMake package SDL2_ttf or pkg-config package SDL2_ttf"
+                DISABLE "-DWITH_VIDEO=OFF"
+                PACKAGE_KEY SDL2_TTF)
         endif ()
     endif ()
 
     if (WITH_NETWORK AND WITH_SLIRP AND
         (NOT LIBSLIRP_FOUND OR NOT TARGET PkgConfig::LIBSLIRP))
-        if (WIN32)
-            list(APPEND SIMH_BUILD_DEPS
-                 "libslirp >= 4.9.0 (pkg-config package slirp)")
-        else ()
-            list(APPEND SIMH_BUILD_DEPS
-                 "libslirp >= 4.7.0 (pkg-config package slirp)")
-        endif ()
+        zimh_record_missing_dependency(
+            NAME "libslirp"
+            VERSION ">= ${LIBSLIRP_MIN_VERSION}"
+            REASON "WITH_NETWORK=ON and WITH_SLIRP=ON"
+            PROBE "pkg-config package slirp >= ${LIBSLIRP_MIN_VERSION}"
+            DISABLE "-DWITH_SLIRP=OFF"
+            PACKAGE_KEY LIBSLIRP)
     endif ()
 
     return ()
@@ -139,12 +167,13 @@ endif ()
 
 if (WITH_NETWORK AND WITH_SLIRP AND
     (NOT LIBSLIRP_FOUND OR NOT TARGET PkgConfig::LIBSLIRP))
-    message(FATAL_ERROR
-        "WITH_SLIRP=ON requires external libslirp "
-        "(pkg-config package 'slirp') version ${LIBSLIRP_MIN_VERSION} "
-        "or newer. Install libslirp-dev, libslirp, or libslirp-devel, "
-        "or configure with -DWITH_SLIRP=OFF. "
-        "The dependency superbuild does not build libslirp.")
+    zimh_record_missing_dependency(
+        NAME "libslirp"
+        VERSION ">= ${LIBSLIRP_MIN_VERSION}"
+        REASON "WITH_NETWORK=ON and WITH_SLIRP=ON"
+        PROBE "pkg-config package slirp >= ${LIBSLIRP_MIN_VERSION}"
+        DISABLE "-DWITH_SLIRP=OFF"
+        PACKAGE_KEY LIBSLIRP)
 endif ()
 
 include (ExternalProject)

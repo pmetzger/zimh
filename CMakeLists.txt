@@ -358,6 +358,7 @@ include(CheckSymbolExists)
 include(CheckTypeSize)
 include(CheckCCompilerFlag)
 include(FindPackageHandleStandardArgs)
+include(dependency-report)
 
 ## Deal with platform quirkiness
 include(platform-quirks)
@@ -391,6 +392,25 @@ include(build_dep_matrix)
 include(os-features)
 include(dep-locate)
 include(dep-link)
+
+if (WITH_UNIT_TESTS)
+    find_package(PkgConfig QUIET)
+    if (PKG_CONFIG_FOUND)
+        pkg_check_modules(CMOCKA IMPORTED_TARGET cmocka>=1.1.5)
+    endif ()
+
+    if (NOT CMOCKA_FOUND)
+        zimh_record_missing_dependency(
+            NAME "cmocka"
+            VERSION ">= 1.1.5"
+            REASON "WITH_UNIT_TESTS=ON"
+            PROBE "pkg-config package cmocka >= 1.1.5"
+            DISABLE "-DWITH_UNIT_TESTS=OFF"
+            PACKAGE_KEY CMOCKA)
+    endif ()
+endif ()
+
+zimh_report_missing_dependencies()
 
 if (VIDEO_PKG_STATUS)
     string(REPLACE ";" ", " VIDEO_PKG_STATUS "${VIDEO_PKG_STATUS}")
@@ -485,24 +505,6 @@ unset(_feature_text)
 
 unset(ROM_STATUS)
 
-if (NOT ENABLE_DEP_BUILD AND SIMH_BUILD_DEPS)
-    ## Don't build dependencies. Just wail about them.
-    message("")
-    message("Missing SIMH dependencies:")
-    foreach (dep ${SIMH_BUILD_DEPS})
-        message(STATUS "    ${dep}")
-    endforeach()
-    message("")
-    message("Please install the above dependencies via your platform package management or")
-    message("software installation system and reconfigure.")
-    message("")
-    message("Also see tools/ci/deps/deps.sh for Brew and apt packages installed during")
-    message("github.com workflow actions.")
-    message(FATAL_ERROR "Missing dependencies, cannot continue.")
-
-    ## TODO: Assume that these dependencies are optional?
-endif ()
-
 if (NOT DEFINED DO_DEPENDENCY_BUILD OR SIMH_BUILD_DEPS)
     if (DEFINED DO_DEPENDENCY_BUILD AND NOT DO_DEPENDENCY_BUILD AND SIMH_BUILD_DEPS)
         message(FATAL_ERROR "Dependency libraries did not build successfully!!??")
@@ -577,19 +579,13 @@ if (NOT DO_DEPENDENCY_BUILD)
     include(simh-extra-tools)
 
     if (WITH_UNIT_TESTS)
-        pkg_check_modules(CMOCKA IMPORTED_TARGET cmocka>=1.1.5)
-
-        if (CMOCKA_FOUND)
-            add_library(unittest INTERFACE)
-            add_subdirectory(tests/unit)
-            target_link_libraries(unittest INTERFACE
-                PkgConfig::CMOCKA
-                simh_unit_support
-            )
-            message(STATUS "Host-side cmocka unit tests enabled")
-        else ()
-            message(STATUS "Host-side unit tests requested but cmocka >= 1.1.5 was not found")
-        endif ()
+        add_library(unittest INTERFACE)
+        add_subdirectory(tests/unit)
+        target_link_libraries(unittest INTERFACE
+            PkgConfig::CMOCKA
+            simh_unit_support
+        )
+        message(STATUS "Host-side cmocka unit tests enabled")
     endif ()
 
     get_property(SIMH_UNIT_TEST_TARGETS GLOBAL PROPERTY SIMH_UNIT_TEST_TARGETS)
