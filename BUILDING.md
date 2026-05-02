@@ -352,3 +352,21 @@ bison --version
 ```
 
 If `SDL2_ttf` is missing, a full video-enabled build is not ready yet.
+
+## Selecting a non-default compiler
+
+Use `ZIMH_C_COMPILER` to configure a build tree with a specific C
+compiler. This is useful for shaking out compiler-specific warnings and
+evaluation-order assumptions, for example by building with GNU GCC on a
+host that normally defaults to Clang.
+
+Example:
+
+```sh
+cmake -G Ninja -DZIMH_C_COMPILER=/opt/local/bin/gcc-mp-15 \
+  -DCMAKE_BUILD_TYPE=Release -S . -B build/gcc-ordering
+```
+
+Set this option only when configuring a fresh build directory. CMake
+selects the compiler early and caches that choice, so changing compiler
+families in an existing build tree is not supported.

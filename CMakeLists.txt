@@ -1,6 +1,23 @@
 ## Note: C_STANDARD 17 and C_STANDARD 23 require CMake 3.21 or better.
 cmake_minimum_required(VERSION 3.21)
 
+## Let developers intentionally configure a build tree with a non-default
+## compiler, e.g. GNU GCC on a Clang-oriented host, to shake out compiler
+## evaluation-order and warning differences. This must run before project().
+set(ZIMH_C_COMPILER "" CACHE FILEPATH
+    "Optional non-default C compiler for this build tree.")
+if (ZIMH_C_COMPILER)
+    if (DEFINED CMAKE_C_COMPILER AND
+        NOT CMAKE_C_COMPILER STREQUAL ZIMH_C_COMPILER)
+        message(FATAL_ERROR
+            "ZIMH_C_COMPILER must be set before the build tree chooses "
+            "CMAKE_C_COMPILER. Use a fresh build directory.")
+    endif ()
+
+    set(CMAKE_C_COMPILER "${ZIMH_C_COMPILER}" CACHE FILEPATH
+        "C compiler" FORCE)
+endif ()
+
 if (${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR
          ""
