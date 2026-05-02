@@ -2,6 +2,20 @@
 #
 # This makefile preserves a small set of useful entry points while
 # delegating all real build and test logic to CMake and CTest.
+#
+# Common targets:
+#
+#   make all                Build the default simulator set.
+#   make build              Build the default simulator set.
+#   make configure          Configure the CMake build tree.
+#   make <simulator>        Build one simulator target.
+#   make experimental       Build the experimental simulator set.
+#   make unit-tests         Build and run host-side unit tests.
+#   make integration-tests  Build and run simulator tests.
+#   make test               Run unit-tests and integration-tests.
+#   make stub               Build the stub simulator skeleton.
+#   make frontpaneltest     Build the front panel sample program.
+#   make extra-tools        Build stub and frontpaneltest.
 
 BUILD_DIR ?= build/release
 CMAKE ?= cmake
@@ -13,7 +27,7 @@ CTEST_ARGS ?= --output-on-failure --timeout 300
 
 .DEFAULT_GOAL := all
 
-.PHONY: all configure help clean \
+.PHONY: all build configure help clean \
 	experimental unit-tests integration-tests test \
 	microvax3900 3b2-400 \
 	stub frontpaneltest extra-tools
@@ -31,6 +45,8 @@ configure: $(BUILD_DIR)/CMakeCache.txt
 all: $(BUILD_DIR)/CMakeCache.txt
 	$(CMAKE) --build "$(BUILD_DIR)" $(CMAKE_BUILD_ARGS)
 
+build: all
+
 experimental: $(BUILD_DIR)/CMakeCache.txt
 	$(CMAKE) --build "$(BUILD_DIR)" \
 		--target experimental-simulators \
@@ -38,11 +54,13 @@ experimental: $(BUILD_DIR)/CMakeCache.txt
 
 unit-tests: $(BUILD_DIR)/CMakeCache.txt
 	$(CMAKE) --build "$(BUILD_DIR)" \
+		--parallel \
 		--target unit-tests \
 		$(CMAKE_BUILD_ARGS)
 
 integration-tests: $(BUILD_DIR)/CMakeCache.txt
 	$(CMAKE) --build "$(BUILD_DIR)" \
+		--parallel \
 		--target integration-tests \
 		$(CMAKE_BUILD_ARGS)
 
@@ -73,14 +91,16 @@ help:
 	@printf '%s\n' \
 		'Common targets:' \
 		'  make all                Build the default simulator set.' \
+		'  make build              Build the default simulator set.' \
+		'  make configure          Configure the CMake build tree.' \
 		'  make <simulator>        Build one simulator target.' \
 		'  make experimental       Build the experimental simulator set.' \
 		'  make unit-tests         Build and run host-side unit tests.' \
 		'  make integration-tests  Build and run simulator tests.' \
 		'  make test               Run unit-tests and integration-tests.' \
-		'  make stub              Build the stub simulator skeleton.' \
-		'  make frontpaneltest    Build the front panel sample program.' \
-		'  make extra-tools       Build stub and frontpaneltest.' \
+		'  make stub               Build the stub simulator skeleton.' \
+		'  make frontpaneltest     Build the front panel sample program.' \
+		'  make extra-tools        Build stub and frontpaneltest.' \
 		'' \
 		'Configured build directory:' \
 		'  $(BUILD_DIR)'
