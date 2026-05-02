@@ -170,6 +170,7 @@ static void test_sim_time_reset_restores_default_wrappers(void **state)
 {
     struct timespec now = {0};
     struct timespec req = {0};
+    time_t result = 0;
     time_t sec = 0;
 
     (void)state;
@@ -180,7 +181,8 @@ static void test_sim_time_reset_restores_default_wrappers(void **state)
 
     assert_int_equal(sim_clock_gettime(CLOCK_REALTIME, &now), 0);
     assert_true(now.tv_sec > 0);
-    assert_int_equal(sim_time(&sec), sec);
+    result = sim_time(&sec);
+    assert_int_equal(result, sec);
     assert_true(sec > 0);
     assert_int_equal(sim_nanosleep(&req, NULL), 0);
 }
