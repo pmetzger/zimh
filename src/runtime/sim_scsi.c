@@ -6,6 +6,8 @@
 #include "sim_disk.h"
 #include "sim_tape.h"
 
+#include <stdarg.h>
+
 /* SCSI commands */
 
 #define CMD_TESTRDY     0x00                            /* test unit ready */

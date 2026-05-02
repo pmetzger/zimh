@@ -1,10 +1,12 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <setjmp.h>
+#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 #include <sys/stat.h>
+
 #if defined(_WIN32)
 #include <io.h>
 #include <process.h>

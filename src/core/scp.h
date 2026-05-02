@@ -17,6 +17,8 @@
 #ifndef SIM_SCP_H_
 #define SIM_SCP_H_     0
 
+#include <stdarg.h>
+
 #include "sim_defs.h"
 
 #include "sim_fio.h"

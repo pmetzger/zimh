@@ -33,11 +33,12 @@
 
 /* This program provides a basic test of the simh_frontpanel API. */
 
-#include <stdio.h>
 #include <ctype.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <stdio.h>
 #include <string.h>
 #include "sim_frontpanel.h"
-#include <signal.h>
 
 #if defined(_WIN32)
 #include <windows.h>

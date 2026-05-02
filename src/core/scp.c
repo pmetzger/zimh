@@ -217,15 +217,16 @@
 #include "sim_sock.h"
 #include "sim_frontpanel.h"
 #include "zimh_version.h"
-#include <signal.h>
 #include <ctype.h>
-#include <time.h>
 #include <math.h>
-#if defined(_WIN32)
-#include <io.h>
-#include <fcntl.h>
-#endif
 #include <setjmp.h>
+#include <signal.h>
+#include <stdarg.h>
+#include <time.h>
+#if defined(_WIN32)
+#include <fcntl.h>
+#include <io.h>
+#endif
 
 #if defined(HAVE_EDITLINE)              /* Editline command line editing */
 #if defined(HAVE_EDITLINE_READLINE_H)

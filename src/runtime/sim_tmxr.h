@@ -27,6 +27,8 @@
 #ifndef SIM_TMXR_H_
 #define SIM_TMXR_H_    0
 
+#include <stdarg.h>
+
 #ifndef SIMH_SERHANDLE_DEFINED
 #define SIMH_SERHANDLE_DEFINED 0
 typedef struct SERPORT *SERHANDLE;

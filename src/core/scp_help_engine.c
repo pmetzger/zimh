@@ -16,6 +16,7 @@
 #include "scp.h"
 #include <errno.h>
 #include <setjmp.h>
+#include <stdarg.h>
 #if defined(_WIN32)
 #include <fcntl.h>
 #include <io.h>

@@ -322,6 +322,7 @@
 
 #include <ctype.h>
 #include <math.h>
+#include <stdarg.h>
 
 /* Telnet protocol constants - negatives are for init'ing signed char data */
 

@@ -1,10 +1,10 @@
-#include "test_scp_expect_fixture.h"
-
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <cmocka.h>
 
+#include "test_scp_expect_fixture.h"
 #include "scp.h"
 #include "sim_console.h"
 #include "test_scp_fixture.h"

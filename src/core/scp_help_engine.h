@@ -10,6 +10,8 @@
 #ifndef SCP_HELP_ENGINE_H_
 #define SCP_HELP_ENGINE_H_ 0
 
+#include <stdarg.h>
+
 /* Generic SCP and device-help output helpers. */
 void fprint_help(FILE *st);
 

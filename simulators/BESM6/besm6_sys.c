@@ -38,6 +38,7 @@
  */
 #include "besm6_defs.h"
 #include <math.h>
+#include <stdarg.h>
 
 const char *opname_short_bemsh [64] = {
     "зп",  "зпм", "рег", "счм", "сл",  "вч",  "вчоб","вчаб",
