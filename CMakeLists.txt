@@ -295,11 +295,6 @@ if (ENABLE_DEP_BUILD AND NOT USING_VCPKG AND NOT EXISTS ${SIMH_DEP_TOPDIR})
     )
 endif ()
 
-## Default install location is ${CMAKE_SOURCE_DIR}/SIMH-install if not otherwise set
-if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX "${CMAKE_SOURCE_DIR}/SIMH-install" CACHE PATH "${CMAKE_SOURCE_DIR}/SIMH-install default install prefix" FORCE)
-endif()
-
 ## Keep runtime outputs in the active build tree.
 set(SIMH_RUNTIME_OUTPUT_DIR "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${SIMH_RUNTIME_OUTPUT_DIR}")

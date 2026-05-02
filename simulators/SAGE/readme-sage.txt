@@ -26,7 +26,7 @@ Holger Veit, March 2011
 
 
 
-$ build/release/bin/sage
+$ build/release/bin/zimh-sage
 
 Sage-II/IV 68k simulator V3.8-2
 sim> show dev
@@ -48,7 +48,7 @@ Debug output disabled
 $ cp SAGE/FILES/68k.sim .
 $ cp SAGE/FILES/cpm68k12.imd .
 $ cp SAGE/sage-ii.hex .
-$ build/release/bin/sage 68k.sim
+$ build/release/bin/zimh-sage 68k.sim
 
 Sage-II/IV 68k simulator V3.8-2
 Debug output to "debug.log"

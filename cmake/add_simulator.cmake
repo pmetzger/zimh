@@ -271,6 +271,7 @@ function (add_simulator _targ)
     cmake_parse_arguments(SIMH "${ADD_SIMULATOR_OPTIONS}" "${ADD_SIMULATOR_1ARG}" "${ADD_SIMULATOR_NARG}" ${ARGN})
 
     target_sources(${_targ} PRIVATE ${SIMH_CORE_ROOT}/main.c)
+    set_target_properties(${_targ} PROPERTIES OUTPUT_NAME "zimh-${_targ}")
 
     set(pkg_family "default_family")
     if (SIMH_PKG_FAMILY)

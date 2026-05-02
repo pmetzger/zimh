@@ -238,10 +238,11 @@ Common top-level targets include:
   `frontpaneltest`.
 
 Resulting executables land in the configured build tree's `bin/`
-subdirectory. For example:
+subdirectory. Simulator target names are unprefixed, while generated
+simulator executable names use the `zimh-` prefix. For example:
 
-- `build/release/bin/pdp11`
-- `build/release/bin/vax`
+- `build/release/bin/zimh-pdp11`
+- `build/release/bin/zimh-vax`
 - `build/release/bin/frontpaneltest`
 - `build/release/bin/stub`
 

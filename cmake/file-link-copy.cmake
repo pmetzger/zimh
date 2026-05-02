@@ -1,7 +1,7 @@
 ## File link or copy
 ##
-## Written initially for the VAX to link vax to microvax3900, this
-## evolved into a more general-purpose utility.
+## Written initially for the VAX to link zimh-vax to
+## zimh-microvax3900, this evolved into a more general-purpose utility.
 
 if (NOT SRCFILE)
     message(FATAL_ERROR "SRCFILE not defined")

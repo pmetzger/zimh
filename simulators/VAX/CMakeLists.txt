@@ -374,11 +374,11 @@ set(vax_binary_dir "${SIMH_RUNTIME_OUTPUT_DIR}")
 ## Preserve the historical microvax3900 alias for the vax target in the build tree.
 add_custom_command(TARGET vax POST_BUILD
     COMMAND "${CMAKE_COMMAND}"
-        -DSRCFILE=vax${CMAKE_EXECUTABLE_SUFFIX}
-        -DDSTFILE=microvax3900${CMAKE_EXECUTABLE_SUFFIX}
+        -DSRCFILE=zimh-vax${CMAKE_EXECUTABLE_SUFFIX}
+        -DDSTFILE=zimh-microvax3900${CMAKE_EXECUTABLE_SUFFIX}
         -DWORKING_DIR=${vax_binary_dir}
         -P ${CMAKE_SOURCE_DIR}/cmake/file-link-copy.cmake
-    COMMENT "Symlink vax${CMAKE_EXECUTABLE_SUFFIX} to microvax3900${CMAKE_EXECUTABLE_SUFFIX}"
+    COMMENT "Symlink zimh-vax${CMAKE_EXECUTABLE_SUFFIX} to zimh-microvax3900${CMAKE_EXECUTABLE_SUFFIX}"
     WORKING_DIRECTORY ${vax_binary_dir})
 
 ## Mirror the vax-target microvax3900 alias in the install tree.
@@ -386,8 +386,8 @@ install(
     CODE "
         execute_process(
             COMMAND ${CMAKE_COMMAND}
-                -DSRCFILE=vax${CMAKE_EXECUTABLE_SUFFIX}
-                -DDSTFILE=microvax3900${CMAKE_EXECUTABLE_SUFFIX}
+                -DSRCFILE=zimh-vax${CMAKE_EXECUTABLE_SUFFIX}
+                -DDSTFILE=zimh-microvax3900${CMAKE_EXECUTABLE_SUFFIX}
                 -DWORKING_DIR=\$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin
                 -P ${CMAKE_SOURCE_DIR}/cmake/file-link-copy.cmake)"
     COMPONENT vax_family)

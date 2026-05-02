@@ -88,8 +88,8 @@ truly local to the simulator family.
 
 Example:
 - `simulators/VAX/CMakeLists.txt`
-  contains local shared source bundles and a `microvax3900` alias rule that
-  are specific to the VAX family.
+  contains local shared source bundles and a `zimh-microvax3900`
+  executable alias rule that are specific to the VAX family.
 
 ## Adding a Source File to an Existing Simulator
 
