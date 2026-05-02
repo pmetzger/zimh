@@ -14,6 +14,9 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#if !defined(_WIN32)
+#include <sys/types.h>
+#endif
 
 #include <glib.h>
 #include <slirp/libslirp.h>
@@ -24,11 +27,28 @@
 #include "sim_timer.h"
 
 #if !defined(USE_READER_THREAD)
+#undef pthread_mutex_init
+#undef pthread_mutex_destroy
+#undef pthread_mutex_lock
+#undef pthread_mutex_unlock
 #define pthread_mutex_init(mtx, val)
 #define pthread_mutex_destroy(mtx)
 #define pthread_mutex_lock(mtx)
 #define pthread_mutex_unlock(mtx)
 #define pthread_mutex_t int
+#endif
+
+/* libslirp 4.7 lacks these typedefs, but our adapter still supports it. */
+#if SLIRP_CONFIG_VERSION_MAX >= 5
+typedef slirp_ssize_t sim_slirp_packet_result;
+#else
+typedef ssize_t sim_slirp_packet_result;
+#endif
+
+#if SLIRP_CONFIG_VERSION_MAX >= 6
+typedef slirp_os_socket sim_slirp_socket;
+#else
+typedef int sim_slirp_socket;
 #endif
 
 /* Display names indexed by sim_slirp_forward_protocol values. */
@@ -61,11 +81,7 @@ struct slirp_write_request {
 
 /* Poll record used to translate libslirp socket interests to select(). */
 typedef struct sim_slirp_pollfd {
-#if SLIRP_CONFIG_VERSION_MAX >= 6
-    slirp_os_socket fd; /* socket supplied by libslirp */
-#else
-    int fd;             /* socket supplied by libslirp */
-#endif
+    sim_slirp_socket fd; /* socket supplied by libslirp */
     int events;         /* requested SLIRP_POLL_* events */
     int revents;        /* ready SLIRP_POLL_* events */
 } sim_slirp_pollfd;
@@ -559,15 +575,15 @@ static int64_t libslirp_clock_get_ns(void *opaque)
 }
 
 /* Deliver an Ethernet frame emitted by libslirp to the simulator callback. */
-static slirp_ssize_t libslirp_send_packet(const void *buf, size_t len,
-                                          void *opaque)
+static sim_slirp_packet_result libslirp_send_packet(const void *buf,
+                                                    size_t len, void *opaque)
 {
     sim_slirp_handle *slirp = (sim_slirp_handle *)opaque;
 
     if ((slirp == NULL) || (slirp->callback == NULL))
-        return (slirp_ssize_t)len;
+        return (sim_slirp_packet_result)len;
     slirp->callback(slirp->opaque, (const unsigned char *)buf, (int)len);
-    return (slirp_ssize_t)len;
+    return (sim_slirp_packet_result)len;
 }
 
 /* Log libslirp guest-side protocol errors through the simulator debug path. */
@@ -1240,7 +1256,7 @@ static int fill_select_fdsets(sim_slirp_handle *slirp, fd_set *rfds,
     size_t i;
 
     for (i = 0; i < slirp->poll_count; i++) {
-        slirp_os_socket fd = slirp->pollfds[i].fd;
+        sim_slirp_socket fd = slirp->pollfds[i].fd;
         int events = slirp->pollfds[i].events;
 
         if (events & SLIRP_POLL_IN) {
@@ -1269,7 +1285,7 @@ static void collect_select_revents(sim_slirp_handle *slirp, fd_set *rfds,
     size_t i;
 
     for (i = 0; i < slirp->poll_count; i++) {
-        slirp_os_socket fd = slirp->pollfds[i].fd;
+        sim_slirp_socket fd = slirp->pollfds[i].fd;
         int revents = 0;
 
         if (FD_ISSET(fd, rfds))
