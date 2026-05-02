@@ -228,7 +228,18 @@
 #include <setjmp.h>
 
 #if defined(HAVE_EDITLINE)              /* Editline command line editing */
+#if defined(HAVE_EDITLINE_READLINE_H)
 #include <editline/readline.h>
+#elif defined(HAVE_READLINE_READLINE_H)
+#include <readline/readline.h>
+#if defined(HAVE_READLINE_HISTORY_H)
+#include <readline/history.h>
+#elif defined(HAVE_EDITLINE_HISTORY_H)
+#include <editline/history.h>
+#endif
+#else
+#error "HAVE_EDITLINE requires a readline-compatible header"
+#endif
 #endif
 
 /* search logical and boolean ops */

@@ -7,6 +7,8 @@
 # The following variables will be defined for your use:
 #   - EDITLINE_INCLUDE_DIRS  : editline include directory
 #   - EDITLINE_LIBRARIES     : editline libraries
+#   - EDITLINE_COMPILE_DEFINITIONS
+#                             : editline compile definitions
 #   - EDITLINE_VERSION       : complete version of editline (x.y)
 #   - EDITLINE_MAJOR_VERSION : major version of editline
 #   - EDITLINE_MINOR_VERSION : minor version of editline
@@ -73,44 +75,66 @@ endforeach()
 ########## Public ##########
 find_path(
     ${EDITLINE_PUBLIC_VAR_NS}_INCLUDE_DIRS
-    NAMES histedit.h
+    NAMES editline/readline.h readline/readline.h
 )
 
+find_library(
+    ${EDITLINE_PUBLIC_VAR_NS}_LIBRARIES
+    NAMES edit
+)
+
+find_library(
+    ${EDITLINE_PUBLIC_VAR_NS}_TERMCAP
+    NAMES termcap
+)
+
+set(${EDITLINE_PUBLIC_VAR_NS}_READLINE_COMPAT_FOUND FALSE)
+set(${EDITLINE_PUBLIC_VAR_NS}_COMPILE_DEFINITIONS)
+set(${EDITLINE_PRIVATE_VAR_NS}_READLINE_HEADER_DEFINITION)
+set(${EDITLINE_PRIVATE_VAR_NS}_HISTORY_HEADER_DEFINITION)
+
 if(${EDITLINE_PUBLIC_VAR_NS}_INCLUDE_DIRS)
+    # scp.c uses libedit's readline compatibility API, not histedit.h.
+    if(EXISTS "${${EDITLINE_PUBLIC_VAR_NS}_INCLUDE_DIRS}/editline/readline.h")
+        set(${EDITLINE_PRIVATE_VAR_NS}_READLINE_HEADER_DEFINITION
+            HAVE_EDITLINE_READLINE_H)
+        set(${EDITLINE_PUBLIC_VAR_NS}_READLINE_COMPAT_FOUND TRUE)
+    elseif(EXISTS "${${EDITLINE_PUBLIC_VAR_NS}_INCLUDE_DIRS}/readline/readline.h")
+        set(${EDITLINE_PRIVATE_VAR_NS}_READLINE_HEADER_DEFINITION
+            HAVE_READLINE_READLINE_H)
+        if(EXISTS "${${EDITLINE_PUBLIC_VAR_NS}_INCLUDE_DIRS}/readline/history.h")
+            set(${EDITLINE_PRIVATE_VAR_NS}_HISTORY_HEADER_DEFINITION
+                HAVE_READLINE_HISTORY_H)
+            set(${EDITLINE_PUBLIC_VAR_NS}_READLINE_COMPAT_FOUND TRUE)
+        elseif(EXISTS "${${EDITLINE_PUBLIC_VAR_NS}_INCLUDE_DIRS}/editline/history.h")
+            set(${EDITLINE_PRIVATE_VAR_NS}_HISTORY_HEADER_DEFINITION
+                HAVE_EDITLINE_HISTORY_H)
+            set(${EDITLINE_PUBLIC_VAR_NS}_READLINE_COMPAT_FOUND TRUE)
+        endif()
+    endif()
+endif()
 
-    find_library(
-        ${EDITLINE_PUBLIC_VAR_NS}_LIBRARIES
-        NAMES edit
-    )
-
-    find_library(
-        ${EDITLINE_PUBLIC_VAR_NS}_TERMCAP
-        NAMES termcap
-    )
+if(${EDITLINE_PUBLIC_VAR_NS}_READLINE_COMPAT_FOUND)
+    list(APPEND ${EDITLINE_PUBLIC_VAR_NS}_COMPILE_DEFINITIONS
+        HAVE_EDITLINE
+        ${${EDITLINE_PRIVATE_VAR_NS}_READLINE_HEADER_DEFINITION}
+        ${${EDITLINE_PRIVATE_VAR_NS}_HISTORY_HEADER_DEFINITION})
+endif()
 
 #     file(READ "${${EDITLINE_PUBLIC_VAR_NS}_INCLUDE_DIRS}/histedit.h" ${EDITLINE_PRIVATE_VAR_NS}_H_CONTENT)
 #     string(REGEX REPLACE ".*# *define +LIBEDIT_MAJOR +([0-9]+).*" "\\1" ${EDITLINE_PUBLIC_VAR_NS}_MAJOR_VERSION ${${EDITLINE_PRIVATE_VAR_NS}_H_CONTENT})
 #     string(REGEX REPLACE ".*# *define +LIBEDIT_MINOR +([0-9]+).*" "\\1" ${EDITLINE_PUBLIC_VAR_NS}_MINOR_VERSION ${${EDITLINE_PRIVATE_VAR_NS}_H_CONTENT})
 #     set(${EDITLINE_PUBLIC_VAR_NS}_VERSION "${${EDITLINE_PUBLIC_VAR_NS}_MAJOR_VERSION}.${${EDITLINE_PUBLIC_VAR_NS}_MINOR_VERSION}")
 
-    include(FindPackageHandleStandardArgs)
-    if(${EDITLINE_PUBLIC_VAR_NS}_FIND_REQUIRED AND NOT ${EDITLINE_PUBLIC_VAR_NS}_FIND_QUIETLY)
-        find_package_handle_standard_args(
-            ${EDITLINE_PUBLIC_VAR_NS}
-            REQUIRED_VARS ${EDITLINE_PUBLIC_VAR_NS}_LIBRARIES ${EDITLINE_PUBLIC_VAR_NS}_INCLUDE_DIRS
-#             VERSION_VAR ${EDITLINE_PUBLIC_VAR_NS}_VERSION
-        )
-    else(${EDITLINE_PUBLIC_VAR_NS}_FIND_REQUIRED AND NOT ${EDITLINE_PUBLIC_VAR_NS}_FIND_QUIETLY)
-        find_package_handle_standard_args(${EDITLINE_PUBLIC_VAR_NS} "editline not found" ${EDITLINE_PUBLIC_VAR_NS}_LIBRARIES ${EDITLINE_PUBLIC_VAR_NS}_INCLUDE_DIRS)
-    endif()
-
-else()
-
-    if(${EDITLINE_PUBLIC_VAR_NS}_FIND_REQUIRED AND NOT ${EDITLINE_PUBLIC_VAR_NS}_FIND_QUIETLY)
-        message(FATAL_ERROR "Could not find editline include directory")
-    endif(${EDITLINE_PUBLIC_VAR_NS}_FIND_REQUIRED AND NOT ${EDITLINE_PUBLIC_VAR_NS}_FIND_QUIETLY)
-
-endif()
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(
+    ${EDITLINE_PUBLIC_VAR_NS}
+    REQUIRED_VARS
+        ${EDITLINE_PUBLIC_VAR_NS}_LIBRARIES
+        ${EDITLINE_PUBLIC_VAR_NS}_INCLUDE_DIRS
+        ${EDITLINE_PUBLIC_VAR_NS}_READLINE_COMPAT_FOUND
+#   VERSION_VAR ${EDITLINE_PUBLIC_VAR_NS}_VERSION
+)
 
 mark_as_advanced(
     ${EDITLINE_PUBLIC_VAR_NS}_INCLUDE_DIRS
@@ -121,7 +145,7 @@ if (${EDITLINE_PUBLIC_VAR_NS}_FOUND)
     add_library(Editline::Editline UNKNOWN IMPORTED)
     set_target_properties(Editline::Editline PROPERTIES
         INTERFACE_INCLUDE_DIRECTORIES "${${EDITLINE_PUBLIC_VAR_NS}_INCLUDE_DIRS}"
-        INTERFACE_COMPILE_DEFINITIONS "HAVE_EDITLINE"
+        INTERFACE_COMPILE_DEFINITIONS "${${EDITLINE_PUBLIC_VAR_NS}_COMPILE_DEFINITIONS}"
         INTERFACE_LINK_LIBRARIES "$<$<BOOL:${${EDITLINE_PUBLIC_VAR_NS}_TERMCAP}>:${${EDITLINE_PUBLIC_VAR_NS}_TERMCAP}>")
     set_property(TARGET Editline::Editline APPEND PROPERTY
         IMPORTED_LOCATION "${${EDITLINE_PUBLIC_VAR_NS}_LIBRARIES}")
