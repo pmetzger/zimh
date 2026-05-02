@@ -279,7 +279,7 @@ function (add_simulator _targ)
     endif ()
 
     set(_install_opts)
-    if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.21")
+    if (SIMH_CMAKE_RUNTIME_DEPENDENCIES_SUPPORTED)
         list(APPEND _install_opts RUNTIME_DEPENDENCY_SET simhRuntime)
     endif ()
 
@@ -289,7 +289,7 @@ function (add_simulator _targ)
         COMPONENT ${pkg_family}
     )
 
-    if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.21")
+    if (SIMH_CMAKE_RUNTIME_DEPENDENCIES_SUPPORTED)
         ## Collect runtime dependencies. The simhRuntime install() is invoked by cpack-setup.cmake
         install(IMPORTED_RUNTIME_ARTIFACTS ${_targ} COMPONENT ${pkg_family} BUNDLE COMPONENT ${pkg_family})
     endif()

@@ -152,6 +152,17 @@ if (CMAKE_GENERATOR MATCHES "Visual Studio .*" AND CMAKE_GENERATOR_TOOLSET MATCH
     string(APPEND SIMH_SYSTEM_ID "-XP")
 endif ()
 
+set(SIMH_CMAKE_RUNTIME_DEPENDENCIES_SUPPORTED FALSE)
+if (CMAKE_VERSION VERSION_GREATER_EQUAL "3.21" AND
+    (CMAKE_SYSTEM_NAME STREQUAL "Darwin" OR
+     CMAKE_SYSTEM_NAME STREQUAL "Linux" OR
+     WIN32))
+    ## CMake documents file(GET_RUNTIME_DEPENDENCIES), and therefore
+    ## install(RUNTIME_DEPENDENCY_SET), as supporting Windows, Linux, and
+    ## macOS.  Revisit this list if CMake adds support for more platforms.
+    set(SIMH_CMAKE_RUNTIME_DEPENDENCIES_SUPPORTED TRUE)
+endif ()
+
 # SIMH_DEP_TOPDIR: This is the top-level directory where dependencies live. It's cached so that
 # scripts (e.g., cmake-builder.ps1) can update PATH to find shared objects and DLLs.
 #
