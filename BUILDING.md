@@ -219,7 +219,7 @@ Common top-level targets include:
   Builds the experimental simulator set.
 - `unit-tests`
   `cmake --build build/release --target unit-tests`
-  Builds and runs the host-side `simh-unit-*` suite.
+  Builds and runs the host-side `zimh-unit-*` suite.
 - `integration-tests`
   `cmake --build build/release --target integration-tests`
   Builds and runs the simulator `simh-*` suite.

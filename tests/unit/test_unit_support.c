@@ -59,7 +59,7 @@ static void test_support_temp_dir_round_trip(void **state)
     (void)state;
 
     assert_int_equal(
-        simh_test_make_temp_dir(dir_path, sizeof(dir_path), "simh-unit"), 0);
+        simh_test_make_temp_dir(dir_path, sizeof(dir_path), "zimh-unit"), 0);
     assert_int_equal(stat(dir_path, &st), 0);
     assert_true(S_ISDIR(st.st_mode));
 
@@ -118,9 +118,9 @@ static void test_scp_fixture_helpers_install_devices(void **state)
     devices[1] = NULL;
 
     assert_int_equal(
-        simh_test_install_devices("simh-unit-test-support", devices), 0);
+        simh_test_install_devices("zimh-unit-test-support", devices), 0);
     assert_ptr_equal(sim_devices[0], &device);
-    assert_string_equal(sim_name, "simh-unit-test-support");
+    assert_string_equal(sim_name, "zimh-unit-test-support");
 
     assert_string_equal(sim_set_uname(&units[0], "SYSDISK0"), "SYSDISK0");
     assert_string_equal(sim_set_uname(&units[1], "SYSDISK1"), "SYSDISK1");

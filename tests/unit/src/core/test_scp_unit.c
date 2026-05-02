@@ -42,7 +42,7 @@ static int setup_scp_unit_fixture(void **state)
 
     devices[0] = &fixture->device;
     devices[1] = NULL;
-    assert_int_equal(simh_test_install_devices("simh-unit-scp-unit", devices),
+    assert_int_equal(simh_test_install_devices("zimh-unit-scp-unit", devices),
                      0);
 
     *state = fixture;

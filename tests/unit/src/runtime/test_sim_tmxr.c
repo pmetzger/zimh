@@ -520,7 +520,7 @@ static int setup_sim_tmxr_fixture(void **state)
              "127.0.0.1:2000");
 
     fixture->device.name = "TMXR";
-    assert_int_equal(simh_test_set_sim_name("simh-unit-sim-tmxr"), 0);
+    assert_int_equal(simh_test_set_sim_name("zimh-unit-sim-tmxr"), 0);
     fixture->mux.dptr = &fixture->device;
     fixture->mux.ldsc = fixture->lines;
     fixture->mux.lines = 4;
@@ -1983,7 +1983,7 @@ static void test_tmxr_connection_message_formats_multiline_banner(void **state)
     assert_non_null(message);
     assert_string_equal(
         message,
-        "\n\r\nConnected to the simh-unit-sim-tmxr simulator TMXR device,"
+        "\n\r\nConnected to the zimh-unit-sim-tmxr simulator TMXR device,"
         " line 2\r\n\n");
     free(message);
 }
@@ -2004,7 +2004,7 @@ static void test_tmxr_connection_message_formats_single_line_forced_banner(
     assert_non_null(message);
     assert_string_equal(
         message,
-        "\n\r\nConnected to the simh-unit-sim-tmxr simulator TMXR device\r\n\n");
+        "\n\r\nConnected to the zimh-unit-sim-tmxr simulator TMXR device\r\n\n");
     free(message);
 }
 

@@ -39,7 +39,7 @@ with external libslirp.
 
 5. Packet-level IPv6 tests
 
-   Add lower-level IPv6 unit coverage in `simh-unit-sim-slirp`, such as
+   Add lower-level IPv6 unit coverage in `zimh-unit-sim-slirp`, such as
    synthetic IPv6 neighbor discovery or ICMPv6 to the SLIRP gateway.  Guest OS
    coverage belongs in `NETWORK_TESTING.md`; these tests should stay small,
    fast, and easy to debug.

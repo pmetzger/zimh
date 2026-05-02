@@ -16,7 +16,7 @@
 #include "test_support.h"
 #include "zimh_version.h"
 
-static const char simh_test_prog_name[] = "/test/bin/simh-unit-scp-cmdvars";
+static const char simh_test_prog_name[] = "/test/bin/zimh-unit-scp-cmdvars";
 static int simh_test_uname_probe_calls = 0;
 static int simh_test_localtime_calls = 0;
 static struct timespec simh_test_cmdvars_time = {0};
@@ -293,7 +293,7 @@ static void test_sim_sub_args_expands_variable_without_trailing_percent(
     (void)state;
 
     expand_command("A%SIM_NAME", expanded, sizeof(expanded));
-    assert_string_equal(expanded, "Asimh-unit");
+    assert_string_equal(expanded, "Azimh-unit");
 }
 
 /* Verify SCP-owned substitution variables can be set and removed directly. */
@@ -554,10 +554,10 @@ static void test_sim_get_env_special_handles_windows_sim_bin_name(
 
     (void)state;
 
-    sim_prog_name = "C:\\test\\bin\\simh-unit.exe";
+    sim_prog_name = "C:\\test\\bin\\zimh-unit.exe";
     assert_string_equal(
         _sim_get_env_special("SIM_BIN_NAME", value, sizeof(value)),
-        "simh-unit.exe");
+        "zimh-unit.exe");
 }
 
 /* Verify substring extraction and replacement modifiers still work. */
@@ -794,16 +794,16 @@ static void test_sim_sub_args_expands_sim_identity_variables(void **state)
     assert_int_equal(setenv("SIM_BIN_PATH", "/host/bin", 1), 0);
 
     expand_command("A%SIM_NAME%B", expanded, sizeof(expanded));
-    assert_string_equal(expanded, "Asimh-unitB");
+    assert_string_equal(expanded, "Azimh-unitB");
 
     expand_command("A%SIM_BIN_NAME%B", expanded, sizeof(expanded));
-    assert_string_equal(expanded, "Asimh-unit-scp-cmdvarsB");
+    assert_string_equal(expanded, "Azimh-unit-scp-cmdvarsB");
 
     expand_command("A%SIM_BIN_PATH%B", expanded, sizeof(expanded));
-    assert_string_equal(expanded, "A/test/bin/simh-unit-scp-cmdvarsB");
+    assert_string_equal(expanded, "A/test/bin/zimh-unit-scp-cmdvarsB");
 
     expand_command("SIM_NAME tail", expanded, sizeof(expanded));
-    assert_string_equal(expanded, "simh-unit tail");
+    assert_string_equal(expanded, "zimh-unit tail");
 }
 
 /* Verify SIM_OSTYPE still expands while removed metadata stays absent. */

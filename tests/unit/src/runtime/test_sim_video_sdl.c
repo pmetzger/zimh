@@ -19,7 +19,7 @@ static void use_dummy_sdl_drivers(void)
 
 static void test_screenshot_reports_surface_allocation_failure(void **state)
 {
-    const char *path = "simh-unit-video-screenshot.bmp";
+    const char *path = "zimh-unit-video-screenshot.bmp";
     VID_DISPLAY *display = NULL;
 
     (void)state;

@@ -372,8 +372,8 @@ endfunction ()
 
 
 function(add_unit_test _targ)
-    set(UNIT_TARGET "simh-${_targ}")
-    set(UNIT_TEST "simh-${_targ}")
+    set(UNIT_TARGET "zimh-${_targ}")
+    set(UNIT_TEST "zimh-${_targ}")
 
     simh_executable_template(${UNIT_TARGET} "${ARGN}")
     cmake_parse_arguments(SIMH "FEATURE_INT64;FEATURE_FULL64;BUILDROMS;FEATURE_VIDEO,FEATURE_DISPLAY"
@@ -384,9 +384,9 @@ function(add_unit_test _targ)
     target_link_libraries(${UNIT_TARGET} PUBLIC unittest)
     add_test(NAME ${UNIT_TEST} COMMAND ${UNIT_TARGET})
 
-    set(TEST_LABEL "simh;unit")
+    set(TEST_LABEL "zimh;unit")
     if (SIMH_LABEL)
-      list(APPEND TEST_LABEL "simh-${SIMH_LABEL}")
+      list(APPEND TEST_LABEL "zimh-${SIMH_LABEL}")
     endif ()
     set_tests_properties(${UNIT_TEST} PROPERTIES LABELS "${TEST_LABEL}")
 

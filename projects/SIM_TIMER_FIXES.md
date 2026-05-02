@@ -49,7 +49,7 @@ What remains:
 Coverage status:
 
 - there is a dedicated unit-test target:
-  - `simh-unit-sim-timer`
+  - `zimh-unit-sim-timer`
 - but it is still only a foothold suite
 - current coverage from that test alone is extremely low:
   - functions: `6.33%`

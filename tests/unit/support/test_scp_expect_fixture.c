@@ -48,7 +48,7 @@ int simh_test_setup_scp_expect_fixture(void **state)
 
     devices[0] = &fixture->device;
     devices[1] = NULL;
-    assert_int_equal(simh_test_install_devices("simh-unit-scp-expect", devices),
+    assert_int_equal(simh_test_install_devices("zimh-unit-scp-expect", devices),
                      0);
 
     sim_expect_init_context(&fixture->exp, &fixture->device, 0);

@@ -130,14 +130,14 @@ cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -S . -B build/release
 Build specific unit-test executables:
 
 ```sh
-ninja -C build/release simh-unit-smoke simh-unit-support
+ninja -C build/release zimh-unit-smoke zimh-unit-support
 ```
 
 Run just the host-side unit tests:
 
 ```sh
 ctest --test-dir build/release \
-  -R 'simh-unit-(smoke|support)' \
+  -R 'zimh-unit-(smoke|support)' \
   --output-on-failure
 ```
 

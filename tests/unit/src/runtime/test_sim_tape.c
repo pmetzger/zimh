@@ -60,7 +60,7 @@ static int setup_sim_tape_fixture(void **state)
                                          fixture->temp_dir, "sample.tap"),
                      0);
     assert_int_equal(
-        simh_test_install_devices("simh-unit-sim-tape", fixture->devices),
+        simh_test_install_devices("zimh-unit-sim-tape", fixture->devices),
         0);
     assert_int_equal(sim_tape_init(), SCPE_OK);
 
