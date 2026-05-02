@@ -1,7 +1,5 @@
 #include <errno.h>
 #include <fcntl.h>
-#include <setjmp.h>
-#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
@@ -15,7 +13,7 @@
 #include <unistd.h>
 #endif
 
-#include <cmocka.h>
+#include "test_cmocka.h"
 
 #include "sim_win32_compat.h"
 

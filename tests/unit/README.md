@@ -8,7 +8,7 @@ that can be exercised directly without booting a simulated machine.
 
 ## Framework
 
-The unit-test framework is `cmocka`.
+The unit-test framework is `cmocka` 1.1.5 or newer.
 
 The top-level CMake build enables host-side unit tests with the
 `WITH_UNIT_TESTS` option. When `cmocka` is available, CMake creates the

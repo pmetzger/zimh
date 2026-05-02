@@ -1,11 +1,9 @@
-#include <setjmp.h>
-#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <cmocka.h>
+#include "test_cmocka.h"
 
 #include "scp.h"
 #include "test_scp_fixture.h"

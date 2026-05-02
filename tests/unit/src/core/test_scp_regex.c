@@ -1,9 +1,8 @@
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <cmocka.h>
+#include "test_cmocka.h"
 
 #include "scp.h"
 #include "test_simh_personality.h"

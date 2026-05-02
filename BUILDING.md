@@ -69,7 +69,7 @@ features:
 
 For testing, you will need:
 
-- `cmocka`
+- `cmocka` 1.1.5 or newer
   Provides the host-side C unit-test framework used under `tests/unit/`.
 
 For networking, you will need the libraries for the backends you enable:
@@ -340,7 +340,7 @@ should be expected to run normally.
 You can quickly check whether common dependencies are visible:
 
 ```sh
-pkg-config --modversion cmocka
+pkg-config --atleast-version=1.1.5 cmocka
 pkg-config --modversion sdl2
 pkg-config --modversion SDL2_ttf
 pkg-config --modversion freetype2

@@ -1,4 +1,3 @@
-#include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,7 +8,7 @@
 #include <sys/utsname.h>
 #endif
 
-#include <cmocka.h>
+#include "test_cmocka.h"
 
 #include "scp.h"
 #include "sim_console.h"

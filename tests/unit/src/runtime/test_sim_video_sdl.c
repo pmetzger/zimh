@@ -1,9 +1,7 @@
-#include <setjmp.h>
-#include <stdarg.h>
 #include <stddef.h>
 #include <stdlib.h>
 
-#include <cmocka.h>
+#include "test_cmocka.h"
 
 #include "sim_video.h"
 

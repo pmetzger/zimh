@@ -560,7 +560,7 @@ if (NOT DO_DEPENDENCY_BUILD)
     include(simh-extra-tools)
 
     if (WITH_UNIT_TESTS)
-        pkg_check_modules(CMOCKA IMPORTED_TARGET cmocka)
+        pkg_check_modules(CMOCKA IMPORTED_TARGET cmocka>=1.1.5)
 
         if (CMOCKA_FOUND)
             add_library(unittest INTERFACE)
@@ -571,7 +571,7 @@ if (NOT DO_DEPENDENCY_BUILD)
             )
             message(STATUS "Host-side cmocka unit tests enabled")
         else ()
-            message(STATUS "Host-side unit tests requested but cmocka was not found")
+            message(STATUS "Host-side unit tests requested but cmocka >= 1.1.5 was not found")
         endif ()
     endif ()
 

@@ -1,7 +1,5 @@
 #include <errno.h>
 #include <fcntl.h>
-#include <setjmp.h>
-#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -10,7 +8,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include <cmocka.h>
+#include "test_cmocka.h"
 
 #include "sim_defs.h"
 #include "sim_fio.h"

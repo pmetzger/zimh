@@ -1,10 +1,8 @@
-#include <setjmp.h>
-#include <stdarg.h>
 #include <stddef.h>
 #include <string.h>
 #include <sys/stat.h>
 
-#include <cmocka.h>
+#include "test_cmocka.h"
 
 #include "test_support.h"
 

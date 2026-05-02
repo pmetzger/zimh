@@ -1,8 +1,7 @@
-#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <cmocka.h>
+#include "test_cmocka.h"
 
 #include "test_scp_expect_fixture.h"
 #include "scp.h"

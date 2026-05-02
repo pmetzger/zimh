@@ -1,10 +1,8 @@
-#include <setjmp.h>
-#include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
-#include <cmocka.h>
+#include "test_cmocka.h"
 
 #include "sim_slirp.h"
 
