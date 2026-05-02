@@ -24,6 +24,12 @@ platforms and recent levels of Windows APIs.
 When adding new source code to this repository, prefer keeping lines
 under 80 columns.
 
+When adding or touching include blocks in C source files, keep system
+includes alphabetized where practical. Do this in a way that preserves
+required include ordering and keeps conditional platform blocks readable;
+do not force alphabetical order when it would obscure intent or risk
+changing behavior.
+
 When doing source code commits, create a commit message in tmp/ in the
 repository and make sure it is propery formatted, including keeping
 lines under 80 columns, and then use that with git's `-F` flag. Give
