@@ -262,6 +262,10 @@ iox_floppy(int addr)
 t_stat
 floppy_reset(DEVICE *dptr)
 {
+        /* Generic callback signature.
+           This implementation does not use every parameter. */
+        (void)dptr;
+
         fl_rstatus = FL_ST_DENS | FL_ST_RDY;
         return 0;
 }
@@ -304,8 +308,9 @@ floppy_svc(UNIT *uptr)
 
         switch (uptr->state) {
         case U_READ:
-                dtomem(uptr->fileref, uptr->devaddr,
-                    uptr->memaddr, uptr->wcnt, PM_DMA);
+                if (dtomem(uptr->fileref, uptr->devaddr,
+                    uptr->memaddr, uptr->wcnt, PM_DMA) != SCPE_OK)
+                        goto err;
                 lah = (uptr->memaddr + uptr->wcnt) >> 16;
                 lal = (uptr->memaddr + uptr->wcnt) & 0177777;
                 break;
@@ -368,10 +373,16 @@ dtomem(FILE *fp, int daddr, int maddr, int wcnt, int how)
         int i;
 
         wp = malloc(wcnt * 2);  /* bounce buffer */
-        if (sim_fseek(fp, daddr, SEEK_SET) < 0)
+        if (wp == NULL)
                 return STOP_UNHIOX;
-        if (sim_fread(wp, bcnt, 1, fp) < 0)
+        if (sim_fseek(fp, daddr, SEEK_SET) < 0) {
+                free(wp);
                 return STOP_UNHIOX;
+        }
+        if (sim_fread(wp, 1, bcnt, fp) != (size_t)bcnt) {
+                free(wp);
+                return STOP_UNHIOX;
+        }
         for (i = 0; i < bcnt; i += 2)
                 wrmem(maddr++, (wp[i] << 8) | wp[i+1], how);
         free(wp);
@@ -381,6 +392,11 @@ dtomem(FILE *fp, int daddr, int maddr, int wcnt, int how)
 t_stat
 floppy_boot(int32 unitno, DEVICE *dptr)
 {
+        /* Generic callback signature.
+           This implementation does not use every parameter. */
+        (void)unitno;
+        (void)dptr;
+
         printf("floppy_boot \n");
         return 1;
 }
@@ -419,7 +435,7 @@ floppy_test(UNIT *up)
                 printf("\r\n addr %06o nd100 %06o z80 %04x count %o\r\n",
                     cbaddr, prdmem(cbaddr, PM_CPU),
                     prdmem(cbaddr+1, PM_CPU), prdmem(cbaddr+2, PM_CPU));
-                dtomem(up->fileref, up->devaddr + z80addr - 0x2200,
+                rv = dtomem(up->fileref, up->devaddr + z80addr - 0x2200,
                     n100addr, bcnt/2, PM_CPU);
                 break;
 
