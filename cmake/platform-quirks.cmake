@@ -142,6 +142,9 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES ".*Clang")
         # initializers produce too much noise during warning sweeps.
         "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wno-missing-field-initializers>>"
         "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wformat=2>>"
+        # Locale and compatibility date substitutions intentionally include
+        # two-digit year formats, so -Wformat-y2k produces spurious warnings.
+        "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wno-format-y2k>>"
         "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wundef>>"
         "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wimplicit-fallthrough>>"
         "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wstrict-prototypes>>"
