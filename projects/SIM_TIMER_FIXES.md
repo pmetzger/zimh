@@ -20,6 +20,8 @@ What is already done:
 - the remaining timed-wait code now builds deadlines from
   `sim_clock_gettime()` through a shared helper instead of reading the
   clock directly at each call site
+- the stale Windows-side `NEED_CLOCK_GETTIME` shim is gone; Windows
+  realtime clock handling now lives in `sim_time.c`
 
 What remains:
 
@@ -31,9 +33,6 @@ What remains:
     - keep the current shared deadline-building helper but treat the
       `pthread_cond_timedwait()` call itself as the remaining exception
     - or otherwise isolate these absolute-time wait paths more cleanly
-- remove or shrink the Windows-side `NEED_CLOCK_GETTIME` shim
-  - once the file has been moved decisively onto `sim_clock_gettime()`,
-    this local compatibility layer should be reassessed
 - simplify the `_WIN32 || HAVE_WINMM` split if the extra `HAVE_WINMM`
   condition is no longer buying anything meaningful
 - review the `NEED_THREAD_PRIORITY` / `#undef NEED_THREAD_PRIORITY`
