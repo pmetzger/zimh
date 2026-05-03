@@ -602,7 +602,10 @@ static t_stat jrst_tab[16] = {
 #define IOC             if (TSTF (F_USR) && !TSTF (F_UIO)) goto MUUO;
 #define IO7(x,y)        IOC; fptr = ((Q_ITS)? x[ac]: y[ac]); \
                         if (fptr == NULL) goto MUUO; \
-                        if (fptr (ea, MM_OPND)) INCPC; break;
+                        if (fptr (ea, MM_OPND)) { \
+                            INCPC; \
+                        } \
+                        break;
 #define IOA             IOC; if (!Q_ITS) ea = calc_ioea (inst, pflgs)
 #define IOAM            IOC; ea = ((Q_ITS)? ((a10) Read (ea, MM_OPND)): \
                             calc_ioea (inst, pflgs))

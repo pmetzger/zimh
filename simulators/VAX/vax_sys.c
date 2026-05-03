@@ -1170,9 +1170,10 @@ return vp;
                             cptr++; \
                             fl = fl | v; \
                             }
-#define SPUTNUM(v,d)    if (fl & SP_MINUS) \
+#define SPUTNUM(v,d)    if (fl & SP_MINUS) { \
                             v = -v; \
-                            PUTNUM (v, d)
+                        } \
+                        PUTNUM (v, d)
 #define PARSE_LOSE      { \
                             *r = SCPE_ARG; \
                             return vp; \

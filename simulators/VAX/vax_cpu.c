@@ -219,11 +219,12 @@
                             Write (va, r, L_LONG, WA); \
                         else R[rn] = (r)
 #define WRITE_Q(arl,arh)  if (spec > (GRN | nPC)) { \
-                        if ((Test (va + 7, WA, &mstat) >= 0) || \
-                            (Test (va, WA, &mstat) < 0)) \
-                            Write (va, arl, L_LONG, WA); \
-                            Write (va + 4, arh, L_LONG, WA); \
+                            if ((Test (va + 7, WA, &mstat) >= 0) || \
+                                (Test (va, WA, &mstat) < 0)) { \
+                                Write (va, arl, L_LONG, WA); \
                             } \
+                            Write (va + 4, arh, L_LONG, WA); \
+                        } \
                         else { \
                             if (rn >= nSP) \
                                 RSVD_ADDR_FAULT; \
