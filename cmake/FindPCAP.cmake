@@ -32,18 +32,20 @@ find_path(PCAP_INCLUDE_DIR
 #     set(LIB_PATH_SUFFIXES x86)
 # endif ()
 
-# find_library(PCAP_LIBRARY
-#         NAMES
-#             pcap pcap_static libpcap libpcap_static
-#         HINTS
-#             ENV PCAP_DIR
-#         PATH_SUFFIXES
-#             ${LIB_PATH_SUFFIXES}
-#         PATHS
-#             ${PCAP_PATH}
-#         )
-# ## message(STATUS "LIB_PATH_SUFFIXES ${LIB_PATH_SUFFIXES}")
-# ## message(STATUS "PCAP_LIBRARY is ${PCAP_LIBRARY}")
+## Temporary pcap dynamic-loading workaround.  Delete this branch when
+## WITH_PCAP=ON requires both pcap headers and the pcap library.
+if (ZIMH_PCAP_LINK_REQUIRED)
+    find_library(PCAP_LIBRARY
+        NAMES
+            pcap pcap_static libpcap libpcap_static
+        HINTS
+            ENV PCAP_DIR
+        PATH_SUFFIXES
+            ${LIB_PATH_SUFFIXES}
+        PATHS
+            ${PCAP_PATH}
+        )
+endif ()
 
 # if (WIN32 AND PCAP_LIBRARY)
 #     ## Only worry about the packet library on Windows.
@@ -62,15 +64,27 @@ find_path(PCAP_INCLUDE_DIR
 # endif (WIN32 AND PCAP_LIBRARY)
 # ## message(STATUS "PACKET_LIBRARY is ${PACKET_LIBRARY}")
 
-# set(PCAP_LIBRARIES ${PCAP_LIBRARY} ${PACKET_LIBRARY})
+if (ZIMH_PCAP_LINK_REQUIRED)
+    set(PCAP_LIBRARIES ${PCAP_LIBRARY})
+else ()
+    set(PCAP_LIBRARIES)
+endif ()
 set(PCAP_INCLUDE_DIRS ${PCAP_INCLUDE_DIR})
 unset(PCAP_LIBRARY)
 unset(PCAP_INCLUDE_DIR)
 
 include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(
-    PCAP
-    REQUIRED_VARS
-        ## PCAP_LIBRARIES
-        PCAP_INCLUDE_DIRS
-)
+if (ZIMH_PCAP_LINK_REQUIRED)
+    find_package_handle_standard_args(
+        PCAP
+        REQUIRED_VARS
+            PCAP_LIBRARIES
+            PCAP_INCLUDE_DIRS
+    )
+else ()
+    find_package_handle_standard_args(
+        PCAP
+        REQUIRED_VARS
+            PCAP_INCLUDE_DIRS
+    )
+endif ()

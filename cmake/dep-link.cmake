@@ -217,7 +217,7 @@ endif ()
 
 if (WITH_NETWORK)
     set(network_runtime USE_SHARED)
-    ## pcap is special: Headers only and dynamically loaded.
+    ## pcap is normally headers-only because the runtime dynamically loads it.
     if (WITH_PCAP)
         find_package(PCAP)
 
@@ -288,6 +288,10 @@ if (WITH_NETWORK)
             endforeach()
 
             target_include_directories(simh_network INTERFACE "${PCAP_INCLUDE_DIRS}")
+            if (ZIMH_PCAP_LINK_REQUIRED)
+                ## Temporary platform fix until pcap dynamic loading is removed.
+                target_link_libraries(simh_network INTERFACE ${PCAP_LIBRARIES})
+            endif ()
             target_compile_definitions(simh_network INTERFACE HAVE_PCAP_NETWORK)
         endif ()
     endif ()
