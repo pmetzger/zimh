@@ -431,23 +431,6 @@ atexit (sim_timer_exit);
 return _compute_minimum_sleep ();
 }
 
-#if defined(NEED_CLOCK_GETTIME)
-int clock_gettime(int clk_id, struct timespec *tp)
-{
-t_uint64 now, unixbase;
-
-if (clk_id != CLOCK_REALTIME)
-    return -1;
-unixbase = 116444736;
-unixbase *= 1000000000;
-GetSystemTimeAsFileTime((FILETIME*)&now);
-now -= unixbase;
-tp->tv_sec = (long)(now/10000000);
-tp->tv_nsec = (now%10000000)*100;
-return 0;
-}
-#endif
-
 #else
 
 /* UNIX routines */
