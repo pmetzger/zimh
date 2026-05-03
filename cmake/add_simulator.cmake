@@ -38,6 +38,29 @@ set(SIM_VIDEO_SOURCES
     ${SIMH_COMPONENTS_ROOT}/display/display.c
     ${SIMH_COMPONENTS_ROOT}/display/sim_ws.c)
 
+function(zimh_find_bison command_var job_pool_args_var)
+    find_program(ZIMH_BISON_COMMAND
+        NAMES bison win_bison
+        REQUIRED)
+
+    get_filename_component(_zimh_bison_name "${ZIMH_BISON_COMMAND}" NAME_WE)
+    set(_zimh_bison_job_pool_args)
+
+    if (_zimh_bison_name STREQUAL "win_bison")
+        # win_bison.exe uses process-global temporary output names, so parallel
+        # invocations can collide. Keep those custom commands serialized.
+        get_property(_zimh_job_pools GLOBAL PROPERTY JOB_POOLS)
+        list(FIND _zimh_job_pools "win_bison=1" _zimh_win_bison_pool)
+        if (_zimh_win_bison_pool EQUAL -1)
+            set_property(GLOBAL APPEND PROPERTY JOB_POOLS win_bison=1)
+        endif ()
+        set(_zimh_bison_job_pool_args JOB_POOL win_bison)
+    endif ()
+
+    set(${command_var} "${ZIMH_BISON_COMMAND}" PARENT_SCOPE)
+    set(${job_pool_args_var} "${_zimh_bison_job_pool_args}" PARENT_SCOPE)
+endfunction()
+
 ## Build a simulator core library, with and without AIO support. The AIO variant
 ## has "_aio" appended to its name, e.g., "simhz64_aio" or "simhz64_video_aio".
 function(build_simcore _targ)

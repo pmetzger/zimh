@@ -6,7 +6,7 @@
 ## Not yet: if this directory later gets a local unit-test subtree, declare
 ## it explicitly here with add_subdirectory(unit-tests).
 
-find_program(BISON_COMMAND bison REQUIRED)
+zimh_find_bison(BISON_COMMAND BISON_JOB_POOL)
 
 set(sage_parser_c "${CMAKE_CURRENT_BINARY_DIR}/m68k_parse.tab.c")
 set(sage_parser_h "${CMAKE_CURRENT_BINARY_DIR}/m68k_parse.tab.h")
@@ -22,6 +22,7 @@ add_custom_command(
         "${CMAKE_CURRENT_SOURCE_DIR}/m68k_parse.y"
     BYPRODUCTS
         "${sage_parser_h}"
+    ${BISON_JOB_POOL}
     VERBATIM
 )
 
