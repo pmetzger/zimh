@@ -226,7 +226,7 @@ Common top-level targets include:
   Builds and runs the host-side `zimh-unit-*` suite.
 - `integration-tests`
   `cmake --build build/release --target integration-tests`
-  Builds and runs the simulator `simh-*` suite.
+  Builds and runs the simulator `zimh-*` integration suite.
 - `stub`
   `cmake --build build/release --target stub`
   Builds the stub simulator skeleton under `src/components/stub/`.
@@ -331,7 +331,7 @@ Or use a new build directory name instead.
 In constrained sandboxed environments, one test has been known to fail
 for environmental reasons rather than build correctness:
 
-- `simh-uc15`
+- `zimh-uc15`
 
 That simulator uses shared memory. If `shm_open` is blocked by the
 environment, the test will fail even when the build itself is correct.

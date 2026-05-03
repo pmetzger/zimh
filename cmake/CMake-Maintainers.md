@@ -256,7 +256,7 @@ Common maintainer workflows:
   - `ctest --test-dir build/release --output-on-failure`
 
 - run a simulator regression slice:
-  - `ctest --test-dir build/release -R simh-pdp11 --output-on-failure`
+  - `ctest --test-dir build/release -R zimh-pdp11 --output-on-failure`
 
 - run host-side unit tests:
   - `ctest --test-dir build/release -R 'zimh-unit-' --output-on-failure`

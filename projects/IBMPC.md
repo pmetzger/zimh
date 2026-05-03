@@ -237,7 +237,7 @@ So this phase should include:
 Desired minimum end state:
 
 - `cmake --build build/release --target ibmpc ibmpcxt` passes
-- `ctest --test-dir build/release -R '^simh-(ibmpc|ibmpcxt)$'` passes
+- `ctest --test-dir build/release -R '^zimh-(ibmpc|ibmpcxt)$'` passes
 
 ## Recommended Execution Order
 

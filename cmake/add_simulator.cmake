@@ -330,13 +330,13 @@ function (add_simulator _targ)
         ENDIF ()
     endif ()
 
-    add_test(NAME "simh-${_targ}" COMMAND ${test_cmd})
+    add_test(NAME "zimh-${_targ}" COMMAND ${test_cmd})
 
-    set(TEST_LABELS "simh;integration")
+    set(TEST_LABELS "zimh;integration")
     if (SIMH_LABEL)
-        list(APPEND TEST_LABELS "simh-${SIMH_LABEL}")
+        list(APPEND TEST_LABELS "zimh-${SIMH_LABEL}")
     endif ()
-    set_tests_properties("simh-${_targ}" PROPERTIES LABELS "${TEST_LABELS}")
+    set_tests_properties("zimh-${_targ}" PROPERTIES LABELS "${TEST_LABELS}")
 
     set(test_output_dir "${CMAKE_CURRENT_BINARY_DIR}/tests/${_targ}")
     file(MAKE_DIRECTORY "${test_output_dir}")
@@ -369,7 +369,7 @@ function (add_simulator _targ)
         endif ()
     endif ()
 
-    set_property(TEST "simh-${_targ}" PROPERTY ENVIRONMENT "${test_add_env}")
+    set_property(TEST "zimh-${_targ}" PROPERTY ENVIRONMENT "${test_add_env}")
 
     if (NOT WITH_ROMS)
         target_compile_definitions(${_targ} PRIVATE DONT_USE_INTERNAL_ROM)

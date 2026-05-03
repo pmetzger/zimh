@@ -293,7 +293,7 @@ ninja -C build/release <simulator> -j8
 3. run the associated regression path:
 
 ```sh
-ctest --test-dir build/release -R simh-<name> --output-on-failure
+ctest --test-dir build/release -R zimh-<name> --output-on-failure
 ```
 
 If the project is currently using another existing build directory during the

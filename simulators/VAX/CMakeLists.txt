@@ -551,7 +551,7 @@ if (Python3_Interpreter_FOUND)
         "${CMAKE_CURRENT_BINARY_DIR}/tests/vax780-fp-overflow-smoke")
     file(MAKE_DIRECTORY "${vax780_fp_smoke_dir}")
     add_test(
-        NAME simh-vax780-fp-overflow-smoke
+        NAME zimh-vax780-fp-overflow-smoke
         COMMAND
             ${Python3_EXECUTABLE}
             "${CMAKE_CURRENT_SOURCE_DIR}/tests/vax780_fp_overflow_smoke.py"
@@ -559,9 +559,9 @@ if (Python3_Interpreter_FOUND)
             --work-dir
             "${vax780_fp_smoke_dir}")
     set_tests_properties(
-        simh-vax780-fp-overflow-smoke
+        zimh-vax780-fp-overflow-smoke
         PROPERTIES
-            LABELS "simh;integration;simh-VAX"
+            LABELS "zimh;integration;zimh-VAX"
             ENVIRONMENT "SIMH_TEST_OUTPUT_DIR=${vax780_fp_smoke_dir}")
 endif ()
 

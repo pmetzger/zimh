@@ -521,7 +521,7 @@ foreach ($phase in $scriptPhases) {
             }
 
             if (![String]::IsNullOrEmpty($target)) {
-                $tests = "simh-(" + ($target -join "|") + ")`$"
+                $tests = "zimh-(" + ($target -join "|") + ")`$"
                 $testArgs += @("-R", $tests)
             }
 

@@ -359,7 +359,7 @@ if [[ x"${simTarget}" != x ]]; then
         [[ x"${simTests}" != x ]] && simTests="${simTests}|"
         simTests="${simTests}${tgt}"
     done
-    testArgs="${testArgs} -R simh-(${simTests})\$"
+    testArgs="${testArgs} -R zimh-(${simTests})\$"
 fi
 
 buildArgs="${buildArgs} --config ${buildConfig}"
