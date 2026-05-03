@@ -1,6 +1,9 @@
 ##+=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
-## vcpkg setup for MSVC. MinGW builds should use 'pacman' to install
-## required dependency libraries.
+## vcpkg setup for supported hosts. This file chooses a default vcpkg
+## triplet when the user has not set one explicitly, then initializes the
+## vcpkg toolchain after compiler detection.
+## MinGW builds should use 'pacman' to install required dependency
+## libraries.
 ##-=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
 
 if (NOT USING_VCPKG)
