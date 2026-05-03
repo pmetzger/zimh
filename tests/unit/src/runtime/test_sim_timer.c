@@ -192,6 +192,25 @@ static void test_sim_os_ms_sleep_uses_shared_time_wrappers (void **state)
     assert_int_equal (simh_test_last_sleep_req.tv_nsec, 50000000L);
 }
 
+/* Verify sim_timenow_double reads time through the shared clock wrapper. */
+static void test_sim_timenow_double_uses_shared_clock_wrapper (void **state)
+{
+    double now;
+
+    (void)state;
+
+    simh_test_clock_values[0] = (struct timespec){.tv_sec = 42,
+                                                  .tv_nsec = 125000000L};
+    simh_test_clock_value_count = 1;
+    sim_time_set_test_hooks (simh_test_clock_gettime_stub, NULL);
+
+    now = sim_timenow_double ();
+
+    assert_int_equal (simh_test_clock_calls, 1);
+    assert_int_equal (simh_test_last_clock_id, CLOCK_REALTIME);
+    assert_float_equal (now, 42.125, 0.000001);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -218,6 +237,9 @@ int main(void)
             setup_sim_timer_fixture, teardown_sim_timer_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_os_ms_sleep_uses_shared_time_wrappers,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_timenow_double_uses_shared_clock_wrapper,
             setup_sim_timer_fixture, teardown_sim_timer_fixture),
     };
 

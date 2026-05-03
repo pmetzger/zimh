@@ -2182,7 +2182,7 @@ double sim_timenow_double (void)
 {
 struct timespec now;
 
-clock_gettime (CLOCK_REALTIME, &now);
+sim_clock_gettime (CLOCK_REALTIME, &now);
 return _timespec_to_double (&now);
 }
 
