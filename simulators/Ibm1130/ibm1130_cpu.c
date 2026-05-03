@@ -423,8 +423,8 @@ char *upcase (char *str)
 
 void calc_ints (void)
 {
-    register int i;
-    register int32 newbits = 0;
+    int i;
+    int32 newbits = 0;
 
     GUI_BEGIN_CRITICAL_SECTION              /* using critical section here so we don't mislead the GUI thread */
 

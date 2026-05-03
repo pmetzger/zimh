@@ -99,7 +99,7 @@
     }
 
 #define POP(x)  {                                           \
-    register uint32 y = RAM_PP(SP);                         \
+    uint32 y = RAM_PP(SP);                                  \
     x = y + (RAM_PP(SP) << 8);                              \
 }
 
@@ -115,7 +115,7 @@
 
 #define CALLC(cond) {                                       \
     if (cond) {                                             \
-        register uint32 adrr = GET_WORD(PC);                \
+        uint32 adrr = GET_WORD(PC);                         \
         CHECK_BREAK_WORD(SP - 2);                           \
         PUSH(PC + 2);                                       \
         PCQ_ENTRY(PCX);                                     \
@@ -186,9 +186,9 @@ static t_stat cpu_reset(DEVICE *dptr);
 static t_bool cpu_is_pc_a_subroutine_call (t_addr **ret_addrs);
 static t_stat cpu_hex_load(FILE *fileref, const char *cptr, const char *fnam, int flag);
 static t_stat sim_instr_mmu(void);
-static uint32 GetBYTE(register uint32 Addr);
-static void PutWORD(register uint32 Addr, register const uint32 Value);
-static void PutBYTE(register uint32 Addr, register const uint32 Value);
+static uint32 GetBYTE(uint32 Addr);
+static void PutWORD(uint32 Addr, const uint32 Value);
+static void PutBYTE(uint32 Addr, const uint32 Value);
 static const char* cpu_description(DEVICE *dptr);
 static t_stat cpu_cmd_memory(int32 flag, const char *cptr);
 static t_stat cpu_cmd_reg(int32 flag, const char *cptr);
@@ -209,9 +209,9 @@ uint32 getCommon(void);
 uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                         int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 
-static void PutBYTEasROMorRAM(register uint32 Addr, register const uint32 Value, register const uint32 makeROM);
-void PutBYTEExtended(register uint32 Addr, register const uint32 Value);
-uint32 GetBYTEExtended(register uint32 Addr);
+static void PutBYTEasROMorRAM(uint32 Addr, const uint32 Value, const uint32 makeROM);
+void PutBYTEExtended(uint32 Addr, const uint32 Value);
+uint32 GetBYTEExtended(uint32 Addr);
 void cpu_raise_interrupt(uint32 irq);
 
 const char* handlerNameForPort(const int32 port);
@@ -1917,7 +1917,7 @@ uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
     return 0;
 }
 
-static void PutBYTE(register uint32 Addr, register const uint32 Value) {
+static void PutBYTE(uint32 Addr, const uint32 Value) {
     MDEV m;
 
     Addr &= ADDRMASK;   /* registers are NOT guaranteed to be always 16-bit values */
@@ -1938,7 +1938,7 @@ static void PutBYTE(register uint32 Addr, register const uint32 Value) {
     }
 }
 
-static void PutBYTEasROMorRAM(register uint32 Addr, register const uint32 Value, register const uint32 makeROM) {
+static void PutBYTEasROMorRAM(uint32 Addr, const uint32 Value, const uint32 makeROM) {
     Addr &= ADDRMASK;   /* registers are NOT guaranteed to be always 16-bit values */
     if ((cpu_unit.flags & UNIT_CPU_BANKED) && (((common_low == 0) && (Addr < common)) || ((common_low == 1) && (Addr >= common))))
         Addr |= bankSelect << MAXBANKSIZELOG2;
@@ -1947,7 +1947,7 @@ static void PutBYTEasROMorRAM(register uint32 Addr, register const uint32 Value,
     M[Addr] = Value;
 }
 
-void PutBYTEExtended(register uint32 Addr, register const uint32 Value) {
+void PutBYTEExtended(uint32 Addr, const uint32 Value) {
     MDEV m;
 
     Addr &= ADDRMASKEXTENDED;
@@ -1965,12 +1965,12 @@ void PutBYTEExtended(register uint32 Addr, register const uint32 Value) {
     }
 }
 
-static void PutWORD(register uint32 Addr, register const uint32 Value) {
+static void PutWORD(uint32 Addr, const uint32 Value) {
     PutBYTE(Addr, Value);
     PutBYTE(Addr + 1, Value >> 8);
 }
 
-static uint32 GetBYTE(register uint32 Addr) {
+static uint32 GetBYTE(uint32 Addr) {
     MDEV m;
 
     Addr &= ADDRMASK;   /* registers are NOT guaranteed to be always 16-bit values */
@@ -1990,7 +1990,7 @@ static uint32 GetBYTE(register uint32 Addr) {
     return M[Addr]; /* ROM */
 }
 
-uint32 GetBYTEExtended(register uint32 Addr) {
+uint32 GetBYTEExtended(uint32 Addr) {
     MDEV m;
 
     Addr &= ADDRMASKEXTENDED;
@@ -2174,21 +2174,21 @@ static t_stat sim_instr_mmu (void) {
     extern uint32 keyboardInterruptHandler;
     int32 reason = SCPE_OK;
     uint32 i;
-    register uint32 specialProcessing;
-    register uint32 AF;
-    register uint32 BC;
-    register uint32 DE;
-    register uint32 HL;
-    register uint32 PC;
-    register uint32 SP;
-    register uint32 IX;
-    register uint32 IY;
-    register uint32 temp = 0;
-    register uint32 acu = 0;
-    register uint32 sum;
-    register uint32 cbits;
-    register uint32 op;
-    register uint32 adr;
+    uint32 specialProcessing;
+    uint32 AF;
+    uint32 BC;
+    uint32 DE;
+    uint32 HL;
+    uint32 PC;
+    uint32 SP;
+    uint32 IX;
+    uint32 IY;
+    uint32 temp = 0;
+    uint32 acu = 0;
+    uint32 sum;
+    uint32 cbits;
+    uint32 op;
+    uint32 adr;
 
     /*  The clock frequency simulation works as follows:
      For each 8080 or Z80 instruction one can determine the number of t-states
@@ -2208,7 +2208,7 @@ static t_stat sim_instr_mmu (void) {
      3. In case startTime is in the future there is a sleep until startTime
         is equal to the current time.
      */
-    register uint32 tStates;    /* number of t-states executed in the current time-slice */
+    uint32 tStates;             /* number of t-states executed in the current time-slice */
     uint32 tStatesInSlice;      /* number of t-states in a 10 mSec time-slice */
     uint32 startTime, now;
     int32 tStateModifier = FALSE;
@@ -7706,4 +7706,3 @@ static t_stat cpu_cmd_reg(int32 flag, const char *cptr)
 
     return SCPE_OK | SCPE_NOMESSAGE;
 }
-

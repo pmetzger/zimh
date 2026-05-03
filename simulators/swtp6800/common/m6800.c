@@ -1848,7 +1848,7 @@ void push_word(uint16 val)
 /* pop a byte from the stack */
 uint8 pop_byte(void)
 {
-    register uint8 res;
+    uint8 res;
 
     SP = (SP + 1) & ADDRMASK;
     res = CPU_BD_get_mbyte(SP);
@@ -1858,7 +1858,7 @@ uint8 pop_byte(void)
 /* pop a word from the stack */
 uint16 pop_word(void)
 {
-    register uint16 res;
+    uint16 res;
 
     res = pop_byte() << 8;
     res |= pop_byte();

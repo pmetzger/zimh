@@ -694,8 +694,8 @@ DEVICE pit_dev = {
 
 t_stat sim_instr (void)
 {
-register int32 PC, IR, i, t, MA, j, k, tac;
-register uint32 mddata, uAC0, uAC1, uAC2, uAC3;
+int32 PC, IR, i, t, MA, j, k, tac;
+uint32 mddata, uAC0, uAC1, uAC2, uAC3;
 int16 sAC0, sAC1, sAC2;
 int32 sddata, mi1, mi2, fpnum32;
 t_int64 fpnum, expon;
@@ -1049,7 +1049,7 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
     /* Shift operations */
 
     if ((IR & 0103777) == 0101210) {                    /* LSH: Logical Shift */
-        register int16 sh;
+        int16 sh;
         sh = AC[(IR >> 13) & 3] & 0377;
         i = (IR >> 11) & 3;
         if (sh & 0200) {
@@ -1063,7 +1063,7 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
         continue;
     }
     if ((IR & 0103777) == 0101310) {                    /* DLSH: Double logical shift */
-        register int16 sh;
+        int16 sh;
         sh = AC[(IR >> 13) & 3] & 0377;
         i = (IR >> 11) & 3;
         uAC0 = AC[i] << 16;
@@ -1191,7 +1191,7 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
         continue;
     }
     if ((IR & 0103777) == 0102310) {                    /* SZBO: skip on zero bit & set to 1 */
-        register int32 save;
+        int32 save;
         i = (IR >> 11) & 3;
         j = (IR >> 13) & 3;
         if (i != j) {
@@ -1211,8 +1211,8 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
         continue;
     }
     if ((IR & 0103777) == 0102410) {                    /* LOB: Locate lead bit */
-        register int32 a, r;
-        register int16 b;
+        int32 a, r;
+        int16 b;
         a = AC[(IR >> 13) & 3] & 0xffff;
         for (i = 0; i < 16; i++) {
             if ((a << i) & 0100000) break;
@@ -1224,8 +1224,8 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
         continue;
     }
     if ((IR & 0103777) == 0102510) {                    /* LRB: Locate & reset lead bit */
-        register int32 a, r;
-        register int16 b;
+        int32 a, r;
+        int16 b;
         j = (IR >> 13) & 3;
         a = AC[j];
         for (i = 0; i < 16; i++) {
@@ -1240,8 +1240,8 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
         continue;
     }
     if ((IR & 0103777) == 0102610) {                    /* COB: Count bits */
-        register int32 a;
-        register int16 b, c = 0;
+        int32 a;
+        int16 b, c = 0;
         a = AC[(IR >> 13) & 3];
         for (i = 0; i < 16; i++) {
             if ((a >> i) & 1) c++;
@@ -1280,7 +1280,7 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
         continue;
     }
     if ((IR & 0103777) == 0101010) {                    /* SGT: Skip if ACS > ACD */
-        register int16 a1, d1;
+        int16 a1, d1;
         a1 = AC[(IR >> 13) & 3] & 0xffff;
         d1 = AC[(IR >> 11) & 3] & 0xffff;
         if (a1 > d1)
@@ -1288,7 +1288,7 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
         continue;
     }
     if ((IR & 0103777) == 0101110) {                    /* SGE: Skip if ACS >= ACD */
-        register int16 a1, d1;
+        int16 a1, d1;
         a1 = AC[(IR >> 13) & 3] & 0xffff;
         d1 = AC[(IR >> 11) & 3] & 0xffff;
         if (a1 >= d1)
@@ -1296,7 +1296,7 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
         continue;
     }
     if ((IR & 0103777) == 0102370) {                    /* CLM: Compare to limits */
-        register int32 s, d, MA;
+        int32 s, d, MA;
         int16 H, L, ca;
         s = (IR >> 13) & 3;
         d = (IR >> 11) & 3;
@@ -1323,7 +1323,7 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
     /* Memory block operations */
 
     if (IR == 0113710) {                                /* BAM: Block add & move */
-        register int32 w;
+        int32 w;
         t = AC[1];
         if (t < 1 || t > 0100000)
             continue;
@@ -1369,7 +1369,7 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
     /* Stack operations */
 
     if ((IR & 0103777) == 0103110) {                    /* PSH: Push multiple accums */
-        register int32 j;
+        int32 j;
         j = (IR >> 11) & 3;
         t = GetMap(040) & AMASK;
         i = (IR >> 13) & 3;
@@ -1452,7 +1452,7 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
         continue;
     }
     if (IR == 0163710) {                                /* SAVE */
-        register int32 savep;
+        int32 savep;
         savep = ((GetMap(PC) + GetMap(040)) + 5) & AMASK;
         if (savep  > GetMap(042)) {
             pushrtn(PC-1);
@@ -1748,7 +1748,7 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
     /* Exotic, complex instructions */
 
     if ((IR & 0162377) == 0142170) {                    /* DSPA: Dispatch */
-        register int32 d;
+        int32 d;
         int16 a, H, L;
         MA = effective(PC, (IR >> 8) & 3, GetMap(PC));
         H = GetMap(MA - 1) & 0177777;
@@ -1769,7 +1769,7 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
 
     if (((IR & 0100077) == 0100030) ||
         ((IR & 0102077) == 0100070)) {                  /* XOP: Extended Operation */
-        register int32 op, d, sa, da;
+        int32 op, d, sa, da;
         op = (IR >> 6) & 037;
         if ((IR & 077) == 070) op += 32;
         t = GetMap(040) & AMASK;
@@ -1796,7 +1796,7 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
         continue;
     }
     if ((IR & 0103777) == 0103510) {                    /* SYC: System call */
-        register int32 j;
+        int32 j;
         DisMap = Usermap;
         Usermap = 0;
         MapStat &= ~1;                                  /* Disable MAP */
@@ -1829,7 +1829,7 @@ if ((IR & 0100017) == 0100010) {                        /* This pattern for all 
         continue;
     }
     if (IR == 0113410) {                                /* LMP: Load Map */
-        register int32 w, m;
+        int32 w, m;
         if ((Debug_Flags & 077) == 03)
             fprintf(Trace, "%o LMP (Map=%o)\n", PC - 1, (MapStat>>7)&07);
         t = AC[1];
@@ -4783,7 +4783,7 @@ if (IR == 061777) {                                     /* VCT: Vector on Interr
 /* Memory reference instructions */
 
 if (t < 014) {                                          /* mem ref? */
-    register int32 src, MA;
+    int32 src, MA;
 
     MA = IR & 0377;
     switch ((IR >> 8) & 03) {                           /* decode IR<6:7> */
@@ -4935,7 +4935,7 @@ if (t < 014) {                                          /* mem ref? */
 /* Operate instruction */
 
 else if (t & 020) {                                     /* operate? */
-    register int32 src, srcAC, dstAC;
+    int32 src, srcAC, dstAC;
 
     srcAC = (t >> 2) & 3;                               /* get reg decodes */
     dstAC = t & 03;
@@ -5029,7 +5029,7 @@ else if (t & 020) {                                     /* operate? */
 /* IOT instruction */
 
 else {                                                  /* IOT */
-    register int32 dstAC, pulse, code, device, iodata;
+    int32 dstAC, pulse, code, device, iodata;
     char pulcode[4];
 
     if ((MapStat & 0100)                                /* LEF mode bit on? */
@@ -5331,7 +5331,7 @@ return reason;
 
 int32 effective(int32 PC, int32 index, int32 disp)
 {
-    register int32 i, MA;
+    int32 i, MA;
 
     MA = disp & 077777;
     switch (index) {                                    /* decode IR<6:7> */
@@ -5377,7 +5377,7 @@ int32 effective(int32 PC, int32 index, int32 disp)
 
 int32 LEFmode(int32 PC, int32 index, int32 disp, int32 indirect)
 {
-    register int32 i, MA;
+    int32 i, MA;
     int16 sMA;
 
     MA = disp & 077777;
@@ -5431,7 +5431,7 @@ int32 LEFmode(int32 PC, int32 index, int32 disp, int32 indirect)
 
 int32 Bytepointer(int32 PC, int32 index)
 {
-    register int32 MA;
+    int32 MA;
 
     switch (index) {                                    /* decode IR<6:7> */
     case 0:                                             /* page zero */

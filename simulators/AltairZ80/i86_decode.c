@@ -27,8 +27,8 @@
 /* GLOBAL */
 volatile int intr;
 
-extern uint32 GetBYTEExtended(register uint32 Addr);
-extern void PutBYTEExtended(register uint32 Addr, register const uint32 Value);
+extern uint32 GetBYTEExtended(uint32 Addr);
+extern void PutBYTEExtended(uint32 Addr, const uint32 Value);
 extern int32 AX_S;      /* AX register (8086)                           */
 extern int32 BX_S;      /* BX register (8086)                           */
 extern int32 CX_S;      /* CX register (8086)                           */
@@ -367,7 +367,7 @@ static struct modrm modrmtab[] = {
 
 void fetch_decode_modrm(PC_ENV *m, uint16 *mod, uint16 *regh, uint16 *regl)
 {    uint8 fetched;
-    register struct modrm *p;
+    struct modrm *p;
     /* do the fetch in real mode.  Shift the CS segment register
        over by 4 bits, and add in the IP register.  Index into
        the system memory.
@@ -666,7 +666,7 @@ uint16 decode_rm10_address(PC_ENV *m, int rm)
 */
 uint8 fetch_data_byte(PC_ENV *m, uint16 offset)
 {
-    register uint8 value;
+    uint8 value;
     /* this code originally completely broken, and never showed
        up since the DS segments === SS segment in all test cases.
        It had been originally assumed, that all access to data would
@@ -740,7 +740,7 @@ uint8 fetch_data_byte(PC_ENV *m, uint16 offset)
 */
 uint8 fetch_data_byte_abs(PC_ENV *m, uint16 segment, uint16 offset)
 {
-    register uint8 value;
+    uint8 value;
     uint32 addr;
     /* note, cannot change this, since we do not know the ID of the segment. */
 /* [JCE] Simulate wrap at top of memory (the A20 gate) */
@@ -836,7 +836,7 @@ void store_data_byte(PC_ENV *m, uint16 offset, uint8 val)
 {
     /* See note above in fetch_data_byte. */
     uint32             addr;
-    register uint16 segment;
+    uint16 segment;
     switch(m->sysmode & SYSMODE_SEGMASK)
     {
      case 0:
@@ -884,7 +884,7 @@ void store_data_byte(PC_ENV *m, uint16 offset, uint8 val)
 
 void store_data_byte_abs(PC_ENV *m, uint16 segment, uint16 offset, uint8 val)
 {
-    register uint32 addr;
+    uint32 addr;
 /* [JCE] Simulate wrap at top of memory (the A20 gate) */
 /*    addr = (segment << 4) + offset; */
     addr = (((uint32)segment << 4) + offset) & 0xFFFFF;
@@ -896,8 +896,8 @@ void store_data_byte_abs(PC_ENV *m, uint16 segment, uint16 offset, uint8 val)
 */
 void store_data_word(PC_ENV *m, uint16 offset, uint16 val)
 {
-    register uint32 addr;
-    register uint16 segment;
+    uint32 addr;
+    uint16 segment;
     /* See note above in fetch_data_byte. */
     switch(m->sysmode & SYSMODE_SEGMASK)
     {
@@ -947,7 +947,7 @@ void store_data_word(PC_ENV *m, uint16 offset, uint16 val)
 
 void store_data_word_abs(PC_ENV *m, uint16 segment, uint16 offset, uint16 val)
 {
-    register uint32 addr;
+    uint32 addr;
     /* [JCE] Wrap at top of memory */
     addr = ((segment << 4) + offset) & 0xFFFFF;
     PutBYTEExtended(addr, val & 0xff);

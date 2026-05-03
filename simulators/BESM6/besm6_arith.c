@@ -326,7 +326,7 @@ void besm6_multiply (t_value val)
     alureg_t        acc, word, a, b;
     t_uint64        mr, alo, blo, ahi, bhi;
 
-    register t_uint64 l;
+    t_uint64 l;
 
     if (! ACC || ! val) {
         /* multiplication by zero is zero */

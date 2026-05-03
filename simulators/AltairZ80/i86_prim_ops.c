@@ -24,8 +24,8 @@
 #include "altairz80_defs.h"
 #include "i86.h"
 
-extern uint32 GetBYTEExtended(register uint32 Addr);
-extern void PutBYTEExtended(register uint32 Addr, register const uint32 Value);
+extern uint32 GetBYTEExtended(uint32 Addr);
+extern void PutBYTEExtended(uint32 Addr, const uint32 Value);
 
 /* $Log: i86_prim_ops.c,v $
  * Revision 0.9  2003-01-10  23:33:10  jce
@@ -242,8 +242,8 @@ uint16 aam_word(PC_ENV *m, uint8 d)
 
 uint8 adc_byte(PC_ENV *m, uint8 d, uint8 s)
 {
-    register uint16 res;         /* all operands in native machine order */
-    register uint16 cc;
+    uint16 res;                  /* all operands in native machine order */
+    uint16 cc;
     if (ACCESS_FLAG(m,F_CF) )
       res = 1 + d + s;
     else
@@ -261,8 +261,8 @@ uint8 adc_byte(PC_ENV *m, uint8 d, uint8 s)
 
 uint16 adc_word(PC_ENV *m, uint16 d, uint16 s)
 {
-    register uint32 res;         /* all operands in native machine order */
-    register uint32 cc;
+    uint32 res;                  /* all operands in native machine order */
+    uint32 cc;
     if (ACCESS_FLAG(m,F_CF) )
       res = 1 + d + s;
     else
@@ -285,8 +285,8 @@ uint16 adc_word(PC_ENV *m, uint16 d, uint16 s)
 */
 uint8 add_byte(PC_ENV *m, uint8 d, uint8 s)
 {
-    register uint16 res;         /* all operands in native machine order */
-    register uint16 cc;
+    uint16 res;                  /* all operands in native machine order */
+    uint16 cc;
     res = d + s;
     /* set the carry flag to be bit 8 */
     CONDITIONAL_SET_FLAG(res & 0x100, m, F_CF);
@@ -306,8 +306,8 @@ uint8 add_byte(PC_ENV *m, uint8 d, uint8 s)
 */
 uint16 add_word(PC_ENV *m, uint16 d, uint16 s)
 {
-    register uint32 res;         /* all operands in native machine order */
-    register uint32 cc;
+    uint32 res;                  /* all operands in native machine order */
+    uint32 cc;
     res = d + s;
     /* set the carry flag to be bit 8 */
     CONDITIONAL_SET_FLAG(res & 0x10000, m, F_CF);
@@ -328,7 +328,7 @@ uint16 add_word(PC_ENV *m, uint16 d, uint16 s)
 */
 uint8 and_byte(PC_ENV *m, uint8 d, uint8 s)
 {
-    register uint8 res;         /* all operands in native machine order */
+    uint8 res;                  /* all operands in native machine order */
     res = d & s;
     /* set the flags  */
     CLEAR_FLAG(m, F_OF);
@@ -346,7 +346,7 @@ uint8 and_byte(PC_ENV *m, uint8 d, uint8 s)
 */
 uint16 and_word(PC_ENV *m, uint16 d, uint16 s)
 {
-    register uint16 res;         /* all operands in native machine order */
+    uint16 res;                  /* all operands in native machine order */
     res = d & s;
     /* set the flags  */
     CLEAR_FLAG(m, F_OF);
@@ -359,8 +359,8 @@ uint16 and_word(PC_ENV *m, uint16 d, uint16 s)
 
 uint8 cmp_byte(PC_ENV *m, uint8 d, uint8 s)
 {
-    register uint32 res;         /* all operands in native machine order */
-    register uint32 bc;
+    uint32 res;                  /* all operands in native machine order */
+    uint32 bc;
     res = d - s;
     CLEAR_FLAG(m, F_CF);
     CONDITIONAL_SET_FLAG(res&0x80, m, F_SF);
@@ -377,8 +377,8 @@ uint8 cmp_byte(PC_ENV *m, uint8 d, uint8 s)
 
 uint16 cmp_word(PC_ENV *m, uint16 d, uint16 s)
 {
-    register uint32 res;         /* all operands in native machine order */
-    register uint32 bc;
+    uint32 res;                  /* all operands in native machine order */
+    uint32 bc;
     res = d - s;
     CONDITIONAL_SET_FLAG(res&0x8000, m, F_SF);
     CONDITIONAL_SET_FLAG((res&0xffff)==0, m, F_ZF);
@@ -393,8 +393,8 @@ uint16 cmp_word(PC_ENV *m, uint16 d, uint16 s)
 
 uint8 dec_byte(PC_ENV *m, uint8 d)
 {
-    register uint32 res;         /* all operands in native machine order */
-    register uint32 bc;
+    uint32 res;                  /* all operands in native machine order */
+    uint32 bc;
     res = d - 1;
     CONDITIONAL_SET_FLAG(res&0x80, m, F_SF);
     CONDITIONAL_SET_FLAG((res&0xff)==0, m, F_ZF);
@@ -410,8 +410,8 @@ uint8 dec_byte(PC_ENV *m, uint8 d)
 
 uint16 dec_word(PC_ENV *m, uint16 d)
 {
-    register uint32 res;         /* all operands in native machine order */
-    register uint32 bc;
+    uint32 res;                  /* all operands in native machine order */
+    uint32 bc;
     res = d - 1;
     CONDITIONAL_SET_FLAG(res&0x8000, m, F_SF);
     CONDITIONAL_SET_FLAG((res&0xffff)==0, m, F_ZF);
@@ -431,8 +431,8 @@ uint16 dec_word(PC_ENV *m, uint16 d)
 */
 uint8 inc_byte(PC_ENV *m, uint8 d)
 {
-    register uint32 res;         /* all operands in native machine order */
-    register uint32 cc;
+    uint32 res;                  /* all operands in native machine order */
+    uint32 cc;
     res = d + 1;
     CONDITIONAL_SET_FLAG((res&0xff)==0, m, F_ZF);
     CONDITIONAL_SET_FLAG(res & 0x80, m, F_SF);
@@ -450,8 +450,8 @@ uint8 inc_byte(PC_ENV *m, uint8 d)
 */
 uint16 inc_word(PC_ENV *m, uint16 d)
 {
-    register uint32 res;         /* all operands in native machine order */
-    register uint32 cc;
+    uint32 res;                  /* all operands in native machine order */
+    uint32 cc;
     res = d + 1;
     CONDITIONAL_SET_FLAG((res&0xffff)==0, m, F_ZF);
     CONDITIONAL_SET_FLAG(res & 0x8000, m, F_SF);
@@ -465,7 +465,7 @@ uint16 inc_word(PC_ENV *m, uint16 d)
 
 uint8 or_byte(PC_ENV *m, uint8 d, uint8 s)
 {
-    register uint8 res;         /* all operands in native machine order */
+    uint8 res;                  /* all operands in native machine order */
     res = d | s;
     CLEAR_FLAG(m, F_OF);
     CLEAR_FLAG(m, F_CF);
@@ -477,7 +477,7 @@ uint8 or_byte(PC_ENV *m, uint8 d, uint8 s)
 
 uint16 or_word(PC_ENV *m, uint16 d, uint16 s)
 {
-    register uint16 res;         /* all operands in native machine order */
+    uint16 res;                  /* all operands in native machine order */
     res = d | s;
     /* set the carry flag to be bit 8 */
     CLEAR_FLAG(m, F_OF);
@@ -490,8 +490,8 @@ uint16 or_word(PC_ENV *m, uint16 d, uint16 s)
 
 uint8 neg_byte(PC_ENV *m, uint8 s)
 {
-    register uint8 res;
-    register uint8 bc;
+    uint8 res;
+    uint8 bc;
     CONDITIONAL_SET_FLAG(s!=0, m, F_CF);
     res = -s;
     CONDITIONAL_SET_FLAG((res&0xff)==0, m, F_ZF);
@@ -510,8 +510,8 @@ uint8 neg_byte(PC_ENV *m, uint8 s)
 
 uint16 neg_word(PC_ENV *m, uint16 s)
 {
-    register uint16 res;
-    register uint16 bc;
+    uint16 res;
+    uint16 bc;
     CONDITIONAL_SET_FLAG(s!=0, m, F_CF);
     res = -s;
     CONDITIONAL_SET_FLAG((res&0xffff)==0, m, F_ZF);
@@ -564,7 +564,7 @@ void push_word(PC_ENV *m, uint16 w)
  */
 uint16 pop_word(PC_ENV *m)
 {
-    register uint16 res;
+    uint16 res;
     res  = GetBYTEExtended((m->R_SS << 4) + m->R_SP);
     m->R_SP++;
     res |= GetBYTEExtended((m->R_SS << 4) + m->R_SP) << 8;
@@ -578,7 +578,7 @@ uint16 pop_word(PC_ENV *m)
 *****************************************************************/
 uint8 rcl_byte(PC_ENV *m, uint8 d, uint8 s)
 {
-    register uint32  res, cnt, mask,cf;
+    uint32  res, cnt, mask,cf;
     /* s is the rotate distance.  It varies from 0 - 8. */
     /* have
                CF  B_7 B_6 B_5 B_4 B_3 B_2 B_1 B_0
@@ -640,7 +640,7 @@ uint8 rcl_byte(PC_ENV *m, uint8 d, uint8 s)
 
 uint16  rcl_word(PC_ENV *m, uint16 d, uint16 s)
 {
-    register uint32  res, cnt, mask,cf;
+    uint32  res, cnt, mask,cf;
     /* see analysis above. */
     /* width here is 16 bits + carry bit */
     res = d;
@@ -834,7 +834,7 @@ uint16 rcr_word(PC_ENV *m, uint16 d, uint16 s)
 
 uint8 rol_byte(PC_ENV *m, uint8 d, uint8 s)
 {
-    register uint32  res, cnt, mask;
+    uint32  res, cnt, mask;
     /* rotate left */
     /*
       s is the rotate distance.  It varies from 0 - 8.
@@ -869,7 +869,7 @@ uint8 rol_byte(PC_ENV *m, uint8 d, uint8 s)
 
 uint16 rol_word(PC_ENV *m, uint16 d, uint16 s)
 {
-    register uint32  res, cnt, mask;
+    uint32  res, cnt, mask;
     /* rotate left */
     /*
       s is the rotate distance.  It varies from 0 - 8.
@@ -904,7 +904,7 @@ uint16 rol_word(PC_ENV *m, uint16 d, uint16 s)
 
 uint8 ror_byte(PC_ENV *m, uint8 d, uint8 s)
 {
-    register uint32  res, cnt, mask;
+    uint32  res, cnt, mask;
     /* rotate right */
     /*
       s is the rotate distance.  It varies from 0 - 8.
@@ -937,7 +937,7 @@ uint8 ror_byte(PC_ENV *m, uint8 d, uint8 s)
 
 uint16 ror_word(PC_ENV *m, uint16 d, uint16 s)
 {
-    register uint32  res, cnt, mask;
+    uint32  res, cnt, mask;
     /* rotate right */
     /*
       s is the rotate distance.  It varies from 0 - 8.
@@ -1234,8 +1234,8 @@ uint16 sar_word(PC_ENV *m, uint16 d, uint16 s)
 
 uint8 sbb_byte(PC_ENV *m, uint8 d, uint8 s)
 {
-    register uint32 res;         /* all operands in native machine order */
-    register uint32 bc;
+    uint32 res;                  /* all operands in native machine order */
+    uint32 bc;
     if (ACCESS_FLAG(m,F_CF) )
       res = d - s - 1;
     else
@@ -1253,8 +1253,8 @@ uint8 sbb_byte(PC_ENV *m, uint8 d, uint8 s)
 
 uint16 sbb_word(PC_ENV *m, uint16 d, uint16 s)
 {
-    register uint32 res;         /* all operands in native machine order */
-    register uint32 bc;
+    uint32 res;                  /* all operands in native machine order */
+    uint32 bc;
     if (ACCESS_FLAG(m,F_CF))
       res = d - s - 1;
     else
@@ -1272,8 +1272,8 @@ uint16 sbb_word(PC_ENV *m, uint16 d, uint16 s)
 
 uint8 sub_byte(PC_ENV *m, uint8 d, uint8 s)
 {
-    register uint32 res;         /* all operands in native machine order */
-    register uint32 bc;
+    uint32 res;                  /* all operands in native machine order */
+    uint32 bc;
     res = d - s;
     CONDITIONAL_SET_FLAG(res&0x80, m, F_SF);
     CONDITIONAL_SET_FLAG((res&0xff)==0, m, F_ZF);
@@ -1288,8 +1288,8 @@ uint8 sub_byte(PC_ENV *m, uint8 d, uint8 s)
 
 uint16 sub_word(PC_ENV *m, uint16 d, uint16 s)
 {
-    register uint32 res;         /* all operands in native machine order */
-    register uint32 bc;
+    uint32 res;                  /* all operands in native machine order */
+    uint32 bc;
     res = d - s;
     CONDITIONAL_SET_FLAG(res&0x8000, m, F_SF);
     CONDITIONAL_SET_FLAG((res&0xffff)==0, m, F_ZF);
@@ -1304,7 +1304,7 @@ uint16 sub_word(PC_ENV *m, uint16 d, uint16 s)
 
 void test_byte(PC_ENV *m, uint8 d, uint8 s)
 {
-    register uint32 res;         /* all operands in native machine order */
+    uint32 res;                  /* all operands in native machine order */
     res = d & s;
     CLEAR_FLAG(m, F_OF);
     CONDITIONAL_SET_FLAG(res&0x80, m, F_SF);
@@ -1316,7 +1316,7 @@ void test_byte(PC_ENV *m, uint8 d, uint8 s)
 
 void test_word(PC_ENV *m, uint16 d, uint16 s)
 {
-    register uint32 res;         /* all operands in native machine order */
+    uint32 res;                  /* all operands in native machine order */
     res = d & s;
     CLEAR_FLAG(m, F_OF);
     CONDITIONAL_SET_FLAG(res&0x8000, m, F_SF);
@@ -1328,7 +1328,7 @@ void test_word(PC_ENV *m, uint16 d, uint16 s)
 
 uint8 xor_byte(PC_ENV *m, uint8 d, uint8 s)
 {
-    register uint8 res;         /* all operands in native machine order */
+    uint8 res;                  /* all operands in native machine order */
     res = d ^ s;
     CLEAR_FLAG(m, F_OF);
     CONDITIONAL_SET_FLAG(res&0x80, m, F_SF);
@@ -1340,7 +1340,7 @@ uint8 xor_byte(PC_ENV *m, uint8 d, uint8 s)
 
 uint16 xor_word(PC_ENV *m, uint16 d, uint16 s)
 {
-    register uint16 res;         /* all operands in native machine order */
+    uint16 res;                  /* all operands in native machine order */
     res = d ^ s;
     /* set the carry flag to be bit 8 */
     CLEAR_FLAG(m, F_OF);

@@ -1027,7 +1027,7 @@ void push_word(uint16 val)
 /* pop a word from the stack */
 uint16 pop_word(void)
 {
-    register uint16 res;
+    uint16 res;
 
     res = get_mbyte(SP);
     SP++;

@@ -82,7 +82,7 @@
     }
 
 #define POP(x)  {                               \
-    register uint32 y = RAM_PP(SP);             \
+    uint32 y = RAM_PP(SP);                      \
     x = y + (RAM_PP(SP) << 8);                  \
 }
 
@@ -96,7 +96,7 @@
 
 #define CALLC(cond) {                           \
     if (cond) {                                 \
-        register uint32 adrr = GET_WORD(PC);    \
+        uint32 adrr = GET_WORD(PC);             \
         PUSH(PC + 2);                           \
         PC = adrr;                              \
     } else {                                    \
@@ -933,20 +933,20 @@ static const uint8 cpTable[256] = {
 
 uint8 MOPT[MAXBANKSIZE]; /* RAM which is present */
 
-static uint8 GET_BYTE(register uint32 Addr) {
+static uint8 GET_BYTE(uint32 Addr) {
     return MOPT[Addr & ADDRMASK];
 }
 
-static void PUT_BYTE(register uint32 Addr, register uint32 Value) {
+static void PUT_BYTE(uint32 Addr, uint32 Value) {
     MOPT[Addr & ADDRMASK] = Value;
 }
 
-static void PUT_WORD(register uint32 Addr, register uint32 Value) {
+static void PUT_WORD(uint32 Addr, uint32 Value) {
     MOPT[Addr & ADDRMASK] = Value;
     MOPT[(Addr + 1) & ADDRMASK] = Value >> 8;
 }
 
-static uint16 GET_WORD(register uint32 a) {
+static uint16 GET_WORD(uint32 a) {
     return GET_BYTE(a) | (GET_BYTE(a + 1) << 8);
 }
 
@@ -993,21 +993,21 @@ static uint16 GET_WORD(register uint32 a) {
 
 t_stat sim_instr_nommu(void) {
     int32 reason = SCPE_OK;
-    register uint32 AF;
-    register uint32 BC;
-    register uint32 DE;
-    register uint32 HL;
-    register uint32 PC;
-    register uint32 SP;
-    register uint32 IX;
-    register uint32 IY;
-    register uint32 temp = 0;
-    register uint32 acu = 0;
-    register uint32 sum;
-    register uint32 cbits;
-    register uint32 op;
-    register uint32 adr;
-    register int32 l_sim_brk_summ;
+    uint32 AF;
+    uint32 BC;
+    uint32 DE;
+    uint32 HL;
+    uint32 PC;
+    uint32 SP;
+    uint32 IX;
+    uint32 IY;
+    uint32 temp = 0;
+    uint32 acu = 0;
+    uint32 sum;
+    uint32 cbits;
+    uint32 op;
+    uint32 adr;
+    int32 l_sim_brk_summ;
 
     AF = AF_S;
     BC = BC_S;
