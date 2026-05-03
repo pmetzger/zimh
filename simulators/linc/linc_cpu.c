@@ -432,7 +432,7 @@ static void cpu_opr(void)
   case 000: case 001: case 002: case 003: case 004: case 005: case 006: case 007:
   case 010: case 011: case 012: case 013:
     if (C & IMASK)
-      ; //Pause.
+      paused = XL[C03] ? 0 : 1;
     break;
   case 015: //KBD
     A = kbd_key(C & IMASK);
@@ -819,6 +819,21 @@ static int mtp_or_opr(void)
   return (C & 07700) == INSN_MTP || (C & 07700) == INSN_OPR;
 }
 
+/* Release an indexed OPR pause when its external level is asserted. */
+static void cpu_opr_restart(void)
+{
+  if (!paused)
+    return;
+  if ((C & 07700) != INSN_OPR)
+    return;
+  if ((C & IMASK) == 0)
+    return;
+  if (C03 > 013)
+    return;
+  if (XL[C03])
+    paused = 0;
+}
+
 static void cpu_interrupt(void)
 {
   if (!INTREQ)
@@ -912,6 +927,8 @@ t_stat sim_instr(void)
       if (--sim_step == 0)
         return SCPE_STEP;
     }
+
+    cpu_opr_restart();
 
     if (paused)
       sim_interval--;
