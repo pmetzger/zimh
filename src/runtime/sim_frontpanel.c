@@ -25,6 +25,7 @@
 #include "sim_sock.h"
 
 #include "sim_frontpanel.h"
+#include "sim_time.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -43,54 +44,10 @@
 #define sleep(n) Sleep(n*1000)
 #define msleep(n) Sleep(n)
 #define strtoull _strtoui64
-#define CLOCK_REALTIME 0
-int clock_gettime(int clk_id, struct timespec *tp)
-{
-unsigned long long now, unixbase;
-
-unixbase = 116444736;
-unixbase *= 1000000000;
-GetSystemTimeAsFileTime((FILETIME*)&now);
-now -= unixbase;
-tp->tv_sec = (long)(now/10000000);
-tp->tv_nsec = (now%10000000)*100;
-return 0;
-}
 #else /* NOT _WIN32 */
 #include <unistd.h>
 #define msleep(n) usleep(1000*n)
 #include <sys/wait.h>
-#if defined (__APPLE__)
-#define HAVE_STRUCT_TIMESPEC 1   /* OSX defined the structure but doesn't tell us */
-#endif
-
-/* Provide a fallback CLOCK_REALTIME if the host headers omit it. */
-#if !defined(CLOCK_REALTIME)
-#define CLOCK_REALTIME 1
-#define NEED_CLOCK_GETTIME 1
-#if !defined(HAVE_STRUCT_TIMESPEC)
-#define HAVE_STRUCT_TIMESPEC
-#if !defined(_TIMESPEC_DEFINED)
-#define _TIMESPEC_DEFINED
-struct timespec {
-    long   tv_sec;
-    long   tv_nsec;
-};
-#endif /* _TIMESPEC_DEFINED */
-#endif /* HAVE_STRUCT_TIMESPEC */
-#if defined(NEED_CLOCK_GETTIME)
-int clock_gettime(int clk_id, struct timespec *tp)
-{
-struct timeval cur;
-struct timezone foo;
-
-gettimeofday (&cur, &foo);
-tp->tv_sec = cur.tv_sec;
-tp->tv_nsec = cur.tv_usec*1000;
-return 0;
-}
-#endif /* defined(NEED_CLOCK_GETTIME) */
-#endif /* !defined(CLOCK_REALTIME) */
 
 #endif /* NOT _WIN32 */
 
@@ -260,12 +217,12 @@ size_t obufsize = 10240 + 9*bufsize;
 
 while (p && p->Debug && (dbits & p->debug)) {
     int i, len;
-    struct timespec time_now;
+    struct timespec time_now = {0};
     char timestamp[32];
     char threadname[50];
     char *obuf = (char *)_panel_malloc (obufsize);
 
-    clock_gettime(CLOCK_REALTIME, &time_now);
+    (void)sim_clock_gettime(CLOCK_REALTIME, &time_now);
     sprintf (timestamp, "%lld.%03d ", (long long)(time_now.tv_sec), (int)(time_now.tv_nsec/1000000));
     sprintf (threadname, "%s:%s ", p->parent ? p->device_name : "CPU", (pthread_getspecific (panel_thread_id)) ? (char *)pthread_getspecific (panel_thread_id) : "");
 

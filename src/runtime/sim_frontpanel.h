@@ -17,10 +17,10 @@
 
    Any application which wants to use this API needs to:
       1) include this file in the application code
-      2) compile sim_frontpanel.c and sim_sock.c from the top level directory
-         of the simh source.
-      3) link the sim_frontpanel and sim_sock object modules and libpthreads
-         into the application.
+      2) compile sim_frontpanel.c, sim_sock.c, and sim_time.c from the top
+         level directory of the simh source.
+      3) link the sim_frontpanel, sim_sock, and sim_time object modules and
+         libpthreads into the application.
       4) Use a simh simulator built from the same version of simh that the
          sim_frontpanel and sim_sock modules came from.
 */

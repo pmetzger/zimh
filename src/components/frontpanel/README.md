@@ -7,6 +7,7 @@ It is not itself a simulator. Instead, it links against:
 
 - `src/runtime/sim_frontpanel.c`
 - `src/runtime/sim_sock.c`
+- `src/runtime/sim_time.c`
 
 and uses the front-panel API to:
 

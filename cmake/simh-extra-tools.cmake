@@ -22,9 +22,11 @@ target_sources(stub PRIVATE ${SIMH_CORE_ROOT}/main.c)
 add_executable(frontpaneltest
     ${SIMH_COMPONENTS_ROOT}/frontpanel/FrontPanelTest.c
     ${SIMH_RUNTIME_ROOT}/sim_sock.c
+    ${SIMH_RUNTIME_ROOT}/sim_time.c
     ${SIMH_RUNTIME_ROOT}/sim_frontpanel.c)
 
 target_include_directories(frontpaneltest PUBLIC
+    "${SIMH_COMPAT_ROOT}"
     "${SIMH_CORE_ROOT}"
     "${SIMH_RUNTIME_ROOT}"
     "${SIMH_COMPONENTS_ROOT}")
