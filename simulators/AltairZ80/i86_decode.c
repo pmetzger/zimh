@@ -28,7 +28,7 @@
 volatile int intr;
 
 extern uint32 GetBYTEExtended(register uint32 Addr);
-extern void PutBYTEExtended(register uint32 Addr, const register uint32 Value);
+extern void PutBYTEExtended(register uint32 Addr, register const uint32 Value);
 extern int32 AX_S;      /* AX register (8086)                           */
 extern int32 BX_S;      /* BX register (8086)                           */
 extern int32 CX_S;      /* CX register (8086)                           */

@@ -3975,7 +3975,7 @@ cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
     t_stat              r;
     t_value             sim_eval;
     struct InstHistory *h;
-    const static char   flags[] = "ABCNSMV";
+    static const char   flags[] = "ABCNSMV";
 
     if (hst_lnt == 0)
         return SCPE_NOFNC;      /* enabled? */

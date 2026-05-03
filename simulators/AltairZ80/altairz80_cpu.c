@@ -187,8 +187,8 @@ static t_bool cpu_is_pc_a_subroutine_call (t_addr **ret_addrs);
 static t_stat cpu_hex_load(FILE *fileref, const char *cptr, const char *fnam, int flag);
 static t_stat sim_instr_mmu(void);
 static uint32 GetBYTE(register uint32 Addr);
-static void PutWORD(register uint32 Addr, const register uint32 Value);
-static void PutBYTE(register uint32 Addr, const register uint32 Value);
+static void PutWORD(register uint32 Addr, register const uint32 Value);
+static void PutBYTE(register uint32 Addr, register const uint32 Value);
 static const char* cpu_description(DEVICE *dptr);
 static t_stat cpu_cmd_memory(int32 flag, const char *cptr);
 static t_stat cpu_cmd_reg(int32 flag, const char *cptr);
@@ -209,8 +209,8 @@ uint32 getCommon(void);
 uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                         int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 
-static void PutBYTEasROMorRAM(register uint32 Addr, const register uint32 Value, const register uint32 makeROM);
-void PutBYTEExtended(register uint32 Addr, const register uint32 Value);
+static void PutBYTEasROMorRAM(register uint32 Addr, register const uint32 Value, register const uint32 makeROM);
+void PutBYTEExtended(register uint32 Addr, register const uint32 Value);
 uint32 GetBYTEExtended(register uint32 Addr);
 void cpu_raise_interrupt(uint32 irq);
 
@@ -1917,7 +1917,7 @@ uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
     return 0;
 }
 
-static void PutBYTE(register uint32 Addr, const register uint32 Value) {
+static void PutBYTE(register uint32 Addr, register const uint32 Value) {
     MDEV m;
 
     Addr &= ADDRMASK;   /* registers are NOT guaranteed to be always 16-bit values */
@@ -1938,7 +1938,7 @@ static void PutBYTE(register uint32 Addr, const register uint32 Value) {
     }
 }
 
-static void PutBYTEasROMorRAM(register uint32 Addr, const register uint32 Value, const register uint32 makeROM) {
+static void PutBYTEasROMorRAM(register uint32 Addr, register const uint32 Value, register const uint32 makeROM) {
     Addr &= ADDRMASK;   /* registers are NOT guaranteed to be always 16-bit values */
     if ((cpu_unit.flags & UNIT_CPU_BANKED) && (((common_low == 0) && (Addr < common)) || ((common_low == 1) && (Addr >= common))))
         Addr |= bankSelect << MAXBANKSIZELOG2;
@@ -1947,7 +1947,7 @@ static void PutBYTEasROMorRAM(register uint32 Addr, const register uint32 Value,
     M[Addr] = Value;
 }
 
-void PutBYTEExtended(register uint32 Addr, const register uint32 Value) {
+void PutBYTEExtended(register uint32 Addr, register const uint32 Value) {
     MDEV m;
 
     Addr &= ADDRMASKEXTENDED;
@@ -1965,7 +1965,7 @@ void PutBYTEExtended(register uint32 Addr, const register uint32 Value) {
     }
 }
 
-static void PutWORD(register uint32 Addr, const register uint32 Value) {
+static void PutWORD(register uint32 Addr, register const uint32 Value) {
     PutBYTE(Addr, Value);
     PutBYTE(Addr + 1, Value >> 8);
 }
@@ -6705,7 +6705,7 @@ typedef struct {
     const char* flagName;   /* string to print if flag is set       */
 } CPUFLAG;
 
-const static CPUFLAG cpuflags8080[] = {
+static const CPUFLAG cpuflags8080[] = {
     {FLAG_S,    "S"},
     {FLAG_Z,    "Z"},
     {FLAG_H,    "H"},
@@ -6714,7 +6714,7 @@ const static CPUFLAG cpuflags8080[] = {
     {0,         0}      /* last mask must be 0 */
 };
 
-const static CPUFLAG cpuflagsZ80[] = {
+static const CPUFLAG cpuflagsZ80[] = {
     {FLAG_S,    "S"},
     {FLAG_Z,    "Z"},
     {FLAG_H,    "H"},
@@ -6724,7 +6724,7 @@ const static CPUFLAG cpuflagsZ80[] = {
     {0,         0}      /* last mask must be 0 */
 };
 
-const static CPUFLAG cpuflags8086[] = {
+static const CPUFLAG cpuflags8086[] = {
     {1 << 11,   "O"},
     {1 << 10,   "D"},
     {1 << 9,    "I"},
@@ -6737,7 +6737,7 @@ const static CPUFLAG cpuflags8086[] = {
     {0,         0}      /* last mask must be 0 */
 };
 
-const static CPUFLAG cpuflagsM68K[] = {
+static const CPUFLAG cpuflagsM68K[] = {
     {1 << 15,   "T1"},  /* Trace Enable T1              */
     {1 << 14,   "T0"},  /* Trace Enable T0              */
     {1 << 13,   "S"},   /* Supervisor / User State      */
@@ -6754,9 +6754,9 @@ const static CPUFLAG cpuflagsM68K[] = {
 };
 
 /* needs to be set for each chiptype < NUM_CHIP_TYPE */
-const static uint32 *flagregister[NUM_CHIP_TYPE] = { (uint32*)&AF_S, (uint32*)&AF_S,
+static const uint32 *flagregister[NUM_CHIP_TYPE] = { (uint32*)&AF_S, (uint32*)&AF_S,
     (uint32*)&FLAGS_S, &m68k_registers[M68K_REG_SR]};
-const static CPUFLAG *cpuflags[NUM_CHIP_TYPE] = { cpuflags8080, cpuflagsZ80,
+static const CPUFLAG *cpuflags[NUM_CHIP_TYPE] = { cpuflags8080, cpuflagsZ80,
     cpuflags8086, cpuflagsM68K, };
 
 /* needs to be set for each ramtype <= MAX_RAM_TYPE */

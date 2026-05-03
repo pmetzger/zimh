@@ -221,11 +221,11 @@ static int32 FCBAddress = CPM_FCB_ADDRESS;      /* FCB Address                  
 /* support for wild card file expansion */
 
 #if defined (_WIN32)
-const static char hostPathSeparator     = '\\'; /* back slash in Windows    */
-const static char hostPathSeparatorAlt  = '/';  /* '/' is an alternative    */
+static const char hostPathSeparator     = '\\'; /* back slash in Windows    */
+static const char hostPathSeparatorAlt  = '/';  /* '/' is an alternative    */
 #else
-const static char hostPathSeparator     = '/';  /* slash in UNIX            */
-const static char hostPathSeparatorAlt  = '/';  /* no alternative           */
+static const char hostPathSeparator     = '/';  /* slash in UNIX            */
+static const char hostPathSeparatorAlt  = '/';  /* no alternative           */
 #endif
 
 typedef struct NameNode {

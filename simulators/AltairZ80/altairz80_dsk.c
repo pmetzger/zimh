@@ -203,7 +203,7 @@ static int32 warnDSK12                      = 0;
 static int8 dskbuf[DSK_SECTSIZE];                       /* data Buffer                                  */
 static int32 sector_true                    = 0;        /* sector true flag for sector register read    */
 
-const static int32 alt_bootrom_dsk[BOOTROM_SIZE_DSK] = {  // boot ROM for mini disk support
+static const int32 alt_bootrom_dsk[BOOTROM_SIZE_DSK] = {  // boot ROM for mini disk support
     0x21, 0x13, 0xff, 0x11, 0x00, 0x4c, 0x0e, 0xe3, /* ff00-ff07 */
     0x7e, 0x12, 0x23, 0x13, 0x0d, 0xc2, 0x08, 0xff, /* ff08-ff0f */
     0xc3, 0x00, 0x4c, 0xf3, 0xaf, 0xd3, 0x22, 0x2f, /* ff10-ff17 */

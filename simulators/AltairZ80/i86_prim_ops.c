@@ -25,7 +25,7 @@
 #include "i86.h"
 
 extern uint32 GetBYTEExtended(register uint32 Addr);
-extern void PutBYTEExtended(register uint32 Addr, const register uint32 Value);
+extern void PutBYTEExtended(register uint32 Addr, register const uint32 Value);
 
 /* $Log: i86_prim_ops.c,v $
  * Revision 0.9  2003-01-10  23:33:10  jce
