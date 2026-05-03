@@ -6,6 +6,7 @@
 
 #include "sim_console.h"
 #include "sim_dynstr.h"
+#include "sim_host_path.h"
 
 #if !defined(_WIN32)
 #include <sys/utsname.h>
@@ -702,6 +703,11 @@ const char *_sim_get_env_special(const char *gbuf, char *rbuf, size_t rbuf_size)
     } else if (!strcmp("SIM_MESSAGE", gbuf)) {
         sprintf(rbuf, "%s", sim_show_message ? "" : "-Q");
         ap = rbuf;
+    } else if (!strcmp("SIM_NULL_DEVICE", gbuf)) {
+        strlcpy(rbuf, NULL_DEVICE, rbuf_size);
+        ap = rbuf;
+    } else if (!strcmp("SIM_TMPDIR", gbuf)) {
+        ap = sim_host_temp_dir(rbuf, rbuf_size);
     } else if (!strcmp("SIM_NAME", gbuf)) {
         strlcpy(rbuf, sim_name, rbuf_size);
         ap = rbuf;

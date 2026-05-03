@@ -1931,9 +1931,9 @@ combinations are rendered literally.
 
 Omitted parameters result in null-string substitutions.
 
-Tokens preceded and followed by `%` characters are expanded as
-environment variables, and if an environment variable isn't found then
-it can be one of the available built-in variables (see below).
+Tokens preceded and followed by `%` characters expand using the first
+matching value from built-in variables, then variables set by SCP commands,
+then host environment variables. Built-in variables are listed below.
 
 #### File Path Argument Parsing
 
@@ -2001,13 +2001,14 @@ left one position.
 | `%SIM_BIN_NAME%` | The name of the simulator program binary          |
 | `%SIM_BIN_PATH%` | The full path of the simulator program binary     |
 | `%SIM_OSTYPE%`   | The host operating system running the simulator   |
+| `%SIM_NULL_DEVICE%` | The host null-device path                     |
+| `%SIM_TMPDIR%`   | The host temporary-file directory path            |
 | `%SIM_RUNLIMIT%` | The active `RUNLIMIT` numeric value, if any       |
 | `%SIM_RUNLIMIT_UNITS%` | The units of the active `RUNLIMIT`, if any |
 
-#### Command-Published Variables
+#### Variables Set by Commands
 
-Some commands publish additional variables for later command
-substitution.
+Some commands set additional variables for later command substitution.
 
 - `_FILE_COMPARE_DIFF_OFFSET`
   When a `FILE COMPARE` operation finds a difference, this variable is

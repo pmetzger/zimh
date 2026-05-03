@@ -46,6 +46,14 @@ These files own shared host file-I/O support: file opening, sizing,
 path-handling helpers, and the cross-platform filesystem behaviors that
 the runtime layer relies on.
 
+## `sim_host_path.c`, `sim_host_path.h`, and `sim_host_path_internal.h`
+
+These files own small host path-name discovery helpers that are not tied
+to a specific file operation. Use them for reusable answers such as the
+host temporary-file directory, where the correct spelling or lookup order
+varies by operating system. The internal header is only for private
+test seams used to verify platform fallback behavior.
+
 ## `sim_frontpanel.c` and `sim_frontpanel.h`
 
 These files own shared front-panel support: host UI integration, panel

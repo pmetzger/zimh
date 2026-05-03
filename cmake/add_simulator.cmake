@@ -19,6 +19,7 @@ set(SIM_SOURCES
     ${SIMH_RUNTIME_ROOT}/sim_dynstr.c
     ${SIMH_RUNTIME_ROOT}/sim_ether.c
     ${SIMH_RUNTIME_ROOT}/sim_fio.c
+    ${SIMH_RUNTIME_ROOT}/sim_host_path.c
     ${SIMH_RUNTIME_ROOT}/sim_imd.c
     ${SIMH_RUNTIME_ROOT}/sim_scsi.c
     ${SIMH_RUNTIME_ROOT}/sim_serial.c

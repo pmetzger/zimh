@@ -1596,6 +1596,7 @@ static const char simh_help2[] =
       " %%TIME_SS%%, %%TIME_MSEC%%, %%STATUS%%, %%TSTATUS%%,\n"
       " %%SIM_VERIFY%%, %%SIM_QUIET%%, %%SIM_MESSAGE%%, %%SIM_NAME%%,\n"
       " %%SIM_BIN_NAME%%, %%SIM_BIN_PATH%%, %%SIM_OSTYPE%%,\n"
+      " %%SIM_NULL_DEVICE%%, %%SIM_TMPDIR%%,\n"
       " %%SIM_RUNLIMIT%%, %%SIM_RUNLIMIT_UNITS%%\n\n"
       "+Token %%0 expands to the command file name.\n"
       "+Token %%n (n being a single digit) expands to the n'th argument\n"
@@ -1603,9 +1604,9 @@ static const char simh_help2[] =
       "+The input sequence \"%%%%\" represents a literal \"%%\".  All other\n"
       "+character combinations are rendered literally.\n\n"
       "+Omitted parameters result in null-string substitutions.\n\n"
-      "+Tokens preceded and followed by %% characters are expanded as environment\n"
-      "+variables, and if an environment variable isn't found then it can be one of\n"
-      "+several special variables:\n\n"
+      "+Tokens preceded and followed by %% characters expand using the first\n"
+      "+matching value from built-in variables, then variables set by SCP commands,\n"
+      "+then host environment variables.  Built-in variables are:\n\n"
       "++%%DATE%%              yyyy-mm-dd\n"
       "++%%TIME%%              hh:mm:ss\n"
       "++%%DATETIME%%          yyyy-mm-ddThh:mm:ss\n"
@@ -1641,11 +1642,12 @@ static const char simh_help2[] =
       "++%%SIM_BIN_NAME%%      The program name of the current simulator\n"
       "++%%SIM_BIN_PATH%%      The program path that invoked the current simulator\n"
       "++%%SIM_OSTYPE%%        The Operating System running the current simulator\n"
+      "++%%SIM_NULL_DEVICE%%   The host null-device path\n"
+      "++%%SIM_TMPDIR%%        The host temporary-file directory path\n"
       "++%%SIM_RUNLIMIT%%      The active RUNLIMIT value\n"
       "++%%SIM_RUNLIMIT_UNITS%% The units of the active RUNLIMIT\n\n"
-      "+Environment variable lookups are done first with the precise name between\n"
-      "+the %% characters and if that fails, then the name between the %% characters\n"
-      "+is upcased and a lookup of that value is attempted.\n\n"
+      "+When host environment lookup is tried, the precise name between the %%\n"
+      "+characters is tried first.  If that fails, the upcased name is tried.\n\n"
       "+The first Space delimited token on the line is extracted in uppercase and\n"
       "+then looked up as an environment variable.  If found it the value is\n"
       "+substituted for the original string before expanding everything else.  If\n"
@@ -3611,9 +3613,9 @@ return result;
 
    Omitted parameters result in null-string substitutions.
 
-   Tokens preceded and followed by % characters are expanded as environment
-   variables, and if one isn't found then can be one of several special
-   variables:
+   Tokens preceded and followed by % characters expand using the first
+   matching value from built-in variables, then variables set by SCP commands,
+   then host environment variables.  Built-in variables are:
           %DATE%              yyyy-mm-dd
           %TIME%              hh:mm:ss
           %DATETIME%          yyyy-mm-ddThh:mm:ss
@@ -3625,11 +3627,12 @@ return result;
           %SIM_VERBOSE%       The Verify/Verbose mode of the current Do command file
           %SIM_QUIET%         The Quiet mode of the current Do command file
           %SIM_MESSAGE%       The message display status of the current Do command file
+          %SIM_NULL_DEVICE%   The host null-device path
+          %SIM_TMPDIR%        The host temporary-file directory path
           %SIM_RUNLIMIT%      The active RUNLIMIT value
           %SIM_RUNLIMIT_UNITS% The units of the active RUNLIMIT
-   Environment variable lookups are done first with the precise name between
-   the % characters and if that fails, then the name between the % characters
-   is upcased and a lookup of that value is attempted.
+   When host environment lookup is tried, the precise name between the %
+   characters is tried first.  If that fails, the upcased name is tried.
 
    The first Space delimited token on the line is extracted in uppercase and
    then looked up as an environment variable.  If found it the value is

@@ -13,6 +13,7 @@
 #include "scp.h"
 #include "sim_console.h"
 #include "sim_dynstr.h"
+#include "sim_host_path_internal.h"
 #include "test_simh_personality.h"
 #include "test_support.h"
 #include "zimh_version.h"
@@ -24,6 +25,11 @@ static struct timespec simh_test_cmdvars_time = {0};
 static int simh_test_cmdvars_time_status = 0;
 static int simh_test_dynstr_fail_at_call = 0;
 static int simh_test_dynstr_realloc_calls = 0;
+
+struct simh_test_saved_env {
+    const char *name;
+    char *value;
+};
 
 extern t_bool sim_runlimit_enabled;
 extern int32 sim_runlimit_value;
@@ -69,6 +75,19 @@ static t_bool simh_test_localtime_hook_fail(time_t now, struct tm *tmnow)
     return FALSE;
 }
 
+#if defined(_WIN32)
+static unsigned long simh_test_win32_temp_path_success(unsigned long size,
+                                                       char *buf)
+{
+    const char *path = "C:\\portable\\tmp\\";
+
+    if (strlen(path) + 1 > size)
+        return (unsigned long)(strlen(path) + 1);
+    strcpy(buf, path);
+    return (unsigned long)strlen(path);
+}
+#endif
+
 static void *simh_test_dynstr_realloc_fail_on_call(void *ptr, size_t size)
 {
     ++simh_test_dynstr_realloc_calls;
@@ -97,6 +116,11 @@ static int setup_scp_cmdvars_fixture(void **state)
     unsetenv("SIM_BIN_PATH");
     unsetenv("SIM_DELTA");
     unsetenv("SIM_VERSION_MODE");
+    unsetenv("SIM_NULL_DEVICE");
+    unsetenv("SIM_TMPDIR");
+#if defined(_WIN32)
+    sim_host_path_reset_test_hooks();
+#endif
     simh_test_reset_simulator_state();
     sim_prog_name = simh_test_prog_name;
     sim_switches = 0;
@@ -132,6 +156,11 @@ static int teardown_scp_cmdvars_fixture(void **state)
     unsetenv("SIM_BIN_PATH");
     unsetenv("SIM_DELTA");
     unsetenv("SIM_VERSION_MODE");
+    unsetenv("SIM_NULL_DEVICE");
+    unsetenv("SIM_TMPDIR");
+#if defined(_WIN32)
+    sim_host_path_reset_test_hooks();
+#endif
     simh_test_reset_simulator_state();
     sim_switches = 0;
     sim_rem_cmd_active_line = -1;
@@ -144,6 +173,26 @@ static int teardown_scp_cmdvars_fixture(void **state)
 #endif
     sim_cmdvars_set_test_localtime_hook(NULL);
     return 0;
+}
+
+/* Save one environment variable so a test can restore process state. */
+static struct simh_test_saved_env save_env(const char *name)
+{
+    const char *value = getenv(name);
+    struct simh_test_saved_env saved = {name, value ? strdup(value) : NULL};
+
+    return saved;
+}
+
+/* Restore one environment variable saved with save_env. */
+static void restore_env(struct simh_test_saved_env *saved)
+{
+    if (saved->value != NULL) {
+        assert_int_equal(setenv(saved->name, saved->value, 1), 0);
+        free(saved->value);
+        saved->value = NULL;
+    } else
+        unsetenv(saved->name);
 }
 
 /* Expand one SCP command string with an otherwise empty argument vector. */
@@ -198,8 +247,8 @@ static void read_text_file(const char *path, char *buffer, size_t size)
 }
 
 /* Temporarily replace stdin with a small prepared input file. */
-static void with_redirected_stdin(const char *contents,
-                                  void (*fn)(void *ctx), void *ctx)
+static void with_redirected_stdin(const char *contents, void (*fn)(void *ctx),
+                                  void *ctx)
 {
     char path[] = "/tmp/zimh-cmdvars-stdin-XXXXXX";
     int saved_stdin;
@@ -207,7 +256,8 @@ static void with_redirected_stdin(const char *contents,
 
     fd = mkstemp(path);
     assert_true(fd >= 0);
-    assert_int_equal(write(fd, contents, strlen(contents)), (int)strlen(contents));
+    assert_int_equal(write(fd, contents, strlen(contents)),
+                     (int)strlen(contents));
     assert_int_equal(lseek(fd, 0, SEEK_SET), 0);
 
     saved_stdin = dup(STDIN_FILENO);
@@ -258,8 +308,8 @@ static void test_sim_sub_args_expands_external_environment(void **state)
 }
 
 /* Verify lowercase names still fall back to uppercase host environment. */
-static void test_sim_sub_args_expands_uppercased_external_environment(
-    void **state)
+static void
+test_sim_sub_args_expands_uppercased_external_environment(void **state)
 {
     char expanded[CBUFSIZE];
 
@@ -280,14 +330,13 @@ static void test_sim_sub_args_handles_malformed_substring_modifier(void **state)
 
     assert_int_equal(setenv("ZIMH_TEST_EXTERNAL", "value", 1), 0);
 
-    expand_command("A%ZIMH_TEST_EXTERNAL:~bogus%B", expanded,
-                   sizeof(expanded));
+    expand_command("A%ZIMH_TEST_EXTERNAL:~bogus%B", expanded, sizeof(expanded));
     assert_string_equal(expanded, "AvalueB");
 }
 
 /* Verify %VAR still expands if the closing percent is omitted. */
-static void test_sim_sub_args_expands_variable_without_trailing_percent(
-    void **state)
+static void
+test_sim_sub_args_expands_variable_without_trailing_percent(void **state)
 {
     char expanded[CBUFSIZE];
 
@@ -343,15 +392,11 @@ static void test_sim_get_env_special_expands_documented_builtins(void **state)
     char seeded[CBUFSIZE];
     char value[CBUFSIZE];
     const char *always_nonempty[] = {
-        "DATE",           "TIME",        "DATETIME",
-        "LDATE",          "LTIME",       "CTIME",
-        "UTIME",          "DATE_YYYY",   "DATE_YY",
-        "DATE_19XX_YY",   "DATE_19XX_YYYY",
-        "DATE_MM",        "DATE_MMM",    "DATE_MONTH",
-        "DATE_DD",        "DATE_D",      "DATE_WW",
-        "DATE_WYYYY",     "DATE_JJJ",    "TIME_HH",
-        "TIME_MM",        "TIME_SS",     "TIME_MSEC",
-        "STATUS",         "TSTATUS",
+        "DATE",           "TIME",    "DATETIME",   "LDATE",      "LTIME",
+        "CTIME",          "UTIME",   "DATE_YYYY",  "DATE_YY",    "DATE_19XX_YY",
+        "DATE_19XX_YYYY", "DATE_MM", "DATE_MMM",   "DATE_MONTH", "DATE_DD",
+        "DATE_D",         "DATE_WW", "DATE_WYYYY", "DATE_JJJ",   "TIME_HH",
+        "TIME_MM",        "TIME_SS", "TIME_MSEC",  "STATUS",     "TSTATUS",
     };
     size_t i;
 
@@ -361,8 +406,8 @@ static void test_sim_get_env_special_expands_documented_builtins(void **state)
     sim_last_cmd_stat = SCPE_ARG;
 
     for (i = 0; i < sizeof(always_nonempty) / sizeof(always_nonempty[0]); ++i) {
-        assert_non_null(_sim_get_env_special(always_nonempty[i], value,
-                                             sizeof(value)));
+        assert_non_null(
+            _sim_get_env_special(always_nonempty[i], value, sizeof(value)));
         assert_true(value[0] != '\0');
     }
 }
@@ -404,30 +449,29 @@ static void test_sim_sub_args_expands_fixed_datetime_values(void **state)
 
     (void)state;
 
-    simh_test_cmdvars_time = (struct timespec){.tv_sec = 1609504496,
-                                               .tv_nsec = 789000000};
+    simh_test_cmdvars_time =
+        (struct timespec){.tv_sec = 1609504496, .tv_nsec = 789000000};
     sim_time_set_test_hooks(simh_test_cmdvars_clock_gettime, NULL);
 
     for (i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i)
-        with_timezone("UTC", run_fixed_time_expansion_case,
-                      (void *)&cases[i]);
+        with_timezone("UTC", run_fixed_time_expansion_case, (void *)&cases[i]);
 }
 
 /* Verify DATE_19XX_* covers leap-year branches in its calendar mapping. */
 static void test_sim_sub_args_expands_date_19xx_leap_years(void **state)
 {
-    struct simh_test_cmdvars_time_case case_2000_yy = {
-        "A%DATE_19XX_YY%B", "A84B"};
-    struct simh_test_cmdvars_time_case case_2000_yyyy = {
-        "A%DATE_19XX_YYYY%B", "A1984B"};
-    struct simh_test_cmdvars_time_case case_2004_yy = {
-        "A%DATE_19XX_YY%B", "A76B"};
-    struct simh_test_cmdvars_time_case case_2004_yyyy = {
-        "A%DATE_19XX_YYYY%B", "A1976B"};
-    struct simh_test_cmdvars_time_case case_2100_yy = {
-        "A%DATE_19XX_YY%B", "A99B"};
-    struct simh_test_cmdvars_time_case case_2100_yyyy = {
-        "A%DATE_19XX_YYYY%B", "A1999B"};
+    struct simh_test_cmdvars_time_case case_2000_yy = {"A%DATE_19XX_YY%B",
+                                                       "A84B"};
+    struct simh_test_cmdvars_time_case case_2000_yyyy = {"A%DATE_19XX_YYYY%B",
+                                                         "A1984B"};
+    struct simh_test_cmdvars_time_case case_2004_yy = {"A%DATE_19XX_YY%B",
+                                                       "A76B"};
+    struct simh_test_cmdvars_time_case case_2004_yyyy = {"A%DATE_19XX_YYYY%B",
+                                                         "A1976B"};
+    struct simh_test_cmdvars_time_case case_2100_yy = {"A%DATE_19XX_YY%B",
+                                                       "A99B"};
+    struct simh_test_cmdvars_time_case case_2100_yyyy = {"A%DATE_19XX_YYYY%B",
+                                                         "A1999B"};
 
     (void)state;
 
@@ -456,8 +500,8 @@ static void run_fixed_iso_week_case(void *ctx)
     const struct simh_test_cmdvars_iso_case *test_case = ctx;
     char expanded[CBUFSIZE];
 
-    simh_test_cmdvars_time = (struct timespec){.tv_sec = test_case->epoch,
-                                               .tv_nsec = 0};
+    simh_test_cmdvars_time =
+        (struct timespec){.tv_sec = test_case->epoch, .tv_nsec = 0};
     sim_time_set_test_hooks(simh_test_cmdvars_clock_gettime, NULL);
 
     expand_command("A%DATE_WW%B", expanded, sizeof(expanded));
@@ -485,8 +529,7 @@ static void test_sim_sub_args_expands_iso_week_boundary(void **state)
     (void)state;
 
     for (i = 0; i < sizeof(cases) / sizeof(cases[0]); ++i)
-        with_timezone("UTC", run_fixed_iso_week_case,
-                      (void *)&cases[i]);
+        with_timezone("UTC", run_fixed_iso_week_case, (void *)&cases[i]);
 }
 
 /* Verify mode-reporting variables reflect current SCP state. */
@@ -521,14 +564,15 @@ static void test_sim_get_env_special_expands_mode_variables(void **state)
     assert_string_equal(value, "");
 
     assert_int_equal(set_verify(1, NULL), SCPE_OK);
-    assert_string_equal(_sim_get_env_special("SIM_VERIFY", value, sizeof(value)),
-                        "-V");
+    assert_string_equal(
+        _sim_get_env_special("SIM_VERIFY", value, sizeof(value)), "-V");
     assert_string_equal(
         _sim_get_env_special("SIM_VERBOSE", value, sizeof(value)), "-V");
 }
 
 /* Verify SIM_BIN_NAME handles plain and missing program-name values. */
-static void test_sim_get_env_special_handles_sim_bin_name_edge_cases(void **state)
+static void
+test_sim_get_env_special_handles_sim_bin_name_edge_cases(void **state)
 {
     char value[CBUFSIZE];
 
@@ -548,8 +592,7 @@ static void test_sim_get_env_special_handles_sim_bin_name_edge_cases(void **stat
 }
 
 /* Verify SIM_BIN_NAME strips Windows-style path prefixes too. */
-static void test_sim_get_env_special_handles_windows_sim_bin_name(
-    void **state)
+static void test_sim_get_env_special_handles_windows_sim_bin_name(void **state)
 {
     char value[CBUFSIZE];
 
@@ -644,8 +687,8 @@ static void test_sim_get_env_special_expands_captured_aliases(void **state)
 }
 
 /* Verify missing aliases are ignored instead of creating empty entries. */
-static void test_sim_cmdvars_capture_env_alias_ignores_missing_environment(
-    void **state)
+static void
+test_sim_cmdvars_capture_env_alias_ignores_missing_environment(void **state)
 {
     char value[CBUFSIZE];
 
@@ -656,8 +699,8 @@ static void test_sim_cmdvars_capture_env_alias_ignores_missing_environment(
 }
 
 /* Verify missing lookups skip over unrelated captured aliases cleanly. */
-static void test_sim_get_env_special_ignores_unmatched_captured_aliases(
-    void **state)
+static void
+test_sim_get_env_special_ignores_unmatched_captured_aliases(void **state)
 {
     char value[CBUFSIZE];
 
@@ -666,8 +709,8 @@ static void test_sim_get_env_special_ignores_unmatched_captured_aliases(
     assert_int_equal(setenv("ZIMH_ALIAS", "from-host", 1), 0);
     sim_cmdvars_capture_env_alias("ZIMH_ALIAS");
 
-    assert_null(_sim_get_env_special("ZIMH_MISSING_ALIAS", value,
-                                     sizeof(value)));
+    assert_null(
+        _sim_get_env_special("ZIMH_MISSING_ALIAS", value, sizeof(value)));
 }
 
 /* Verify unsetting a missing SCP-owned variable leaves others untouched. */
@@ -807,6 +850,99 @@ static void test_sim_sub_args_expands_sim_identity_variables(void **state)
     assert_string_equal(expanded, "zimh-unit tail");
 }
 
+/* Verify portable host-path variables do not come from same-named env vars. */
+static void test_sim_sub_args_expands_portable_path_variables(void **state)
+{
+    char expanded[CBUFSIZE];
+    char value[CBUFSIZE];
+    const char *temp_env_name;
+    const char *temp_env_value;
+    const char *expected_tmpdir;
+    struct simh_test_saved_env saved_temp;
+
+    (void)state;
+
+#if defined(_WIN32)
+    temp_env_name = "TMP";
+    temp_env_value = "C:\\portable\\tmp";
+    expected_tmpdir = "C:\\portable\\tmp\\";
+    sim_host_path_set_test_win32_temp_hooks(simh_test_win32_temp_path_success,
+                                            simh_test_win32_temp_path_success);
+#else
+    temp_env_name = "TMPDIR";
+    temp_env_value = "/portable/tmp";
+    expected_tmpdir = "/portable/tmp";
+#endif
+    saved_temp = save_env(temp_env_name);
+
+    assert_int_equal(setenv("SIM_NULL_DEVICE", "host-null", 1), 0);
+    assert_int_equal(setenv("SIM_TMPDIR", "host-tmpdir", 1), 0);
+    assert_int_equal(setenv(temp_env_name, temp_env_value, 1), 0);
+
+    expand_command("A%SIM_NULL_DEVICE%B", expanded, sizeof(expanded));
+    assert_string_equal(expanded, "A" NULL_DEVICE "B");
+    assert_string_equal(
+        _sim_get_env_special("SIM_NULL_DEVICE", value, sizeof(value)),
+        NULL_DEVICE);
+
+    expand_command("A%SIM_TMPDIR%B", expanded, sizeof(expanded));
+    snprintf(value, sizeof(value), "A%sB", expected_tmpdir);
+    assert_string_equal(expanded, value);
+    assert_string_equal(
+        _sim_get_env_special("SIM_TMPDIR", value, sizeof(value)),
+        expected_tmpdir);
+
+    restore_env(&saved_temp);
+}
+
+/* Verify DO-file expansion can attach an output unit to the null device. */
+static void test_do_file_attaches_output_unit_to_null_device(void **state)
+{
+    char temp_dir[1024];
+    char script_path[1024];
+    char nul_path[1024];
+    char saved_cwd[1024];
+    UNIT unit;
+    DEVICE device;
+    DEVICE *devices[2];
+    t_stat status;
+
+    (void)state;
+
+    assert_non_null(getcwd(saved_cwd, sizeof(saved_cwd)));
+    assert_int_equal(
+        simh_test_make_temp_dir(temp_dir, sizeof(temp_dir), "scp-cmdvars"), 0);
+    assert_int_equal(simh_test_join_path(script_path, sizeof(script_path),
+                                         temp_dir, "attach-null.sim"),
+                     0);
+    assert_int_equal(
+        simh_test_join_path(nul_path, sizeof(nul_path), temp_dir, "nul"), 0);
+    assert_int_equal(
+        simh_test_write_file(script_path, "attach OUT %SIM_NULL_DEVICE%\n",
+                             strlen("attach OUT %SIM_NULL_DEVICE%\n")),
+        0);
+
+    simh_test_init_device_unit(&device, &unit, "OUT", "OUT0", 0,
+                               UNIT_ATTABLE | UNIT_SEQ, 8, 1);
+    devices[0] = &device;
+    devices[1] = NULL;
+    assert_int_equal(simh_test_set_devices(devices), 0);
+
+    assert_int_equal(chdir(temp_dir), 0);
+    status = do_cmd(1, script_path);
+    assert_int_equal(chdir(saved_cwd), 0);
+    assert_int_equal(SCPE_BARE_STATUS(status), SCPE_OK);
+
+    assert_true((unit.flags & UNIT_ATT) != 0);
+    assert_string_equal(unit.filename, NULL_DEVICE);
+#if !defined(_WIN32)
+    assert_int_equal(access(nul_path, F_OK), -1);
+#endif
+
+    assert_int_equal(detach_unit(&unit), SCPE_OK);
+    assert_int_equal(simh_test_remove_path(temp_dir), 0);
+}
+
 /* Verify SIM_OSTYPE still expands while removed metadata stays absent. */
 static void test_show_version_keeps_only_sim_ostype(void **state)
 {
@@ -874,8 +1010,8 @@ static void test_show_version_prints_zimh_banner(void **state)
 }
 
 /* Verify SIM_OSTYPE cleanly reports no value when uname probing fails. */
-static void test_sim_get_env_special_ostype_handles_total_probe_failure(
-    void **state)
+static void
+test_sim_get_env_special_ostype_handles_total_probe_failure(void **state)
 {
     char value[CBUFSIZE];
 
@@ -946,8 +1082,8 @@ static void test_sim_get_env_special_tstatus_prefers_stop_message(void **state)
 }
 
 /* Verify TSTATUS falls back to generic error text when needed. */
-static void test_sim_get_env_special_tstatus_falls_back_to_error_text(
-    void **state)
+static void
+test_sim_get_env_special_tstatus_falls_back_to_error_text(void **state)
 {
     char value[CBUFSIZE];
 
@@ -971,8 +1107,8 @@ static void test_sim_get_env_special_tstatus_handles_ok_status(void **state)
 }
 
 /* Verify TSTATUS falls back when an in-range stop message is absent. */
-static void test_sim_get_env_special_tstatus_handles_missing_stop_message(
-    void **state)
+static void
+test_sim_get_env_special_tstatus_handles_missing_stop_message(void **state)
 {
     char value[CBUFSIZE];
     const char *saved_message;
@@ -1000,28 +1136,27 @@ static void test_sim_get_env_special_handles_runlimit_edge_cases(void **state)
     sim_runlimit_value = 12;
     sim_runlimit_units = NULL;
 
-    assert_string_equal(_sim_get_env_special("SIM_RUNLIMIT", value,
-                                             sizeof(value)),
-                        "12");
-    assert_null(_sim_get_env_special("SIM_RUNLIMIT_UNITS", value,
-                                     sizeof(value)));
+    assert_string_equal(
+        _sim_get_env_special("SIM_RUNLIMIT", value, sizeof(value)), "12");
+    assert_null(
+        _sim_get_env_special("SIM_RUNLIMIT_UNITS", value, sizeof(value)));
 
     sim_runlimit_enabled = FALSE;
-    assert_null(_sim_get_env_special("SIM_RUNLIMIT_UNITS", value,
-                                     sizeof(value)));
+    assert_null(
+        _sim_get_env_special("SIM_RUNLIMIT_UNITS", value, sizeof(value)));
 }
 
 /* Verify substitution fixups cope with a caller buffer too small for NUL. */
-static void test_sim_get_env_special_handles_exhausted_fixup_buffer(
-    void **state)
+static void
+test_sim_get_env_special_handles_exhausted_fixup_buffer(void **state)
 {
     char value[1];
 
     (void)state;
 
     assert_int_equal(setenv("ZIMH_TEST_EXTERNAL", "abcdef", 1), 0);
-    assert_non_null(_sim_get_env_special("ZIMH_TEST_EXTERNAL:cd=1234567890123456789",
-                                         value, sizeof(value)));
+    assert_non_null(_sim_get_env_special(
+        "ZIMH_TEST_EXTERNAL:cd=1234567890123456789", value, sizeof(value)));
     assert_string_equal(value, "");
 }
 
@@ -1078,8 +1213,8 @@ static void test_sim_set_environment_prompt_uses_default(void **state)
 }
 
 /* Verify /P strips a single-quoted prompt before use. */
-static void test_sim_set_environment_prompt_uses_single_quoted_prompt(
-    void **state)
+static void
+test_sim_set_environment_prompt_uses_single_quoted_prompt(void **state)
 {
     (void)state;
 
@@ -1174,8 +1309,8 @@ static void test_sim_set_environment_replaces_captured_alias(void **state)
 }
 
 /* Verify SET ENVIRONMENT leaves unrelated captured aliases alone. */
-static void test_sim_set_environment_keeps_unmatched_captured_alias(
-    void **state)
+static void
+test_sim_set_environment_keeps_unmatched_captured_alias(void **state)
 {
     (void)state;
 
@@ -1208,10 +1343,8 @@ static void run_prompt_environment_read(void *ctx)
 /* Verify /P reads from stdin in interactive mode. */
 static void test_sim_set_environment_prompt_reads_stdin(void **state)
 {
-    struct prompt_test_context prompt_ctx = {
-        "\"Prompt\" ZIMH_TEST_SET=default",
-        "typed"
-    };
+    struct prompt_test_context prompt_ctx = {"\"Prompt\" ZIMH_TEST_SET=default",
+                                             "typed"};
 
     (void)state;
 
@@ -1219,13 +1352,11 @@ static void test_sim_set_environment_prompt_reads_stdin(void **state)
 }
 
 /* Verify /P falls back to the default when interactive input is empty. */
-static void test_sim_set_environment_prompt_uses_default_after_empty_input(
-    void **state)
+static void
+test_sim_set_environment_prompt_uses_default_after_empty_input(void **state)
 {
-    struct prompt_test_context prompt_ctx = {
-        "\"Prompt\" ZIMH_TEST_SET=default",
-        "default"
-    };
+    struct prompt_test_context prompt_ctx = {"\"Prompt\" ZIMH_TEST_SET=default",
+                                             "default"};
 
     (void)state;
 
@@ -1233,13 +1364,10 @@ static void test_sim_set_environment_prompt_uses_default_after_empty_input(
 }
 
 /* Verify /P falls back to the default when stdin immediately hits EOF. */
-static void test_sim_set_environment_prompt_uses_default_after_eof(
-    void **state)
+static void test_sim_set_environment_prompt_uses_default_after_eof(void **state)
 {
-    struct prompt_test_context prompt_ctx = {
-        "\"Prompt\" ZIMH_TEST_SET=default",
-        "default"
-    };
+    struct prompt_test_context prompt_ctx = {"\"Prompt\" ZIMH_TEST_SET=default",
+                                             "default"};
 
     (void)state;
 
@@ -1303,8 +1431,8 @@ static void test_sim_sub_args_handles_escape_and_do_arguments(void **state)
 }
 
 /* Verify missing DO arguments and %* expansion use the remaining args. */
-static void test_sim_sub_args_handles_missing_and_star_do_arguments(
-    void **state)
+static void
+test_sim_sub_args_handles_missing_and_star_do_arguments(void **state)
 {
     char expanded[CBUFSIZE];
     char *do_arg[10] = {0};
@@ -1332,15 +1460,14 @@ static void test_sim_sub_args_uses_zero_time_after_clock_failure(void **state)
     simh_test_cmdvars_time_status = -1;
     sim_time_set_test_hooks(simh_test_cmdvars_clock_gettime, NULL);
 
-    with_timezone("UTC", run_fixed_time_expansion_case,
-                  &(struct simh_test_cmdvars_time_case){
-                      "A%DATE% %UTIME% %TIME_MSEC% %DATE_D%B",
-                      "A1970-01-01 0 000 4B"});
+    with_timezone(
+        "UTC", run_fixed_time_expansion_case,
+        &(struct simh_test_cmdvars_time_case){
+            "A%DATE% %UTIME% %TIME_MSEC% %DATE_D%B", "A1970-01-01 0 000 4B"});
 }
 
 /* Verify malformed overlong %~ parts strings fail closed cleanly. */
-static void test_sim_sub_args_ignores_overlong_filepath_parts_spec(
-    void **state)
+static void test_sim_sub_args_ignores_overlong_filepath_parts_spec(void **state)
 {
     char expanded[CBUFSIZE];
     char *do_arg[10] = {0};
@@ -1358,9 +1485,7 @@ static void test_sim_sub_args_ignores_overlong_filepath_parts_spec(
 /* Verify DATE_D maps Sunday to 7 rather than 0. */
 static void test_sim_sub_args_expands_date_d_for_sunday(void **state)
 {
-    struct simh_test_cmdvars_time_case sunday_case = {
-        "A%DATE_D%B", "A7B"
-    };
+    struct simh_test_cmdvars_time_case sunday_case = {"A%DATE_D%B", "A7B"};
 
     (void)state;
 
@@ -1574,8 +1699,8 @@ static void test_sim_sub_args_decodes_single_quoted_argument(void **state)
 }
 
 /* Verify whole-line quoted decode trims decoded leading whitespace. */
-static void test_sim_sub_args_decodes_single_quoted_argument_with_spaces(
-    void **state)
+static void
+test_sim_sub_args_decodes_single_quoted_argument_with_spaces(void **state)
 {
     char expanded[CBUFSIZE];
     char *do_arg[10] = {0};
@@ -1587,8 +1712,8 @@ static void test_sim_sub_args_decodes_single_quoted_argument_with_spaces(
 }
 
 /* Verify a single-quoted whole-line command is decoded too. */
-static void test_sim_sub_args_decodes_single_quoted_argument_single_quotes(
-    void **state)
+static void
+test_sim_sub_args_decodes_single_quoted_argument_single_quotes(void **state)
 {
     char expanded[CBUFSIZE];
     char *do_arg[10] = {0};
@@ -1600,8 +1725,8 @@ static void test_sim_sub_args_decodes_single_quoted_argument_single_quotes(
 }
 
 /* Verify invalid whole-line quoted decode falls back to the original text. */
-static void test_sim_sub_args_preserves_invalid_single_argument_decode(
-    void **state)
+static void
+test_sim_sub_args_preserves_invalid_single_argument_decode(void **state)
 {
     char expanded[CBUFSIZE];
     char *do_arg[10] = {0};
@@ -1613,8 +1738,8 @@ static void test_sim_sub_args_preserves_invalid_single_argument_decode(
 }
 
 /* Verify quoted-only commands with trailing tokens bypass decode cleanly. */
-static void test_sim_sub_args_preserves_quoted_command_with_trailing_text(
-    void **state)
+static void
+test_sim_sub_args_preserves_quoted_command_with_trailing_text(void **state)
 {
     char expanded[CBUFSIZE];
     char *do_arg[10] = {0};
@@ -1626,8 +1751,8 @@ static void test_sim_sub_args_preserves_quoted_command_with_trailing_text(
 }
 
 /* Verify quoted commands skip intervening spaces before trailing text. */
-static void test_sim_sub_args_preserves_quoted_command_after_space_skip(
-    void **state)
+static void
+test_sim_sub_args_preserves_quoted_command_after_space_skip(void **state)
 {
     char expanded[CBUFSIZE];
     char *do_arg[10] = {0};
@@ -1640,8 +1765,8 @@ static void test_sim_sub_args_preserves_quoted_command_after_space_skip(
 }
 
 /* Verify quoted commands with trailing spaces skip whitespace cleanly. */
-static void test_sim_sub_args_preserves_quoted_command_with_trailing_spaces(
-    void **state)
+static void
+test_sim_sub_args_preserves_quoted_command_with_trailing_spaces(void **state)
 {
     char expanded[CBUFSIZE];
     char *do_arg[10] = {0};
@@ -1653,8 +1778,8 @@ static void test_sim_sub_args_preserves_quoted_command_with_trailing_spaces(
 }
 
 /* Verify leading whitespace and quoted-only commands are preserved cleanly. */
-static void test_sim_sub_args_handles_leading_space_and_quoted_command(
-    void **state)
+static void
+test_sim_sub_args_handles_leading_space_and_quoted_command(void **state)
 {
     char expanded[CBUFSIZE];
     char *do_arg[10] = {0};
@@ -1688,10 +1813,9 @@ static void test_sim_set_environment_rejects_bad_inputs(void **state)
     assert_int_equal(sim_set_environment(0, ""), SCPE_2FARG);
 
     sim_switches = SWMASK('S');
-    assert_int_equal(
-        SCPE_BARE_STATUS(
-            sim_set_environment(0, "ZIMH_TEST_SET=\"unterminated")),
-        SCPE_ARG);
+    assert_int_equal(SCPE_BARE_STATUS(sim_set_environment(
+                         0, "ZIMH_TEST_SET=\"unterminated")),
+                     SCPE_ARG);
 
     sim_switches = SWMASK('A');
     assert_int_equal(
@@ -1707,13 +1831,13 @@ static void test_sim_set_environment_prompt_reports_missing_fields(void **state)
     sim_switches = SWMASK('P');
     sim_rem_cmd_active_line = 0;
 
-    assert_int_equal(
-        SCPE_BARE_STATUS(sim_set_environment(0, "   ")), SCPE_2FARG);
+    assert_int_equal(SCPE_BARE_STATUS(sim_set_environment(0, "   ")),
+                     SCPE_2FARG);
     assert_int_equal(
         SCPE_BARE_STATUS(sim_set_environment(0, "\"\" ZIMH_TEST_SET=default")),
         SCPE_ARG);
-    assert_int_equal(
-        SCPE_BARE_STATUS(sim_set_environment(0, "\"Prompt\" ")), SCPE_2FARG);
+    assert_int_equal(SCPE_BARE_STATUS(sim_set_environment(0, "\"Prompt\" ")),
+                     SCPE_2FARG);
 
     assert_int_equal(sim_set_environment(0, "\"Prompt\" ZIMH_TEST_SET"),
                      SCPE_OK);
@@ -1824,6 +1948,12 @@ int main(void)
                                         teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_sub_args_expands_sim_identity_variables,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sub_args_expands_portable_path_variables,
+            setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_do_file_attaches_output_unit_to_null_device,
             setup_scp_cmdvars_fixture, teardown_scp_cmdvars_fixture),
         cmocka_unit_test_setup_teardown(test_show_version_keeps_only_sim_ostype,
                                         setup_scp_cmdvars_fixture,
