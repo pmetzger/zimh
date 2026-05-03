@@ -563,7 +563,8 @@ tmxr_eth_filter_hook = hooks->eth_filter ?
     hooks->eth_filter : eth_filter;
 }
 
-/* Close the Ethernet framer attached to a TMXR line. */
+/* Close the Ethernet framer attached to a TMXR line.  Begin by making sure
+   the DDCMP framer is stopped, then close and free its Ethernet interface. */
 static void tmxr_close_framer (TMLN *lp)
 {
     if (lp->framer == NULL)
@@ -4534,6 +4535,12 @@ t_stat tmxr_attach_ex (TMXR *mp, UNIT *uptr, const char *cptr, t_bool async)
 t_stat r;
 int32 i;
 
+#if !defined(SIM_ASYNCH_MUX)
+/* Shared helper signature.
+   This build variant does not use every parameter. */
+(void)async;
+#endif
+
 if (mp->dptr == NULL)                                   /* has device been set? */
     mp->dptr = find_dev_from_unit (uptr);               /* no, so set device now */
 
@@ -4708,6 +4715,12 @@ t_stat tmxr_show_open_devices (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, co
 {
 int i;
 char gbuf[CBUFSIZE];
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void)dptr;
+(void)uptr;
+(void)val;
 
 cptr = get_glyph (cptr, gbuf, 0);
 if (*cptr)
@@ -5023,6 +5036,11 @@ t_bool single_line = FALSE;               /* default to Multi-Line help */
 t_bool port_speed_control = FALSE;
 t_bool modem_control = FALSE;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void)uptr;
+(void)cptr;
+
 if (mux) {
     single_line = (mux->lines == 1);
     port_speed_control = mux->port_speed_control;
@@ -5286,11 +5304,25 @@ return SCPE_OK;
 
 t_stat tmxr_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void)vptr;
+(void)addr;
+(void)uptr;
+(void)sw;
+
 return SCPE_NOFNC;
 }
 
 t_stat tmxr_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void)val;
+(void)addr;
+(void)uptr;
+(void)sw;
+
 return SCPE_NOFNC;
 }
 
@@ -5681,6 +5713,10 @@ size_t tbuf_size;
 t_addr lncount = (t_addr) (mp->lines - 1);
 t_stat result = SCPE_OK;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void)uptr;
+
 if (mp->lnorder == NULL)                                /* if the connection order array is not defined */
     return SCPE_NXPAR;                                  /*   then report a "Non-existent parameter" error */
 
@@ -5802,6 +5838,11 @@ const TMXR *mp = (const TMXR *) desc;
 int32 *iptr = mp->lnorder;
 t_bool first = TRUE;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void)uptr;
+(void)val;
+
 if (iptr == NULL)                                       /* connection order undefined? */
     return SCPE_NXPAR;                                  /* "Non-existent parameter" error */
 
@@ -5852,6 +5893,11 @@ t_stat tmxr_show_summ (FILE *st, UNIT *uptr, int32 val, const void *desc)
 const TMXR *mp = (const TMXR *) desc;
 int32 i, t;
 
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void)uptr;
+(void)val;
+
 if (mp == NULL)
     return SCPE_IERR;
 for (i = t = 0; i < mp->lines; i++)
@@ -5870,6 +5916,10 @@ t_stat tmxr_show_cstat (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 const TMXR *mp = (const TMXR *) desc;
 int32 i, any;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void)uptr;
 
 if (mp == NULL)
     return SCPE_IERR;
@@ -5894,6 +5944,11 @@ return SCPE_OK;
 
 t_stat tmxr_show_sync_devices (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, const char *desc)
 {
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void)dptr;
+(void)desc;
+
 return tmxr_show_sync (st, uptr, val, NULL);
 }
 
@@ -5901,6 +5956,12 @@ t_stat tmxr_show_sync (FILE* st, UNIT* uptr, int32 val, const void *desc)
 {
   ETH_LIST  list[ETH_MAX_DEVICE];
   int number, fcnt = 0;
+
+  /* Generic callback signature.
+     This implementation does not use every parameter. */
+  (void)uptr;
+  (void)val;
+  (void)desc;
 
   number = tmxr_eth_devices_hook (ETH_MAX_DEVICE, list, TRUE);
   fprintf(st, "DDCMP synchronous link devices:\n");
@@ -5924,6 +5985,11 @@ t_stat tmxr_show_sync (FILE* st, UNIT* uptr, int32 val, const void *desc)
 t_stat tmxr_show_lines (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
 const TMXR *mp = (const TMXR *) desc;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void)uptr;
+(void)val;
 
 if (mp == NULL)
     return SCPE_IERR;
