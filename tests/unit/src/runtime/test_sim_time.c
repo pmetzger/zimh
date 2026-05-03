@@ -5,6 +5,7 @@
 
 #include "sim_defs.h"
 #include "sim_time.h"
+#include "sim_time_internal.h"
 
 static int simh_test_clock_calls = 0;
 static int simh_test_sleep_calls = 0;
@@ -123,6 +124,27 @@ static void test_sim_nanosleep_propagates_hook_failure(void **state)
     assert_int_equal(simh_test_last_sleep_req.tv_sec, 1);
     assert_int_equal(simh_test_last_sleep_req.tv_nsec, 500);
     assert_int_equal(errno, EBUSY);
+}
+
+/* Verify Windows FILETIME ticks convert to Unix epoch timespec values. */
+static void test_sim_time_converts_windows_filetime_to_timespec(void **state)
+{
+    const uint64_t windows_unix_epoch = 116444736000000000ULL;
+    struct timespec converted = {0};
+
+    (void)state;
+
+    sim_time_windows_filetime_to_timespec(
+        windows_unix_epoch + (123456789ULL * 10000000ULL) + 9876543ULL,
+        &converted);
+
+    assert_int_equal(converted.tv_sec, 123456789);
+    assert_int_equal(converted.tv_nsec, 987654300L);
+
+    sim_time_windows_filetime_to_timespec(windows_unix_epoch, &converted);
+
+    assert_int_equal(converted.tv_sec, 0);
+    assert_int_equal(converted.tv_nsec, 0);
 }
 
 /* Verify sim_time reads CLOCK_REALTIME seconds through sim_clock_gettime. */
@@ -298,6 +320,9 @@ int main(void)
                                         teardown_sim_time_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_nanosleep_propagates_hook_failure,
+            setup_sim_time_fixture, teardown_sim_time_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_time_converts_windows_filetime_to_timespec,
             setup_sim_time_fixture, teardown_sim_time_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_time_returns_seconds_and_stores_output,

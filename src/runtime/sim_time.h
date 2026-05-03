@@ -7,8 +7,8 @@
 
 #include <time.h>
 
-#if defined(_WIN32)
-#include "sim_time_win32.h"
+#if defined(_WIN32) && !defined(CLOCK_REALTIME)
+#define CLOCK_REALTIME 1
 #endif
 
 /* Test hook for the clock source used by sim_clock_gettime(). */

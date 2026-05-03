@@ -79,11 +79,11 @@ These files own shared magnetic-tape image support: tape container
 formats, record handling, and reusable runtime helpers for simulated
 tape devices.
 
-## `sim_time.c`, `sim_time.h`, and `sim_time_win32.h`
+## `sim_time.c`, `sim_time.h`, and `sim_time_internal.h`
 
 These files own the thin runtime time-wrapper layer: testable wrappers
-around kernel-facing time and sleep calls, plus the Windows-only
-compatibility definitions needed by that wrapper layer.
+around kernel-facing time and sleep calls, plus internal conversion
+helpers needed by platform backends.
 
 ## `sim_timer.c` and `sim_timer.h`
 
