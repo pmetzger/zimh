@@ -317,6 +317,7 @@
 #include "sim_sock.h"
 #include "sim_timer.h"
 #include "sim_tmxr.h"
+#include "sim_tmxr_internal.h"
 #include "sim_ether.h"
 #include "scp.h"
 
@@ -489,6 +490,7 @@ static tmxr_open_serial_fn tmxr_open_serial_hook = sim_open_serial;
 static tmxr_eth_devices_fn tmxr_eth_devices_hook = eth_devices;
 static tmxr_eth_open_fn tmxr_eth_open_hook = eth_open;
 static tmxr_eth_read_fn tmxr_eth_read_hook = eth_read;
+static tmxr_eth_write_fn tmxr_eth_write_hook = eth_write;
 static tmxr_eth_close_fn tmxr_eth_close_hook = eth_close;
 static tmxr_eth_filter_fn tmxr_eth_filter_hook = eth_filter;
 
@@ -510,6 +512,7 @@ tmxr_open_serial_hook = sim_open_serial;
 tmxr_eth_devices_hook = eth_devices;
 tmxr_eth_open_hook = eth_open;
 tmxr_eth_read_hook = eth_read;
+tmxr_eth_write_hook = eth_write;
 tmxr_eth_close_hook = eth_close;
 tmxr_eth_filter_hook = eth_filter;
 }
@@ -552,10 +555,26 @@ tmxr_eth_open_hook = hooks->eth_open ?
     hooks->eth_open : eth_open;
 tmxr_eth_read_hook = hooks->eth_read ?
     hooks->eth_read : eth_read;
+tmxr_eth_write_hook = hooks->eth_write ?
+    hooks->eth_write : eth_write;
 tmxr_eth_close_hook = hooks->eth_close ?
     hooks->eth_close : eth_close;
 tmxr_eth_filter_hook = hooks->eth_filter ?
     hooks->eth_filter : eth_filter;
+}
+
+/* Close the Ethernet framer attached to a TMXR line. */
+static void tmxr_close_framer (TMLN *lp)
+{
+    if (lp->framer == NULL)
+        return;
+
+    tmxr_stop_framer (lp);
+    tmxr_eth_close_hook (lp->framer->eth);
+    free (lp->framer->eth);
+    free (lp->framer);
+    lp->framer = NULL;
+    lp->conn = FALSE;
 }
 
 /* Replace the contents of the TMXR-owned string field at *dest with a
@@ -1621,6 +1640,9 @@ if (lp->txlog)
     fflush (lp->txlog);                                 /* flush log */
 
 tmxr_send_buffered_data (lp);                           /* send any buffered data */
+
+if (closeserial)
+    tmxr_close_framer (lp);
 
 snprintf (msg, sizeof (msg), "tmxr_reset_ln_ex(%s)",
           closeserial ? "TRUE" : "FALSE");
@@ -2915,15 +2937,8 @@ return 0;                           /* not done */
 static void _mux_detach_line (TMLN *lp, t_bool close_listener, t_bool close_connecting)
 {
 if (lp->framer) {
-    /* DDCMP framer in use, close that up.  Begin by making sure it is
-     * stopped.
-     */
-    tmxr_stop_framer (lp);
-    /* Finished with the framer's Ethernet interface */
-    tmxr_eth_close_hook (lp->framer->eth);
-    free (lp->framer->eth);
-    free (lp->framer);
-    lp->framer = NULL;
+    /* DDCMP framer in use; close the Ethernet interface. */
+    tmxr_close_framer (lp);
     }
 if (close_listener && lp->master) {
     tmxr_close_sock_hook (lp->master);
@@ -3009,6 +3024,41 @@ if (speed[0] && (!datagram))
     tmxr_set_line_speed (lp, speed);
 }
 
+/* Copy one case-preserving glyph without writing beyond the output buffer. */
+static const char *tmxr_get_glyph_nc_bounded(const char *iptr, char *optr,
+                                             size_t optr_size, char mchar,
+                                             t_bool *truncated)
+{
+size_t used = 0;
+
+*truncated = FALSE;
+if (optr_size == 0) {
+    while ((*iptr != 0) &&
+           (sim_isspace (*iptr) == 0) &&
+           (*iptr != mchar)) {
+        *truncated = TRUE;
+        iptr++;
+        }
+    }
+else {
+    while ((*iptr != 0) &&
+           (sim_isspace (*iptr) == 0) &&
+           (*iptr != mchar)) {
+        if (used + 1 < optr_size)
+            optr[used++] = *iptr;
+        else
+            *truncated = TRUE;
+        iptr++;
+        }
+    optr[used] = '\0';
+    }
+if (mchar && (*iptr == mchar))
+    iptr++;
+while (sim_isspace (*iptr))
+    iptr++;
+return iptr;
+}
+
 /* Parse and validate a SYNC framer specification. */
 static t_stat tmxr_parse_framer_spec (const char *framer, char *fr_eth,
                                       size_t fr_eth_size, int8 *fr_mode,
@@ -3017,8 +3067,12 @@ static t_stat tmxr_parse_framer_spec (const char *framer, char *fr_eth,
 const char *cptr;
 char option[CBUFSIZE];
 int32 speed;
+t_bool fr_eth_truncated;
 
-cptr = get_glyph_nc (framer, fr_eth, ':');
+cptr = tmxr_get_glyph_nc_bounded (framer, fr_eth, fr_eth_size, ':',
+                                  &fr_eth_truncated);
+if (fr_eth_truncated)
+    return sim_messagef (SCPE_ARG, "Framer device name too long\n");
 cptr = get_glyph (cptr, option, ':');
 if (0 == MATCH_CMD (option, "INTEGRAL") ||
     0 == MATCH_CMD (option, "COAX"))
@@ -3224,7 +3278,7 @@ char tbuf[CBUFSIZE], listen[CBUFSIZE], destination[CBUFSIZE],
      logfiletmpl[CBUFSIZE], buffered[CBUFSIZE], hostport[CBUFSIZE],
      port[CBUFSIZE], option[CBUFSIZE], speed[CBUFSIZE], dev_name[CBUFSIZE],
      acl[CBUFSIZE];
-char framer[CBUFSIZE],fr_eth[CBUFSIZE];
+char framer[CBUFSIZE], fr_eth[ETH_DEV_NAME_MAX];
 int num;
 int8 fr_mode;
 int32 fr_speed;
@@ -5994,21 +6048,26 @@ for (j=0; 1; ++j) {
 
 static int tmxr_buf_debug_telnet_options (u_char *buf, int bufsize)
 {
-int optsize = 2;
+int optsize = 1;
 
 tmxr_buf_debug_telnet_option ((u_char)buf[0]);
+if (bufsize < 2)
+    return optsize;
+
 tmxr_buf_debug_telnet_option ((u_char)buf[1]);
+optsize++;
 switch ((u_char)buf[1]) {
     case TN_IAC:
     default:
         return optsize;
-        break;
     case TN_WILL:
     case TN_WONT:
     case TN_DO:
     case TN_DONT:
-        ++optsize;
-        tmxr_buf_debug_telnet_option ((u_char)buf[2]);
+        if (bufsize >= 3) {
+            ++optsize;
+            tmxr_buf_debug_telnet_option ((u_char)buf[2]);
+            }
         break;
     }
 return optsize;
@@ -6187,12 +6246,15 @@ t_stat tmxr_sock_test (DEVICE *dptr, const char *cptr)
 char cmd[CBUFSIZE], host[CBUFSIZE], port[CBUFSIZE];
 int line;
 TMXR *tmxr;
-TMLN *ln;
 int32 tmp1, tmp2;
 t_stat stat = SCPE_OK;
 SOCKET sock_mux = INVALID_SOCKET;
 SOCKET sock_line = INVALID_SOCKET;
 SIM_TEST_INIT;
+
+/* Generic callback signature.
+   This implementation does not use every parameter. */
+(void)cptr;
 
 sim_printf ("Testing %s:\n", dptr->name);
 SIM_TEST(sim_parse_addr ("", NULL, 0, "localhost", NULL, 0, "1234", NULL) != -1);
@@ -6216,13 +6278,11 @@ snprintf (cmd, sizeof (cmd), "%s -u localhost:65500;telnet;nomessage",
           dptr->name);
 SIM_TEST(attach_cmd (0, cmd));
 tmxr = (TMXR *)dptr->units->tmxr;
-ln = &tmxr->ldsc[tmxr->lines - 1];
 SIM_TEST(detach_cmd (0, dptr->name));
 snprintf (cmd, sizeof (cmd), "%s -u localhost:65500;notelnet",
           dptr->name);
 SIM_TEST(attach_cmd (0, cmd));
 tmxr = (TMXR *)dptr->units->tmxr;
-ln = &tmxr->ldsc[tmxr->lines - 1];
 SIM_TEST(detach_cmd (0, dptr->name));
 if (tmxr->lines > 1) {
     tmxr->modem_control = FALSE;
@@ -6250,12 +6310,13 @@ return stat;
 
 static int framer_await_status (TMLN *line, int cnt)
 {
-int i, stat, attempt, flen;
+int stat, attempt, flen;
 ETH_PACK framer_rpkt;
 
-i = line->framer->status_cnt;
 attempt = 0;
 while (attempt < 5) {
+    if (cnt != line->framer->status_cnt)
+        return 1;
     stat = tmxr_eth_read_hook (line->framer->eth, &framer_rpkt, NULL);
     if (stat) {
         flen  = framer_rpkt.msg[14] + (framer_rpkt.msg[15] << 8);
@@ -6268,8 +6329,6 @@ while (attempt < 5) {
             continue;
             }
         }
-    if (i != line->framer->status_cnt)
-        return 1;
     attempt++;
     sim_os_ms_sleep (50);
     }
@@ -6328,7 +6387,9 @@ framer_start.msg[22] = (line->framer->fspeed >> 16) & 0xff;
 framer_start.msg[23] = line->framer->fspeed >> 24;
 /* Send the request */
 cnt = line->framer->status_cnt;
-ret = eth_write (line->framer->eth, &framer_start, NULL);
+ret = tmxr_eth_write_hook (line->framer->eth, &framer_start, NULL);
+if (ret != SCPE_OK)
+    return;
 framer_await_status (line, cnt);
 }
 
@@ -6347,7 +6408,9 @@ framer_stop.msg[16] = 0x11;
 framer_stop.msg[17] = 2;       /* Command 2: stop framer */
 /* Send the request */
 cnt = line->framer->status_cnt;
-ret = eth_write (line->framer->eth, &framer_stop, NULL);
+ret = tmxr_eth_write_hook (line->framer->eth, &framer_stop, NULL);
+if (ret != SCPE_OK)
+    return;
 /* Mark the framer off right now */
 line->framer->status.on = 0;
 framer_await_status (line, cnt);
@@ -6364,6 +6427,9 @@ while (1) {
         return 0;
     /* Size reported by framer includes status, subtract that */
     flen  = (framer_rpkt.msg[14] + (framer_rpkt.msg[15] << 8)) - 2;
+    /* TODO: Check the pkoning2/ddcmp framer API and firmware before
+       deciding whether nonzero data-frame status means drop, report a line
+       error, count/log, or pass the packet through unchanged. */
     fstat = framer_rpkt.msg[16] + (framer_rpkt.msg[17] << 8);
     /* Ignore malformed frames shorter than the status field. */
     if (flen < 0)
@@ -6401,7 +6467,8 @@ ETH_PACK framer_tx;
 tmxr_setup_framer (line, &framer_tx, length);
 memcpy (&framer_tx.msg[16], buf, length);
 /* Send the request */
-ret = eth_write (line->framer->eth, &framer_tx, NULL);
-/* Always report the whole thing was written */
+ret = tmxr_eth_write_hook (line->framer->eth, &framer_tx, NULL);
+if (ret != SCPE_OK)
+    return -1;                                          /* report I/O error */
 return length;
 }

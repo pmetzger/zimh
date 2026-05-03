@@ -12,6 +12,7 @@
 #include "sim_defs.h"
 #include "sim_serial.h"
 #include "sim_tmxr.h"
+#include "sim_tmxr_internal.h"
 #include "test_simh_personality.h"
 #include "test_support.h"
 
@@ -99,6 +100,12 @@ struct sim_tmxr_fixture {
         ETH_PACK eth_read_packets[4];
         int eth_read_results[4];
         int next_eth_read_result;
+
+        int eth_write_calls;
+        ETH_DEV *last_eth_write_dev;
+        ETH_PACK eth_write_packets[4];
+        t_stat eth_write_result;
+        t_bool poll_rx_after_eth_write;
 
         int eth_filter_calls;
         ETH_DEV *last_eth_filter_dev;
@@ -354,6 +361,26 @@ static int test_tmxr_eth_read(ETH_DEV *dev, ETH_PACK *packet,
     return result;
 }
 
+static t_stat test_tmxr_eth_write(ETH_DEV *dev, ETH_PACK *packet,
+                                  ETH_PCALLBACK routine)
+{
+    int call;
+
+    assert_non_null(tmxr_io_fixture);
+    (void)routine;
+
+    call = tmxr_io_fixture->io.eth_write_calls;
+    tmxr_io_fixture->io.last_eth_write_dev = dev;
+    if (call < 4 && packet != NULL)
+        tmxr_io_fixture->io.eth_write_packets[call] = *packet;
+    tmxr_io_fixture->io.eth_write_calls++;
+    if (tmxr_io_fixture->io.poll_rx_after_eth_write) {
+        tmxr_io_fixture->io.poll_rx_after_eth_write = FALSE;
+        tmxr_poll_rx(&tmxr_io_fixture->mux);
+    }
+    return tmxr_io_fixture->io.eth_write_result;
+}
+
 static t_stat test_tmxr_eth_filter(ETH_DEV *dev, int addr_count,
                                    const ETH_MAC addresses[],
                                    ETH_BOOL all_multicast,
@@ -396,6 +423,7 @@ static void install_tmxr_test_io_hooks(void)
         test_tmxr_eth_devices,
         test_tmxr_eth_open,
         test_tmxr_eth_read,
+        test_tmxr_eth_write,
         test_tmxr_eth_close,
         test_tmxr_eth_filter,
     };
@@ -478,6 +506,12 @@ static void set_test_framer_packet_header(ETH_PACK *packet, uint16 frame_len,
     packet->msg[18] = first_payload;
 }
 
+static void set_test_framer_status_packet(ETH_PACK *packet, uint8 on_flags)
+{
+    set_test_framer_packet_header(packet, 4, 021);
+    packet->msg[19] = on_flags;
+}
+
 static void register_and_open_test_tmxr(struct sim_tmxr_fixture *fixture)
 {
     assert_int_equal(sim_register_internal_device(&fixture->device), SCPE_OK);
@@ -512,6 +546,7 @@ static int setup_sim_tmxr_fixture(void **state)
     fixture->io.open_serial_status = SCPE_OPENERR;
     fixture->io.eth_open_result = SCPE_OK;
     fixture->io.next_eth_read_result = 4;
+    fixture->io.eth_write_result = SCPE_OK;
     fixture->io.eth_filter_result = SCPE_OK;
     snprintf(fixture->io.sockname, sizeof(fixture->io.sockname), "%s",
              "127.0.0.1:1000");
@@ -1115,6 +1150,151 @@ static void test_tmxr_poll_rx_skips_short_framer_data_frame(void **state)
     assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
 }
 
+/* Verify framer write failures are reported as lost output instead of being
+   mistaken for successful packet transmission. */
+static void test_tmxr_put_packet_ln_reports_framer_write_failure(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[1];
+    const uint8 payload[] = {0x11, 0x22, 0x33};
+
+    install_tmxr_test_io_hooks();
+    fixture->io.eth_devices_result = 1;
+    snprintf(fixture->io.eth_devices_list[0].name,
+             sizeof(fixture->io.eth_devices_list[0].name), "%s", "framer0");
+    fixture->io.eth_devices_list[0].eth_api = ETH_API_PCAP;
+
+    assert_int_equal(
+        tmxr_open_master(&fixture->mux, "Line=1,SYNC=sync0:integral:56000"),
+        SCPE_OK);
+    line->conn = TRUE;
+    fixture->io.eth_write_calls = 0;
+    fixture->io.eth_write_result = SCPE_IOERR;
+
+    assert_int_equal(tmxr_put_packet_ln(line, payload, sizeof(payload)),
+                     SCPE_LOST);
+    assert_int_not_equal(fixture->io.eth_write_calls, 0);
+    assert_int_equal(fixture->io.eth_write_packets[0].msg[14], 0x03);
+    assert_int_equal(fixture->io.eth_write_packets[0].msg[15], 0x00);
+    assert_int_equal(fixture->io.eth_write_packets[0].msg[16], 0x11);
+    assert_int_equal(fixture->io.eth_write_packets[0].msg[17], 0x22);
+    assert_int_equal(fixture->io.eth_write_packets[0].msg[18], 0x33);
+    assert_null(line->framer);
+    assert_false(line->conn);
+
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
+/* Verify framer start treats a status received during the command write as the
+   response to that command instead of waiting for a later status packet. */
+static void test_tmxr_start_framer_uses_prewrite_status_snapshot(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[1];
+    int32 status_bits = 0;
+
+    install_tmxr_test_io_hooks();
+    fixture->io.eth_devices_result = 1;
+    snprintf(fixture->io.eth_devices_list[0].name,
+             sizeof(fixture->io.eth_devices_list[0].name), "%s", "framer0");
+    fixture->io.eth_devices_list[0].eth_api = ETH_API_PCAP;
+
+    assert_int_equal(
+        tmxr_open_master(&fixture->mux, "Line=1,SYNC=sync0:integral:56000"),
+        SCPE_OK);
+    line->conn = TRUE;
+    line->rcve = TRUE;
+    fixture->io.eth_write_calls = 0;
+    fixture->io.eth_read_calls = 0;
+    fixture->io.sleep_calls = 0;
+    set_test_framer_status_packet(&fixture->io.eth_read_packets[0], 1);
+    fixture->io.eth_read_results[0] = 1;
+    fixture->io.next_eth_read_result = 0;
+    fixture->io.poll_rx_after_eth_write = TRUE;
+
+    assert_int_equal(
+        tmxr_set_get_modem_bits(line, TMXR_MDM_DTR, 0, &status_bits), SCPE_OK);
+
+    assert_int_equal(fixture->io.eth_write_calls, 1);
+    assert_int_equal(fixture->io.eth_read_calls, 2);
+    assert_int_equal(fixture->io.sleep_calls, 0);
+    assert_int_equal(status_bits, TMXR_MDM_DTR | TMXR_MDM_DSR);
+
+    assert_int_equal(tmxr_detach_ln(line), SCPE_OK);
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
+/* Verify failed framer start commands do not wait for a status response to a
+   command that was never written. */
+static void test_tmxr_start_framer_skips_status_wait_after_write_failure(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[1];
+    int32 status_bits = 0;
+
+    install_tmxr_test_io_hooks();
+    fixture->io.eth_devices_result = 1;
+    snprintf(fixture->io.eth_devices_list[0].name,
+             sizeof(fixture->io.eth_devices_list[0].name), "%s", "framer0");
+    fixture->io.eth_devices_list[0].eth_api = ETH_API_PCAP;
+
+    assert_int_equal(
+        tmxr_open_master(&fixture->mux, "Line=1,SYNC=sync0:integral:56000"),
+        SCPE_OK);
+    line->conn = TRUE;
+    fixture->io.eth_write_calls = 0;
+    fixture->io.eth_read_calls = 0;
+    fixture->io.sleep_calls = 0;
+    fixture->io.eth_write_result = SCPE_IOERR;
+
+    assert_int_equal(
+        tmxr_set_get_modem_bits(line, TMXR_MDM_DTR, 0, &status_bits), SCPE_OK);
+
+    assert_int_equal(fixture->io.eth_write_calls, 1);
+    assert_int_equal(fixture->io.eth_read_calls, 0);
+    assert_int_equal(fixture->io.sleep_calls, 0);
+
+    assert_int_equal(tmxr_detach_ln(line), SCPE_OK);
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
+/* Verify failed framer stop commands do not wait for a status response to a
+   command that was never written. */
+static void test_tmxr_stop_framer_skips_status_wait_after_write_failure(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[1];
+    int32 status_bits = 0;
+
+    install_tmxr_test_io_hooks();
+    fixture->io.eth_devices_result = 1;
+    snprintf(fixture->io.eth_devices_list[0].name,
+             sizeof(fixture->io.eth_devices_list[0].name), "%s", "framer0");
+    fixture->io.eth_devices_list[0].eth_api = ETH_API_PCAP;
+
+    assert_int_equal(
+        tmxr_open_master(&fixture->mux, "Line=1,SYNC=sync0:integral:56000"),
+        SCPE_OK);
+    line->conn = TRUE;
+    line->modembits = TMXR_MDM_DTR;
+    fixture->io.eth_write_calls = 0;
+    fixture->io.eth_read_calls = 0;
+    fixture->io.sleep_calls = 0;
+    fixture->io.eth_write_result = SCPE_IOERR;
+
+    assert_int_equal(
+        tmxr_set_get_modem_bits(line, 0, TMXR_MDM_DTR, &status_bits), SCPE_OK);
+
+    assert_int_equal(fixture->io.eth_write_calls, 1);
+    assert_int_equal(fixture->io.eth_read_calls, 0);
+    assert_int_equal(fixture->io.sleep_calls, 0);
+
+    assert_int_equal(tmxr_detach_ln(line), SCPE_OK);
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
 /* Verify SHOW SYNC lists framer aliases using the host Ethernet inventory. */
 static void test_tmxr_show_sync_lists_framer_aliases(void **state)
 {
@@ -1528,6 +1708,32 @@ static void test_tmxr_open_master_rejects_invalid_framer_speed(void **state)
     assert_int_equal(SCPE_BARE_STATUS(status), SCPE_ARG);
     assert_int_equal(fixture->io.eth_open_calls, 0);
 }
+
+#if CBUFSIZE > (ETH_DEV_NAME_MAX + 32)
+/* Verify overlong SYNC= device names are rejected before Ethernet open. */
+static void test_tmxr_open_master_rejects_oversize_framer_device_name(
+    void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    const char prefix[] = "Line=1,SYNC=";
+    const char suffix[] = ":integral:56000";
+    char command[CBUFSIZE];
+    char *cursor = command;
+    t_stat status;
+
+    install_tmxr_test_io_hooks();
+
+    memcpy(cursor, prefix, sizeof(prefix) - 1);
+    cursor += sizeof(prefix) - 1;
+    memset(cursor, 'a', ETH_DEV_NAME_MAX);
+    cursor += ETH_DEV_NAME_MAX;
+    memcpy(cursor, suffix, sizeof(suffix));
+
+    status = tmxr_open_master(&fixture->mux, command);
+    assert_int_equal(SCPE_BARE_STATUS(status), SCPE_ARG);
+    assert_int_equal(fixture->io.eth_open_calls, 0);
+}
+#endif
 
 /* Verify mux-wide DISABLED is rejected because disabling requires an explicit
    line selection. */
@@ -2977,6 +3183,43 @@ static void test_tmxr_debug_formats_telnet_and_octal_text(void **state)
     free(output);
 }
 
+/* Verify TMXR debug text mode does not read past truncated Telnet command
+   sequences at the end of the debug buffer. */
+static void test_tmxr_debug_formats_truncated_telnet_options(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+    char trailing_iac[] = {(char)0xFF, (char)0xFB, (char)0x03};
+    char trailing_will[] = {(char)0xFF, (char)0xFB, (char)0x03};
+    char complete_will[] = {(char)0xFF, (char)0xFB, (char)0x03};
+    char *output;
+
+    fixture->device.dctrl = TMXR_DBG_RCV;
+    line->notelnet = FALSE;
+
+    output = capture_tmxr_debug_output(TMXR_DBG_RCV, line, "recv",
+                                       trailing_iac, 1);
+    assert_non_null(strstr(output, "Line:0 recv 1 bytes"));
+    assert_non_null(strstr(output, "_TN_IAC_"));
+    assert_null(strstr(output, "_TN_WILL_"));
+    assert_null(strstr(output, "_TN_SGA_"));
+    free(output);
+
+    output = capture_tmxr_debug_output(TMXR_DBG_RCV, line, "recv",
+                                       trailing_will, 2);
+    assert_non_null(strstr(output, "Line:0 recv 2 bytes"));
+    assert_non_null(strstr(output, "_TN_IAC__TN_WILL_"));
+    assert_null(strstr(output, "_TN_SGA_"));
+    free(output);
+
+    output = capture_tmxr_debug_output(TMXR_DBG_RCV, line, "recv",
+                                       complete_will,
+                                       (int)sizeof(complete_will));
+    assert_non_null(strstr(output, "Line:0 recv 3 bytes"));
+    assert_non_null(strstr(output, "_TN_IAC__TN_WILL__TN_SGA_"));
+    free(output);
+}
+
 /* Verify TMXR debug hex-dump mode formats non-Telnet data as grouped hex
    plus printable text. */
 static void test_tmxr_debug_formats_notelnet_hex_dump(void **state)
@@ -3073,6 +3316,18 @@ int main(void)
             test_tmxr_poll_rx_skips_short_framer_data_frame,
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
+            test_tmxr_put_packet_ln_reports_framer_write_failure,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_start_framer_uses_prewrite_status_snapshot,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_start_framer_skips_status_wait_after_write_failure,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_stop_framer_skips_status_wait_after_write_failure,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
             test_tmxr_show_sync_lists_framer_aliases,
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
@@ -3144,6 +3399,11 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_tmxr_open_master_rejects_invalid_framer_speed,
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+#if CBUFSIZE > (ETH_DEV_NAME_MAX + 32)
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_open_master_rejects_oversize_framer_device_name,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+#endif
         cmocka_unit_test_setup_teardown(
             test_tmxr_open_master_rejects_disabled_without_line,
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
@@ -3302,6 +3562,9 @@ int main(void)
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
             test_tmxr_debug_formats_telnet_and_octal_text,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_debug_formats_truncated_telnet_options,
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
             test_tmxr_debug_formats_notelnet_hex_dump,
