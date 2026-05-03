@@ -98,6 +98,7 @@ typedef struct {
     uint32 sectsize; /* sector size, not including pre/postamble */
     uint8 track;     /* Current Track */
     uint8 ready;     /* Is drive ready? */
+    int rpm;         /* Drive RPM */
 } WD179X_DRIVE_INFO;
 
 typedef struct {
@@ -193,6 +194,7 @@ static t_stat wd179x_reset(DEVICE *dptr);
 static const char* wd179x_description(DEVICE *dptr);
 uint8 floorlog2(unsigned int n);
 static uint8 computeSectorSize(const WD179X_DRIVE_INFO *pDrive);
+static int wd179x_index_pulse_rotation(const WD179X_DRIVE_INFO *pDrive);
 static uint8 testMode(const WD179X_DRIVE_INFO *pDrive);
 static t_stat wd179x_sectRead(WD179X_DRIVE_INFO* pDrive, uint8 Cyl, uint8 Head,
     uint8 Sector, uint8* buf, uint32 buflen, uint32* flags, uint32* readlen);
@@ -348,6 +350,15 @@ void wd179x_connect_external_fifo(uint16 fifo_len, uint8* storage)
 void wd179x_reset_external_fifo(void)
 {
     wd179x_info->fdc_fifo_index = 0;
+}
+
+void wd179x_set_drive_rpm(int rpm)
+{
+    if (wd179x_info->sel_drive >= WD179X_MAX_DRIVES) {
+        return;
+    }
+
+    wd179x_info->drive[wd179x_info->sel_drive].rpm = rpm;
 }
 
 void wd179x_external_restore(void)
@@ -568,6 +579,26 @@ static uint8 computeSectorSize(const WD179X_DRIVE_INFO *pDrive) {
     }
 
     return(0);  /* Hard coded to 128-byte sectors */
+}
+
+/* Return the simulator delay for the selected drive's next index pulse. */
+static int wd179x_index_pulse_rotation(const WD179X_DRIVE_INFO *pDrive)
+{
+    switch (pDrive->rpm) {
+    case 300:
+        return CROMFDC_5IN_ROT;
+    case 360:
+        return CROMFDC_8IN_ROT;
+    default:
+        break;
+    }
+
+    if (pDrive->uptr->u3 != IMAGE_TYPE_IMD) {
+        return CROMFDC_8IN_ROT;
+    }
+
+    return ((pDrive->imd->ntracks % 77) == 0) ? CROMFDC_8IN_ROT
+                                              : CROMFDC_5IN_ROT;
 }
 
 static uint8 testMode(const WD179X_DRIVE_INFO *pDrive) {
@@ -1210,11 +1241,8 @@ static uint8 Do1793Command(uint8 cCommand)
                 if (cCommand & 0x04) {
                     wd179x_info->index_pulse_wait = TRUE;
                     if (wd179x_info->sel_drive < WD179X_MAX_DRIVES) {
-                        if (pDrive->uptr->u3 == IMAGE_TYPE_IMD) {
-                            sim_activate (wd179x_unit, ((wd179x_info->drive[wd179x_info->sel_drive].imd->ntracks % 77) == 0) ? CROMFDC_8IN_ROT : CROMFDC_5IN_ROT); /* Generate INDEX pulse */
-                        } else {
-                            sim_activate(wd179x_unit, CROMFDC_8IN_ROT); /* Generate INDEX pulse */
-                        }
+                        sim_activate(wd179x_unit,
+                                     wd179x_index_pulse_rotation(pDrive));
                     }
                 } else {
                     wd179x_info->intrq = 1;

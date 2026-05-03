@@ -43,6 +43,7 @@ extern uint8 WD179X_Write(const uint32 Addr, uint8 cData);
 
 extern void wd179x_external_restore(void);
 extern uint8 wd179x_get_nheads(void);
+extern void wd179x_set_drive_rpm(int rpm);
 
 #define WD179X_FDC_MSR       0   /* R=FDC Main Status Register, W=Drive Select Register */
 #define WD179X_FDC_DATA      1   /* R/W FDC Data Register */

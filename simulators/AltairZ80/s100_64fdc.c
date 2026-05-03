@@ -1586,8 +1586,10 @@ static int32 cromfdc_control(const int32 port, const int32 io, const int32 data)
         }
         if(data & CROMFDC_CTRL_MAXI) {
             wd179x_infop->drivetype = 8;
+            wd179x_set_drive_rpm(360);
         } else {
             wd179x_infop->drivetype = 5;
+            wd179x_set_drive_rpm(300);
         }
 
         if(data & CROMFDC_CTRL_MTRON) {

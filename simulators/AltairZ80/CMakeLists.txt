@@ -96,6 +96,8 @@ add_simulator(altairz80
 
 set(altairz80_boot_rom_choice_output_dir
     "${CMAKE_CURRENT_BINARY_DIR}/tests/altairz80-boot-rom-choice")
+set(altairz80_wd179x_index_pulse_output_dir
+    "${CMAKE_CURRENT_BINARY_DIR}/tests/altairz80-wd179x-index-pulse")
 
 find_package(Python3 COMPONENTS Interpreter)
 if (Python3_Interpreter_FOUND)
@@ -114,4 +116,20 @@ if (Python3_Interpreter_FOUND)
             LABELS "zimh;integration;zimh-AltairZ80"
             ENVIRONMENT
             "SIMH_TEST_OUTPUT_DIR=${altairz80_boot_rom_choice_output_dir}")
+
+    add_test(
+        NAME zimh-altairz80-wd179x-index-pulse
+        COMMAND
+            ${Python3_EXECUTABLE}
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/wd179x_index_pulse_test.py"
+            $<TARGET_FILE:altairz80>
+            --work-dir
+            "${altairz80_wd179x_index_pulse_output_dir}")
+
+    set_tests_properties(
+        zimh-altairz80-wd179x-index-pulse
+        PROPERTIES
+            LABELS "zimh;integration;zimh-AltairZ80"
+            ENVIRONMENT
+            "SIMH_TEST_OUTPUT_DIR=${altairz80_wd179x_index_pulse_output_dir}")
 endif ()
