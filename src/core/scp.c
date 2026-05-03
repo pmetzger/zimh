@@ -10651,6 +10651,7 @@ t_stat sim_messagef (t_stat stat, const char* fmt, ...)
 char stackbuf[STACKBUFSIZE];
 size_t bufsize = sizeof(stackbuf);
 char *buf = stackbuf;
+int formatted_len;
 size_t len;
 va_list arglist;
 t_bool inhibit_message = (!sim_show_message || (stat & SCPE_NOMESSAGE));
@@ -10667,15 +10668,21 @@ prefix_len = strlen (msg_prefix);
 while (1) {                                         /* format passed string, args */
     va_start (arglist, fmt);
     strlcpy (buf, msg_prefix, bufsize);
-    len = prefix_len + vsnprintf (buf + prefix_len,
-                                  bufsize - prefix_len,
-                                  fmt,
-                                  arglist);
+    formatted_len = vsnprintf (buf + prefix_len,
+                               bufsize - prefix_len,
+                               fmt,
+                               arglist);
     va_end (arglist);
 
 /* If the formatted result didn't fit into the buffer, then grow the buffer and try again */
 
-    if ((len < 0) || (len >= bufsize)) {
+    if (formatted_len < 0) {
+        if (buf != stackbuf)
+            free (buf);
+        return SCPE_IERR;
+        }
+    len = prefix_len + (size_t)formatted_len;
+    if (len >= bufsize) {
         if (buf != stackbuf)
             free (buf);
         bufsize = bufsize * 2;

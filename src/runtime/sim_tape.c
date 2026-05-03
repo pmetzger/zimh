@@ -3419,8 +3419,6 @@ for (objc = 0, sizec = 0, tpos = 0;; ) {
     i = sim_fread (&bc, sizeof (bc), 1, uptr->fileref);
     if (i == 0)     /* past or at eof? */
         break;
-    if (bc > 65535) /* Range check length value to satisfy Coverity */
-        break;
     if (countmap[bc] == 0)
         sizec++;
     ++countmap[bc];
