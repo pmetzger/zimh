@@ -43,16 +43,15 @@
 */
 
 uint32              cdp_cmd(UNIT *, uint16, uint16);
-t_stat              cdp_srv(UNIT *);
-t_stat              cdp_reset(DEVICE *);
-t_stat              cdp_attach(UNIT *, const char *);
-t_stat              cdp_detach(UNIT *);
-t_stat              cdp_help(FILE *, DEVICE *, UNIT *, int32, const char *);
-const char         *cdp_description(DEVICE *dptr);
-t_stat              cdp_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc);
-t_stat              cdp_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc);
-t_stat              cdp_set_echo (UNIT *uptr, int32 val, const char *cptr, void *desc);
-t_stat              cdp_show_echo (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat       cdp_srv(UNIT *);
+static t_stat       cdp_attach(UNIT *, const char *);
+static t_stat       cdp_detach(UNIT *);
+static t_stat       cdp_help(FILE *, DEVICE *, UNIT *, int32, const char *);
+static const char  *cdp_description(DEVICE *dptr);
+static t_stat       cdp_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat       cdp_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat       cdp_set_echo (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat       cdp_show_echo (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 UNIT                cdp_unit[4] = {
     {UDATA(cdp_srv, UNIT_CDP, 0), 600},      // unit 0 is the printing mechanism of 407
@@ -85,7 +84,7 @@ int card_nbuf;
 char card_lpt[120];
 int card_nlpt;
 
-void encode_char(int cPunch, int cLpt)
+static void encode_char(int cPunch, int cLpt)
 {
     if ((cPunch) && (card_nbuf < 80)) {
         card_buf[card_nbuf++] = cPunch;
@@ -95,17 +94,17 @@ void encode_char(int cPunch, int cLpt)
     }
 }
 
-void encode_lpt_spc(int nSpaces)
+static void encode_lpt_spc(int nSpaces)
 {
     while (nSpaces-- >0) encode_char(0, 32);
 }
 
-void encode_lpt_str(const char * buf)
+static void encode_lpt_str(const char * buf)
 {
     while (*buf) encode_char(0, *buf++);
 }
 
-void encode_lpt_num(t_int64 d, int l)
+static void encode_lpt_num(t_int64 d, int l)
 {
     char s[20];
     int i,n;
@@ -141,7 +140,7 @@ void encode_lpt_num(t_int64 d, int l)
 #define     wf_NNNNNNNNNN       7
 #define     wf_sNNNNNNNNNN      8
 
-void encode_lpt_word(t_int64 d, int NegZero, int wFormat)
+static void encode_lpt_word(t_int64 d, int NegZero, int wFormat)
 {
     int n;
     int neg=0;
@@ -191,7 +190,7 @@ void encode_lpt_word(t_int64 d, int NegZero, int wFormat)
 // if bSetHiPuch=2, set HiPunch on last digit and on second digit.
 // if bSetHiPuch=3, set HiPunch on third digit
 // if last digit is negative, never set HiPunch even if asked for (a card column cannot have both X(11) and Y(12) punched)
-void sprintf_word(char * pch_word, t_int64 d, int NegZero, int bSetHiPuch)
+static void sprintf_word(char * pch_word, t_int64 d, int NegZero, int bSetHiPuch)
 {
     int i,n,neg, hi;
 
@@ -217,7 +216,7 @@ void sprintf_word(char * pch_word, t_int64 d, int NegZero, int bSetHiPuch)
     pch_word[10] = 0;
 }
 
-void encode_pch_str(const char * buf)
+static void encode_pch_str(const char * buf)
 {
     while (*buf) {
         encode_char(*buf++, 0);
@@ -225,7 +224,7 @@ void encode_pch_str(const char * buf)
 }
 
 
-void encode_8word_wiring(void)
+static void encode_8word_wiring(void)
 {
     // encode 8 numerical words per card
     // get the decoded data from IOSync
@@ -251,7 +250,7 @@ void encode_8word_wiring(void)
     }
 }
 
-void encode_soap_wiring(int bMultiPass)
+static void encode_soap_wiring(int bMultiPass)
 {
     // encode soap card simulating soap control panel wiring for 533
     // from SOAP II manual at http://www.bitsavers.org/pdf/ibm/650/24-4000-0_SOAPII.pdf
@@ -485,7 +484,7 @@ void encode_soap_wiring(int bMultiPass)
     }
 }
 
-void encode_supersoap_wiring(void)
+static void encode_supersoap_wiring(void)
 {
     // encode soap card simulating soap control panel wiring for 533
     // storage in output block (one card format)
@@ -744,7 +743,7 @@ void encode_supersoap_wiring(void)
     }
 }
 
-void encode_is_wiring(void)
+static void encode_is_wiring(void)
 {
     // encode Floationg Decimal Interpretive System (IS) card simulating control panel wiring for 533 as described
     // in manual at http://www.bitsavers.org/pdf/ibm/650/28-4024_FltDecIntrpSys
@@ -864,7 +863,7 @@ void encode_is_wiring(void)
     }
 }
 
-void encode_it_wiring(void)
+static void encode_it_wiring(void)
 {
     // encode card for IT compiler modified soap
     // from IT manual at http://www.bitsavers.org/pdf/ibm/650/CarnegieInternalTranslator.pdf
@@ -1020,7 +1019,7 @@ void encode_it_wiring(void)
     }
 }
 
-void encode_ra_wiring(void)
+static void encode_ra_wiring(void)
 {
     // encode card for Missile Systems Division, Lockheed Aircraft Corporation
     // regional assembly card - five load cards
@@ -1127,7 +1126,7 @@ void encode_ra_wiring(void)
     }
 }
 
-void encode_fortransit_wiring(void)
+static void encode_fortransit_wiring(void)
 {
     // encode card for FORTRANSIT modified IT compiler
     // from FORTRANSIT manual at http://bitsavers.org/pdf/ibm/650/28-4028_FOR_TRANSIT.pdf
@@ -1325,6 +1324,11 @@ uint32 cdp_cmd(UNIT * uptr, uint16 cmd, uint16 addr)
     uint16 image[80];
     uint32              wiring;
 
+    /* Generic device command signature.
+       This implementation does not use every parameter. */
+    (void)cmd;
+    (void)addr;
+
     /* Are we currently tranfering? */
     if (uptr->u5 & URCSTA_BUSY)
         return SCPE_BUSY;
@@ -1419,8 +1423,12 @@ uint32 cdp_cmd(UNIT * uptr, uint16 cmd, uint16 addr)
 }
 
 /* Handle transfer of data for card punch */
-t_stat
+static t_stat
 cdp_srv(UNIT *uptr) {
+
+    /* Generic service routine signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
 
     // I/O is synchronous. No need to set up srv
     return SCPE_OK;
@@ -1428,9 +1436,14 @@ cdp_srv(UNIT *uptr) {
 
 
 /* Set card read/punch control panel wiring */
-t_stat cdp_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc)
+static t_stat cdp_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int f;
+
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void)val;
+    (void)desc;
 
     if (uptr == NULL) return SCPE_IERR;
     if (cptr == NULL) return SCPE_ARG;
@@ -1444,9 +1457,14 @@ t_stat cdp_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc)
 }
 
 /* Show card read/punch control panel wiring */
-t_stat cdp_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc)
+static t_stat cdp_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int f;
+
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void)val;
+    (void)desc;
 
     for (f = 0; wirings[f].name != 0; f++) {
         if ((uptr->flags & UNIT_CARD_WIRING) == wirings[f].mode) {
@@ -1459,11 +1477,15 @@ t_stat cdp_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc)
 }
 
 /* Set card read/punch echo to console */
-t_stat cdp_set_echo (UNIT *uptr, int32 val, const char *cptr, void *desc)
+static t_stat cdp_set_echo (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int                 u = (uptr - cdp_unit);
     t_stat              r;
     int                 num;
+
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void)desc;
 
     if (uptr == NULL) return SCPE_IERR;
     if (cptr == NULL) {
@@ -1496,8 +1518,12 @@ t_stat cdp_set_echo (UNIT *uptr, int32 val, const char *cptr, void *desc)
 }
 
 /* Show card read/punch control panel wiring */
-t_stat cdp_show_echo (FILE *st, UNIT *uptr, int32 val, const void *desc)
+static t_stat cdp_show_echo (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+
     switch(val) {
         case 0:
             fprintf (st, (uptr->flags & UNIT_CARD_ECHO) ? "ECHO": "No ECHO");
@@ -1509,7 +1535,7 @@ t_stat cdp_show_echo (FILE *st, UNIT *uptr, int32 val, const void *desc)
     return SCPE_OK;
 }
 
-t_stat
+static t_stat
 cdp_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
@@ -1523,13 +1549,13 @@ cdp_attach(UNIT * uptr, const char *file)
     return SCPE_OK;
 }
 
-t_stat
+static t_stat
 cdp_detach(UNIT * uptr)
 {
     return sim_card_detach(uptr);
 }
 
-t_stat
+static t_stat
 cdp_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
    fprintf (st, "%s\r\n\r\n", cdp_description(dptr));
@@ -1546,9 +1572,12 @@ cdp_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
    return SCPE_OK;
 }
 
-const char *
+static const char *
 cdp_description(DEVICE *dptr)
 {
+   /* Generic device description signature.
+      This implementation does not use every parameter. */
+   (void)dptr;
+
    return "533 Card Punch + 407 Accounting for printing";
 }
-
