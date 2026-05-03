@@ -416,8 +416,9 @@ dp_inc_escape (uint16 byte)
     XMSB += scale_or_one ();
   if (byte & 010)
     XLSB = 0;
-  if (byte & 4) /* Enter PPM mode. */
-    ;
+  if (byte & 4) {
+    /* PPM is decoded by the disassembler but not implemented here. */
+  }
   if (byte & 2)
     YMSB += scale_or_one ();
   if (byte & 1)

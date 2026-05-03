@@ -1428,17 +1428,13 @@ void cpu_one_inst (void)
         Aex = ADDR (addr + M[reg]);
         RMR = ACC;
         delay = MEAN_TIME (12, 3);
-        if (IS_ADDITIVE (RAU)) {
-            if (! (ACC & BIT41))
-                break;
-        } else if (IS_MULTIPLICATIVE (RAU)) {
-            if (ACC & BIT48)
-                break;
-        } else if (IS_LOGICAL (RAU)) {
-            if (! ACC)
-                break;
-        } else
-            /* fall thru, i.e. branch */;
+        if (IS_ADDITIVE (RAU) && ! (ACC & BIT41))
+            break;
+        if (IS_MULTIPLICATIVE (RAU) && (ACC & BIT48))
+            break;
+        if (IS_LOGICAL (RAU) && ! ACC)
+            break;
+        /* Otherwise, branch. */
         PC = Aex;
         RUU &= ~RUU_RIGHT_INSTR;
         delay += 3;
