@@ -138,37 +138,37 @@ static t_stat tape_seek(FILE *fileref, t_addr block, t_addr offset)
   return SCPE_OK;
 }
 
-static uint16 read_word(FILE *fileref, t_addr block, t_addr offset)
+static t_stat read_word(FILE *fileref, t_addr block, t_addr offset, uint16 *word)
 {
   t_stat stat;
   uint8 data[2];
-  uint16 word;
 
   stat = tape_seek(fileref, block, offset);
   if (stat != SCPE_OK)
-    ;
+    return stat;
   if (sim_fread(data, 1, 2, fileref) != 2)
-    ;
+    return SCPE_IOERR;
   if (data[1] & 0xF0)
-    ;
-  word = data[1];
-  word <<= 8;
-  word |= data[0];
-  return word;
+    return SCPE_FMT;
+  *word = data[1];
+  *word <<= 8;
+  *word |= data[0];
+  return SCPE_OK;
 }
 
-static void write_word(FILE *fileref, t_addr block, t_addr offset, uint16 word)
+static t_stat write_word(FILE *fileref, t_addr block, t_addr offset, uint16 word)
 {
   t_stat stat;
   uint8 data[2];
 
   stat = tape_seek(fileref, block, offset);
   if (stat != SCPE_OK)
-    ;
+    return stat;
   data[0] = word & 0xFF;
   data[1] = word >> 8;
   if (sim_fwrite(data, 1, 2, fileref) != 2)
-    ;
+    return SCPE_IOERR;
+  return SCPE_OK;
 }
 
 /*
@@ -265,11 +265,15 @@ static void tape_done(UNIT *uptr)
   }
 }
 
-static void tape_word(UNIT *uptr, uint16 block, uint16 offset)
+static t_stat tape_word(UNIT *uptr, uint16 block, uint16 offset)
 {
+  t_stat stat;
+
   switch (C & 7) {
   case RDC: case RCG: case RDE: case CHK:
-    B = read_word(uptr->fileref, block, offset);
+    stat = read_word(uptr->fileref, block, offset, &B);
+    if (stat != SCPE_OK)
+      return stat;
     sim_debug(DBG_READ, &tape_dev,
               "Read block %03o offset %03o data %04o address %04o\n",
               block, offset, B, S);
@@ -281,12 +285,15 @@ static void tape_word(UNIT *uptr, uint16 block, uint16 offset)
     sim_debug(DBG_WRITE, &tape_dev,
               "Write block %03o offset %03o data %04o address %04o\n",
               block, offset, B, S);
-    write_word(uptr->fileref, block, offset, B);
+    stat = write_word(uptr->fileref, block, offset, B);
+    if (stat != SCPE_OK)
+      return stat;
     break;
   }
   S = (S+1) & AMASK;
   A += B;
   A &= WMASK;
+  return SCPE_OK;
 }
 
 static t_stat tape_svc(UNIT *uptr)
@@ -354,8 +361,11 @@ static t_stat tape_svc(UNIT *uptr)
         tape_done(uptr);
     /* Word 6 is a guard. */
     } else if (offset >= 7 && offset < 263) {
-      if (CURRENT_BLOCK == WANTED_BLOCK)
-        tape_word(uptr, (uint16)block, (uint16)(offset - 7));
+      if (CURRENT_BLOCK == WANTED_BLOCK) {
+        t_stat stat = tape_word(uptr, (uint16)block, (uint16)(offset - 7));
+        if (stat != SCPE_OK)
+          return stat;
+      }
     }
     else if (offset == 263 && CURRENT_BLOCK == WANTED_BLOCK)
       /* Checksum here. */
@@ -414,6 +424,9 @@ static t_stat tape_boot(int32 unit_num, DEVICE *dptr)
 t_stat tape_metadata(FILE *fileref, uint16 *block_size, int16 *forward_offset, int16 *reverse_offset)
 {
   t_offset size = sim_fsize(fileref);
+  t_stat stat;
+  uint16 word;
+
   if (size == MAX_BLOCKS * DATA_WORDS * 2) {
     /* Plain image. */
     *block_size = DATA_WORDS;
@@ -422,9 +435,17 @@ t_stat tape_metadata(FILE *fileref, uint16 *block_size, int16 *forward_offset, i
   } else if ((size % (2 * DATA_WORDS)) == 6) {
     /* Extended image with additional meta data. */
     uint16 metadata = (uint16)(size / (2 * DATA_WORDS));
-    *block_size = read_word(fileref, metadata, 0);
-    *forward_offset = (int16)read_word(fileref, metadata, 1);
-    *reverse_offset = (int16)read_word(fileref, metadata, 2);
+    stat = read_word(fileref, metadata, 0, block_size);
+    if (stat != SCPE_OK)
+      return stat;
+    stat = read_word(fileref, metadata, 1, &word);
+    if (stat != SCPE_OK)
+      return stat;
+    *forward_offset = (int16)word;
+    stat = read_word(fileref, metadata, 2, &word);
+    if (stat != SCPE_OK)
+      return stat;
+    *reverse_offset = (int16)word;
   } else
     return SCPE_FMT;
   return SCPE_OK;
