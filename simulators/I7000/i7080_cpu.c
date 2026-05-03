@@ -3472,7 +3472,7 @@ cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
         hst = NULL;
     }
     if (lnt) {
-        hst = (struct InstHistory *)calloc(sizeof(struct InstHistory), lnt);
+        hst = (struct InstHistory *)calloc(lnt, sizeof(struct InstHistory));
 
         if (hst == NULL)
             return SCPE_MEM;

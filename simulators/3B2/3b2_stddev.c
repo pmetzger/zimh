@@ -323,7 +323,7 @@ t_stat tod_reset(DEVICE *dptr)
     int32 t;
 
     if (tod_unit.filebuf == NULL) {
-        tod_unit.filebuf = calloc(sizeof(TOD_DATA), 1);
+        tod_unit.filebuf = calloc(1, sizeof(TOD_DATA));
         if (tod_unit.filebuf == NULL) {
             return SCPE_MEM;
         }

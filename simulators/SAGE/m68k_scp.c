@@ -90,8 +90,8 @@ void m68k_sim_init(void)
     sim_vm_cmd = m68k_sim_cmds;
 
     sym_clearall();
-    symbyname = (SYMHASH*)calloc(sizeof(SYMHASH),SYMHASHSIZE);
-    symbyval = (SYMHASH*)calloc(sizeof(SYMHASH),SYMHASHSIZE);
+    symbyname = (SYMHASH*)calloc(SYMHASHSIZE,sizeof(SYMHASH));
+    symbyval = (SYMHASH*)calloc(SYMHASHSIZE,sizeof(SYMHASH));
     for (i=0; i<SYMHASHSIZE; i++)
         symbyval[i].vnext = symbyname[i].nnext = 0;
 

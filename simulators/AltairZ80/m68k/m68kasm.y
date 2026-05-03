@@ -522,7 +522,7 @@ static void init_ophash(void)
 {
 	struct _optable* op = ops;
 	OPHASH* oph;
-	ophash = (OPHASH**)calloc(sizeof(OPHASH*),OPHASHSIZE);
+	ophash = (OPHASH**)calloc(OPHASHSIZE,sizeof(OPHASH*));
 	while (op->mnem) {
 		int idx = getophash(op->mnem);
 		oph = (OPHASH*)malloc(sizeof(OPHASH));

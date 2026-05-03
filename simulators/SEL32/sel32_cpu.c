@@ -8100,7 +8100,7 @@ cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
         hst = NULL;                                 /* and no pointer either */
     }
     if (lnt) {                                      /* see if new size specified, if so get new resized bfer */
-        hst = (struct InstHistory *)calloc(sizeof(struct InstHistory), lnt);
+        hst = (struct InstHistory *)calloc(lnt, sizeof(struct InstHistory));
         if (hst == NULL)
             return SCPE_MEM;                        /* allocation error, so tell user */
         hst_lnt = lnt;                              /* set new length */

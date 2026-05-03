@@ -972,7 +972,7 @@ static TOPIC *buildHelp(TOPIC *topic, DEVICE *dptr, UNIT *uptr,
                         continue;
                     }
                 }
-                newt = (TOPIC *)calloc(sizeof(TOPIC), 1);
+                newt = (TOPIC *)calloc(1, sizeof(TOPIC));
                 if (!newt) {
                     FAIL(SCPE_MEM, No memory, NULL);
                 }

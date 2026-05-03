@@ -580,7 +580,7 @@ if (!sim_is_running) {                                  /* RESET (not IORESET)? 
     tmxr_poll = t * TMXR_MULT;                          /* set mux poll */
     }
 if (clk_unit.filebuf == NULL) {                         /* make sure the TODR is initialized */
-    clk_unit.filebuf = calloc(sizeof(TOY), 1);
+    clk_unit.filebuf = calloc(1, sizeof(TOY));
     if (clk_unit.filebuf == NULL)
         return SCPE_MEM;
     todr_resync ();

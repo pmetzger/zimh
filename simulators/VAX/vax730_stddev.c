@@ -770,7 +770,7 @@ else
 t_stat clk_reset (DEVICE *dptr)
 {
 if (clk_unit.filebuf == NULL) {                         /* make sure the TODR is initialized */
-    clk_unit.filebuf = calloc(sizeof(TOY), 1);
+    clk_unit.filebuf = calloc(1, sizeof(TOY));
     if (clk_unit.filebuf == NULL)
         return SCPE_MEM;
     }
