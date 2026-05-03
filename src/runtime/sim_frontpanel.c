@@ -41,12 +41,8 @@
 #include <process.h>
 #include <windows.h>
 #include <winerror.h>
-#define sleep(n) Sleep(n*1000)
-#define msleep(n) Sleep(n)
-#define strtoull _strtoui64
 #else /* NOT _WIN32 */
 #include <unistd.h>
-#define msleep(n) usleep(1000*n)
 #include <sys/wait.h>
 
 #endif /* NOT _WIN32 */
@@ -338,11 +334,11 @@ pthread_mutex_lock (&p->io_lock);
 p->debugflush_thread_running = 1;
 pthread_mutex_unlock (&p->io_lock);
 pthread_cond_signal (&p->startup_done);   /* Signal we're ready to go */
-msleep (100);
+sim_sleep_msec (100);
 pthread_mutex_lock (&p->io_lock);
 while (p->sock != INVALID_SOCKET) {
     pthread_mutex_unlock (&p->io_lock);
-    msleep (1000);
+    sim_sleep_msec (1000);
     pthread_mutex_lock (&p->io_lock);
     if (0 == (sleeps++)%flush_interval)
         sim_panel_flush_debug (p);
@@ -679,7 +675,7 @@ else {
         if (sock != INVALID_SOCKET) {
             int sta = 0;
             while (!sta) {
-                msleep (10);
+                sim_sleep_msec (10);
                 sta = sim_check_conn (sock, 1);
                 }
             sim_close_sock (sock);
@@ -817,7 +813,7 @@ if (!simulator_panel) {
 for (i=0; i<100; i++) {          /* Allow up to 10 seconds waiting for simulator to start up */
     p->sock = sim_connect_sock_ex (NULL, p->hostport, NULL, NULL, SIM_SOCK_OPT_NODELAY | SIM_SOCK_OPT_BLOCKING);
     if (p->sock == INVALID_SOCKET)
-        msleep (100);
+        sim_sleep_msec (100);
     else
         break;
     }
@@ -997,7 +993,7 @@ if (panel) {
         /* Wait for up to 2 seconds for a graceful shutdown */
         panel->sock = INVALID_SOCKET;
         for (wait_count=0; panel->io_thread_running && (wait_count<20); ++wait_count)
-            msleep (100);
+            sim_sleep_msec (100);
         /* Now close the socket which should stop a pending read that hasn't completed */
         sim_close_sock (sock);
         pthread_join (panel->io_thread, NULL);
@@ -1011,7 +1007,7 @@ if (panel) {
 #if defined(_WIN32)
     if (panel->hProcess) {
         GenerateConsoleCtrlEvent (CTRL_BREAK_EVENT, panel->dwProcessId);
-        msleep (200);
+        sim_sleep_msec (200);
         TerminateProcess (panel->hProcess, 0);
         WaitForSingleObject (panel->hProcess, INFINITE);
         CloseHandle (panel->hProcess);
@@ -1022,7 +1018,7 @@ if (panel) {
 
         if (!kill (panel->pidProcess, 0)) {
             kill (panel->pidProcess, SIGTERM);
-            msleep (200);
+            sim_sleep_msec (200);
             if (!kill (panel->pidProcess, 0))
                 kill (panel->pidProcess, SIGKILL);
             }
@@ -2092,7 +2088,7 @@ if (!p->parent) {
 p->io_thread_running = 1;
 pthread_mutex_unlock (&p->io_lock);
 pthread_cond_signal (&p->startup_done);   /* Signal we're ready to go */
-msleep (100);
+sim_sleep_msec (100);
 pthread_mutex_lock (&p->io_lock);
 while ((p->sock != INVALID_SOCKET) &&
        (p->State != Error)) {
@@ -2334,7 +2330,7 @@ Start_Next_Line:
             /* Let this state transition propagate to the interested thread(s) */
             /* before processing remaining buffered data */
             pthread_mutex_unlock (&p->io_lock);
-            msleep (100);
+            sim_sleep_msec (100);
             pthread_mutex_lock (&p->io_lock);
             }
         }
@@ -2395,7 +2391,7 @@ pthread_mutex_lock (&p->io_lock);
 p->callback_thread_running = 1;
 pthread_mutex_unlock (&p->io_lock);
 pthread_cond_signal (&p->startup_done);   /* Signal we're ready to go */
-msleep (100);
+sim_sleep_msec (100);
 pthread_mutex_lock (&p->io_lock);
 while ((p->sock != INVALID_SOCKET) &&
        (p->usecs_between_callbacks) &&
@@ -2413,7 +2409,7 @@ while ((p->sock != INVALID_SOCKET) &&
     /*  1) update the query string if it has changed                            */
     /*     (only really happens at startup)                                     */
     /*  2) update register state by polling if the simulator is halted          */
-    msleep (500);
+    sim_sleep_msec (500);
     pthread_mutex_lock (&p->io_lock);
     if (new_register) {
         size_t repeat_data = strlen (register_repeat_prefix) +  /* prefix */
