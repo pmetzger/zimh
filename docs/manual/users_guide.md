@@ -1935,6 +1935,30 @@ Tokens preceded and followed by `%` characters are expanded as
 environment variables, and if an environment variable isn't found then
 it can be one of the available built-in variables (see below).
 
+#### File Path Argument Parsing
+
+Command arguments and environment variables can be parsed as file paths
+with `%~...%` substitutions.  In the examples below, `I` can be a
+numeric `DO` argument such as `1`, or the name of an environment
+variable.
+
+| token     | interpretation                                           |
+|-----------|----------------------------------------------------------|
+| `%~I%`    | value of `%I%` with surrounding quotes removed           |
+| `%~fI%`   | value of `%I%` expanded to a full path                   |
+| `%~pI%`   | path portion only                                        |
+| `%~nI%`   | file name without extension                              |
+| `%~xI%`   | file extension only                                      |
+| `%~tI%`   | file timestamp                                           |
+| `%~zI%`   | file size                                                |
+| `%~pnI%`  | path and file name without extension                     |
+| `%~nxI%`  | file name and extension                                  |
+
+The modifier letters can be combined and are appended in the order
+given.  For example, `%~nx1%` expands the first `DO` argument to a file
+name and extension, while `%~ztnxFILE%` expands environment variable
+`FILE` to file size, timestamp, file name, and extension.
+
 #### `DO` command argument manipulation
 
 The `SHIFT` command will shift the `%1` thru `%9` arguments to the

@@ -980,6 +980,8 @@ return getcwd (buf, buf_size);
  *    %~pI%       - expands filepath value to a path only
  *    %~nI%       - expands filepath value to a file name only
  *    %~xI%       - expands filepath value to a file extension only
+ *    %~tI%       - expands filepath value to the file timestamp
+ *    %~zI%       - expands filepath value to the file size
  *
  * The modifiers can be combined to get compound results:
  *
@@ -991,157 +993,296 @@ return getcwd (buf, buf_size);
  * invocation.
  */
 
-char *sim_filepath_parts (const char *filepath, const char *parts)
+/* Records the expanded path information used by sim_filepath_parts().
+   fullpath is allocated for this struct and freed with it; name and ext
+   point into fullpath.  Optional file size and timestamp text are cached
+   here when requested. */
+struct sim_filepath_info {
+    char *fullpath;
+    char *name;
+    char *ext;
+    char filesize[32];
+    /* GCC cannot infer localtime field ranges, so this covers the
+       worst case so GCC can prove the timestamp formatting fits. */
+    char datetime[80];
+};
+
+/* Detect paths that do not need the current directory prepended.
+   For example, /tmp/a and C:\tmp\a are already full paths. */
+static t_bool sim_filepath_is_fullpath(const char *filepath)
 {
-size_t tot_len = 0, tot_size = 0;
-char *fullpath = NULL, *result = NULL;
-char *c, *name, *ext;
-char chr;
-const char *p;
-char filesizebuf[32] = "";
-char filedatetimebuf[32] = "";
-char namebuf[PATH_MAX + 1];
+    return (((filepath[0] != '\0') && (filepath[1] == ':')) ||
+            (filepath[0] == '/') || (filepath[0] == '\\'));
+}
 
+/* Return an allocated full path string.  For example, report.bin becomes
+   <current-directory>/report.bin. */
+static char *sim_filepath_make_fullpath(const char *filepath)
+{
+    size_t tot_len;
+    char *fullpath;
 
-/* Expand ~/ home directory */
-if (NULL == _sim_expand_homedir (filepath, namebuf, sizeof (namebuf)))
-    return NULL;
-filepath = namebuf;
-
-/* Check for full or current directory relative path */
-if ((filepath[1] == ':')  ||
-    (filepath[0] == '/')  ||
-    (filepath[0] == '\\')){
-        tot_len = 1 + strlen (filepath);
-        fullpath = (char *)malloc (tot_len);
+    if (sim_filepath_is_fullpath(filepath)) {
+        tot_len = 1 + strlen(filepath);
+        fullpath = (char *)malloc(tot_len);
         if (fullpath == NULL)
             return NULL;
-        strlcpy (fullpath, filepath, tot_len);
+        strlcpy(fullpath, filepath, tot_len);
+        return fullpath;
     }
-else {          /* Need to prepend current directory */
-    char dir[PATH_MAX+1] = "";
-    char *wd = sim_getcwd(dir, sizeof (dir));
 
-    if (wd == NULL)
-        return NULL;
-    tot_len = 1 + strlen (filepath) + 1 + strlen (dir);
-    fullpath = (char *)malloc (tot_len);
-    if (fullpath == NULL)
-        return NULL;
-    strlcpy (fullpath, dir, tot_len);
-    if ((dir[strlen (dir) - 1] != '/') &&       /* if missing a trailing directory separator? */
-        (dir[strlen (dir) - 1] != '\\'))
-        strlcat (fullpath, "/", tot_len);       /*  then add one */
-    strlcat (fullpath, filepath, tot_len);
+    {
+        char dir[PATH_MAX + 1] = "";
+        char *wd = sim_getcwd(dir, sizeof(dir));
+        size_t dir_len;
+
+        if (wd == NULL)
+            return NULL;
+
+        dir_len = strlen(dir);
+        tot_len = 1 + strlen(filepath) + 1 + dir_len;
+        fullpath = (char *)malloc(tot_len);
+        if (fullpath == NULL)
+            return NULL;
+
+        strlcpy(fullpath, dir, tot_len);
+        if ((dir_len != 0) &&
+            (dir[dir_len - 1] != '/') &&
+            (dir[dir_len - 1] != '\\'))
+            strlcat(fullpath, "/", tot_len);
+        strlcat(fullpath, filepath, tot_len);
+        return fullpath;
     }
-while ((c = strchr (fullpath, '\\')))           /* standardize on / directory separator */
-       *c = '/';
-if ((fullpath[1] == ':') && islower (fullpath[0]))
-    fullpath[0] = toupper (fullpath[0]);
-while ((c = strstr (fullpath + 1, "//")))       /* strip out redundant / characters (leaving the option for a leading //) */
-       memmove (c, c + 1, 1 + strlen (c + 1));
-while ((c = strstr (fullpath, "/./")))          /* strip out irrelevant /./ sequences */
-       memmove (c, c + 2, 1 + strlen (c + 2));
-while ((c = strstr (fullpath, "/../"))) {       /* process up directory climbing */
-    char *cl = c - 1;
+}
 
-    while ((*cl != '/') && (cl > fullpath))
-        --cl;
-    if ((cl <= fullpath) ||                      /* Digest Leading /../ sequences */
-        ((fullpath[1] == ':') && (c == fullpath + 2)))
-        memmove (c, c + 3, 1 + strlen (c + 3)); /* and removing intervening elements */
-    else
-        if (*cl == '/')
-            memmove (cl, c + 3, 1 + strlen (c + 3));/* and removing intervening elements */
+/* Preserve the lexical path cleanup rules for filepath parts.  For example,
+   /tmp//a/./b/../c becomes /tmp/a/c. */
+static void sim_filepath_normalize_fullpath(char *fullpath)
+{
+    char *c;
+
+    while ((c = strchr(fullpath, '\\')) != NULL)
+        *c = '/';
+    if ((fullpath[0] != '\0') && (fullpath[1] == ':') &&
+        islower(fullpath[0]))
+        fullpath[0] = toupper(fullpath[0]);
+    while ((c = strstr(fullpath + 1, "//")) != NULL)
+        memmove(c, c + 1, 1 + strlen(c + 1));
+    while ((c = strstr(fullpath, "/./")) != NULL)
+        memmove(c, c + 2, 1 + strlen(c + 2));
+    while ((c = strstr(fullpath, "/../")) != NULL) {
+        char *cl = c - 1;
+
+        while ((*cl != '/') && (cl > fullpath))
+            --cl;
+        if ((cl <= fullpath) ||
+            ((fullpath[1] == ':') && (c == fullpath + 2)))
+            memmove(c, c + 3, 1 + strlen(c + 3));
+        else if (*cl == '/')
+            memmove(cl, c + 3, 1 + strlen(c + 3));
         else
             break;
     }
-if (!strrchr (fullpath, '/'))
-    name = fullpath + strlen (fullpath);
-else
-    name = 1 + strrchr (fullpath, '/');
-ext = strrchr (name, '.');
-if (ext == NULL)
-    ext = name + strlen (name);
-tot_size = 0;
-if (*parts == '\0')             /* empty part specifier means strip only quotes */
-    tot_size = strlen (filepath);
-if (strchr (parts, 't') ||      /* modification time or */
-    strchr (parts, 'z')) {      /* or size requested? */
-    struct stat filestat;
-    struct tm *tm;
+}
 
-    memset (&filestat, 0, sizeof (filestat));
-    (void)stat (fullpath, &filestat);
-    if (sizeof (filestat.st_size) == 4)
-        snprintf (filesizebuf, sizeof (filesizebuf), "%ld ",
-                  (long)filestat.st_size);
+/* Point the name and extension fields into the normalized fullpath.
+   For example, /tmp/report.bin records report.bin and .bin. */
+static void sim_filepath_find_parts(struct sim_filepath_info *info)
+{
+    char *name;
+
+    name = strrchr(info->fullpath, '/');
+    if (name == NULL)
+        info->name = info->fullpath + strlen(info->fullpath);
     else
-        snprintf (filesizebuf, sizeof (filesizebuf),
-                  "%" LL_FMT "d ", (LL_TYPE)filestat.st_size);
-    tm = localtime (&filestat.st_mtime);
-    snprintf (filedatetimebuf, sizeof (filedatetimebuf),
-              "%02d/%02d/%04d %02d:%02d %cM ",
-              1 + tm->tm_mon, tm->tm_mday, 1900 + tm->tm_year,
-              tm->tm_hour % 12, tm->tm_min,
-              (0 == (tm->tm_hour % 12)) ? 'A' : 'P');
+        info->name = name + 1;
+
+    info->ext = strrchr(info->name, '.');
+    if (info->ext == NULL)
+        info->ext = info->name + strlen(info->name);
+}
+
+/* Format the %~z file-size substitution.  The result includes the
+   trailing space that existing command substitutions expect. */
+static void sim_filepath_format_size(char *buf, size_t size,
+                                     const struct stat *filestat)
+{
+    if (sizeof(filestat->st_size) == 4)
+        snprintf(buf, size, "%ld ", (long)filestat->st_size);
+    else
+        snprintf(buf, size, "%" LL_FMT "d ", (LL_TYPE)filestat->st_size);
+}
+
+/* Format the MM/DD/YYYY hh:mm AM/PM timestamp substitution. */
+static t_bool sim_filepath_format_datetime(char *buf, size_t size,
+                                           time_t mtime)
+{
+    struct tm *tm = localtime(&mtime);
+    int written;
+
+    if (tm == NULL)
+        return FALSE;
+
+    written = snprintf(buf, size, "%02d/%02d/%04d %02d:%02d %cM ",
+                       1 + tm->tm_mon, tm->tm_mday, 1900 + tm->tm_year,
+                       tm->tm_hour % 12, tm->tm_min,
+                       (0 == (tm->tm_hour % 12)) ? 'A' : 'P');
+    return ((written >= 0) && ((size_t)written < size));
+}
+
+/* Missing or unreadable files still get deterministic placeholder metadata:
+   size 0 and the timestamp produced from time_t 0. */
+static void sim_filepath_read_metadata(struct sim_filepath_info *info)
+{
+    struct stat filestat;
+
+    memset(&filestat, 0, sizeof(filestat));
+    (void)stat(info->fullpath, &filestat);
+    sim_filepath_format_size(info->filesize, sizeof(info->filesize),
+                             &filestat);
+    (void)sim_filepath_format_datetime(info->datetime, sizeof(info->datetime),
+                                       filestat.st_mtime);
+}
+
+/* Allocate and normalize fullpath, then record name and ext inside it.
+   For example, /tmp//alpha/./report.bin becomes /tmp/alpha/report.bin,
+   with name pointing at report.bin and ext pointing at .bin. */
+static t_bool sim_filepath_info_init(struct sim_filepath_info *info,
+                                     const char *filepath)
+{
+    memset(info, 0, sizeof(*info));
+    info->fullpath = sim_filepath_make_fullpath(filepath);
+    if (info->fullpath == NULL)
+        return FALSE;
+
+    sim_filepath_normalize_fullpath(info->fullpath);
+    sim_filepath_find_parts(info);
+    return TRUE;
+}
+
+/* Release owned storage and clear borrowed pointers into it. */
+static void sim_filepath_info_free(struct sim_filepath_info *info)
+{
+    free(info->fullpath);
+    memset(info, 0, sizeof(*info));
+}
+
+/* Return the number of bytes one requested part will add to the result.
+   For example, 'n' contributes the filename length without the extension,
+   and 'p' contributes the directory prefix length. */
+static size_t sim_filepath_part_size(const struct sim_filepath_info *info,
+                                     char part)
+{
+    switch (part) {
+    case 'f':
+        return strlen(info->fullpath);
+    case 'p':
+        return (size_t)(info->name - info->fullpath);
+    case 'n':
+        return (size_t)(info->ext - info->name);
+    case 'x':
+        return strlen(info->ext);
+    case 't':
+        return strlen(info->datetime);
+    case 'z':
+        return strlen(info->filesize);
+    default:
+        return 0;
     }
-for (p = parts; *p; p++) {
-    switch (*p) {
-        case 'f':
-            tot_size += strlen (fullpath);
-            break;
-        case 'p':
-            tot_size += name - fullpath;
-            break;
-        case 'n':
-            tot_size += ext - name;
-            break;
-        case 'x':
-            tot_size += strlen (ext);
-            break;
-        case 't':
-            tot_size += strlen (filedatetimebuf);
-            break;
-        case 'z':
-            tot_size += strlen (filesizebuf);
-            break;
-        }
+}
+
+/* Measure the exact allocation needed for the requested part list. */
+static size_t sim_filepath_parts_size(const struct sim_filepath_info *info,
+                                      const char *filepath,
+                                      const char *parts)
+{
+    size_t size = 0;
+    const char *p;
+
+    if (*parts == '\0')
+        return strlen(filepath);
+
+    for (p = parts; *p; ++p)
+        size += sim_filepath_part_size(info, *p);
+
+    return size;
+}
+
+/* Append a byte span and return the next output position. */
+static char *sim_filepath_append(char *dst, const char *src, size_t len)
+{
+    memcpy(dst, src, len);
+    return dst + len;
+}
+
+/* Append the text for one part character, such as 'p' for the path or
+   'n' for the filename without extension. */
+static char *sim_filepath_append_part(char *dst,
+                                      const struct sim_filepath_info *info,
+                                      char part)
+{
+    switch (part) {
+    case 'f':
+        return sim_filepath_append(dst, info->fullpath, strlen(info->fullpath));
+    case 'p':
+        return sim_filepath_append(dst, info->fullpath,
+                                   (size_t)(info->name - info->fullpath));
+    case 'n':
+        return sim_filepath_append(dst, info->name,
+                                   (size_t)(info->ext - info->name));
+    case 'x':
+        return sim_filepath_append(dst, info->ext, strlen(info->ext));
+    case 't':
+        return sim_filepath_append(dst, info->datetime, strlen(info->datetime));
+    case 'z':
+        return sim_filepath_append(dst, info->filesize, strlen(info->filesize));
+    default:
+        return dst;
     }
-result = (char *)malloc (1 + tot_size);
-*result = '\0';
-if (*parts == '\0')             /* empty part specifier means strip only quotes */
-    strlcat (result, filepath, 1 + tot_size);
-for (p = parts; *p; p++) {
-    switch (*p) {
-        case 'f':
-            strlcat (result, fullpath, 1 + tot_size);
-            break;
-        case 'p':
-            chr = *name;
-            *name = '\0';
-            strlcat (result, fullpath, 1 + tot_size);
-            *name = chr;
-            break;
-        case 'n':
-            chr = *ext;
-            *ext = '\0';
-            strlcat (result, name, 1 + tot_size);
-            *ext = chr;
-            break;
-        case 'x':
-            strlcat (result, ext, 1 + tot_size);
-            break;
-        case 't':
-            strlcat (result, filedatetimebuf, 1 + tot_size);
-            break;
-        case 'z':
-            strlcat (result, filesizebuf, 1 + tot_size);
-            break;
-        }
-    }
-free (fullpath);
-return result;
+}
+
+/* Allocate and assemble the final substitution result. */
+static char *sim_filepath_parts_build(const struct sim_filepath_info *info,
+                                      const char *filepath, const char *parts)
+{
+    size_t size = sim_filepath_parts_size(info, filepath, parts);
+    char *result = (char *)malloc(size + 1);
+    char *dst = result;
+    const char *p;
+
+    if (result == NULL)
+        return NULL;
+
+    if (*parts == '\0')
+        dst = sim_filepath_append(dst, filepath, strlen(filepath));
+    else
+        for (p = parts; *p; ++p)
+            dst = sim_filepath_append_part(dst, info, *p);
+
+    *dst = '\0';
+    return result;
+}
+
+/* Expand filepath, then return the requested path, name, metadata, or
+   combined parts described by the part-character string. */
+char *sim_filepath_parts(const char *filepath, const char *parts)
+{
+    struct sim_filepath_info info;
+    char *result;
+    char namebuf[PATH_MAX + 1];
+
+    if (NULL == _sim_expand_homedir(filepath, namebuf, sizeof(namebuf)))
+        return NULL;
+    filepath = namebuf;
+
+    if (!sim_filepath_info_init(&info, filepath))
+        return NULL;
+    if (strchr(parts, 't') || strchr(parts, 'z'))
+        sim_filepath_read_metadata(&info);
+
+    result = sim_filepath_parts_build(&info, filepath, parts);
+    sim_filepath_info_free(&info);
+    return result;
 }
 
 #if defined (_WIN32)

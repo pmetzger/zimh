@@ -33,6 +33,25 @@ struct stdout_capture_context {
     char **filelist;
 };
 
+/* Run one callback with TZ set to a known value, then restore it. */
+static void with_timezone(const char *timezone, void (*fn)(void *ctx),
+                          void *ctx)
+{
+    const char *saved_tz = getenv("TZ");
+    char *saved_copy = saved_tz ? strdup(saved_tz) : NULL;
+
+    assert_int_equal(setenv("TZ", timezone, 1), 0);
+    tzset();
+    fn(ctx);
+    if (saved_copy != NULL) {
+        assert_int_equal(setenv("TZ", saved_copy, 1), 0);
+        free(saved_copy);
+    } else {
+        assert_int_equal(unsetenv("TZ"), 0);
+    }
+    tzset();
+}
+
 static int setup_sim_fio_fixture(void **state)
 {
     static const uint8_t file_bytes[] = {0x10, 0x20, 0x30, 0x40, 0x50};
@@ -288,6 +307,81 @@ test_sim_filepath_parts_handles_home_expansion_and_time_fields(void **state)
     } else {
         assert_int_equal(unsetenv("HOME"), 0);
     }
+}
+
+static void expect_fixed_timestamp_text(void *ctx)
+{
+    struct sim_fio_fixture *fixture = ctx;
+    time_t access_time = (time_t)1700000000;
+    time_t write_time = (time_t)1700000123;
+    char *time_text;
+
+    assert_int_equal(
+        sim_set_file_times(fixture->file_path, access_time, write_time),
+        SCPE_OK);
+
+    time_text = sim_filepath_parts(fixture->file_path, "t");
+    assert_non_null(time_text);
+    assert_string_equal(time_text, "11/14/2023 10:15 PM ");
+
+    free(time_text);
+}
+
+static void expect_ordered_part_text(void *ctx)
+{
+    struct sim_fio_fixture *fixture = ctx;
+    time_t access_time = (time_t)1700000000;
+    time_t write_time = (time_t)1700000123;
+    char *part_text;
+
+    assert_int_equal(
+        sim_set_file_times(fixture->file_path, access_time, write_time),
+        SCPE_OK);
+
+    part_text = sim_filepath_parts(fixture->file_path, "ztnx");
+    assert_non_null(part_text);
+    assert_string_equal(part_text, "5 11/14/2023 10:15 PM report.bin");
+
+    free(part_text);
+}
+
+/* Verify timestamp extraction preserves the fixed legacy formatting. */
+static void test_sim_filepath_parts_formats_fixed_timestamp(void **state)
+{
+    struct sim_fio_fixture *fixture = *state;
+
+    with_timezone("UTC0", expect_fixed_timestamp_text, fixture);
+}
+
+/* Verify combined parts are appended in caller-requested order. */
+static void test_sim_filepath_parts_preserves_part_order(void **state)
+{
+    struct sim_fio_fixture *fixture = *state;
+
+    with_timezone("UTC0", expect_ordered_part_text, fixture);
+}
+
+/* Verify relative paths are resolved against the current directory. */
+static void test_sim_filepath_parts_resolves_relative_paths(void **state)
+{
+    struct sim_fio_fixture *fixture = *state;
+    char *full_path;
+    char *name_ext;
+
+    assert_int_equal(sim_chdir(fixture->temp_dir), 0);
+
+    full_path = sim_filepath_parts("alpha/./report.bin", "f");
+    name_ext = sim_filepath_parts("alpha/./report.bin", "nx");
+
+    assert_non_null(full_path);
+    assert_non_null(name_ext);
+    assert_string_equal(full_path, fixture->normalized_path);
+    assert_string_equal(name_ext, "report.bin");
+
+    free(name_ext);
+    free(full_path);
+
+    assert_int_equal(chdir(fixture->original_cwd), 0);
 }
 
 /* Verify missing files still produce defined placeholder time and size
@@ -832,6 +926,15 @@ int main(void)
             setup_sim_fio_fixture, teardown_sim_fio_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_filepath_parts_handles_home_expansion_and_time_fields,
+            setup_sim_fio_fixture, teardown_sim_fio_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_filepath_parts_formats_fixed_timestamp,
+            setup_sim_fio_fixture, teardown_sim_fio_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_filepath_parts_preserves_part_order,
+            setup_sim_fio_fixture, teardown_sim_fio_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_filepath_parts_resolves_relative_paths,
             setup_sim_fio_fixture, teardown_sim_fio_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_filepath_parts_handles_missing_file_metadata,
