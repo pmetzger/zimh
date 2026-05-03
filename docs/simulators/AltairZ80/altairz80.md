@@ -947,6 +947,11 @@ for disk 0 to the original number of 77. The command `D TRACKS[0-7]
 77` changes the highest track number for all disks to 77. The Mini-Disk
 support was added by Mike Douglas in May 2014.
 
+When booting from `DSK`, AltairZ80 chooses the boot ROM behavior from
+the attached image size. Mini-Disk-sized images use the Mini-Disk boot
+ROM. Standard Altair disk images boot from track 0, sector 0. Other
+image sizes use the standard boot ROM starting at track 0, sector 8.
+
 The DSK device can be configured with
 
 | command | action |

@@ -72,6 +72,9 @@ For testing, you will need:
 
 - `cmocka` 1.1.5 or newer
   Provides the host-side C unit-test framework used under `tests/unit/`.
+- Python 3
+  Runs integration-test drivers that need more than a simple simulator
+  command script.
 
 For networking, you will need the libraries for the backends you enable:
 
@@ -97,6 +100,9 @@ Notes:
   instead of `bison.exe`. The CMake build accepts either executable name.
 - `cmocka` is for host-side unit tests rather than the historical
   simulator binaries themselves.
+- Python 3 is required for the full integration test suite. CMake can
+  configure without Python, but Python-backed tests are skipped when no
+  interpreter is found.
 - `SDL2_ttf` is the usual missing piece when a video-enabled build does
   not configure successfully.
 - `libedit` is optional, but without it SCP falls back to plainer
@@ -352,6 +358,7 @@ pkg-config --modversion libpng
 pkg-config --modversion zlib
 pkg-config --modversion libedit
 pkg-config --modversion slirp
+python3 --version
 bison --version
 ```
 

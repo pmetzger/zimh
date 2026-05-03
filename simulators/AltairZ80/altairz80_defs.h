@@ -52,6 +52,9 @@
 #define LDA_INSTRUCTION         0x3e                        /* op-code for LD A,<8-bit value> instruction   */
 #define UNIT_NO_OFFSET_1        0x37                        /* LD A,<unitno>                                */
 #define UNIT_NO_OFFSET_2        0xb4                        /* LD a,80h | <unitno>                          */
+/* Standard disk boot ROM patch points. */
+#define LDB_INSTRUCTION         0x06
+#define START_SECTOR_OFFSET     0x57
 
 #define CPU_INDEX_8080          4                           /* index of default PC register */
 

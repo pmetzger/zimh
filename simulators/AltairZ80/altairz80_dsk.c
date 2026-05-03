@@ -157,6 +157,9 @@
 #define MINI_DISK_SIZE      (MINI_DISK_TRACKS * MINI_DISK_SECT * DSK_SECTSIZE)
 #define MINI_DISK_DELTA     4096                    /* threshold for detecting mini disks       */
 
+#define ALTAIR_DISK_SIZE    337664                  /* size of regular Altair disks             */
+#define ALTAIR_DISK_DELTA   256                     /* threshold for detecting Altair disks     */
+
 int32 dsk10(const int32 port, const int32 io, const int32 data);
 int32 dsk11(const int32 port, const int32 io, const int32 data);
 int32 dsk12(const int32 port, const int32 io, const int32 data);
@@ -187,6 +190,8 @@ static int32 sectors_per_track [NUM_OF_DSK] = { DSK_SECT, DSK_SECT, DSK_SECT, DS
                                                 DSK_SECT, DSK_SECT, DSK_SECT, DSK_SECT,
                                                 DSK_SECT, DSK_SECT, DSK_SECT, DSK_SECT,
                                                 DSK_SECT, DSK_SECT, DSK_SECT, DSK_SECT };
+static int32 current_image_size [NUM_OF_DSK] = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 static int32 tracks         [NUM_OF_DSK]    = { MAX_TRACKS, MAX_TRACKS, MAX_TRACKS, MAX_TRACKS,
                                                 MAX_TRACKS, MAX_TRACKS, MAX_TRACKS, MAX_TRACKS,
                                                 MAX_TRACKS, MAX_TRACKS, MAX_TRACKS, MAX_TRACKS,
@@ -310,6 +315,8 @@ static REG dsk_reg[] = {
                "Number of tracks register array"), REG_CIRC                                 },
     { BRDATAD (SECTPERTRACK, sectors_per_track, 10, 32,  NUM_OF_DSK,
                "Number of sectors per track register array"), REG_CIRC                      },
+    { BRDATAD (IMAGESIZE, current_image_size,    10, 32,  NUM_OF_DSK,
+               "Size of disk image array"), REG_CIRC + REG_RO                               },
     { DRDATAD (IN9COUNT,     in9_count,         4,
                "Count of IN(9) register"),  REG_RO                                          },
     { DRDATAD (IN9MESSAGE,   in9_message,       4,
@@ -396,6 +403,23 @@ static t_stat dsk_reset(DEVICE *dptr) {
     sim_map_resource(0x0A, 1, RESOURCE_TYPE_IO, &dsk12, "dsk12", dptr->flags & DEV_DIS);
     return SCPE_OK;
 }
+
+static t_bool dsk_image_size_is_near(
+    const int32 image_size, const int32 expected_size, const int32 delta)
+{
+    return (expected_size - delta < image_size) &&
+           (image_size < expected_size + delta);
+}
+
+static int32 dsk_boot_start_sector(const int32 image_size)
+{
+    if (dsk_image_size_is_near(
+            image_size, ALTAIR_DISK_SIZE, ALTAIR_DISK_DELTA))
+        return 0;
+
+    return 8;
+}
+
 /* dsk_attach - determine type of drive attached based on disk image size */
 
 static t_stat dsk_attach(UNIT *uptr, const char *cptr) {
@@ -413,8 +437,10 @@ static t_stat dsk_attach(UNIT *uptr, const char *cptr) {
      tracks to 16, otherwise, 32 sectors per track. */
 
     imageSize = sim_fsize(uptr -> fileref);
-    sectors_per_track[thisUnitIndex] = (((MINI_DISK_SIZE - MINI_DISK_DELTA < imageSize) &&
-                                         (imageSize < MINI_DISK_SIZE + MINI_DISK_DELTA)) ?
+    current_image_size[thisUnitIndex] = imageSize;
+    sectors_per_track[thisUnitIndex] = (dsk_image_size_is_near(
+                                            imageSize, MINI_DISK_SIZE,
+                                            MINI_DISK_DELTA) ?
                                         MINI_DISK_SECT : DSK_SECT);
     return SCPE_OK;
 }
@@ -426,7 +452,8 @@ void install_ALTAIRbootROM(void) {
 }
 
 /*  The boot routine modifies the boot ROM in such a way that subsequently
-    the specified disk is used for boot purposes.
+    the specified disk is used for boot purposes.  For the standard boot ROM,
+    the starting sector is chosen from the attached image size.
 */
 static t_stat dsk_boot(int32 unitno, DEVICE *dptr) {
     if (cpu_unit.flags & (UNIT_CPU_ALTAIRROM | UNIT_CPU_BANKED)) {
@@ -435,17 +462,25 @@ static t_stat dsk_boot(int32 unitno, DEVICE *dptr) {
                                                    ALTAIR_ROM_LOW, TRUE) == SCPE_OK);
             ASSURE(result);
         } else {
-        /* check whether we are really modifying an LD A,<> instruction */
+            if (bootrom_dsk[START_SECTOR_OFFSET - 1] == LDB_INSTRUCTION)
+                bootrom_dsk[START_SECTOR_OFFSET] =
+                    dsk_boot_start_sector(current_image_size[unitno]);
+            else {
+                sim_printf("Incorrect boot ROM first sector offset detected.\n");
+                return SCPE_IERR;
+            }
+
+            /* check whether we are really modifying an LD A,<> instruction */
             if ((bootrom_dsk[UNIT_NO_OFFSET_1 - 1] == LDA_INSTRUCTION) &&
                 (bootrom_dsk[UNIT_NO_OFFSET_2 - 1] == LDA_INSTRUCTION)) {
-            bootrom_dsk[UNIT_NO_OFFSET_1] = unitno & 0xff;             /* LD A,<unitno>        */
-            bootrom_dsk[UNIT_NO_OFFSET_2] = 0x80 | (unitno & 0xff);    /* LD a,80h | <unitno>  */
-        } else { /* Attempt to modify non LD A,<> instructions is refused. */
-                sim_printf("Incorrect boot ROM offsets detected.\n");
-            return SCPE_IERR;
+                bootrom_dsk[UNIT_NO_OFFSET_1] = unitno & 0xff;          /* LD A,<unitno>        */
+                bootrom_dsk[UNIT_NO_OFFSET_2] = 0x80 | (unitno & 0xff); /* LD a,80h | <unitno>  */
+            } else { /* Attempt to modify non LD A,<> instructions is refused. */
+                sim_printf("Incorrect boot ROM unit number offset detected.\n");
+                return SCPE_IERR;
+            }
+            install_ALTAIRbootROM();                                    /* install modified ROM */
         }
-        install_ALTAIRbootROM();                                         /* install modified ROM */
-    }
     }
     *((int32 *) sim_PC->loc) = ALTAIR_ROM_LOW;
     return SCPE_OK;

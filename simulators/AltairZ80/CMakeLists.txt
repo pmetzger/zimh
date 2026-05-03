@@ -93,3 +93,25 @@ add_simulator(altairz80
     LABEL AltairZ80
     PKG_FAMILY altairz80_family
     TEST altairz80)
+
+set(altairz80_boot_rom_choice_output_dir
+    "${CMAKE_CURRENT_BINARY_DIR}/tests/altairz80-boot-rom-choice")
+
+find_package(Python3 COMPONENTS Interpreter)
+if (Python3_Interpreter_FOUND)
+    add_test(
+        NAME zimh-altairz80-boot-rom-choice
+        COMMAND
+            ${Python3_EXECUTABLE}
+            "${CMAKE_CURRENT_SOURCE_DIR}/tests/boot_rom_choice_test.py"
+            $<TARGET_FILE:altairz80>
+            --work-dir
+            "${altairz80_boot_rom_choice_output_dir}")
+
+    set_tests_properties(
+        zimh-altairz80-boot-rom-choice
+        PROPERTIES
+            LABELS "zimh;integration;zimh-AltairZ80"
+            ENVIRONMENT
+            "SIMH_TEST_OUTPUT_DIR=${altairz80_boot_rom_choice_output_dir}")
+endif ()
