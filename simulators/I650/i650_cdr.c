@@ -44,14 +44,12 @@
 */
 
 uint32              cdr_cmd(UNIT *, uint16, uint16);
-t_stat              cdr_srv(UNIT *);
-t_stat              cdr_reset(DEVICE *);
-t_stat              cdr_attach(UNIT *, const char *);
-t_stat              cdr_detach(UNIT *);
-t_stat              cdr_help(FILE *, DEVICE *, UNIT *, int32, const char *);
-const char         *cdr_description(DEVICE *dptr);
-t_stat              cdr_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc);
-t_stat              cdr_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc);
+static t_stat       cdr_srv(UNIT *);
+static t_stat       cdr_attach(UNIT *, const char *);
+static t_stat       cdr_help(FILE *, DEVICE *, UNIT *, int32, const char *);
+static const char  *cdr_description(DEVICE *dptr);
+static t_stat       cdr_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc);
+static t_stat       cdr_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 UNIT                cdr_unit[4] = {
    {UDATA(cdr_srv, UNIT_CDR, 0), 300},  // Unit 0 used internally for carddeck operations simulator specific command
@@ -81,7 +79,7 @@ int    ReadStakerLast[3];
 
 // get 10 digits word with sign from card buf (the data struct).
 // return the first column where HiPunch set (first column is 1; 0 is no HiPunch set)
-int decode_8word_wiring(uint16 image[80], int bCheckForHiPunch)
+static int decode_8word_wiring(uint16 image[80], int bCheckForHiPunch)
 {
     // decode up to 8 numerical words per card
     // input card
@@ -142,7 +140,7 @@ int decode_8word_wiring(uint16 image[80], int bCheckForHiPunch)
 
 // load soap symbolic info, This is a facility to help debugging of soap programs into SimH
 // does not exist in real hw
-void decode_soap_symb_info(uint16 image[80])
+static void decode_soap_symb_info(uint16 image[80])
 {
     t_int64 d;
     int op,da,ia,i,i2;
@@ -186,7 +184,7 @@ void decode_soap_symb_info(uint16 image[80])
     strlcpy(Symbolic_Buffer, buf, i2);
 }
 
-t_int64 decode_num_word(char * buf, int nDigits, int bSpaceIsZero)
+static t_int64 decode_num_word(char * buf, int nDigits, int bSpaceIsZero)
 {
     t_int64 d;
     int i,c;
@@ -209,7 +207,7 @@ t_int64 decode_num_word(char * buf, int nDigits, int bSpaceIsZero)
     return d;
 }
 
-t_int64 decode_alpha_word(char * buf, int n)
+static t_int64 decode_alpha_word(char * buf, int n)
 {
     t_int64 d;
     int i;
@@ -222,7 +220,7 @@ t_int64 decode_alpha_word(char * buf, int n)
 }
 
 
-void decode_soap_wiring(uint16 image[80], int bMultiPass)
+static void decode_soap_wiring(uint16 image[80], int bMultiPass)
 {
     // decode soap card simulating soap control panel wiring for 533
     // from SOAP II manual at http://www.bitsavers.org/pdf/ibm/650/24-4000-0_SOAPII.pdf
@@ -302,7 +300,7 @@ void decode_soap_wiring(uint16 image[80], int bMultiPass)
     }
 }
 
-void decode_supersoap_wiring(uint16 image[80])
+static void decode_supersoap_wiring(uint16 image[80])
 {
     // decode supersoap card simulating soap control panel wiring for 533
     // educated guess based on supersoap program listing at http://archive.computerhistory.org/resources/access/text/2018/07/102784987-05-01-acc.pdf
@@ -381,7 +379,7 @@ void decode_supersoap_wiring(uint16 image[80])
 }
 
 
-int sformat(char * buf, const char * match)
+static int sformat(char * buf, const char * match)
 {
     char m,c;
 
@@ -398,7 +396,7 @@ int sformat(char * buf, const char * match)
     return 1; // end of match string -> return 1 -> buf matches
 }
 
-void decode_is_wiring(uint16 image[80])
+static void decode_is_wiring(uint16 image[80])
 {
     // decode Floationg Decimal Interpretive System (IS) card simulating control panel wiring for 533 as described
     // in manual at http://www.bitsavers.org/pdf/ibm/650/28-4024_FltDecIntrpSys.pdf
@@ -532,7 +530,7 @@ void decode_is_wiring(uint16 image[80])
     }
 }
 
-void decode_it_wiring(uint16 image[80])
+static void decode_it_wiring(uint16 image[80])
 {
     // decode IT compiler card simulating control panel wiring for 533
     // from IT manual at http://www.bitsavers.org/pdf/ibm/650/CarnegieInternalTranslator.pdf
@@ -609,7 +607,7 @@ void decode_it_wiring(uint16 image[80])
 // convert RrNNNN to word
 // R can be A to I (equivalent to 1 to 9). r and N can be 0 to 9
 // any other char assumed to be zero
-t_int64 decode_regional_addr(char * buf, char * nbuf)
+static t_int64 decode_regional_addr(char * buf, char * nbuf)
 {
    int c;
    t_int64 w;
@@ -630,7 +628,7 @@ t_int64 decode_regional_addr(char * buf, char * nbuf)
    return w * 10000 + decode_num_word(nbuf, 4, 1);
 }
 
-int decode_ra_wiring(uint16 image[80], int HiPunch)
+static int decode_ra_wiring(uint16 image[80], int HiPunch)
 {
     // decode REGIONAL ASSEMBLY card simulating control panel wiring for 533
     // return 1 if it is a load card that makes RD inst continue to DA addr instead of IA addr
@@ -810,7 +808,7 @@ int decode_ra_wiring(uint16 image[80], int HiPunch)
     return IsLoadCard;
 }
 
-int decode_fds_wiring(uint16 image[80], int HiPunch)
+static int decode_fds_wiring(uint16 image[80], int HiPunch)
 {
     // decode Interpretive Floating Decimal System card
     // return 1 if it is a load card that makes RD inst continue to DA addr instead of IA addr
@@ -977,7 +975,7 @@ int decode_fds_wiring(uint16 image[80], int HiPunch)
     return IsLoadCard;
 }
 
-void decode_fortransit_wiring(uint16 image[80])
+static void decode_fortransit_wiring(uint16 image[80])
 {
     // decode FORTRANSIT translator card simulating control panel wiring for 533
     // from FORTRANSIT manual at http://bitsavers.org/pdf/ibm/650/28-4028_FOR_TRANSIT.pdf
@@ -1112,6 +1110,11 @@ uint32 cdr_cmd(UNIT * uptr, uint16 cmd, uint16 addr)
     int i, HiPunch;
     char cbuf[81];
     int ncdr, ic;
+
+    /* Generic device command signature.
+       This implementation does not use every parameter. */
+    (void)cmd;
+    (void)addr;
 
     /* Are we currently tranfering? */
     if (uptr->u5 & URCSTA_BUSY)
@@ -1255,17 +1258,26 @@ uint32 cdr_cmd(UNIT * uptr, uint16 cmd, uint16 addr)
 
 /* Handle transfer of data for card reader */
 
-t_stat
+static t_stat
 cdr_srv(UNIT *uptr) {
+
+    /* Generic service routine signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
 
     // I/O is synchronous. No need to set up svr
     return SCPE_OK;
 }
 
 /* Set card read/punch control panel wiring */
-t_stat cdr_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc)
+static t_stat cdr_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
     int f;
+
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void)val;
+    (void)desc;
 
     if (uptr == NULL) return SCPE_IERR;
     if (cptr == NULL) return SCPE_ARG;
@@ -1279,9 +1291,14 @@ t_stat cdr_set_wiring (UNIT *uptr, int32 val, const char *cptr, void *desc)
 }
 
 /* Show card read/punch control panel wiring */
-t_stat cdr_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc)
+static t_stat cdr_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
     int f;
+
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void)val;
+    (void)desc;
 
     for (f = 0; wirings[f].name != 0; f++) {
         if ((uptr->flags & UNIT_CARD_WIRING) == wirings[f].mode) {
@@ -1294,7 +1311,7 @@ t_stat cdr_show_wiring (FILE *st, UNIT *uptr, int32 val, const void *desc)
 }
 
 
-t_stat
+static t_stat
 cdr_attach(UNIT * uptr, const char *file)
 {
     t_stat              r;
@@ -1326,7 +1343,7 @@ cdr_attach(UNIT * uptr, const char *file)
     return SCPE_OK;
 }
 
-t_stat
+static t_stat
 cdr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
    fprintf (st, "%s\r\n\r\n", cdr_description(dptr));
@@ -1339,9 +1356,13 @@ cdr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
    return SCPE_OK;
 }
 
-const char *
+static const char *
 cdr_description(DEVICE *dptr)
 {
+   /* Generic device description signature.
+      This implementation does not use every parameter. */
+   (void)dptr;
+
    return "533 Card Read-Punch unit";
 }
 
