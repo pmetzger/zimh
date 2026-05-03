@@ -30,6 +30,9 @@ time_t sim_time(time_t *now);
 /* Sleep for a whole number of seconds through sim_nanosleep(). */
 void sim_sleep(unsigned int sec);
 
+/* Sleep for a millisecond interval through sim_nanosleep(). */
+void sim_sleep_msec(unsigned int msec);
+
 /* Install test hooks for deterministic clock and sleep behavior. */
 void sim_time_set_test_hooks(sim_clock_gettime_fn clock_hook,
                              sim_nanosleep_fn sleep_hook);

@@ -200,6 +200,19 @@ static void test_sim_sleep_converts_seconds_to_timespec(void **state)
     assert_int_equal(simh_test_last_sleep_req.tv_nsec, 0);
 }
 
+/* Verify sim_sleep_msec turns milliseconds into one nanosleep request. */
+static void test_sim_sleep_msec_converts_milliseconds_to_timespec(void **state)
+{
+    (void)state;
+
+    sim_time_set_test_hooks(NULL, simh_test_nanosleep_stub);
+
+    sim_sleep_msec(1250);
+    assert_int_equal(simh_test_sleep_calls, 1);
+    assert_int_equal(simh_test_last_sleep_req.tv_sec, 1);
+    assert_int_equal(simh_test_last_sleep_req.tv_nsec, 250000000L);
+}
+
 /* CMocka-aware nanosleep stub for exercising EINTR retry behavior. */
 static int simh_test_nanosleep_eintr_then_success(const struct timespec *req,
                                                   struct timespec *rem)
@@ -237,6 +250,27 @@ static void test_sim_sleep_uses_remaining_time_after_eintr(void **state)
     assert_int_equal(simh_test_sleep_calls, 2);
     assert_int_equal(simh_test_last_sleep_req.tv_sec, 1);
     assert_int_equal(simh_test_last_sleep_req.tv_nsec, 200);
+}
+
+/* Verify sim_sleep_msec also retries interrupted sleeps. */
+static void test_sim_sleep_msec_uses_remaining_time_after_eintr(void **state)
+{
+    (void)state;
+
+    simh_test_sleep_rem = (struct timespec){.tv_sec = 0, .tv_nsec = 250000000L};
+    sim_time_set_test_hooks(NULL, simh_test_nanosleep_eintr_then_success);
+
+    expect_function_call(simh_test_nanosleep_eintr_then_success);
+    expect_any(simh_test_nanosleep_eintr_then_success, req);
+    expect_any(simh_test_nanosleep_eintr_then_success, rem);
+    expect_function_call(simh_test_nanosleep_eintr_then_success);
+    expect_any(simh_test_nanosleep_eintr_then_success, req);
+    expect_any(simh_test_nanosleep_eintr_then_success, rem);
+
+    sim_sleep_msec(1500);
+    assert_int_equal(simh_test_sleep_calls, 2);
+    assert_int_equal(simh_test_last_sleep_req.tv_sec, 0);
+    assert_int_equal(simh_test_last_sleep_req.tv_nsec, 250000000L);
 }
 
 /* Verify sim_sleep stops retrying on non-EINTR errors. */
@@ -281,7 +315,13 @@ int main(void)
             test_sim_sleep_converts_seconds_to_timespec, setup_sim_time_fixture,
             teardown_sim_time_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_sleep_msec_converts_milliseconds_to_timespec,
+            setup_sim_time_fixture, teardown_sim_time_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_sleep_uses_remaining_time_after_eintr,
+            setup_sim_time_fixture, teardown_sim_time_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_sleep_msec_uses_remaining_time_after_eintr,
             setup_sim_time_fixture, teardown_sim_time_fixture),
         cmocka_unit_test_setup_teardown(test_sim_sleep_stops_on_non_eintr_error,
                                         setup_sim_time_fixture,

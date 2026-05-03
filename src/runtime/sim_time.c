@@ -54,6 +54,18 @@ int sim_nanosleep(const struct timespec *req, struct timespec *rem)
     return sleep_fn(req, rem);
 }
 
+/* Sleep for an interval, retrying after EINTR with the remaining time. */
+static void sim_sleep_timespec(struct timespec req)
+{
+    struct timespec rem = {0};
+
+    while (sim_nanosleep(&req, &rem) != 0) {
+        if (errno != EINTR)
+            return;
+        req = rem;
+    }
+}
+
 /* Return the current wall-clock seconds value in time(3) form. */
 time_t sim_time(time_t *now)
 {
@@ -73,13 +85,19 @@ time_t sim_time(time_t *now)
 void sim_sleep(unsigned int sec)
 {
     struct timespec req = {.tv_sec = (time_t)sec, .tv_nsec = 0};
-    struct timespec rem = {0};
 
-    while (sim_nanosleep(&req, &rem) != 0) {
-        if (errno != EINTR)
-            return;
-        req = rem;
-    }
+    sim_sleep_timespec(req);
+}
+
+/* Sleep for a millisecond interval through sim_nanosleep(). */
+void sim_sleep_msec(unsigned int msec)
+{
+    struct timespec req = {
+        .tv_sec = (time_t)(msec / 1000),
+        .tv_nsec = (long)((msec % 1000) * 1000000UL),
+    };
+
+    sim_sleep_timespec(req);
 }
 
 /* Install deterministic test hooks for clock and sleep calls. */
