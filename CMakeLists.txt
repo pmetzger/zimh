@@ -394,9 +394,16 @@ include(dep-locate)
 include(dep-link)
 
 if (WITH_UNIT_TESTS)
-    find_package(PkgConfig QUIET)
-    if (PKG_CONFIG_FOUND)
-        pkg_check_modules(CMOCKA IMPORTED_TARGET cmocka>=1.1.5)
+    if (WIN32)
+        find_package(cmocka CONFIG QUIET)
+        if (TARGET cmocka::cmocka)
+            set(CMOCKA_FOUND TRUE)
+        endif ()
+    else ()
+        find_package(PkgConfig QUIET)
+        if (PKG_CONFIG_FOUND)
+            pkg_check_modules(CMOCKA IMPORTED_TARGET cmocka>=1.1.5)
+        endif ()
     endif ()
 
     if (NOT CMOCKA_FOUND)
@@ -404,7 +411,7 @@ if (WITH_UNIT_TESTS)
             NAME "cmocka"
             VERSION ">= 1.1.5"
             REASON "WITH_UNIT_TESTS=ON"
-            PROBE "pkg-config package cmocka >= 1.1.5"
+            PROBE "cmocka CMake package or pkg-config package >= 1.1.5"
             DISABLE "-DWITH_UNIT_TESTS=OFF"
             PACKAGE_KEY CMOCKA)
     endif ()
@@ -579,13 +586,31 @@ if (NOT DO_DEPENDENCY_BUILD)
     include(simh-extra-tools)
 
     if (WITH_UNIT_TESTS)
-        add_library(unittest INTERFACE)
-        add_subdirectory(tests/unit)
-        target_link_libraries(unittest INTERFACE
-            PkgConfig::CMOCKA
-            simh_unit_support
-        )
-        message(STATUS "Host-side cmocka unit tests enabled")
+        set(unittest_cmocka_target "")
+
+        if (WIN32)
+            if (TARGET cmocka::cmocka)
+                set(unittest_cmocka_target cmocka::cmocka)
+            endif ()
+        else ()
+            if (CMOCKA_FOUND)
+                set(unittest_cmocka_target PkgConfig::CMOCKA)
+            endif ()
+        endif ()
+
+        if (unittest_cmocka_target)
+            add_library(unittest INTERFACE)
+            add_subdirectory(tests/unit)
+            target_link_libraries(unittest INTERFACE
+                ${unittest_cmocka_target}
+                simh_unit_support
+            )
+            message(STATUS "Host-side cmocka unit tests enabled")
+        else ()
+            message(STATUS "Host-side unit tests requested but cmocka was not found")
+        endif ()
+
+        unset(unittest_cmocka_target)
     endif ()
 
     get_property(SIMH_UNIT_TEST_TARGETS GLOBAL PROPERTY SIMH_UNIT_TEST_TARGETS)
