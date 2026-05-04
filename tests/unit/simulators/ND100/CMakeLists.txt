@@ -17,7 +17,7 @@ simh_executable_template(zimh-unit-nd100-cpu-shift
         ${PROJECT_SOURCE_DIR}/tests/unit/support
 )
 
-target_link_libraries(zimh-unit-nd100-cpu-shift PUBLIC PkgConfig::CMOCKA)
+target_link_libraries(zimh-unit-nd100-cpu-shift PUBLIC ${unittest_cmocka_target})
 add_test(NAME zimh-unit-nd100-cpu-shift COMMAND zimh-unit-nd100-cpu-shift)
 set_tests_properties(zimh-unit-nd100-cpu-shift PROPERTIES
     LABELS "zimh;unit;zimh-unit")

@@ -18,7 +18,7 @@ simh_executable_template(zimh-unit-linc-cpu
         ${PROJECT_SOURCE_DIR}/tests/unit/support
 )
 
-target_link_libraries(zimh-unit-linc-cpu PUBLIC PkgConfig::CMOCKA)
+target_link_libraries(zimh-unit-linc-cpu PUBLIC ${unittest_cmocka_target})
 add_test(NAME zimh-unit-linc-cpu COMMAND zimh-unit-linc-cpu)
 set_tests_properties(zimh-unit-linc-cpu PROPERTIES LABELS "zimh;unit;zimh-unit")
 set_property(GLOBAL APPEND PROPERTY SIMH_UNIT_TEST_TARGETS zimh-unit-linc-cpu)
