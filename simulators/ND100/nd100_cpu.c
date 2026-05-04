@@ -241,6 +241,10 @@ while (reason == 0) {
 t_stat
 cpu_reset(DEVICE *dptr)
 {
+        /* Generic device reset signature.
+           This implementation does not use every parameter. */
+        (void)dptr;
+
         sim_brk_types = sim_brk_dflt = SWMASK ('E');
         regSTH |= STS_N100;
         return SCPE_OK;
@@ -249,6 +253,11 @@ cpu_reset(DEVICE *dptr)
 t_stat
 cpu_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+        /* Generic examine signature.
+           This implementation does not use every parameter. */
+        (void)uptr;
+        (void)sw;
+
         if (addr >= MAXMEMSIZE)
                 return SCPE_ARG;
         *vptr = rdmem(addr, M_PT); /* XXX */
@@ -260,20 +269,16 @@ cpu_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 t_stat
 cpu_dep(t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+        /* Generic deposit signature.
+           This implementation does not use every parameter. */
+        (void)val;
+        (void)addr;
+        (void)uptr;
+        (void)sw;
+
         return SCPE_ARG;
 }
 
-t_stat
-cpu_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
-{
-        return SCPE_ARG;
-}
-
-t_stat
-cpu_boot(int32 unitno, DEVICE *dptr)
-{
-        return SCPE_ARG;
-}
 
 /*
  * Store register.
@@ -398,7 +403,7 @@ ins_andor(int IR, int off)
  * The instruction will always have a skip return (no error condition).
  */
 static void
-ins_bfill(int IR)
+ins_bfill(void)
 {
         while (regT & 07777) {
                 wrbyte(regX, regA, BIT15(regT), M_APT);
@@ -433,7 +438,7 @@ ins_bfill(int IR)
  *      - BIT13(regD): all regs are setup in the middle of execution.
  */
 static void
-ins_movb(int IR)
+ins_movb(void)
 {
         int i;
 
@@ -484,7 +489,7 @@ ins_movb(int IR)
  * no illegal overlap exists.
  */
 static void
-ins_movbf(int IR)
+ins_movbf(void)
 {
         int i;
 
@@ -571,11 +576,11 @@ ins_skip_ext(int IR)
         } else if (IR == ND_SKP_ADDD) {
                 intrpt14(IIE_II, PM_CPU);
         } else if (IR == ND_SKP_BFILL) {
-                ins_bfill(IR);
+                ins_bfill();
         } else if (IR == ND_SKP_MOVB) {
-                ins_movb(IR);
+                ins_movb();
         } else if (IR == ND_SKP_MOVBF) {
-                ins_movbf(IR);
+                ins_movbf();
         } else if (IR == ND_SKP_LWCS) {
                 ;
         } else if (IR == 0140127) {     /* XXX */
@@ -725,6 +730,10 @@ ins_mis(int IR, int off)
         int reason = 0;
         int n, i;
 
+        /* Instruction dispatch table signature.
+           This instruction does not use every parameter. */
+        (void)off;
+
         if ((IR & 0177760) == ND_MIS_OPCOM)
                 reason = nd_mis_opc(IR);
         else if ((IR & ND_MIS_TRMSK) == ND_MIS_TRA)
@@ -786,6 +795,10 @@ ins_sht(int IR, int off)
         int m, n, rs, i;
         uint32 ushc;
 
+        /* Instruction dispatch table signature.
+           This instruction does not use every parameter. */
+        (void)off;
+
         rs = sht_reg[(IR >> 7) & 03];
         n = BIT5(IR) ? (32 - (IR & 037)) : (IR & 037);
         m = BIT7(regSTL);
@@ -841,12 +854,21 @@ ins_sht(int IR, int off)
 int
 ins_na(int IR, int addr)
 {
+        /* Instruction dispatch table signature.
+           This instruction does not use every parameter. */
+        (void)IR;
+        (void)addr;
+
         return STOP_UNHINS;
 }
 
 int
 ins_iox(int IR, int addr)
 {
+        /* Instruction dispatch table signature.
+           This instruction does not use every parameter. */
+        (void)addr;
+
         return iox_check(IR & ND_IOXMSK);
 }
 
@@ -854,6 +876,10 @@ int
 ins_arg(int IR, int addr)
 {
         int rs, n = (IR >> 8) & 03;
+
+        /* Instruction dispatch table signature.
+           This instruction does not use every parameter. */
+        (void)addr;
 
         rs = n ? n + 4 : 3;
         R[rs] = add3(BIT10(IR) ? R[rs] : 0, SEXT8(IR), 0);
@@ -865,6 +891,10 @@ ins_bop(int IR, int addr)
 {
 
         int rd, n, reason = 0;
+
+        /* Instruction dispatch table signature.
+           This instruction does not use every parameter. */
+        (void)addr;
 
         regSTL = (regSTL & 0377) | regSTH; /* Hack for bskp */
         rd = IR & 7;
@@ -1209,7 +1239,7 @@ done:   regT = (f1->e + 16384) | (f1->s << 15);
  * Affected: (T), (A), (D), C, O, Q, TG
  */
 static void
-sub48(struct fp *f1, struct fp *f2, int addr)
+sub48(struct fp *f1, struct fp *f2)
 {
         struct fp *ft;
         t_uint64 m3;
@@ -1257,7 +1287,7 @@ ins_fad(int IR, int addr)
         mkfp48(&f2, regT, regA, regD);
 
         if (f1.s ^ f2.s)
-                sub48(&f1, &f2, addr);
+                sub48(&f1, &f2);
         else
                 add48(&f1, &f2);
         return SCPE_OK;
@@ -1275,7 +1305,7 @@ ins_fsb(int IR, int addr)
         f1.s ^= 1; /* swap sign of right op */
 
         if (f1.s ^ f2.s)
-                sub48(&f1, &f2, addr);
+                sub48(&f1, &f2);
         else
                 add48(&f1, &f2);
         return SCPE_OK;
@@ -1339,6 +1369,10 @@ ins_cjp(int IR, int off)
         int n, i;
         uint16 s;
 
+        /* Instruction dispatch table signature.
+           This instruction does not use every parameter. */
+        (void)off;
+
         n = (IR & ND_CJPMSK) >> ND_CJPSH;
         if (cjpmsk[n] & 04)
                 regX++;
@@ -1359,6 +1393,10 @@ ins_skp(int IR, int off)
 {
         int c_o, shc, n, rv = SCPE_OK;
         uint16 s, d;
+
+        /* Instruction dispatch table signature.
+           This instruction does not use every parameter. */
+        (void)off;
 
         if (IR & 0300) { /* extended instructions */
                 rv = ins_skip_ext(IR);
@@ -1385,6 +1423,10 @@ ins_rop(int IR, int off)
 {
         int n, rs, rd;
         uint16 s, d;
+
+        /* Instruction dispatch table signature.
+           This instruction does not use every parameter. */
+        (void)off;
 
         rs = (IR & 070) >> 3;
         rd = IR & 07;
@@ -1703,6 +1745,12 @@ hist_set(UNIT *uptr, int32 val, const char *cptr, void *desc)
         int32 i, lnt;
         t_stat r;
 
+        /* Generic set modifier signature.
+           This implementation does not use every parameter. */
+        (void)uptr;
+        (void)val;
+        (void)desc;
+
         if (cptr == NULL) {
                 for (i = 0 ; i < hist_cnt ; i++)
                         hist[i].ir = HIST_IR_INVALID;
@@ -1764,6 +1812,11 @@ hist_show(FILE *st, UNIT *uptr, int32 val, const void *desc)
         const char *cptr = (const char *) desc;
         t_stat r;
         Hist_entry *hptr;
+
+        /* Generic show modifier signature.
+           This implementation does not use every parameter. */
+        (void)uptr;
+        (void)val;
 
         if (hist_cnt == 0)
                 return SCPE_NOFNC;
