@@ -31,7 +31,6 @@
 #include "cdc1700_defs.h"
 #include <ctype.h>
 
-extern void buildDCtables(void);
 extern void buildIOtable(void);
 
 extern int disassem(char *, uint16, t_bool, t_bool, t_bool);

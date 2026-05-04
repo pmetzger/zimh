@@ -666,6 +666,9 @@ typedef struct io_device IO_DEVICE;
  */
 typedef uint16 devINTR(DEVICE *);
 
+void buildDCtables(void);
+uint16 dcINTR(void);
+
 /*
  * Generic device flags
  */

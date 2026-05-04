@@ -32,7 +32,6 @@
 extern char INTprefix[];
 
 extern void buildIOtable(void);
-extern void buildDCtables(void);
 extern void RaiseExternalInterrupt(DEVICE *);
 extern void rebuildPending(void);
 

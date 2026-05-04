@@ -35,7 +35,6 @@ extern char INTprefix[];
 extern t_bool inProtectedMode(void);
 extern uint16 dev1INTR(DEVICE *);
 extern uint16 cpuINTR(DEVICE *);
-extern uint16 dcINTR(void);
 
 extern void RaiseExternalInterrupt(DEVICE *);
 

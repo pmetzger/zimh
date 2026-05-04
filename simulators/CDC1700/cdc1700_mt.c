@@ -117,8 +117,6 @@ extern t_stat clr_stoponrej(UNIT *, int32, const char *, void *);
 
 extern t_stat set_equipment(UNIT *, int32, const char *, void *);
 
-extern void buildDCtables(void);
-
 extern uint16 M[], Areg, IOAreg;
 extern t_uint64 Instructions;
 

@@ -53,19 +53,20 @@ extern enum IOstatus fw_doBDCIO(IO_DEVICE *, uint16 *, t_bool, uint8);
 extern uint16 LoadFromMem(uint16);
 extern t_bool IOStoreToMem(uint16, uint16, t_bool);
 
-t_stat set_intr(UNIT *uptr, int32 val, const char *, void *);
-t_stat show_intr(FILE *, UNIT *, int32, const void *);
-t_stat show_target(FILE *, UNIT *, int32, const void *);
+static t_stat set_intr(UNIT *uptr, int32 val, const char *, void *);
+static t_stat show_intr(FILE *, UNIT *, int32, const void *);
+static t_stat show_target(FILE *, UNIT *, int32, const void *);
+static const char *description(DEVICE *);
 
-t_stat dc_svc(UNIT *);
-t_stat dc_reset(DEVICE *);
+static t_stat dc_svc(UNIT *);
+static t_stat dc_reset(DEVICE *);
 
 void DCstate(const char *, DEVICE *, IO_DEVICE *);
 t_bool DCreject(IO_DEVICE *, t_bool, uint8);
 enum IOstatus DCin(IO_DEVICE *, uint8);
 enum IOstatus DCout(IO_DEVICE *, uint8);
 
-t_stat dc_help(FILE *, DEVICE *, UNIT *, int32, const char *);
+static t_stat dc_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 
 /*
         1706-A Buffered Data Channel
@@ -254,7 +255,7 @@ DEVICE dca_dev = {
   NULL, NULL, NULL,
   &DCAdev,
   DEV_DEBUG | DEV_NOEQUIP | DEV_INDEV | DEV_OUTDEV, 0, dc_deb,
-  NULL, NULL, &dc_help, NULL, NULL, NULL
+  NULL, NULL, &dc_help, NULL, NULL, &description
 };
 
 DEVICE dcb_dev = {
@@ -264,7 +265,7 @@ DEVICE dcb_dev = {
   NULL, NULL, NULL,
   &DCBdev,
   DEV_DEBUG | DEV_NOEQUIP | DEV_INDEV | DEV_OUTDEV, 0, dc_deb,
-  NULL, NULL, &dc_help, NULL, NULL, NULL
+  NULL, NULL, &dc_help, NULL, NULL, &description
 };
 
 DEVICE dcc_dev = {
@@ -274,7 +275,7 @@ DEVICE dcc_dev = {
   NULL, NULL, NULL,
   &DCCdev,
   DEV_DEBUG | DEV_NOEQUIP | DEV_INDEV | DEV_OUTDEV, 0, dc_deb,
-  NULL, NULL, &dc_help, NULL, NULL, NULL
+  NULL, NULL, &dc_help, NULL, NULL, &description
 };
 
 static DEVICE *dc_devices[IO_1706_MAX] = {
@@ -302,13 +303,17 @@ void DCstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
  */
 static const char *description(DEVICE *dptr)
 {
-  return "1706-A";
+  /* Generic device description signature.
+     This implementation does not use every parameter. */
+  (void)dptr;
+
+  return "1706-A Buffered Data Channel";
 }
 
 /*
  * Unit service
  */
-t_stat dc_svc(UNIT *uptr)
+static t_stat dc_svc(UNIT *uptr)
 {
   DEVICE *dptr;
   enum IOstatus status;
@@ -473,7 +478,7 @@ t_stat dc_svc(UNIT *uptr)
 /*
  * Reset routine
  */
-t_stat dc_reset(DEVICE *dptr)
+static t_stat dc_reset(DEVICE *dptr)
 {
   IO_DEVICE *iod = (IO_DEVICE *)dptr->ctxt;
 
@@ -487,11 +492,16 @@ t_stat dc_reset(DEVICE *dptr)
 /*
  * Set the interrupt level for a buffered data channel.
  */
-t_stat set_intr(UNIT *uptr, int32 val, const char *cptr, void *desc)
+static t_stat set_intr(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
   IO_DEVICE *iod = (IO_DEVICE *)uptr->up7;
   t_value v;
   t_stat r;
+
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void)val;
+  (void)desc;
 
   if (cptr == NULL)
     return SCPE_ARG;
@@ -510,9 +520,14 @@ t_stat set_intr(UNIT *uptr, int32 val, const char *cptr, void *desc)
 /*
  * Display the current interrupt level.
  */
-t_stat show_intr(FILE *st, UNIT *uptr, int32 val, const void *desc)
+static t_stat show_intr(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   IO_DEVICE *iod = (IO_DEVICE *)uptr->up7;
+
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void)val;
+  (void)desc;
 
   if (iod->iod_equip != 0) {
     fprintf(st, "Interrupt: ");
@@ -524,9 +539,14 @@ t_stat show_intr(FILE *st, UNIT *uptr, int32 val, const void *desc)
 /*
  * Display buffered data channel target device and equipment address
  */
-t_stat show_target(FILE *st, UNIT *uptr, int32 val, const void *desc)
+static t_stat show_target(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
   IO_DEVICE *iod;
+
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void)val;
+  (void)desc;
 
   if (uptr == NULL)
     return SCPE_IERR;
@@ -566,7 +586,7 @@ t_bool DCreject(IO_DEVICE *iod, t_bool output, uint8 reg)
  * status and terminate the transfer before starting the actual transfer.
  * The diagnostics check for this particular case.
  */
-enum IOstatus DCxfer(IO_DEVICE *iod, IO_DEVICE *target, t_bool output)
+static enum IOstatus DCxfer(IO_DEVICE *iod, IO_DEVICE *target, t_bool output)
 {
   DEVICE *dptr = (DEVICE *)iod->iod_indev;
 
@@ -779,7 +799,8 @@ uint16 dcINTR(void)
   return result;
 }
 
-t_stat dc_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
+static t_stat dc_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
+                      const char *cptr)
 {
   const char helpString[] =
     " The %D device is a 1706-A buffered data channel.\n"
