@@ -6,6 +6,12 @@
 
 #if defined(_WIN32) || defined(SIMH_COMPAT_TEST)
 
+/*
+ * This compatibility shim remains for code that still calls mkstemp or
+ * mkstemps on Windows. If all in-tree callers move to sim_tempfile, this
+ * file may become a candidate for removal.
+ */
+
 #include <errno.h>
 #include <stdint.h>
 #include <string.h>
