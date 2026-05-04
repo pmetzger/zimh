@@ -156,11 +156,8 @@ phase because they are either utilities or bundled sidecar code.
 
 ### IBM 1130 utilities
 
-- `simulators/Ibm1130/utils/*.c`
-- `simulators/Ibm1130/utils/*.mak`
-
-These matter, but they should likely be handled together with the
-general IBM 1130 utility/build-path decision.
+The IBM 1130 utilities have their own build-path cleanup plan in
+`projects/IBM1130_UTILITIES_CMAKE.md`.
 
 ### Bundled AltairZ80 Musashi sidecar code
 

@@ -11,22 +11,9 @@ paths by accident.
 
 ### 1. IBM 1130 utility build files
 
-These still appear to be the only recorded build path for code that
-exists in the tree, even though they are not part of the maintained
-CMake build:
-
-- `simulators/Ibm1130/utils/makefile`
-- `simulators/Ibm1130/utils/*.mak`
-
-Why they are not safe to purge yet:
-- `simulators/Ibm1130/CMakeLists.txt` does not yet build the utilities
-- current simulator docs still tell users to use these files
-- removing them now would silently strand those tools
-
-Required decision first:
-- either migrate the IBM 1130 utilities into CMake
-- or explicitly declare them unsupported and remove both the build files
-  and the related documentation
+These are tracked separately in `projects/IBM1130_UTILITIES_CMAKE.md`.
+That work should add maintained CMake targets for the IBM 1130 utilities
+before removing the old local makefiles.
 
 ### 2. Embedded/sidecar legacy build files
 
@@ -62,7 +49,7 @@ build or compatibility story:
 
 ## Proposed order
 
-1. decide the fate of the IBM 1130 utility build files
+1. complete `projects/IBM1130_UTILITIES_CMAKE.md`
 2. decide the fate of the Altair/Musashi sidecar makefiles
 3. clean up the historical display README text
 4. clean up broader documentation references once the tree-level policy
