@@ -13,14 +13,11 @@
 #include "sim_ether.h"
 #include "sim_card.h"
 #include "sim_tmxr.h"
+#include "sim_tempfile.h"
 #include "scp.h"
 #include <errno.h>
 #include <setjmp.h>
 #include <stdarg.h>
-#if defined(_WIN32)
-#include <fcntl.h>
-#include <io.h>
-#endif
 
 /* Used when sorting a list of command names. */
 static int _cmd_name_compare(const void *pa, const void *pb)
@@ -1078,23 +1075,11 @@ static char *helpPrompt(TOPIC *topic, const char *pstring, t_bool oneword)
 static void displayMagicTopic(FILE *st, DEVICE *dptr, TOPIC *topic)
 {
     char tbuf[CBUFSIZE];
+    char tmp_path[PATH_MAX + 1];
     size_t i, skiplines = 0;
-#ifdef _WIN32
-    FILE *tmp;
-    char *tmpnam;
-
-    do {
-        int fd;
-        tmpnam = _tempnam(NULL, "simh");
-        fd = _open(tmpnam, _O_CREAT | _O_RDWR | _O_EXCL, _S_IREAD | _S_IWRITE);
-        if (fd != -1) {
-            tmp = _fdopen(fd, "w+");
-            break;
-        }
-    } while (1);
-#else
-    FILE *tmp = tmpfile();
-#endif
+    FILE *tmp =
+        sim_tempfile_open_stream(tmp_path, sizeof(tmp_path), "simh-help-",
+                                 NULL, "w+");
 
     if (!tmp) {
         fprintf(st, "Unable to create temporary file: %s\n", strerror(errno));
@@ -1130,10 +1115,7 @@ static void displayMagicTopic(FILE *st, DEVICE *dptr, TOPIC *topic)
         fputs(tbuf, st);
     }
     fclose(tmp);
-#ifdef _WIN32
-    remove(tmpnam);
-    free(tmpnam);
-#endif
+    remove(tmp_path);
 }
 
 static t_stat displayFlatHelp(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,

@@ -122,6 +122,30 @@ static void test_scp_help_flattens_simple_help_text(void **state)
     fclose(stream);
 }
 
+/* Verify magic topics render generated help through the help engine. */
+static void test_scp_help_flattens_magic_register_topic(void **state)
+{
+    struct scp_help_engine_fixture *fixture = *state;
+    const char *help = SCP_HELP_L(Main topic summary)
+        SCP_HELP_T(1, $Registers)
+        SCP_HELP_L(Additional register guidance);
+    FILE *stream;
+    char *text;
+    size_t size;
+
+    stream = tmpfile();
+    assert_non_null(stream);
+    assert_int_equal(scp_help(stream, &fixture->device, &fixture->unit,
+                              SCP_HELP_FLAT | SCP_HELP_ONECMD, help, ""),
+                     SCPE_OK);
+    assert_int_equal(simh_test_read_stream(stream, &text, &size), 0);
+    assert_non_null(strstr(text, "Registers"));
+    assert_non_null(strstr(text, "ACC"));
+    assert_non_null(strstr(text, "Additional register guidance"));
+    free(text);
+    fclose(stream);
+}
+
 /* Verify help loaded from a host file is parsed and rendered the same way. */
 static void test_scp_help_from_file_reads_and_renders_help_text(void **state)
 {
@@ -163,6 +187,9 @@ int main(void)
         cmocka_unit_test_setup_teardown(test_scp_help_flattens_simple_help_text,
                                         setup_scp_help_engine_fixture,
                                         teardown_scp_help_engine_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_scp_help_flattens_magic_register_topic,
+            setup_scp_help_engine_fixture, teardown_scp_help_engine_fixture),
         cmocka_unit_test_setup_teardown(
             test_scp_help_from_file_reads_and_renders_help_text,
             setup_scp_help_engine_fixture, teardown_scp_help_engine_fixture),

@@ -14,7 +14,21 @@
 
 #include "sim_defs.h"
 
+/* Copy a path only when caller-provided storage can hold the full string. */
+static t_bool sim_host_path_copy(char *buf, size_t buf_size, const char *path)
+{
+    if (strlcpy(buf, path, buf_size) >= buf_size)
+        return FALSE;
+    return TRUE;
+}
+
 #if defined(_WIN32)
+typedef enum {
+    SIM_WIN32_TEMP_DIR_UNAVAILABLE,
+    SIM_WIN32_TEMP_DIR_TOO_LONG,
+    SIM_WIN32_TEMP_DIR_OK
+} sim_win32_temp_dir_result;
+
 static sim_host_win32_temp_path_fn sim_win32_get_temp_path2_hook = NULL;
 static sim_host_win32_temp_path_fn sim_win32_get_temp_path_hook = NULL;
 static t_bool sim_win32_temp_path_hooks_installed = FALSE;
@@ -58,7 +72,7 @@ void sim_host_path_reset_test_hooks(void)
 }
 
 /* Return the Windows temporary-directory path from the best available API. */
-static t_bool sim_win32_temp_dir(char *buf, size_t buf_size)
+static sim_win32_temp_dir_result sim_win32_temp_dir(char *buf, size_t buf_size)
 {
     sim_host_win32_temp_path_fn get_temp_path2;
     sim_host_win32_temp_path_fn get_temp_path;
@@ -76,12 +90,17 @@ static t_bool sim_win32_temp_dir(char *buf, size_t buf_size)
 
     length = get_temp_path2 == NULL ? 0 : get_temp_path2((DWORD)buf_size, buf);
     if (length > 0)
-        return (size_t)length < buf_size;
+        return (size_t)length < buf_size ? SIM_WIN32_TEMP_DIR_OK
+                                         : SIM_WIN32_TEMP_DIR_TOO_LONG;
 
     if (length == 0)
         length =
             get_temp_path == NULL ? 0 : get_temp_path((DWORD)buf_size, buf);
-    return (length > 0) && ((size_t)length < buf_size);
+    if (length == 0)
+        return SIM_WIN32_TEMP_DIR_UNAVAILABLE;
+
+    return (size_t)length < buf_size ? SIM_WIN32_TEMP_DIR_OK
+                                     : SIM_WIN32_TEMP_DIR_TOO_LONG;
 }
 #endif
 
@@ -106,23 +125,32 @@ const char *sim_host_temp_dir(char *buf, size_t buf_size)
         return NULL;
 
 #if defined(_WIN32)
-    if (sim_win32_temp_dir(buf, buf_size))
+    switch (sim_win32_temp_dir(buf, buf_size)) {
+    case SIM_WIN32_TEMP_DIR_OK:
         return buf;
+    case SIM_WIN32_TEMP_DIR_TOO_LONG:
+        return NULL;
+    case SIM_WIN32_TEMP_DIR_UNAVAILABLE:
+        break;
+    }
 #endif
 
     for (i = 0; env_names[i] != NULL; ++i) {
         const char *value = getenv(env_names[i]);
 
         if ((value != NULL) && (value[0] != '\0')) {
-            strlcpy(buf, value, buf_size);
+            if (!sim_host_path_copy(buf, buf_size, value))
+                return NULL;
             return buf;
         }
     }
 #if defined(_WIN32)
-    strlcpy(buf, ".", buf_size);
+    if (!sim_host_path_copy(buf, buf_size, "."))
+        return NULL;
 #else
     /* Use the conventional command-file fallback, not C's P_tmpdir. */
-    strlcpy(buf, "/tmp", buf_size);
+    if (!sim_host_path_copy(buf, buf_size, "/tmp"))
+        return NULL;
 #endif
     return buf;
 }

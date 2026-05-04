@@ -93,6 +93,15 @@ static void test_sim_host_temp_dir_rejects_invalid_buffer(void **state)
     assert_null(sim_host_temp_dir(buf, 0));
 }
 
+static void test_sim_host_temp_dir_rejects_short_buffer(void **state)
+{
+    char buf[4];
+
+    (void)state;
+
+    assert_null(sim_host_temp_dir(buf, sizeof(buf)));
+}
+
 #if !defined(_WIN32)
 static void test_sim_host_temp_dir_uses_posix_environment_order(void **state)
 {
@@ -113,6 +122,26 @@ static void test_sim_host_temp_dir_uses_posix_environment_order(void **state)
 
     unsetenv("TMP");
     assert_string_equal(sim_host_temp_dir(buf, sizeof(buf)), "/zimh/temp");
+
+    restore_env(&saved_tmpdir);
+    restore_env(&saved_tmp);
+    restore_env(&saved_temp);
+}
+
+static void test_sim_host_temp_dir_rejects_long_posix_environment(void **state)
+{
+    char buf[8];
+    struct saved_env saved_tmpdir = save_env("TMPDIR");
+    struct saved_env saved_tmp = save_env("TMP");
+    struct saved_env saved_temp = save_env("TEMP");
+
+    (void)state;
+
+    assert_int_equal(setenv("TMPDIR", "/too/long/for/buffer", 1), 0);
+    unsetenv("TMP");
+    unsetenv("TEMP");
+
+    assert_null(sim_host_temp_dir(buf, sizeof(buf)));
 
     restore_env(&saved_tmpdir);
     restore_env(&saved_tmp);
@@ -205,8 +234,11 @@ int main(void)
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_sim_host_temp_dir_rejects_invalid_buffer),
+        cmocka_unit_test(test_sim_host_temp_dir_rejects_short_buffer),
 #if !defined(_WIN32)
         cmocka_unit_test(test_sim_host_temp_dir_uses_posix_environment_order),
+        cmocka_unit_test(
+            test_sim_host_temp_dir_rejects_long_posix_environment),
         cmocka_unit_test(test_sim_host_temp_dir_uses_posix_default),
 #else
         cmocka_unit_test(test_sim_host_temp_dir_prefers_get_temp_path2),
