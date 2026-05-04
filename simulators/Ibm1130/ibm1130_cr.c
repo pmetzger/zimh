@@ -1,12 +1,8 @@
 #include "ibm1130_defs.h"
 #include "ibm1130_fmt.h"
+#include "sim_tempfile.h"
+
 #include <ctype.h>
-#include <sys/stat.h>
-
-#ifdef _WIN32
-#  include <io.h>       /* Microsoft puts definition of mktemp into io.h rather than stdlib.h */
-#endif
-
 /* ibm1130_cr.c: IBM 1130 1442 Card Reader simulator
 
    Based on the SIMH package written by Robert M Supnik
@@ -730,7 +726,7 @@ static int16 ascii_to_card[256];
 static CPCODE *cardcode;
 static size_t ncardcode;
 static FILE *deckfile = NULL;
-static char tempfile[128];
+static char tempfile[PATH_MAX + 1];
 static int any_punched = 0;
 
 #define MAXARGLEN 80                    /* max length of a saved attach command argument */
@@ -746,6 +742,29 @@ static enum {STATION_EMPTY, STATION_LOADED, STATION_READ, STATION_PUNCHED} punch
 
 static t_bool nextdeck (void);
 static void checkdeck (void);
+
+/* open_scratch_deck - create a temporary deck file for literal cards */
+static FILE *open_scratch_deck(void)
+{
+    FILE *scratch;
+
+    scratch = sim_tempfile_open_stream(tempfile, sizeof(tempfile),
+                                       "ibm1130-cr-", ".deck", "w+b");
+    if (scratch == NULL)
+        tempfile[0] = '\0';
+
+    return scratch;
+}
+
+/* remove_scratch_deck - remove and forget the active scratch deck path */
+static void remove_scratch_deck(void)
+{
+    if (tempfile[0] == '\0')
+        return;
+
+    remove(tempfile);
+    tempfile[0] = '\0';
+}
 
 static t_stat pcr_attach(UNIT *uptr, const char *devname);
 static t_stat pcr_detach(UNIT *uptr);
@@ -1324,7 +1343,7 @@ static t_bool nextdeck (void)
         cr_unit.fileref = NULL;
 
         if (cr_unit.flags & UNIT_SCRATCH) {
-            remove(tempfile);
+            remove_scratch_deck();
             CLRBIT(cr_unit.flags, UNIT_SCRATCH);
         }
     }
@@ -1351,57 +1370,12 @@ static t_bool nextdeck (void)
 
         if (buf[0] == '!') {                /* literal text line, make a temporary file */
 
-#if defined  (__GNUC__) && !defined (_WIN32)                /* GCC complains about mktemp & always provides mkstemp */
-
-            if (*tempfile == '\0') {                        /* first time, open guaranteed-unique file */
-                int fh;
-                mode_t prev_mode = umask(0177);
-
-                strcpy(tempfile, "tempXXXXXX");             /* get modifiable copy of name template */
-
-                if ((fh = mkstemp(tempfile)) == -1) {       /* open file. Actual name is set by side effect */
-                    printf("Cannot create temporary deck file\n");
-                    break_simulation(STOP_DECK_BREAK);
-                    umask(prev_mode);
-                    return 0;
-                }
-                                                            /* get FILE * from the file handle */
-                if ((cr_unit.fileref = fdopen(fh, "w+b")) == NULL) {
-                    printf("Cannot use temporary deck file %s\n", tempfile);
-                    break_simulation(STOP_DECK_BREAK);
-                    umask(prev_mode);
-                    return 0;
-                }
-                umask(prev_mode);
-            }
-            else {                                          /* on later opens, just reuse the old name */
-                mode_t prev_mode = umask(0177);
-
-                if ((cr_unit.fileref = fopen(tempfile, "w+b")) == NULL) {
-                    printf("Cannot create temporary file %s\n", tempfile);
-                    break_simulation(STOP_DECK_BREAK);
-                    umask(prev_mode);
-                    return 0;
-                }
-                umask(prev_mode);
-            }
-#else                   /* ANSI standard C always provides mktemp */
-
-            if (*tempfile == '\0') {                        /* first time, construct unique name */
-                strcpy(tempfile, "tempXXXXXX");             /* make a modifiable copy of the template */
-                if (mktemp(tempfile) == NULL) {
-                    printf("Cannot create temporary card file name\n");
-                    break_simulation(STOP_DECK_BREAK);
-                    return 0;
-                }
-            }
-                                                            /* (re)create file */
-            if ((cr_unit.fileref = fopen(tempfile, "w+b")) == NULL) {
-                printf("Cannot create temporary file %s\n", tempfile);
+            cr_unit.fileref = open_scratch_deck();
+            if (cr_unit.fileref == NULL) {
+                printf("Cannot create temporary deck file\n");
                 break_simulation(STOP_DECK_BREAK);
                 return 0;
             }
-#endif
 
             SETBIT(cr_unit.flags, UNIT_SCRATCH);
 
@@ -1726,7 +1700,7 @@ t_stat cr_detach (UNIT *uptr)
             fclose(cr_unit.fileref);
 
         if (cr_unit.flags & UNIT_SCRATCH) {
-            remove(tempfile);
+            remove_scratch_deck();
             CLRBIT(cr_unit.flags, UNIT_SCRATCH);
         }
 
