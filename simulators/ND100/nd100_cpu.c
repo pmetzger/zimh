@@ -787,7 +787,7 @@ ins_sht(int IR, int off)
         uint32 ushc;
 
         rs = sht_reg[(IR >> 7) & 03];
-        n = BIT5(IR) ? 32 - IR & 037 : IR & 037;
+        n = BIT5(IR) ? (32 - (IR & 037)) : (IR & 037);
         m = BIT7(regSTL);
 
         ushc = rs ? R[rs] : (regA << 16) | regD;
