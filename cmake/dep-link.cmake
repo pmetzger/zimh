@@ -330,10 +330,10 @@ if (WITH_NETWORK)
         endif (HAVE_TAP_NETWORK)
     endif (WITH_TAP)
 
-    if (WITH_SLIRP AND LIBSLIRP_FOUND AND TARGET PkgConfig::LIBSLIRP)
+    if (WITH_SLIRP AND TARGET ZIMH::LIBSLIRP)
         target_link_libraries(simh_network INTERFACE slirp)
         list(APPEND NETWORK_PKG_STATUS "NAT(SLiRP)")
-    endif (WITH_SLIRP AND LIBSLIRP_FOUND AND TARGET PkgConfig::LIBSLIRP)
+    endif (WITH_SLIRP AND TARGET ZIMH::LIBSLIRP)
 
     ## Finally, set the network runtime
     if (NOT network_runtime)

@@ -17,6 +17,8 @@ if (WIN32)
 else ()
     set(LIBSLIRP_MIN_VERSION 4.7.0)
 endif ()
+set(LIBSLIRP_PROBE
+    "pkg-config slirp >= ${LIBSLIRP_MIN_VERSION} or vcpkg libslirp")
 
 if (NOT ZLIB_FOUND)
     set(ZLIB_USE_STATIC_LIBS ON)
@@ -92,6 +94,8 @@ if (NOT WIN32 OR MINGW)
     endif ()
 endif ()
 
+include(libslirp-target)
+
 ##-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
 ## Add rules for the superbuild if dependencies need to be built:
 ##-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~-~
@@ -151,13 +155,12 @@ if (NOT ENABLE_DEP_BUILD)
         endif ()
     endif ()
 
-    if (WITH_NETWORK AND WITH_SLIRP AND
-        (NOT LIBSLIRP_FOUND OR NOT TARGET PkgConfig::LIBSLIRP))
+    if (WITH_NETWORK AND WITH_SLIRP AND NOT TARGET ZIMH::LIBSLIRP)
         zimh_record_missing_dependency(
             NAME "libslirp"
             VERSION ">= ${LIBSLIRP_MIN_VERSION}"
             REASON "WITH_NETWORK=ON and WITH_SLIRP=ON"
-            PROBE "pkg-config package slirp >= ${LIBSLIRP_MIN_VERSION}"
+            PROBE "${LIBSLIRP_PROBE}"
             DISABLE "-DWITH_SLIRP=OFF"
             PACKAGE_KEY LIBSLIRP)
     endif ()
@@ -165,13 +168,12 @@ if (NOT ENABLE_DEP_BUILD)
     return ()
 endif ()
 
-if (WITH_NETWORK AND WITH_SLIRP AND
-    (NOT LIBSLIRP_FOUND OR NOT TARGET PkgConfig::LIBSLIRP))
+if (WITH_NETWORK AND WITH_SLIRP AND NOT TARGET ZIMH::LIBSLIRP)
     zimh_record_missing_dependency(
         NAME "libslirp"
         VERSION ">= ${LIBSLIRP_MIN_VERSION}"
         REASON "WITH_NETWORK=ON and WITH_SLIRP=ON"
-        PROBE "pkg-config package slirp >= ${LIBSLIRP_MIN_VERSION}"
+        PROBE "${LIBSLIRP_PROBE}"
         DISABLE "-DWITH_SLIRP=OFF"
         PACKAGE_KEY LIBSLIRP)
 endif ()
