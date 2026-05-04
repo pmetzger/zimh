@@ -136,7 +136,7 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES ".*Clang")
     ## LIST(APPEND EXTRA_TARGET_CFLAGS "-Wall" "-fno-inline" "-fstrict-overflow" "-Wstrict-overflow=3")
     LIST(APPEND EXTRA_TARGET_CFLAGS
         "$<$<CONFIG:Debug>:$<$<OR:$<BOOL:${DEBUG_WALL}>,$<BOOL:${DEBUG_WARNINGS}>>:-Wall>>"
-        "$<$<CONFIG:Release>:-Wall>"
+        "$<$<CONFIG:Release,RelWithDebInfo>:-Wall>"
         "$<$<CONFIG:Debug>:$<$<BOOL:${DEBUG_WARNINGS}>:-Wextra>>"
         # Keep this warning disabled for now; legacy aggregate
         # initializers produce too much noise during warning sweeps.
@@ -198,22 +198,26 @@ if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID MATCHES ".*Clang")
             endif ()
         endif ()
 
-        message(STATUS "Adding GNU-specific optimizations to CMAKE_C_FLAGS_RELEASE")
+        message(STATUS "Adding GNU-specific optimizations to optimized build flags")
         list(APPEND opt_flags "-finline-functions" "-fgcse-after-reload" "-fpredictive-commoning"
                             "-fipa-cp-clone" "-fno-unsafe-loop-optimizations")
     elseif (CMAKE_C_COMPILER_ID MATCHES ".*Clang")
-        message(STATUS "Adding Clang-specific optimizations to CMAKE_C_FLAGS_RELEASE")
+        message(STATUS "Adding Clang-specific optimizations to optimized build flags")
     endif()
 
     foreach (opt_flag ${opt_flags})
         message(STATUS "    ${opt_flag}")
-        string(REGEX REPLACE "${opt_flag}[ \t\r\n]*" "" CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
-        string(APPEND CMAKE_C_FLAGS_RELEASE " ${opt_flag}")
-        string(REGEX REPLACE "${opt_flag}[ \t\r\n]*" "" CMAKE_C_FLAGS_MINSIZEREL "${CMAKE_C_FLAGS_MINSIZEREL}")
-        string(APPEND CMAKE_C_FLAGS_MINSIZEREL " ${opt_flag}")
+        foreach (optimized_c_flags_var
+                 CMAKE_C_FLAGS_RELEASE
+                 CMAKE_C_FLAGS_RELWITHDEBINFO
+                 CMAKE_C_FLAGS_MINSIZEREL)
+            string(REGEX REPLACE "${opt_flag}[ \t\r\n]*" ""
+                   ${optimized_c_flags_var} "${${optimized_c_flags_var}}")
+            string(APPEND ${optimized_c_flags_var} " ${opt_flag}")
+        endforeach ()
     endforeach ()
 else ()
-    message(STATUS "Not changing CMAKE_C_FLAGS_RELEASE on ${CMAKE_C_COMPILER_ID}")
+    message(STATUS "Not changing optimized build flags on ${CMAKE_C_COMPILER_ID}")
 endif ()
 
 

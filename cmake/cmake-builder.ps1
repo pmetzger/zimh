@@ -14,7 +14,8 @@ simulators using the CMake meta-build tool. The phases are:
 2. Build missing runtime dependencies and the simulator suite with the compiler
    configuration selected by the '-config' option. The "Release" configuration
    generates optimized executables; the "Debug" configuration generates
-   development executables with debugger information.
+   development executables with debugger information; and "RelWithDebInfo"
+   generates optimized executables with debugger information.
 3. Test the simulators
 
 There is an install phase that can be invoked separately as part of the SIMH
@@ -86,7 +87,8 @@ param (
     [Parameter(Mandatory=$false)]
     [string] $flavor         = "vs2022",
 
-    ## The target build configuration. Valid values: "Release" and "Debug"
+    ## The target build configuration. Valid values are "Release", "Debug",
+    ## and "RelWithDebInfo"
     [Parameter(Mandatory=$false)]
     [string] $config         = "Release",
 
@@ -294,7 +296,7 @@ if (!$testonly)
 }
 
 ## Validate the requested configuration.
-if (!@("Release", "Debug").Contains($config))
+if (!@("Release", "Debug", "RelWithDebInfo").Contains($config))
 {
     @"
 ${scriptName}: Invalid configuration: "${config}".

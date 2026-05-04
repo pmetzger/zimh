@@ -287,6 +287,9 @@ cmake --build build/release --target integration-tests
 
 Some useful CMake options:
 
+- `-DCMAKE_BUILD_TYPE=RelWithDebInfo`
+  Build optimized binaries while retaining debugger information. This is
+  useful for profiling, debugger sessions, and tools such as Valgrind.
 - `-DWITH_VIDEO=Off`
   Disable SDL-based graphics support. Default: `On`.
 - `-DWITH_NETWORK=Off`

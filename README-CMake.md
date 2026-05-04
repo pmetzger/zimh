@@ -99,7 +99,9 @@ The most commonly used options are:
 
 - `CMAKE_BUILD_TYPE`
   Default: generator-dependent.
-  Use `Release` or `Debug` for single-config generators such as Ninja.
+  Use `Release`, `Debug`, or `RelWithDebInfo` for single-config
+  generators such as Ninja. `RelWithDebInfo` is optimized like a release
+  build while retaining debugger information.
 - `WITH_VIDEO`
   Default: `On`.
   Enable SDL-based graphics and display support.
