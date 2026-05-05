@@ -993,6 +993,8 @@ MT_CLR_INMRK (uptr);                                    /* Not within a TAR tape
 if (MT_GET_FMT (uptr) >= MTUF_F_ANSI) {
     memory_free_tape ((void *)uptr->fileref);
     uptr->fileref = NULL;
+    free (uptr->filename);
+    uptr->filename = NULL;
     uptr->flags &= ~UNIT_ATT;
     r = SCPE_OK;
     }
@@ -2056,7 +2058,9 @@ t_stat sim_tape_wrrecf (UNIT *uptr, uint8 *buf, t_mtrlnt bc)
 struct tape_context *ctx = (struct tape_context *)uptr->tape_ctx;
 uint32 f = MT_GET_FMT (uptr);
 t_mtrlnt sbc;
+t_mtrlnt rbc;
 t_stat status = MTSE_OK;
+static const uint8 pad = 0;
 
 if (ctx == NULL)                                        /* if not properly attached? */
     return sim_messagef (SCPE_IERR, "Bad Attach\n");    /*   that's a problem */
@@ -2064,7 +2068,7 @@ sim_debug_unit (ctx->dbit, uptr, "sim_tape_wrrecf(unit=%d, buf=%p, bc=%d)\n", (i
 
 sim_tape_data_trace(uptr, buf, bc, "Record Write", (uptr->dctrl | ctx->dptr->dctrl) & MTSE_DBG_DAT, MTSE_DBG_STR);
 MT_CLR_PNU (uptr);
-sbc = MTR_L (bc);
+sbc = rbc = MTR_L (bc);
 if ((uptr->flags & UNIT_ATT) == 0)                      /* not attached? */
     return MTSE_UNATT;
 if (sim_tape_wrp (uptr))                                /* write prot? */
@@ -2076,8 +2080,19 @@ if (sim_tape_seek (uptr, uptr->pos))                    /* set pos */
 switch (f) {                                            /* case on format */
 
     case MTUF_F_STD:                                    /* standard */
-        sbc = MTR_L ((bc + 1) & ~1);                    /* pad odd length */
-        FALLTHROUGH;
+        sbc = MTR_L ((rbc + 1) & ~1);                   /* pad odd length */
+        (void)sim_fwrite (&bc, sizeof (t_mtrlnt), 1, uptr->fileref);
+        (void)sim_fwrite (buf, sizeof (uint8), rbc, uptr->fileref);
+        if (sbc != rbc)
+            (void)sim_fwrite (&pad, sizeof (uint8), 1, uptr->fileref);
+        (void)sim_fwrite (&bc, sizeof (t_mtrlnt), 1, uptr->fileref);
+        if (ferror (uptr->fileref)) {                   /* error? */
+            MT_SET_PNU (uptr);
+            return sim_tape_ioerr (uptr);
+            }
+        uptr->pos = uptr->pos + sbc + (2 * sizeof (t_mtrlnt));  /* move tape */
+        break;
+
     case MTUF_F_E11:                                    /* E11 */
         (void)sim_fwrite (&bc, sizeof (t_mtrlnt), 1, uptr->fileref);
         (void)sim_fwrite (buf, sizeof (uint8), sbc, uptr->fileref);
@@ -2107,7 +2122,7 @@ switch (f) {                                            /* case on format */
         }
 if (uptr->pos > uptr->tape_eom)
     uptr->tape_eom = uptr->pos;         /* update EOM as needed */
-sim_tape_data_trace(uptr, buf, sbc, "Record Written", (uptr->dctrl | ctx->dptr->dctrl) & MTSE_DBG_DAT, MTSE_DBG_STR);
+sim_tape_data_trace(uptr, buf, rbc, "Record Written", (uptr->dctrl | ctx->dptr->dctrl) & MTSE_DBG_DAT, MTSE_DBG_STR);
 return MTSE_OK;
 }
 

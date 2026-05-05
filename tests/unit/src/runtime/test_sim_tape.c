@@ -108,6 +108,28 @@ static void assert_tape_record_equals(const uint8 *actual, t_mtrlnt actual_len,
     assert_memory_equal(actual, expected, expected_len);
 }
 
+static void assert_standard_tape_file_padded_record(
+    struct sim_tape_fixture *fixture, const uint8 *expected,
+    size_t expected_len)
+{
+    void *actual_data;
+    uint8 *actual;
+    size_t actual_len;
+    size_t header_len = sizeof(t_mtrlnt);
+    size_t padded_len = (expected_len + 1) & ~(size_t)1;
+
+    assert_int_equal(sim_tape_detach(&fixture->unit), SCPE_OK);
+    assert_int_equal(
+        simh_test_read_file(fixture->tape_path, &actual_data, &actual_len),
+        0);
+    actual = actual_data;
+    assert_int_equal(actual_len, (2 * header_len) + padded_len);
+    assert_memory_equal(&actual[header_len], expected, expected_len);
+    if (padded_len != expected_len)
+        assert_int_equal(actual[header_len + expected_len], 0);
+    free(actual_data);
+}
+
 static void assert_string_contains(const char *haystack, const char *needle)
 {
     assert_non_null(strstr(haystack, needle));
@@ -431,6 +453,31 @@ static void test_sim_tape_standard_image_round_trip(void **state)
     assert_int_equal(record_length, 0);
 }
 
+/* Verify odd standard tape records are padded internally without making
+   the pad byte part of the caller-visible record. */
+static void
+test_sim_tape_standard_odd_record_uses_internal_padding(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+    uint8 record[] = {0x61, 0x62, 0x63};
+    uint8 read_buffer[16] = {0};
+    t_mtrlnt record_length;
+
+    assert_int_equal(sim_tape_attach(&fixture->unit, fixture->tape_path),
+                     SCPE_OK);
+    assert_int_equal(sim_tape_wrrecf(&fixture->unit, record, sizeof(record)),
+                     MTSE_OK);
+    assert_int_equal(sim_tape_rewind(&fixture->unit), MTSE_OK);
+
+    assert_int_equal(sim_tape_rdrecf(&fixture->unit, read_buffer,
+                                     &record_length, sizeof(read_buffer)),
+                     MTSE_OK);
+    assert_tape_record_equals(read_buffer, record_length, record,
+                              sizeof(record));
+
+    assert_standard_tape_file_padded_record(fixture, record, sizeof(record));
+}
+
 /* Verify forward and reverse spacing move across records and file
    boundaries as expected on a standard tape image. */
 static void test_sim_tape_spacing_and_reverse_reads_work(void **state)
@@ -517,6 +564,46 @@ static void test_sim_tape_operational_error_paths(void **state)
     assert_int_equal(fixture->unit.pos, 0);
     assert_int_equal(fixture->unit.tape_eom, 0);
     assert_null(fixture->unit.fileref);
+    assert_null(fixture->unit.io_flush);
+}
+
+/* Verify memory-backed tape formats release attach metadata on detach. */
+static void test_sim_tape_memory_format_detach_clears_filename(void **state)
+{
+    static const char ansi_text[] = "WORLD\n";
+    static const char fixed_text[] = "HELLO\n";
+    struct sim_tape_fixture *fixture = *state;
+    char ansi_path[1024];
+
+    assert_int_equal(simh_test_write_file(fixture->tape_path, fixed_text,
+                                          sizeof(fixed_text) - 1),
+                     0);
+    assert_int_equal(simh_test_join_path(ansi_path, sizeof(ansi_path),
+                                         fixture->temp_dir, "sample.txt"),
+                     0);
+    assert_int_equal(simh_test_write_file(ansi_path, ansi_text,
+                                          sizeof(ansi_text) - 1),
+                     0);
+
+    assert_int_equal(sim_tape_set_fmt(&fixture->unit, 0, "FIXED", NULL),
+                     SCPE_OK);
+    assert_int_equal(sim_tape_attach(&fixture->unit, fixture->tape_path),
+                     SCPE_OK);
+    assert_non_null(fixture->unit.filename);
+
+    assert_int_equal(sim_tape_detach(&fixture->unit), SCPE_OK);
+    assert_null(fixture->unit.filename);
+    assert_null(fixture->unit.up8);
+    assert_null(fixture->unit.io_flush);
+
+    assert_int_equal(sim_tape_set_fmt(&fixture->unit, 0, "ANSI-VMS", NULL),
+                     SCPE_OK);
+    assert_int_equal(sim_tape_attach(&fixture->unit, ansi_path), SCPE_OK);
+    assert_non_null(fixture->unit.filename);
+
+    assert_int_equal(sim_tape_detach(&fixture->unit), SCPE_OK);
+    assert_null(fixture->unit.filename);
+    assert_null(fixture->unit.up8);
     assert_null(fixture->unit.io_flush);
 }
 
@@ -782,6 +869,9 @@ int main(void)
                                         setup_sim_tape_fixture,
                                         teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_tape_standard_odd_record_uses_internal_padding,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_tape_spacing_and_reverse_reads_work,
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
@@ -805,6 +895,9 @@ int main(void)
         cmocka_unit_test_setup_teardown(test_sim_tape_operational_error_paths,
                                         setup_sim_tape_fixture,
                                         teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_memory_format_detach_clears_filename,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test(
             test_sim_tape_error_text_covers_named_and_generic_errors),
     };
