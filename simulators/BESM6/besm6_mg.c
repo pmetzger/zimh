@@ -366,7 +366,6 @@ static void log_data (t_value *data, int nwords)
 static void mg_write (UNIT *u)
 {
     KMT *c = unit_to_ctlr (u);
-    int unit = u - mg_unit;
     int ret;
     t_value fullzone[8+1024];
     int page = (u->cmd & MG_PAGE) >> 2 | (u->cmd & MG_BLOCK) >> 8;
@@ -444,7 +443,6 @@ static void mg_read (UNIT *u)
     t_mtrlnt len;
     t_value fullzone[8+1024];
     int ret;
-    int unit = (u - mg_unit) & 7;
     int page = (u->cmd & MG_PAGE) >> 2 | (u->cmd & MG_BLOCK) >> 8;
 
     if (u->dptr->dctrl)
