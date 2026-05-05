@@ -85,7 +85,10 @@ set(VAX440
     ${VAXD}/vax_vs.c
     ${VAXD}/vax4xx_rz94.c)
 
-set(VAX630
+## KA630 and KA620 share the base MicroVAX II/rtVAX system sources.
+## The KA630 MicroVAX II can also build the VAXstation video stack below;
+## the KA620 rtVAX target does not include those video devices.
+set(VAX630_BASE
     ${VAXD}/vax_cpu.c
     ${VAXD}/vax_cpu1.c
     ${VAXD}/vax_fpa.c
@@ -100,12 +103,6 @@ set(VAX630
     ${VAXD}/vax630_sysdev.c
     ${VAXD}/vax630_io.c
     ${VAXD}/vax630_syslist.c
-    ${VAXD}/vax_va.c
-    ${VAXD}/vax_vc.c
-    ${VAXD}/vax_lk.c
-    ${VAXD}/vax_vs.c
-    ${VAXD}/vax_2681.c
-    ${VAXD}/vax_gpx.c
     ${PDP11D}/pdp11_rl.c
     ${PDP11D}/pdp11_rq.c
     ${PDP11D}/pdp11_ts.c
@@ -118,6 +115,18 @@ set(VAX630
     ${PDP11D}/pdp11_td.c
     ${PDP11D}/pdp11_io_lib.c
     ${PDP11D}/pdp11_dup.c)
+
+set(VAX630_VIDEO
+    ${VAXD}/vax_va.c
+    ${VAXD}/vax_vc.c
+    ${VAXD}/vax_lk.c
+    ${VAXD}/vax_vs.c
+    ${VAXD}/vax_2681.c
+    ${VAXD}/vax_gpx.c)
+
+set(VAX630
+    ${VAX630_BASE}
+    ${VAX630_VIDEO})
 
 
 add_simulator(infoserver100
@@ -340,7 +349,7 @@ add_simulator(microvax3100m80
 
 add_simulator(rtvax1000
     SOURCES
-        ${VAX630}
+        ${VAX630_BASE}
     INCLUDES
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${PDP11D}
