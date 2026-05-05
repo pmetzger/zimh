@@ -133,6 +133,10 @@ extern uint8 unreg_dev(uint16);
 /* globals */
 
 static const char* i8251_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return i8251_NAME;
 }
 int     i8251_num = 0;
@@ -233,6 +237,10 @@ DEVICE i8251_dev = {
 
 t_stat i8251_cfg(uint16 base, uint16 devnum, uint8 dummy)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) dummy;
+
     i8251_baseport[devnum] = base & BYTEMASK;
     sim_printf("    i8251%d: installed at base port 0%02XH\n",
         devnum, i8251_baseport[devnum]);
@@ -264,6 +272,11 @@ t_stat i8251_clr(void)
 
 t_stat i8251_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int i;
 
     if (uptr == NULL)
@@ -303,6 +316,10 @@ t_stat i8251_svc (UNIT *uptr)
 
 t_stat i8251_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     uint8 devnum;
 
     for (devnum=0; devnum<i8251_num+1; devnum++) {

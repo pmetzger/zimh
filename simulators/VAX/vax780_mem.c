@@ -264,6 +264,10 @@ return;
 
 t_stat mctl_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i, amb, akb;
 t_bool extmem = MEMSIZE > MAXMEMSIZE;
 
@@ -291,6 +295,12 @@ return buf;
 
 t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 struct {
     uint32 capacity;
     const char *option;

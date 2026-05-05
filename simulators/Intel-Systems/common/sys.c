@@ -358,11 +358,21 @@ DEVICE sys_dev = {
 };
 
 static const char* sys_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return sys_name;
 }
 
 t_stat sys_cfg(uint16 base, uint16 devnum, uint8 dummy)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) base;
+    (void) devnum;
+    (void) dummy;
+
     int i, j;
     DEVICE *dptr;
 
@@ -489,6 +499,12 @@ t_stat sys_reset(DEVICE *dptr)
 
 t_stat sys_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int i, j;
     DEVICE *dptr;
 
@@ -591,6 +607,11 @@ t_stat sys_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat sys_show_model (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int i, j;
 
     if (uptr == NULL)

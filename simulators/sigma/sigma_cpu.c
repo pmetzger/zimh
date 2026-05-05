@@ -2535,6 +2535,10 @@ return int_reset (dptr);
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 uint32 lnt;
 
 if (sw & SWMASK ('C'))
@@ -2557,6 +2561,10 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 uint32 lnt;
 
 if (sw & SWMASK ('C'))
@@ -2585,6 +2593,11 @@ return SCPE_OK;
 
 t_stat cpu_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 uint32 model = CPUF_GETMOD (val);
 
 if (model == cpu_model)                                 /* no change? */
@@ -2603,6 +2616,11 @@ return SCPE_OK;
 
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+
 uint32 mc = 0;
 uint32 i;
 
@@ -2624,6 +2642,12 @@ return SCPE_OK;
 
 t_stat cpu_set_opt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if ((val & (cpu_tab[cpu_model].std | cpu_tab[cpu_model].opt)) == 0)
     return SCPE_NOFNC;
 cpu_unit.flags |= val;
@@ -2632,6 +2656,12 @@ return SCPE_OK;
 
 t_stat cpu_clr_opt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (val & cpu_tab[cpu_model].std)
     return SCPE_NOFNC;
 cpu_unit.flags &= ~val;
@@ -2642,6 +2672,12 @@ return SCPE_OK;
 
 t_stat cpu_set_rblks (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 invmask, lnt, i, j;
 t_stat r;
 
@@ -2666,6 +2702,12 @@ return SCPE_OK;
 
 t_stat cpu_show_rblks (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "register blocks=%d", rf_bmax);
 return SCPE_OK;
 }
@@ -2688,18 +2730,34 @@ return;
 
 t_stat cpu_set_alarm (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 cons_alarm_enb = val;
 return SCPE_OK;
 }
 
 t_stat cpu_show_alarm (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fputs (cons_alarm_enb? "alarm enabled\n": "alarm disabled\n", st);
 return SCPE_OK;
 }
 
 t_stat cpu_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if (cons_alarm && cons_alarm_enb)
     sim_putchar ('\a');
 return SCPE_OK;
@@ -2711,6 +2769,10 @@ return SCPE_OK;
 
 t_stat cpu_show_addr (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 t_stat r;
 char *cptr = (char *) desc;
 uint32 ad, bpa, dlnt, virt;
@@ -2767,6 +2829,12 @@ return;
 
 t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i, lnt;
 t_stat r;
 
@@ -2830,6 +2898,11 @@ return;
 
 t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 k, di, lnt;
 t_stat r;
 char *cptr = (char *) desc;

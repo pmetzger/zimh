@@ -393,11 +393,19 @@ static t_stat tape_svc(UNIT *uptr)
 
 static t_stat tape_reset(DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void)dptr;
+
   return SCPE_OK;
 }
 
 static t_stat tape_boot(int32 unit_num, DEVICE *dptr)
 {
+  /* Generic boot signature.
+     This implementation does not use every parameter. */
+  (void)dptr;
+
   uint16 block = 0300;
   uint16 blocks = 8;
   uint16 quarter = 0;

@@ -176,7 +176,7 @@ int32 int_vec[IPL_HLVL][32];                            /* int req to vector */
         - write: machine check (?)
 */
 
-int32 ReadQb (uint32 pa)
+static int32 ReadQb (uint32 pa)
 {
 int32 idx, val;
 
@@ -193,7 +193,7 @@ MACH_CHECK (MCHK_READ);
 return 0;
 }
 
-void WriteQb (uint32 pa, int32 val, int32 mode)
+static void WriteQb (uint32 pa, int32 val, int32 mode)
 {
 int32 idx;
 
@@ -409,6 +409,10 @@ return 0;
 
 t_stat dbl_rd (int32 *data, int32 addr, int32 access)
 {
+/* Generic register read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 *data = qb_ipc & QBIPC_MASK;
 
 sim_debug(DBG_REG, &qba_dev, "dbl_rd(addr=0x%08X, data=0x%X) ", addr, *data);
@@ -419,6 +423,10 @@ return SCPE_OK;
 
 t_stat dbl_wr (int32 data, int32 addr, int32 access)
 {
+/* Generic register write signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 sc = (addr & 3) << 3;
 int32 nval = data << sc;
 int32 old_val = qb_ipc;
@@ -444,6 +452,10 @@ return SCPE_OK;
 
 int32 qbmap_rd (int32 pa, int32 lnt)
 {
+/* Generic memory read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 idx = ((pa - QBMAPBASE) >> 2);
 
 return qb_map[idx] & QBMAP_RD;
@@ -481,6 +493,10 @@ return;
 
 t_stat qbmem_rd (int32 *dat, int32 pa, int32 md)
 {
+/* Generic bus read signature.
+   This implementation does not use every parameter. */
+(void) md;
+
 int32 qa = pa & QBMAMASK;                               /* Qbus addr */
 uint32 ma;
 
@@ -591,6 +607,10 @@ return FALSE;
 
 void ioreset_wr (int32 data)
 {
+/* Generic register write signature.
+   This implementation does not use every parameter. */
+(void) data;
+
 reset_all (5);                                          /* from qba on... */
 return;
 }
@@ -599,6 +619,10 @@ return;
 
 t_stat qba_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 for (i = 0; i < IPL_HLVL; i++)
@@ -748,6 +772,11 @@ return 0;
 
 t_stat qba_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 qa = (uint32) exta, pa;
 
 if ((vptr == NULL) || (qa >= QBMSIZE))
@@ -763,6 +792,11 @@ return SCPE_NXM;
 
 t_stat qba_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 qa = (uint32) exta, pa;
 
 if (qa >= QBMSIZE)
@@ -799,6 +833,11 @@ return SCPE_OK;
 
 t_stat qba_show_virt (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 t_stat r;
 const char *cptr = (const char *) desc;
 uint32 qa, pa;
@@ -820,11 +859,22 @@ return SCPE_OK;
 
 t_stat qba_show_map (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 return show_bus_map (of, (const char *)desc, (uint32 *)qb_map, QBNMAPR, "Qbus", QBMAP_VLD);
 }
 
 t_stat qba_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Qbus Adapter (QBA)\n\n");
 fprintf (st, "The Qbus adapter (QBA) simulates the CQBIC Qbus adapter chip.\n");
 fprint_set_help (st, dptr);
@@ -839,5 +889,9 @@ return SCPE_OK;
 
 const char *qba_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Qbus adapter";
 }

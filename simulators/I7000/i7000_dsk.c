@@ -297,6 +297,12 @@ DEVICE              dsk_dev = {
 
 uint32 dsk_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
+#ifndef I7010
+    /* Build-variant command signature.
+       This implementation does not use every parameter. */
+    (void)cmd;
+#endif
+
     int                 u = (uptr->u3 >> 8) & 0xf;
     int                chan = UNIT_G_CHAN(dsk_unit[u].flags);
 #ifdef I7010
@@ -951,7 +957,7 @@ clear_drive:
 }
 
 /* Print a format pattern */
-void
+static void
 print_format(UNIT * uptr)
 {
     struct disk_t      *dsk = &disk_type[uptr->u4];
@@ -1607,6 +1613,13 @@ bcd_to_track(uint32 addr)
 t_stat
 dsk_boot(int unit_num, DEVICE * dptr)
 {
+#ifndef I7090
+    /* Build-variant boot signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+    (void)unit_num;
+#endif
+
 #ifdef I7090
     UNIT               *uptr = &dptr->units[unit_num];
     int                 chan = UNIT_G_CHAN(uptr->flags) - 1;
@@ -1700,6 +1713,10 @@ dsk_boot(int unit_num, DEVICE * dptr)
 void
 dsk_ini(UNIT * uptr, t_bool f)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)f;
+
     uptr->u5 = 0;
 }
 
@@ -1751,6 +1768,11 @@ dsk_reset(DEVICE * dptr)
 t_stat
 dsk_set_type(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)val;
+
     int                 i, u;
 
     if (cptr == NULL)
@@ -1788,6 +1810,11 @@ dsk_set_type(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 dsk_get_type(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)v;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fputs(disk_type[uptr->u4].name, st);
@@ -1797,6 +1824,11 @@ dsk_get_type(FILE * st, UNIT * uptr, int32 v, const void *desc)
 t_stat
 dsk_set_module(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)val;
+
     int                 u;
 
     if (cptr == NULL)
@@ -1829,6 +1861,11 @@ dsk_set_module(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 dsk_get_module(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)v;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "Module=%d", uptr->u3 & 0xff);
@@ -1838,6 +1875,12 @@ dsk_get_module(FILE * st, UNIT * uptr, int32 v, const void *desc)
 t_stat dsk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
     const char *cptr)
 {
+      /* Generic callback signature.
+         This implementation does not use every parameter. */
+      (void)cptr;
+      (void)flag;
+      (void)uptr;
+
       int i;
 fprintf (st, "IBM 7631 Disk File Controller\n\n");
 fprintf (st, "The IBM 7631 Disk File Controller supports several types of ");
@@ -1879,6 +1922,10 @@ return SCPE_OK;
 
 const char *dsk_description (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
 return "IBM 7631 disk file controller";
 }
 

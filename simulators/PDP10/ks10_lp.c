@@ -762,6 +762,10 @@ t_stat lp20_init (UNIT *uptr)
 /* Reset routine */
 t_stat lp20_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     UNIT *uptr = &lp20_unit;
     int   i;
     int   par;
@@ -841,6 +845,11 @@ t_stat lp20_detach (UNIT *uptr)
 t_stat
 lp20_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     t_value   i;
     t_stat    r;
     if (cptr == NULL)
@@ -858,6 +867,11 @@ lp20_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 lp20_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) v;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "linesperpage=%d", uptr->capac);
@@ -867,6 +881,12 @@ lp20_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 t_stat lp20_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
         const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Line Printer (LPT)\n\n");
 fprintf (st, "The line printer (LPT) writes data to a disk file. \n");
 fprintf (st, "The Line printer can be configured to any number of lines per page with the:\n");
@@ -890,6 +910,10 @@ return SCPE_OK;
 
 const char *lp20_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "LP20 line printer" ;
 }
 

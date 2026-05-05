@@ -303,6 +303,10 @@ UART2681 va_uart = {
 
 t_stat va_rd (int32 *data, int32 PA, int32 access)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 rg = (PA >> 1) & 0x1F;
 if (rg == 0) {
     *data = CSR_MBO | CSR_FPS;
@@ -318,6 +322,10 @@ return SCPE_OK;
 
 t_stat va_wr (int32 data, int32 PA, int32 access)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 rg = (PA >> 1) & 0x1F;
 if (rg == 0) {
     if (data > 0)
@@ -330,7 +338,7 @@ sim_debug (DBG_REG, &va_dev, "va_wr: %d, %X from PC %08X\n", rg, data, fault_PC)
 return SCPE_OK;
 }
 
-void va_dga_fifo_clr (void)
+static void va_dga_fifo_clr (void)
 {
 sim_debug (DBG_DGA, &va_dev, "dga_fifo_clr\n");
 va_ram[VA_FFO_OF] = 0;                                  /* clear top word */
@@ -339,7 +347,7 @@ va_dga_fifo_rp = VA_FFO_OF;
 va_dga_fifo_sz = 0;                                     /* empty */
 }
 
-void va_dga_fifo_wr (uint32 val)
+static void va_dga_fifo_wr (uint32 val)
 {
 sim_debug (DBG_DGA, &va_dev, "dga_fifo_wr: %d, %X (%d) from PC %08X\n", va_dga_fifo_wp, val, (va_dga_fifo_sz + 1), fault_PC);
 #if 0
@@ -371,7 +379,7 @@ if (va_dga_fifo_wp == VA_DGA_FIFOSIZE)                  /* pointer wrap? */
 va_dga_fifo_sz++;
 }
 
-uint32 va_dga_fifo_rd (void)
+static uint32 va_dga_fifo_rd (void)
 {
 uint32 val, wc, bc, r;
 
@@ -411,7 +419,7 @@ return val;
 
 /* DGA Register descriptions on page 3-121 */
 
-int32 va_dga_rd (int32 pa)
+static int32 va_dga_rd (int32 pa)
 {
 int32 rg = (pa >> 1) & 0xFF;
 int32 data = 0;
@@ -478,8 +486,12 @@ return data;
 
 /* DGA Register descriptions on page 3-121 */
 
-void va_dga_wr (int32 pa, int32 val, int32 lnt)
+static void va_dga_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Generic register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa >> 1) & 0xFF;
 
 if (rg <= DGA_MAXREG)
@@ -855,6 +867,10 @@ else
 
 t_stat va_intsvc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 SET_INT (QDSS);
 return SCPE_OK;
 }
@@ -999,6 +1015,10 @@ return SCPE_OK;
 
 t_stat va_dmasvc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 uint32 wc, bc, i, r;
 
 if (GET_MODE (va_dga_csr) == MODE_HALT)
@@ -1140,6 +1160,12 @@ return auto_config (NULL, 0);                           /* run autoconfig */
 
 t_stat va_set_yoff (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i;
 t_stat r;
 
@@ -1153,12 +1179,24 @@ return r;
 
 t_stat va_show_yoff (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "%d", va_yoff);
 return SCPE_OK;
 }
 
 t_stat va_set_dpln (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i;
 t_stat r;
 
@@ -1176,12 +1214,24 @@ return r;
 
 t_stat va_show_dpln (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "%d", va_dpln);
 return SCPE_OK;
 }
 
 t_stat va_show_cmap (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i;
 for (i = 0; i < VA_BPP; i++)
     fprintf (st, "%d = (0x%02x, 0x%02x, 0x%02x)\n", i,
@@ -1191,11 +1241,23 @@ return SCPE_OK;
 
 t_stat va_set_enable (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 return cpu_set_model (NULL, 0, (val ? "VAXSTATIONGPX" : "MICROVAX"), NULL);
 }
 
 t_stat va_set_capture (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (vid_active)
     return sim_messagef (SCPE_ALATT, "Capture Mode Can't be changed with device enabled\n");
 va_input_captured = val;
@@ -1215,6 +1277,12 @@ return SCPE_OK;
 
 t_stat va_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "VCB02 8-Bit Colour Video Subsystem (%s)\n\n", dptr->name);
 fprintf (st, "Use the Control-Right-Shift key combination to regain focus from the simulated\n");
 fprintf (st, "video display\n");
@@ -1226,6 +1294,10 @@ return SCPE_OK;
 
 const char *va_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "VCB02 Colour Graphics Adapter";
 }
 

@@ -316,6 +316,11 @@ const char *sim_stop_messages[SCPE_BASE] = {
  */
 t_stat cpu_examine (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic examine signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     if (addr >= MEMSIZE)
         return SCPE_NXM;
     if (vptr) {
@@ -338,6 +343,11 @@ t_stat cpu_examine (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
  */
 t_stat cpu_deposit (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic deposit signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     if (addr >= MEMSIZE)
         return SCPE_NXM;
     if (addr < 010) {
@@ -355,6 +365,10 @@ t_stat cpu_deposit (t_value val, t_addr addr, UNIT *uptr, int32 sw)
  */
 t_stat cpu_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
 
     ACC = 0;
@@ -392,6 +406,13 @@ t_stat cpu_reset (DEVICE *dptr)
  */
 t_stat cpu_req (UNIT *u, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) u;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     GRP |= GRP_PANEL_REQ;
     return SCPE_OK;
 }
@@ -401,6 +422,12 @@ t_stat cpu_req (UNIT *u, int32 val, const char *cptr, void *desc)
  */
 t_stat cpu_set_pult (UNIT *u, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) u;
+    (void) val;
+    (void) desc;
+
     int sw;
     if (cptr) sw = atoi(cptr); else sw = 0;
     if (sw >= 0 && sw <= 10) {
@@ -417,6 +444,12 @@ t_stat cpu_set_pult (UNIT *u, int32 val, const char *cptr, void *desc)
 
 t_stat cpu_show_pult (FILE *st, UNIT *up, int32 v, const void *dp)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) up;
+    (void) v;
+    (void) dp;
+
     fprintf(st, "Pult packet switch position is %d", pult_packet_switch);
     return SCPE_OK;
 }
@@ -792,7 +825,7 @@ static void cmd_033 (void)
     }
 }
 
-void check_initial_setup (void)
+static void check_initial_setup (void)
 {
     const int MGRP_COPY = 01455;    /* OS version specific? */
     const int TAKEN = 0442;         /* fixed? */
@@ -859,7 +892,7 @@ void check_initial_setup (void)
  * When stopped, perform a longjmp to cpu_halt,
  * sending a stop code.
  */
-void cpu_one_inst (void)
+static void cpu_one_inst (void)
 {
     int reg, opcode, addr, nextpc, next_mod;
     t_value word;
@@ -1541,7 +1574,7 @@ void cpu_one_inst (void)
  * Операция прерывания 1: внутреннее прерывание.
  * Описана в 9-м томе технического описания БЭСМ-6, страница 119.
  */
-void op_int_1 (const char *msg)
+static void op_int_1 (const char *msg)
 {
     /*besm6_okno (msg);*/
     M[SPSW] = (M[PSW] & (PSW_INTR_DISABLE | PSW_MMAP_DISABLE |
@@ -1563,7 +1596,7 @@ void op_int_1 (const char *msg)
  * Операция прерывания 2: внешнее прерывание.
  * Описана в 9-м томе технического описания БЭСМ-6, страница 129.
  */
-void op_int_2 (void)
+static void op_int_2 (void)
 {
     /*besm6_okno ("Внешнее прерывание");*/
     M[SPSW] = (M[PSW] & (PSW_INTR_DISABLE | PSW_MMAP_DISABLE |
@@ -1799,7 +1832,7 @@ t_stat sim_instr (void)
  * Some installations used 50 Hz with a modified OS
  * for a better user time/system time ratio.
  */
-t_stat fast_clk (UNIT * this)
+static t_stat fast_clk (UNIT * this)
 {
     static unsigned counter;
     static unsigned tty_counter;
@@ -1841,8 +1874,12 @@ UNIT clocks[] = {
     { UDATA(fast_clk, UNIT_IDLE, 0), CLK_DELAY },   /* Bit 40 of the GRP, 250 Hz */
 };
 
-t_stat clk_reset (DEVICE * dev)
+static t_stat clk_reset (DEVICE * dev)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dev;
+
     sim_register_clock_unit (&clocks[0]);
 
     /* Схема автозапуска включается по нереализованной кнопке "МР" */

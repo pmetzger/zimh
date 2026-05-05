@@ -473,6 +473,10 @@ return data;
 
 void rd_wr (int32 pa, int32 data, int32 access)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 rg = (pa >> 2) & 3;
 
 if (rd_dev.flags & DEV_DIS)                             /* disabled? */
@@ -638,7 +642,7 @@ return CMD_UNKNOWN;
 
 /* read cylinder 0 - simulate special formatting */
 
-t_stat rd_rdcyl0 (int32 hd, int32 dtype)
+static t_stat rd_rdcyl0 (int32 hd, int32 dtype)
 {
 uint32 i;
 uint16 c;
@@ -686,7 +690,7 @@ else
 return SCPE_OK;
 }
 
-t_stat rd_rddata (UNIT *uptr, t_lba lba, t_seccnt sects)
+static t_stat rd_rddata (UNIT *uptr, t_lba lba, t_seccnt sects)
 {
 t_seccnt sectsread;
 t_stat r;
@@ -696,7 +700,7 @@ sim_disk_data_trace (uptr, (uint8 *)rd_xb, lba, sectsread*RD_NUMBY, "sim_disk_rd
 return r;
 }
 
-t_stat rd_wrdata (UNIT *uptr, t_lba lba, t_seccnt sects)
+static t_stat rd_wrdata (UNIT *uptr, t_lba lba, t_seccnt sects)
 {
 t_seccnt sectswritten;
 
@@ -850,6 +854,10 @@ if ((rd_term & 0x20) && setint) {
 
 t_stat rd_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 rd_rg_p = 0;
 CLR_INT (SCA);                                          /* clear int req */
 rd_done (TRM_OK, FALSE);
@@ -887,6 +895,11 @@ return sim_disk_detach (uptr);
 
 t_stat rd_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (uptr->flags & UNIT_ATT)
     return SCPE_ALATT;
 
@@ -909,6 +922,11 @@ return SCPE_OK;
 
 t_stat rd_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 fprintf (st, "%s", drv_tab[GET_DTYPE (uptr->flags)].name);
 return SCPE_OK;
 }
@@ -937,5 +955,9 @@ return SCPE_OK;
 
 const char *rd_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "HDC9224 disk controller";
 }

@@ -1717,6 +1717,11 @@ return detach_unit (uptr);                              /*   and detach the unit
 
 t_stat dl_set_model (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (uptr->flags & UNIT_ATT)                                 /* we cannot alter the disc model */
     return SCPE_ALATT;                                      /*   if the unit is attached */
 

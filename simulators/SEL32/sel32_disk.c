@@ -399,7 +399,6 @@ t_stat  disk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *c
 const   char  *disk_description (DEVICE *dptr);
 extern  uint32  inbusy;
 extern  uint32  outbusy;
-extern  uint32  readfull(CHANP *chp, uint32 maddr, uint32 *word);
 extern  int     irq_pend;                       /* go scan for pending int or I/O */
 extern  UNIT    itm_unit;
 extern  uint32  PSD[];                          /* PSD */
@@ -521,7 +520,7 @@ DEVICE          ddb_dev = {
 };
 #endif
 
-uint32 dmle_ecc32(uint8 *str, int32 len)
+static uint32 dmle_ecc32(uint8 *str, int32 len)
 {
     int i, j;
     uint32 ch, ecc = 0;
@@ -542,7 +541,7 @@ uint32 dmle_ecc32(uint8 *str, int32 len)
     return (~ecc & MASK32);                     /* return ecc value */
 }
 
-uint32 dmbe_ecc32(uint8 *str, int32 len)
+static uint32 dmbe_ecc32(uint8 *str, int32 len)
 {
     int i, j;
     uint32 ch, ecc = 0;
@@ -564,7 +563,7 @@ uint32 dmbe_ecc32(uint8 *str, int32 len)
 }
 
 /* convert sector disk address to star values (c,h,s) */
-uint32 disksec2star(uint32 daddr, int type)
+static uint32 disksec2star(uint32 daddr, int type)
 {
     uint32 sec = daddr % disk_type[type].spt;   /* get sector value */
     uint32 spc = disk_type[type].nhds * disk_type[type].spt; /* sec per cyl */
@@ -576,7 +575,7 @@ uint32 disksec2star(uint32 daddr, int type)
 }
 
 /* read alternate track label and return new STAR */
-uint32 get_dmatrk(UNIT *uptr, uint32 star, uint8 buf[])
+static uint32 get_dmatrk(UNIT *uptr, uint32 star, uint8 buf[])
 {
     uint32  nstar, tstart, offset;
     uint32  sec=0, trk=0, cyl=0;
@@ -695,6 +694,10 @@ uint32 get_dmatrk(UNIT *uptr, uint32 star, uint8 buf[])
 /* start a disk operation */
 t_stat disk_preio(UNIT *uptr, uint16 chan)
 {
+    /* Channel device callback signature.
+       This implementation does not use every parameter. */
+    (void)chan;
+
     DEVICE      *dptr = get_dev(uptr);
     uint16      chsa = GET_UADDR(uptr->CMD);
     int         unit = (uptr - dptr->units);
@@ -953,6 +956,10 @@ loop:
 
 t_stat disk_startcmd(UNIT *uptr, uint16 chan,  uint8 cmd)
 {
+    /* Channel device callback signature.
+       This implementation does not use every parameter. */
+    (void)chan;
+
     uint16      chsa = GET_UADDR(uptr->CMD);
     DEVICE      *dptr = get_dev(uptr);
     int32       unit = (uptr - dptr->units);
@@ -2681,6 +2688,10 @@ t_stat  disk_rschnlio(UNIT *uptr) {
 /* initialize the disk */
 void disk_ini(UNIT *uptr, t_bool f)
 {
+    /* Generic device initialization signature.
+       This implementation does not use every parameter. */
+    (void)f;
+
     DEVICE  *dptr = get_dev(uptr);
     int     unit = (uptr - dptr->units);        /* get the UNIT number */
     int     i = GET_TYPE(uptr->flags);
@@ -2706,6 +2717,10 @@ void disk_ini(UNIT *uptr, t_bool f)
 
 t_stat disk_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     int     cn, unit;
 
     for (unit=0; unit < NUM_UNITS_DISK; unit++) {
@@ -2730,7 +2745,7 @@ t_stat disk_reset(DEVICE *dptr)
 /* The next lower track contains the UTX media map (UMAP) and is pointed */
 /* to by word 3 of sector label 1 and is placed there by the UTX prep program */
 /* Add track and sector labels to disk */
-int disk_label(UNIT *uptr) {
+static int disk_label(UNIT *uptr) {
     int         type = GET_TYPE(uptr->flags);
     DEVICE      *dptr = get_dev(uptr);
     uint32      trk, cyl, sec;
@@ -2930,7 +2945,7 @@ int disk_label(UNIT *uptr) {
 }
 
 /* create the disk file for the specified device */
-int disk_format(UNIT *uptr) {
+static int disk_format(UNIT *uptr) {
     int         type = GET_TYPE(uptr->flags);
     DEVICE      *dptr = get_dev(uptr);
     uint32      ssize = SSB(type);              /* disk sector size in bytes */
@@ -3420,6 +3435,11 @@ t_stat disk_boot(int32 unit_num, DEVICE *dptr) {
 /* set the disk type attached to unit */
 t_stat disk_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)val;
+    (void)desc;
+
     int     i;
 
     if (cptr == NULL)                           /* any disk name input? */
@@ -3444,6 +3464,11 @@ t_stat disk_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat disk_get_type(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
+    /* Generic show command signature.
+       This implementation does not use every parameter. */
+    (void)v;
+    (void)desc;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fputs("TYPE=", st);
@@ -3454,6 +3479,12 @@ t_stat disk_get_type(FILE *st, UNIT *uptr, int32 v, const void *desc)
 /* help information for disk */
 t_stat disk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)flag;
+    (void)cptr;
+
     int i;
     fprintf (st, "SEL 2314 Disk Processor II\r\n");
     fprintf (st, "Use:\r\n");
@@ -3479,6 +3510,10 @@ t_stat disk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cp
 
 const char *disk_description (DEVICE *dptr)
 {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "SEL 2314 Disk Processor II";
 }
 

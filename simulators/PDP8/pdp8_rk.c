@@ -419,6 +419,10 @@ return SCPE_OK;
 
 t_stat rk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 UNIT *uptr;
 
@@ -452,6 +456,10 @@ static const uint16 boot_rom[] = {
 
 t_stat rk_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 if (rk_dib.dev != DEV_RK)                               /* only std devno */
@@ -465,5 +473,9 @@ return SCPE_OK;
 
 const char *rk_description (DEVICE *dptr)
 {
+/* Generic description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "RK8E/RK05 cartridge disk";
 }

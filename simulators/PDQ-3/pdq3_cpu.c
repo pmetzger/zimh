@@ -275,6 +275,11 @@ void cpu_setRegs(uint16 newctp, uint16 newssv, uint16 newrq)
 /* this is a dummy routine to ignore invalid writes to the ROM
  * which occur during context switch from HDT to boot loader */
 static t_stat rom_ignore(t_addr ea, uint16 data) {
+  /* Memory-mapped I/O write callback signature.
+     This implementation does not use every parameter. */
+  (void) ea;
+  (void) data;
+
   return SCPE_OK;
 }
 
@@ -308,6 +313,10 @@ static t_stat rom_ignore(t_addr ea, uint16 data) {
  * the different boot sectors I found.
  */
 t_stat cpu_boot(int32 unitnum, DEVICE *dptr) {
+  /* Generic bootstrap signature.
+     This implementation does not use every parameter. */
+  (void) unitnum;
+
   t_stat rc;
   uint16 ctp, ssv, rq;
 //  sim_printf("BOOT CPU\n");
@@ -411,11 +420,19 @@ t_stat cpu_buserror(void) {
 }
 
 static t_stat ssr_read(t_addr ioaddr, uint16 *data) {
+  /* Memory-mapped I/O read callback signature.
+     This implementation does not use every parameter. */
+  (void) ioaddr;
+
   *data = reg_ssr & ~(SSR_PRNT|SSR_BIT3);
   return SCPE_OK;
 }
 
 static t_stat ssr_write(t_addr ioaddr, uint16 data) {
+  /* Memory-mapped I/O write callback signature.
+     This implementation does not use every parameter. */
+  (void) ioaddr;
+
   if (isbitset(data,SSR_BERR)) {
     clrbit(reg_ssr,SSR_BERR);
     sim_debug(DBG_CPU_INT2, &cpu_dev, DBG_PCFORMAT1 "Clear BERR\n", DBG_PC);
@@ -450,6 +467,10 @@ static t_stat ssr_write(t_addr ioaddr, uint16 data) {
 
 static t_stat ses_read(t_addr ioaddr, uint16 *data)
 {
+  /* Memory-mapped I/O read callback signature.
+     This implementation does not use every parameter. */
+  (void) ioaddr;
+
   *data = reg_ses;
 //  sim_printf("ses is %x\n",reg_ses);
   return SCPE_OK;
@@ -457,12 +478,20 @@ static t_stat ses_read(t_addr ioaddr, uint16 *data)
 
 static t_stat cpu_readserial(t_addr dummy, uint16 *data)
 {
+  /* Memory-mapped I/O read callback signature.
+     This implementation does not use every parameter. */
+  (void) dummy;
+
   *data = reg_cpuserial;
   return SCPE_OK;
 }
 
 static t_stat rom_baseread(t_addr dummy, uint16 *data)
 {
+  /* Memory-mapped I/O read callback signature.
+     This implementation does not use every parameter. */
+  (void) dummy;
+
   *data = reg_fc68;
   return SCPE_OK;
 }
@@ -482,7 +511,7 @@ static uint16 int_vectors[32] = {
   NIL
 };
 
-t_bool cpu_isIntEnabled(void) {
+static t_bool cpu_isIntEnabled(void) {
   return reg_ssr & SSR_INTEN;
 }
 
@@ -1601,11 +1630,21 @@ t_stat sim_instr(void)
 }
 
 static t_stat cpu_set_flag(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+  /* Generic modifier signature.
+     This implementation does not use every parameter. */
+  (void) cptr;
+  (void) desc;
+
   uptr->flags |= value;
   return SCPE_OK;
 }
 
 static t_stat cpu_set_noflag(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+  /* Generic modifier signature.
+     This implementation does not use every parameter. */
+  (void) cptr;
+  (void) desc;
+
   uptr->flags &= ~value;
   return SCPE_OK;
 }

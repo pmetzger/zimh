@@ -172,7 +172,7 @@ UDP_LINK udp_links[MAXLINKS] = { {0} };         // data for every active connect
 TMLN udp_lines[MAXLINKS] = { {0} };             // line descriptors
 TMXR udp_tmxr = { MAXLINKS, NULL, 0, udp_lines};// datagram mux
 
-int32 udp_find_free_link (void)
+static int32 udp_find_free_link (void)
 {
   //   Find a free UDP_LINK block, initialize it and return its index.  If none
   // are free, then return -1 ...
@@ -186,7 +186,7 @@ int32 udp_find_free_link (void)
   return NOLINK;
 }
 
-t_stat udp_parse_remote (int32 link, const char *premote)
+static t_stat udp_parse_remote (int32 link, const char *premote)
 {
   // This routine will parse a remote address string in any of these forms -
   //
@@ -333,7 +333,7 @@ t_stat udp_set_link_loopback (DEVICE *dptr, int32 link, t_bool enable_loopback)
   return tmxr_set_line_loopback (&udp_lines[link], enable_loopback);
 }
 
-int32 udp_receive_packet (int32 link, UDP_PACKET *ppkt)
+static int32 udp_receive_packet (int32 link, UDP_PACKET *ppkt)
 {
   //   This routine will do the hard part of receiving a UDP packet.  If it's
   // successful the packet length, in bytes, is returned.  The receiver socket

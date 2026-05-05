@@ -555,6 +555,10 @@ return SCPE_OK;
 
 t_stat tti_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmxr_set_console_units (&tti_unit, &tto_unit[0]);
 tti_buf = 0;
 tti_csr = 0;
@@ -565,6 +569,12 @@ return SCPE_OK;
 
 t_stat tti_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Console Terminal Input (TTI)\n\n");
 fprintf (st, "The terminal input (TTI) polls the console keyboard for input.\n\n");
 fprint_set_help (st, dptr);
@@ -575,6 +585,10 @@ return SCPE_OK;
 
 const char *tti_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "console terminal input";
 }
 
@@ -608,6 +622,10 @@ return SCPE_OK;
 
 t_stat tto_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 tto_buf = 0;
@@ -622,6 +640,12 @@ return SCPE_OK;
 
 t_stat tto_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Console Terminal Output (TTO)\n\n");
 fprintf (st, "The terminal output (TTO) writes to the simulator console.\n\n");
 fprint_set_help (st, dptr);
@@ -632,6 +656,10 @@ return SCPE_OK;
 
 const char *tto_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "console terminal output";
 }
 
@@ -732,6 +760,10 @@ tmr_nicr = val;
 
 t_stat tmr_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 sim_debug (TMR_DB_TICK, &tmr_dev, "tmr_svc()\n");
 tmxr_poll = tmr_poll * TMXR_MULT;                   /* set mux poll */
 if (tmr_iccs & TMR_CSR_DON)                         /* done? set err */
@@ -767,6 +799,10 @@ else
 
 t_stat clk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (clk_unit.filebuf == NULL) {                         /* make sure the TODR is initialized */
     clk_unit.filebuf = calloc(1, sizeof(TOY));
     if (clk_unit.filebuf == NULL)
@@ -794,6 +830,12 @@ return SCPE_OK;
 
 t_stat clk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Real-Time Clock (%s)\n\n", dptr->name);
 fprintf (st, "The real-time clock autocalibrates; the clock interval is adjusted up or down\n");
 fprintf (st, "so that the clock tracks actual elapsed time.\n\n");
@@ -831,6 +873,10 @@ return SCPE_OK;
 
 const char *clk_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "time of year clock";
 }
 
@@ -896,6 +942,10 @@ return r;
 
 t_stat tmr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmr_iccs = 0;
 tmr_nicr = 0;
 tmr_int = 0;
@@ -905,6 +955,10 @@ return SCPE_OK;
 
 const char *tmr_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "interval timer";
 }
 
@@ -1057,6 +1111,10 @@ return val;
 
 void fl_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Shared memory write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa >> 1) & 0xF;
 
 sim_debug (FL_DB_REG, &fl_dev, "fl_wr(%s) data=0x%02X\n", fl_regnames[rg], val);
@@ -1100,7 +1158,7 @@ switch (rg) {
         }
 }
 
-void fl_maint_status (void)
+static void fl_maint_status (void)
 {
 fl_cs0 = fl_cs0 & (FLCS0_FNC | FLCS0_DS | FLCS0_DKS | FLCS0_SS);
 fl_cs0 = fl_cs0 | FLCS0_DONE;
@@ -1110,7 +1168,7 @@ fl_cs3 = 0;                                             /* FIXME */
 fl_cs4 = 0;                                             /* FIXME */
 }
 
-void fl_xfer_status (void)
+static void fl_xfer_status (void)
 {
 fl_cs0 = fl_cs0 & (FLCS0_FNC | FLCS0_DS | FLCS0_DKS | FLCS0_SS);
 fl_cs0 = fl_cs0 | FLCS0_DONE;
@@ -1219,6 +1277,10 @@ return FALSE;
 
 t_stat fl_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 fl_ecode = 0;                                           /* clear error */
 fl_sector = 0;                                          /* clear addr */
 fl_track = 0;
@@ -1230,5 +1292,9 @@ return SCPE_OK;
 
 const char *fl_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "console floppy";
 }

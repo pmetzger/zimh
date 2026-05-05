@@ -271,6 +271,10 @@ t_stat sim_instr_8086(void) {
 
 void halt_sys(PC_ENV *m)
 {
+    /* Shared helper signature.
+       This implementation does not use every parameter. */
+    (void)m;
+
     intr |= INTR_HALTED;
 }
 
@@ -740,6 +744,10 @@ uint8 fetch_data_byte(PC_ENV *m, uint16 offset)
 */
 uint8 fetch_data_byte_abs(PC_ENV *m, uint16 segment, uint16 offset)
 {
+    /* Shared helper signature.
+       This implementation does not use every parameter. */
+    (void)m;
+
     uint8 value;
     uint32 addr;
     /* note, cannot change this, since we do not know the ID of the segment. */
@@ -820,6 +828,10 @@ uint16 fetch_data_word(PC_ENV *m, uint16 offset)
 */
 uint16 fetch_data_word_abs(PC_ENV *m, uint16 segment, uint16 offset)
 {
+    /* Shared helper signature.
+       This implementation does not use every parameter. */
+    (void)m;
+
     uint16 value;
     uint32 addr;
 /* [JCE] Simulate wrap at top of memory (the A20 gate) */
@@ -884,6 +896,10 @@ void store_data_byte(PC_ENV *m, uint16 offset, uint8 val)
 
 void store_data_byte_abs(PC_ENV *m, uint16 segment, uint16 offset, uint8 val)
 {
+    /* Shared helper signature.
+       This implementation does not use every parameter. */
+    (void)m;
+
     uint32 addr;
 /* [JCE] Simulate wrap at top of memory (the A20 gate) */
 /*    addr = (segment << 4) + offset; */
@@ -947,6 +963,10 @@ void store_data_word(PC_ENV *m, uint16 offset, uint16 val)
 
 void store_data_word_abs(PC_ENV *m, uint16 segment, uint16 offset, uint16 val)
 {
+    /* Shared helper signature.
+       This implementation does not use every parameter. */
+    (void)m;
+
     uint32 addr;
     /* [JCE] Wrap at top of memory */
     addr = ((segment << 4) + offset) & 0xFFFFF;

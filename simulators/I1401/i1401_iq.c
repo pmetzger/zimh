@@ -167,6 +167,10 @@ return SCPE_OK;
 
 t_stat inq_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 temp;
 
 sim_activate (&inq_unit, inq_unit.wait);                /* continue poll */
@@ -192,6 +196,10 @@ return;
 
 t_stat inq_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ind[IN_INR] = ind[IN_INC] = 0;                          /* clear indicators */
 sim_activate (&inq_unit, inq_unit.wait);                /* activate poll */
 return SCPE_OK;

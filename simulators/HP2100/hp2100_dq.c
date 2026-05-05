@@ -416,6 +416,10 @@ DEVICE dqc_dev = {
 
 static SIGNALS_VALUE dqd_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
 SIGNALS_VALUE  outbound    = { ioNONE, 0 };
@@ -554,6 +558,10 @@ return outbound;                                        /* return the outbound s
 
 static SIGNALS_VALUE dqc_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 int32          fnc, drv;
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
@@ -1119,6 +1127,11 @@ return detach_unit (uptr);                              /* detach unit */
 
 t_stat dqc_load_unload (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if ((uptr->flags & UNIT_ATT) == 0) return SCPE_UNATT;   /* must be attached to load */
 if (value == UNIT_UNLOAD)                               /* unload heads? */
     uptr->flags = uptr->flags | UNIT_UNLOAD;            /* indicate unload */

@@ -172,11 +172,22 @@ drm_boot(int32 unit_num, DEVICE * dptr)
 
 void
 drm_ini(UNIT *uptr, t_bool f) {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)f;
+
     uptr->u5 = 0;
 }
 
 t_stat
 drm_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr) {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)cptr;
+   (void)dptr;
+   (void)flag;
+   (void)uptr;
+
    fprintf(st, "Drum device for IBM 702 and 705\n\n");
    fprintf(st, "The Drum had 1000 tracks with the capacity of %d digits ",
        DRMCHARTRK);
@@ -188,6 +199,10 @@ drm_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr) {
 
 const char *
 drm_description (DEVICE *dptr) {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)dptr;
+
    return "Drum";
 }
 

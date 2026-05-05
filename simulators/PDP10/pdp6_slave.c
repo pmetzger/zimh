@@ -286,6 +286,10 @@ const char helpString[] =
 
 static const char *slave_description (DEVICE *dptr)
 {
+  /* Generic description signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   return "Auxiliary processor";
 }
 

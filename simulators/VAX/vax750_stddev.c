@@ -396,6 +396,10 @@ DEVICE td_dev = {
 
 static void set_csi_int (int32 ctlr, t_bool val)
 {
+/* Generic controller callback signature.
+   This implementation does not use every parameter. */
+(void) ctlr;
+
 if (csi_int ^ val) {
     csi_int = val;
     sim_debug (TDDEB_INT, &td_dev, "CSI_INT(%d)\n", val);
@@ -404,6 +408,10 @@ if (csi_int ^ val) {
 
 static void set_cso_int (int32 ctlr, t_bool val)
 {
+/* Generic controller callback signature.
+   This implementation does not use every parameter. */
+(void) ctlr;
+
 if (cso_int ^ val) {
     cso_int = val;
     sim_debug (TDDEB_INT, &td_dev, "CSO_INT(%d)\n", val);
@@ -558,6 +566,10 @@ return SCPE_OK;
 
 t_stat tti_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmxr_set_console_units (&tti_unit, &tto_unit);
 tti_buf = 0;
 tti_csr = 0;
@@ -568,6 +580,12 @@ return SCPE_OK;
 
 t_stat tti_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Console Terminal Input (TTI)\n\n");
 fprintf (st, "The terminal input (TTI) polls the console keyboard for input.\n\n");
 fprint_set_help (st, dptr);
@@ -578,6 +596,10 @@ return SCPE_OK;
 
 const char *tti_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "console terminal input";
 }
 
@@ -608,6 +630,10 @@ return SCPE_OK;
 
 t_stat tto_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tto_buf = 0;
 tto_csr = CSR_DONE;
 tto_int = 0;
@@ -617,6 +643,12 @@ return SCPE_OK;
 
 t_stat tto_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Console Terminal Output (TTO)\n\n");
 fprintf (st, "The terminal output (TTO) writes to the simulator console.\n\n");
 fprint_set_help (st, dptr);
@@ -627,6 +659,10 @@ return SCPE_OK;
 
 const char *tto_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "console terminal output";
 }
 
@@ -729,6 +765,10 @@ tmr_nicr = val;
 
 t_stat tmr_svc (UNIT *uptr)
 {
+/* Generic service routine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 sim_debug (TMR_DB_TICK, &tmr_dev, "tmr_svc()\n");
 tmxr_poll = tmr_poll * TMXR_MULT;                   /* set mux poll */
 if (tmr_iccs & TMR_CSR_DON)                         /* done? set err */
@@ -764,6 +804,10 @@ else
 
 t_stat clk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (clk_unit.filebuf == NULL) {                         /* make sure the TODR is initialized */
     clk_unit.filebuf = calloc(1, sizeof(TOY));
     if (clk_unit.filebuf == NULL)
@@ -787,6 +831,12 @@ return SCPE_OK;
 
 t_stat clk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Real-Time Clock (%s)\n\n", dptr->name);
 fprintf (st, "The real-time clock autocalibrates; the clock interval is adjusted up or down\n");
 fprintf (st, "so that the clock tracks actual elapsed time.\n\n");
@@ -824,6 +874,10 @@ return SCPE_OK;
 
 const char *clk_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "time of year clock";
 }
 
@@ -887,6 +941,10 @@ return r;
 
 t_stat tmr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmr_iccs = 0;
 tmr_nicr = 0;
 tmr_int = 0;
@@ -896,6 +954,10 @@ return SCPE_OK;
 
 const char *tmr_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "interval timer";
 }
 
@@ -1021,10 +1083,18 @@ return SCPE_OK;
 
 t_stat td_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return td_connect_console_device (&td_dev, set_csi_int, set_cso_int);
 }
 
 const char *td_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Console TU58 cartridge";
 }

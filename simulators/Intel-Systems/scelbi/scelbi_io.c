@@ -150,6 +150,10 @@ DEVICE ptr_dev = {
  */
 t_stat tty_svc (UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     int32 temp;
 
     sim_activate (&tty_unit, tty_unit.wait);        /* continue poll */
@@ -169,6 +173,10 @@ t_stat tty_svc (UNIT *uptr)
  */
 t_stat ptr_svc (UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     return SCPE_OK;
 }
 
@@ -178,6 +186,10 @@ t_stat ptr_svc (UNIT *uptr)
  */
 t_stat tty_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     tty_unit.buf = 0;                              /* Data */
     tty_unit.u3 = 0x01;                            /* Status
                                                       Flag 1 (bit 0) == 1
@@ -190,6 +202,10 @@ t_stat tty_reset (DEVICE *dptr)
  */
 t_stat ptr_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     ptr_unit.buf = 0;
     ptr_unit.u3 = 0;
     sim_cancel (&ptr_unit);                        /* deactivate unit */
@@ -214,6 +230,10 @@ int32 ttyin_charin = 0;
  */
 int32 ttyin_d(int32 io, int32 data)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+
     int32 newbit;
 
     /* if (ttyin_bitcntr != 0) {
@@ -308,6 +328,10 @@ int32 ttyout_d(int32 io, int32 data)
  */
 int32 iostat_s(int32 io, int32 data)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+
     if (io == 0)
         return (tty_unit.u3);
       else
@@ -318,6 +342,10 @@ int32 iostat_s(int32 io, int32 data)
  */
 int32 kbd_d(int32 io, int32 data)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+
     if (io == 0) {
         tty_unit.u3 = tty_unit.u3 & 0xEF;  /* Reset Flag 5 (bit 4) */
         return (tty_unit.buf | 0x80); /* bit 7 always set in SCELBAL */
@@ -339,6 +367,10 @@ int32 prt_d(int32 io, int32 data)
  */
 int32 nulldev(int32 flag, int32 data)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+
     if (flag == 0)
         return (0377);
     return 0;

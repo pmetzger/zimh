@@ -252,7 +252,7 @@ DEVICE dp_dev = {
 
 /* Controller: IO routine */
 
-uint32 dpc (uint32 dev, uint32 op, uint32 dat)
+static uint32 dpc (uint32 dev, uint32 op, uint32 dat)
 {
 uint32 f, t, u;
 UNIT *uptr;
@@ -538,6 +538,10 @@ return;
 
 t_stat dp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 u;
 UNIT *uptr;
 
@@ -603,6 +607,11 @@ return detach_unit (uptr);
 
 t_stat dp_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (uptr->flags & UNIT_ATT)
     return SCPE_ALATT;
 uptr->capac = drv_tab[GET_DTYPE (val)].size;

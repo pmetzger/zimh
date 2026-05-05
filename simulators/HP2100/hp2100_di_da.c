@@ -1352,6 +1352,11 @@ else                                                    /* otherwise */
 
 static t_stat da_load_unload (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 const int32 unit = uptr - da_unit;                          /* calculate the unit number */
 const t_bool load = (value != UNIT_UNLOAD);                 /* true if the heads are loading */
 t_stat result;
@@ -1910,6 +1915,10 @@ return accepted;                                        /* indicate the acceptan
 
 void da_bus_respond (CARD_ID card, uint32 unit, uint8 new_cntl)
 {
+/* HP-IB responder callback signature.
+   This implementation does not use every parameter. */
+(void) card;
+
 if (new_cntl & BUS_IFC) {                               /* is interface clear asserted? */
     di [da].listeners = 0;                              /* perform an Unlisten */
     di [da].talker = 0;                                 /*   and an Untalk */

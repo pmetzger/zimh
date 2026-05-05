@@ -235,6 +235,12 @@ for (i=0; i<32; i++)
 
 t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 slot[32];
 int32 base[32];
 struct {
@@ -402,6 +408,11 @@ return 0;
 
 void rom_wr_B (int32 pa, int32 val)
 {
+/* CPU ROM write signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) val;
+
 return;
 }
 
@@ -617,6 +628,12 @@ return;
 
 int32 machine_check (int32 p1, int32 opc, int32 cc, int32 delta)
 {
+/* Shared machine-check signature.
+   This implementation does not use every parameter. */
+(void) p1;
+(void) opc;
+(void) delta;
+
 int32 acc;
 int32 mstat1, mstat2, mear, ebcs, merg, ehmsts;
 
@@ -666,6 +683,10 @@ return cc;
 
 int32 con_halt (int32 code, int32 cc)
 {
+/* Shared console halt signature.
+   This implementation does not use every parameter. */
+(void) code;
+
 if ((cpu_boot_cmd[0] == 0) ||                           /* saved boot cmd? */
     (vax860_boot_parse (0, cpu_boot_cmd) != SCPE_OK) || /* reparse the boot cmd */
     (reset_all (0) != SCPE_OK) ||                       /* reset the world */
@@ -774,6 +795,11 @@ return SCPE_NOFNC;
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 t_stat r;
 
 r = cpu_load_bootcode (BOOT_CODE_FILENAME, BOOT_CODE_ARRAY, BOOT_CODE_SIZE, FALSE, 0x200);
@@ -787,6 +813,10 @@ return SCPE_OK;
 
 t_stat abus_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_vm_cmd = vax860_cmd;
 init_pamm ();
 return SCPE_OK;
@@ -794,6 +824,10 @@ return SCPE_OK;
 
 const char *abus_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "bus controller";
 }
 
@@ -832,6 +866,12 @@ return SCPE_OK;
 
 t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (cptr == NULL) return SCPE_ARG;
 if (strcmp(cptr, "8600") == 0) {
    sys_model = 0;
@@ -854,6 +894,13 @@ return SCPE_OK;
 
 t_stat cpu_model_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Initial memory size is 32MB.\n\n");
 fprintf (st, "The simulator is booted with the BOOT command:\n\n");
 fprintf (st, "   sim> BO{OT} <device>{/R5:flags}\n\n");

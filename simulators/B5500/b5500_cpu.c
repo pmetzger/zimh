@@ -429,7 +429,7 @@ DEVICE              cpu_dev = {
         16      Fetch
 */
 
-int memory_cycle(uint8 E) {
+static int memory_cycle(uint8 E) {
         uint16 addr = 0;
 
         sim_interval--;
@@ -474,7 +474,7 @@ int memory_cycle(uint8 E) {
 
 
 /* Set registers based on MSCW */
-void set_via_MSCW(t_uint64 word) {
+static void set_via_MSCW(t_uint64 word) {
         F = FF(word);
         R = RF(word);
         MSFF = (word & SMSFF) != 0;
@@ -485,7 +485,7 @@ void set_via_MSCW(t_uint64 word) {
    if no_set_lc is non-zero don't set LC from RCW.
    if no_bits is non-zero don't set GH and KV,
    return BROF flag  */
-int  set_via_RCW(t_uint64 word, int no_set_lc, int no_bits) {
+static int  set_via_RCW(t_uint64 word, int no_set_lc, int no_bits) {
         if (!no_set_lc) {
             L = LF(word);
             C = CF(word);
@@ -503,13 +503,13 @@ int  set_via_RCW(t_uint64 word, int no_set_lc, int no_bits) {
 }
 
 /* Set the stack pointer from INCW */
-void set_via_INCW(t_uint64 word) {
+static void set_via_INCW(t_uint64 word) {
         S = CF(word);
         CWMF = (word & SCWMF) != 0;
 }
 
 /* Set registers from ICW */
-void set_via_ICW(t_uint64 word) {
+static void set_via_ICW(t_uint64 word) {
         Ma = CF(word);
         MSFF = (word & SMSFF) != 0;
         SALF = (word & SSALF) != 0;
@@ -518,7 +518,7 @@ void set_via_ICW(t_uint64 word) {
 }
 
 /* Make sure that B is empty */
-void B_empty(void) {
+static void B_empty(void) {
     if (BROF) {
         next_addr(S);
         if (NCSF && (S & 077700) == R) {
@@ -531,7 +531,7 @@ void B_empty(void) {
 }
 
 /* Make sure A is empty, push to B if not */
-void A_empty(void) {
+static void A_empty(void) {
     if (AROF) {
         B_empty();
         B = A;
@@ -541,7 +541,7 @@ void A_empty(void) {
 }
 
 /* Make sure both A and B are empty */
-void AB_empty(void) {
+static void AB_empty(void) {
     B_empty();
     if (AROF) {
         next_addr(S);
@@ -555,7 +555,7 @@ void AB_empty(void) {
 }
 
 /* Make sure that A is valid, copy from B or memory */
-void A_valid(void) {
+static void A_valid(void) {
     if (!AROF) {
         if (BROF) {             /* Transfer B to A */
             A = B;
@@ -573,7 +573,7 @@ void A_valid(void) {
 }
 
 /* Make sure both A and B are valid */
-void AB_valid(void) {
+static void AB_valid(void) {
     A_valid();
     if (!BROF) {
         if (NCSF && (S & 077700) == R) {
@@ -586,7 +586,7 @@ void AB_valid(void) {
 }
 
 /* Make sure A is empty and B is valid */
-void B_valid(void) {
+static void B_valid(void) {
     A_empty();
     if (!BROF) {
         if (NCSF && (S & 077700) == R) {
@@ -599,7 +599,7 @@ void B_valid(void) {
 }
 
 /* Make sure B is valid, don't care about A */
-void B_valid_and_A(void) {
+static void B_valid_and_A(void) {
     if (!BROF) {
         if (NCSF && (S & 077700) == R) {
             Q |= STK_OVERFL; /* Stack fault */
@@ -611,7 +611,7 @@ void B_valid_and_A(void) {
 }
 
 /* Saves the top word on the stack into MA */
-void save_tos(void) {
+static void save_tos(void) {
     if (AROF) {
         memory_cycle(014);      /* Store A in Ma */
         AROF = 0;
@@ -626,7 +626,7 @@ void save_tos(void) {
 }
 
 /* Enter a subroutine, flag true for descriptor, false for opdc */
-void enterSubr(int flag) {
+static void enterSubr(int flag) {
     /* Program descriptor */
     if ((A & ARGF) != 0 && MSFF == 0) {
         return;
@@ -666,7 +666,7 @@ void enterSubr(int flag) {
 }
 
 /* Make B register into an integer, return 1 if failed */
-int mkint(void) {
+static int mkint(void) {
         int     exp_b;
         int     last_digit;
         int     f = 0;
@@ -709,7 +709,7 @@ int mkint(void) {
 }
 
 /* Compute an index word return true if failed. */
-int indexWord(void) {
+static int indexWord(void) {
     if (A & WCOUNT) {
         B_valid_and_A();
         if (mkint()) {
@@ -741,7 +741,7 @@ int indexWord(void) {
 /* Character mode helper routines */
 
 /* Adjust source bit pointers to point to char */
-void adjust_source(void) {
+static void adjust_source(void) {
     if (GH & 07) {
         GH &= 070;
         GH += 010;
@@ -754,7 +754,7 @@ void adjust_source(void) {
 }
 
 /* Adjust destination bit pointers to point to char */
-void adjust_dest(void) {
+static void adjust_dest(void) {
     if (KV & 07) {
         KV &= 070;
         KV += 010;
@@ -769,7 +769,7 @@ void adjust_dest(void) {
 }
 
 /* Advance to next destination bit/char */
-void next_dest(int bit) {
+static void next_dest(int bit) {
     if (bit)
        KV += 1;
     else
@@ -788,7 +788,7 @@ void next_dest(int bit) {
 }
 
 /* Advance to previous destination bit/char */
-void prev_dest(int bit) {
+static void prev_dest(int bit) {
     if (bit) {
        if ((KV & 07) == 0) {
           if (KV == 0) {
@@ -816,7 +816,7 @@ void prev_dest(int bit) {
 }
 
 /* Make sure destination have valid data */
-void fill_dest(void) {
+static void fill_dest(void) {
     if (BROF == 0) {
        memory_cycle(3);
        BROF = 1;
@@ -824,7 +824,7 @@ void fill_dest(void) {
 }
 
 /* Advance source to next bit/char */
-void next_src(int bit) {
+static void next_src(int bit) {
     if (bit)
        GH += 1;
     else
@@ -841,7 +841,7 @@ void next_src(int bit) {
 }
 
 /* Advance source to previous bit/char */
-void prev_src(int bit) {
+static void prev_src(int bit) {
     if (bit) {
        if ((GH & 07) == 0) {
           if (GH == 0) {
@@ -865,7 +865,7 @@ void prev_src(int bit) {
 }
 
 /* Make sure source has valid data */
-void fill_src(void) {
+static void fill_src(void) {
     if (AROF == 0) {
        memory_cycle(4);
        AROF = 1;
@@ -876,7 +876,7 @@ void fill_src(void) {
 /* Helper routines for managing processor */
 
 /* Fetch next program sylable */
-void next_prog(void) {
+static void next_prog(void) {
     if (!PROF)
         memory_cycle(020);
     T = (P >> ((3 - L) * 12)) & 07777;
@@ -889,7 +889,7 @@ void next_prog(void) {
 }
 
 /* Initiate a processor, A must contain the ICW */
-void initiate(void) {
+static void initiate(void) {
     int brflg, arflg, temp;
 
     set_via_INCW(A);    /* Set up Stack */
@@ -926,7 +926,7 @@ void initiate(void) {
 }
 
 /* Save processor state in case of error or halt */
-void storeInterrupt(int forced, int test) {
+static void storeInterrupt(int forced, int test) {
     int         f;
     uint16      temp;
 
@@ -1023,7 +1023,7 @@ void storeInterrupt(int forced, int test) {
 
 */
 
-int check_idle(void) {
+static int check_idle(void) {
     static uint16  loop_data[7] = {
           WMOP_TUS, WMOP_OPDC, WMOP_LOR, WMOP_OPDC,
           WMOP_NEQ, WMOP_LITC, WMOP_BBC };
@@ -1069,7 +1069,7 @@ int check_idle(void) {
         return 2 if B > A
         return 4 if B < A
 */
-uint8   compare(void) {
+static uint8   compare(void) {
     int         sign_a, sign_b;
     int         exp_a, exp_b;
     t_uint64    ma, mb;
@@ -1137,7 +1137,7 @@ uint8   compare(void) {
 
 /* Handle addition instruction.
    A & B valid. */
-void add(int opcode) {
+static void add(int opcode) {
     int exp_a, exp_b;
     int sa, sb;
     int rnd;
@@ -1266,7 +1266,7 @@ void add(int opcode) {
 /*
  * Perform a 40 bit multiply on A and B, result into B,X
  */
-void mult_step(t_uint64 a, t_uint64 *b, t_uint64 *x) {
+static void mult_step(t_uint64 a, t_uint64 *b, t_uint64 *x) {
     t_uint64  u0,u1,v0,v1,t,w1,w2,w3,k;
 
     /* Split into 32 bit and 8 bit */
@@ -1294,7 +1294,7 @@ void mult_step(t_uint64 a, t_uint64 *b, t_uint64 *x) {
 }
 
 /* Do multiply instruction */
-void multiply(void) {
+static void multiply(void) {
     int         exp_a, exp_b;
     int         f;
     int         int_f;
@@ -1381,7 +1381,7 @@ void multiply(void) {
 
 
 /* Do divide instruction */
-void divide(int op) {
+static void divide(int op) {
     int exp_a, exp_b, q, sa, sb;
     t_uint64 t;
 
@@ -1522,7 +1522,7 @@ void divide(int op) {
 /* Double precision addition.
    A & Y (not in real B5500) have operand 1.
    B & X have operand 2 */
-void double_add(int opcode) {
+static void double_add(int opcode) {
     int         exp_a, exp_b;
     int         sa, sb;
     int         ld;
@@ -1672,7 +1672,7 @@ void double_add(int opcode) {
 /* Double precision multiply.
    A & Y (not in real B5500) have operand 1.
    B & X have operand 2 */
-void double_mult(void) {
+static void double_mult(void) {
     int         exp_a, exp_b;
     int         f;
     int         ld;
@@ -1789,7 +1789,7 @@ void double_mult(void) {
 /* Double precision divide.
    A & Y (not in real B5500) have operand 1.
    B & X have operand 2 */
-void double_divide(void) {
+static void double_divide(void) {
     int exp_a, exp_b;
     int f;
     int         n;
@@ -1930,7 +1930,7 @@ void double_divide(void) {
     }
 }
 
-void relativeAddr(int store) {
+static void relativeAddr(int store) {
     uint16    base = R;
     uint16    addr = (uint16)(A & 01777);
 
@@ -3834,6 +3834,10 @@ rtc_srv(UNIT * uptr)
 t_stat
 cpu_reset(DEVICE * dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     /* Reset CPU 2 first */
     cpu_index = 1;
     C = 020;
@@ -3873,6 +3877,11 @@ cpu_reset(DEVICE * dptr)
 t_stat
 cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic memory examine signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)sw;
+
     if (addr >= MAXMEMSIZE)
         return SCPE_NXM;
     if (vptr != NULL)
@@ -3885,6 +3894,11 @@ cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic memory deposit signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)sw;
+
     if (addr >= MAXMEMSIZE)
         return SCPE_NXM;
     M[addr] = val & (FLAG|FWORD);
@@ -3894,6 +3908,12 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_msize(UNIT *uptr, int32 v, const char *cptr, void *dptr)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)cptr;
+    (void)dptr;
+
     int32 val;
     if ((v < 0) || (v > MAXMEMSIZE))
         return SCPE_ARG;
@@ -3909,6 +3929,12 @@ cpu_msize(UNIT *uptr, int32 v, const char *cptr, void *dptr)
 t_stat
 cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)cptr;
+    (void)desc;
+
     t_uint64            mc = 0;
     uint32              i;
     int32               v;
@@ -3937,6 +3963,12 @@ cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+    (void)desc;
+
     int32               i, lnt;
     t_stat              r;
 
@@ -3970,6 +4002,11 @@ cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+
     int32               k, di, lnt;
     const char          *cptr = (const char *) desc;
     t_stat              r;
@@ -4037,6 +4074,12 @@ cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 
 t_stat              cpu_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)flag;
+    (void)cptr;
+
     fprintf(st, "B5500 CPU\n\n");
     fprintf(st, "The B5500 could support up to two CPU's the second CPU is disabled by\n");
     fprintf(st, "default. Use:\n");

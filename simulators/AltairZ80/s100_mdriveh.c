@@ -100,6 +100,10 @@ static REG mdriveh_reg[] = {
 #define MDRIVEH_NAME    "Compupro Memory Drive"
 
 static const char* mdriveh_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return MDRIVEH_NAME;
 }
 

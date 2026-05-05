@@ -664,6 +664,10 @@ return OK;
 
 t_stat tq_quesvc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 i, cnid;
 uint16 pkt = 0;
 UNIT *nuptr;
@@ -1298,7 +1302,7 @@ return ST_SUC;                                          /* success! */
 
 /* I/O completion callback */
 
-void tq_io_complete (UNIT *uptr, t_stat status)
+static void tq_io_complete (UNIT *uptr, t_stat status)
 {
 struct tq_req_results *res = (struct tq_req_results *)uptr->results;
 
@@ -2259,6 +2263,11 @@ return SCPE_OK;
 
 t_stat tq_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic simulator boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 return SCPE_NOFNC;
 }
 
@@ -2266,7 +2275,7 @@ return SCPE_NOFNC;
 
 /* Special show commands */
 
-void tq_show_ring (FILE *st, struct uq_ring *rp)
+static void tq_show_ring (FILE *st, struct uq_ring *rp)
 {
 uint32 i, desc;
 uint16 d[2];
@@ -2293,7 +2302,7 @@ for (i = 0; i < (rp->lnt >> 2); i++) {
 return;
 }
 
-void tq_show_pkt (FILE *st, int32 pkt)
+static void tq_show_pkt (FILE *st, int32 pkt)
 {
 int32 i, j;
 uint32 cr = GETP (pkt, UQ_HCTC, CR);
@@ -2317,6 +2326,11 @@ return;
 
 t_stat tq_show_unitq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 int32 pkt, u = uptr - tq_dev.units;
 
 if (tq_csta != CST_UP) {
@@ -2345,6 +2359,11 @@ return SCPE_OK;
 
 t_stat tq_show_ctrl (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 int32 i, pkt;
 
 if (tq_csta != CST_UP) {
@@ -2393,6 +2412,11 @@ return SCPE_OK;
 
 t_stat tq_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 uint32 i, cap;
 uint32 max = sim_taddr_64? TQU_EMAXC: TQU_MAXC;
 t_stat r;
@@ -2419,6 +2443,12 @@ return SCPE_OK;
 
 t_stat tq_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "%s (%dMB)", drv_tab[tq_typ].name, (uint32) (drv_tab[tq_typ].cap >> 20));
 return SCPE_OK;
 }
@@ -2427,6 +2457,11 @@ return SCPE_OK;
 
 t_stat tq_show_plug (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 fprintf (st, "UNIT=%d", uptr->unit_plug);
 return SCPE_OK;
 }
@@ -2435,6 +2470,11 @@ return SCPE_OK;
 
 t_stat tq_set_plug (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 int32 plug;
 uint32 i;
 t_stat r;
@@ -2477,6 +2517,10 @@ return SCPE_OK;
 
 const char *tq_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return (UNIBUS) ? "TUK50 TMSCP magnetic tape controller" :
                   "TQK50 TMSCP magnetic tape controller";
 }

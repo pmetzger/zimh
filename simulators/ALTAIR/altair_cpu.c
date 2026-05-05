@@ -1137,6 +1137,10 @@ void putpair(int32 reg, int32 val)
 
 t_stat cpu_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 C = 0;
 Z = 0;
 saved_PC = 0;
@@ -1149,6 +1153,11 @@ return SCPE_OK;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE) return SCPE_NXM;
 if (vptr != NULL) *vptr = M[addr] & 0377;
 return SCPE_OK;
@@ -1158,6 +1167,11 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic memory deposit signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     if (addr >= MEMSIZE) return SCPE_NXM;
     M[addr] = val & 0377;
     return SCPE_OK;
@@ -1165,6 +1179,12 @@ t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 mc = 0;
 uint32 i;
 
@@ -1180,6 +1200,10 @@ return SCPE_OK;
 
 int32 nulldev(int32 flag, int32 data)
 {
+    /* Shared I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+
     if (flag == 0)
         return (0377);
     return 0;

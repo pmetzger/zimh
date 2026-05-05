@@ -71,6 +71,11 @@ DEVICE sagefd_dev = {
 
 static void sagefd_seldrv(I8272* chip,int drvnum)
 {
+    /* Chip callback signature.
+       This implementation does not use every parameter. */
+    (void) chip;
+    (void) drvnum;
+
     /* this routine defeats the standard drive select in i8272.c
      * which interprets the US0/US1 bits of various commands.
      * Sage uses 8255 portc bits for that, and always leaves
@@ -118,6 +123,11 @@ static t_stat fdcint_svc(UNIT* unit)
 
 static t_stat sagefd_boot(int32 unit_num,DEVICE* dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unit_num;
+    (void) dptr;
+
     printf("sagefd_boot\n");
     return SCPE_OK;
 }

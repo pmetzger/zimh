@@ -202,6 +202,10 @@ t_stat ptp_svc (UNIT *uptr)
 
 t_stat ptp_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     UNIT *uptr = &ptp_unit;
     uptr->CHR = 0;
     uptr->CHL = 0;
@@ -310,7 +314,7 @@ t_stat ptr_svc (UNIT *uptr)
     return SCPE_OK;
 }
 
-uint64
+static uint64
 ptr_read_word(UNIT *uptr) {
      int i, ch;
      uint64 word = 0;
@@ -367,6 +371,10 @@ ptr_boot(int32 unit_num, DEVICE * dptr)
 
 t_stat ptr_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     UNIT *uptr = &ptr_unit;
     uptr->CHR = 0;
     uptr->CHL = 0;
@@ -397,6 +405,12 @@ t_stat ptr_detach (UNIT *uptr)
 
 t_stat ptr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Paper Tape Reader (PTR)\n\n");
 fprintf (st, "The paper tape reader (PTR) reads data from a disk file.  The POS register\n");
 fprintf (st, "specifies the number of the next data item to be read.  Thus, by changing\n");
@@ -409,11 +423,21 @@ return SCPE_OK;
 
 const char *ptr_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "paper tape reader";
 }
 
 t_stat ptp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Paper Tape Punch (PTP)\n\n");
 fprintf (st, "The paper tape punch (PTP) writes data to a disk file.  The POS register\n");
 fprintf (st, "specifies the number of the next data item to be written.  Thus, by changing\n");
@@ -427,6 +451,10 @@ return SCPE_OK;
 
 const char *ptp_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "paper tape punch";
 }
 #endif

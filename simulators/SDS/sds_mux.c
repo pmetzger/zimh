@@ -288,6 +288,10 @@ return SCPE_OK;
 
 t_stat pin_mux (uint32 num, uint32 *dat)
 {
+/* SDS PIN routine signature.
+   This implementation does not use every parameter. */
+(void) num;
+
 uint32 ln = mux_scan >> 2;
 uint32 flag = mux_scan & MUX_FLAGMASK;
 
@@ -308,6 +312,10 @@ return SCPE_OK;
 
 t_stat pot_mux (uint32 num, uint32 *dat)
 {
+/* SDS POT routine signature.
+   This implementation does not use every parameter. */
+(void) num;
+
 uint32 ln = P_CHAN (*dat);
 uint32 chr = P_CHAR (*dat);
 
@@ -458,6 +466,10 @@ return;
 
 t_stat mux_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i, t;
 
 if (mux_dev.flags & DEV_DIS)                            /* master disabled? */
@@ -510,6 +522,12 @@ return r;
 
 t_stat mux_vlines (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 newln, i, t;
 t_stat r;
 

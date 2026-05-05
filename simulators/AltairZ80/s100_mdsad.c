@@ -245,6 +245,10 @@ static REG mdsad_reg[] = {
 #define MDSAD_NAME  "North Star Floppy Controller"
 
 static const char* mdsad_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return MDSAD_NAME;
 }
 
@@ -403,6 +407,10 @@ static t_stat mdsad_boot(int32 unitno, DEVICE *dptr)
 
 static int32 mdsaddev(const int32 Addr, const int32 rw, const int32 data)
 {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) data;
+
     if(rw == 0) { /* Read */
         return(MDSAD_Read(Addr));
     } else {    /* Write */

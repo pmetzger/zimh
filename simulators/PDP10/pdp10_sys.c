@@ -171,7 +171,7 @@ const char *sim_stop_messages[SCPE_BASE] = {
    Here it is simply skipped.
 */
 
-d10 getrimw (FILE *fileref)
+static d10 getrimw (FILE *fileref)
 {
 int32 i, tmp;
 d10 word;
@@ -188,7 +188,7 @@ for (i = 0; i < 6;) {
 return word;
 }
 
-t_stat load_rim (FILE *fileref)
+static t_stat load_rim (FILE *fileref)
 {
 d10 count, cksm, data;
 a10 pa;
@@ -261,7 +261,7 @@ return SCPE_OK;
         JRST start
 */
 
-t_stat load_sav (FILE *fileref)
+static t_stat load_sav (FILE *fileref)
 {
 d10 count, data;
 a10 pa;
@@ -317,7 +317,7 @@ return SCPE_OK;
 
 #define DIRSIZ  (2 * PAG_SIZE)
 
-t_stat load_exe (FILE *fileref)
+static t_stat load_exe (FILE *fileref)
 {
 d10 data, dirbuf[DIRSIZ], pagbuf[PAG_SIZE], entbuf[2];
 int32 ndir, entvec, i, j, k, cont, bsz, bty, rpt, wc;
@@ -397,6 +397,11 @@ return SCPE_OK;
 
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void)cptr;
+(void)flag;
+
 d10 data;
 int32 wc, fmt;
 
@@ -756,6 +761,11 @@ static const char *devnam[NUMDEV] = {
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
     UNIT *uptr, int32 sw)
 {
+/* Generic symbolic output signature.
+   This implementation does not use every parameter. */
+(void)addr;
+(void)uptr;
+
 int32 i, j, c, ac, xr, y, dev;
 d10 inst;
 
@@ -832,7 +842,7 @@ return SCPE_ARG;
         val     =       output value
 */
 
-t_value get_opnd (const char *cptr, t_stat *status)
+static t_value get_opnd (const char *cptr, t_stat *status)
 {
 int32 sign = 0;
 t_value val, xr = 0, ind = 0;
@@ -882,6 +892,11 @@ return (ind | (xr << 18) | val);
 
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+/* Generic symbolic input signature.
+   This implementation does not use every parameter. */
+(void)addr;
+(void)uptr;
+
 int32 i, j;
 t_value ac, dev;
 t_stat r;

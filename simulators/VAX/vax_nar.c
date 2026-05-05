@@ -33,6 +33,7 @@ uint32 nar[NARSIZE];                                    /* network address ROM *
 ETH_MAC nar_mac = {0x08, 0x00, 0x2B, 0xCC, 0xDD, 0xEE};
 t_bool nar_init = FALSE;
 
+int32 nar_rd (int32 pa);
 t_stat nar_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw);
 t_stat nar_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw);
 t_stat nar_reset (DEVICE *dptr);
@@ -79,6 +80,12 @@ return nar[rg];
 
 t_stat nar_showmac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 char buffer[20];
 
 eth_mac_fmt (nar_mac, buffer);
@@ -88,6 +95,12 @@ return SCPE_OK;
 
 t_stat nar_setmac (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+/* Generic set signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 t_stat status;
 
 if (!cptr)
@@ -103,6 +116,11 @@ return SCPE_OK;
 
 t_stat nar_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if ((vptr == NULL) || (addr & 03))
@@ -117,6 +135,11 @@ return SCPE_OK;
 
 t_stat nar_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if (addr & 03)
@@ -131,6 +154,10 @@ return SCPE_OK;
 
 t_stat nar_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint16 i, c, w;
 t_stat r;
 
@@ -183,6 +210,12 @@ return SCPE_OK;
 
 t_stat nar_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Network address ROM\n\n");
 fprintf (st, "The ROM consists of a single unit, simulating the 32 byte\n");
 fprintf (st, "network address ROM.\n");
@@ -198,5 +231,9 @@ return SCPE_OK;
 
 const char *nar_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "network address ROM";
 }

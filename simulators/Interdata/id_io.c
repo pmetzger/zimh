@@ -316,7 +316,7 @@ return;
 
 /* Reset */
 
-void sch_reset_ch (uint32 rst_lim)
+static void sch_reset_ch (uint32 rst_lim)
 {
 uint32 ch;
 
@@ -335,6 +335,10 @@ return;
 
 t_stat sch_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sch_reset_ch (0);                                       /* reset all chan */
 return SCPE_OK;
 }
@@ -343,6 +347,12 @@ return SCPE_OK;
 
 t_stat sch_set_nchan (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 uint32 i, newmax;
@@ -374,6 +384,12 @@ return SCPE_OK;
 
 t_stat sch_show_nchan (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "channels=%d", sch_max);
 return SCPE_OK;
 }
@@ -382,6 +398,11 @@ return SCPE_OK;
 
 t_stat sch_show_reg (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if (val < 0)
     return SCPE_IERR;
 if (val >= (int32) sch_max)
@@ -401,6 +422,10 @@ return SCPE_OK;
 
 void sch_ini (t_bool dtpl)
 {
+/* Device initialization signature.
+   This implementation does not use every parameter. */
+(void) dtpl;
+
 uint32 i;
 
 for (i = 0; i < sch_max; i++)
@@ -515,6 +540,11 @@ return cnt;
 
 t_stat set_sch (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 uint32 newch;
@@ -541,6 +571,11 @@ return SCPE_OK;
 
 t_stat show_sch (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 
@@ -560,6 +595,11 @@ return SCPE_OK;
 
 t_stat set_dev (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 uint32 newdev;
@@ -588,6 +628,11 @@ return SCPE_OK;
 
 t_stat show_dev (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 

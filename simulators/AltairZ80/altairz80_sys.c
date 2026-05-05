@@ -29,6 +29,7 @@
     03/27/14 -- MWD Add MITS Hard Disk device (mhdsk_dev)
 */
 
+#include "altairz80_defs.h"
 #include "m68k/m68k.h"
 
 #define SIM_EMAX 6
@@ -106,7 +107,6 @@ extern DEVICE scp300f_dev;
 extern DEVICE djhdc_dev;
 
 extern long disasm (unsigned char *data, char *output, int segsize, long offset);
-extern t_stat parse_sym_m68k(char* c, t_addr a, UNIT* u, t_value* val, int32 sw);
 
 void prepareMemoryAccessMessage(const t_addr loc);
 void prepareInstructionMessage(const t_addr loc, const uint32 op);
@@ -558,6 +558,10 @@ static int32 DAsm(char *S, const uint32 *val, const int32 useZ80Mnemonics, const
 */
 
 t_stat fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw) {
+    /* Generic symbolic output signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+
     char disasm_result[128];
     int32 ch = val[0] & 0x7f;
     long r = 1;
@@ -863,6 +867,11 @@ t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 
 /* Set Memory Base Address routine */
 t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void)val;
+    (void)desc;
+
     DEVICE *dptr;
     PNP_INFO *pnp;
     uint32 newba;
@@ -903,6 +912,11 @@ t_stat set_membase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 /* Show Base Address routine */
 t_stat show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void)val;
+    (void)desc;
+
     DEVICE *dptr;
     PNP_INFO *pnp;
 
@@ -922,6 +936,11 @@ t_stat show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 /* Set Memory Base Address routine */
 t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void)val;
+    (void)desc;
+
     DEVICE *dptr;
     PNP_INFO *pnp;
     uint32 newba;
@@ -963,6 +982,11 @@ t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 /* Show I/O Base Address routine */
 t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void)val;
+    (void)desc;
+
     DEVICE *dptr;
     PNP_INFO *pnp;
 

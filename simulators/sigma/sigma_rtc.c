@@ -188,6 +188,11 @@ return SCPE_OK;
 
 t_stat rtc_set_tps (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 uint32 newval, i;
 t_stat r;
 
@@ -216,6 +221,11 @@ return SCPE_ARG;
 
 t_stat rtc_show_tps (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 uint32 idx;
 
 if (val >= RTC_NUM_EVNTS)
@@ -232,6 +242,10 @@ return SCPE_OK;
 
 t_stat rtc_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 i;
 
 sim_rtcn_init (rtc_unit.wait, TMR_RTC);                 /* init base clock */
@@ -257,6 +271,12 @@ return SCPE_OK;
 
 t_stat rtc_show_events (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 i;
 
 fprintf (of, "Event  Status  Frequency  Ticks  Extra\n");

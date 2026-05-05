@@ -358,6 +358,10 @@ return SCPE_OK;
 
 t_stat pcell_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 rf_sta = rf_sta | RFS_PCA;                              /* set photocell */
 if (rf_sta & RFS_PIE) {                                 /* int enable? */
     sim_activate (&pcell_unit, RF_NUMWD * rf_time);
@@ -370,6 +374,10 @@ return SCPE_OK;
 
 t_stat rf_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 rf_sta = rf_da = 0;
 rf_done = 1;
 int_req = int_req & ~INT_RF;                            /* clear interrupt */
@@ -405,6 +413,11 @@ static const uint16 dm4_rom[] = {
 
 t_stat rf_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 size_t i;
 
 if (rf_dib.dev != DEV_RF)                               /* only std devno */
@@ -444,6 +457,11 @@ return attach_unit (uptr, cptr);
 
 t_stat rf_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (val < 0)
     return SCPE_IERR;
 if (uptr->flags & UNIT_ATT)
@@ -455,5 +473,9 @@ return SCPE_OK;
 
 const char *rf_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "RF08 fixed head disk";
 }

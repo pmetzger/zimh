@@ -235,6 +235,10 @@ return SCPE_OK;
 
 t_stat pin_dsk (uint32 num, uint32 *dat)
 {
+/* SDS PIN routine signature.
+   This implementation does not use every parameter. */
+(void) num;
+
 *dat = dsk_da;                                          /* ret disk addr */
 return SCPE_OK;
 }
@@ -243,6 +247,10 @@ return SCPE_OK;
 
 t_stat pot_dsk (uint32 num, uint32 *dat)
 {
+/* SDS POT routine signature.
+   This implementation does not use every parameter. */
+(void) num;
+
 int32 st;
 
 if (sim_is_active (&dsk_unit))                          /* busy? wait */
@@ -373,6 +381,10 @@ return;
 
 t_stat dsk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 chan_disc (dsk_dib.chan);                               /* disconnect */

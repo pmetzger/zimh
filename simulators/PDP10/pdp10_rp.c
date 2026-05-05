@@ -491,6 +491,10 @@ DEVICE rp_dev = {
 
 t_stat rp_rd (int32 *data, int32 PA, int32 access)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 drv, dtype, i, j;
 
 drv = GET_UNIT (rpcs2);                                 /* get current unit */
@@ -1100,6 +1104,10 @@ return VEC_RP;                                          /* acknowledge */
 
 t_stat rp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 UNIT *uptr;
 
@@ -1189,6 +1197,10 @@ return sim_disk_detach (uptr);
 
 t_stat rp_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 if ((val < 0) || (cptr && *cptr))
     return SCPE_ARG;
 if (uptr->flags & UNIT_ATT)
@@ -1202,6 +1214,11 @@ return SCPE_OK;
 
 t_stat rp_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 fprintf (st, "%s", drv_tab[GET_DTYPE (uptr->flags)].name);
 return SCPE_OK;
 }
@@ -1348,6 +1365,10 @@ static const d10 boot_rom_its[] = {
 
 t_stat rp_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic device boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 extern a10 saved_PC;
 UNIT *uptr;
@@ -1398,5 +1419,9 @@ ves.  RP\n");
 
 const char *rp_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
   return "RP04/05/06/07 RM02/03/05/80 Massbus disk controller";
 }

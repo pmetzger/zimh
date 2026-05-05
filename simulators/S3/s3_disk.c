@@ -621,21 +621,37 @@ int32 dsk (int32 disk, int32 op, int32 m, int32 n, int32 data)
 
 t_stat r1_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 seekbusy[0] = 0;
 return SCPE_OK;
 }
 t_stat f1_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 seekbusy[0] = 0;
 return SCPE_OK;
 }
 t_stat r2_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 seekbusy[1] = 0;
 return SCPE_OK;
 }
 t_stat f2_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 seekbusy[1] = 0;
 return SCPE_OK;
 }
@@ -645,6 +661,10 @@ return SCPE_OK;
 
 t_stat r1_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 diskerr[0] = notrdy[0] = seekbusy[0] = 0;               /* clear indicators */
 found[0] = 0;
 sim_cancel (&r1_unit);                                  /* clear event */
@@ -653,6 +673,10 @@ return SCPE_OK;
 }
 t_stat f1_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 diskerr[0] = notrdy[0] = seekbusy[0] = 0;               /* clear indicators */
 found[0] = 0;
 sim_cancel (&f1_unit);                                  /* clear event */
@@ -661,6 +685,10 @@ return SCPE_OK;
 }
 t_stat r2_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 diskerr[1] = notrdy[1] = seekbusy[1] = 0;               /* clear indicators */
 found[1] = 0;
 sim_cancel (&r2_unit);                                  /* clear event */
@@ -669,6 +697,10 @@ return SCPE_OK;
 }
 t_stat f2_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 diskerr[1] = notrdy[1] = seekbusy[1] = 0;               /* clear indicators */
 found[1] = 0;
 sim_cancel (&f2_unit);                                  /* clear event */
@@ -711,6 +743,11 @@ return attach_unit (uptr, cptr);
 
 t_stat r1_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 int i;
 r1_unit.u3 = 0;
 read_sector(r1_dev.units, dbuf, 0);
@@ -721,6 +758,11 @@ return SCPE_OK;
 }
 t_stat f1_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 int i;
 f1_unit.u3 = 0;
 read_sector(f1_dev.units, dbuf, 0);
@@ -731,6 +773,11 @@ return SCPE_OK;
 }
 t_stat r2_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 int i;
 r2_unit.u3 = 0;
 read_sector(r2_dev.units, dbuf, 0);
@@ -741,6 +788,11 @@ return SCPE_OK;
 }
 t_stat f2_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 int i;
 f2_unit.u3 = 0;
 read_sector(f2_dev.units, dbuf, 0);

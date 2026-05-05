@@ -717,6 +717,10 @@ t_stat ctc_reset(DEVICE *dptr)
 
 t_stat ctc_svc(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+
     uint16 lp, ulp;
 
     if (cio[int_slot].ivec > 0) {

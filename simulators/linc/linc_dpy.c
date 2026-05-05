@@ -1,4 +1,5 @@
 #include "linc_defs.h"
+#include "display/display.h"
 
 /* Debug */
 #define DBG             0001
@@ -31,10 +32,18 @@ void dpy_dis(uint16 h, uint16 x, uint16 y)
 void
 cpu_get_switches (unsigned long *p1, unsigned long *p2)
 {
+  /* Display library callback signature.
+     This implementation does not use every parameter. */
+  (void) p1;
+  (void) p2;
 }
 
 /* Called from display library to set data switches. */
 void
 cpu_set_switches (unsigned long p1, unsigned long p2)
 {
+  /* Display library callback signature.
+     This implementation does not use every parameter. */
+  (void) p1;
+  (void) p2;
 }

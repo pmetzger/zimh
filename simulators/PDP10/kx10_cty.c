@@ -176,6 +176,10 @@ t_stat ctyi_svc (UNIT *uptr)
 
 t_stat cty_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     cty_unit[0].STATUS &= ~(TEL_RDY | TEL_BSY);
     cty_unit[1].STATUS &= ~(KEY_RDY | KEY_BSY);
     clr_interrupt(CTY_DEVNUM);
@@ -188,6 +192,13 @@ t_stat cty_reset (DEVICE *dptr)
 
 t_stat cty_stop_os (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
 #if ITS
     if (cpu_unit[0].flags & UNIT_ITSPAGE)
         M[037] = FMASK;
@@ -199,6 +210,12 @@ t_stat cty_stop_os (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
+
     cty_unit[0].flags = (cty_unit[0].flags & ~TT_MODE) | val;
     cty_unit[1].flags = (cty_unit[1].flags & ~TT_MODE) | val;
     return SCPE_OK;
@@ -206,6 +223,13 @@ t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat cty_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "To stop the cpu use the command:\n\n");
 fprintf (st, "    sim> SET CTY STOP\n\n");
 #if ITS
@@ -232,6 +256,10 @@ return SCPE_OK;
 
 const char *cty_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Console TTY Line";
 }
 #endif

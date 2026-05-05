@@ -178,6 +178,10 @@ DEVICE drm_dev = {
 
 t_stat drm_chsel (uint32 ch, uint32 sel, uint32 unit)
 {
+/* Channel select callback signature.
+   This implementation does not use every parameter. */
+(void) unit;
+
 drm_ch = ch;                                            /* save channel */
 if (sel & CHSL_NDS)                                     /* nds? nop */
     return ch6_end_nds (ch);
@@ -204,6 +208,10 @@ return SCPE_OK;
 
 t_uint64 drm_sdc (uint32 ch)
 {
+/* Shared channel diagnostic signature.
+   This implementation does not use every parameter. */
+(void) ch;
+
 t_uint64 val;
 
 
@@ -219,6 +227,10 @@ return val;
 
 t_stat drm_chwr (uint32 ch, t_uint64 val, uint32 flags)
 {
+/* Channel write callback signature.
+   This implementation does not use every parameter. */
+(void) flags;
+
 int32 cp, dp;
 
 if (drm_sta == DRM_1ST) {

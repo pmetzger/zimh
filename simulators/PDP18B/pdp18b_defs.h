@@ -564,6 +564,8 @@ t_stat set_devno (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat show_devno (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat set_3cyc_reg (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat show_3cyc_reg (FILE *st, UNIT *uptr, int32 val, const void *desc);
+int32 clk (int32 dev, int32 pulse, int32 dat);
+t_stat fp15 (int32 ir);
 
 /* Translation tables */
 extern const int32 asc_to_baud[128];

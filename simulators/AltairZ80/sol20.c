@@ -1622,22 +1622,42 @@ DEVICE sol20p_dev = {
 };
 
 static const char* sol20_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return SOL20_NAME;
 }
 
 static const char* sol20k_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return SOL20K_NAME;
 }
 
 static const char* sol20t_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return SOL20T_NAME;
 }
 
 static const char* sol20s_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return SOL20S_NAME;
 }
 
 static const char* sol20p_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return SOL20P_NAME;
 }
 
@@ -1704,6 +1724,11 @@ static t_stat sol20_reset(DEVICE *dptr)
  */
 static t_stat sol20_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+    (void) dptr;
+
     sim_printf("%s: Booting using ROM at 0x%04x\n", SOL20_SNAME, sol20_ctx.rom_base);
 
     *((int32 *) sim_PC->loc) = sol20_ctx.rom_base;
@@ -1915,6 +1940,11 @@ static t_stat sol20_detach_mux(UNIT *uptr)
 }
 
 static t_stat sol20_show_ports(FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     SOL20_PORT_CTX *port;
 
     port = (SOL20_PORT_CTX *) uptr->dptr->ctxt;
@@ -1944,6 +1974,11 @@ static t_stat sol20_config_line(DEVICE *dev, TMLN *tmln, int baud)
 
 static t_stat sol20_set_baud(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) value;
+    (void) desc;
+
     int32 baud;
     t_stat r = SCPE_ARG;
     SOL20_PORT_CTX *port;
@@ -1966,6 +2001,11 @@ static t_stat sol20_set_baud(UNIT *uptr, int32 value, const char *cptr, void *de
 
 static t_stat sol20_show_baud(FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) value;
+    (void) desc;
+
     SOL20_PORT_CTX *port;
 
     port = (SOL20_PORT_CTX *) uptr->dptr->ctxt;
@@ -1979,6 +2019,12 @@ static t_stat sol20_show_baud(FILE *st, UNIT *uptr, int32 value, const void *des
 
 static t_stat sol20_set_rom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
 
@@ -2004,6 +2050,12 @@ static t_stat sol20_set_rom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 static t_stat sol20_show_rom(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (sol20_rom == sol20_rom_13) {
         fprintf(st, "ROM=v1.3");
     }
@@ -2028,6 +2080,11 @@ static t_stat sol20_show_rom(FILE *st, UNIT *uptr, int32 val, const void *desc)
  */
 static t_stat sol20_set_tape(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
 
@@ -2047,6 +2104,11 @@ static t_stat sol20_set_tape(UNIT *uptr, int32 val, const char *cptr, void *desc
 
 static t_stat sol20_show_tape(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     if (uptr->wait == SOL20_TAPE_NORMAL) {
         fprintf(st, "TAPE=NORMAL");
     }
@@ -2096,6 +2158,11 @@ static t_stat sol20_erase(UNIT *uptr)
  */
 static int32 sol20rom(int32 addr, int32 rw, int32 data)
 {
+    /* Memory resource handler signature.
+       This implementation does not use every parameter. */
+    (void) rw;
+    (void) data;
+
     return(sol20_rom[addr & SOL20_ROM_MASK]);
 }
 
@@ -2556,6 +2623,11 @@ static uint8 translate_key(SIM_KEY_EVENT *kev)
 /* Show ROM Address routine */
 t_stat show_rombase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE *dptr;
     SOL20_CTX *ctxp;
 
@@ -2575,6 +2647,11 @@ t_stat show_rombase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 /* Show RAM Address routine */
 t_stat show_rambase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE *dptr;
     SOL20_CTX *ctxp;
 
@@ -2596,6 +2673,13 @@ t_stat show_rambase(FILE *st, UNIT *uptr, int32 val, const void *desc)
  */
 static t_stat sol20_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     fprintf(st, "Sol-20 Function Keys:\n");
     fprintf(st, "F1: Rewind tape\n");
     fprintf(st, "F2: Eject tape\n");

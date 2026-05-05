@@ -77,6 +77,7 @@
 
  */
 
+#include "altairz80_defs.h"
 #include "m68k/m68k.h"
 
 /* Read/write macros */
@@ -140,19 +141,6 @@ static uint32 m68k_int_controller_pending = 0;      /* list of pending interrupt
 static uint32 m68k_int_controller_highest_int = 0;  /* Highest pending interrupt    */
 
 static uint8 m68k_ram[M68K_MAX_RAM + 1];            /* RAM                          */
-
-/* Interface to HDSK device */
-extern void hdsk_prepareRead(void);
-extern void hdsk_prepareWrite(void);
-extern void hdsk_setSelectedDisk(const int32 disk);
-extern void hdsk_setSelectedSector(const int32 sector);
-extern void hdsk_setSelectedTrack(const int32 track);
-extern void hdsk_setSelectedDMA(const int32 dma);
-extern int32 hdsk_getStatus(void);
-extern t_bool hdsk_checkParameters(void);
-extern int32 hdsk_read(void);
-extern int32 hdsk_write(void);
-extern int32 hdsk_flush(void);
 
 /* Interface to SIMH I/O devices */
 extern void out(const uint32 Port, const uint32 Value);

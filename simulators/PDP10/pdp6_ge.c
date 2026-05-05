@@ -286,6 +286,10 @@ const char helpString[] =
 
 static const char *ge_description(DEVICE *dptr)
 {
+  /* Generic device description signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   return "GE DATANET-760";
 }
 
@@ -346,6 +350,10 @@ static void gtyo_text(char data) {
 }
 
 static void gtyo_lp(char data) {
+  /* Shared output-state handler signature.
+     This state does not use every parameter. */
+  (void) data;
+
   if (gtyo_unit->LP != 0)
     sim_debug(DEBUG_CMD, &ge_dev, "Checksum mismatch\n");
   gtyo_process = gtyo_soh;

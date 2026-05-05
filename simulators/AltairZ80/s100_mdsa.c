@@ -166,6 +166,10 @@ static REG mdsa_reg[] = {
 #define MDSA_NAME  "North Star Single Density Controller"
 
 static const char* mdsa_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return MDSA_NAME;
 }
 
@@ -303,6 +307,9 @@ t_stat mdsa_detach(UNIT *uptr)
 
 static t_stat mdsa_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
 
     PNP_INFO *pnp = (PNP_INFO *)dptr->ctxt;
 
@@ -314,6 +321,10 @@ static t_stat mdsa_boot(int32 unitno, DEVICE *dptr)
 
 static int32 mdsadev(const int32 Addr, const int32 rw, const int32 data)
 {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) data;
+
     if(rw == 0) { /* Read */
         return(MDSA_Read(Addr));
     } else {    /* Write */

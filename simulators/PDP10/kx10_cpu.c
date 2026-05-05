@@ -1282,6 +1282,10 @@ t_stat dev_pag(uint32 dev, uint64 *data) {
  * All operations set sweep done.
  */
 t_stat dev_cca(uint32 dev, uint64 *data) {
+    /* Generic I/O device signature.
+       This implementation does not use every parameter. */
+    (void) dev;
+
     irq_flags |= SWP_DONE;
     *data = 0;
     check_apr_irq();
@@ -1471,6 +1475,11 @@ t_stat dev_tim(uint32 dev, uint64 *data) {
 t_addr
 tim_irq(uint32 dev, t_addr addr)
 {
+    /* Generic device interrupt signature.
+       This implementation does not use every parameter. */
+    (void) dev;
+    (void) addr;
+
     return 0514;
 }
 
@@ -4100,6 +4109,10 @@ int Mem_write_waits(int flag, int cur_context) {
 #endif
 
 int page_lookup_ka(t_addr addr, int flag, t_addr *loc, int wr, int cur_context, int fetch) {
+      /* Shared paging helper signature.
+         This model variant does not use every parameter. */
+      (void) cur_context;
+
       if (adr_cond && addr == AS)
         address_conditions (fetch, wr);
 
@@ -4282,6 +4295,12 @@ t_stat dev_apr(uint32 dev, uint64 *data) {
 #define set_reg(reg, value)          FM[(reg) & 017] = value
 
 int page_lookup(t_addr addr, int flag, t_addr *loc, int wr, int cur_context, int fetch) {
+      /* Shared paging helper signature.
+         This model variant does not use every parameter. */
+      (void) wr;
+      (void) cur_context;
+      (void) fetch;
+
       if (!flag && (FLAGS & USER) != 0) {
           if (addr <= Pl) {
              *loc = (addr + Rl) & RMASK;
@@ -4297,6 +4316,10 @@ int page_lookup(t_addr addr, int flag, t_addr *loc, int wr, int cur_context, int
 }
 
 int Mem_read(int flag, int cur_context, int fetch, int mod) {
+    /* Shared memory helper signature.
+       This model variant does not use every parameter. */
+    (void) mod;
+
     t_addr addr = AB;
 
     sim_interval--;
@@ -4406,7 +4429,12 @@ int Mem_write_nopage(void) {
  */
 int Mem_read_word(t_addr addr, uint64 *data, int ept)
 {
-#if KL | KI | KS
+#if !(KL | KI | KS)
+/* Shared memory helper signature.
+   This build variant does not use every parameter. */
+(void) ept;
+#else
+
     if (ept)
        addr += eb_ptr;
 #endif
@@ -4418,7 +4446,12 @@ int Mem_read_word(t_addr addr, uint64 *data, int ept)
 
 int Mem_write_word(t_addr addr, uint64 *data, int ept)
 {
-#if KL | KI | KS
+#if !(KL | KI | KS)
+/* Shared memory helper signature.
+   This build variant does not use every parameter. */
+(void) ept;
+#else
+
     if (ept)
        addr += eb_ptr;
 #endif
@@ -13584,6 +13617,10 @@ rtc_srv(UNIT * uptr)
 t_stat
 qua_srv(UNIT * uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     if ((fault_data & 1) == 0 && pi_enable && !pi_pending && (FLAGS & USER) != 0) {
        mem_prot = 1;
        check_apr_irq();
@@ -13798,6 +13835,10 @@ return SCPE_OK;
 /* Called at close of simulator */
 t_stat cpu_detach (UNIT *uptr)
 {
+    /* Generic unit detach signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
 #if PIDP10
     pi_panel_stop();
 #endif
@@ -13808,6 +13849,12 @@ t_stat cpu_detach (UNIT *uptr)
 
 t_stat cpu_set_size (UNIT *uptr, int32 sval, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 i;
 int32 val = (int32)sval;
 
@@ -13972,6 +14019,12 @@ t_bool build_dev_tab (void)
 /* Set serial */
 t_stat cpu_set_serial (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 lnt;
 t_stat r;
 
@@ -13995,6 +14048,12 @@ return SCPE_OK;
 /* Show serial */
 t_stat cpu_show_serial (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "Serial: " );
 if (apr_serial == -1) {
     fprintf (st, "%d (default)", DEF_SERIAL);
@@ -14008,6 +14067,12 @@ return SCPE_OK;
 /* Set history */
 t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i, lnt;
 t_stat r;
 
@@ -14038,6 +14103,11 @@ return SCPE_OK;
 /* Show history */
 t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 k, di, lnt;
 char *cptr = (char *) desc;
 t_stat r;
@@ -14124,6 +14194,10 @@ cpu_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 cpu_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
 #if KS
     return "KS10 CPU";
 #endif

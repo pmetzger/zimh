@@ -452,6 +452,10 @@ return SCPE_OK;
 
 t_stat muxi_rtc_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 t_stat r;
 int32 newln, ln, c;
 
@@ -580,6 +584,10 @@ return;
 
 t_stat mux_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 if (mux_dev.flags & DEV_DIS)                            /* master disabled? */
@@ -625,6 +633,12 @@ return r;
 
 t_stat mux_vlines (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 newln, i, t;
 t_stat r;
 

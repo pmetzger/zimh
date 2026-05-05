@@ -201,6 +201,10 @@ switch (c) {
 
 t_stat vs_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 vs_x = 0;
 vs_y = 0;
 vs_l = FALSE;
@@ -259,6 +263,10 @@ if (vs_mode == VSXXX_INC)
 
 const char *vs_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "  VCB01 - VS Mouse interface";
 }
 

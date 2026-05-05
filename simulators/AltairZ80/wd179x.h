@@ -42,6 +42,8 @@ extern uint8 WD179X_Read(const uint32 Addr);
 extern uint8 WD179X_Write(const uint32 Addr, uint8 cData);
 
 extern void wd179x_external_restore(void);
+extern void wd179x_connect_external_fifo(uint16 fifo_len, uint8 *storage);
+extern void wd179x_reset_external_fifo(void);
 extern uint8 wd179x_get_nheads(void);
 extern void wd179x_set_drive_rpm(int rpm);
 

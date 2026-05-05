@@ -118,6 +118,10 @@ DEVICE mctl_dev = {
 
 t_stat mctl_rdreg (int32 *val, int32 pa, int32 lnt)
 {
+/* Nexus register read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 ofs;
 ofs = NEXUS_GETOFS (pa);                                /* get offset */
 
@@ -148,6 +152,10 @@ return SCPE_OK;
 
 t_stat mctl_wrreg (int32 val, int32 pa, int32 lnt)
 {
+/* Nexus register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 ofs;
 
 ofs = NEXUS_GETOFS (pa);                                /* get offset */
@@ -177,6 +185,11 @@ return SCPE_OK;
 
 void rom_wr_B (int32 pa, int32 val)
 {
+/* Shared ROM write hook.
+   This model does not use every parameter. */
+(void) pa;
+(void) val;
+
 return;
 }
 
@@ -184,6 +197,10 @@ return;
 
 t_stat mctl_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 mcsr0 = 0;
 mcsr1 = 0;
 mcsr2 = MEM_BOARD_MASK(MEMSIZE, MEM_SIZE_64K) | MCSR2_CS;     /* Use 64k chips */
@@ -192,11 +209,21 @@ return SCPE_OK;
 
 const char *mctl_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "memory controller";
 }
 
 t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 memsize = (uint32)(MEMSIZE>>20);
 uint32 baseaddr = 0;
 uint32 slot = 6;

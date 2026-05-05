@@ -123,6 +123,10 @@ DEVICE dpy_dev = {
 
 static t_stat dpy_60hz_svc (UNIT *uptr)
 {
+  /* Generic unit service signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   sim_debug (DBG_60HZ, &dpy_dev, "60 Hz interrupt\n");
   flag_on (INT_60HZ);
   tv_refresh ();
@@ -202,6 +206,10 @@ static void dpy_write (uint16 reg, uint16 data)
 
 static t_stat dpy_reset (DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   memset (black, 0, sizeof black);
   memset (green, 0377, sizeof green);
   sim_activate_abs (&dpy_unit, 0);

@@ -214,6 +214,7 @@ struct  pc_env
 /* GLOBAL */
 extern volatile int intr;
 
+void setViewRegisters (void);
 void halt_sys (PC_ENV *sys);
 void fetch_decode_modrm (PC_ENV *m, uint16 *mod, uint16 *regh, uint16 *regl);
 uint8 *decode_rm_byte_register (PC_ENV *m, int reg);

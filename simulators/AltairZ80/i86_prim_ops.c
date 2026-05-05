@@ -530,11 +530,19 @@ uint16 neg_word(PC_ENV *m, uint16 s)
 
 uint8 not_byte(PC_ENV *m, uint8 s)
 {
+    /* Shared helper signature.
+       This implementation does not use every parameter. */
+    (void)m;
+
     return ~s;
 }
 
 uint16 not_word(PC_ENV *m, uint16 s)
 {
+    /* Shared helper signature.
+       This implementation does not use every parameter. */
+    (void)m;
+
     return ~s;
 }
 
@@ -543,6 +551,10 @@ uint16 not_word(PC_ENV *m, uint16 s)
  */
 uint16 mem_access_word(PC_ENV *m, int addr)
 {
+    /* Shared helper signature.
+       This implementation does not use every parameter. */
+    (void)m;
+
     /* Load in two steps.  Native byte order independent */
     return GetBYTEExtended(addr) | (GetBYTEExtended(addr + 1) << 8);
 }

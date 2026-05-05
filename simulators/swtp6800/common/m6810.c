@@ -91,6 +91,10 @@ DEVICE m6810_dev = {
 
 t_stat m6810_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     if (m6810_unit.filebuf == NULL) {
         m6810_unit.filebuf = calloc(128, sizeof(uint8));
         if (m6810_unit.filebuf == NULL) {

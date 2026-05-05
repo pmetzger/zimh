@@ -413,6 +413,10 @@ DEVICE lp20_dev = {
 
 static t_stat lp20_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O page read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 update_lpcs (0);                                        /* update csr's */
 switch ((pa >> 1) & 07) {                               /* case on PA<3:1> */
 
@@ -1012,6 +1016,11 @@ return SCPE_OK;
 
 static t_stat lp20_set_vfu_type (UNIT *uptr, int32 val, const char *gptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 char gbuf[CBUFSIZE], *cptr;
 char *fname, *cp;
 FILE *vfile;
@@ -1143,6 +1152,12 @@ return SCPE_FMT;
 
 static t_stat lp20_show_vfu_type (FILE *st, UNIT *up, int32 v, const void *dp)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) up;
+(void) v;
+(void) dp;
+
 if (lpcsb & CSB_OVFU)
     fprintf (st, "optical VFU");
 else
@@ -1158,6 +1173,11 @@ return SCPE_OK;
 
 static t_stat lp20_set_lpi (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 int32 newlpi;
 
 if (uptr->flags & UNIT_ATT)
@@ -1181,6 +1201,12 @@ return SCPE_OK;
 
 static t_stat lp20_show_lpi (FILE *st, UNIT *up, int32 v, const void *dp)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) up;
+(void) v;
+(void) dp;
+
 fprintf (st, "%u LPI", lpi);
 
 return SCPE_OK;
@@ -1188,6 +1214,12 @@ return SCPE_OK;
 
 static t_stat lp20_show_vfu (FILE *st, UNIT *up, int32 v, const void *dp)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) up;
+(void) v;
+(void) dp;
+
 int l, c, sum;
 
 if (lpcsb & CSB_OVFU)
@@ -1226,6 +1258,11 @@ return SCPE_OK;
 }
 static t_stat lp20_set_tof (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 int32 s_lpcsa = lpcsa;
 int32 s_lppagc = lppagc;
 
@@ -1257,6 +1294,13 @@ return even;
 
 static t_stat lp20_clear_vfu (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) cptr;
+(void) desc;
+
 int i;
 
 if (!get_yn ("Clear DAVFU & RAM? [N]", FALSE))
@@ -1274,6 +1318,13 @@ return SCPE_OK;
 static t_stat lp20_help (FILE *st, DEVICE *dptr,
                             UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st,
          "The LP20 DMA line printer controller is a UNIBUS device developed by the 36-bit product line.\n"
          "The controller is used in the KS10, in PDP-11 based remote stations and in the KL10 console.\n"
@@ -1315,5 +1366,9 @@ return SCPE_OK;
 }
 static const char *lp20_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "DMA Line Printer controller";
 }

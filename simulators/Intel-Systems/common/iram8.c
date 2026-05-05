@@ -57,6 +57,10 @@ void RAM_put_mbyte(uint16 addr, uint8 val);
 // globals
 
 static const char* iRAM_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return iRAM_NAME;
 }
 
@@ -118,6 +122,10 @@ DEVICE RAM_dev = {
 
 t_stat RAM_cfg(uint16 base, uint16 size, uint8 dummy)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) dummy;
+
     RAM_unit.capac = size;              /* set RAM size */
     RAM_unit.u3 = base;                 /* set RAM base */
     RAM_unit.filebuf = (uint8 *)calloc(size, sizeof(uint8));
@@ -142,6 +150,10 @@ t_stat RAM_clr(void)
 
 t_stat RAM_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return SCPE_OK;
 }
 
@@ -149,6 +161,12 @@ t_stat RAM_reset (DEVICE *dptr)
 
 t_stat RAM_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     uint32 size, result, i;
 
     if (cptr == NULL)
@@ -172,6 +190,12 @@ t_stat RAM_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat RAM_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     uint32 size, result, i;
 
     if (cptr == NULL)
@@ -195,6 +219,11 @@ t_stat RAM_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat RAM_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_ARG;
     fprintf(st, "%s at Base Address 0%04XH (%dD) for 0%04XH (%dD) Bytes ",

@@ -56,6 +56,10 @@ uint8 EPROM_get_mbyte (uint16 addr, uint8 devnum);
 /* globals */
 
 static const char* EPROM_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return EPROM_NAME;
 }
 int ieprom_num = 0;
@@ -121,6 +125,10 @@ DEVICE EPROM_dev = {
 
 t_stat EPROM_cfg(uint16 base, uint16 size, uint8 devnum)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     EPROM_unit[ieprom_num].capac = size;        /* set EPROM size */
     EPROM_unit[ieprom_num].u3 = base;           /* set EPROM base */
     EPROM_unit[ieprom_num].filebuf = (uint8 *)calloc(size, sizeof(uint8));
@@ -151,6 +159,10 @@ t_stat EPROM_clr(void)
 
 t_stat EPROM_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     EPROM_clr();
     return SCPE_OK;
 }
@@ -159,6 +171,11 @@ t_stat EPROM_reset (DEVICE *dptr)
 
 t_stat EPROM_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int i;
 
     if (uptr == NULL)

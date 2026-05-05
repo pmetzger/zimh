@@ -48,7 +48,7 @@ char * dig[] = { 0, "5", "\r", "9", " ", "Щ", ",", ".", "\n", ")", "4", "Ш", "
 
 char ** reg = 0;
 
-char *  process (int sym)
+static char *process (int sym)
 {
     /* Inversion is required for Baudot TTYs */
     sym ^= 31;
@@ -102,7 +102,7 @@ char *vt_cptr [LINES_MAX+1];
 
 void tt_print(void);
 void consul_receive(void);
-t_stat vt_clk(UNIT *);
+static t_stat vt_clk(UNIT *);
 extern const char *get_sim_sw (const char *cptr);
 
 int attached_console;
@@ -178,8 +178,12 @@ static void reset_line(int num)
     tty_instate[num] = 0;
 }
 
-t_stat tty_reset (DEVICE *dptr)
+static t_stat tty_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     memset(tty_active, 0, sizeof(tty_active));
     memset(tty_sym, 0, sizeof(tty_sym));
     memset(tty_typed, 0, sizeof(tty_typed));
@@ -198,7 +202,7 @@ t_stat tty_reset (DEVICE *dptr)
 }
 
 /* Bit 19 of GRP, should be <tty_rate> Hz */
-t_stat vt_clk (UNIT * this)
+static t_stat vt_clk (UNIT * this)
 {
     int num;
 
@@ -294,8 +298,13 @@ t_stat vt_clk (UNIT * this)
     }
 }
 
-t_stat tty_setmode (UNIT *u, int32 val, const char *cptr, void *desc)
+static t_stat tty_setmode (UNIT *u, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     int num = u - tty_unit;
     TMLN *t = &tty_line [num];
     uint32 mask = 1 << (TTY_MAX - num);
@@ -349,7 +358,7 @@ t_stat tty_setmode (UNIT *u, int32 val, const char *cptr, void *desc)
  *      attach tty <port>
  * Where <port> is the port number for telnet, e.g. 4199.
  */
-t_stat tty_attach (UNIT *u, const char *cptr)
+static t_stat tty_attach (UNIT *u, const char *cptr)
 {
     int num = u - tty_unit;
     char gbuf[CBUFSIZE];
@@ -398,22 +407,44 @@ t_stat tty_attach (UNIT *u, const char *cptr)
     return SCPE_ALATT;
 }
 
-t_stat tty_detach (UNIT *u)
+static t_stat tty_detach (UNIT *u)
 {
+    /* Generic detach signature.
+       This implementation does not use every parameter. */
+    (void) u;
+
     return tmxr_detach (&tty_desc, &tty_unit[0]);
 }
 
-t_stat tty_showrate (FILE *f, UNIT *up, int32 v, const void *dp) {
+static t_stat tty_showrate (FILE *f, UNIT *up, int32 v, const void *dp) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) up;
+    (void) v;
+    (void) dp;
+
     fprintf(f, "%d Baud", tty_rate);
     return SCPE_OK;
 }
 
-t_stat tty_showturbo (FILE *f, UNIT *up, int32 v, const void *dp) {
+static t_stat tty_showturbo (FILE *f, UNIT *up, int32 v, const void *dp) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) up;
+    (void) v;
+    (void) dp;
+
     fprintf(f, tty_turbo ? "Turbo" : "Authentic feel");
     return SCPE_OK;
 }
 
-t_stat tty_setrate (UNIT *up, int32 v, const char *cp, void *dp) {
+static t_stat tty_setrate (UNIT *up, int32 v, const char *cp, void *dp) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) up;
+    (void) v;
+    (void) dp;
+
     int rate;
     if (cp)
         rate = atoi(cp);
@@ -428,7 +459,13 @@ t_stat tty_setrate (UNIT *up, int32 v, const char *cp, void *dp) {
     return SCPE_OK;
 }
 
-t_stat tty_setturbo (UNIT *up, int32 v, const char *cp, void *dp) {
+static t_stat tty_setturbo (UNIT *up, int32 v, const char *cp, void *dp) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) up;
+    (void) v;
+    (void) dp;
+
     if (!cp)
         return SCPE_MISVAL;
     if (!MATCH_CMD("ON", cp))
@@ -519,7 +556,7 @@ void tty_send (uint32 mask)
 /*
  * Sending a character to a terminal with the given number.
  */
-void vt_putc (int num, int c)
+static void vt_putc (int num, int c)
 {
     TMLN *t = &tty_line [num];
 
@@ -537,7 +574,7 @@ void vt_putc (int num, int c)
 /*
  * Sending a string to a terminal with the given number.
  */
-void vt_puts (int num, const char *s)
+static void vt_puts (int num, const char *s)
 {
     TMLN *t = &tty_line [num];
 
@@ -560,7 +597,7 @@ const char * koi7_rus_to_unicode [32] = {
 };
 
 /* Videoton-340 employed single byte control codes rather than ESC sequences. */
-void vt_send(int num, uint32 sym)
+static void vt_send(int num, uint32 sym)
 {
     if ((tty_unit[num].flags & TTY_CHARSET_MASK) == TTY_RAW_CHARSET) {
         vt_putc(num, sym);
@@ -868,6 +905,11 @@ static t_stat cmd_show (int32 num, const char *cptr)
  */
 static t_stat cmd_exit (int32 num, const char *cptr)
 {
+    /* Generic command signature.
+       This implementation does not use every parameter. */
+    (void) num;
+    (void) cptr;
+
     return SCPE_EXIT;
 }
 
@@ -953,7 +995,7 @@ static t_stat cmd_help (int32 num, const char *cptr)
 /*
  * Executing a command.
  */
-void vt_cmd_exec (int num)
+static void vt_cmd_exec (int num)
 {
     TMLN *t = &tty_line [num];
     char gbuf [CBUFSIZE];
@@ -981,7 +1023,7 @@ void vt_cmd_exec (int num)
 /*
  * Command line interface mode.
  */
-void vt_cmd_loop (int num, int c)
+static void vt_cmd_loop (int num, int c)
 {
     TMLN *t = &tty_line [num];
     char *cbuf, **cptr;
@@ -1053,7 +1095,7 @@ void vt_cmd_loop (int num, int c)
  * Getting a char from a terminal with the given number.
  * Returns -1 if there is no char to input.
  */
-int vt_getc (int num)
+static int vt_getc (int num)
 {
     TMLN *t = &tty_line [num];
     extern int32 sim_int_char;
@@ -1220,7 +1262,7 @@ int odd_parity(unsigned char c)
  * Converting Enter and Backspace to conventional values,
  * unless the mode is RAW.
  */
-int vt_fix(int num, int c) {
+static int vt_fix(int num, int c) {
     if ((tty_unit[num].flags & TTY_CHARSET_MASK) != TTY_RAW_CHARSET) {
         switch (c) {
         case '\r': case '\n':
@@ -1329,7 +1371,6 @@ static char cons_is_printing[2];
 void consul_print (int dev_num, uint32 cmd)
 {
     extern unsigned short gost_to_unicode(unsigned char);
-    extern void uni2utf8(unsigned short ch, char buf[5]);
     int uni;
     char buf[5];
     int line_num = dev_num + TTY_MAX + 1;

@@ -63,6 +63,12 @@ DEVICE crt_dev = {
 static t_stat
 crt_svc(UNIT *uptr)
 {
+#ifndef USE_DISPLAY
+  /* Generic unit service signature.
+     This build variant does not use every parameter. */
+  (void) uptr;
+#endif
+
 #ifdef USE_DISPLAY
   display_age (100, 0);
   if (!display_is_blank ())
@@ -78,6 +84,12 @@ crt_svc(UNIT *uptr)
 static t_stat
 crt_reset (DEVICE *dptr)
 {
+#ifndef USE_DISPLAY
+  /* Generic device reset signature.
+     This build variant does not use every parameter. */
+  (void) dptr;
+#endif
+
 #ifdef USE_DISPLAY
   if (dptr->flags & DEV_DIS || sim_switches & SWMASK('P')) {
     display_close (dptr);

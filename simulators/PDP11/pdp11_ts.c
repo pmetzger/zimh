@@ -506,7 +506,7 @@ switch (st) {
 return 0;
 }
 
-int32 ts_spacef (UNIT *uptr, int32 fc, t_bool upd)
+static int32 ts_spacef (UNIT *uptr, int32 fc, t_bool upd)
 {
 t_stat st;
 t_mtrlnt tbc;
@@ -522,7 +522,7 @@ do {
 return 0;
 }
 
-int32 ts_skipf (UNIT *uptr, int32 fc)
+static int32 ts_skipf (UNIT *uptr, int32 fc)
 {
 t_stat st;
 t_mtrlnt tbc;
@@ -549,7 +549,7 @@ do {
 return 0;
 }
 
-int32 ts_spacer (UNIT *uptr, int32 fc, t_bool upd)
+static int32 ts_spacer (UNIT *uptr, int32 fc, t_bool upd)
 {
 int32 st;
 t_mtrlnt tbc;
@@ -565,7 +565,7 @@ do {
 return 0;
 }
 
-int32 ts_skipr (UNIT *uptr, int32 fc)
+static int32 ts_skipr (UNIT *uptr, int32 fc)
 {
 t_stat st;
 t_mtrlnt tbc;
@@ -590,7 +590,7 @@ do {
 return 0;
 }
 
-int32 ts_readf (UNIT *uptr, uint32 fc)
+static int32 ts_readf (UNIT *uptr, uint32 fc)
 {
 t_stat st;
 t_mtrlnt i, t, tbc, wbc;
@@ -632,7 +632,7 @@ if (tbc > wbc)                                          /* rec too big? */
 return 0;
 }
 
-int32 ts_readr (UNIT *uptr, uint32 fc)
+static int32 ts_readr (UNIT *uptr, uint32 fc)
 {
 t_stat st;
 t_mtrlnt i, tbc, wbc;
@@ -663,7 +663,7 @@ if (tbc > wbc)                                          /* rec too big? */
 return 0;
 }
 
-int32 ts_write (UNIT *uptr, int32 fc)
+static int32 ts_write (UNIT *uptr, int32 fc)
 {
 int32 i, t;
 uint32 wa;
@@ -700,7 +700,7 @@ if (sim_tape_eot (&ts_unit))                            /* EOT on write? */
 return 0;
 }
 
-int32 ts_wtmk (UNIT *uptr)
+static int32 ts_wtmk (UNIT *uptr)
 {
 t_stat st;
 
@@ -1052,6 +1052,10 @@ return;
 
 t_stat ts_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 sim_tape_rewind (&ts_unit);
@@ -1167,6 +1171,11 @@ static const uint16 boot_rom[] = {
 
 t_stat ts_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 size_t i;
 
 sim_tape_rewind (&ts_unit);
@@ -1182,6 +1191,11 @@ return SCPE_OK;
 
 t_stat ts_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 return SCPE_NOFNC;
 }
 #endif
@@ -1210,6 +1224,10 @@ return SCPE_OK;
 
 const char *ts_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return (UNIBUS) ? "TS11 magnetic tape controller" :
                   "TSV11/TSV05 magnetic tape controller ";
 }

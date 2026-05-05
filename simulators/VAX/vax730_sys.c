@@ -423,6 +423,11 @@ return;
 
 int32 machine_check (int32 p1, int32 opc, int32 cc, int32 delta)
 {
+/* Model-dependent machine check signature.
+   This implementation does not use every parameter. */
+(void) opc;
+(void) delta;
+
 int32 acc, nxm;
 
 if (in_ie)                                              /* in exc? panic */
@@ -450,6 +455,10 @@ return cc;
 
 int32 con_halt (int32 code, int32 cc)
 {
+/* Model-dependent console halt signature.
+   This implementation does not use every parameter. */
+(void) code;
+
 if ((cpu_boot_cmd[0] == 0) ||                           /* saved boot cmd? */
     (vax730_boot_parse (0, cpu_boot_cmd) != SCPE_OK) || /* reparse the boot cmd */
     (reset_all (0) != SCPE_OK) ||                       /* reset the world */
@@ -556,6 +565,11 @@ return SCPE_NOFNC;
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic CPU boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 t_stat r;
 
 
@@ -570,12 +584,20 @@ return SCPE_OK;
 
 t_stat sysb_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_vm_cmd = vax730_cmd;
 return SCPE_OK;
 }
 
 const char *sysb_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "system bus controller";
 }
 
@@ -583,13 +605,18 @@ return "system bus controller";
 
 t_stat show_nexus (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 fprintf (st, "nexus=%d, address=%X", val, NEXUSBASE + ((1 << REG_V_NEXUS) * val));
 return SCPE_OK;
 }
 
 /* Init nexus tables */
 
-void init_nexus_tab (void)
+static void init_nexus_tab (void)
 {
 uint32 i;
 
@@ -610,7 +637,7 @@ return;
 */
 
 
-t_stat build_nexus_tab (DEVICE *dptr, DIB *dibp)
+static t_stat build_nexus_tab (DEVICE *dptr, DIB *dibp)
 {
 uint32 idx;
 
@@ -668,6 +695,13 @@ return SCPE_OK;
 
 t_stat cpu_model_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Initial memory size is 2MB.\n\n");
 fprintf (st, "The simulator is booted with the BOOT command:\n\n");
 fprintf (st, "   sim> BO{OT} <device>{/R5:flags}\n\n");

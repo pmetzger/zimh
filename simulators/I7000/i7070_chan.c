@@ -241,10 +241,15 @@ chan_reset(DEVICE * dptr)
 t_stat
 chan_boot(int32 unit_num, DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+    (void)unit_num;
+
     return SCPE_NOFNC;  /* Not implimented until I know how boot work */
 }
 
-t_stat
+static t_stat
 chan_issue_cmd(uint16 chan, uint16 dcmd, uint16 dev) {
     DEVICE            **dptr;
     DIB                *dibp;
@@ -1188,10 +1193,18 @@ chan_fetch(int chan)
 }
 
 void chan_set_attn_a(int chan) {
+    /* Shared helper signature.
+       This build variant does not use every parameter. */
+    (void)chan;
+
     pri_latchs[0] |= 0x002;
 }
 
 void chan_set_attn_b(int chan) {
+    /* Shared helper signature.
+       This build variant does not use every parameter. */
+    (void)chan;
+
     pri_latchs[0] |= 0x004;
 }
 
@@ -1280,6 +1293,12 @@ chan_cmd(uint16 dev, uint16 dcmd, uint16 addr)
 int
 chan_write(int chan, t_uint64 * data, int flags)
 {
+    /* Shared helper signature.
+       This build variant does not use every parameter. */
+    (void)chan;
+    (void)data;
+    (void)flags;
+
     return TIME_ERROR;
 }
 
@@ -1289,6 +1308,12 @@ chan_write(int chan, t_uint64 * data, int flags)
 int
 chan_read(int chan, t_uint64 * data, int flags)
 {
+    /* Shared helper signature.
+       This build variant does not use every parameter. */
+    (void)chan;
+    (void)data;
+    (void)flags;
+
     return TIME_ERROR;
 }
 
@@ -1577,6 +1602,12 @@ chan9_set_error(int chan, uint32 mask)
 t_stat
 chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)cptr;
+   (void)flag;
+   (void)uptr;
+
    fprintf (st, "%s\n\n", chan_description(dptr));
    fprintf (st, "The 7070 supports up to 8 channels. Channel models include\n\n");
    fprintf (st, "        7604            standard multiplexor channel\n");
@@ -1591,6 +1622,10 @@ chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 chan_description(DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "IBM 7070 channel controller";
 }
 

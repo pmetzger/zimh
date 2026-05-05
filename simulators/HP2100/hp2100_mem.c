@@ -1673,6 +1673,10 @@ return map_address (logical, map, NO_PROTECTION);       /* translate the address
 
 static t_stat meu_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 meu_current_map = System_Map;                           /* enable the system map */
 
 meu_status = 0;                                         /* disable MEM and clear the status register */
@@ -1873,6 +1877,10 @@ else {                                                  /* otherwise the MEU is 
 
 static SIGNALS_VALUE mp_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set  = inbound_signals;
 SIGNALS_VALUE  outbound     = { ioNONE, 0 };
@@ -2327,6 +2335,10 @@ return (mp_VR & MPVR_PARITY_ERROR) == 0;                /* return TRUE for MP, F
 
 static t_stat mp_service (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 mp_control = mp_reenable;                               /* reenable MP if a non-HLT I/O instruction was executed */
 
 mp_reenable = CLEAR;                                    /* clear the reenable */
@@ -2355,6 +2367,12 @@ return SCPE_OK;
 
 static t_stat mp_set_jsb (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (value == UNIT_MP_JSB)                               /* if jumper W5 is out */
     jsb_bound = 0;                                      /*   then the protected lower bound is address 0 */
 else                                                    /* otherwise W5 is installed */

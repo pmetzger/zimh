@@ -307,6 +307,10 @@ return SCPE_OK;
 
 t_stat df_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 df_sta = df_da = 0;
 df_done = 1;
 int_req = int_req & ~INT_DF;                            /* clear interrupt */
@@ -341,6 +345,11 @@ static const uint16 dm4_rom[] = {
 
 t_stat df_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 size_t i;
 
 if (sim_switches & SWMASK ('D')) {
@@ -378,6 +387,11 @@ return attach_unit (uptr, cptr);
 
 t_stat df_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (val < 0)
     return SCPE_IERR;
 if (uptr->flags & UNIT_ATT)
@@ -389,5 +403,9 @@ return SCPE_OK;
 
 const char *df_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "DF32 fixed head disk";
 }

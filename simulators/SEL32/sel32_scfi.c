@@ -293,7 +293,6 @@ t_stat  scfi_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *c
 const   char  *scfi_description (DEVICE *dptr);
 extern  uint32  inbusy;
 extern  uint32  outbusy;
-extern  uint32  readfull(CHANP *chp, uint32 maddr, uint32 *word);
 extern  int     irq_pend;                       /* go scan for pending int or I/O */
 extern  UNIT    itm_unit;
 extern  uint32  PSD[];                          /* PSD */
@@ -400,7 +399,7 @@ DEVICE          sdb_dev = {
 #endif
 
 /* convert sector disk address to star values (c,h,s) */
-uint32 scfisec2star(uint32 daddr, int type)
+static uint32 scfisec2star(uint32 daddr, int type)
 {
     uint32 sec = daddr % scfi_type[type].spt;   /* get sector value */
     uint32 spc = scfi_type[type].nhds * scfi_type[type].spt; /* sec per cyl */
@@ -414,6 +413,10 @@ uint32 scfisec2star(uint32 daddr, int type)
 /* start a disk operation */
 t_stat scfi_preio(UNIT *uptr, uint16 chan)
 {
+    /* Channel device callback signature.
+       This implementation does not use every parameter. */
+    (void)chan;
+
     DEVICE      *dptr = get_dev(uptr);
     uint16      chsa = GET_UADDR(uptr->CMD);
     int         unit = (uptr - dptr->units);
@@ -669,6 +672,10 @@ loop:
 
 t_stat scfi_startcmd(UNIT *uptr, uint16 chan,  uint8 cmd)
 {
+    /* Channel device callback signature.
+       This implementation does not use every parameter. */
+    (void)chan;
+
     uint16      chsa = GET_UADDR(uptr->CMD);
     DEVICE      *dptr = get_dev(uptr);
     int32       unit = (uptr - dptr->units);
@@ -1562,6 +1569,10 @@ t_stat  scfi_rschnlio(UNIT *uptr) {
 /* initialize the disk */
 void scfi_ini(UNIT *uptr, t_bool f)
 {
+    /* Generic device initialization signature.
+       This implementation does not use every parameter. */
+    (void)f;
+
     DEVICE  *dptr = get_dev(uptr);
     int     i = GET_TYPE(uptr->flags);
 
@@ -1579,12 +1590,16 @@ void scfi_ini(UNIT *uptr, t_bool f)
 
 t_stat scfi_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     /* add reset code here */
     return SCPE_OK;
 }
 
 /* create the disk file for the specified device */
-int scfi_format(UNIT *uptr) {
+static int scfi_format(UNIT *uptr) {
     int         type = GET_TYPE(uptr->flags);
     DEVICE      *dptr = get_dev(uptr);
     uint32      ssize = SSB(type);              /* disk sector size in bytes */
@@ -1938,6 +1953,11 @@ t_stat scfi_boot(int32 unit_num, DEVICE *dptr) {
 /* set the disk type attached to unit */
 t_stat scfi_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)val;
+    (void)desc;
+
     int     i;
 
     if (cptr == NULL)                           /* any disk name input? */
@@ -1962,6 +1982,11 @@ t_stat scfi_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat scfi_get_type(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
+    /* Generic show command signature.
+       This implementation does not use every parameter. */
+    (void)v;
+    (void)desc;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fputs("TYPE=", st);
@@ -1972,6 +1997,12 @@ t_stat scfi_get_type(FILE *st, UNIT *uptr, int32 v, const void *desc)
 /* help information for disk */
 t_stat scfi_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)flag;
+    (void)cptr;
+
     int i;
     fprintf (st, "SEL-32 SCFI Disk Processor\r\n");
     fprintf (st, "Use:\r\n");
@@ -1997,6 +2028,10 @@ t_stat scfi_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cp
 
 const char *scfi_description (DEVICE *dptr)
 {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "SEL-32 SCFI Disk Processor";
 }
 

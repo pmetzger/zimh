@@ -150,6 +150,10 @@ DEVICE ka_dev[] = {
 
 t_stat ka_rdreg (int32 *val, int32 pa, int32 lnt)
 {
+/* Nexus register dispatch signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 ka, ofs;
 
 ka = NEXUS_GETNEX (pa) - TR_KA0;                        /* get CPU num */
@@ -192,6 +196,10 @@ return SCPE_OK;
 
 t_stat ka_wrreg (int32 val, int32 pa, int32 lnt)
 {
+/* Nexus register dispatch signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 ka, ofs;
 
 ka = NEXUS_GETNEX (pa) - TR_KA0;                        /* get CPU num */
@@ -229,6 +237,10 @@ return SCPE_OK;
 
 t_stat ka_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 rxcd_count = 0;
@@ -345,6 +357,10 @@ return;
 
 int32 pcsr_rd (int32 pa)
 {
+/* Register dispatch signature.
+   This implementation does not use every parameter. */
+(void) pa;
+
 int32 data;
 int32 ip_int = (ipir >> cur_cpu) & 0x1;
 data = ka_pcsr[cur_cpu] | (rxcd_int << PCSR_V_CONINT) | (ip_int << PCSR_V_IPINT);
@@ -353,6 +369,11 @@ return data;
 
 void pcsr_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register dispatch signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) lnt;
+
 ka_pcsr[cur_cpu] &= ~(val & PCSR_W1C);
 ka_pcsr[cur_cpu] &= ~(PCSR_WR) | (val & PCSR_WR);
 if (val & PCSR_CONCLR)

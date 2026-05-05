@@ -420,7 +420,7 @@ return SCPE_ARG;                                        /* no match */
         rnum    =       output register number, -1 if error
 */
 
-int32 get_reg (char *cptr, char **optr, int32 rtype)
+static int32 get_reg (char *cptr, char **optr, int32 rtype)
 {
 int32 reg;
 
@@ -459,7 +459,7 @@ return reg;
         status  =       SCPE_OK if ok, else error code
 */
 
-t_stat get_addr (char *cptr, char **tptr, t_addr *ea, t_addr addr)
+static t_stat get_addr (char *cptr, char **tptr, t_addr *ea, t_addr addr)
 {
 int32 sign = 1;
 

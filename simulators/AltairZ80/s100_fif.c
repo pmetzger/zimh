@@ -85,6 +85,10 @@ static UNIT fif_unit[] = {
 #define FIF_NAME    "IMSAI"
 
 static const char* fif_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return FIF_NAME;
 }
 
@@ -129,6 +133,13 @@ static void resetDSKWarningFlags(void) {
 }
 
 static t_stat fif_set_verbose(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+    (void) cptr;
+    (void) desc;
+
     resetDSKWarningFlags();
     return SCPE_OK;
 }
@@ -324,6 +335,9 @@ static void getdesc(uint16 addr) {
 
 */
 static int32 fif_io(const int32 port, const int32 io, const int32 data) {
+    /* Shared I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) port;
 
     static int32    fdstate = 0;    /* chan 0xfd state */
     static int32    desc;

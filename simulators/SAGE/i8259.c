@@ -44,6 +44,10 @@ static int32 priomask[] = { 0x0000,0x4000,0x6000,0x7000,0x7800,0x7c00,0x7e00,0x7
 
 t_stat i8259_io(IOHANDLER* ioh,uint32* value,uint32 rw,uint32 mask)
 {
+    /* Shared I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) mask;
+
     int port = ioh->offset;
     I8259* chip = (I8259*)ioh->ctxt;
     if (rw==MEM_WRITE) {

@@ -1186,6 +1186,10 @@ DEVICE mpx_dev = {
 
 static SIGNALS_VALUE mpx_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 static const char * const output_state [] = { "Command", "Command override", "Parameter", "Data" };
 static const char * const input_state  [] = { "Status",  "Invalid status",   "Parameter", "Data" };
 const char * const hold_or_clear = (inbound_signals & ioCLF ? ",C" : "");
@@ -1434,6 +1438,10 @@ return outbound;                                        /* return the outbound s
 
 static t_stat cntl_service (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 uint8 ch;
 uint32 i;
 t_bool add_crlf;
@@ -2305,6 +2313,12 @@ return status;
 
 static t_stat set_revision (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if ((cptr == NULL) ||                                   /* no parameter? */
     (*cptr < 'C') || (*cptr > 'D') ||                   /*   or not C or D? */
     (*(cptr + 1) != '\0'))                              /*   or not just one character? */
@@ -2325,6 +2339,12 @@ else {
 
 static t_stat show_revision (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (mpx_dev.flags & DEV_REV_D)
     fputs ("12792D", st);
 else

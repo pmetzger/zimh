@@ -296,7 +296,7 @@ static MTAB ibctimer_mod[] = {
     { 0 }
 };
 
-const char* ibctimer_description(DEVICE* dptr) {
+static const char* ibctimer_description(DEVICE* dptr) {
     if (dptr == NULL) {
         return NULL;
     }
@@ -327,7 +327,7 @@ DEVICE ibctimer_device = {
 };
 
 /* Port 0x14 IBC Periodic Timer */
-int32 ibctimer_dev(const int32 port, const int32 io, const int32 data) {
+static int32 ibctimer_dev(const int32 port, const int32 io, const int32 data) {
     int32 result = 0xFF;
     if (io == 0) {
         sim_debug(IN_MSG, &ibctimer_device, ": " ADDRESS_FORMAT
@@ -403,7 +403,7 @@ static MTAB ibcrtctimer_mod[] = {
     { 0 }
 };
 
-const char* ibcrtctimer_description(DEVICE* dptr) {
+static const char* ibcrtctimer_description(DEVICE* dptr) {
     if (dptr == NULL) {
         return NULL;
     }
@@ -421,7 +421,7 @@ DEVICE ibcrtctimer_device = {
 };
 
 /* port 0x20 IBC Super Cadet RTC Timer */
-int32 ibcrtctimer_dev(const int32 port, const int32 io, const int32 data) {
+static int32 ibcrtctimer_dev(const int32 port, const int32 io, const int32 data) {
     int32 result = 0xFF;
     if (io == 0) {
         sim_debug(IN_MSG, &ibcrtctimer_device, ": " ADDRESS_FORMAT
@@ -466,6 +466,11 @@ static t_stat ibcrtctimer_svc(UNIT* uptr)
 
 t_stat ibc_show_vectable(FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     uint8 i;
     int32 vectable = (IR_S & 0xFF00);
     int32 vector;
@@ -1568,6 +1573,12 @@ IO_RESOURCE_LIST IBC_SCC_RESOURCES[] = {
 };
 
 static t_stat ibc_set_model(UNIT* uptr, int32 value, const char* cptr, void* desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
+
     IO_RESOURCE_LIST* resources;
 
     if (value == (int32)ibc_info->model) {

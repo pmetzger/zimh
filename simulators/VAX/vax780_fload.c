@@ -89,6 +89,10 @@ uint32 rtfile_find (uint32 block, uint32 sector);
 
 t_stat vax780_fload (int32 flag, const char *cptr)
 {
+/* Generic command handler signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 char gbuf[CBUFSIZE];
 uint16 file_name[3], blkbuf[BLK_SIZE];
 t_stat r;

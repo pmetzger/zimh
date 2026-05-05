@@ -601,6 +601,10 @@ return SCPE_OK;
 
 t_stat mt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 u;
 UNIT *uptr;
 
@@ -657,6 +661,11 @@ return sim_tape_detach (uptr);
 
 t_stat mt_vlock (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 int32 u = uptr - mt_dev.units;                          /* get unit number */
 
 if ((uptr->flags & UNIT_ATT) && (val || sim_tape_wrp (uptr)))
@@ -669,5 +678,9 @@ return SCPE_OK;
 
 const char *mt_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "TM8E/TU10 magtape";
 }

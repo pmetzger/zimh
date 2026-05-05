@@ -85,6 +85,10 @@ DEVICE mctl_dev = {
 
 t_stat mctl_rd (int32 *data, int32 PA, int32 access)
 {
+/* Bus read dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 rg = (PA >> 1) & 0xF;
 if (rg >= mctl_count)
     return SCPE_NXM;
@@ -94,6 +98,10 @@ return SCPE_OK;
 
 t_stat mctl_wr (int32 data, int32 PA, int32 access)
 {
+/* Bus write dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 rg = (PA >> 1) & 0xF;
 if (rg >= mctl_count)
     return SCPE_NXM;
@@ -103,6 +111,10 @@ return SCPE_OK;
 
 t_stat mctl_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 rg;
 for (rg = 0; rg < MAX_MCTL_COUNT; rg++) {
     mctl_csr[rg] = 0;
@@ -113,6 +125,10 @@ return SCPE_OK;
 
 const char *mctl_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "memory controller";
 }
 
@@ -120,11 +136,22 @@ return "memory controller";
 
 void rom_wr_B (int32 pa, int32 val)
 {
+/* Shared ROM write hook.
+   This model does not use every parameter. */
+(void) pa;
+(void) val;
+
 return;
 }
 
 t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 memsize = (uint32)(MEMSIZE>>10);
 uint32 baseaddr = 0;
 uint32 csraddr = mctl_dib.ba;

@@ -30,7 +30,7 @@
    use "bison m68kasm.y -o m68kasm.c" to create m68kasm.c
 */
 
-#include "sim_defs.h"
+#include "altairz80_defs.h"
 #include <ctype.h>
 #include <string.h>
 
@@ -438,6 +438,10 @@ easr:
 
 static void yyerror(char* s)
 {
+	/* Generic parser callback signature.
+	   This implementation does not use every parameter. */
+	(void)s;
+
 	/* do not emit anything, but set error flag */
 	yyerrc = 1;
 }
@@ -595,6 +599,10 @@ static t_addr yyaddr;
 
 t_stat parse_sym_m68k(char* c, t_addr a, UNIT* u, t_value* val, int32 sw)
 {
+	/* Generic parse symbol signature.
+	   This implementation does not use every parameter. */
+	(void)u;
+
 	char ch;
 
 	if (!ophash) init_ophash();

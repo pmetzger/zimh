@@ -190,7 +190,6 @@ extern t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc);
 extern uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
                                int32 (*routine)(const int32, const int32, const int32), const char* name, uint8 unmap);
 extern int32 find_unit_index(UNIT *uptr);
-extern void raise_scp300f_interrupt(uint8 intnum);
 
 /* These are needed for DMA. */
 extern void PutByteDMA(const uint32 Addr, const uint32 Value);
@@ -414,6 +413,11 @@ static t_stat djhdc_detach(UNIT *uptr)
 /* Set geometry of the disk drive */
 static t_stat djhdc_unit_set_geometry(UNIT* uptr, int32 value, const char* cptr, void* desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) value;
+    (void) desc;
+
     DJHDC_DRIVE_INFO* pDrive;
     int32 i;
     int32 result;
@@ -467,6 +471,11 @@ static t_stat djhdc_unit_set_geometry(UNIT* uptr, int32 value, const char* cptr,
 /* Show geometry of the disk drive */
 static t_stat djhdc_unit_show_geometry(FILE* st, UNIT* uptr, int32 value, const void* desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) value;
+    (void) desc;
+
     DJHDC_DRIVE_INFO* pDrive;
     int32 i;
 

@@ -572,6 +572,11 @@ return;
 
 int32 machine_check (int32 p1, int32 opc, int32 cc, int32 delta)
 {
+/* System-specific machine-check hook.
+   This implementation does not use every parameter. */
+(void) opc;
+(void) delta;
+
 int32 acc;
 
 if (mchk_flag[cur_cpu])                                 /* double error? */
@@ -600,6 +605,10 @@ return cc;
 
 int32 con_halt (int32 code, int32 cc)
 {
+/* System-specific console halt hook.
+   This implementation does not use every parameter. */
+(void) code;
+
 if ((cpu_boot_cmd[0] == 0) ||                           /* saved boot cmd? */
     (vax820_boot_parse (0, cpu_boot_cmd) != SCPE_OK) || /* reparse the boot cmd */
     (reset_all (0) != SCPE_OK) ||                       /* reset the world */
@@ -689,6 +698,11 @@ return SCPE_NOFNC;
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic device boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 t_stat r;
 
 r = cpu_load_bootcode (BOOT_CODE_FILENAME, BOOT_CODE_ARRAY, BOOT_CODE_SIZE, FALSE, 0x200);
@@ -702,6 +716,10 @@ return SCPE_OK;
 
 t_stat bi_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 accs = ACCS_ON;                                         /* enabled by default */
 wcs_addr = 0;
 wcs_data = 0;
@@ -716,6 +734,11 @@ return SCPE_OK;
 
 t_stat show_nexus (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 fprintf (st, "nexus=%d", val);
 return SCPE_OK;
 }
@@ -794,6 +817,12 @@ return SCPE_OK;
 
 t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (cptr == NULL)
     return SCPE_ARG;
 if (strcmp(cptr, "8200") == 0) {
@@ -817,6 +846,13 @@ return SCPE_OK;
 
 t_stat cpu_model_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Initial memory size is 32MB.\n\n");
 fprintf (st, "The simulator is booted with the BOOT command:\n\n");
 fprintf (st, "   sim> BO{OT} <device>{/R5:flags}\n\n");

@@ -166,6 +166,10 @@ static REG vfdhd_reg[] = {
 #define VFDHD_NAME  "Vector Graphic FD-HD Controller"
 
 static const char* vfdhd_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return VFDHD_NAME;
 }
 

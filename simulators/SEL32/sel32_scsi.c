@@ -403,7 +403,7 @@ DEVICE  sbb_dev = {
 #endif
 
 /* convert sector disk address to star values (c,h,s) */
-uint32 scsisec2star(uint32 daddr, int type)
+static uint32 scsisec2star(uint32 daddr, int type)
 {
     int32 sec = daddr % scsi_type[type].spt;    /* get sector value */
     int32 spc = scsi_type[type].nhds * scsi_type[type].spt; /* sec per cyl */
@@ -417,6 +417,10 @@ uint32 scsisec2star(uint32 daddr, int type)
 /* start a disk operation */
 t_stat scsi_preio(UNIT *uptr, uint16 chan)
 {
+    /* Channel device callback signature.
+       This implementation does not use every parameter. */
+    (void)chan;
+
     DEVICE      *dptr = get_dev(uptr);
     uint16      chsa = GET_UADDR(uptr->CMD);
     int         unit = (uptr - dptr->units);
@@ -431,6 +435,10 @@ t_stat scsi_preio(UNIT *uptr, uint16 chan)
 
 t_stat scsi_startcmd(UNIT *uptr, uint16 chan,  uint8 cmd)
 {
+    /* Channel device callback signature.
+       This implementation does not use every parameter. */
+    (void)chan;
+
     uint16      chsa = GET_UADDR(uptr->CMD);
     DEVICE      *dptr = get_dev(uptr);
     int         unit = (uptr - dptr->units);
@@ -1435,6 +1443,10 @@ read_cap:                                       /* merge point from TCMD process
 /* initialize the disk */
 void scsi_ini(UNIT *uptr, t_bool f)
 {
+    /* Generic device initialization signature.
+       This implementation does not use every parameter. */
+    (void)f;
+
     DEVICE  *dptr = get_dev(uptr);
     int     i = GET_TYPE(uptr->flags);
 
@@ -1475,7 +1487,7 @@ t_stat scsi_reset(DEVICE *dptr)
 }
 
 /* create the disk file for the specified device */
-int scsi_format(UNIT *uptr) {
+static int scsi_format(UNIT *uptr) {
     int         type = GET_TYPE(uptr->flags);
     DEVICE      *dptr = get_dev(uptr);
     int32       ssize = scsi_type[type].ssiz * 4;   /* disk sector size in bytes */
@@ -1986,6 +1998,11 @@ t_stat scsi_boot(int32 unit_num, DEVICE *dptr) {
 /* Disk option setting commands */
 t_stat scsi_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)val;
+    (void)desc;
+
     int     i;
 
     if (cptr == NULL)                           /* any disk name input? */
@@ -2010,6 +2027,11 @@ t_stat scsi_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat scsi_get_type(FILE * st, UNIT *uptr, int32 v, const void *desc)
 {
+    /* Generic show command signature.
+       This implementation does not use every parameter. */
+    (void)v;
+    (void)desc;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fputs("TYPE=", st);
@@ -2021,6 +2043,12 @@ t_stat scsi_get_type(FILE * st, UNIT *uptr, int32 v, const void *desc)
 t_stat scsi_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
     const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)flag;
+    (void)cptr;
+
     int i;
     fprintf (st, "SEL-32 MFP SCSI Bus Disk Controller\r\n");
     fprintf (st, "Use:\r\n");
@@ -2046,6 +2074,10 @@ t_stat scsi_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
 
 const char *scsi_description (DEVICE *dptr)
 {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "SEL-32 MFP SCSI Disk Controller";
 }
 

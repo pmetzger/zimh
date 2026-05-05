@@ -100,5 +100,19 @@ typedef struct {
 } PNP_INFO;
 
 extern ChipType chiptype;
+extern int32 find_unit_index(UNIT *uptr);
+extern void hdsk_prepareRead(void);
+extern void hdsk_prepareWrite(void);
+extern void hdsk_setSelectedDisk(const int32 disk);
+extern void hdsk_setSelectedSector(const int32 sector);
+extern void hdsk_setSelectedTrack(const int32 track);
+extern void hdsk_setSelectedDMA(const int32 dma);
+extern int32 hdsk_getStatus(void);
+extern t_bool hdsk_checkParameters(void);
+extern int32 hdsk_read(void);
+extern int32 hdsk_write(void);
+extern int32 hdsk_flush(void);
+extern t_stat parse_sym_m68k(char *c, t_addr a, UNIT *u, t_value *val, int32 sw);
+extern void raise_scp300f_interrupt(uint8 isr_index);
 
 #endif

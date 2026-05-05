@@ -431,6 +431,10 @@ DEVICE dsk_dev = {
 
 t_stat dsk_chsel (uint32 ch, uint32 sel, uint32 unit)
 {
+/* Shared channel select signature.
+   This implementation does not use every parameter. */
+(void) unit;
+
 uint32 u;
 
 dsk_ch = ch;
@@ -1063,6 +1067,10 @@ return FALSE;
 
 t_stat dsk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 i;
 UNIT *uptr;
 
@@ -1113,6 +1121,11 @@ return dsk_show_format (stdout, uptr, 0, NULL);
 
 t_stat dsk_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 uint32 dtyp = GET_DTYPE (val);
 uint32 u = uptr - dsk_dev.units;
 UNIT *u1;
@@ -1136,6 +1149,10 @@ return SCPE_OK;
 
 t_stat dsk_show_format (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 uint32 a, t, k, u, tlim, dtyp, da;
 uint32 rptr, rlnt, rlim, rec, ctptr, *format;
 uint32 minrsz = DSK_BUFSIZ;

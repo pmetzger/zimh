@@ -294,6 +294,10 @@ t_stat i8272_setDMA(I8272* chip, uint32 dma_addr)
 
 t_stat i8272_io(IOHANDLER* ioh,uint32* value,uint32 rw,uint32 mask)
 {
+    /* Shared I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) mask;
+
     int port = ioh->offset;
     I8272* chip = (I8272*)ioh->ctxt;
     if (rw==MEM_WRITE)

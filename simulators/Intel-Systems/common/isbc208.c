@@ -522,6 +522,10 @@ extern uint16   PCX;
 
 int isbc208_onetime = 1;
 static const char* isbc208_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return isbc208_NAME;
 }
 
@@ -688,6 +692,11 @@ DEVICE isbc208_dev = {
 
 t_stat isbc208_cfg(uint16 baseport, uint16 devnum, uint8 intnum)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+    (void) intnum;
+
     int32 i;
     UNIT *uptr;
 
@@ -746,6 +755,10 @@ t_stat isbc208_clr(void)
 
 t_stat isbc208_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     isbc208_reset1();
     return SCPE_OK;
 }
@@ -828,6 +841,11 @@ t_stat isbc208_attach (UNIT *uptr, const char *cptr)
 
 t_stat isbc208_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     if (uptr->flags & UNIT_ATT)
         return sim_messagef (SCPE_ALATT, "%s is already attached to %s\n", sim_uname(uptr), uptr->filename);
     if (val & UNIT_WPMODE) {            /* write protect */
@@ -1072,6 +1090,10 @@ t_stat isbc208_svc (UNIT *uptr)
 // read/write FDC data register stack
 uint8 isbc208_r11(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read FDC data register */
 //        sim_printf("208 R11: Read data=%02X pcmd=%02X rsp=%d PCX=%04X\nA", data, pcmd, rsp, PCX);
         wsp = 0;                        /* clear write stack index */
@@ -1186,6 +1208,10 @@ uint8 isbc208_r11(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r0(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read current address CH 0 */
         if (i8237_rD) {                 /* high byte */
             i8237_rD = 0;
@@ -1208,6 +1234,10 @@ uint8 isbc208_r0(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r1(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read current word count CH 0 */
         if (i8237_rD) {                 /* high byte */
             i8237_rD = 0;
@@ -1230,6 +1260,10 @@ uint8 isbc208_r1(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r2(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read current address CH 1 */
         if (i8237_rD) {                 /* high byte */
             i8237_rD = 0;
@@ -1252,6 +1286,10 @@ uint8 isbc208_r2(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r3(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read current word count CH 1 */
         if (i8237_rD) {                 /* high byte */
             i8237_rD = 0;
@@ -1274,6 +1312,10 @@ uint8 isbc208_r3(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r4(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read current address CH 2 */
         if (i8237_rD) {                 /* high byte */
             i8237_rD = 0;
@@ -1296,6 +1338,10 @@ uint8 isbc208_r4(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r5(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read current word count CH 2 */
         if (i8237_rD) {                 /* high byte */
             i8237_rD = 0;
@@ -1318,6 +1364,10 @@ uint8 isbc208_r5(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r6(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read current address CH 3 */
         if (i8237_rD) {                 /* high byte */
             i8237_rD = 0;
@@ -1340,6 +1390,10 @@ uint8 isbc208_r6(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r7(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read current word count CH 3 */
         if (i8237_rD) {                 /* high byte */
             i8237_rD = 0;
@@ -1362,6 +1416,10 @@ uint8 isbc208_r7(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r8(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read status register */
         return (i8237_r8);
     } else {                            /* write command register */
@@ -1372,6 +1430,10 @@ uint8 isbc208_r8(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r9(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {
         return 0;
     } else {                            /* write request register */
@@ -1382,6 +1444,10 @@ uint8 isbc208_r9(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_rA(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {
         return 0;
     } else {                            /* write single mask register */
@@ -1417,6 +1483,10 @@ uint8 isbc208_rA(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_rB(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {
         return 0;
     } else {                            /* write mode register */
@@ -1427,6 +1497,11 @@ uint8 isbc208_rB(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_rC(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+    (void) devnum;
+
     if (io == 0) {
         return 0;
     } else {                            /* clear byte pointer FF */
@@ -1437,6 +1512,11 @@ uint8 isbc208_rC(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_rD(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+    (void) devnum;
+
     if (io == 0) {                      /* read temporary register */
         return 0;
     } else {                            /* master clear */
@@ -1447,6 +1527,11 @@ uint8 isbc208_rD(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_rE(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+    (void) devnum;
+
     if (io == 0) {
         return 0;
     } else {                            /* clear mask register */
@@ -1457,6 +1542,10 @@ uint8 isbc208_rE(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_rF(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {
         return 0;
     } else {                            /* write all mask register bits */
@@ -1467,6 +1556,11 @@ uint8 isbc208_rF(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r10(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+    (void) devnum;
+
     if (io == 0) {                      /* read FDC status register */
 //        sim_printf("FDC Status=%02X PCX=%04X\n", i8272_msr, PCX);
         return i8272_msr;
@@ -1477,6 +1571,10 @@ uint8 isbc208_r10(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r12(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read interrupt status */
         return (isbc208_i);
     } else {                            /* write controller auxillary port */
@@ -1487,6 +1585,11 @@ uint8 isbc208_r12(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r13(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+    (void) devnum;
+
     if (io == 0) {
         return 0;
     } else {                            /* reset controller */
@@ -1497,6 +1600,10 @@ uint8 isbc208_r13(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r14(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {
         return 0;
     } else {                            /* Low-Byte Segment Address Register */
@@ -1507,6 +1614,10 @@ uint8 isbc208_r14(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc208_r15(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {
         return 0;
     } else {                            /* High-Byte Segment Address Register */

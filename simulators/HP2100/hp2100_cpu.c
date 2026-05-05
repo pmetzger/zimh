@@ -2230,6 +2230,10 @@ return status;                                          /* return the status cod
 
 void cpu_post_cmd (t_bool from_scp)
 {
+/* SCP post-command hook signature.
+   This implementation does not use every parameter. */
+(void) from_scp;
+
 if (MR != saved_MR) {                                   /* if M has changed since the last update */
     saved_MR = MR;                                      /*   then save the new M value */
     TR = mem_fast_read (MR, Current_Map);               /*     and set T to the contents of the addressed location */
@@ -3115,6 +3119,11 @@ else {                                                  /* otherwise */
 
 static SIGNALS_VALUE cpu_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+(void) inbound_value;
+
 static INBOUND_SET last_signal_set = ioNONE;            /* the last set of I/O signals processed */
 INBOUND_SIGNAL     signal;
 INBOUND_SET        working_set = inbound_signals;
@@ -3239,6 +3248,10 @@ return outbound;                                        /* return the outbound s
 
 static SIGNALS_VALUE ovf_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
 SIGNALS_VALUE  outbound    = { ioNONE, 0 };
@@ -3327,6 +3340,11 @@ return outbound;                                        /* return the outbound s
 
 static SIGNALS_VALUE pwr_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+(void) inbound_value;
+
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
 SIGNALS_VALUE  outbound    = { ioNONE, 0 };
@@ -3403,6 +3421,10 @@ return outbound;                                        /* return the outbound s
 
 static t_stat cpu_examine (t_value *eval_array, t_addr address, UNIT *uptr, int32 switches)
 {
+/* Generic memory access signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 uint32 index;
 
 index = meu_map_address ((HP_WORD) address, switches);  /* map the supplied address as directed by the switches */
@@ -3447,6 +3469,10 @@ return SCPE_OK;                                         /* return success status
 
 static t_stat cpu_deposit (t_value value, t_addr address, UNIT *uptr, int32 switches)
 {
+/* Generic memory access signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 uint32 index;
 
 index = meu_map_address ((HP_WORD) address, switches);  /* map the supplied address as directed by the switches */
@@ -3592,6 +3618,11 @@ return SCPE_OK;
 
 static t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic device boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 const int32 select_code = IBL_SC  (SR);                 /* the select code from S register bits 11-6 */
 const int32 rom_socket  = IBL_ROM (SR);                 /* the ROM socket number from S register bits 15-14 */
 
@@ -3642,6 +3673,11 @@ else                                                    /* otherwise this is a 2
 
 static t_stat set_stops (UNIT *uptr, int32 option, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 char gbuf [CBUFSIZE];
 t_stat status;
 uint32 stop;
@@ -3735,6 +3771,11 @@ return SCPE_OK;                                         /* the stops were succes
 
 static t_stat set_size (UNIT *uptr, int32 new_size, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 static const char confirm [] = "Really truncate memory [N]?";
 const uint32 model = UNIT_MODEL (cpu_unit [0].flags);   /* the current CPU model index */
 int32 old_size = (int32) mem_size;                      /* current memory size */
@@ -3807,6 +3848,11 @@ return SCPE_OK;
 
 static t_stat set_model (UNIT *uptr, int32 new_model, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 const FEATURE_TABLE new_cpu = cpu_features [UNIT_MODEL (new_model)];    /* get the features describing the new model */
 uint32 new_memsize;
 t_stat result;
@@ -3879,6 +3925,11 @@ return result;
 
 static t_stat set_option (UNIT *uptr, int32 option, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 const uint32 model = UNIT_MODEL (uptr->flags);          /* the current CPU model index */
 
 if ((cpu_features [model].opt & option) == 0)           /* if the option is not available for the current CPU */
@@ -3927,6 +3978,11 @@ return SCPE_OK;
 
 static t_stat clear_option (UNIT *uptr, int32 option, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 const uint32 model = UNIT_MODEL (uptr->flags);          /* the current CPU model index */
 
 if ((cpu_features [model].opt & option) == 0)           /* if the option is not available for the current CPU */
@@ -3988,6 +4044,12 @@ return SCPE_OK;
 
 static t_stat set_loader (UNIT *uptr, int32 enable, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 static MEMORY_WORD loader [IBL_SIZE];                       /* the shadow memory for the currently disabled loader */
 const  t_bool currently_enabled = (mem_end == mem_size);    /* TRUE if the loader is currently enabled */
 
@@ -4050,6 +4112,12 @@ return SCPE_OK;
 
 static t_stat set_roms (UNIT *uptr, int32 option, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) option;
+(void) desc;
+
 DEVICE *dptr;
 char   gbuf [CBUFSIZE];
 uint32 socket = 0;
@@ -4121,6 +4189,11 @@ return SCPE_OK;                                         /* report that the comma
 
 static t_stat set_exec (UNIT *uptr, int32 option, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 char   gbuf [CBUFSIZE];
 uint32 match, mask, radix;
 t_stat status;
@@ -4204,6 +4277,11 @@ else {                                                  /* otherwise at least on
 
 static t_stat show_stops (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 uint32 stop;
 t_bool need_spacer = FALSE;
 
@@ -4240,6 +4318,11 @@ return SCPE_OK;                                         /* report the success of
 
 static t_stat show_model (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 fputs ((const char *) desc, st);                        /* output the CPU model name */
 
 if (!(cpu_configuration & CPU_1000))                    /* if the CPU is a 2100 or 21xx */
@@ -4288,6 +4371,12 @@ return SCPE_OK;
 
 static t_stat show_roms (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 const char *cname, *dname;
 DIB    *dibptr;
 uint32 socket;
@@ -4370,6 +4459,12 @@ return SCPE_OK;                                         /* return success status
 
 static t_stat show_cage (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 const char *cname, *dname;
 uint32 sc, last_sc;
 
@@ -4420,6 +4515,12 @@ return SCPE_OK;                                         /* return success status
 
 static t_stat show_exec (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 radix;
 
 if (exec_mask == 0)                                     /* if the instruction is entirely masked */
@@ -4460,6 +4561,12 @@ return SCPE_OK;                                         /* report the success of
 
 static t_stat show_speed (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "Simulation speed = %ux\n", cpu_speed);    /* display the current CPU speed */
 return SCPE_OK;                                         /*   and report success */
 }

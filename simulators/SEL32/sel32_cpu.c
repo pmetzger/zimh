@@ -36,7 +36,6 @@ struct  ipcom   *IPC = 0;
 #else /* USE_IPU_THREAD */
 /* running IPU thread on CPU, n/u in IPU fork */
 /* this is different than IPU defines */
-extern  void   *ipu_sim_instr(void *value);
 int             MyIndex;
 int             PeerIndex;
 pthread_t       ipuThread;                  /* thread structure */
@@ -147,7 +146,6 @@ LOCAL  t_stat Mem_write(uint32 addr, uint32 *data);
 extern t_stat checkxio(uint16 addr, uint32 *status);    /* XIO check in chan.c */
 extern t_stat startxio(uint16 addr, uint32 *status);    /* XIO start in chan.c */
 extern t_stat testxio(uint16 addr, uint32 *status);     /* XIO test in chan.c */
-extern t_stat stopxio(uint16 addr, uint32 *status);     /* XIO stop in chan.c */
 extern t_stat rschnlxio(uint16 addr, uint32 *status);   /* reset channel XIO */
 extern t_stat haltxio(uint16 addr, uint32 *status);     /* halt XIO */
 extern t_stat grabxio(uint16 addr, uint32 *status);     /* grab XIO n/u */
@@ -156,7 +154,6 @@ extern t_stat chan_set_devs(void);                          /* set up the define
 extern uint32 scan_chan(uint32 *ilev);                  /* go scan for I/O int pending */
 extern uint32 cont_chan(uint16 chsa);                   /* continue channel program */
 extern uint16 loading;                                  /* set when doing IPL */
-extern int fprint_inst(FILE *of, uint32 val, int32 sw); /* instruction print function */
 LOCAL  int irq_pend = 0;                                /* go scan for pending interrupt */
 extern void rtc_setup(uint32 ss, uint32 level);         /* tell rtc to start/stop */
 extern void itm_setup(uint32 ss, uint32 level);         /* tell itm to start/stop */
@@ -542,7 +539,7 @@ LOCAL void clr_simsem()
 }
 #else
 /* use pthread mutexs */
-LOCAL void lock_mutex(void)
+static void lock_mutex(void)
 {
     if (IPC != 0) {
         if (pthread_mutex_trylock((pthread_mutex_t *)&(IPC->mutex)) == 0) {
@@ -555,7 +552,7 @@ LOCAL void lock_mutex(void)
     }
 }
 
-LOCAL void unlock_mutex(void)
+static void unlock_mutex(void)
 {
     if (IPC) {
         pthread_mutex_unlock((pthread_mutex_t *)&(IPC->mutex));
@@ -1786,7 +1783,7 @@ LOCAL t_stat Mem_write(uint32 addr, uint32 *data)
 
 /* function to set the CCs in PSD1 */
 /* ovr is setting for CC1 */
-LOCAL void set_CCs(uint32 value, int ovr)
+static void set_CCs(uint32 value, int ovr)
 {
     PSD1 &= 0x87FFFFFE;                             /* clear the old CC's */
     if (ovr)
@@ -7760,6 +7757,10 @@ LOCAL uint32 def_tape = 0x1000;                     /* tape device 10, device 0 
 /* do any one time initialization here for cpu */
 t_stat cpu_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     int     i;
     t_stat  devs = SCPE_OK;
 
@@ -7942,6 +7943,10 @@ t_stat cpu_reset(DEVICE *dptr)
 /* examine a 32bit memory location and return a byte */
 t_stat cpu_ex(t_value *vptr, t_addr baddr, UNIT *uptr, int32 sw)
 {
+    /* Generic examine signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+
     uint32 status, realaddr, prot;
     uint32 addr = (baddr & 0xfffffc) >> 2;          /* make 24 bit byte address into word address */
 
@@ -7969,6 +7974,11 @@ t_stat cpu_ex(t_value *vptr, t_addr baddr, UNIT *uptr, int32 sw)
 /* address is byte address with bits 30,31 = 0 */
 t_stat cpu_dep(t_value val, t_addr baddr, UNIT *uptr, int32 sw)
 {
+    /* Generic deposit signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)sw;
+
     uint32 addr = (baddr & 0xfffffc) >> 2;          /* make 24 bit byte address into word address */
     static const uint32 bmasks[4] = {0x00FFFFFF, 0xFF00FFFF, 0xFFFF00FF, 0xFFFFFF00};
 
@@ -7998,6 +8008,12 @@ uint32 memwds [] = {
 
 t_stat cpu_set_size(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)cptr;
+    (void)desc;
+
     uint32      i;
     uint32      sz;
     int32       val = (int32)sval;
@@ -8035,6 +8051,13 @@ t_stat cpu_set_size(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 #ifdef DEFINE_IPU_MODELS
 t_stat cpu_set_ipu(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)sval;
+    (void)cptr;
+    (void)desc;
+
 //  sim_printf("cpu_set_ipu sval %x cptr %s desc %s\n", sval, cptr, (char *)desc);
 #ifdef CPUONLY
     sim_printf("IPU not available for this version of sel32\n");
@@ -8055,6 +8078,13 @@ t_stat cpu_set_ipu(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 
 t_stat cpu_clr_ipu(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)sval;
+    (void)cptr;
+    (void)desc;
+
     cpu_unit.flags &= ~UNIT_IPU;                    /* disable IPU for this MODEL */
 #ifdef USE_IPU_THREAD
     ipu_unit.flags = cpu_unit.flags;                /* tell ipu about cpu flags */
@@ -8065,6 +8095,13 @@ t_stat cpu_clr_ipu(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 
 t_stat cpu_show_ipu(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show command signature.
+       This implementation does not use every parameter. */
+    (void)st;
+    (void)uptr;
+    (void)val;
+    (void)desc;
+
     if (IPU_MODEL)
         sim_printf("IPU enabled\n");
     else
@@ -8079,6 +8116,12 @@ t_stat cpu_show_ipu(FILE *st, UNIT *uptr, int32 val, const void *desc)
 t_stat
 cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+    (void)desc;
+
     int32               i, lnt;
     t_stat              r;
 
@@ -8111,6 +8154,11 @@ cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
 /* Show history */
 t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+
     int32               k, di, lnt;
     char               *cptr = (char *) desc;
     t_stat              r;
@@ -8168,11 +8216,22 @@ t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 /* return description for the specified device */
 const char *cpu_description (DEVICE *dptr)
 {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "SEL 32 CPU";                            /* return description */
 }
 
 t_stat cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+    (void)uptr;
+    (void)flag;
+    (void)cptr;
+
     fprintf(st, "The CPU can maintain a history of the most recently executed instructions.\n");
     fprintf(st, "This is controlled by the SET CPU HISTORY and SHOW CPU HISTORY commands:\n\n");
     fprintf(st, "   sim> SET CPU HISTORY            clear history buffer\n");

@@ -53,6 +53,10 @@ extern uint8 isbc464_get_mbyte(uint16 addr);
 /* local globals */
 
 static const char* multibus_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return multibus_NAME;
 }
 
@@ -119,6 +123,10 @@ DEVICE multibus_dev = {
 
 t_stat multibus_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
 //    if (SBC_reset(NULL) == 0) {
 //        sim_printf("  Multibus: Reset\n");
         sim_activate (&multibus_unit, multibus_unit.wait); /* activate unit */
@@ -133,6 +141,10 @@ t_stat multibus_reset(DEVICE *dptr)
 
 t_stat multibus_svc(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     sim_activate (&multibus_unit, multibus_unit.wait); /* continue poll */
     return SCPE_OK;
 }

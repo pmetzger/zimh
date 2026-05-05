@@ -550,6 +550,10 @@ return;
 
 t_stat rl_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 UNIT *uptr;
 
@@ -607,6 +611,11 @@ return SCPE_OK;
 
 t_stat rl_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (uptr->flags & UNIT_ATT)
     return SCPE_ALATT;
 uptr->capac = (val & UNIT_RL02)? RL02_SIZE: RL01_SIZE;
@@ -631,6 +640,12 @@ return SCPE_OK;
 
 t_stat rl_set_bad (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) cptr;
+(void) desc;
+
 int32 i, da = RL_BBMAP * RL_NUMBY;
 
 if ((uptr->flags & UNIT_ATT) == 0)
@@ -691,6 +706,10 @@ static const uint16 boot_rom[] = {
 
 t_stat rl_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 if (unitno)                                             /* only unit 0 */
@@ -706,5 +725,9 @@ return SCPE_OK;
 
 const char *rl_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "RL8A cartridge disk";
 }

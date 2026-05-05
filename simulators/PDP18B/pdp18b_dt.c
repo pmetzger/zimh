@@ -465,6 +465,10 @@ DEVICE dt_dev = {
 #if defined (TC02)                                      /* TC02/TC15 */
 int32 dt75 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 old_dtsa = dtsa, fnc;
 UNIT *uptr;
 
@@ -506,6 +510,10 @@ return dat;
 
 int32 dt76 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if ((pulse & 01) && (dtsb & DTB_DTF))                   /* DTDF */
     return IOT_SKP + dat;
 return dat;
@@ -514,6 +522,10 @@ return dat;
 #else                                                   /* Type 550 */
 int32 dt75 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if (((pulse & 041) == 001) && (dtsb & DTB_DTF))         /* MMDF */
     dat = dat | IOT_SKP;
 else if (((pulse & 041) == 041) && (dtsb & DTB_ERF))    /* MMEF */
@@ -532,6 +544,10 @@ return dat;
 
 int32 dt76 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 fnc, mot, unum;
 UNIT *uptr = NULL;
 
@@ -1375,6 +1391,10 @@ return 0;                                               /* all others */
 
 t_stat dt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i, prev_mot;
 UNIT *uptr;
 

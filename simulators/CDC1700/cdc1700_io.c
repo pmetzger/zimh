@@ -87,6 +87,11 @@ devINTR *IOintr[16];
  */
 t_stat show_addr(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   DEVICE *dptr;
   IO_DEVICE *iod;
 
@@ -119,6 +124,11 @@ t_stat show_addr(FILE *st, UNIT *uptr, int32 val, const void *desc)
  */
 t_stat set_stoponrej(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   DEVICE *dptr;
 
   if (cptr != NULL)
@@ -134,6 +144,11 @@ t_stat set_stoponrej(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat clr_stoponrej(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   DEVICE *dptr;
 
   if (cptr != NULL)
@@ -152,6 +167,11 @@ t_stat clr_stoponrej(UNIT *uptr, int32 val, const char *cptr, void *desc)
  */
 t_stat set_protected(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   DEVICE *dptr;
 
   if (cptr != NULL)
@@ -167,6 +187,11 @@ t_stat set_protected(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat clear_protected(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   DEVICE *dptr;
 
   if (cptr != NULL)
@@ -187,15 +212,19 @@ t_stat clear_protected(UNIT *uptr, int32 val, const char *cptr, void *desc)
 /*
  * Interrupt status for a non-existent device
  */
-uint16 noneINTR(DEVICE *dptr)
+static uint16 noneINTR(DEVICE *dptr)
 {
+  /* Generic device interrupt signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   return 0;
 }
 
 /*
  * Generic device interrupt status
  */
-uint16 deviceINTR(DEVICE *dptr)
+static uint16 deviceINTR(DEVICE *dptr)
 {
   IO_DEVICE *iod = (IO_DEVICE *)dptr->ctxt;
 
@@ -480,6 +509,11 @@ enum IOstatus doIO(t_bool output, DEVICE **device)
  */
 static enum IOstatus notPresent(DEVICE *dev, t_bool output)
 {
+  /* Generic device I/O signature.
+     This implementation does not use every parameter. */
+  (void) dev;
+  (void) output;
+
   if ((cpu_dev.dctrl & DBG_MISSING) != 0) {
     fprintf(DBGOUT,
             "%sAccess to missing device (Q: %04X, Equipment: %2u)\r\n",

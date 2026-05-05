@@ -307,6 +307,11 @@ mode, and starts the processor running.
 
 int32 petr (int32 inst, int32 dev, int32 dat)
 {
+    /* TX-0 I/O instruction signature.
+       This implementation does not use every parameter. */
+    (void) dev;
+    (void) dat;
+
     int32 tmpAC = 0;
     int i = 0;
     t_stat result;
@@ -379,6 +384,10 @@ return SCPE_OK;
 
 t_stat petr_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     petr_state = 0;                                          /* clear state */
     petr_wait = 0;
     petr_hold = 0;
@@ -406,6 +415,11 @@ extern UNIT cpu_unit;
 /* Switches the CPU to READIN mode and starts execution. */
 t_stat petr_boot (int32 unitno, DEVICE *dptr)
 {
+    /* Generic bootstrap signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+    (void) dptr;
+
     t_stat reason = SCPE_OK;
 
 #ifdef SANITY_CHECK_TAPE
@@ -516,6 +530,11 @@ t_stat petr_boot (int32 unitno, DEVICE *dptr)
 
 int32 ptp (int32 inst, int32 dev, int32 dat)
 {
+    /* TX-0 I/O instruction signature.
+       This implementation does not use every parameter. */
+    (void) inst;
+    (void) dev;
+
     iosta = iosta & ~IOS_PTP;                               /* clear flag */
     ptp_unit.buf = dat & 0177;
     ptp_svc (&ptp_unit);
@@ -543,6 +562,10 @@ t_stat ptp_svc (UNIT *uptr)
 
 t_stat ptp_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     ptp_unit.buf = 0;                                       /* clear state */
     iosta = iosta & ~IOS_PTP;                               /* clear flag */
     sim_cancel (&ptp_unit);                                 /* deactivate unit */
@@ -553,12 +576,23 @@ t_stat ptp_reset (DEVICE *dptr)
 
 int32 tti (int32 inst, int32 dev, int32 dat)
 {
+    /* TX-0 I/O instruction signature.
+       This implementation does not use every parameter. */
+    (void) inst;
+    (void) dev;
+    (void) dat;
+
     iosta = iosta & ~IOS_TTI;                               /* clear flag */
     return tty_buf & 077;
 }
 
 int32 tto (int32 inst, int32 dev, int32 dat)
 {
+    /* TX-0 I/O instruction signature.
+       This implementation does not use every parameter. */
+    (void) inst;
+    (void) dev;
+
     tty_buf = dat & TT_WIDTH;                               /* load buffer */
     ios = 0;
     tto_svc(&tto_unit);
@@ -627,6 +661,10 @@ t_stat tto_svc (UNIT *uptr)
 
 t_stat tty_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     tmxr_set_console_units (&tti_unit, &tto_unit);
     tty_buf = 0;                                            /* clear buffer */
     tty_uc = 0;                                             /* clear case */

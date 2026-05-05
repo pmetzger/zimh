@@ -419,6 +419,12 @@ dsk_svc (UNIT *uptr)
 t_stat
 dsk_set_dct (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32 dct;
     t_stat r;
 
@@ -434,6 +440,11 @@ dsk_set_dct (UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 dsk_show_dct (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) val;
+   (void) desc;
+
    if (uptr == NULL)
       return SCPE_IERR;
 
@@ -461,6 +472,11 @@ dsk_reset(DEVICE * dptr)
 t_stat
 dsk_boot(int32 unit_num, DEVICE * dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unit_num;
+    (void) dptr;
+
     return SCPE_OK;
 }
 
@@ -492,6 +508,12 @@ dsk_detach (UNIT *uptr)
 t_stat
 dsk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
 fprintf (st, "The DSK controller implements the 270 disk controller for the PDP6\n");
 fprintf (st, "Options include the ability to set units write enabled or write locked\n");
 fprint_set_help (st, dptr);
@@ -503,7 +525,11 @@ return SCPE_OK;
 
 const char *dsk_description (DEVICE *dptr)
 {
-return "270 disk controller";
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
+    return "270 disk controller";
 }
 
 #endif

@@ -1670,6 +1670,11 @@ return SCPE_OK;
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic CPU boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 return SCPE_ARG;
 }
 
@@ -1677,6 +1682,10 @@ return SCPE_ARG;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if (vptr == NULL) return SCPE_ARG;
 if (sw & SWMASK ('V') && dmapen) {
     addr = trans_c (addr);
@@ -1693,6 +1702,10 @@ return SCPE_NXM;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if (sw & SWMASK ('V') && dmapen) {
     addr = trans_c (addr);
     if (addr == M64) return STOP_MME;
@@ -1708,6 +1721,12 @@ return SCPE_NXM;
 
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 t_uint64 mc = 0;
 uint32 i, clim;
 t_uint64 *nM = NULL;
@@ -1729,6 +1748,10 @@ return SCPE_OK;
 
 t_stat cpu_show_virt (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+
 t_stat r;
 const char *cptr = (const char *) desc;
 t_uint64 va, pa;
@@ -1759,6 +1782,12 @@ return SCPE_OK;
 
 t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 i, lnt;
 t_stat r;
 
@@ -1839,6 +1868,11 @@ return SCPE_OK;
 
 t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 k, di, lnt;
 const char *cptr = (const char *) desc;
 t_stat r;

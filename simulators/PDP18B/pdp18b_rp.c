@@ -229,6 +229,10 @@ DEVICE rp_dev = {
 
 int32 rp63 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 sb = pulse & 060;                                 /* subopcode */
 
 rp_updsta (0, 0);
@@ -283,6 +287,10 @@ return dat;
 
 int32 rp64 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 u, f, c, sb;
 UNIT *uptr;
 
@@ -502,6 +510,10 @@ return;
 
 t_stat rp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 UNIT *uptr;
 
@@ -549,6 +561,11 @@ return reason;
 
 t_stat rp_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (uptr->flags & UNIT_ATT)
     return SCPE_ALATT;
 uptr->capac = RP_QSIZE (val);

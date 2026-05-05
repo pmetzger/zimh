@@ -1506,6 +1506,10 @@ return;
 
 t_stat fpp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_cancel (&fpp_unit);
 fpp_flag = 0;
 fpp_last_lockbit = 0;
@@ -1532,5 +1536,9 @@ return SCPE_OK;
 
 const char *fpp_description (DEVICE *dptr)
 {
+/* Generic description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "FPP8A floating point processor";
 }

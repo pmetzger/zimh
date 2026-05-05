@@ -507,6 +507,12 @@ static void do_poly (int unit, t_bool step)
 
 static t_stat set_units (UNIT *u, int32 val, const char *s, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) u;
+    (void) val;
+    (void) desc;
+
     uint32      i, units;
     t_stat      stat;
 
@@ -533,6 +539,12 @@ static t_stat set_units (UNIT *u, int32 val, const char *s, void *desc)
 
 t_stat kg_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
 const char *const text =
 /*567901234567890123456789012345678901234567890123456789012345678901234567890*/
 " KG11-A Communications Arithmetic Option (KG)\n"
@@ -549,6 +561,7 @@ const char *const text =
 " The KG is disabled by default.\n"
 /*567901234567890123456789012345678901234567890123456789012345678901234567890*/
 "\n";
+
 fprintf (st, "%s", text);
 fprint_set_help (st, dptr);
 fprint_show_help (st, dptr);
@@ -558,5 +571,9 @@ return SCPE_OK;
 
 const char *kg_description (DEVICE *dptr)
 {
-return "KG11-A Communications Arithmetic Option";
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
+    return "KG11-A Communications Arithmetic Option";
 }

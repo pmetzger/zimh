@@ -377,6 +377,10 @@ DEVICE tbg_dev = {
 
 static SIGNALS_VALUE tbg_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
 SIGNALS_VALUE  outbound    = { ioNONE, 0 };

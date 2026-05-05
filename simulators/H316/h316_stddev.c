@@ -345,6 +345,10 @@ DEVICE clk_dev = {
 
 int32 ptrio (int32 inst, int32 fnc, int32 dat, int32 dev)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 switch (inst) {                                         /* case on opcode */
 
     case ioOCP:                                         /* OCP */
@@ -457,6 +461,10 @@ return detach_unit (uptr);
 
 t_stat ptr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 CLR_INT (INT_PTR);                                      /* clear ready, enb */
 CLR_ENB (INT_PTR);
 ptr_unit.buf = 0;                                       /* clear buffer */
@@ -491,6 +499,11 @@ static const int32 pboot[] = {
 
 t_stat ptr_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 size_t i;
 
 for (i = 0; i < PBOOT_SIZE; i++)                        /* copy bootstrap */
@@ -503,6 +516,10 @@ return SCPE_OK;
 
 int32 ptpio (int32 inst, int32 fnc, int32 dat, int32 dev)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 switch (inst) {                                         /* case on opcode */
 
     case ioOCP:                                         /* OCP */
@@ -576,6 +593,10 @@ return SCPE_OK;
 
 t_stat ptp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmxr_set_console_units (&tty_unit[TTR], &tty_unit[TTO]);
 CLR_INT (INT_PTP);                                      /* clear ready, enb */
 CLR_ENB (INT_PTP);
@@ -590,6 +611,10 @@ return SCPE_OK;
 
 int32 ttyio (int32 inst, int32 fnc, int32 dat, int32 dev)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 switch (inst) {                                         /* case on opcode */
 
     case ioOCP:                                         /* OCP */
@@ -818,6 +843,10 @@ return SCPE_OK;
 
 t_stat tty_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 CLR_INT (INT_TTY);                                      /* clear ready, enb */
 CLR_ENB (INT_TTY);
 tty_mode = 0;                                           /* mode = input */
@@ -839,6 +868,11 @@ return SCPE_OK;
 
 t_stat ttio_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (uptr->flags & UNIT_ATTABLE)                         /* not TTR, TTP */
     return SCPE_NOFNC;
 tty_unit[TTO].flags = (tty_unit[TTO].flags & ~TT_MODE) | val;
@@ -852,6 +886,11 @@ return SCPE_OK;
 
 t_stat ttrp_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (!(uptr->flags & UNIT_ATTABLE))                      /* PTR, PTP, TTR, TTP only */
     return SCPE_NOFNC;
 if (!(val & UNIT_UASC))
@@ -863,6 +902,11 @@ return SCPE_OK;
 
 t_stat ttrp_set_start_stop (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (!(uptr->flags & UNIT_ATTABLE))                      /* TTR, TTP only */
     return SCPE_NOFNC;
 if (!(uptr->flags & UNIT_ATT))                          /* must be attached */
@@ -880,6 +924,10 @@ return SCPE_OK;
 
 int32 clkio (int32 inst, int32 fnc, int32 dat, int32 dev)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 switch (inst) {                                         /* case on opcode */
 
     case ioOCP:                                         /* OCP */
@@ -944,6 +992,10 @@ return SCPE_OK;
 
 t_stat clk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_register_clock_unit (&clk_unit);                    /* declare clock unit */
 CLR_INT (INT_CLK);                                      /* clear ready, enb */
 CLR_ENB (INT_CLK);
@@ -955,6 +1007,11 @@ return SCPE_OK;
 
 t_stat clk_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if (cptr)
     return SCPE_ARG;
 if ((val != 50) && (val != 60))
@@ -967,6 +1024,12 @@ return SCPE_OK;
 
 t_stat clk_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, (clk_tps == 50)? "50Hz": "60Hz");
 return SCPE_OK;
 }

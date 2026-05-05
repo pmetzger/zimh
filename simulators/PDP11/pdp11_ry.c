@@ -262,6 +262,10 @@ DEVICE ry_dev = {
 
 t_stat ry_rd (int32 *data, int32 PA, int32 access)
 {
+/* Generic I/O page read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 1) {                                /* decode PA<1> */
 
     case 0:                                             /* RYCS */
@@ -606,6 +610,11 @@ return attach_unit (uptr, cptr);
 
 t_stat ry_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (uptr->flags & UNIT_ATT)
     return SCPE_ALATT;
 uptr->capac = val? RY_SIZE: RX_SIZE;
@@ -685,6 +694,10 @@ static const uint16 boot_rom[] = {
 
 t_stat ry_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 if ((ry_unit[unitno & RX_M_NUMDR].flags & UNIT_DEN) == 0)
@@ -701,6 +714,11 @@ return SCPE_OK;
 
 t_stat ry_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 return SCPE_NOFNC;
 }
 
@@ -708,6 +726,12 @@ return SCPE_NOFNC;
 
 t_stat ry_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "RX211/RX02 Floppy Disk\n\n");
 fprintf (st, "RX211 options include the ability to set units write enabled or write locked,\n");
 fprintf (st, "single or double density, or autosized:\n\n");
@@ -730,6 +754,10 @@ return SCPE_OK;
 
 const char *ry_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return (UNIBUS) ? "RX211 floppy disk controller" :
                   "RXV21 floppy disk controller";
 }

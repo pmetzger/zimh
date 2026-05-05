@@ -525,6 +525,10 @@ return SCPE_OK;
 
 t_stat tlb_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 itlb_reset ();
 dtlb_reset ();
 return SCPE_OK;

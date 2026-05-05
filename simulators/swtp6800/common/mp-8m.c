@@ -100,6 +100,10 @@ DEVICE mp_8m_dev = {
 
 t_stat mp_8m_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int32 i;
     UNIT *uptr;
 

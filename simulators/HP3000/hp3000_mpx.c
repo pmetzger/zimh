@@ -1195,6 +1195,10 @@ return;
 
 void mpx_service (uint32 ticks_elapsed)
 {
+/* Shared channel service signature.
+   This implementation does not use every parameter. */
+(void) ticks_elapsed;
+
 DIB          *dibptr;
 int32        cycles;
 uint32       srn, mask, priority_mask;
@@ -1637,6 +1641,10 @@ return;
 
 static SIGNALS_DATA mpx_interface (DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* Generic DIB interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 uint32         address;
 SIO_ORDER      sio_order;
 INBOUND_SIGNAL signal;
@@ -1856,6 +1864,10 @@ return IORETURN (outbound_signals, outbound_value);     /* return the outbound s
 
 static t_stat mpx_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 state_reg = 0;                                          /* clear the state */
 aux_reg   = 0;                                          /*   and auxiliary registers */
 

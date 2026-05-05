@@ -596,7 +596,7 @@ static int32 scp300fdev(const int32 port, const int32 io, const int32 data)
     }
 }
 
-int days_since_1980(void) {
+static int days_since_1980(void) {
     time_t jan1980 = 315532800;
     time_t now;
     time_t local_now;
@@ -930,6 +930,12 @@ static t_stat scp300f_svc(UNIT* uptr)
 /* Set ROM to Tarbell or Cromemco 16FDC */
 static t_stat scp300f_dev_set_rom(UNIT* uptr, int32 value, const char* cptr, void* desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+    (void) desc;
+
     if (cptr == NULL)
         return SCPE_ARG;
 
@@ -952,6 +958,12 @@ static t_stat scp300f_dev_set_rom(UNIT* uptr, int32 value, const char* cptr, voi
 /* Show current ROM selection */
 static t_stat scp300f_dev_show_rom(FILE* st, UNIT* uptr, int32 value, const void* desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+    (void) desc;
+
     fprintf(st, "ROM=%s", scp300f_rom_type_str[scp300f_info->rom_type]);
 
     return SCPE_OK;

@@ -145,6 +145,10 @@ static REG mfdc_reg[] = {
 #define MDSK_NAME   "Micropolis FD Control"
 
 static const char* mfdc_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return MDSK_NAME;
 }
 

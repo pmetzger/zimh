@@ -19,6 +19,7 @@
 #include "test_support.h"
 
 #include "ibm1130_defs.h"
+#include "ibm1130_fmt.h"
 
 UNIT cpu_unit = {0};
 int cgi = 0;

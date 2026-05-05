@@ -279,6 +279,10 @@ const char *sim_stop_messages[SCPE_BASE] = {
 
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void)fnam;
+
 int32 c[6], d, i, cnt, csum;
 uint32 org;
 
@@ -540,7 +544,7 @@ static const char r50_to_asc[] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ$._0123456789";
         count   =       -number of extra words retired
 */
 
-int32 fprint_spec (FILE *of, t_addr addr, int32 spec, t_value nval,
+static int32 fprint_spec (FILE *of, t_addr addr, int32 spec, t_value nval,
     int32 flag, int32 iflag)
 {
 int32 reg, mode;
@@ -794,7 +798,7 @@ return SCPE_ARG;                                        /* no match */
                         < 0 if error
 */
 
-int32 get_reg (char *cptr, const char *strings[], char mchar)
+static int32 get_reg (char *cptr, const char *strings[], char mchar)
 {
 int32 i;
 
@@ -820,7 +824,7 @@ return -1;
    Flags: 0 (no result), A_NUM (number), A_REL (relative)
 */
 
-char *get_addr (char *cptr, int32 *dptr, int32 *pflag)
+static char *get_addr (char *cptr, int32 *dptr, int32 *pflag)
 {
 int32 val, minus;
 char *tptr;
@@ -872,7 +876,7 @@ return tptr;
                         = +1 error
 */
 
-t_stat get_spec (char *cptr, t_addr addr, int32 n1, int32 *sptr, t_value *dptr,
+static t_stat get_spec (char *cptr, t_addr addr, int32 n1, int32 *sptr, t_value *dptr,
     int32 cflag, int32 iflag)
 {
 int32 reg, indir, pflag, disp = 0;

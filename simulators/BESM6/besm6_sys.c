@@ -76,7 +76,7 @@ static const char *opname_long_madlen [16] = {
  * Выдача мнемоники по коду инструкции.
  * Код должен быть в диапазоне 000..077 или 0200..0370.
  */
-const char *besm6_opname (int opcode)
+static const char *besm6_opname (int opcode)
 {
     if (sim_switches & SWMASK ('L')) {
         /* Latin mnemonics. */
@@ -92,7 +92,7 @@ const char *besm6_opname (int opcode)
 /*
  * Выдача кода инструкции по мнемонике (UTF-8).
  */
-int besm6_opcode (char *instr)
+static int besm6_opcode (char *instr)
 {
     int i;
 
@@ -190,7 +190,7 @@ void besm6_debug (const char *fmt, ...)
  *      48——–42 41   40————————————————–1
  *      порядок знак мантисса в доп. коде
  */
-t_value ieee_to_besm6 (double d)
+static t_value ieee_to_besm6 (double d)
 {
     t_value word;
     int exponent;
@@ -240,7 +240,7 @@ double besm6_to_ieee (t_value word)
 /*
  * Пропуск пробелов.
  */
-const char *skip_spaces (const char *p)
+static const char *skip_spaces (const char *p)
 {
     for (;;) {
         if (*p == (char) 0xEF && p[1] == (char) 0xBB && p[2] == (char) 0xBF) {
@@ -260,7 +260,7 @@ const char *skip_spaces (const char *p)
  * Fetch Unicode symbol from UTF-8 string.
  * Advance string pointer.
  */
-int utf8_to_unicode (const char **p)
+static int utf8_to_unicode (const char **p)
 {
     int c1, c2, c3;
 
@@ -274,7 +274,7 @@ int utf8_to_unicode (const char **p)
     return (c1 & 0x0f) << 12 | (c2 & 0x3f) << 6 | (c3 & 0x3f);
 }
 
-char *besm6_parse_octal (const char *cptr, int *offset)
+static char *besm6_parse_octal (const char *cptr, int *offset)
 {
     char *eptr;
 
@@ -299,7 +299,7 @@ static const char *get_alnum (const char *iptr, char *optr)
  * Parse single instruction (half word).
  * Allow mnemonics or octal code.
  */
-const char *parse_instruction (const char *cptr, uint32 *val)
+static const char *parse_instruction (const char *cptr, uint32 *val)
 {
     int opcode, reg, addr, negate;
     char gbuf[CBUFSIZE];
@@ -392,7 +392,7 @@ const char *parse_instruction (const char *cptr, uint32 *val)
 /*
  * Instruction parse: two commands per word.
  */
-t_stat parse_instruction_word (const char *cptr, t_value *val)
+static t_stat parse_instruction_word (const char *cptr, t_value *val)
 {
     uint32 left, right;
 
@@ -451,7 +451,7 @@ void besm6_fprint_cmd (FILE *of, uint32 cmd)
 /*
  * Печать машинной инструкции в восьмеричном виде.
  */
-void besm6_fprint_insn (FILE *of, uint32 insn)
+static void besm6_fprint_insn (FILE *of, uint32 insn)
 {
     if (insn & BBIT(20))
         fprintf (of, "%02o %02o %05o ",
@@ -534,6 +534,11 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
  */
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+    /* Generic symbolic input signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+    (void)sw;
+
     int32 i;
 
     if (uptr && (uptr != &cpu_unit))                /* must be CPU */
@@ -564,7 +569,7 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
  * с 0123 4567 0123 4567       - восьмеричное слово
  * к 00 22 00000 00 010 0000   - команды
  */
-t_stat besm6_read_line (FILE *input, int *type, t_value *val)
+static t_stat besm6_read_line (FILE *input, int *type, t_value *val)
 {
     char buf [512];
     const char *p;
@@ -638,7 +643,7 @@ t_stat besm6_read_line (FILE *input, int *type, t_value *val)
 /*
  * Load memory from file.
  */
-t_stat besm6_load (FILE *input)
+static t_stat besm6_load (FILE *input)
 {
     int addr, type;
     t_value word;
@@ -683,7 +688,7 @@ t_stat besm6_load (FILE *input)
 /*
  * Dump memory to file.
  */
-t_stat besm6_dump (FILE *of, const char *fnam)
+static t_stat besm6_dump (FILE *of, const char *fnam)
 {
     int addr, last_addr = -1;
     t_value word;
@@ -728,6 +733,10 @@ t_stat besm6_dump (FILE *of, const char *fnam)
  */
 t_stat sim_load (FILE *fi, const char *cptr, const char *fnam, int dump_flag)
 {
+    /* Generic simulator load signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+
     if (dump_flag)
         return besm6_dump (fi, fnam);
 

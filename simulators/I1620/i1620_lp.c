@@ -371,6 +371,10 @@ return SCPE_OK;
 
 t_stat lpt_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 ind[IN_PRBSY] = 0;
 return SCPE_OK;
 }
@@ -391,6 +395,10 @@ return;
 
 t_stat lpt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 lpt_buf_init ();                                        /* clear buffer */
 cct_ptr = 0;                                            /* clear cct ptr */
 lpt_savctrl = K_LIN|1;                                  /* reset cct action */

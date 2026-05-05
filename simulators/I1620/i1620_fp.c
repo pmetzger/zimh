@@ -65,7 +65,7 @@ extern t_stat div_field (uint32 dvd, uint32 dvr, int32 *ez);
 
 /* Unpack and validate a floating point argument */
 
-t_stat fp_unpack (uint32 ad, FPA *fp)
+static t_stat fp_unpack (uint32 ad, FPA *fp)
 {
 uint8 d0, d1, esign;
 
@@ -86,7 +86,7 @@ return fp_scan_mant (fp->addr, &(fp->lnt), &(fp->zero));
 
 /* Unpack and validate source and destination arguments */
 
-t_stat fp_unpack_two (uint32 dad, uint32 sad, FPA *dfp, FPA *sfp)
+static t_stat fp_unpack_two (uint32 dad, uint32 sad, FPA *dfp, FPA *sfp)
 {
 t_stat r;
 
@@ -101,7 +101,7 @@ return SCPE_OK;
 
 /* Pack floating point result */
 
-t_stat fp_pack (FPA *fp)
+static t_stat fp_pack (FPA *fp)
 {
 int32 e;
 uint32 i, mad;
@@ -126,7 +126,7 @@ return SCPE_OK;
 
 /* Shift mantissa right n positions */
 
-void fp_rsh (FPA *fp, uint32 n)
+static void fp_rsh (FPA *fp, uint32 n)
 {
 uint32 i, sad, dad;
 
@@ -146,7 +146,7 @@ return;
 
 /* Shift mantissa left 1 position */
 
-void fp_lsh_1 (FPA *fp)
+static void fp_lsh_1 (FPA *fp)
 {
 uint32 i, mad, nxt;
 
@@ -201,7 +201,7 @@ return STOP_FPLNT;                                      /* too long */
 
 /* Copy floating point mantissa */
 
-void fp_copy_mant (uint32 d, uint32 s, uint32 l)
+static void fp_copy_mant (uint32 d, uint32 s, uint32 l)
 {
 uint32 i;
 
@@ -218,7 +218,7 @@ return;
 
 /* Compare floating point mantissa */
 
-int32 fp_comp_mant (uint32 d, uint32 s, uint32 l)
+static int32 fp_comp_mant (uint32 d, uint32 s, uint32 l)
 {
 uint8 i, dd, sd;
 

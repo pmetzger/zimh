@@ -263,6 +263,11 @@ DEVICE pif_dev = {
 
 static SIGNALS_VALUE pif_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+(void) inbound_value;
+
 const t_bool   is_rte_pif  = (pif_dev.flags & DEV_12936) == 0;  /* TRUE if 12620A card */
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
@@ -414,6 +419,11 @@ return SCPE_OK;
 
 static t_stat pif_set_card (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if ((val < 0) || (val > 1) || (cptr != NULL))           /* sanity check */
     return SCPE_ARG;                                    /* bad argument */
 
@@ -430,6 +440,12 @@ return SCPE_OK;
 
 static t_stat pif_show_card (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (pif_dev.flags & DEV_12936)
     fputs ("12936A", st);
 else

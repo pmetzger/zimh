@@ -795,7 +795,7 @@ mtc_srv(UNIT * uptr)
     return SCPE_OK;
 }
 
-uint64
+static uint64
 mtc_read_word(UNIT *uptr) {
      int i,  cc, ch;
      uint64  hold_reg = 0;
@@ -866,7 +866,12 @@ mtc_boot(int32 unit_num, DEVICE * dptr)
 t_stat
 mtc_reset(DEVICE * dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
+
     for (i = 0 ; i < 8; i++) {
         UNIT    *uptr = &mtc_unit[i];
 
@@ -885,6 +890,12 @@ mtc_reset(DEVICE * dptr)
 t_stat
 mtc_set_dct (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32 dct;
     t_stat r;
 
@@ -900,6 +911,11 @@ mtc_set_dct (UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 mtc_show_dct (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) val;
+   (void) desc;
+
    if (uptr == NULL)
       return SCPE_IERR;
 
@@ -938,7 +954,11 @@ return SCPE_OK;
 const char *
 mtc_description (DEVICE *dptr)
 {
-return "Type 516 magnetic tape controller" ;
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
+    return "Type 516 magnetic tape controller" ;
 }
 
 #endif

@@ -153,7 +153,7 @@ DEVICE uw_dev = {
     };
 
 
-void uw_send(uint8 *data, int n) {
+static void uw_send(uint8 *data, int n) {
 if (!uw_ldsc[0].conn)
     return;
 if (!(CSR & CSR_XMIT))
@@ -169,7 +169,7 @@ while(n > 0) {
 tmxr_poll_tx (&uw_desc);
 }
 
-void uw_send_data(uint8 type, uint16 data)
+static void uw_send_data(uint8 type, uint16 data)
 {
 uint8 message[3];
 message[0] = type;
@@ -178,7 +178,7 @@ message[2] = data & 0xFF;
 uw_send(message, sizeof message);
 }
 
-void uw_send_csr(uint8 type, uint8 reg, uint16 data)
+static void uw_send_csr(uint8 type, uint8 reg, uint16 data)
 {
 uint8 message[4];
 message[0] = type;
@@ -188,7 +188,7 @@ message[3] = data & 0xFF;
 uw_send(message, sizeof message);
 }
 
-void uw_set_int(void)
+static void uw_set_int(void)
 {
 sim_debug (DBG_INT, &uw_dev, "Interupt%s\n",
            CSR & CSR_IE ? "" : " (disabled)");
@@ -196,7 +196,7 @@ if (CSR & CSR_IE)
     SET_INT(UW);
 }
 
-void uw_clr_int(void)
+static void uw_clr_int(void)
 {
 sim_debug (DBG_INT, &uw_dev, "Clear interupt\n");
 CLR_INT(UW);
@@ -204,6 +204,10 @@ CLR_INT(UW);
 
 t_stat uw_wr (int32 data, int32 pa, int32 access)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 uint8 message;
 uint16 xmit_off = 0;
 pa = (pa & 0x0F) >> 1;
@@ -242,6 +246,10 @@ return SCPE_OK;
 
 t_stat uw_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 pa = (pa & 0x0F) >> 1;
 *data = uw_csr[pa];
 sim_debug (DBG_REG, &uw_dev, "Read CSR%d: %04X\n", pa, *data);
@@ -254,7 +262,7 @@ sim_debug (DBG_INT, &uw_dev, "Interrupt ack: %03o\n", IVR);
 return IVR;
 }
 
-void uw_receive(void)
+static void uw_receive(void)
 {
 uint32 addr;
 uint16 data16;
@@ -347,6 +355,10 @@ uw_length = 0;
 
 t_stat uw_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 ch;
 int i;
 
@@ -417,5 +429,9 @@ return stat;
 
 const char *uw_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "UW - M7452 Unibus window module for VAXstation 100";
 }

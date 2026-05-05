@@ -206,6 +206,10 @@ const char helpString[] =
 
 static const char *auxcpu_description (DEVICE *dptr)
 {
+  /* Generic device description signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   return "Auxiliary processor";
 }
 
@@ -378,6 +382,12 @@ t_stat auxcpu_devio(uint32 dev, uint64 *data)
 
 static t_stat auxcpu_set_base (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     t_stat r;
     t_value x;
 
@@ -394,6 +404,12 @@ static t_stat auxcpu_set_base (UNIT *uptr, int32 val, const char *cptr, void *de
 
 static t_stat auxcpu_show_base (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf (st, "Base: %011o", auxcpu_base);
     return SCPE_OK;
 }

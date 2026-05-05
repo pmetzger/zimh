@@ -481,6 +481,10 @@ return SCPE_OK;
 
 t_stat lp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_cancel (&lp_unit);                                 /* stop dev thread */
 lp_cmd = 0;
 lp_lastcmd = 0;
@@ -504,6 +508,12 @@ return attach_unit (uptr, cptr);
 
 t_stat lp_load_cct (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 FILE *cfile;
 t_stat r;
 
@@ -562,6 +572,12 @@ return SCPE_OK;
 
 t_stat lp_settype (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 lp_model = val;
 lp_reset (&lp_dev);
 return SCPE_OK;
@@ -571,6 +587,12 @@ return SCPE_OK;
 
 t_stat lp_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, lp_model? "7450": "7440");
 return SCPE_OK;
 }

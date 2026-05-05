@@ -1765,6 +1765,10 @@ return result;                                          /* return the result of 
 
 static t_stat pulse_service (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 t_stat status;
 
 dprintf (lp_dev, DEB_SERV, "Pulse service entered\n");
@@ -1789,6 +1793,10 @@ return status;
 
 static t_stat timer_service (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 dprintf (lp_dev, DEB_SERV, "Watchdog service entered\n");
 
 if (set_interrupt (ST_XFR_TMR_IRQ) == INTREQ)           /* set the transfer timer interrupt flip-flop */
@@ -1820,6 +1828,10 @@ return SCPE_OK;                                         /* return success */
 
 static t_stat ui_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return master_reset (FALSE);                            /* perform a non-programmed master reset */
 }
 
@@ -3046,6 +3058,11 @@ else                                                    /* otherwise */
 
 static t_stat lp_set_mode (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 switch ((DEVICE_MODES) value) {                         /* dispatch the mode to set */
 
     case Fast_Time:                                     /* entering optimized timing mode */
@@ -3090,6 +3107,12 @@ return SCPE_OK;                                         /* mode changes always s
 
 static t_stat lp_set_model (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (lp_dev.flags & DEV_REALTIME)                        /* if the printer is in real-time mode */
     dlyptr = &real_times [GET_MODEL (value)];           /*   then use the times for the new model */
 
@@ -3139,6 +3162,11 @@ return SCPE_OK;                                         /* allow the reassignmen
 
 static t_stat lp_set_on_offline (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if ((uptr->flags & UNIT_ATT) == 0)                      /* if the printer is detached */
     return SCPE_UNATT;                                  /*   then it can't be set online or offline */
 
@@ -3184,6 +3212,11 @@ return SCPE_OK;                                         /* return operation succ
 
 static t_stat lp_set_vfu (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) value;
+(void) desc;
+
 FILE   *vfu_stream;
 t_stat result;
 
@@ -3217,6 +3250,12 @@ return result;                                          /* return the result of 
 
 static t_stat lp_show_mode (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) value;
+(void) desc;
+
 fprintf (st, "%s timing, %s mode",                      /* print the timing and connection modes */
          (lp_dev.flags & DEV_REALTIME ? "realistic" : "fast"),
          (lp_dev.flags & DEV_DIAG ? "diagnostic" : "printer"));
@@ -3247,6 +3286,10 @@ return SCPE_OK;
 
 static t_stat lp_show_vfu (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 static const char header_1 [] = " Ch 1 Ch 2 Ch 3 Ch 4 Ch 5 Ch 6 Ch 7 Ch 8 Ch 9 Ch10 Ch11 Ch12";
 static const char header_2 [] = " ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ----";
 
@@ -3381,6 +3424,10 @@ return result;                                          /* return the result of 
 
 static OUTBOUND_SET lp_control (uint32 control_word)
 {
+/* Generic printer control signature.
+   This implementation does not use every parameter. */
+(void) control_word;
+
 return NO_SIGNALS;                                      /* no special control action is needed */
 }
 

@@ -317,7 +317,7 @@ CTLR xu_ctrl[] = {
 
 /* Multicontroller support */
 
-CTLR* xu_unit2ctlr(UNIT* uptr)
+static CTLR* xu_unit2ctlr(UNIT* uptr)
 {
   int i;
   unsigned int j;
@@ -329,7 +329,7 @@ CTLR* xu_unit2ctlr(UNIT* uptr)
   return 0;
 }
 
-CTLR* xu_dev2ctlr(DEVICE* dptr)
+static CTLR* xu_dev2ctlr(DEVICE* dptr)
 {
   int i;
   for (i=0; i<XU_MAX_CONTROLLERS; i++)
@@ -339,7 +339,7 @@ CTLR* xu_dev2ctlr(DEVICE* dptr)
   return 0;
 }
 
-CTLR* xu_pa2ctlr(uint32 PA)
+static CTLR* xu_pa2ctlr(uint32 PA)
 {
   int i;
   for (i=0; i<XU_MAX_CONTROLLERS; i++)
@@ -354,17 +354,36 @@ CTLR* xu_pa2ctlr(uint32 PA)
 /* stop simh from reading non-existant unit data stream */
 t_stat xu_ex (t_value* vptr, t_addr addr, UNIT* uptr, int32 sw)
 {
+  /* Generic examine signature.
+     This implementation does not use every parameter. */
+  (void) vptr;
+  (void) addr;
+  (void) uptr;
+  (void) sw;
+
   return SCPE_NOFNC;
 }
 
 /* stop simh from writing non-existant unit data stream */
 t_stat xu_dep (t_value val, t_addr addr, UNIT* uptr, int32 sw)
 {
+  /* Generic deposit signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) addr;
+  (void) uptr;
+  (void) sw;
+
   return SCPE_NOFNC;
 }
 
 t_stat xu_showmac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xu = xu_unit2ctlr(uptr);
   char  buffer[20];
 
@@ -375,6 +394,11 @@ t_stat xu_showmac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat xu_setmac (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   t_stat status;
   CTLR* xu = xu_unit2ctlr(uptr);
 
@@ -386,6 +410,12 @@ t_stat xu_setmac (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat xu_set_stats (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) cptr;
+  (void) desc;
+
   CTLR* xu = xu_unit2ctlr(uptr);
 
   /* set stats to zero, regardless of passed parameter */
@@ -400,6 +430,11 @@ static void xu_fprint_stat (FILE* st, const char* label, int value)
 
 t_stat xu_show_stats (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xu = xu_unit2ctlr(uptr);
   struct xu_stats* stats = &xu->var->stats;
 
@@ -419,6 +454,11 @@ t_stat xu_show_stats (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat xu_show_filters (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xu = xu_unit2ctlr(uptr);
   char  buffer[20];
   int i;
@@ -437,6 +477,11 @@ t_stat xu_show_filters (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat xu_show_type (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xu = xu_unit2ctlr(uptr);
   fprintf(st, "type=");
   switch (xu->var->type) {
@@ -448,6 +493,11 @@ t_stat xu_show_type (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat xu_set_type (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xu = xu_unit2ctlr(uptr);
   if (!cptr) return SCPE_IERR;
   if (uptr->flags & UNIT_ATT) return SCPE_ALATT;
@@ -462,6 +512,11 @@ t_stat xu_set_type (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat xu_show_throttle (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xu = xu_unit2ctlr(uptr);
 
   if (xu->var->throttle_delay == ETH_THROT_DISABLED_DELAY)
@@ -473,6 +528,11 @@ t_stat xu_show_throttle (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat xu_set_throttle (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xu = xu_unit2ctlr(uptr);
   char tbuf[CBUFSIZE], gbuf[CBUFSIZE];
   const char *tptr = cptr;
@@ -534,7 +594,7 @@ t_stat xu_set_throttle (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 /*============================================================================*/
 
-void upd_stat16(uint16* stat, uint16 add)
+static void upd_stat16(uint16* stat, uint16 add)
 {
   *stat += add;
   /* did stat roll over? latches at maximum */
@@ -542,7 +602,7 @@ void upd_stat16(uint16* stat, uint16 add)
     *stat = 0xFFFF;
 }
 
-void upd_stat32(uint32* stat, uint32 add)
+static void upd_stat32(uint32* stat, uint32 add)
 {
   *stat += add;
   /* did stat roll over? latches at maximum */
@@ -550,12 +610,12 @@ void upd_stat32(uint32* stat, uint32 add)
     *stat = 0xFFFFFFFF;
 }
 
-void bit_stat16(uint16* stat, uint16 bits)
+static void bit_stat16(uint16* stat, uint16 bits)
 {
   *stat |= bits;
 }
 
-t_stat xu_process_loopback(CTLR* xu, ETH_PACK* pack)
+static t_stat xu_process_loopback(CTLR* xu, ETH_PACK* pack)
 {
   ETH_PACK  response;
   ETH_MAC   physical_address;
@@ -602,7 +662,7 @@ t_stat xu_process_loopback(CTLR* xu, ETH_PACK* pack)
   return status;
 }
 
-t_stat xu_process_local (CTLR* xu, ETH_PACK* pack)
+static t_stat xu_process_local (CTLR* xu, ETH_PACK* pack)
 {
   /* returns SCPE_OK if local processing occurred,
      otherwise returns SCPE_NOFNC or some other code */
@@ -622,7 +682,7 @@ t_stat xu_process_local (CTLR* xu, ETH_PACK* pack)
   return SCPE_NOFNC;
 }
 
-void xu_read_callback(CTLR* xu, int status)
+static void xu_read_callback(CTLR* xu, int status)
 {
   if (DBG_PCK & xu->dev->dctrl)
       eth_packet_trace_ex(xu->var->etherface, xu->var->read_buffer.msg, xu->var->read_buffer.len, "xu-recvd", DBG_DAT & xu->dev->dctrl, DBG_PCK);
@@ -647,7 +707,7 @@ void xub_read_callback(int status)
   xu_read_callback(&xu_ctrl[1], status);
 }
 
-t_stat xu_system_id (CTLR* xu, const ETH_MAC dest, uint16 receipt_id)
+static t_stat xu_system_id (CTLR* xu, const ETH_MAC dest, uint16 receipt_id)
 {
   static uint16 receipt = 0;
   ETH_PACK system_id;
@@ -765,7 +825,7 @@ t_stat xu_tmrsvc(UNIT* uptr)
   return SCPE_OK;
 }
 
-void xu_write_callback (CTLR* xu, int status)
+static void xu_write_callback (CTLR* xu, int status)
 {
   xu->var->write_buffer.status = status;
 }
@@ -780,7 +840,7 @@ void xub_write_callback (int status)
   xu_write_callback(&xu_ctrl[1], status);
 }
 
-void xu_setclrint(CTLR* xu, int32 bits)
+static void xu_setclrint(CTLR* xu, int32 bits)
 {
   if (xu->var->pcsr0 & 0xFF00) {    /* if any interrupt bits on, */
     xu->var->pcsr0 |= PCSR0_INTR;   /*   turn master bit on */
@@ -791,7 +851,7 @@ void xu_setclrint(CTLR* xu, int32 bits)
   }
 }
 
-t_stat xu_sw_reset (CTLR* xu)
+static t_stat xu_sw_reset (CTLR* xu)
 {
   int i;
 
@@ -882,7 +942,7 @@ t_stat xu_reset(DEVICE* dptr)
 
 
 /* Perform one of the defined ancillary functions. */
-int32 xu_command(CTLR* xu)
+static int32 xu_command(CTLR* xu)
 {
   uint32 udbb;
   int fnc, mtlen, i, j;
@@ -1388,7 +1448,7 @@ void xu_process_receive(CTLR* xu)
 
 }
 
-void xu_process_transmit(CTLR* xu)
+static void xu_process_transmit(CTLR* xu)
 {
   uint32 segb, ba;
   int slen, wlen, i, off, giant, runt;
@@ -1528,7 +1588,7 @@ void xu_process_transmit(CTLR* xu)
   } /* while */
 }
 
-void xu_port_command (CTLR* xu)
+static void xu_port_command (CTLR* xu)
 {
   int command = xu->var->pcsr0 & PCSR0_PCMD;
   int state = xu->var->pcsr1 & PCSR1_STATE;
@@ -1646,6 +1706,10 @@ void xu_port_command (CTLR* xu)
 
 t_stat xu_rd(int32 *data, int32 PA, int32 access)
 {
+  /* Generic I/O read signature.
+     This implementation does not use every parameter. */
+  (void) access;
+
   CTLR* xu = xu_pa2ctlr(PA);
   int reg = (PA >> 1) & 03;
 
@@ -2131,6 +2195,10 @@ return scp_help (st, dptr, uptr, flag, helpString, cptr);
 
 const char *xu_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "DEUNA/DELUA Ethernet controller";
 }
 

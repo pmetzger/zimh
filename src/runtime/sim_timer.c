@@ -964,6 +964,10 @@ return (sim_idle_rate_ms != 0);
 /* sim_show_timers - show running timer information */
 t_stat sim_show_timers (FILE* st, DEVICE *dptr, UNIT* uptr, int32 val, const char* desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int tmr, clocks;
 struct timespec now;
 time_t time_t_now;
@@ -1121,6 +1125,11 @@ return SCPE_OK;
 
 t_stat sim_show_clock_queues (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) flag;
+(void) cptr;
+
 int tmr;
 
 #if defined (SIM_ASYNCH_CLOCKS)
@@ -1236,8 +1245,12 @@ REG sim_throttle_reg[] = {
 
 /* Set/Clear catchup */
 
-t_stat sim_timer_set_catchup (int32 flag, const char *cptr)
+static t_stat sim_timer_set_catchup (int32 flag, const char *cptr)
 {
+/* Generic set command signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+
 if (flag) {
     if (!sim_catchup_ticks)
         sim_catchup_ticks = TRUE;
@@ -1252,14 +1265,24 @@ return SCPE_OK;
 
 t_stat sim_timer_show_catchup (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "Calibrated Ticks%s", sim_catchup_ticks ? " with Catchup Ticks" : "");
 return SCPE_OK;
 }
 
 /* Set idle calibration threshold */
 
-t_stat sim_timer_set_idle_pct (int32 flag, const char *cptr)
+static t_stat sim_timer_set_idle_pct (int32 flag, const char *cptr)
 {
+/* Generic set command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 t_stat r = SCPE_OK;
 
 if (cptr == NULL)
@@ -1288,8 +1311,12 @@ return SCPE_OK;
 
 /* Set stop time */
 
-t_stat sim_timer_set_stop (int32 flag, const char *cptr)
+static t_stat sim_timer_set_stop (int32 flag, const char *cptr)
 {
+/* Generic set command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 t_stat r;
 t_value stop_time;
 
@@ -1308,8 +1335,13 @@ return SCPE_OK;
 
 /* Set/Clear asynch */
 
-t_stat sim_timer_set_async (int32 flag, const char *cptr)
+#if defined (SIM_ASYNCH_CLOCKS)
+static t_stat sim_timer_set_async (int32 flag, const char *cptr)
 {
+/* Generic set command signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+
 if (flag) {
     if (sim_asynch_enabled && (!sim_asynch_timer)) {
         sim_asynch_timer = TRUE;
@@ -1324,6 +1356,7 @@ else {
     }
 return SCPE_OK;
 }
+#endif
 
 static CTAB set_timer_tab[] = {
 #if defined (SIM_ASYNCH_CLOCKS)
@@ -1345,21 +1378,37 @@ static t_stat sim_timer_clock_reset (DEVICE *dptr);
 
 static const char *sim_timer_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Clock Assist facilities";
 }
 
 static const char *sim_int_timer_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Internal Timer";
 }
 
 static const char *sim_int_stop_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Stop facility";
 }
 
 static const char *sim_throttle_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Throttle facility";
 }
 
@@ -1395,6 +1444,10 @@ DEVICE sim_throttle_dev = {
 
 t_stat sim_set_timers (int32 arg, const char *cptr)
 {
+/* Generic set command signature.
+   This implementation does not use every parameter. */
+(void) arg;
+
 char *cvptr, gbuf[CBUFSIZE];
 CTAB *ctptr;
 t_stat r;
@@ -1542,6 +1595,12 @@ return TRUE;
 
 t_stat sim_set_idle (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 t_stat r;
 uint32 v;
 
@@ -1563,6 +1622,13 @@ return SCPE_OK;
 
 t_stat sim_clr_idle (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) cptr;
+(void) desc;
+
 sim_idle_enab = FALSE;
 return SCPE_OK;
 }
@@ -1571,6 +1637,12 @@ return SCPE_OK;
 
 t_stat sim_show_idle (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (sim_idle_enab)
     fprintf (st, "idle enabled");
 else
@@ -1651,6 +1723,13 @@ return SCPE_OK;
 
 t_stat sim_show_throt (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, const char *cptr)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) dnotused;
+(void) unotused;
+(void) flag;
+(void) cptr;
+
 if (sim_idle_rate_ms == 0)
     fprintf (st, "Throttling:                    Not Available\n");
 else {
@@ -2016,6 +2095,10 @@ return stat;
 
 t_stat sim_timer_stop_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 return SCPE_STOP;
 }
 
@@ -2178,6 +2261,10 @@ t_bool              sim_timer_thread_running = FALSE;
 static void *
 _timer_thread(void *arg)
 {
+/* Generic thread start signature.
+   This implementation does not use every parameter. */
+(void) arg;
+
 int sched_policy;
 struct sched_param sched_priority;
 
@@ -2412,6 +2499,10 @@ sim_calb_tmr = tmr;
 
 static t_stat sim_timer_clock_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_debug (DBG_TRC, &sim_timer_dev, "sim_timer_clock_reset()\n");
 _rtcn_configure_calibrated_clock (sim_calb_tmr);
 sim_timer_dev.description = &sim_timer_description;

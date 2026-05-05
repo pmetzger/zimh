@@ -151,7 +151,7 @@ DEVICE *amb_dev[] = {
    words.  It can only operate in field 0 and is not checksummed.
 */
 
-t_stat sim_load_rim (FILE *fi)
+static t_stat sim_load_rim (FILE *fi)
 {
 int32 origin, hi, lo, wd;
 
@@ -179,7 +179,7 @@ return SCPE_OK;
    a character > 0200 indicates a change of field.
 */
 
-int32 sim_bin_getc (FILE *fi, uint32 *newf)
+static int32 sim_bin_getc (FILE *fi, uint32 *newf)
 {
 int32 c, rubout;
 
@@ -202,7 +202,7 @@ while ((c = getc (fi)) != EOF) {                        /* read char */
 return EOF;
 }
 
-t_stat sim_load_bin (FILE *fi, t_bool do_load)
+static t_stat sim_load_bin (FILE *fi, t_bool do_load)
 {
 int32 hi, lo, wd, csum, t;
 uint32 field, newf, origin, words;
@@ -580,7 +580,7 @@ static const int32 fop_val[] = {
         status  =       space needed
 */
 
-int32 fprint_opr (FILE *of, int32 inst, int32 Class, int32 sp)
+static int32 fprint_opr (FILE *of, int32 inst, int32 Class, int32 sp)
 {
 int32 i, j;
 

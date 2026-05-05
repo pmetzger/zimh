@@ -546,7 +546,7 @@ uint32 eth_crc32(uint32 crc, const void* vbuf, size_t len)
   return(crc ^ mask);
 }
 
-int eth_get_packet_crc32_data(const uint8 *msg, int len, uint8 *crcdata)
+static int eth_get_packet_crc32_data(const uint8 *msg, int len, uint8 *crcdata)
 {
   int crc_len;
 
@@ -562,7 +562,7 @@ int eth_get_packet_crc32_data(const uint8 *msg, int len, uint8 *crcdata)
   return crc_len;
 }
 
-int eth_add_packet_crc32(uint8 *msg, int len)
+static int eth_add_packet_crc32(uint8 *msg, int len)
 {
   int crc_len;
 
@@ -630,12 +630,12 @@ void eth_packet_trace(ETH_DEV* dev, const uint8 *msg, int len, const char* txt)
   eth_packet_trace_ex(dev, msg, len, txt, 0, dev->dbit);
 }
 
-void eth_packet_trace_detail(ETH_DEV* dev, const uint8 *msg, int len, const char* txt)
+static void eth_packet_trace_detail(ETH_DEV* dev, const uint8 *msg, int len, const char* txt)
 {
   eth_packet_trace_ex(dev, msg, len, txt, 1     , dev->dbit);
 }
 
-void eth_zero(ETH_DEV* dev)
+static void eth_zero(ETH_DEV* dev)
 {
   /* set all members to NULL OR 0 */
   memset(dev, 0, sizeof(ETH_DEV));
@@ -774,7 +774,7 @@ static const char* _eth_getname(int number, char* name, char *desc)
   return name;
 }
 
-const char* eth_getname_bydesc(const char* desc, char* name, char *ndesc)
+static const char* eth_getname_bydesc(const char* desc, char* name, char *ndesc)
 {
   ETH_LIST  list[ETH_MAX_DEVICE];
   int count = eth_devices(ETH_MAX_DEVICE, list, FALSE);
@@ -800,7 +800,7 @@ const char* eth_getname_bydesc(const char* desc, char* name, char *ndesc)
   return NULL;
 }
 
-char* eth_getname_byname(const char* name, char* temp, char *desc)
+static char* eth_getname_byname(const char* name, char* temp, char *desc)
 {
   ETH_LIST  list[ETH_MAX_DEVICE];
   int count = eth_devices(ETH_MAX_DEVICE, list, FALSE);
@@ -820,7 +820,7 @@ char* eth_getname_byname(const char* name, char* temp, char *desc)
   return (found ? temp : NULL);
 }
 
-char* eth_getdesc_byname(char* name, char* temp)
+static char* eth_getdesc_byname(char* name, char* temp)
 {
   ETH_LIST  list[ETH_MAX_DEVICE];
   int count = eth_devices(ETH_MAX_DEVICE, list, FALSE);
@@ -922,6 +922,10 @@ t_stat eth_close (ETH_DEV* dev)
   {return SCPE_NOFNC;}
 t_stat eth_attach_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
   {
+/* Generic test command signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+
   fprintf (st, "%s attach help\n\n", dptr->name);
   fprintf (st, "This simulator was not built with ethernet device support\n");
   return SCPE_OK;
@@ -1032,6 +1036,10 @@ typedef void * pcap_t;  /* Pseudo Type to avoid compiler errors */
 */
 static int eth_host_pcap_devices(int used, int max, ETH_LIST* list)
 {
+/* Shared helper signature.
+   This build variant does not use every parameter. */
+(void) max;
+
 int i;
 
 for (i=0; i<used; ++i) {
@@ -1292,7 +1300,7 @@ static void load_function(const char* function, _func* func_ptr) {
 }
 
 /* load wpcap.dll as required */
-int load_pcap(void) {
+static int load_pcap(void) {
   switch(lib_loaded) {
     case 0:                  /* not loaded */
             /* attempt to load DLL */
@@ -2078,10 +2086,16 @@ return NULL;
 t_stat eth_set_async (ETH_DEV *dev, int latency)
 {
 #if !defined(USE_READER_THREAD) || !defined(SIM_ASYNCH_IO)
+/* Public API signature.
+   This build variant does not use every parameter. */
+(void) dev;
+(void) latency;
+
 char *msg = "Eth: Can't operate asynchronously, must poll.\n"
             " *** Build with USE_READER_THREAD defined and link with pthreads for asynchronous operation. ***\n";
 return sim_messagef (SCPE_NOFNC, "%s", msg);
 #else
+
 int wakeup_needed;
 
 dev->asynch_io = sim_asynch_enabled;
@@ -2104,8 +2118,13 @@ return SCPE_OK;
 t_stat eth_clr_async (ETH_DEV *dev)
 {
 #if !defined(USE_READER_THREAD) || !defined(SIM_ASYNCH_IO)
+/* Public API signature.
+   This build variant does not use every parameter. */
+(void) dev;
+
 return SCPE_NOFNC;
 #else
+
 /* make sure device exists */
 if (!dev) return SCPE_UNATT;
 
@@ -2645,7 +2664,7 @@ if (!rand_initialized)
 return (rand() & 0xFF);
 }
 
-t_stat eth_check_address_conflict_ex (ETH_DEV* dev,
+static t_stat eth_check_address_conflict_ex (ETH_DEV* dev,
                                       const ETH_MAC mac,
                                       int *reflections,
                                       t_bool silent)
@@ -2803,7 +2822,7 @@ if (0 == eth_mac_cmp (mac, dev->host_nic_phy_hw_addr))
 return eth_check_address_conflict_ex (dev, mac, NULL, FALSE);
 }
 
-t_stat eth_reflect(ETH_DEV* dev)
+static t_stat eth_reflect(ETH_DEV* dev)
 {
 t_stat r;
 
@@ -3847,7 +3866,7 @@ if (status < 0) {
 return status;
 }
 
-t_stat eth_bpf_filter (ETH_DEV* dev, int addr_count, ETH_MAC* const filter_address,
+static t_stat eth_bpf_filter (ETH_DEV* dev, int addr_count, ETH_MAC* const filter_address,
                        ETH_BOOL all_multicast, ETH_BOOL promiscuous,
                        int reflections,
                        ETH_MAC physical_addr,
@@ -4178,6 +4197,9 @@ if (dev->eth_api == ETH_API_NAT)
 static
 t_stat eth_test_crc32 (DEVICE *dptr)
 {
+/* Generic test helper signature.
+   This implementation does not use every parameter. */
+(void) dptr;
 int errors = 0;
 int val;
 uint8 data[12];

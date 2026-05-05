@@ -593,6 +593,10 @@ DEVICE baci_dev = {
 
 static SIGNALS_VALUE baci_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 const char * const hold_or_clear = (inbound_signals & ioCLF ? ",C" : "");
 uint8              ch;
 uint32             mask;
@@ -1145,6 +1149,10 @@ return SCPE_OK;
 
 static t_stat baci_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 io_assert (&baci_dev, ioa_POPIO);                       /* PRESET the device */
 
 baci_ibuf = 0;                                          /* clear input buffer */

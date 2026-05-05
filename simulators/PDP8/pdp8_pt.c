@@ -167,6 +167,10 @@ switch (IR & 07) {                                      /* decode IR<9:11> */
 
 t_stat ptr_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 temp;
 
 if ((ptr_unit.flags & UNIT_ATT) == 0)                   /* attached? */
@@ -192,6 +196,10 @@ return SCPE_OK;
 
 t_stat ptr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ptr_unit.buf = 0;
 dev_done = dev_done & ~INT_PTR;                         /* clear done, int */
 int_req = int_req & ~INT_PTR;
@@ -236,6 +244,10 @@ switch (IR & 07) {                                      /* decode IR<9:11> */
 
 t_stat ptp_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 dev_done = dev_done | INT_PTP;                          /* set done */
 int_req = INT_UPDATE;                                   /* update interrupts */
 if ((ptp_unit.flags & UNIT_ATT) == 0)                   /* attached? */
@@ -253,6 +265,10 @@ return SCPE_OK;
 
 t_stat ptp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ptp_unit.buf = 0;
 dev_done = dev_done & ~INT_PTP;                         /* clear done, int */
 int_req = int_req & ~INT_PTP;
@@ -297,6 +313,11 @@ static const uint16 boot_rom[] = {
 
 t_stat ptr_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 size_t i;
 extern uint16 M[];
 
@@ -310,10 +331,18 @@ return SCPE_OK;
 
 const char *ptr_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "PC8E paper tape reader";
 }
 
 const char *ptp_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "PC8E paper tape punch";
 }

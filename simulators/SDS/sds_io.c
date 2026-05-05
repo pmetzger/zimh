@@ -102,15 +102,6 @@ t_stat pin_adr (uint32 num, uint32 *dat);
 t_stat pot_fork (uint32 num, uint32 *dat);
 t_stat dev_disc (uint32 ch, uint32 dev);
 t_stat dev_wreor (uint32 ch, uint32 dev);
-extern t_stat pot_RL1 (uint32 num, uint32 *dat);
-extern t_stat pot_RL2 (uint32 num, uint32 *dat);
-extern t_stat pot_RL4 (uint32 num, uint32 *dat);
-extern t_stat pin_rads (uint32 num, uint32 *dat);
-extern t_stat pot_rada (uint32 num, uint32 *dat);
-extern t_stat pin_dsk (uint32 num, uint32 *dat);
-extern t_stat pot_dsk (uint32 num, uint32 *dat);
-t_stat pin_mux (uint32 num, uint32 *dat);
-t_stat pot_mux (uint32 num, uint32 *dat);
 extern void set_dyn_map (void);
 
 /* SDS I/O model
@@ -552,6 +543,10 @@ return SCPE_OK;
 
 t_stat pot_fork (uint32 num, uint32 *dat)
 {
+/* Alert dispatch signature.
+   This implementation does not use every parameter. */
+(void) num;
+
 uint32 igrp = SYI_GETGRP (*dat);                        /* get group */
 uint32 fbit = (0100000 >> (VEC_FORK & 017));            /* bit in group */
 
@@ -888,6 +883,10 @@ return;
 
 t_stat chan_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 xfr_req = 0;
@@ -909,6 +908,10 @@ return SCPE_OK;
 
 t_stat set_chan (UNIT *uptr, int32 val, const char *sptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 int32 i;
@@ -936,6 +939,11 @@ return SCPE_ARG;
 
 t_stat show_chan (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 
@@ -1004,6 +1012,11 @@ return FALSE;
 
 t_stat chan_show_reg (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if ((val < 0) || (val >= NUM_CHAN)) return SCPE_IERR;
 fprintf (st, "UAR:      %02o\n", chan_uar[val]);
 fprintf (st, "WCR:      %05o\n", chan_wcr[val]);

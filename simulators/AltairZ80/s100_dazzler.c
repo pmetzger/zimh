@@ -233,6 +233,10 @@ DEVICE js1_dev = {
 */
 static const char *daz_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Cromemco Dazzler";
 }
 
@@ -272,6 +276,11 @@ static t_stat daz_reset(DEVICE *dptr)
 
 static t_stat daz_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+    (void) dptr;
+
     if (chiptype == CHIP_TYPE_8080) {
         exdep_cmd(EX_D, "-m 100 MVI A,01H");
         exdep_cmd(EX_D, "-m 102 ORI 80H");
@@ -567,6 +576,12 @@ static void daz_set_0f(uint8 val) {
 
 static t_stat daz_set_video(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
 
@@ -587,6 +602,12 @@ static t_stat daz_set_video(UNIT *uptr, int32 val, const char *cptr, void *desc)
 }
 
 static t_stat daz_show_video(FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!st) return SCPE_IERR;
 
     fprintf(st, "VIDEO=%s", DAZ_SHOW_VIDEO(daz_0e));
@@ -596,6 +617,12 @@ static t_stat daz_show_video(FILE *st, UNIT *uptr, int32 val, const void *desc) 
 
 static t_stat daz_set_resolution(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     uint8 old = daz_0f;
 
     if (!cptr) return SCPE_IERR;
@@ -616,6 +643,12 @@ static t_stat daz_set_resolution(UNIT *uptr, int32 val, const char *cptr, void *
 }
 
 static t_stat daz_show_resolution(FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!st) return SCPE_IERR;
 
     fprintf(st, "RES=%s", DAZ_SHOW_RES(daz_0f));
@@ -625,6 +658,12 @@ static t_stat daz_show_resolution(FILE *st, UNIT *uptr, int32 val, const void *d
 
 static t_stat daz_set_memsize(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     uint8 old = daz_0f;
 
     if (!cptr) return SCPE_IERR;
@@ -645,6 +684,12 @@ static t_stat daz_set_memsize(UNIT *uptr, int32 val, const char *cptr, void *des
 }
 
 static t_stat daz_show_memsize(FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!st) return SCPE_IERR;
 
     fprintf(st, "MEMSIZE=%s @ %04X", DAZ_SHOW_MEMSIZE(daz_0f), daz_addr);
@@ -654,6 +699,12 @@ static t_stat daz_show_memsize(FILE *st, UNIT *uptr, int32 val, const void *desc
 
 static t_stat daz_set_color(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     uint8 old = daz_0f;
 
     if (!cptr) return SCPE_IERR;
@@ -674,6 +725,12 @@ static t_stat daz_set_color(UNIT *uptr, int32 val, const char *cptr, void *desc)
 }
 
 static t_stat daz_show_color(FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!st) return SCPE_IERR;
 
     fprintf(st, "%s", DAZ_SHOW_COLOR(daz_0f));
@@ -690,11 +747,19 @@ static t_stat daz_show_color(FILE *st, UNIT *uptr, int32 val, const void *desc) 
 */
 static const char *js1_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Cromemco D+7A";
 }
 
 t_stat js1_svc(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     return SCPE_OK;
 }
 
@@ -713,6 +778,10 @@ static t_stat js1_reset(DEVICE *dptr)
 
 static int32 js1_io(const int32 port, const int32 io, const int32 data)
 {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) data;
+
     int32 p = port - js1_ctx.pnp.io_base;
 
     if (io == 0) {    /* IN */

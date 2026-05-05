@@ -165,6 +165,7 @@
                         { UNIT_MSIZE, (1u << 23) + (7u << 20), NULL, "15M", &cpu_set_size, NULL, NULL, "Set Memory to 15M bytes" }, \
                         { MTAB_XTD|MTAB_VDV|MTAB_NMO, 0, "MEMORY", NULL, NULL, &cpu_show_memory, NULL, "Display memory configuration" }
 extern t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc);
+extern t_stat mctl_populate_rom (const char *rom_filename);
 #define CPU_MODEL_MODIFIERS { MTAB_XTD|MTAB_VDV, 0, "MODEL",     NULL,                                      \
                               NULL, &cpu_show_model, NULL, "Display the simulator CPU Model" },              \
                             { MTAB_XTD|MTAB_VDV, 0, "BOOTDEV",   "BOOTDEV={A|B|C|D}",                       \
@@ -433,6 +434,8 @@ int32 mba_rdbufW (uint32 mbus, int32 bc, uint16 *buf);
 int32 mba_wrbufW (uint32 mbus, int32 bc, const uint16 *buf);
 int32 mba_chbufW (uint32 mbus, int32 bc, uint16 *buf);
 int32 mba_get_bc (uint32 mbus);
+void init_mbus_tab (void);
+t_stat build_mbus_tab (DEVICE *dptr, DIB *dibp);
 void mba_upd_ata (uint32 mbus, uint32 val);
 void mba_set_exc (uint32 mbus);
 void mba_set_don (uint32 mbus);

@@ -1303,6 +1303,10 @@ return;
 
 t_bool BadCmPSL (int32 newpsl)
 {
+/* Shared compatibility-mode signature.
+   This build variant does not use every parameter. */
+(void) newpsl;
+
 return TRUE;                                            /* always bad */
 }
 

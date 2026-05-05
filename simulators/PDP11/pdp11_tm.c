@@ -265,6 +265,10 @@ DEVICE tm_dev = {
 
 t_stat tm_rd (int32 *data, int32 PA, int32 access)
 {
+/* Memory-mapped I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 UNIT *uptr;
 
 uptr = tm_dev.units + GET_UNIT (tm_cmd);                /* get unit */
@@ -583,6 +587,10 @@ return SCPE_OK;
 
 t_stat tm_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 u;
 UNIT *uptr;
 
@@ -640,6 +648,11 @@ return sim_tape_detach (uptr);
 
 t_stat tm_vlock (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 int32 u = uptr - tm_dev.units;
 
 if ((uptr->flags & UNIT_ATT) &&
@@ -717,6 +730,10 @@ static const uint16 boot2_rom[] = {
 
 t_stat tm_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 sim_tape_rewind (&tm_unit[unitno]);
@@ -789,5 +806,9 @@ return SCPE_OK;
 
 const char *tm_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "TM11 Magnet Tape controller";
 }

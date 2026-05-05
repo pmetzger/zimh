@@ -460,6 +460,24 @@ int32 Map_ReadB (uint32 ba, int32 bc, uint8 *buf);
 int32 Map_ReadW (uint32 ba, int32 bc, uint16 *buf);
 int32 Map_WriteB (uint32 ba, int32 bc, const uint8 *buf);
 int32 Map_WriteW (uint32 ba, int32 bc, const uint16 *buf);
+int32 cqbic_rd (int32 pa);
+void cqbic_wr (int32 pa, int32 val, int32 lnt);
+int32 cqipc_rd (int32 pa);
+void cqipc_wr (int32 pa, int32 val, int32 lnt);
+int32 cqmap_rd (int32 pa);
+void cqmap_wr (int32 pa, int32 val, int32 lnt);
+int32 iccs_rd (void);
+void iccs_wr (int32 data);
+void ioreset_wr (int32 data);
+int32 rxcs_rd (void);
+void rxcs_wr (int32 data);
+int32 rxdb_rd (void);
+int32 todr_rd (void);
+void todr_wr (int32 data);
+int32 txcs_rd (void);
+void txcs_wr (int32 data);
+void txdb_wr (int32 data);
+int32 sysd_hlt_enb (void);
 
 #include "pdp11_io_lib.h"
 

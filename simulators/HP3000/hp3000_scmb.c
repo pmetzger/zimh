@@ -1141,6 +1141,11 @@ return SCPE_OK;
 
 static t_stat scmb_set_bus (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 const CARD_ID card = (CARD_ID) (uptr == &scmb_unit [card2]);
 
 if (value == UNIT_W1_SEL && MPX_BUS (card)) {                       /* if we're moving from MPX to SEL */

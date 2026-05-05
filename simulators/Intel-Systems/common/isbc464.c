@@ -61,6 +61,10 @@ extern uint8 xack;                         /* XACK signal */
 
 int isbc464_onetime = 1;
 static const char* isbc464_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return isbc464_NAME;
 }
 
@@ -124,6 +128,10 @@ DEVICE isbc464_dev = {
 
 t_stat isbc464_cfg(uint16 base, uint16 size, uint8 dummy)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) dummy;
+
     isbc464_unit.capac = size;
     isbc464_unit.u3 = base;
     isbc464_unit.filebuf = (uint8 *)calloc(size, sizeof(uint8));
@@ -148,6 +156,11 @@ t_stat isbc464_clr(void)
 
 t_stat isbc464_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     uint32 size, result, i;
 
     if (cptr == NULL)
@@ -182,6 +195,11 @@ t_stat isbc464_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc464_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     uint32 size, result, i;
 
     if (cptr == NULL)
@@ -216,6 +234,11 @@ t_stat isbc464_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc464_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     fprintf(st, "%s, Size=%04X, Base=%04X ",
         ((isbc464_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled",
         uptr->capac, uptr->BASE_ADDR);

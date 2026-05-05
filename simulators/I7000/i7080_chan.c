@@ -176,6 +176,11 @@ DEVICE              chan_dev = {
 
 t_stat
 set_chan_type(UNIT *uptr, int32 val, const char *cptr, void *desc) {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)desc;
+
     if ((uptr->flags & CHAN_MOD) == 0)
         return SCPE_ARG;
     uptr->flags &= ~CHAN_MODEL;
@@ -252,7 +257,7 @@ chan_boot(int32 unit_num, DEVICE * dptr)
     return SCPE_OK;
 }
 
-t_stat
+static t_stat
 chan_issue_cmd(uint16 chan, uint16 dcmd, uint16 dev) {
     DEVICE            **dptr;
     DIB                *dibp;
@@ -309,7 +314,7 @@ chan_issue_cmd(uint16 chan, uint16 dcmd, uint16 dev) {
 
 /* Decrement the record count for a given channel, return 1 when
    no more records to send */
-int chan_decr_reccnt(int chan) {
+static int chan_decr_reccnt(int chan) {
     int unit;
 
     unit = 512 + chan_unit[chan].u3 * 32;
@@ -346,7 +351,7 @@ int chan_decr_reccnt(int chan) {
 }
 
 /* Return true if record count is zero */
-int chan_zero_reccnt(int chan) {
+static int chan_zero_reccnt(int chan) {
     int unit;
 
     unit = 512 + chan_unit[chan].u3 * 32;
@@ -359,7 +364,7 @@ int chan_zero_reccnt(int chan) {
 }
 
 /* Return next channel data address, advance address by 5 if channel */
-uint32  chan_next_addr(int chan) {
+static uint32  chan_next_addr(int chan) {
     uint32      unit = 0;
     uint32      s_unit = 0;
     uint32      addr = 0;
@@ -761,10 +766,18 @@ chan_proc(void)
 }
 
 void chan_set_attn_inq(int chan) {
+    /* Shared helper signature.
+       This build variant does not use every parameter. */
+    (void)chan;
+
 /*    inquiry = 1; */
 }
 
 void chan_clear_attn_inq(int chan) {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)chan;
+
 /*    inquiry = 0; */
 }
 
@@ -1012,6 +1025,12 @@ chan_chr_13(void)
 int
 chan_write(int chan, t_uint64 * data, int flags)
 {
+    /* Shared helper signature.
+       This build variant does not use every parameter. */
+    (void)chan;
+    (void)data;
+    (void)flags;
+
     return TIME_ERROR;
 }
 
@@ -1021,6 +1040,12 @@ chan_write(int chan, t_uint64 * data, int flags)
 int
 chan_read(int chan, t_uint64 * data, int flags)
 {
+    /* Shared helper signature.
+       This build variant does not use every parameter. */
+    (void)chan;
+    (void)data;
+    (void)flags;
+
     return TIME_ERROR;
 }
 
@@ -1241,6 +1266,12 @@ chan9_set_error(int chan, uint32 mask)
 t_stat
 chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)flag;
+    (void)uptr;
+
     fprintf(st, "%s\n", chan_description(dptr));
     fprintf(st, "The 7080 supports up to 10 channels. Channel 0 is for unit\n");
     fprintf(st, "record devices.  Channels 1 through 4 are for tape drives.\n\n");
@@ -1258,6 +1289,10 @@ chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 chan_description(DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "IBM 7080 channel controller";
 }
 

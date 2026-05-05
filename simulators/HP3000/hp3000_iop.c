@@ -789,6 +789,10 @@ return;
 
 static t_stat iop_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 IOA = 0;                                                /* clear the I/O Address register and initialize */
 iop_initialize ();                                      /*   which clears the external interrupt flip-flop */
 
@@ -828,6 +832,11 @@ return SCPE_OK;
 
 static t_stat iop_set_filter (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 const char *tptr;
 char       *mptr;
 t_addr     dev, low, high;
@@ -890,6 +899,12 @@ return result;                                          /* return the result of 
 
 static t_stat iop_show_filter (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) value;
+(void) desc;
+
 int32  group, low, high;
 uint32 test_filter;
 t_bool first = TRUE, in_range = FALSE;

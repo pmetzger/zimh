@@ -566,6 +566,11 @@ rom[rg] = ((val & 0xFF) << sc) | (rom[rg] & ~(0xFF << sc));
 
 t_stat rom_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if ((vptr == NULL) || (addr & 03))
@@ -580,6 +585,11 @@ return SCPE_OK;
 
 t_stat rom_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if (addr & 03)
@@ -594,6 +604,10 @@ return SCPE_OK;
 
 t_stat rom_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (rom == NULL)
     rom = (uint32 *) calloc (ROMSIZE >> 2, sizeof (uint32));
 
@@ -604,6 +618,12 @@ return SCPE_OK;
 
 t_stat rom_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Read-only memory (ROM)\n\n");
 fprintf (st, "The boot ROM consists of a single unit, simulating the 128KB boot ROM.  It\n");
 fprintf (st, "has no registers.  The boot ROM can be loaded with a binary byte stream\n");
@@ -621,6 +641,10 @@ return SCPE_OK;
 
 const char *rom_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "read-only memory";
 }
 
@@ -650,6 +674,11 @@ else
 
 t_stat nvr_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if ((vptr == NULL) || (addr & 03))
@@ -664,6 +693,11 @@ return SCPE_OK;
 
 t_stat nvr_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if (addr & 03)
@@ -678,6 +712,10 @@ return SCPE_OK;
 
 t_stat nvr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (nvr == NULL) {
     nvr = (uint32 *) calloc (NVRSIZE >> 2, sizeof (uint32));
     nvr_unit.filebuf = nvr;
@@ -719,6 +757,13 @@ return r;
 
 t_stat nvr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Non-volatile Memory (NVR)\n\n");
 fprintf (st, "The NVR consists of a single unit, simulating 1KB of battery-backed up memory\n");
 fprintf (st, "in the SSC chip.  When the simulator starts, NVR is cleared to 0, and the SSC\n");
@@ -732,6 +777,10 @@ return SCPE_OK;
 
 const char *nvr_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "non-volatile memory";
 }
 
@@ -760,6 +809,10 @@ csi_csr = (csi_csr & ~CSICSR_RW) | (data & CSICSR_RW);
 
 t_stat csi_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 csi_unit.buf = 0;
 csi_csr = 0;
 CLR_INT (CSI);
@@ -768,6 +821,10 @@ return SCPE_OK;
 
 const char *csi_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "console storage input";
 }
 
@@ -798,6 +855,10 @@ sim_activate (&cso_unit, cso_unit.wait);
 
 t_stat cso_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 cso_csr = cso_csr | CSR_DONE;
 if (cso_csr & CSR_IE)
     SET_INT (CSO);
@@ -814,6 +875,10 @@ return SCPE_OK;
 
 t_stat cso_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 cso_unit.buf = 0;
 cso_csr = CSR_DONE;
 CLR_INT (CSO);
@@ -823,6 +888,10 @@ return SCPE_OK;
 
 const char *cso_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "console storage output";
 }
 
@@ -1022,6 +1091,10 @@ struct reglink regtable[] = {
 
 int32 ReadReg (uint32 pa, int32 lnt)
 {
+/* Generic register read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 struct reglink *p;
 
 for (p = &regtable[0]; p->low != 0; p++) {
@@ -1044,6 +1117,10 @@ return 0;
 
 int32 ReadRegU (uint32 pa, int32 lnt)
 {
+/* Generic unaligned register read signature.
+   This implementation reads the containing longword. */
+(void) lnt;
+
 return ReadReg (pa & ~03, L_LONG);
 }
 
@@ -1164,6 +1241,12 @@ switch (rg) {
 
 t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 memsize = (uint32)(MEMSIZE>>20);
 uint32 baseaddr = 0;
 struct {
@@ -1208,6 +1291,10 @@ return 0;
 
 void ka_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Generic register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa - KABASE) >> 2;
 
 if ((rg == 0) && ((pa & 3) == 0)) {                     /* lo byte only */
@@ -1673,6 +1760,10 @@ return cc;
 
 int32 con_halt (int32 code, int32 cc)
 {
+/* Generic console halt signature.
+   This implementation does not use every parameter. */
+(void) code;
+
 int32 temp;
 
 conpc = PC;                                             /* save PC */
@@ -1713,6 +1804,11 @@ return run_cmd (flag, "CPU");
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 t_stat r;
 
 PC = ROMBASE;
@@ -1733,6 +1829,12 @@ return SCPE_OK;
 
 t_stat sysd_set_halt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 ka_hltenab = val;
 if (ka_hltenab)
     ka_bdr |= BDR_BRKENB;
@@ -1743,6 +1845,12 @@ return SCPE_OK;
 
 t_stat sysd_show_halt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf(st, "%s", ka_hltenab ? "NOAUTOBOOT" : "AUTOBOOT");
 return SCPE_OK;
 }
@@ -1751,6 +1859,10 @@ return SCPE_OK;
 
 t_stat sysd_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 if (sim_switches & SWMASK ('P')) sysd_powerup ();       /* powerup? */
@@ -1793,6 +1905,12 @@ return SCPE_OK;
 
 t_stat sysd_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "System Devices (SYSD)\n\n");
 fprintf (st, "The system devices are the system-specific facilities implemented in the CVAX\n");
 fprintf (st, "chip, the KA655 CPU board, the CMCTL memory controller, and the SSC\n");
@@ -1813,11 +1931,21 @@ return SCPE_OK;
 
 const char *sysd_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "system devices";
 }
 
 t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 char gbuf[CBUFSIZE];
 
 if ((cptr == NULL) || (!*cptr))
@@ -1862,6 +1990,13 @@ return SCPE_OK;
 
 t_stat cpu_model_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Notes on memory size:\n\n");
 fprintf (st, "- The real KA655 CPU only supported 16MB to 64MB of memory.  The simulator\n");
 fprintf (st, "  implements a KA655\"X\", which increases supported memory to 512MB.\n");

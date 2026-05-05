@@ -1014,18 +1014,34 @@ DEVICE jairp_dev = {
 };
 
 static const char* jair_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return JAIR_NAME;
 }
 
 static const char* jairs0_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return JAIRS0_NAME;
 }
 
 static const char* jairs1_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return JAIRS1_NAME;
 }
 
 static const char* jairp_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return JAIRP_NAME;
 }
 
@@ -1129,6 +1145,11 @@ static t_stat jair_port_reset(DEVICE *dptr) {
  */
 static t_stat jair_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+    (void) dptr;
+
     sim_printf("%s: Booting using ROM at 0x%04x\n", JAIR_SNAME, jair_ctx.rom_base);
 
     *((int32 *) sim_PC->loc) = jair_ctx.rom_base;
@@ -1354,6 +1375,11 @@ static t_stat jair_detach_mux(UNIT *uptr)
 
 static t_stat jair_show_ports(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     JAIR_PORT_CTX *port;
 
     port = (JAIR_PORT_CTX *) uptr->dptr->ctxt;
@@ -1490,6 +1516,11 @@ static int jair_new_baud(UNIT *uptr)
 
 static t_stat jair_set_baud(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) value;
+    (void) desc;
+
     int32 baud;
     t_stat r = SCPE_ARG;
     JAIR_PORT_CTX *port;
@@ -1512,6 +1543,11 @@ static t_stat jair_set_baud(UNIT *uptr, int32 value, const char *cptr, void *des
 
 static t_stat jair_show_baud(FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) value;
+    (void) desc;
+
     JAIR_PORT_CTX *port;
 
     port = (JAIR_PORT_CTX *) uptr->dptr->ctxt;
@@ -1883,11 +1919,25 @@ static uint8 jair_io_out(uint32 addr, int32 data)
 }
 
 static t_stat jair_set_rom(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+    (void) cptr;
+    (void) desc;
+
     jair_ctx.sr_ena = TRUE;
     return SCPE_OK;
 }
 
 static t_stat jair_set_norom(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+    (void) cptr;
+    (void) desc;
+
     jair_ctx.sr_ena = FALSE;
     return SCPE_OK;
 }
@@ -1920,6 +1970,14 @@ static int32 jair_shadow_rom(int32 Addr, int32 rw, int32 data)
  */
 static t_stat jair_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) st;
+    (void) dptr;
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     return SCPE_OK;
 }
 

@@ -379,7 +379,7 @@ static void cpu_scr(void)
   }
 }
 
-int cpu_skip(void)
+static int cpu_skip(void)
 {
   int flag;
   switch (C & 057) {
@@ -946,6 +946,11 @@ t_stat sim_instr(void)
 
 static t_stat cpu_ex(t_value *vptr, t_addr ea, UNIT *uptr, int32 sw)
 {
+  /* Generic examine signature.
+     This implementation does not use every parameter. */
+  (void)uptr;
+  (void)sw;
+
   if (vptr == NULL)
     return SCPE_ARG;
   if (ea >= MEMSIZE)
@@ -956,6 +961,11 @@ static t_stat cpu_ex(t_value *vptr, t_addr ea, UNIT *uptr, int32 sw)
 
 static t_stat cpu_dep(t_value val, t_addr ea, UNIT *uptr, int32 sw)
 {
+  /* Generic deposit signature.
+     This implementation does not use every parameter. */
+  (void)uptr;
+  (void)sw;
+
   if (ea >= MEMSIZE)
     return SCPE_NXM;
   M[ea] = val & WMASK;
@@ -965,6 +975,12 @@ static t_stat cpu_dep(t_value val, t_addr ea, UNIT *uptr, int32 sw)
 static t_stat
 cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void)uptr;
+  (void)val;
+  (void)desc;
+
   t_stat r;
   uint32 x;
 
@@ -988,6 +1004,12 @@ cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
 static t_stat
 cpu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void)uptr;
+  (void)val;
+  (void)desc;
+
   t_value insn;
   uint32 i, j;
 
@@ -1021,6 +1043,10 @@ cpu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 static t_stat
 cpu_reset(DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void)dptr;
+
   sim_brk_types = SWMASK('E') | SWMASK('R') | SWMASK('W');
   sim_brk_dflt = SWMASK('E');
   sim_vm_cmd = linc_cmd;
@@ -1029,6 +1055,10 @@ cpu_reset(DEVICE *dptr)
 
 static t_stat linc_boot(int32 flag, const char *cptr)
 {
+  /* Generic command signature.
+     This implementation does not use every parameter. */
+  (void)flag;
+
   char dev[CBUFSIZE], arg[CBUFSIZE];
   char bbuf[CBUFSIZE], gbuf[CBUFSIZE];
   t_value block;

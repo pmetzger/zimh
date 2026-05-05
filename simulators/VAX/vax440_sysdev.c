@@ -253,7 +253,7 @@ return 0;
 
 /* Map an address via the translation map */
 
-t_bool dma_map_addr (uint32 da, uint32 *ma)
+static t_bool dma_map_addr (uint32 da, uint32 *ma)
 {
 int32 dblk = (da >> VA_V_VPN);                          /* DMA blk */
 if (dblk <= DMANMAPR) {
@@ -403,13 +403,13 @@ else {
 return 0;
 }
 
-int32 isdn_rd (int32 pa)
+static int32 isdn_rd (int32 pa)
 {
 int32 rg = (pa - 0x200D0000) >> 2;
 return isdn[rg];
 }
 
-void isdn_wr (int32 pa, int32 val, int32 lnt)
+static void isdn_wr (int32 pa, int32 val, int32 lnt)
 {
 int32 rg = (pa - 0x200D0000) >> 2;
 if (lnt < L_LONG) {                                     /* byte or word? */
@@ -420,8 +420,12 @@ if (lnt < L_LONG) {                                     /* byte or word? */
 else isdn[rg] = val;
 }
 
-int32 cfg_rd (int32 pa)
+static int32 cfg_rd (int32 pa)
 {
+/* Register read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+
 int32 val = ka_cfgtst;
 t_addr mem = MEMSIZE;
 uint32 sc;
@@ -450,8 +454,14 @@ for (sc = 1; mem > 0; sc++) {
 return val;
 }
 
-void ioreset_wr (int32 pa, int32 val, int32 lnt)
+static void ioreset_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) val;
+(void) lnt;
+
 reset_all (6);
 }
 
@@ -579,13 +589,13 @@ switch (rg) {
 return;
 }
 
-int32 invfl_rd (int32 pa)
+static int32 invfl_rd (int32 pa)
 {
 int32 rg = (pa - 0x20200000) >> 2;
 return invfl[rg];
 }
 
-void invfl_wr (int32 pa, int32 val, int32 lnt)
+static void invfl_wr (int32 pa, int32 val, int32 lnt)
 {
 int32 rg = (pa - 0x20200000) >> 2;
 if (lnt < L_LONG) {                                     /* byte or word? */
@@ -596,13 +606,13 @@ if (lnt < L_LONG) {                                     /* byte or word? */
 else invfl[rg] = val;
 }
 
-int32 cache2ds_rd (int32 pa)
+static int32 cache2ds_rd (int32 pa)
 {
 int32 rg = (pa - 0x08000000) >> 2;
 return cache2ds[rg];
 }
 
-void cache2ds_wr (int32 pa, int32 val, int32 lnt)
+static void cache2ds_wr (int32 pa, int32 val, int32 lnt)
 {
 int32 rg = (pa - 0x08000000) >> 2;
 if (lnt < L_LONG) {                                     /* byte or word? */
@@ -613,13 +623,13 @@ if (lnt < L_LONG) {                                     /* byte or word? */
 else cache2ds[rg] = val;
 }
 
-int32 cache2ts_rd (int32 pa)
+static int32 cache2ts_rd (int32 pa)
 {
 int32 rg = (pa - 0x22000000) >> 2;
 return cache2ts[rg];
 }
 
-void cache2ts_wr (int32 pa, int32 val, int32 lnt)
+static void cache2ts_wr (int32 pa, int32 val, int32 lnt)
 {
 int32 rg = (pa - 0x22000000) >> 2;
 if (lnt < L_LONG) {                                     /* byte or word? */
@@ -630,25 +640,33 @@ if (lnt < L_LONG) {                                     /* byte or word? */
 else cache2ts[rg] = val;
 }
 
-int32 dma_map_rd (int32 pa)
+static int32 dma_map_rd (int32 pa)
 {
 int32 rg = (pa - DMABASE);
 int32 val = ReadL (ka_mapbase + rg);
 return val;
 }
 
-void dma_map_wr (int32 pa, int32 val, int32 lnt)
+static void dma_map_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa - DMABASE);
 WriteL (ka_mapbase + rg, val);
 }
 
-int32 sccr_rd (int32 pa)
+static int32 sccr_rd (int32 pa)
 {
+/* Register read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+
 return SCCR & SCCR_RD;
 }
 
-void sccr_wr (int32 pa, int32 val, int32 lnt)
+static void sccr_wr (int32 pa, int32 val, int32 lnt)
 {
 if (lnt < L_LONG) {                                     /* byte or word? */
     int32 sc = (pa & 3) << 3;                           /* merge */
@@ -658,7 +676,7 @@ if (lnt < L_LONG) {                                     /* byte or word? */
 else SCCR = val & SCCR_WR;
 }
 
-int32 memrg_rd (int32 pa)
+static int32 memrg_rd (int32 pa)
 {
 int32 rg = (pa - 0x20101800) >> 2;
 
@@ -680,8 +698,12 @@ switch (rg) {
 return 0;
 }
 
-void memrg_wr (int32 pa, int32 val, int32 lnt)
+static void memrg_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa - 0x20101800) >> 2;
 
 switch (rg) {
@@ -702,13 +724,22 @@ switch (rg) {
 return;
 }
 
-int32 null_rd (int32 pa)
+static int32 null_rd (int32 pa)
 {
+/* Register read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+
 return 0;
 }
 
-void null_wr (int32 pa, int32 val, int32 lnt)
+static void null_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) val;
+(void) lnt;
 }
 
 /* Read/write I/O register space
@@ -758,6 +789,10 @@ struct reglink regtable[] = {
 
 int32 ReadReg (uint32 pa, int32 lnt)
 {
+/* Register read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 struct reglink *p;
 
 for (p = &regtable[0]; p->low != 0; p++) {
@@ -778,6 +813,10 @@ return 0xFFFFFFFF;
 
 int32 ReadRegU (uint32 pa, int32 lnt)
 {
+/* Unaligned register read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 return ReadReg (pa & ~03, L_LONG);
 }
 
@@ -856,6 +895,10 @@ return 0;
 
 void ka_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa - KABASE) >> 2;
 
 switch (rg) {
@@ -903,6 +946,11 @@ return;
 
 int32 machine_check (int32 p1, int32 opc, int32 cc, int32 delta)
 {
+/* VAX machine-check handler signature.
+   This implementation does not use every parameter. */
+(void) opc;
+(void) delta;
+
 int32 p2, acc;
 
 if (in_ie) {
@@ -971,6 +1019,11 @@ return run_cmd (flag, "CPU");
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 t_stat r;
 
 PC = ROMBASE;
@@ -992,6 +1045,10 @@ return SCPE_OK;
 
 t_stat sysd_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ka_mapbase = 0;
 ka_cfgtst = CFGT_L3C;
 ka_led = 0;
@@ -1022,11 +1079,20 @@ return SCPE_OK;
 
 const char *sysd_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "system devices";
 }
 
 t_stat auto_config (const char *name, int32 nctrl)
 {
+/* Generic autoconfiguration signature.
+   This implementation does not use every parameter. */
+(void) name;
+(void) nctrl;
+
 return SCPE_OK;
 }
 
@@ -1037,6 +1103,12 @@ return SCPE_OK;
 
 t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 char gbuf[CBUFSIZE];
 
 if ((cptr == NULL) || (!*cptr))
@@ -1092,6 +1164,13 @@ return SCPE_OK;
 
 t_stat cpu_model_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Initial memory size is 16MB.\n\n");
 fprintf (st, "The simulator is booted with the BOOT command:\n\n");
 fprintf (st, "   sim> BOOT\n\n");

@@ -1105,6 +1105,12 @@ dtc_boot(int32 unit_num, DEVICE * dptr)
 t_stat
 dtc_set_dct (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32 dct;
     t_stat r;
 
@@ -1120,6 +1126,11 @@ dtc_set_dct (UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 dtc_show_dct (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) val;
+   (void) desc;
+
    if (uptr == NULL)
       return SCPE_IERR;
 
@@ -1132,6 +1143,10 @@ dtc_show_dct (FILE *st, UNIT *uptr, int32 val, const void *desc)
 t_stat
 dtc_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int   i;
 
     dtc_dtsb = dtc_dtsa = 0;                                    /* clear status */

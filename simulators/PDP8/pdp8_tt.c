@@ -217,6 +217,10 @@ return SCPE_OK;
 
 t_stat tti_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmxr_set_console_units (&tti_unit, &tto_unit);
 tti_unit.buf = 0;
 dev_done = dev_done & ~INT_TTI;                         /* clear done, int */
@@ -286,6 +290,10 @@ return SCPE_OK;
 
 t_stat tto_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tto_unit.buf = 0;
 dev_done = dev_done & ~INT_TTO;                         /* clear done, int */
 int_req = int_req & ~INT_TTO;
@@ -296,6 +304,10 @@ return SCPE_OK;
 
 t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 sim_tt_set_mode (&tti_unit, val, cptr, desc);
 sim_tt_set_mode (&tto_unit, val, cptr, desc);
 return SCPE_OK;
@@ -303,6 +315,10 @@ return SCPE_OK;
 
 t_stat tty_set_parity (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 sim_tt_set_parity (&tti_unit, val, cptr, desc);
 sim_tt_set_parity (&tto_unit, val, cptr, desc);
 tti_unit.flags = (tti_unit.flags & ~TT_PAR) | val;
@@ -312,10 +328,18 @@ return SCPE_OK;
 
 const char *tti_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "console terminal input";
 }
 
 const char *tto_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "console terminal output";
 }

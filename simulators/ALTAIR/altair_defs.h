@@ -43,3 +43,13 @@
 /* Rename of global BC and SP variables to avoid namespace conflicts on some platforms */
 #define BC BC_Global
 #define SP SP_Global
+
+/* I/O port handlers */
+
+int32 dsk10(int32 io, int32 data);
+int32 dsk11(int32 io, int32 data);
+int32 dsk12(int32 io, int32 data);
+int32 sio0s(int32 io, int32 data);
+int32 sio0d(int32 io, int32 data);
+int32 sio1s(int32 io, int32 data);
+int32 sio1d(int32 io, int32 data);

@@ -195,7 +195,7 @@ const int8 odd_par[64] = {
    number of entries
 */
 
-t_stat sim_load_cct (FILE *fileref)
+static t_stat sim_load_cct (FILE *fileref)
 {
 int32 col, rpt, ptr, mask, cctbuf[CCT_LNT];
 t_stat r;
@@ -239,7 +239,7 @@ return SCPE_OK;
    a bootstrap paper tape.
 */
 
-int32 get_word (FILE *fileref, int32 *ldr)
+static int32 get_word (FILE *fileref, int32 *ldr)
 {
 int32 i, c, wd;
 
@@ -259,6 +259,10 @@ return wd;
 
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void)fnam;
+
 int32 i, wd, buf[8];
 int32 ldr = 1;
 extern uint32 P;
@@ -480,7 +484,7 @@ static const char *chname[] = {
         inst    =       mask bits
 */
 
-void fprint_reg (FILE *of, int32 inst)
+static void fprint_reg (FILE *of, int32 inst)
 {
 int32 i, j, sp;
 
@@ -533,6 +537,11 @@ int8 ascii_to_sds (int8 ch)
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
     UNIT *uptr, int32 sw)
 {
+/* Generic symbolic output signature.
+   This implementation does not use every parameter. */
+(void)addr;
+(void)uptr;
+
 int32 i, j, ch;
 int32 inst, op, tag, va, shf, nonop;
 
@@ -640,7 +649,7 @@ return SCPE_ARG;
         cptr  = updated pointer to input string
 */
 
-const char *get_tag (const char *cptr, t_value *tag)
+static const char *get_tag (const char *cptr, t_value *tag)
 {
 const char *tptr;
 char gbuf[CBUFSIZE];
@@ -668,6 +677,11 @@ return cptr;                                            /* no change */
 
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+/* Generic symbolic input signature.
+   This implementation does not use every parameter. */
+(void)addr;
+(void)uptr;
+
 int32 i, j, k, ch;
 t_value d, tag;
 t_stat r;

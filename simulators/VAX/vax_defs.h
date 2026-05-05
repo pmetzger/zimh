@@ -1080,16 +1080,27 @@ extern t_bool BadCmPSL (int32 newpsl);
 /* vax_sys.c externals */
 extern const uint16 drom[NUM_INST][MAX_SPEC + 1];
 
+/* vax_syscm.c externals */
+extern t_stat fprint_sym_cm (FILE *of, t_addr addr, t_value *bytes, int32 sw);
+extern t_stat parse_sym_cm (const char *cptr, t_addr addr, t_value *bytes,
+    int32 sw);
+
 /* Model dependent definitions */
 extern int32 eval_int (void);
 extern int32 machine_check (int32 p1, int32 opc, int32 cc, int32 delta);
 extern int32 get_vector (int32 lvl);
 extern int32 con_halt (int32 code, int32 cc);
+extern int32 ReadIPR (int32 rg);
+extern void WriteIPR (int32 rg, int32 val);
 extern t_stat cpu_boot (int32 unitno, DEVICE *dptr);
 extern t_stat build_dib_tab (void);
 extern void rom_wr_B (int32 pa, int32 val);
 extern int32 rz_rd (int32 pa);
 extern void rz_wr (int32 pa, int32 val, int32 lnt);
+extern int32 vc_mem_rd (int32 pa);
+extern void vc_mem_wr (int32 pa, int32 val, int32 mode);
+extern int32 xs_rd (int32 pa);
+extern void xs_wr (int32 pa, int32 val, int32 lnt);
 extern int32 cpu_instruction_set;
 
 #if defined (VAX_780)

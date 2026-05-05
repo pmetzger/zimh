@@ -1129,6 +1129,10 @@ return (csum & 077);
 
 t_stat dt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i, prev_mot;
 UNIT *uptr;
 
@@ -1189,6 +1193,10 @@ static const uint16 boot_rom[] = {
 
 t_stat dt_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 if (unitno)                                             /* only unit 0 */
@@ -1352,5 +1360,9 @@ return detach_unit (uptr);
 
 const char *dt_description (DEVICE *dptr)
 {
+/* Generic description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "TC08/TU56 DECtape";
 }

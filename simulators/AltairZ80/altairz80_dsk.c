@@ -343,6 +343,10 @@ static REG dsk_reg[] = {
 #define DSK_NAME    "Altair Floppy Disk"
 
 static const char* dsk_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return DSK_NAME;
 }
 
@@ -456,6 +460,10 @@ void install_ALTAIRbootROM(void) {
     the starting sector is chosen from the attached image size.
 */
 static t_stat dsk_boot(int32 unitno, DEVICE *dptr) {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     if (cpu_unit.flags & (UNIT_CPU_ALTAIRROM | UNIT_CPU_BANKED)) {
         if (sectors_per_track[unitno] == MINI_DISK_SECT) {
             const t_bool result = (install_bootrom(alt_bootrom_dsk, BOOTROM_SIZE_DSK,
@@ -549,6 +557,10 @@ static void writebuf(void) {
 */
 
 int32 dsk10(const int32 port, const int32 io, const int32 data) {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+
     int32 current_disk_flags;
     in9_count = 0;
     if (io == 0) {                                      /* IN: return flags */
@@ -599,6 +611,10 @@ int32 dsk10(const int32 port, const int32 io, const int32 data) {
 /* Disk Drive Status/Functions */
 
 int32 dsk11(const int32 port, const int32 io, const int32 data) {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+
     if (current_disk >= NUM_OF_DSK) {
         if ((dsk_dev.dctrl & VERBOSE_MSG) && (warnDSK11 < warnLevelDSK)) {
             warnDSK11++;
@@ -700,6 +716,10 @@ int32 dsk11(const int32 port, const int32 io, const int32 data) {
 /* Disk Data In/Out */
 
 int32 dsk12(const int32 port, const int32 io, const int32 data) {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+
     int32 i, rtn;
     UNIT *uptr;
 

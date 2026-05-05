@@ -117,7 +117,7 @@ DEVICE  cr_dev = {
 /* Returns the SDS Internal style BCD of the
  hollerith code or 0x7f if error
  */
-uint8 hol_to_sdsbcd(uint16 hol) {
+static uint8 hol_to_sdsbcd(uint16 hol) {
     uint8 bcd;
 
     /* Convert 10,11,12 rows */
@@ -343,6 +343,10 @@ void cr_set_err (UNIT *uptr) {
 }
 
 t_stat cr_reset (DEVICE *dptr) {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     chan_disc (cr_dib.chan);                /* disconnect */
     cr_bptr = cr_blnt = 0;
     xfr_req = xfr_req & ~XFR_CR;            /* clr xfr flag */
@@ -356,6 +360,10 @@ t_stat cr_attach (UNIT *uptr, const char *cptr) {
 
 /* Boot routine - simulate FILL console command */
 t_stat cr_boot (int32 unitno, DEVICE *dptr) {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+
     extern uint32 P, M[];
 
     cr_reset(dptr);
@@ -369,6 +377,11 @@ t_stat cr_boot (int32 unitno, DEVICE *dptr) {
 }
 
 t_stat cr_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int n;
 
     if ((n = sim_card_input_hopper_count(uptr)) == 0)

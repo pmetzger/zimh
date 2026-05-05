@@ -371,6 +371,10 @@ return val;
 
 t_stat pclk_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 sim_debug (DBG_TICK, &pclk_dev, "pclk_svc()\n");
 if (pclk_csr & CSR_DONE)                                /* done already set? */
     pclk_csr = pclk_csr | CSR_ERR;                      /* set error */
@@ -393,6 +397,10 @@ return SCPE_OK;
 
 t_stat pclk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_debug(DBG_REG, &pclk_dev, "pclk_reset()\n");
 pclk_csr = 0;                                           /* clear reg */
 pclk_csb = 0;
@@ -406,6 +414,12 @@ return auto_config (0, 0);
 
 t_stat pclk_set_line (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (val == UNIT_LINE50HZ) {
     rate[2] = 50;
     xtim[2] = 20000;
@@ -419,6 +433,12 @@ return SCPE_OK;
 
 t_stat pclk_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 static const char *freqs[] = {"100K Hz", "10K Hz", "Line Freq", "External (10Hz)"};
 
 fprintf (st, "%s", freqs[CSR_GETRATE (pclk_csr)]);
@@ -429,5 +449,9 @@ return SCPE_OK;
 
 const char *pclk_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "KW11-P programmable real time clock";
 }

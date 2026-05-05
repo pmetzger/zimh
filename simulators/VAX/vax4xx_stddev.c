@@ -221,6 +221,11 @@ return;
 
 t_stat rom_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if ((vptr == NULL) || (addr & 03))
@@ -235,6 +240,11 @@ return SCPE_OK;
 
 t_stat rom_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if (addr & 03)
@@ -249,6 +259,10 @@ return SCPE_OK;
 
 t_stat rom_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (rom == NULL)
     rom = (uint32 *) calloc (ROMSIZE >> 2, sizeof (uint32));
 if (rom == NULL)
@@ -258,6 +272,12 @@ return SCPE_OK;
 
 t_stat rom_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Read-only memory (ROM)\n\n");
 fprintf (st, "The boot ROM consists of a single unit, simulating the 256KB boot ROM.  It has\n");
 fprintf (st, "no registers.  The boot ROM is loaded with a binary byte stream using the \n");
@@ -277,6 +297,10 @@ return SCPE_OK;
 
 const char *rom_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "read-only memory";
 }
 
@@ -296,6 +320,10 @@ return (val << 2);
 
 void nvr_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa - NVRBASE) >> 2;
 val = val >> 2;
 if (rg < 14)                                            /* watch chip */
@@ -311,6 +339,11 @@ else {
 
 t_stat nvr_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if ((vptr == NULL) || (addr & 03))
@@ -325,6 +358,11 @@ return SCPE_OK;
 
 t_stat nvr_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if (addr & 03)
@@ -339,6 +377,10 @@ return SCPE_OK;
 
 t_stat nvr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (nvr == NULL) {
     nvr = (uint32 *) calloc (NVRSIZE >> 2, sizeof (uint32));
     nvr_unit.filebuf = nvr;
@@ -350,6 +392,13 @@ return SCPE_OK;
 
 t_stat nvr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Non-volatile Memory (NVR)\n\n");
 fprintf (st, "The NVR simulates %d bytes of battery-backed up memory.\n", NVRSIZE);
 fprintf (st, "When the simulator starts, NVR is cleared to 0, and the battery-low indicator\n");
@@ -392,6 +441,10 @@ return r;
 
 const char *nvr_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "non-volatile memory";
 }
 
@@ -438,11 +491,22 @@ return sim_rom_read_with_delay (0xFFFFFFFF);
 
 t_stat or_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return SCPE_OK;
 }
 
 t_stat or_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Option ROMs (OR)\n\n");
 fprintf (st, "The OR simulates the read only memory present on option boards.\n");
 fprintf (st, "These ROMs contain the self-test code that is called by the main\n");
@@ -471,6 +535,10 @@ return SCPE_OK;
 
 const char *or_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "option ROMs";
 }
 
@@ -519,6 +587,10 @@ return SCPE_OK;
 
 t_stat clk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 t;
 
 clk_csr = 0;
@@ -532,6 +604,10 @@ return SCPE_OK;
 
 const char *clk_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "100hz clock tick";
 }
 
@@ -539,20 +615,42 @@ return "100hz clock tick";
 
 int32 ReadIO (uint32 pa, int32 lnt)
 {
+/* Dummy I/O read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) lnt;
+
 return 0;
 }
 
 void WriteIO (uint32 pa, int32 val, int32 lnt)
 {
+/* Dummy I/O write signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) val;
+(void) lnt;
+
 return;
 }
 
 int32 ReadIOU (uint32 pa, int32 lnt)
 {
+/* Dummy unaligned I/O read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) lnt;
+
 return 0;
 }
 
 void WriteIOU (uint32 pa, int32 val, int32 lnt)
 {
+/* Dummy unaligned I/O write signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) val;
+(void) lnt;
+
 return;
 }

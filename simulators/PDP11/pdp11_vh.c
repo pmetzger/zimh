@@ -1749,6 +1749,10 @@ static t_stat vh_detach (   UNIT    *uptr   )
 
 static t_stat vh_show_vec (FILE *st, UNIT *uptr, int32 arg, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) arg;
+
 const TMXR *mp = (const TMXR *) desc;
 
 return show_vec (st, uptr, ((mp->lines * 2) / VH_LINES), desc);
@@ -1776,6 +1780,12 @@ static t_stat vh_show_detail (   FILE    *st,
                 int32   val,
                 const void    *desc   )
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32   i, j;
 
     fprintf (st, "VH:\trxi %d, txi %d\n", vh_rxi, vh_txi);
@@ -1796,6 +1806,12 @@ static t_stat vh_show_rbuf (    FILE    *st,
                 int32   val,
                 const void    *desc   )
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32   i;
 
     for (i = 0; i < rbuf_idx[0]; i++)
@@ -1808,6 +1824,12 @@ static t_stat vh_show_txq ( FILE    *st,
                 int32   val,
                 const void    *desc   )
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32   i;
 
     for (i = 0; i < txq_idx[0]; i++)
@@ -1819,6 +1841,12 @@ static t_stat vh_show_txq ( FILE    *st,
 
 static t_stat vh_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 newln, i, t;
 t_stat r;
 
@@ -1851,6 +1879,11 @@ return vh_reset (&vh_dev);
 
 static t_stat vh_setmode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if (cptr)
     return SCPE_ARG;
 if ((UNIBUS) && (val != UNIT_MODEDHU))
@@ -1862,6 +1895,11 @@ return SCPE_OK;
 
 static t_stat vh_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 t_stat r;
 char gbuf[CBUFSIZE];
 int32 ln;
@@ -1881,6 +1919,11 @@ return tmxr_set_log (NULL, ln, cptr, desc);
 
 static t_stat vh_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 t_stat r;
 int32 ln;
 
@@ -1896,6 +1939,11 @@ return tmxr_set_nolog (NULL, ln, NULL, desc);
 
 static t_stat vh_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 i;
 
 for (i = 0; i < vh_desc.lines; i++) {
@@ -1963,6 +2011,10 @@ return SCPE_OK;
 
 static t_stat vh_help_attach (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic attach-help signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 const char *devtype = (UNIBUS) ? "DHU11" : "DHQ11";
 
 fprintf (st, "%s %s Terminal Multiplexer Attach Help\n\n", devtype, dptr->name);
@@ -1971,5 +2023,9 @@ return tmxr_attach_help (st, dptr, uptr, 1, cptr);
 
 static const char *vh_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return (UNIBUS) ? "DHU11 16-line Terminal Multiplexer" : "DHQ11 8-line Terminal Multiplexer";
 }

@@ -153,6 +153,12 @@ t_stat BOOTROM_attach (UNIT *uptr, const char *cptr)
 
 t_stat BOOTROM_config (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
+
     if ((val < UNIT_NONE) || (val > UNIT_2764)) { /* valid param? */
         return SCPE_ARG;
     }
@@ -171,6 +177,10 @@ t_stat BOOTROM_config (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat BOOTROM_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     t_addr j;
     int c;
     FILE *fp;

@@ -226,6 +226,10 @@ static REG ss1_reg[] = {
 };
 
 static const char* ss1_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Compupro System Support 1";
 }
 

@@ -224,6 +224,10 @@ DEVICE      lpr_dev = {
 
 /* initialize the line printer */
 void lpr_ini(UNIT *uptr, t_bool f) {
+    /* Generic device init signature.
+       This implementation does not use every parameter. */
+    (void) f;
+
     uptr->CMD &= ~(LPR_CMDMSK);             /* zero cmd */
     sim_cancel(uptr);                       /* stop any timers */
     uptr->SNS = 0;                          /* no status */
@@ -245,6 +249,10 @@ t_stat  lpr_rschnlio(UNIT *uptr) {
 
 /* start a line printer operation */
 t_stat lpr_preio(UNIT *uptr, uint16 chan) {
+    /* Generic channel pre-I/O signature.
+       This implementation does not use every parameter. */
+    (void) chan;
+
     DEVICE      *dptr = get_dev(uptr);
     int         unit = (uptr - dptr->units);
     uint16      chsa = GET_UADDR(uptr->CMD);
@@ -582,6 +590,11 @@ t_stat  lpr_haltio(UNIT *uptr) {
 /* Set the number of lines per page on printer */
 t_stat lpr_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int i;
     if (cptr == NULL)
         return SCPE_ARG;
@@ -605,6 +618,11 @@ t_stat lpr_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 /* display the number of lines per page */
 t_stat lpr_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) v;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "linesperpage=%02d", uptr->capac);
@@ -648,6 +666,12 @@ t_stat lpr_attach(UNIT *uptr, const char *file)
 /* help information for lpr */
 t_stat lpr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     fprintf (st, "SEL32 924x High Speed Line Printer\n");
     fprintf (st, "The Line printer can be configured to any number of\n");
     fprintf (st, "lines per page with the:\n");
@@ -666,6 +690,10 @@ t_stat lpr_detach(UNIT * uptr)
 
 const char *lpr_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "SEL32 924x High Speed Line Printer";
 }
 

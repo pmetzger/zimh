@@ -403,7 +403,7 @@ char *dump_buf(uint8 *mp, int32 off, int cnt)
  * return 1 - OK
  * return 0 - error or eof
  */
-int get_word(FILE *fileref, uint32 *word)
+static int get_word(FILE *fileref, uint32 *word)
 {
     unsigned char cbuf[4];
 
@@ -437,7 +437,7 @@ int get_halfword(FILE *fileref, uint16 *word)
 
 /* load a binary file into memory starting at loc 0 */
 /* return SCPE_OK on load complete */
-t_stat load_mem (FILE *fileref)
+static t_stat load_mem (FILE *fileref)
 {
     uint32 data;
     uint32 ma = 0;  /* start at mem add 0 */
@@ -596,7 +596,7 @@ t_stat load_tap (FILE *fileref)
  * return SCPE_OK for OK
  * or SCPE_ARG for arg error (bad number)
  */
-t_value get_2hex(char *pt, uint32 *val)
+static t_value get_2hex(char *pt, uint32 *val)
 {
     int32 hexval;
     uint32 c1 = sim_toupper((uint32)pt[0]); /* first hex char */
@@ -624,7 +624,7 @@ t_value get_2hex(char *pt, uint32 *val)
 /* load an ICL file and configure SPAD interupt and device entries */
 /* SPAD keyword will not be set and will be set when MPX or UTX is loaded */
 /* return SCPE_OK on load complete */
-t_stat load_icl(FILE *fileref)
+static t_stat load_icl(FILE *fileref)
 {
     char        *cp;                        /* work pointer in buf[] */
     uint32      sa;                         /* spad address */
@@ -765,6 +765,11 @@ t_stat load_icl(FILE *fileref)
 #define FMT_ICL 3
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+    /* Generic loader signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)flag;
+
     int32 fmt;
 
     fmt = FMT_NONE;                         /* no format */
@@ -1258,6 +1263,10 @@ int fprint_inst(FILE *of, uint32 val, int32 sw)
 */
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 {
+    /* Generic symbolic output signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+
     int         i;
     int         l = 4;                      /* default to full words */
     int         rdx = 16;                   /* default radex is hex */
@@ -1340,7 +1349,7 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 /*
  * Collect offset in radix.
  */
-t_stat get_off (const char *cptr, const char **tptr, uint32 radix, t_value *val, char *m)
+static t_stat get_off (const char *cptr, const char **tptr, uint32 radix, t_value *val, char *m)
 {
     t_stat r = SCPE_OK;                     /* assume OK return */
 
@@ -1365,7 +1374,7 @@ t_stat get_off (const char *cptr, const char **tptr, uint32 radix, t_value *val,
 /*
  * Collect immediate in radix.
  */
-t_stat get_imm (const char *cptr, const char **tptr, uint32 radix, t_value *val)
+static t_stat get_imm (const char *cptr, const char **tptr, uint32 radix, t_value *val)
 {
     t_stat r;
 
@@ -1394,6 +1403,11 @@ t_stat get_imm (const char *cptr, const char **tptr, uint32 radix, t_value *val)
 
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+    /* Generic symbolic input signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+    (void)uptr;
+
     int        i;
     int        x;
     int        l = 4;                       /* default to full words */

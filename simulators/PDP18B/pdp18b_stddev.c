@@ -421,6 +421,10 @@ DEVICE tto_dev = {
 
 int32 clk (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if (pulse & 001) {                                      /* CLSF */
     if (TST_INT (CLK))
         dat = dat | IOT_SKP;
@@ -496,6 +500,10 @@ return (TST_INT (CLK)? IOS_CLK: 0);
 
 t_stat clk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 t;
 
 sim_register_clock_unit (&clk_unit);                    /* declare clock unit */
@@ -515,6 +523,11 @@ return SCPE_OK;
 
 t_stat clk_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if (cptr)
     return SCPE_ARG;
 if ((val != 50) && (val != 60))
@@ -527,6 +540,12 @@ return SCPE_OK;
 
 t_stat clk_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, (clk_tps == 50)? "50Hz": "60Hz");
 return SCPE_OK;
 }
@@ -548,6 +567,10 @@ return SCPE_OK;
 
 int32 ptr (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if (pulse & 001) {                                      /* RSF */
     if (TST_INT (PTR))
         dat = dat | IOT_SKP;
@@ -572,6 +595,10 @@ return dat;
 
 t_stat ptr_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 temp;
 
 if ((ptr_unit.flags & UNIT_ATT) == 0) {                 /* attached? */
@@ -621,6 +648,10 @@ return SCPE_OK;
 
 t_stat ptr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ptr_state = 0;                                          /* clear state */
 ptr_unit.buf = 0;
 CLR_INT (PTR);                                          /* clear flag */
@@ -699,7 +730,7 @@ if (hi != NULL)
 return word;
 }
 
-t_stat ptr_rim_load (UNIT *uptr, int32 origin)
+static t_stat ptr_rim_load (UNIT *uptr, int32 origin)
 {
 int32 bits, val;
 
@@ -868,6 +899,11 @@ static const int32 boot_rom[] = {
 
 t_stat ptr_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 size_t i;
 int32 mask, wd;
 
@@ -896,6 +932,11 @@ return SCPE_OK;
 
 t_stat ptr_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 return ptr_rim_load (&ptr_unit, ASW);
 }
 
@@ -905,6 +946,10 @@ return ptr_rim_load (&ptr_unit, ASW);
 
 int32 ptp (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if (pulse & 001) {                                      /* PSF */
     if (TST_INT (PTP))
         dat = dat | IOT_SKP;
@@ -924,6 +969,10 @@ return dat;
 
 t_stat ptp_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 SET_INT (PTP);                                          /* set flag */
 if ((ptp_unit.flags & UNIT_ATT) == 0) {                 /* not attached? */
     ptp_err = 1;                                        /* set error */
@@ -959,6 +1008,10 @@ return  ((TST_INT (PTP)? IOS_PTP: 0)
 
 t_stat ptp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ptp_unit.buf = 0;
 CLR_INT (PTP);                                          /* clear flag */
 ptp_err = (ptp_unit.flags & UNIT_ATT)? 0: 1;
@@ -998,6 +1051,10 @@ return detach_unit (uptr);
 
 int32 tti (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if (pulse & 001) {                                      /* KSF */
     if (TST_INT (TTI))
         dat = dat | IOT_SKP;
@@ -1098,6 +1155,10 @@ return (TST_INT (TTI)? IOS_TTI: 0);
 
 t_stat tti_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmxr_set_console_units (&tti_unit, &tto_unit);
 CLR_INT (TTI);                                          /* clear flag */
 if (!sim_is_running) {                                  /* RESET (not CAF)? */
@@ -1114,6 +1175,10 @@ return SCPE_OK;
 
 int32 tto (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if (pulse & 001) {                                      /* TSF */
     if (TST_INT (TTO))
         dat = dat | IOT_SKP;
@@ -1169,6 +1234,10 @@ return (TST_INT (TTO)? IOS_TTO: 0);
 
 t_stat tto_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tto_unit.buf = 0;                                       /* clear buffer */
 tty_shift = 0;                                          /* clear state */
 CLR_INT (TTO);                                          /* clear flag */
@@ -1180,6 +1249,12 @@ return SCPE_OK;
 
 t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 tti_unit.flags = (tti_unit.flags & ~(TTUF_UNIX|TT_PAR|TT_MODE)) | val;
 tto_unit.flags = (tto_unit.flags & ~(TTUF_UNIX|TT_PAR|TT_MODE)) | val;
 return SCPE_OK;

@@ -88,6 +88,10 @@ static UNIT fw2_unit[] = {
 #define FWII_NAME   "Vector Graphic Flashwriter 2"
 
 static const char* fw2_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return FWII_NAME;
 }
 

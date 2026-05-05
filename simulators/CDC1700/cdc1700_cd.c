@@ -414,6 +414,11 @@ DEVICE cd_dev = {
  */
 static t_stat show_drive(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   int32 fixed, u;
 
   if (uptr == NULL)
@@ -437,6 +442,12 @@ static t_stat show_drive(FILE *st, UNIT *uptr, int32 val, const void *desc)
  */
 t_stat set_cd856_2(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) cptr;
+  (void) desc;
+
   UNIT *uptr2;
 
   if (uptr == NULL)
@@ -466,6 +477,12 @@ t_stat set_cd856_2(UNIT *uptr, int32 val, const char *cptr, void *desc)
  */
 t_stat set_cd856_4(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) cptr;
+  (void) desc;
+
   UNIT *uptr2;
 
   if (uptr == NULL)
@@ -493,6 +510,11 @@ t_stat set_cd856_4(UNIT *uptr, int32 val, const char *cptr, void *desc)
  */
 static t_stat show_addressing(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   if (uptr == NULL)
     return SCPE_IERR;
 
@@ -507,6 +529,12 @@ static t_stat show_addressing(FILE *st, UNIT *uptr, int32 val, const void *desc)
  */
 t_stat set_cartfirst(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) cptr;
+  (void) desc;
+
   if (uptr == NULL)
     return SCPE_IERR;
 
@@ -519,6 +547,12 @@ t_stat set_cartfirst(UNIT *uptr, int32 val, const char *cptr, void *desc)
  */
 t_stat set_fixedfirst(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) cptr;
+  (void) desc;
+
   if (uptr == NULL)
     return SCPE_IERR;
 
@@ -696,7 +730,7 @@ static void StartCDDiskIO(UNIT *uptr, struct cdio_unit *iou, uint16 state)
  * Increment sector # and update sector address. Note that I/O occurs on
  * side 0 followed by side 1 before moving to the next cylinder.
  */
-void CDDiskIOIncSector(struct cdio_unit *iou)
+static void CDDiskIOIncSector(struct cdio_unit *iou)
 {
   if (iou->disk != CD_NONE) {
     if (++iou->sector >= CD_NUMSC) {
@@ -828,7 +862,7 @@ static enum cdio_status CDDiskIOCompare(UNIT *uptr)
  * Perform read/write/compare sector operations from within the unit
  * service routine.
  */
-void CDDiskIO(UNIT *uptr, uint16 iotype)
+static void CDDiskIO(UNIT *uptr, uint16 iotype)
 {
   struct cdio_unit *iou = (struct cdio_unit *)uptr->up7;
   const char *error = "Unknown";
@@ -1002,6 +1036,10 @@ t_stat cd_svc(UNIT *uptr)
 
 static t_stat CDreset(DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   struct cdio_unit *iou;
   int i;
 
@@ -1167,6 +1205,10 @@ t_bool CDreject(IO_DEVICE *iod, t_bool output, uint8 reg)
 
 enum IOstatus CDin(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   /*
    * All input requests other than Clear Controller should be handled by
    * the I/O framework.
@@ -1194,6 +1236,10 @@ enum IOstatus CDin(IO_DEVICE *iod, uint8 reg)
 
 enum IOstatus CDout(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   UNIT *uptr;
   struct cdio_unit *iou;
 

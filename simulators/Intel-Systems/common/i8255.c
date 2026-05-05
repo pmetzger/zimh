@@ -99,6 +99,10 @@ extern uint8 unreg_dev(uint16);
 /* globals */
 
 static const char* i8255_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return i8255_NAME;
 }
 int     i8255_num = 0;
@@ -200,6 +204,10 @@ DEVICE i8255_dev = {
 
 t_stat i8255_cfg(uint16 base, uint16 devnum, uint8 dummy)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) dummy;
+
     DEVICE *dptr;
 
     dptr = find_dev (i8255_dev.name);
@@ -235,6 +243,11 @@ t_stat i8255_clr(void)
 
 t_stat i8255_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int i;
 
     if (uptr == NULL)
@@ -256,6 +269,10 @@ t_stat i8255_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat i8255_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     i8255_reset_dev();              //software reset
     return SCPE_OK;
 }

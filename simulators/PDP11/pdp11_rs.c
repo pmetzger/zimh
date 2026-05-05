@@ -647,6 +647,11 @@ return detach_unit (uptr);
 
 t_stat rs_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 int32 dtype = GET_DTYPE (val);
 
 if (uptr->flags & UNIT_ATT)
@@ -688,6 +693,10 @@ static const uint16 boot_rom[] = {
 
 t_stat rs_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 for (i = 0; i < BOOT_LEN; i++)
@@ -700,6 +709,12 @@ return SCPE_OK;
 
 t_stat rs_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "RS03/RS04 Massbus disk controller (RS)\n\n");
 fprintf (st, "The RS controller implements the Massbus family fixed head disks.  RS\n");
 fprintf (st, "options include the ability to set units write enabled or write locked,\n");
@@ -720,5 +735,9 @@ return SCPE_OK;
 
 const char *rs_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "RS03/RS04 Massbus disk controller";
 }

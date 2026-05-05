@@ -887,6 +887,10 @@ return SCPE_OK;
 
 static t_stat ds_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 master_reset ();                                        /* perform a master reset */
 
 if (sim_switches & SWMASK ('P')) {                      /* if this is a power-on reset */
@@ -918,6 +922,10 @@ return SCPE_OK;
 
 static t_stat ds_boot (int32 unit_number, DEVICE *dptr)
 {
+/* Generic simulator boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (unit_number != 0)                                   /* if a unit other than 0 is specified */
     return SCPE_ARG;                                    /*   then fail with an invalid argument error */
 
@@ -1022,6 +1030,11 @@ else                                                    /* otherwise */
 
 static t_stat ds_load_unload (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 const t_bool load = (value != UNIT_UNLOAD);             /* TRUE if the heads are loading */
 t_stat result;
 

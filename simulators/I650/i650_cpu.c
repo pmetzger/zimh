@@ -235,7 +235,7 @@ t_stat cpu_svc (UNIT *uptr)
 
 // return 0 if addr invalid, 1 if addr valid depending on allowed addrs given by ValidDA
 // set the ias TimingRing to AR is IAS is accessed
-int IsDrumAddrOk(int AR, int ValidDA)
+static int IsDrumAddrOk(int AR, int ValidDA)
 {
     // check if AR should be 9000
     if ((STOR) && (ValidDA & vda_9000))
@@ -324,7 +324,7 @@ int ReadAddr(int AR, t_int64 * d, int * NegZero)
 
 // shift acc 1 digit. If direction > 0 to the left, if direction < 0 to the right.
 // Return digit going out of acc (with sign)
-int ShiftAcc(int direction)
+static int ShiftAcc(int direction)
 {
     t_int64 a0, a1;
     int neg = 0;
@@ -357,13 +357,13 @@ int ShiftAcc(int direction)
 //                      mmmmmmm = mantissa
 //                      cc      = modified characteristic (== exponent)
 // get modified characteristic of float d
-int GetExp(t_int64 d)
+static int GetExp(t_int64 d)
 {
     return (AbsWord(d) % 100);
 }
 
 // set modified characteristic of float d
-t_int64 SetExp(t_int64 d, int exp)
+static t_int64 SetExp(t_int64 d, int exp)
 {
     int neg = 0;
 
@@ -378,7 +378,7 @@ t_int64 SetExp(t_int64 d, int exp)
 // round to the 8th digit
 // add the modified characteristic (exp)
 // add sign, check for zero
-void MantissaRoundAndNormalizeToFloat(int * CpuStepsUsed, int neg, int exp)
+static void MantissaRoundAndNormalizeToFloat(int * CpuStepsUsed, int neg, int exp)
 {
     // if high order digit of mantissa is zero, shift left once
     if (Get_HiDigit(ACC[1]) == 0) {
@@ -427,7 +427,7 @@ void MantissaRoundAndNormalizeToFloat(int * CpuStepsUsed, int neg, int exp)
 
 // add float to accumulator, set Overflow
 // return number of steps used
-int AddFloatToAcc(int bSubstractFlag, int bAbsFlag, int bNormalizeFlag)
+static int AddFloatToAcc(int bSubstractFlag, int bAbsFlag, int bNormalizeFlag)
 {
     int nSteps;
     int n, neg;
@@ -512,7 +512,7 @@ int bAccNegComplement; // flag to signals acc has complemented a negative ass (=
                        // needed to compute execution cycles taken by the intruction
 
 // add to accumulator, set Overflow
-void AddToAcc(t_int64 a1, t_int64 a0, int bSetOverflow)
+static void AddToAcc(t_int64 a1, t_int64 a0, int bSetOverflow)
 {
     AccNegativeZeroFlag = 0;
     bAccNegComplement = 0;
@@ -544,7 +544,7 @@ void AddToAcc(t_int64 a1, t_int64 a0, int bSetOverflow)
 }
 
 
-t_int64 SetDA(t_int64 d, int DA)
+static t_int64 SetDA(t_int64 d, int DA)
 {
     int neg = 0;
 
@@ -566,7 +566,7 @@ t_int64 SetDA(t_int64 d, int DA)
 }
 
 // set last 4 digits in d with IA contents
-t_int64 SetIA(t_int64 d, int IA)
+static t_int64 SetIA(t_int64 d, int IA)
 {
     int neg = 0;
 
@@ -579,7 +579,7 @@ t_int64 SetIA(t_int64 d, int IA)
 }
 
 // set last 2 digits in d with IA contents
-t_int64 SetIA2(t_int64 d, int n)
+static t_int64 SetIA2(t_int64 d, int n)
 {
     int neg = 0;
 
@@ -592,7 +592,7 @@ t_int64 SetIA2(t_int64 d, int n)
 }
 
 // normalize to 4 digits, 10 complements
-void NormalizeAddr(int * addr, int bAllowNegativeValue)
+static void NormalizeAddr(int * addr, int bAllowNegativeValue)
 {
     while (*addr >= 10000) *addr -= 10000;
        if (bAllowNegativeValue) {
@@ -605,7 +605,7 @@ void NormalizeAddr(int * addr, int bAllowNegativeValue)
 // apply index register to a tagged address
 // removes tag, replace value with developed address
 // return 1 if address was tagged, and has been replaced by developed addr
-int ApplyIndexRegister(int * addr)
+static int ApplyIndexRegister(int * addr)
 {
     int n = 0;
 
@@ -627,7 +627,7 @@ int ApplyIndexRegister(int * addr)
 // apply index register to a tagged address for Model 4
 // removes tag, replace value with developed address
 // return 1 if address was tagged, and has been replaced by developed addr
-int ApplyIndexRegisterModel4(int * DA, int * IA)
+static int ApplyIndexRegisterModel4(int * DA, int * IA)
 {
     int n, tagDA, tagIA, nIndexApplied;
 
@@ -698,7 +698,7 @@ const char * DecodeOpcode(t_int64 d, int * opcode, int * DA, int * IA)
 // dir = "D->I" or "I->D"
 // bEOB = 1 -> End of IAS band terminated transfer
 // return number of words transfered
-int TransferIAS(const char * dir, int bEOB)
+static int TransferIAS(const char * dir, int bEOB)
 {
     int n, f0, t0, f1, t1, ec, ZeroNeg;
     t_int64 d;
@@ -750,7 +750,7 @@ int TransferIAS(const char * dir, int bEOB)
 //        prior to call ExecOpcode DIST cpu register must be loaded with the needed data for inst execution
 // output: bBranchToDA: =1 if next inst must be taken from DA register instead of DA
 //         CpuStepsUsed: number of steps (=word time) used on program execution
-t_stat ExecOpcode(int opcode, int DA,
+static t_stat ExecOpcode(int opcode, int DA,
                   int * bBranchToDA,
                   int DrumAddr,
                   int * CpuStepsUsed)
@@ -1616,7 +1616,7 @@ t_stat ExecOpcode(int opcode, int DA,
 }
 
 // return 2 if must wait for drum rotation, return 1 if must wait for IAS interlock release
-int WaitForStorage(int AR)
+static int WaitForStorage(int AR)
 {
    if ((AR >= 0) && (AR < DRUMSIZE)) {
        if ((AR % 50) != DrumAddr) return 2; // yes, must wait for drum
@@ -1627,7 +1627,7 @@ int WaitForStorage(int AR)
 }
 
 // return 1 if must wait for interlock release
-int WaitForInterlock(int nInterlock)
+static int WaitForInterlock(int nInterlock)
 {
     int n, arm;
 
@@ -2032,6 +2032,9 @@ end_of_cycle:
 t_stat
 cpu_reset(DEVICE * dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
 
     ACC[0] = ACC[1] = DIST = 0;
     PR = AR = OV = 0;
@@ -2054,6 +2057,11 @@ cpu_reset(DEVICE * dptr)
 t_stat
 cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic examine signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     t_int64  d;
     int NegZero;
     t_value val;
@@ -2078,6 +2086,11 @@ cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic deposit signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     t_int64 d;
     int NegZero;
 
@@ -2098,6 +2111,12 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
+
     int                 mc = 0;
     uint32              i;
     int32               v;
@@ -2129,6 +2148,12 @@ cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 
 t_stat
 cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr) {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     fprintf (st, "These switches are recognized when examining or depositing in CPU memory:\r\n\r\n");
     fprintf (st, "      -c      examine/deposit characters, 5 per word\r\n");
     fprintf (st, "      -m      examine/deposit IBM 650 instructions\r\n\r\n");
@@ -2142,5 +2167,9 @@ cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr) {
 }
 
 const char * cpu_description (DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "IBM 650 CPU";
 }

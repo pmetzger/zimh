@@ -226,6 +226,10 @@ t_stat dk_svc (UNIT *uptr)
 
 const char *dk_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "DK10 Timer module";
 }
 

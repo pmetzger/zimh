@@ -128,6 +128,10 @@ DEVICE drm_dev = {
 
 int32 drm60 (int32 dev, int32 pulse, int32 AC)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if ((pulse & 027) == 06) {                              /* DRLR, DRLW */
     drm_ma = AC & 0177777;                              /* load mem addr */
     drm_unit.FUNC = pulse & DRM_WRITE;                  /* save function */
@@ -137,6 +141,10 @@ return AC;
 
 int32 drm61 (int32 dev, int32 pulse, int32 AC)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 t;
 
 if (pulse & 001) {                                      /* DRSF */
@@ -159,6 +167,10 @@ return AC;
 
 int32 drm62 (int32 dev, int32 pulse, int32 AC)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 t;
 
 if (pulse & 001) {                                      /* DRSN */
@@ -219,6 +231,10 @@ return SCPE_OK;
 
 t_stat drm_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 drm_da = drm_ma = drm_err = 0;
 CLR_INT (DRM);                                          /* clear done */
 sim_cancel (&drm_unit);
@@ -248,6 +264,11 @@ static const int32 boot_rom[] = {
 
 t_stat drm_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 size_t i;
 extern int32 PC;
 

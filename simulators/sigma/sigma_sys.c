@@ -242,6 +242,12 @@ uint16 ebcdic_to_hol[256] = {
 
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void)fnam;
+(void)cptr;
+(void)flag;
+
 return lp_read_cct (fileref);
 }
 

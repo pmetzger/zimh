@@ -88,6 +88,10 @@ DEVICE              cdr_dev = {
 
 uint32 cdr_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dev;
+
     int                 chan = UNIT_G_CHAN(uptr->flags);
 
     if ((uptr->flags & UNIT_ATT) != 0 && cmd == IO_RDS) {
@@ -287,6 +291,10 @@ cdr_boot(int32 unit_num, DEVICE * dptr)
 t_stat
 cdr_reset(DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return SCPE_OK;
 }
 
@@ -340,6 +348,10 @@ cdr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 cdr_description(DEVICE *dptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)dptr;
+
    return "711 Card Reader";
 }
 

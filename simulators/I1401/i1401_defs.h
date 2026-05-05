@@ -301,6 +301,15 @@
 
 int32 bcd2ascii (int32 c, t_bool use_h);
 int32 ascii2bcd (int32 c);
+t_stat read_card (int32 ilnt, int32 mod);
+t_stat punch_card (int32 ilnt, int32 mod);
+t_stat select_stack (int32 mod);
+t_stat carriage_control (int32 mod);
+t_stat write_line (int32 ilnt, int32 mod);
+t_stat inq_io (int32 flag, int32 mod);
+t_stat mt_io (int32 unit, int32 flag, int32 mod);
+t_stat mt_func (int32 unit, int32 flag, int32 mod);
+t_stat dp_io (int32 fnc, int32 flg, int32 mod);
 
 /* Translation Tables */
 

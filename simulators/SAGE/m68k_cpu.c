@@ -310,7 +310,7 @@ static t_stat ReadInstrLongInc(t_addr* pc,uint32* inst)
 }
 
 
-void m68k_set_s(t_bool tf)
+static void m68k_set_s(t_bool tf)
 {
     if (tf) {
         SR |= FLAG_S;
@@ -321,7 +321,7 @@ void m68k_set_s(t_bool tf)
     }
 }
 
-void m68k_setipl(int ipl)
+static void m68k_setipl(int ipl)
 {
 //  printf("set ipl to %d\n",ipl);
     SR &= ~FLAG_IPL_MASK;
@@ -358,6 +358,11 @@ t_stat m68k_raise_autoint(int level)
 
 static void m68k_nocallback(DEVICE* dev,int trapnum)
 {
+    /* CPU trap callback signature.
+       This implementation does not use every parameter. */
+    (void) dev;
+    (void) trapnum;
+
     /* do nothing */
 }
 
@@ -392,6 +397,10 @@ t_stat m68kcpu_reset(DEVICE* dptr)
 
 t_stat m68kcpu_boot(int32 unitno,DEVICE* dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+
     return dptr->reset(dptr);
 }
 
@@ -808,7 +817,7 @@ static t_stat ea_dst_b(uint32 eamod,uint32 eareg,uint32 val,t_addr* pc)
     }
 }
 
-t_stat ea_dst_b_rmw(uint32 eamod,uint32 eareg,uint32 val)
+static t_stat ea_dst_b_rmw(uint32 eamod,uint32 eareg,uint32 val)
 {
     switch (eamod) {
     case EA_DDIR:
@@ -969,7 +978,7 @@ static t_stat ea_dst_l(uint32 eamod,uint32 eareg,uint32 val,t_addr* pc)
     }
 }
 
-t_stat ea_dst_l_rmw(uint32 eamod,uint32 eareg,uint32 val)
+static t_stat ea_dst_l_rmw(uint32 eamod,uint32 eareg,uint32 val)
 {
 
     switch (eamod) {
@@ -1108,7 +1117,7 @@ static t_stat m68k_cpop32(uint32* data)
     return ReadVL(*cur_sp-4,data);
 }
 
-t_stat m68k_gen_exception(int vecno,t_addr* pc)
+static t_stat m68k_gen_exception(int vecno,t_addr* pc)
 {
     t_stat rc;
     uint32 dummy;

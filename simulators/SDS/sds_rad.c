@@ -240,6 +240,10 @@ return SCPE_OK;
 
 t_stat pin_rads (uint32 num, uint32 *dat)
 {
+/* SDS PIN routine signature.
+   This implementation does not use every parameter. */
+(void) num;
+
 *dat = GET_SECTOR (rad_time * RAD_NUMWD);               /* ret curr sec */
 return SCPE_OK;
 }
@@ -248,6 +252,10 @@ return SCPE_OK;
 
 t_stat pot_rada (uint32 num, uint32 *dat)
 {
+/* SDS POT routine signature.
+   This implementation does not use every parameter. */
+(void) num;
+
 rad_da = (*dat) & RAD_AMASK;                            /* save dsk addr */
 return SCPE_OK;
 }
@@ -256,6 +264,10 @@ return SCPE_OK;
 
 t_stat rad_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 xfr_req = xfr_req | XFR_RAD;                            /* set xfr req */
 sim_activate (&rad_unit, rad_time);                     /* activate */
 return SCPE_OK;
@@ -313,6 +325,10 @@ return;
 
 t_stat rad_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 chan_disc (rad_dib.chan);                               /* disconnect */
 rad_nobi = 0;                                           /* clear state */
 rad_da = 0;
@@ -326,6 +342,10 @@ return SCPE_OK;
 
 t_stat rad_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 extern uint32 P, M[];
 
 if (unitno)                                             /* only unit 0 */

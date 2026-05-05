@@ -580,16 +580,23 @@ extern DEBTAB dev_debug[];
 /* Definitions for commonly used functions */
 extern  t_stat  set_dev_addr(UNIT *uptr, int32 val, const char *cptr, void *desc);
 extern  t_stat  show_dev_addr(FILE * st, UNIT *uptr, int32 v, const void *desc);
+extern  int32   itm_rdwr(uint32 cmd, int32 cnt, uint32 level);
 extern  void    chan_end(uint16 chan, uint16 flags);
 extern  int     chan_read_byte(uint16 chsa, uint8 *data);
 extern  int     chan_write_byte(uint16 chsa, uint8 *data);
+extern  int     fprint_inst(FILE *of, uint32 val, int32 sw);
+extern  int     readfull(CHANP *chp, uint32 maddr, uint32 *word);
 extern  void    set_devattn(uint16 addr, uint16 flags);
 extern  void    set_devwake(uint16 chsa, uint16 flags);
 extern  t_stat  chan_boot(uint16 addr, DEVICE *dptr);
+extern  t_stat  stopxio(uint16 addr, uint32 *status);
 extern  int     test_write_byte_end(uint16 chsa);
 extern  DEVICE *get_dev(UNIT *uptr);
 extern  t_stat  set_inch(UNIT *uptr, uint32 inch_addr, uint32 num_inch);    /* set inch addr */
 extern  CHANP  *find_chanp_ptr(uint16 chsa);    /* find chanp pointer */
+#ifdef USE_IPU_THREAD
+extern  void   *ipu_sim_instr(void *value);
+#endif
 
 #ifndef CPUONLY
 #ifndef USE_IPU_THREAD

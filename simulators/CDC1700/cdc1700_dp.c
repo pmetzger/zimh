@@ -320,6 +320,11 @@ DEVICE dp_dev = {
  */
 static t_stat show_drive(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   if (uptr == NULL)
     return SCPE_IERR;
 
@@ -335,6 +340,12 @@ static t_stat show_drive(FILE *st, UNIT *uptr, int32 val, const void *desc)
  */
 t_stat set_dp853(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) cptr;
+  (void) desc;
+
   if (uptr == NULL)
     return SCPE_IERR;
 
@@ -357,6 +368,12 @@ t_stat set_dp853(UNIT *uptr, int32 val, const char *cptr, void *desc)
  */
 t_stat set_dp854(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) cptr;
+  (void) desc;
+
   if (uptr == NULL)
     return SCPE_IERR;
 
@@ -378,6 +395,11 @@ t_stat set_dp854(UNIT *uptr, int32 val, const char *cptr, void *desc)
  */
 static t_stat show_addressing(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   if (uptr == NULL)
     return SCPE_IERR;
 
@@ -392,6 +414,12 @@ static t_stat show_addressing(FILE *st, UNIT *uptr, int32 val, const void *desc)
  */
 t_stat set_normal(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) cptr;
+  (void) desc;
+
   if (uptr == NULL)
     return SCPE_IERR;
 
@@ -404,6 +432,12 @@ t_stat set_normal(UNIT *uptr, int32 val, const char *cptr, void *desc)
  */
 t_stat set_reverse(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) cptr;
+  (void) desc;
+
   if (uptr == NULL)
     return SCPE_IERR;
 
@@ -635,7 +669,7 @@ static enum dpio_status DPDiskIOCompare(UNIT *uptr)
  * Perform read/write/compare sector operations from within the unit
  * service routine.
  */
-void DPDiskIO(UNIT *uptr, uint16 iotype)
+static void DPDiskIO(UNIT *uptr, uint16 iotype)
 {
   struct dpio_unit *iou = (struct dpio_unit *)uptr->up7;
   const char *error = "Unknown";
@@ -946,6 +980,11 @@ t_bool DPreject(IO_DEVICE *iod, t_bool output, uint8 reg)
 
 enum IOstatus DPin(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+  (void) reg;
+
   /*
    * All input requests should be handled by the I/O framework.
    */
@@ -954,6 +993,10 @@ enum IOstatus DPin(IO_DEVICE *iod, uint8 reg)
 
 enum IOstatus DPout(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   UNIT *uptr;
   struct dpio_unit *iou;
 

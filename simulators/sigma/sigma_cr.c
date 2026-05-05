@@ -150,6 +150,10 @@ DEVICE  cr_dev = {
 
 uint32 cr_disp (uint32 op, uint32 dva, uint32 *dvst)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) dva;
+
     switch (op) {                                       /* case on op */
 
         case OP_SIO:                                    /* start I/O */
@@ -368,6 +372,10 @@ t_stat cr_chan_err (uint32 st)
 
 t_stat cr_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
     if (!cr_ebcdic_init) {                          /* initialize translate table */
         for (i = 0; i < 4096; i++)
@@ -420,6 +428,11 @@ t_stat cr_detach (UNIT *uptr)
 }
 
 t_stat cr_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
 
     if (cr_hopper == 0)
         fprintf(st,"hopper empty");

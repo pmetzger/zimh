@@ -229,6 +229,10 @@ DEVICE hayes_dev = {
 
 static const char* hayes_description(DEVICE *dptr)
 {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return HAYES_NAME;
 }
 
@@ -667,6 +671,10 @@ static int32 hayes_reg2(int32 io, int32 data)
 */
 static int32 hayes_reg3(int32 io, int32 data)
 {
+    /* Shared register handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+
     if (io == IO_WR) {
         hayes_ctx.timer = sim_os_msec() + 50;    /* Set timeout to 50ms */
         hayes_ctx.ireg1 &= ~(HAYES_TMR);         /* Clear timer status */

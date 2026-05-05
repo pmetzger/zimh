@@ -441,6 +441,10 @@ easr:
 
 static void yyerror(char* s)
 {
+	/* Generic parser error signature.
+	   This implementation does not use every parameter. */
+	(void) s;
+
 	/* do not emit anything, but set error flag */
 	yyerrc = 1;
 }
@@ -598,6 +602,10 @@ static t_addr yyaddr;
 
 t_stat parse_sym(const char* c, t_addr a, UNIT* u, t_value* val, int32 sw)
 {
+	/* Generic symbolic input signature.
+	   This implementation does not use every parameter. */
+	(void)u;
+
 	char ch;
 
 	if (!ophash) init_ophash();

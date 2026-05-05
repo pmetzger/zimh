@@ -980,6 +980,10 @@ t_stat ai_svc (UNIT *uptr)
 t_stat
 ai_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     channel_status = 0;
     channel_errors = 0;
     channel_pc = 0;
@@ -1019,6 +1023,12 @@ t_stat ai_detach (UNIT *uptr)
 
 t_stat ai_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Systems Concepts DC-10\n\n");
 fprint_set_help (st, dptr);
 fprint_show_help (st, dptr);
@@ -1028,6 +1038,10 @@ return SCPE_OK;
 
 const char *ai_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Systems Concepts DC-10 disk controller";
 }
 

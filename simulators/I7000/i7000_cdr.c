@@ -363,6 +363,11 @@ cdr_detach(UNIT * uptr)
 t_stat
 cdr_setload(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)val;
+
     int i;
     if (cptr == NULL)
         return SCPE_ARG;
@@ -383,6 +388,11 @@ cdr_setload(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 cdr_getload(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)v;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "loadcolumn=%d", uptr->capac);
@@ -423,6 +433,10 @@ cdr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 cdr_description(DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
 #ifdef I7010
    return "1402 Card Reader";
 #endif

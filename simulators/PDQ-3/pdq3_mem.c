@@ -88,6 +88,11 @@ t_stat del_ioh(IOINFO* ioi) {
  * configuration
  *****************************************************************************/
 t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc) {
+  /* Generic show signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   DEVICE* dptr;
   DEVCTXT* ctxt;
   IOINFO* ioi;
@@ -109,6 +114,11 @@ t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc) {
 }
 
 t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc) {
+  /* Generic modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   t_stat rc;
   DEVICE* dptr;
   DEVCTXT* ctxt;
@@ -125,6 +135,11 @@ t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc) {
 }
 
 t_stat set_iovec(UNIT *uptr, int32 val, const char *cptr, void *desc) {
+  /* Generic modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   t_stat rc;
   DEVICE* dptr;
   DEVCTXT* ctxt;
@@ -141,6 +156,11 @@ t_stat set_iovec(UNIT *uptr, int32 val, const char *cptr, void *desc) {
 }
 
 t_stat show_iovec(FILE *st, UNIT *uptr, int value, const void *desc) {
+  /* Generic show signature.
+     This implementation does not use every parameter. */
+  (void) value;
+  (void) desc;
+
   DEVICE* dptr;
   DEVCTXT* ctxt;
   IOINFO* ioi;
@@ -160,6 +180,11 @@ t_stat show_iovec(FILE *st, UNIT *uptr, int value, const void *desc) {
 }
 
 t_stat set_ioprio(UNIT *uptr, int32 val, const char *cptr, void *desc) {
+  /* Generic modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   t_stat rc;
   DEVICE* dptr;
   DEVCTXT* ctxt;
@@ -176,6 +201,11 @@ t_stat set_ioprio(UNIT *uptr, int32 val, const char *cptr, void *desc) {
 }
 
 t_stat show_ioprio(FILE *st, UNIT *uptr, int value, const void *desc) {
+  /* Generic show signature.
+     This implementation does not use every parameter. */
+  (void) value;
+  (void) desc;
+
   DEVICE* dptr;
   DEVCTXT* ctxt;
   IOINFO* ioi;
@@ -318,6 +348,11 @@ t_stat WriteB(t_addr base, t_addr boffset, uint16 data, uint32 dctrl)
 
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic modifier signature.
+     This implementation does not use every parameter. */
+  (void) cptr;
+  (void) desc;
+
   int32 mc;
   t_addr i;
 
@@ -348,5 +383,4 @@ t_stat rom_write(t_addr ea, uint16 data) {
   M[ea] = data;
   return SCPE_OK;
 }
-
 

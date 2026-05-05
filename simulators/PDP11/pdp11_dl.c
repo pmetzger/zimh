@@ -593,7 +593,7 @@ return r;
 
 /* Number of DL devices used by TU58 */
 
-t_value dlx_tu58_count (void)
+static t_value dlx_tu58_count (void)
 {
 DEVICE *td_dptr = find_dev ("TDC");
 
@@ -637,6 +637,12 @@ return;
 
 t_stat dlx_set_lines (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 newln, i, t;
 t_stat r;
 
@@ -676,6 +682,11 @@ return auto_config (dli_dev.name, newln);              /* auto config */
 
 t_stat dl_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 uptr->flags &= ~TT_MODE;
 uptr->flags |= val;
 return SCPE_OK;
@@ -685,6 +696,11 @@ return SCPE_OK;
 
 t_stat dl_show_mode (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 static const char *modes[] = {"7B", "8B", "UC", "7P"};
 
 fprintf (st, "%s", modes[(uptr->flags & TT_MODE) >> TTUF_V_MODE]);
@@ -693,6 +709,13 @@ return SCPE_OK;
 
 t_stat dlx_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "DLI/DLO Terminal Multiplexer (KL11/DL11)\n\n");
 fprintf (st, "The DLI/DLO implements up to %d KL11/DL11 terminal lines.\n", DLX_LINES);
 fprintf (st, "The default number of lines is %d.  The number of lines can\n", DLX_LINES);

@@ -418,6 +418,10 @@ const char *vc_crtc_regnames[] = {
 
 t_stat vc_rd (int32 *data, int32 PA, int32 access)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 uint32 rg = (PA >> 1) & 0x1F;
 uint32 crtc_rg, i;
 
@@ -506,6 +510,10 @@ return SCPE_OK;
 
 t_stat vc_wr (int32 data, int32 PA, int32 access)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 uint32 rg = (PA >> 1) & 0x1F;
 uint32 crtc_rg;
 uint32 old_data;
@@ -787,7 +795,7 @@ if ((vc_dev.dctrl & DBG_CURSOR) && (vc_dev.dctrl & DBG_TCURSOR)) {
 vid_set_cursor (visible, 16, 16, data, mask, 0, 0);
 }
 
-void vc_checkint (void)
+static void vc_checkint (void)
 {
 uint32 i;
 uint32 msk = (vc_intc.irr & ~vc_intc.imr);              /* unmasked interrutps */
@@ -1063,6 +1071,10 @@ return auto_config (NULL, 0);                           /* run autoconfig */
 
 t_stat vc_detach (UNIT *uptr)
 {
+/* Generic detach signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if ((vc_dev.flags & DEV_DIS) == 0) {
     vc_dev.flags |= DEV_DIS;
     vc_reset(&vc_dev);
@@ -1072,11 +1084,23 @@ return SCPE_OK;
 
 t_stat vc_set_enable (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 return cpu_set_model (NULL, 0, (val ? "VAXSTATION" : "MICROVAX"), NULL);
 }
 
 t_stat vc_set_capture (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (vid_active)
     return sim_messagef (SCPE_ALATT, "Capture Mode Can't be changed with device enabled\n");
 vc_input_captured = val;
@@ -1096,6 +1120,12 @@ return SCPE_OK;
 
 t_stat vc_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "VCB01 Monochrome Video Subsystem (%s)\n\n", dptr->name);
 fprintf (st, "Use the Control-Right-Shift key combination to regain focus from the simulated\n");
 fprintf (st, "video display\n");
@@ -1107,6 +1137,10 @@ return SCPE_OK;
 
 const char *vc_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "VCB01 Monochrome Graphics Adapter";
 }
 

@@ -197,6 +197,10 @@ static t_stat u39_ckmode(I8255* chip,uint32 data)
 
 static t_stat u39_reset(I8255* chip)
 {
+    /* Shared chip reset signature.
+       This implementation does not use every parameter. */
+    (void) chip;
+
     sagelp_unit.buf = 0;
     sim_cancel (&sagelp_unit);
     return SCPE_OK;

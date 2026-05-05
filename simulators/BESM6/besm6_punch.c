@@ -107,6 +107,10 @@ int fs_textmode[2];
  */
 t_stat fs_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     sim_cancel (&fs_unit[0]);
     sim_cancel (&fs_unit[1]);
     fs_state[0] = fs_state[1] = FS_IDLE;

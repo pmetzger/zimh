@@ -147,6 +147,10 @@ DEVICE dp_dev = {
 
 t_stat dp (uint32 op, uint32 pa, uint32 f0, uint32 f1)
 {
+/* Shared I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) f0;
+
 int32 drv, sa, sec, psec, cnt, qwc, qnr, t;
 UNIT *uptr;
 t_stat r;
@@ -518,6 +522,10 @@ return;
 
 t_stat dp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 for (i = 0; i < DP_NUMDR; i++)                          /* reset cylinder */

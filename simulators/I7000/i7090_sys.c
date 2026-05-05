@@ -222,6 +222,11 @@ const char          ascii_to_mem[128] = {
 t_stat
 sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
 {
+    /* Generic loader signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)flag;
+
     t_uint64            wd;
     t_uint64            mask;
     uint8               buffer[160];
@@ -721,7 +726,7 @@ const char *chname[11] = {
     "*", "A", "B", "C", "D", "E", "F", "G", "H"
 };
 
-void
+static void
 lookup_sopcode(FILE * of, t_value val, t_opcode * tab)
 {
     uint16              op = (uint16)(val & 07777);
@@ -760,7 +765,7 @@ lookup_sopcode(FILE * of, t_value val, t_opcode * tab)
     }
 }
 
-void
+static void
 lookup_opcode(FILE * of, t_value val, t_opcode * tab)
 {
     uint16              op = (uint16)(val >> 24) & 07777;
@@ -839,6 +844,10 @@ lookup_opcode(FILE * of, t_value val, t_opcode * tab)
 t_stat
 fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
 {
+    /* Generic symbolic output signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+
     t_uint64            inst = *val;
 
 /* Print value in octal first */
@@ -917,7 +926,7 @@ fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
     return SCPE_OK;
 }
 
-t_opcode           *
+static t_opcode           *
 find_opcode(char *op, t_opcode * tab)
 {
     while (tab->name != NULL) {
@@ -943,6 +952,11 @@ find_opcode(char *op, t_opcode * tab)
 t_stat
 parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+    (void)uptr;
+
     int                 i;
     t_value             d, tag;
     int                 sign;

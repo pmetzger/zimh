@@ -339,6 +339,12 @@ static uint16 interruptBit[] = {
 
 t_stat cpu_set_instr(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   if (!cptr)
     return SCPE_IERR;
 
@@ -355,6 +361,12 @@ t_stat cpu_set_instr(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat cpu_show_instr(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   switch (INSTR_SET) {
     case INSTR_ORIGINAL:
       fprintf(st, "\n\tOriginal instruction set");
@@ -381,6 +393,10 @@ t_stat cpu_show_instr(FILE *st, UNIT *uptr, int32 val, const void *desc)
  */
 t_stat cpu_reset(DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   int i;
 
   INTlevel = 0;
@@ -412,6 +428,12 @@ t_stat cpu_reset(DEVICE *dptr)
  */
 t_stat cpu_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) cptr;
+  (void) desc;
+
   uint16 mc = 0;
   uint32 i;
 
@@ -435,6 +457,11 @@ t_stat cpu_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
  */
 t_stat cpu_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+  /* Generic memory examine signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) sw;
+
   if (addr >= cpu_unit.capac)
     return SCPE_NXM;
   if (vptr != NULL)
@@ -447,6 +474,11 @@ t_stat cpu_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
  */
 t_stat cpu_dep(t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+  /* Generic memory deposit signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) sw;
+
   if (addr >= cpu_unit.capac)
     return SCPE_NXM;
   M[addr] = TRUNC16(val);
@@ -456,7 +488,7 @@ t_stat cpu_dep(t_value val, t_addr addr, UNIT *uptr, int32 sw)
 /*
  * Dump the current register contents on debugging output.
  */
-void dumpRegisters(void)
+static void dumpRegisters(void)
 {
   fprintf(DBGOUT,
           "%s[A: %04X, Q: %04X, M: %04X, Ovf: %d, Pfault: %d, I: %d, D: %d]",
@@ -477,6 +509,10 @@ t_bool inProtectedMode(void)
  */
 uint16 cpuINTR(DEVICE *dptr)
 {
+  /* Generic device interrupt signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   return 0;
 }
 
@@ -484,7 +520,7 @@ uint16 cpuINTR(DEVICE *dptr)
  * Raise an internal interrupt. Used for Power Fail, Parity Error and
  * Program Protect Fault. Only Program Protect Fault can occur in emulation.
  */
-void RaiseInternalInterrupt(void)
+static void RaiseInternalInterrupt(void)
 {
   if ((cpu_dev.dctrl & DBG_INTR) != 0) {
     fprintf(DBGOUT,
@@ -538,7 +574,7 @@ uint16 LoadFromMem(uint16 addr)
  * if the write succeeded and FALSE if the write failed and an interrupt
  * has been scheduled.
  */
-t_bool StoreToMem(uint16 addr, uint16 value)
+static t_bool StoreToMem(uint16 addr, uint16 value)
 {
   if (inProtectedMode()) {
     if (!Protected) {
@@ -583,7 +619,7 @@ t_bool IOStoreToMem(uint16 addr, uint16 value, t_bool prot)
  * eliminates minus zero in all but one case (the only case is when minus zero
  * is added to minus zero).
  */
-uint16 doSUB(uint16 a, uint16 b)
+static uint16 doSUB(uint16 a, uint16 b)
 {
   uint32 ea = EXTEND16(a);
   uint32 eb = EXTEND16(b);
@@ -598,7 +634,7 @@ uint16 doSUB(uint16 a, uint16 b)
 
   return TRUNC16(result);
 }
-uint16 doADD(uint16 a, uint16 b)
+static uint16 doADD(uint16 a, uint16 b)
 {
   return doSUB(a, TRUNC16(~b));
 }
@@ -621,7 +657,7 @@ uint16 doADDinternal(uint16 a, uint16 b)
  * For multiply, we do the actual multiply in the positive domain and adjust
  * the resulting sign based on the input values.
  */
-void doMUL(uint16 a)
+static void doMUL(uint16 a)
 {
   uint32 val1, result = 0;
   uint16 sign = Areg ^ a;
@@ -651,7 +687,7 @@ void doMUL(uint16 a)
  * For divide, we once again do the actual division in the positive domain
  * and adjust the resulting signs based on the input values.
  */
-void doDIV(uint16 a)
+static void doDIV(uint16 a)
 {
   uint32 result = 0, divisor, remainder = (Qreg << 16) | Areg;
   uint32 mask = 1;
@@ -726,7 +762,7 @@ void doDIV(uint16 a)
 /*
  * Compute the effective address of an instruction
  */
-t_stat getEffectiveAddr(uint16 p, uint16 instr, uint16 *addr)
+static t_stat getEffectiveAddr(uint16 p, uint16 instr, uint16 *addr)
 {
   uint16 count = MAXINDIRECT;
   uint16 delta = instr & OPC_ADDRMASK;
@@ -894,7 +930,7 @@ t_stat disEffectiveAddr(uint16 p, uint16 instr, uint16 *base, uint16 *addr)
  * Execute a single instruction on the current CPU. Register P must be
  * pointing at the instruction to execute.
  */
-t_stat executeAnInstruction(void)
+static t_stat executeAnInstruction(void)
 {
   DEVICE *dev;
   uint16 instr, operand, operand1, operand2, from;

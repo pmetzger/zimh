@@ -454,6 +454,10 @@ return SCPE_OK;
 
 t_stat mt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 UNIT *uptr;
 
@@ -475,6 +479,10 @@ return SCPE_OK;
 
 t_stat mt_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 extern int32 saved_IS;
 
 if ((sim_switches & SWMASK ('N')) == 0)                 /* unless -n */

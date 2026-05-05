@@ -127,6 +127,10 @@ DEVICE lpt_dev = {
 
 t_stat lpt_rd (int32 *data, int32 PA, int32 access)
 {
+/* Memory-mapped I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 if ((PA & 02) == 0)                                     /* csr */
     *data = lpt_csr & LPTCSR_IMP;
 else *data = lpt_unit.buf;                              /* buffer */
@@ -135,6 +139,10 @@ return SCPE_OK;
 
 t_stat lpt_wr (int32 data, int32 PA, int32 access)
 {
+/* Memory-mapped I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 if ((PA & 02) == 0) {                                   /* csr */
     if (PA & 1)
         return SCPE_OK;
@@ -176,6 +184,10 @@ return SCPE_OK;
 
 t_stat lpt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 lpt_unit.buf = 0;
 lpt_csr = CSR_DONE;
 if ((lpt_unit.flags & UNIT_ATT) == 0)
@@ -205,6 +217,12 @@ return detach_unit (uptr);
 
 t_stat lpt_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Line Printer (LPT)\n\n");
 fprintf (st, "The line printer (LPT) writes data to a disk file.  The POS register specifies\n");
 fprintf (st, "the number of the next data item to be written.  Thus, by changing POS, the\n");
@@ -224,6 +242,10 @@ return SCPE_OK;
 
 const char *lpt_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return (UNIBUS) ? "LP11 line printer" :
                   "LPV11 line printer";
 }

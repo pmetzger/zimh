@@ -284,6 +284,10 @@ static void pi_output (int unit, int cull) {
  */
 t_stat pi_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     sim_cancel (&pi_unit[0]);
     sim_cancel (&pi_unit[1]);
     PI[0].state = PI[1].state = PI_IDLE;

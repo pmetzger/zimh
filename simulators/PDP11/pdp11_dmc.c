@@ -923,7 +923,7 @@ DDCMP_CONDITION_NAME ddcmp_Condition_Names[] = {
     {NULL, NULL}
     };
 
-char *ddcmp_conditions(DDCMP_Condition_Routine *Conditions)
+static char *ddcmp_conditions(DDCMP_Condition_Routine *Conditions)
 {
 static char buf[512];
 DDCMP_CONDITION_NAME *Name;
@@ -985,7 +985,7 @@ DDCMP_ACTION_NAME ddcmp_Actions[] = {
     {NULL, NULL}
     };
 
-char *ddcmp_actions(DDCMP_LinkAction_Routine *Actions)
+static char *ddcmp_actions(DDCMP_LinkAction_Routine *Actions)
 {
 static char buf[512];
 DDCMP_ACTION_NAME *Name;
@@ -1004,7 +1004,7 @@ while (*Actions)
 return buf;
 }
 
-char *ddcmp_link_state(DDCMP *link)
+static char *ddcmp_link_state(DDCMP *link)
 {
 static char buf[512];
 
@@ -1012,7 +1012,7 @@ sprintf (buf, "(R:%d,N:%d,A:%d,T:%d,X:%d,SACK:%d,SNAK:%d,SREP:%d,NAKed:%d)", lin
 return buf;
 }
 
-char *controller_queue_state(CTLR *controller)
+static char *controller_queue_state(CTLR *controller)
 {
 static char buf[512];
 
@@ -1363,12 +1363,12 @@ int dmc_is_dmc(CTLR *controller)
 return controller->dev_type != DMP;
 }
 
-CTLR *dmc_get_controller_from_unit(UNIT *unit)
+static CTLR *dmc_get_controller_from_unit(UNIT *unit)
 {
 return (CTLR *)unit->ctlr;
 }
 
-CTLR* dmc_get_controller_from_address(uint32 address)
+static CTLR* dmc_get_controller_from_address(uint32 address)
 {
 int i;
 
@@ -1383,6 +1383,11 @@ return 0;
 
 t_stat dmc_showpeer (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = (UNIBUS) ? ((&dmc_dev == find_dev_from_unit(uptr)) ? &dmc_dev : &dmp_dev) : &dmv_dev;
 int32 dmc = (int32)(uptr-dptr->units);
 char *peer = ((dptr == &dmc_dev)? &dmc_peer[dmc][0] : &dmp_peer[dmc][0]);
@@ -1396,6 +1401,11 @@ return SCPE_OK;
 
 t_stat dmc_setpeer (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = (UNIBUS) ? ((&dmc_dev == find_dev_from_unit(uptr)) ? &dmc_dev : &dmp_dev) : &dmv_dev;
 int32 dmc = (int32)(uptr-dptr->units);
 char *peer = ((dptr == &dmc_dev)? &dmc_peer[dmc][0] : &dmp_peer[dmc][0]);
@@ -1415,6 +1425,11 @@ return SCPE_OK;
 
 t_stat dmc_showspeed (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = (UNIBUS) ? ((&dmc_dev == find_dev_from_unit(uptr)) ? &dmc_dev : &dmp_dev) : &dmv_dev;
 int32 dmc = (int32)(uptr-dptr->units);
 uint32 *speeds = ((dptr == &dmc_dev)? dmc_speed : dmp_speed);
@@ -1429,6 +1444,11 @@ return SCPE_OK;
 
 t_stat dmc_setspeed (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = (UNIBUS) ? ((&dmc_dev == find_dev_from_unit(uptr)) ? &dmc_dev : &dmp_dev) : &dmv_dev;
 int32 dmc = (int32)(uptr-dptr->units);
 uint32 *speeds = ((dptr == &dmc_dev)? dmc_speed : dmp_speed);
@@ -1446,6 +1466,11 @@ return SCPE_OK;
 
 t_stat dmc_show_microdiag (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 int32 dmc = (int32)(uptr-dmc_dev.units);
 
 fprintf(st, "MicroDiag=%s", dmc_microdiag[dmc] ? "enabled" : "disabled");
@@ -1458,6 +1483,11 @@ return SCPE_OK;
  */
 t_stat dmc_setcorrupt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = (UNIBUS) ? ((&dmc_dev == find_dev_from_unit(uptr)) ? &dmc_dev : &dmp_dev) : &dmv_dev;
 int32 dmc = (int32)(uptr-dptr->units);
 int32 *hunger = (dptr == &dmc_dev) ? &dmc_corruption[dmc] : &dmp_corruption[dmc];
@@ -1480,6 +1510,11 @@ return SCPE_OK;
 
 t_stat dmc_showcorrupt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = (UNIBUS) ? ((&dmc_dev == find_dev_from_unit(uptr)) ? &dmc_dev : &dmp_dev) : &dmv_dev;
 int32 dmc = (int32)(uptr-dptr->units);
 int32 *hunger = (dptr == &dmc_dev) ? &dmc_corruption[dmc] : &dmp_corruption[dmc];
@@ -1495,6 +1530,11 @@ return SCPE_OK;
 
 t_stat dmc_set_microdiag(UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 int32 dmc = (int32)(uptr-dmc_dev.units);
 char gbuf[CBUFSIZE];
 
@@ -1513,6 +1553,11 @@ return SCPE_OK;
 
 t_stat dmc_showtype (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 CTLR *controller = dmc_get_controller_from_unit(uptr);
 
 switch (controller->dev_type) {
@@ -1534,6 +1579,11 @@ return SCPE_OK;
 
 t_stat dmc_settype (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 char gbuf[80];
 t_stat status = SCPE_OK;
 CTLR *controller = dmc_get_controller_from_unit(uptr);
@@ -1556,6 +1606,11 @@ return status;
 
 t_stat dmc_showstats (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 CTLR *controller = dmc_get_controller_from_unit(uptr);
 
 fprintf (st, "%s%d\n", controller->device->name, (int)(uptr-controller->device->units));
@@ -1575,7 +1630,7 @@ fprintf(st, "DDCMP control packets sent=%d\n", controller->ddcmp_control_packets
 return SCPE_OK;
 }
 
-void dmc_showqueue (FILE* st, BUFFER_QUEUE *queue, t_bool detail)
+static void dmc_showqueue (FILE* st, BUFFER_QUEUE *queue, t_bool detail)
 {
 size_t i;
 
@@ -1676,6 +1731,12 @@ return SCPE_OK;
 
 t_stat dmc_setstats (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) cptr;
+(void) desc;
+
 CTLR *controller = dmc_get_controller_from_unit(uptr);
 
 controller->receive_buffer_output_transfers_completed = 0;
@@ -1693,6 +1754,11 @@ return SCPE_OK;
 
 t_stat dmc_showconnectpoll (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 uint32 poll_interval = *((const uint32 *)desc);
 
 fprintf(st, "connectpoll=%u", poll_interval);
@@ -1701,6 +1767,11 @@ return SCPE_OK;
 
 t_stat dmc_setconnectpoll (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 t_stat status = SCPE_OK;
 uint32 *poll_interval = ((uint32 *)desc);
 uint32 newpoll;
@@ -1718,6 +1789,11 @@ return tmxr_connection_poll_interval ((poll_interval == &dmc_connect_poll) ? &dm
 
 t_stat dmc_setnumdevices (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 newln;
 uint32 i, j;
 t_stat r;
@@ -1763,6 +1839,11 @@ return dmc_reset ((DEVICE *)desc);                  /* setup devices and auto co
 
 t_stat dmc_shownumdevices (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = (UNIBUS) ? find_dev_from_unit (uptr) : &dmv_dev;
 
 fprintf (st, "lines=%d", dptr->numunits-2);
@@ -1771,6 +1852,11 @@ return SCPE_OK;
 
 t_stat dmc_showddcmp (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 CTLR *controller = dmc_get_controller_from_unit(uptr);
 static const char *states[] = {"Halt", "IStart", "AStart", "Run", "Maintenance"};
 
@@ -2007,10 +2093,14 @@ return scp_help (st, dptr, uptr, flag, helpString, cptr, devname, devcount, conn
 
 t_stat dmc_help_attach (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic attach help signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+
 return dmc_help (st, dptr, uptr, flag, DMC_HLP_ATTACH);
 }
 
-void dmc_setinint(CTLR *controller)
+static void dmc_setinint(CTLR *controller)
 {
 if (!dmc_is_iei_set(controller))
     return;
@@ -2022,7 +2112,7 @@ dmc_ini_summary |= (1u << controller->index);
 SET_INT(DMCRX);
 }
 
-void dmc_clrinint(CTLR *controller)
+static void dmc_clrinint(CTLR *controller)
 {
 controller->in_int = 0;
 if (dmc_ini_summary & (1u << controller->index)) {
@@ -2035,7 +2125,7 @@ else
     SET_INT(DMCRX);
 }
 
-void dmc_setoutint(CTLR *controller)
+static void dmc_setoutint(CTLR *controller)
 {
 if (!dmc_is_ieo_set(controller))
     return;
@@ -2047,7 +2137,7 @@ dmc_outi_summary |= (1u << controller->index);
 SET_INT(DMCTX);
 }
 
-void dmc_clroutint(CTLR *controller)
+static void dmc_clroutint(CTLR *controller)
 {
 controller->out_int = 0;
 if (dmc_outi_summary & (1u << controller->index)) {
@@ -2060,12 +2150,12 @@ else
     SET_INT(DMCTX);
 }
 
-int dmc_getsel(int addr)
+static int dmc_getsel(int addr)
 {
 return (addr >> 1) & ((UNIBUS) ? 03 : 07);
 }
 
-uint16 dmc_bitfld(int data, int start_bit, int length)
+static uint16 dmc_bitfld(int data, int start_bit, int length)
 {
 uint16 ans = (uint16)(data >> start_bit);
 uint32 mask = (1 << (length))-1;
@@ -2073,7 +2163,7 @@ ans &= mask;
 return ans;
 }
 
-void dmc_dumpregsel0(CTLR *controller, int trace_level, const char * prefix, uint16 data)
+static void dmc_dumpregsel0(CTLR *controller, int trace_level, const char * prefix, uint16 data)
 {
 const char *type_str = "";
 uint16 type = dmc_bitfld(data, DMC_SEL0_V_ITYPE, DMC_SEL0_S_ITYPE);
@@ -2120,7 +2210,7 @@ else {
     }
 }
 
-void dmc_dumpregsel2(CTLR *controller, int trace_level, const char *prefix, uint16 data)
+static void dmc_dumpregsel2(CTLR *controller, int trace_level, const char *prefix, uint16 data)
 {
 const char *type_str = "";
 uint16 type = dmc_bitfld(data, DMC_SEL2_V_CODE, DMC_SEL2_S_CODE);
@@ -2144,7 +2234,7 @@ sim_debug(
     );
 }
 
-void dmc_dumpregsel4(CTLR *controller, int trace_level, const char *prefix, uint16 data)
+static void dmc_dumpregsel4(CTLR *controller, int trace_level, const char *prefix, uint16 data)
 {
 if (dmc_is_rdyi_set(controller)) {
     sim_debug(
@@ -2174,7 +2264,7 @@ else {
     }
 }
 
-void dmc_dumpregsel6(CTLR *controller, int trace_level, const char *prefix, uint16 data)
+static void dmc_dumpregsel6(CTLR *controller, int trace_level, const char *prefix, uint16 data)
 {
 if (dmc_is_rdyi_set(controller)) {
     sim_debug(
@@ -2198,7 +2288,7 @@ else {
     }
 }
 
-void dmc_dumpregsel10(CTLR *controller, int trace_level, const char *prefix, uint16 data)
+static void dmc_dumpregsel10(CTLR *controller, int trace_level, const char *prefix, uint16 data)
 {
 sim_debug(
     trace_level,
@@ -2210,7 +2300,7 @@ sim_debug(
     dmc_bitfld(data, DMC_SEL6_M_LOSTDATA, 1) ? "LOST_DATA " : "");
 }
 
-uint16 dmc_getreg(CTLR *controller, int reg, int ctx)
+static uint16 dmc_getreg(CTLR *controller, int reg, int ctx)
 {
 uint16 ans = 0;
 
@@ -2243,7 +2333,7 @@ switch (dmc_getsel(reg)) {
 return ans;
 }
 
-void dmc_setreg(CTLR *controller, int reg, uint16 data, int ctx)
+static void dmc_setreg(CTLR *controller, int reg, uint16 data, int ctx)
 {
 const char *trace = "Setting";
 
@@ -2273,12 +2363,12 @@ switch (dmc_getsel(reg)) {
     }
 }
 
-int dmc_is_master_clear_set(CTLR *controller)
+static int dmc_is_master_clear_set(CTLR *controller)
 {
 return *controller->csrs->sel0 & DMC_SEL0_M_MCLEAR;
 }
 
-int dmc_is_lu_loop_set(CTLR *controller)
+static int dmc_is_lu_loop_set(CTLR *controller)
 {
 if (dmc_is_dmc(controller))
     return ((*controller->csrs->sel0 & DMC_SEL0_M_LU_LOOP) != 0);
@@ -2286,7 +2376,7 @@ else
     return FALSE;
 }
 
-int dmc_is_run_set(CTLR *controller)
+static int dmc_is_run_set(CTLR *controller)
 {
 return *controller->csrs->sel0 & DMC_SEL0_M_RUN;
 }
@@ -2346,12 +2436,12 @@ else
 return ans;
 }
 
-int dmc_is_rdyo_set(CTLR *controller)
+static int dmc_is_rdyo_set(CTLR *controller)
 {
 return *controller->csrs->sel2 & DMC_SEL2_M_RDO;
 }
 
-void dmc_set_rdyi(CTLR *controller)
+static void dmc_set_rdyi(CTLR *controller)
 {
 if (dmc_is_dmc(controller)) {
     dmc_setreg(controller, 0, *controller->csrs->sel0 | DMC_SEL0_M_RDI, DBG_RGC);
@@ -2367,7 +2457,7 @@ else
 dmc_setinint(controller);
 }
 
-void dmc_clear_rdyi(CTLR *controller)
+static void dmc_clear_rdyi(CTLR *controller)
 {
 if (dmc_is_dmc(controller))
     dmc_setreg(controller, 0, *controller->csrs->sel0 & ~(DMC_SEL0_M_RDI|DMC_SEL0_M_ITYPE), DBG_RGC);
@@ -2375,7 +2465,7 @@ else
     dmc_setreg(controller, 2, *controller->csrs->sel2 & ~DMP_SEL2_M_RDI, DBG_RGC);
 }
 
-void dmc_set_rdyo(CTLR *controller)
+static void dmc_set_rdyo(CTLR *controller)
 {
 dmc_setreg(controller, 2, *controller->csrs->sel2 | DMC_SEL2_M_RDO, DBG_RGC);
 
@@ -2457,18 +2547,18 @@ void dmc_set_lost_data(CTLR *controller)
 dmc_setreg(controller, 6, *controller->csrs->sel6 | DMC_SEL6_M_LOSTDATA, DBG_RGC);
 }
 
-void dmc_clear_master_clear(CTLR *controller)
+static void dmc_clear_master_clear(CTLR *controller)
 {
 dmc_setreg(controller, 0,
            *controller->csrs->sel0 & ~(DMC_SEL0_M_MCLEAR|DMC_SEL0_M_STEPUP|DMC_SEL0_M_ROMI|DMC_SEL0_M_ROMO|DMC_SEL0_M_LU_LOOP|DMC_SEL0_M_STEPLU), DBG_RGC);
 }
 
-void dmc_set_run(CTLR *controller)
+static void dmc_set_run(CTLR *controller)
 {
 dmc_setreg(controller, 0, *controller->csrs->sel0 | DMC_SEL0_M_RUN, DBG_RGC);
 }
 
-int dmc_get_input_transfer_type(CTLR *controller)
+static int dmc_get_input_transfer_type(CTLR *controller)
 {
 int ans = 0;
 
@@ -2479,12 +2569,12 @@ else
 return ans;
 }
 
-void dmc_set_type_output(CTLR *controller, int type)
+static void dmc_set_type_output(CTLR *controller, int type)
 {
 dmc_setreg(controller, 2, (*controller->csrs->sel2 & ~DMC_SEL2_M_CODE) | (type & DMC_SEL2_M_CODE), DBG_RGC);
 }
 
-void dmc_process_master_clear(CTLR *controller)
+static void dmc_process_master_clear(CTLR *controller)
 {
 CONTROL_OUT *control;
 
@@ -2523,14 +2613,14 @@ if (dmc_is_attached(controller->unit))
     dmc_set_run(controller);
 }
 
-void dmc_start_input_transfer(CTLR *controller)
+static void dmc_start_input_transfer(CTLR *controller)
 {
 sim_debug(DBG_INF, controller->device, "%s%d: Starting input transfer\n", controller->device->name, controller->index);
 controller->transfer_state = InputTransfer;
 dmc_set_rdyi(controller);
 }
 
-void dmc_start_control_output_transfer(CTLR *controller)
+static void dmc_start_control_output_transfer(CTLR *controller)
 {
 if ((!controller->control_out) ||
     (controller->transfer_state != Idle) ||
@@ -2543,7 +2633,7 @@ dmc_set_type_output(controller, DMC_C_TYPE_CNTL);
 dmc_set_rdyo(controller);
 }
 
-void dmc_complete_transmit(CTLR *controller)
+static void dmc_complete_transmit(CTLR *controller)
 {
 BUFFER *buffer = controller->link.xmt_buffer;
 if (!buffer)
@@ -2766,7 +2856,7 @@ buffer->buffer_return_time = 0;
 return buffer;
 }
 
-BUFFER *dmc_buffer_queue_add(BUFFER_QUEUE *q, uint32 address, uint16 count, BufferType type)
+static BUFFER *dmc_buffer_queue_add(BUFFER_QUEUE *q, uint32 address, uint16 count, BufferType type)
 {
 BUFFER *buffer = dmc_buffer_allocate(q->controller);
 
@@ -2856,7 +2946,7 @@ controller->transfer_state = OutputTransfer;
 dmc_set_rdyo(controller);
 }
 
-void dmc_check_for_output_transfer_completion(CTLR *controller)
+static void dmc_check_for_output_transfer_completion(CTLR *controller)
 {
 BUFFER *buffer;
 
@@ -2871,7 +2961,7 @@ controller->transfer_state = Idle;
 dmc_process_command(controller); // check for any other transfers
 }
 
-void dmc_check_for_output_control_completion(CTLR *controller)
+static void dmc_check_for_output_control_completion(CTLR *controller)
 {
 CONTROL_OUT *control = controller->control_out;
 
@@ -2888,7 +2978,7 @@ controller->control_out_operations_completed++;
 dmc_process_command(controller); // check for any other transfers
 }
 
-void dmc_process_input_transfer_completion(CTLR *controller)
+static void dmc_process_input_transfer_completion(CTLR *controller)
 {
 if (dmc_is_dmc(controller)) {
     if (dmc_is_run_set(controller) &&
@@ -3022,7 +3112,7 @@ if (abs(badiff) <= (int)queue_size)
 return ans;
 }
 
-t_bool ddcmp_compare (uint8 a, CompareOP Op, uint8 b, CTLR *controller)
+static t_bool ddcmp_compare (uint8 a, CompareOP Op, uint8 b, CTLR *controller)
 {
 int cmp = Mod256Cmp(a & 0xFF, b & 0xFF, controller->free_queue->size);
 
@@ -3239,6 +3329,9 @@ if (ddcmp_compare (controller->link.A, GE, controller->link.X, controller))
 }
 void ddcmp_Ignore                 (CTLR *controller)
 {
+/* Generic DDCMP action signature.
+   This implementation does not use every parameter. */
+(void) controller;
 }
 void ddcmp_GiveBufferToUser       (CTLR *controller)
 {
@@ -3632,7 +3725,7 @@ while (buffer) {
     }
 }
 
-void dmc_check_romi(CTLR *controller)
+static void dmc_check_romi(CTLR *controller)
 {
 if (dmc_is_dmc (controller) &&
     (*controller->csrs->sel0 & DMC_SEL0_M_ROMI) &&
@@ -4039,6 +4132,10 @@ return r;
 
 const char *dmc_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 #if defined (VM_PDP10)
 return "DMR11 Synchronous network controller";
 #else
@@ -4048,6 +4145,10 @@ return "DMC11 Synchronous network controller";
 
 const char *dmp_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return (UNIBUS) ? "DMP11 Synchronous network controller"
                 : "DMV11 Synchronous network controller";
 }

@@ -80,6 +80,10 @@ DEVICE              con_dev = {
  */
 void
 con_ini(UNIT *uptr, t_bool f) {
+     /* Generic callback signature.
+        This implementation does not use every parameter. */
+     (void)f;
+
      int                 u = (uptr - con_unit);
      con_data[u].inptr = 0;
      uptr->u5 = 0;
@@ -89,6 +93,10 @@ con_ini(UNIT *uptr, t_bool f) {
 uint32
 con_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dev;
+
     int                 chan = UNIT_G_CHAN(uptr->flags);
     int                 u = (uptr - con_unit);
 
@@ -258,6 +266,13 @@ con_srv(UNIT *uptr) {
 t_stat
 con_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)cptr;
+   (void)dptr;
+   (void)flag;
+   (void)uptr;
+
    fprintf (st, "Supervisory Printer\n\n");
    fprintf (st, "This is the interface from the operator to the system. The printer\n");
    fprintf (st, "operated in a half duplex mode. To request the system to accept input\n");
@@ -272,6 +287,10 @@ con_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 con_description(DEVICE *dptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)dptr;
+
    return "Supervisory Printer";
 }
 

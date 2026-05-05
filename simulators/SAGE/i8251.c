@@ -42,6 +42,10 @@ DEBTAB i8251_dt[] = {
 
 t_stat i8251_io(IOHANDLER* ioh,uint32* value,uint32 rw,uint32 mask)
 {
+    /* Shared I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) mask;
+
     int port = ioh->offset;
     I8251* chip = (I8251*)ioh->ctxt;
     if (rw==MEM_WRITE) {

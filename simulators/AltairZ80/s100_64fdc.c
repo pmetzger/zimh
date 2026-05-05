@@ -223,6 +223,10 @@ static REG cromfdc_reg[] = {
 #define CROMFDC_NAME    "Cromemco 4/16/64 FDC"
 
 static const char* cromfdc_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return CROMFDC_NAME;
 }
 
@@ -1441,6 +1445,10 @@ static uint8 motor_timeout = 0;
 /* Unit service routine */
 static t_stat cromfdc_svc (UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     if(cromfdc_info->motor_on == 1) {
         motor_timeout ++;
         if(motor_timeout == MOTOR_TO_LIMIT) {
@@ -1528,6 +1536,11 @@ static t_stat cromfdc_reset(DEVICE *dptr)
 
 static t_stat cromfdc_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+    (void) dptr;
+
     if((crofdc_type != 4) && (crofdc_type != 16) && (crofdc_type != 64) && (crofdc_type != 50)) {
         sim_printf("Invalid fdc_type: %d, must be 4, 16, or 64 (or 50 for CCS2422.)\n", crofdc_type);
         return SCPE_ARG;
@@ -1765,6 +1778,11 @@ static uint8 ccs2810_uart_status_reg = 0x00;
 /* CCS 2810 UART Status Register, needed by MOSS 2.2 Monitor */
 static int32 ccs2810_uart_status(const int32 port, const int32 io, const int32 data)
 {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) data;
+
     if(io) { /* I/O Write */
         return (0x00);
     } else { /* I/O Read */

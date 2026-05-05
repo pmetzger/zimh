@@ -165,7 +165,7 @@ DEVICE ch_dev = {
     &ch_description
   };
 
-int ch_checksum (const uint8 *p, int length)
+static int ch_checksum (const uint8 *p, int length)
 {
   int i, sum = 0;
   for (i = 0; i < length; i += 2)
@@ -175,7 +175,7 @@ int ch_checksum (const uint8 *p, int length)
   return sum ^ 0xffff;
 }
 
-t_stat ch_rx_word (int32 *data)
+static t_stat ch_rx_word (int32 *data)
 {
   if (rx_count == 0) {
     *data = 0;
@@ -195,7 +195,7 @@ t_stat ch_rx_word (int32 *data)
   return SCPE_OK;
 }
 
-t_stat ch_tx_word (int data)
+static t_stat ch_tx_word (int data)
 {
   if (tx_count < 246) {
     int i = CHUDP_HEADER + 2*tx_count;
@@ -212,7 +212,7 @@ t_stat ch_tx_word (int data)
   }
 }
 
-int ch_test_int (void)
+static int ch_test_int (void)
 {
   if ((status & (RXD|RXIE)) == (RXD|RXIE) ||
       (status & (TXD|TXIE)) == (TXD|TXIE)) {
@@ -227,7 +227,7 @@ int ch_test_int (void)
   }
 }
 
-t_stat ch_transmit (void)
+static t_stat ch_transmit (void)
 {
   size_t len;
   t_stat r;
@@ -250,7 +250,7 @@ t_stat ch_transmit (void)
   return SCPE_OK;
 }
 
-void ch_validate (const uint8 *p, int count)
+static void ch_validate (const uint8 *p, int count)
 {
   int chksum;
   int size;
@@ -278,7 +278,7 @@ void ch_validate (const uint8 *p, int count)
     sim_debug (DBG_TRC, &ch_dev, "Checksum: %05o\n", chksum);
 }
 
-int ch_receive (void)
+static int ch_receive (void)
 {
   size_t count;
   const uint8 *p;
@@ -314,6 +314,10 @@ int ch_receive (void)
 
 t_stat ch_rd (int32 *data, int32 PA, int32 access)
 {
+  /* Generic I/O read signature.
+     This implementation does not use every parameter. */
+  (void) access;
+
   int reg = (PA >> 1) & 07;
 
   switch (reg) {
@@ -344,7 +348,7 @@ t_stat ch_rd (int32 *data, int32 PA, int32 access)
   return SCPE_OK;
 }
 
-void ch_clear (void)
+static void ch_clear (void)
 {
   status = TXD;
   rx_count = 0;
@@ -358,7 +362,7 @@ void ch_clear (void)
   ch_test_int ();
 }
 
-void ch_command (int32 data)
+static void ch_command (int32 data)
 {
   if (data & RESET) {
     /* Do this first so other bits can do their things. */
@@ -384,6 +388,10 @@ void ch_command (int32 data)
 
 t_stat ch_wr (int32 data, int32 PA, int32 access)
 {
+  /* Generic I/O write signature.
+     This implementation does not use every parameter. */
+  (void) access;
+
   int reg = (PA >> 1) & 07;
 
   switch (reg) {
@@ -481,12 +489,23 @@ t_stat ch_reset (DEVICE *dptr)
 
 t_stat ch_show_peer (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   fprintf (st, "peer=%s", peer[0] ? peer : "unspecified");
   return SCPE_OK;
 }
 
 t_stat ch_set_peer (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   char host[256], port[256];
 
   if ((cptr == NULL) || (*cptr == 0))
@@ -504,6 +523,12 @@ t_stat ch_set_peer (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat ch_show_node (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   if (address == CH11_NO_ADDRESS)
     fprintf (st, "node=unspecified");
   else
@@ -513,6 +538,11 @@ t_stat ch_show_node (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat ch_set_node (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   t_stat r;
   int x;
 
@@ -531,6 +561,10 @@ t_stat ch_set_node (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 const char *ch_description (DEVICE *dptr)
 {
+  /* Generic device description signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   return "CH11 Chaosnet interface";
 }
 
@@ -561,6 +595,13 @@ t_stat ch_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr
 
 t_stat ch_help_attach (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+  /* Generic attach-help signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+  (void) uptr;
+  (void) flag;
+  (void) cptr;
+
   fprintf (st, "To configure CH11, first set the local Chaosnet node address, and\n");
   fprintf (st, "the peer:\n\n");
   fprintf (st, "  sim> SET CH NODE=<octal address>\n");

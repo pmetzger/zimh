@@ -627,7 +627,7 @@ return SCPE_OK;
    - Set channel idle
    - If stacked nds, set up immediate channel timeout */
 
-t_stat ch6_end_ds (uint32 ch)
+static t_stat ch6_end_ds (uint32 ch)
 {
 if (ch >= NUM_CHAN)                                     /* invalid arg? */
     return STOP_NXCHN;
@@ -1775,6 +1775,11 @@ return SCPE_OK;
 
 t_stat ch_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 
 dptr = find_dev_from_unit (uptr);
@@ -1792,6 +1797,11 @@ return SCPE_OK;
 
 t_stat ch_set_enable (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr, *dptr1;
 char gbuf[CBUFSIZE];
 uint32 i, ch;
@@ -1853,6 +1863,11 @@ return;
 
 t_stat ch_set_disable (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr, *dptr1;
 UNIT *uptr1;
 uint32 i, ch;
@@ -1884,6 +1899,11 @@ return reset_all (0);
 
 t_stat ch_show_chan (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 uint32 i;
 

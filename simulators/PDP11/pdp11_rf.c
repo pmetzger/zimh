@@ -207,6 +207,10 @@ DEVICE rf_dev = {
 
 t_stat rf_rd (int32 *data, int32 PA, int32 access)
 {
+/* Bus read dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 07) {                               /* decode PA<3:1> */
 
     case 0:                                             /* RFCS */
@@ -424,6 +428,10 @@ return rf_cs;
 
 t_stat rf_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 rf_cs = RFCS_DONE;
 rf_da = rf_dae = 0;
 rf_dbr = 0;
@@ -465,6 +473,11 @@ static const uint16 boot_rom[] = {
 
 t_stat rf_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 size_t i;
 
 for (i = 0; i < BOOT_LEN; i++)
@@ -496,6 +509,11 @@ return attach_unit (uptr, cptr);
 
 t_stat rf_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (val < 0)
     return SCPE_IERR;
 if (uptr->flags & UNIT_ATT)
@@ -507,6 +525,12 @@ return SCPE_OK;
 
 t_stat rf_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 const char *text2, *text3;
 const char *const text =
 /*567901234567890123456789012345678901234567890123456789012345678901234567890*/
@@ -566,5 +590,9 @@ return SCPE_OK;
 
 const char *rf_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "RF11-A Fixed Head Disk controller";
 }

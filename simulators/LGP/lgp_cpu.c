@@ -643,6 +643,13 @@ return SCPE_OK;
 
 t_stat cpu_set_30opt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) cptr;
+(void) desc;
+
 if (Q_LGP21)
     return SCPE_ARG;
 return SCPE_OK;
@@ -652,6 +659,11 @@ return SCPE_OK;
 
 t_stat cpu_set_30opt_i (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 if (Q_LGP21 || (cptr == NULL))
     return SCPE_ARG;
 if (strcmp (cptr, "TTI") == 0)
@@ -666,6 +678,11 @@ return SCPE_OK;
 
 t_stat cpu_set_30opt_o (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 if (Q_LGP21 || (cptr == NULL))
     return SCPE_ARG;
 if (strcmp (cptr, "TTO") == 0)
@@ -680,6 +697,11 @@ return SCPE_OK;
 
 t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (val)
     uptr->flags = uptr->flags & ~(UNIT_IN4B|UNIT_INPT|UNIT_OUTPT);
 return reset_all (0);
@@ -689,6 +711,11 @@ return reset_all (0);
 
 t_stat cpu_show_model (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 fputs (Q_LGP21? "LGP-21": "LGP-30", st);
 if (uptr->flags & UNIT_TTSS_D)
     fputs (", track/sector", st);
@@ -707,6 +734,11 @@ return SCPE_OK;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE)
     return SCPE_NXM;
 if (vptr != NULL)
@@ -718,6 +750,11 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE)
     return SCPE_NXM;
 Write (addr, val);
@@ -728,6 +765,12 @@ return SCPE_OK;
 
 t_stat cpu_set_exec (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 inst;
 t_stat r;
 
@@ -749,6 +792,12 @@ return r;
 
 t_stat cpu_set_fill (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 inst;
 t_stat r;
 

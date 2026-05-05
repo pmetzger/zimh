@@ -89,5 +89,11 @@
 #define UNIT_MODE_READIN       (3 << UNIT_V_MODE)
 #define UNIT_MODE_TEST  (1 << UNIT_V_MODE)
 
+extern int32 petr (int32 inst, int32 dev, int32 dat);
+extern int32 ptp (int32 inst, int32 dev, int32 dat);
+extern int32 tti (int32 inst, int32 dev, int32 dat);
+extern int32 tto (int32 inst, int32 dev, int32 dat);
+extern t_stat fprint_sym_orig (FILE *of, t_addr addr, t_value *val,
+    UNIT *uptr, int32 sw);
 
 #endif  /* TX0_DEFS_H_ */

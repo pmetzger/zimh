@@ -436,6 +436,10 @@ static REG jade_reg[] = {
 #define JADE_SNAME "JADEDD"
 
 static const char* jade_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return JADE_NAME;
 }
 
@@ -711,6 +715,11 @@ static t_stat jade_set_membase(UNIT *uptr, int32 val, const char *cptr, void *de
 /* Show Base Address routine */
 t_stat jade_show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE *dptr;
     JADE_INFO *pInfo;
 
@@ -732,6 +741,11 @@ t_stat jade_show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 static t_stat jade_set_prom(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     JADE_INFO *pInfo = (JADE_INFO *)uptr->dptr->ctxt;
 
     jade_info->pe = (uint8) value;
@@ -750,6 +764,9 @@ static t_stat jade_set_prom(UNIT *uptr, int32 value, const char *cptr, void *des
 
 static t_stat jade_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
 
     JADE_INFO *pInfo = (JADE_INFO *)dptr->ctxt;
 
@@ -764,6 +781,10 @@ static t_stat jade_boot(int32 unitno, DEVICE *dptr)
 
 static t_stat jade_svc(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     return SCPE_OK;
 }
 
@@ -1220,6 +1241,11 @@ static uint8 DCM_Format(uint8 drive, uint8 track)
 
 static int32 jadeprom(int32 Addr, int32 rw, int32 Data)
 {
+    /* Memory resource handler signature.
+       This implementation does not use every parameter. */
+    (void) rw;
+    (void) Data;
+
     return(jade_prom[Addr & JADE_PROM_MASK]);
 }
 

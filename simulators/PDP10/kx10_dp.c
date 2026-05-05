@@ -871,7 +871,13 @@ t_stat dp_svc (UNIT *uptr)
 t_stat
 dp_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     int         i;
+
     if (uptr == NULL) return SCPE_IERR;
     for (i = 0; dp_drv_tab[i].sect != 0; i++) {
         if (GET_DTYPE(val) == dp_drv_tab[i].devtype) {
@@ -887,7 +893,13 @@ dp_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 dp_set_hdr(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     DEVICE *dptr;
+
     dptr = find_dev_from_unit (uptr);
     if (dptr == NULL)
        return SCPE_IERR;
@@ -898,6 +910,11 @@ dp_set_hdr(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat dp_show_hdr (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) val;
+   (void) desc;
+
    DEVICE *dptr;
 
    if (uptr == NULL)
@@ -1003,7 +1020,11 @@ return SCPE_OK;
 
 const char *dp_description (DEVICE *dptr)
 {
-return "RP10 disk controller";
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
+    return "RP10 disk controller";
 }
 
 #endif

@@ -130,6 +130,11 @@ DEVICE              lpr_dev = {
 t_stat
 lpr_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)val;
+
     int i;
     if (cptr == NULL)
         return SCPE_ARG;
@@ -151,13 +156,18 @@ lpr_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 lpr_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)v;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "linesperpage=%d", uptr->capac);
     return SCPE_OK;
 }
 
-t_stat
+static t_stat
 print_line(UNIT * uptr, int chan, int unit)
 {
 /* Convert word record into column image */
@@ -640,6 +650,10 @@ t_stat lpr_srv(UNIT * uptr)
 void
 lpr_ini(UNIT * uptr, t_bool f)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)f;
+
     int                 u = (uptr - lpr_unit);
 
     uptr->u3 = 0;
@@ -651,6 +665,10 @@ lpr_ini(UNIT * uptr, t_bool f)
 t_stat
 lpr_reset(DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return SCPE_OK;
 }
 
@@ -675,6 +693,12 @@ lpr_detach(UNIT * uptr)
 t_stat
 lpr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)cptr;
+   (void)flag;
+   (void)uptr;
+
    const char *cpu = cpu_description(&cpu_dev);
    extern void fprint_attach_help_ex (FILE *st, DEVICE *dptr, t_bool silent);
 
@@ -701,6 +725,10 @@ lpr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 lpr_description(DEVICE *dptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)dptr;
+
    return "716 Line Printer";
 }
 

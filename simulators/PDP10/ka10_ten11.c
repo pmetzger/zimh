@@ -220,6 +220,10 @@ const char helpString[] =
 
 static const char *ten11_description (DEVICE *dptr)
 {
+  /* Generic device description signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   return "Rubin PDP-10 to PDP-11 interface";
 }
 
@@ -437,6 +441,12 @@ int ten11_write (t_addr addr, uint64 data)
 
 static t_stat ten11_set_base (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     t_stat r;
     t_value x;
 
@@ -455,6 +465,12 @@ static t_stat ten11_set_base (UNIT *uptr, int32 val, const char *cptr, void *des
 
 static t_stat ten11_show_base (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf (st, "Base: %011o", ten11_base);
     return SCPE_OK;
 }

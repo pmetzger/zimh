@@ -182,6 +182,10 @@ DEVICE vc_dev = {
 
 void vc_wr (int32 pa, int32 data, int32 access)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 rg = (pa >> 2) & 0x1F;
 
 if (vc_dev.flags & DEV_DIS)                             /* disabled? */
@@ -528,6 +532,10 @@ return SCPE_OK;
 
 t_stat vc_detach (UNIT *uptr)
 {
+/* Generic detach signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if ((vc_dev.flags & DEV_DIS) == 0) {
     vc_dev.flags |= DEV_DIS;
     vc_reset(&vc_dev);
@@ -537,11 +545,23 @@ return SCPE_OK;
 
 t_stat vc_set_enable (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 return cpu_set_model (NULL, 0, (val ? "VAXSTATION" : "MICROVAX"), NULL);
 }
 
 t_stat vc_set_capture (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (vid_active)
     return sim_messagef (SCPE_ALATT, "Capture Mode Can't be changed with device enabled\n");
 vc_input_captured = val;
@@ -561,6 +581,12 @@ return SCPE_OK;
 
 t_stat vc_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Monochrome Video Subsystem (%s)\n\n", dptr->name);
 fprintf (st, "Use the Control-Right-Shift key combination to regain focus from the simulated\n");
 fprintf (st, "video display\n");
@@ -572,5 +598,9 @@ return SCPE_OK;
 
 const char *vc_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Monochrome Graphics Adapter";
 }

@@ -176,6 +176,10 @@ static t_bool sym_delete(const char* name)
 
 static t_stat symset_cmd(int32 arg, const char* buf)
 {
+    /* Generic command signature.
+       This implementation does not use every parameter. */
+    (void) arg;
+
     const char *name,*vstr;
     char gbuf[2*CBUFSIZE];
     t_addr val;
@@ -192,6 +196,10 @@ static t_stat symset_cmd(int32 arg, const char* buf)
 
 static t_stat symclr_cmd(int32 arg, const char* buf)
 {
+    /* Generic command signature.
+       This implementation does not use every parameter. */
+    (void) arg;
+
     char* token;
     if (buf[0] == '-' && buf[1]=='a') {
         sym_clearall();
@@ -209,6 +217,10 @@ static t_stat symclr_cmd(int32 arg, const char* buf)
 
 static t_stat symlist_cmd(int32 arg, const char* buf)
 {
+    /* Generic command signature.
+       This implementation does not use every parameter. */
+    (void) arg;
+
     int i;
     SYMHASH* n;
     char gbuf[2*CBUFSIZE];
@@ -259,6 +271,10 @@ static void putascii(uint32* buf)
 
 static t_stat hdump_cmd(int32 arg, const char* buf)
 {
+    /* Generic command signature.
+       This implementation does not use every parameter. */
+    (void) arg;
+
     int i;
     t_addr low, high, base, top;
     char gbuf[2*CBUFSIZE];

@@ -525,6 +525,10 @@ static t_bool set_nz(void)
 
 t_stat mau_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     memset(&mau_state, 0, sizeof(MAU_STATE));
 #if defined(REV3)
     mau_state.asr |= MAU_ASR_VER;  /* Version 1 MAU */
@@ -1708,7 +1712,7 @@ static uint32 xfp_lt(XFP *a, XFP *b)
  *
  * Derived from the SoftFloat 2c package (see copyright notice above)
  */
-void mau_int_to_xfp(int32 val, XFP *result)
+static void mau_int_to_xfp(int32 val, XFP *result)
 {
     int32 shift_width;
     uint32 sign;
@@ -1742,7 +1746,7 @@ void mau_int_to_xfp(int32 val, XFP *result)
  *
  * Derived from the SoftFloat 2c package (see copyright notice above)
  */
-t_int64 xfp_to_int64(XFP *val, RM rounding_mode)
+static t_int64 xfp_to_int64(XFP *val, RM rounding_mode)
 {
     uint32 sign;
     int32 exp, shift_count;
@@ -1768,7 +1772,7 @@ t_int64 xfp_to_int64(XFP *val, RM rounding_mode)
     return round_pack_int64(sign, frac, frac_extra, rounding_mode);
 }
 
-void mau_int64_to_xfp(t_uint64 val, XFP *result)
+static void mau_int64_to_xfp(t_uint64 val, XFP *result)
 {
     uint32 sign;
     t_uint64 abs;
@@ -1793,7 +1797,7 @@ void mau_int64_to_xfp(t_uint64 val, XFP *result)
 /*
  * Convert a float value to a decimal value.
  */
-void xfp_to_decimal(XFP *a, DEC *d, RM rounding_mode)
+static void xfp_to_decimal(XFP *a, DEC *d, RM rounding_mode)
 {
     t_int64 tmp;
     int i;
@@ -1845,7 +1849,7 @@ void xfp_to_decimal(XFP *a, DEC *d, RM rounding_mode)
 /*
  * Convert a decimal value to a float value.
  */
-void mau_decimal_to_xfp(DEC *d, XFP *a)
+static void mau_decimal_to_xfp(DEC *d, XFP *a)
 {
     int i;
     uint32 sign;
@@ -1921,7 +1925,7 @@ void mau_decimal_to_xfp(DEC *d, XFP *a)
  *
  * Derived from the SoftFloat 2c package (see copyright notice above)
  */
-uint32 xfp_to_int(XFP *val, RM rounding_mode)
+static uint32 xfp_to_int(XFP *val, RM rounding_mode)
 {
     uint32 sign;
     int32 exp, shift_count;
@@ -1952,7 +1956,7 @@ uint32 xfp_to_int(XFP *val, RM rounding_mode)
  *
  * Derived from the SoftFloat 2c library (see copyright notice above)
  */
-void mau_round_xfp_to_int(XFP *val, XFP *result, RM rounding_mode)
+static void mau_round_xfp_to_int(XFP *val, XFP *result, RM rounding_mode)
 {
     uint32 sign;
     int32 exp;
@@ -3587,6 +3591,10 @@ t_stat mau_broadcast(uint32 cmd, uint32 src, uint32 dst)
 
 const char *mau_description(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
 #if defined(REV3)
     return "WE 32106 MAU";
 #else

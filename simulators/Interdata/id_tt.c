@@ -129,6 +129,10 @@ DEVICE tt_dev = {
 
 uint32 tt (uint32 dev, uint32 op, uint32 dat)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 uint32 old_rd, t;
 
 switch (op) {                                           /* case IO op */
@@ -256,6 +260,12 @@ return SCPE_OK;
 
 t_stat tt_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 tt_unit[TTO].flags = (tt_unit[TTO].flags & ~TT_MODE) | val;
 if (val == TT_MODE_7P)
     val = TT_MODE_7B;
@@ -267,6 +277,13 @@ return SCPE_OK;
 
 t_stat tt_set_break (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) cptr;
+(void) desc;
+
 if (tt_dev.flags & DEV_DIS)
     return SCPE_NOFNC;
 tt_sta = tt_sta | STA_BRK;
@@ -284,6 +301,12 @@ return SCPE_OK;
 
 t_stat tt_set_enbdis (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 extern DEVICE ttp_dev;
 extern t_stat ttp_reset (DEVICE *dptr);
 

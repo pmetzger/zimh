@@ -95,16 +95,34 @@ DEVICE csr_dev = {
 
 t_stat csr_ex(t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+    /* Generic examine signature.
+       This implementation does not use every parameter. */
+    (void) vptr;
+    (void) exta;
+    (void) uptr;
+    (void) sw;
+
     return SCPE_OK;
 }
 
 t_stat csr_dep(t_value val, t_addr exta, UNIT *uptr, int32 sw)
 {
+    /* Generic deposit signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) exta;
+    (void) uptr;
+    (void) sw;
+
     return SCPE_OK;
 }
 
 t_stat csr_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     CSRBIT(CSRFECC, TRUE);
     CSRBIT(CSRTHERM, FALSE);
     CSRBIT(CSRITIM, TRUE);
@@ -118,6 +136,10 @@ t_stat csr_reset(DEVICE *dptr)
 
 uint32 csr_read(uint32 pa, size_t size)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint32 reg = (pa - CSRBASE) & 0xff;
 
     switch (reg & 0xf0) {
@@ -147,6 +169,10 @@ uint32 csr_read(uint32 pa, size_t size)
 
 void csr_write(uint32 pa, uint32 val, size_t size)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint32 reg = pa - CSRBASE;
 
     switch (reg) {

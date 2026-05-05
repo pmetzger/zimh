@@ -252,6 +252,10 @@ DEVICE pmmi_dev = {
 
 static const char* pmmi_description(DEVICE *dptr)
 {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return PMMI_NAME;
 }
 
@@ -479,6 +483,11 @@ static t_stat pmmi_detach(UNIT *uptr)
 
 static t_stat pmmi_set_baud(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) value;
+    (void) desc;
+
     int32 baud;
     t_stat r = SCPE_ARG;
 
@@ -500,6 +509,11 @@ static t_stat pmmi_set_baud(UNIT *uptr, int32 value, const char *cptr, void *des
 
 static t_stat pmmi_show_baud(FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) value;
+    (void) desc;
+
     if (uptr->flags & UNIT_ATT) {
         fprintf(st, "Baud rate: %d", pmmi_ctx.baud);
     }

@@ -900,6 +900,10 @@ return SCPE_OK;
 
 t_stat fp15_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 jea = 0;
 fir = 0;
 fguard = 0;

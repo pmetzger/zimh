@@ -135,6 +135,10 @@ DEVICE dh_dev = {
 t_stat
 dh_rd(int32 *data, int32 PA, int32 access)
 {
+  /* Memory-mapped I/O dispatch signature.
+     This implementation does not use every parameter. */
+  (void) access;
+
   t_stat stat = SCPE_OK;
   *data = 0;
   switch (PA & 017) {
@@ -340,6 +344,10 @@ t_stat dh_output_svc(UNIT *uptr)
 
 t_stat dh_reset(DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   CLR_INT (DHRX);
   CLR_INT (DHTX);
   sim_cancel (&dh_unit[0]);
@@ -357,5 +365,9 @@ t_stat dh_reset(DEVICE *dptr)
 
 const char *dh_description (DEVICE *dptr)
 {
+  /* Generic device description signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   return "DH-11, asynchronous serial line interface";
 }

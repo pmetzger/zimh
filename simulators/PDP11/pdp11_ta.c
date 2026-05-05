@@ -214,6 +214,10 @@ DEVICE ta_dev = {
 
 t_stat ta_rd (int32 *data, int32 PA, int32 access)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 01) {                               /* decode PA<1> */
 
     case 0:                                             /* TACSR */
@@ -525,6 +529,10 @@ return crc;
 
 t_stat ta_map_err (UNIT *uptr, t_stat st)
 {
+/* Shared tape error mapping signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 switch (st) {
 
     case MTSE_FMT:                                      /* illegal fmt */
@@ -569,6 +577,10 @@ return SCPE_OK;
 
 t_stat ta_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 u;
 UNIT *uptr;
 
@@ -659,6 +671,11 @@ static const uint16 boot_rom[] = {
 
 t_stat ta_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 size_t i;
 
 for (i = 0; i < BOOT_LEN; i++)
@@ -697,5 +714,9 @@ return SCPE_OK;
 
 const char *ta_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "TA11/TU60 Cassette Tape";
 }

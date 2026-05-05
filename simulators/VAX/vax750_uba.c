@@ -92,6 +92,7 @@ int32 uba_get_ubvector (int32 lvl);
 void uba_eval_int (void);
 void uba_ioreset (void);
 t_bool uba_map_addr (uint32 ua, uint32 *ma);
+static t_bool uba_map_addr_c (uint32 ua, uint32 *ma);
 t_stat uba_show_virt (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat uba_show_map (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
@@ -180,6 +181,10 @@ DEVICE uba_dev = {
 
 t_stat uba_rdreg (int32 *val, int32 pa, int32 lnt)
 {
+/* Nexus register dispatch signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 idx, ofs;
 
 ofs = NEXUS_GETOFS (pa);                                /* get offset */
@@ -221,6 +226,10 @@ return SCPE_OK;
 
 t_stat uba_wrreg (int32 val, int32 pa, int32 lnt)
 {
+/* Nexus register dispatch signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 idx, ofs;
 
 ofs = NEXUS_GETOFS (pa);                                /* get offset */
@@ -259,7 +268,7 @@ return SCPE_OK;
 
 /* Read and write Unibus I/O space */
 
-int32 ReadUb (uint32 pa)
+static int32 ReadUb (uint32 pa)
 {
 int32 idx, val;
 
@@ -275,7 +284,7 @@ MACH_CHECK(MCHK_BPE);
 return 0;
 }
 
-void WriteUb (uint32 pa, int32 val, int32 mode)
+static void WriteUb (uint32 pa, int32 val, int32 mode)
 {
 int32 idx;
 
@@ -559,7 +568,7 @@ return FALSE;
 
 /* Map an address via the translation map - console version (no status changes) */
 
-t_bool uba_map_addr_c (uint32 ua, uint32 *ma)
+static t_bool uba_map_addr_c (uint32 ua, uint32 *ma)
 {
 uint32 ublk, umap;
 
@@ -595,6 +604,10 @@ return;
 
 t_stat uba_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 for (i = 0; i < IPL_HLVL; i++) {
@@ -611,6 +624,10 @@ return SCPE_OK;
 
 const char *uba_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Unibus adapter";
 }
 
@@ -618,6 +635,11 @@ return "Unibus adapter";
 
 t_stat uba_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic memory examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 ua = (uint32) exta, pa;
 
 if ((vptr == NULL) || (ua >= UBADDRSIZE))
@@ -633,6 +655,11 @@ return SCPE_NXM;
 
 t_stat uba_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic memory deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 ua = (uint32) exta, pa;
 
 if (ua >= UBADDRSIZE)
@@ -648,6 +675,11 @@ return SCPE_NXM;
 
 t_stat uba_show_virt (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 t_stat r;
 const char *cptr = (const char *) desc;
 uint32 ua, pa;
@@ -669,5 +701,10 @@ return SCPE_OK;
 
 t_stat uba_show_map (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 return show_bus_map (of, (const char *)desc, uba_map, UBA_NMAPR, "Unibus", UBAMAP_VLD);
 }

@@ -429,6 +429,10 @@ static const char * const state[] = {
 
 t_stat rl_rd (int32 *data, int32 PA, int32 access)
 {
+/* Generic I/O page read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 UNIT *uptr;
 
 switch ((PA >> 1) & 07) {                               /* decode PA<2:1> */
@@ -1000,6 +1004,10 @@ else CLR_INT (RL);
 
 t_stat rl_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 UNIT *uptr;
 
@@ -1052,6 +1060,10 @@ return sim_disk_detach (uptr);
 
 t_stat rl_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 if ((val < 0) || (cptr && *cptr))
     return SCPE_ARG;
 if (uptr->flags & UNIT_ATT)
@@ -1065,6 +1077,11 @@ return SCPE_OK;
 
 t_stat rl_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 fprintf (st, "%s", drv_tab[GET_DTYPE (uptr->flags)].name);
 return SCPE_OK;
 }
@@ -1075,11 +1092,22 @@ return SCPE_OK;
 
 t_stat rl_set_bad (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) cptr;
+(void) desc;
+
 return pdp11_bad_block (uptr, RL_NUMSC, RL_NUMWD);
 }
 
 t_stat rl_set_cover (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     /* allowed only if in LOAD state */
     if ((uptr->STAT & RLDS_M_STATE) != RLDS_LOAD)
         return (SCPE_NOFNC);
@@ -1089,6 +1117,11 @@ t_stat rl_set_cover (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat rl_show_cover (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     fprintf (st, "cover %s", (uptr->STAT & RLDS_CVO) ? "open" : "closed");
     return (SCPE_OK);
 }
@@ -1096,6 +1129,11 @@ t_stat rl_show_cover (FILE *st, UNIT *uptr, int32 val, const void *desc)
 /* simulate the LOAD button on the drive */
 t_stat rl_set_load (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     if (val == 0) {                                     /* LOAD */
         if (uptr->STAT & RLDS_CVO)                      /* cover open? */
             return (SCPE_NOFNC);
@@ -1118,6 +1156,11 @@ t_stat rl_set_load (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat rl_show_load (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     fprintf (st, "load %s",
         ((uptr->STAT & RLDS_M_STATE) != RLDS_LOAD) ? "set" : "reset");
     return (SCPE_OK);
@@ -1125,6 +1168,11 @@ t_stat rl_show_load (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat rl_show_dstate (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int32   cnt;
 
     fprintf (st, "drive state: %s\n", state[(uptr->STAT & RLDS_M_STATE)]);
@@ -1154,6 +1202,12 @@ t_stat rl_show_dstate (FILE *st, UNIT *uptr, int32 val, const void *desc)
 /* Handle SET RL RLV12|RLV11 */
 t_stat rl_set_ctrl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
+
     if (UNIBUS)
         return (SCPE_NOFNC);
     if ((val & DEV_RLV11) && (MEMSIZE > UNIMEMSIZE))
@@ -1167,6 +1221,12 @@ t_stat rl_set_ctrl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 /* SHOW RL will display the controller type */
 t_stat rl_show_ctrl (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     const char *s = "RLV12";
 
     if (UNIBUS)
@@ -1231,6 +1291,10 @@ static const uint16 boot_rom[] = {
 
 t_stat rl_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 for (i = 0; i < BOOT_LEN; i++)
@@ -1245,6 +1309,11 @@ return SCPE_OK;
 
 t_stat rl_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 return SCPE_NOFNC;
 }
 
@@ -1252,6 +1321,12 @@ return SCPE_NOFNC;
 
 t_stat rl_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "RL11/RL01/RL02 Cartridge Disk (RL)\n\n");
 fprintf (st, "RL11 options include the ability to set units write enabled or write locked,\n");
 fprintf (st, "to set the drive type to RL01, RL02, or autosize, and to write a DEC standard\n");
@@ -1275,6 +1350,10 @@ return SCPE_OK;
 
 const char *rl_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return (UNIBUS) ? "RL11/RL01(2) cartridge disk controller" :
                   "RLV12/RL01(2) cartridge disk controller";
 }

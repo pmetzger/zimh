@@ -176,6 +176,10 @@ DEVICE timer_dev = {
 };
 
 t_stat timer_reset(DEVICE *dptr) {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int32 i;
 
     memset(&TIMERS, 0, sizeof(struct timer_ctr) * 3);
@@ -290,6 +294,10 @@ t_stat tmr_svc(UNIT *uptr)
 
 uint32 timer_read(uint32 pa, size_t size)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint32 reg;
     uint16 ctr_val;
     uint8 ctrnum, retval;
@@ -360,7 +368,7 @@ uint32 timer_read(uint32 pa, size_t size)
     return retval;
 }
 
-void handle_timer_write(uint8 ctrnum, uint32 val)
+static void handle_timer_write(uint8 ctrnum, uint32 val)
 {
     struct timer_ctr *ctr;
 
@@ -402,6 +410,10 @@ void handle_timer_write(uint8 ctrnum, uint32 val)
 
 void timer_write(uint32 pa, uint32 val, size_t size)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint8 reg, ctrnum;
     struct timer_ctr *ctr;
 
@@ -479,6 +491,10 @@ void timer_write(uint32 pa, uint32 val, size_t size)
 
 const char *tmr_description(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
 #if defined (REV3)
     return "82C54 Programmable Interval Timer";
 #else
@@ -488,6 +504,12 @@ const char *tmr_description(DEVICE *dptr)
 
 t_stat tmr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
 #if defined (REV3)
     fprintf(st, "82C54 Programmable Interval Timer (TMR)\n\n");
     fprintf(st, "The TMR device implements three programmable timers used by the 3B2/700\n");

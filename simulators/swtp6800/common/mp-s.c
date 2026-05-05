@@ -195,6 +195,10 @@ DEVICE ptp_dev = {
 
 t_stat sio_svc (UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     int32 temp;
 
     sim_activate (&sio_unit, sio_unit.wait); // continue poll
@@ -215,6 +219,10 @@ t_stat sio_svc (UNIT *uptr)
 
 t_stat ptr_svc (UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     int32 temp;
 
     sim_activate (&ptr_unit, ptr_unit.wait); // continue poll
@@ -231,6 +239,10 @@ t_stat ptr_svc (UNIT *uptr)
 
 t_stat ptp_svc (UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     return SCPE_OK;
 }
 
@@ -238,6 +250,10 @@ t_stat ptp_svc (UNIT *uptr)
 
 t_stat sio_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     sio_unit.buf = 0;                   //clear data buffer
     sio_unit.u3 = TXE;                  //set TXE flag
     sio_unit.wait = 10000;
@@ -249,6 +265,10 @@ t_stat sio_reset (DEVICE *dptr)
 
 t_stat ptr_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     ptr_unit.buf = 0;                   //clear data buffer
     ptr_unit.u3 = TXE;                  //set TXE flag
     sim_cancel (&ptr_unit);             // deactivate unit
@@ -259,6 +279,10 @@ t_stat ptr_reset (DEVICE *dptr)
 
 t_stat ptp_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     ptp_unit.buf = 0;                   //clear data buffer
     ptp_unit.u3 = TXE;                  //set TXE flag
     sim_cancel (&ptp_unit);             // deactivate unit
@@ -370,11 +394,21 @@ int32 sio0d(int32 io, int32 data)
 
 int32 sio1s(int32 io, int32 data)
 {
+    /* Memory-mapped I/O callback signature.
+       This implementation does not use every parameter. */
+    (void) io;
+    (void) data;
+
     return status;
 }
 
 int32 sio1d(int32 io, int32 data)
 {
+    /* Memory-mapped I/O callback signature.
+       This implementation does not use every parameter. */
+    (void) io;
+    (void) data;
+
     return odata;
 }
 

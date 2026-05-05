@@ -338,12 +338,20 @@ static inline void mmu_update_pd(uint32 va, uint32 pd_addr, uint32 mask)
 
 t_stat mmu_init(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     flush_caches();
     return SCPE_OK;
 }
 
 uint32 mmu_read(uint32 pa, size_t size)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint32 offset;
     uint32 data = 0;
 
@@ -423,6 +431,10 @@ uint32 mmu_read(uint32 pa, size_t size)
 
 void mmu_write(uint32 pa, uint32 val, size_t size)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint32 offset;
 
     offset = (pa >> 2) & 0x1f;
@@ -514,8 +526,8 @@ void mmu_write(uint32 pa, uint32 val, size_t size)
  * typses of fault checking.
  *
  */
-t_stat mmu_get_sd(uint32 va, uint8 r_acc, t_bool fc,
-                  uint32 *sd0, uint32 *sd1)
+static t_stat mmu_get_sd(uint32 va, uint8 r_acc, t_bool fc,
+                         uint32 *sd0, uint32 *sd1)
 {
     /* We immediately do some bounds checking (fc flag is not checked
      * because this is a fatal error) */
@@ -574,9 +586,9 @@ t_stat mmu_get_sd(uint32 va, uint8 r_acc, t_bool fc,
 /*
  * Load a page descriptor from memory
  */
-t_stat mmu_get_pd(uint32 va, uint8 r_acc, t_bool fc,
-                  uint32 sd0, uint32 sd1,
-                  uint32 *pd, uint8 *pd_acc)
+static t_stat mmu_get_pd(uint32 va, uint8 r_acc, t_bool fc,
+                         uint32 sd0, uint32 sd1,
+                         uint32 *pd, uint8 *pd_acc)
 {
     uint32 pd_addr;
 
@@ -610,9 +622,9 @@ t_stat mmu_get_pd(uint32 va, uint8 r_acc, t_bool fc,
 /*
  * Decode an address from a contiguous segment.
  */
-t_stat mmu_decode_contig(uint32 va, uint8 r_acc,
-                         uint32 sd0, uint32 sd1,
-                         t_bool fc, uint32 *pa)
+static t_stat mmu_decode_contig(uint32 va, uint8 r_acc,
+                                uint32 sd0, uint32 sd1,
+                                t_bool fc, uint32 *pa)
 {
     if (fc) {
         /* Update R and M bits if configured */
@@ -642,9 +654,9 @@ t_stat mmu_decode_contig(uint32 va, uint8 r_acc,
     return SCPE_OK;
 }
 
-t_stat mmu_decode_paged(uint32 va, uint8 r_acc, t_bool fc,
-                        uint32 sd1, uint32 pd,
-                        uint8 pd_acc, uint32 *pa)
+static t_stat mmu_decode_paged(uint32 va, uint8 r_acc, t_bool fc,
+                               uint32 sd1, uint32 pd,
+                               uint8 pd_acc, uint32 *pa)
 {
     /* If the PD is not marked present, fail */
     if (!PD_PRESENT(pd)) {
@@ -818,5 +830,9 @@ void mmu_disable(void)
 
 const char *mmu_description(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "WE32101";
 }

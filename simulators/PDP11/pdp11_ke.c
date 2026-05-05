@@ -108,6 +108,10 @@ DEVICE ke_dev = {
 
 t_stat ke_rd (int32 *data, int32 PA, int32 access)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch (PA & 016) {                                     /* decode PA<3:1> */
 
     case KE_AC:                                         /* AC */
@@ -345,6 +349,10 @@ return ke_SR;
 
 t_stat ke_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ke_SR = 0;
 ke_SC = 0;
 ke_AC = 0;
@@ -354,6 +362,12 @@ return auto_config(0, 0);
 
 t_stat ke_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 const char *const text =
 /*567901234567890123456789012345678901234567890123456789012345678901234567890*/
 "KE11A Extended Arithmetic Option (KE)\n"
@@ -378,5 +392,9 @@ return SCPE_OK;
 
 const char *ke_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "KE11-A extended arithmetic element";
 }

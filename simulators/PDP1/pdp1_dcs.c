@@ -180,6 +180,10 @@ DEVICE dcsl_dev = {
 
 int32 dcs (int32 inst, int32 dev, int32 dat)
 {
+/* Generic IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 pls = (inst >> 6) & 077;
 
 if (dcs_dev.flags & DEV_DIS)                            /* disabled? */
@@ -323,6 +327,10 @@ return;
 
 t_stat dcs_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 if (dcs_dev.flags & DEV_DIS)                            /* master disabled? */
@@ -370,6 +378,12 @@ return r;
 
 t_stat dcs_vlines (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 newln, i, t;
 t_stat r;
 

@@ -41,6 +41,7 @@
 #include "3b2_scsi.h"
 #include "3b2_mau.h"
 #include "3b2_stddev.h"
+#include "3b2_sys.h"
 #include "3b2_timer.h"
 
 char sim_name[] = "AT&T 3B2/400";

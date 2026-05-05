@@ -96,6 +96,12 @@ gw(FILE *f)
 t_stat
 sim_load(FILE *f, const char *buf, const char *fnam, t_bool flag)
 {
+        /* Generic loader signature.
+           This implementation does not use every parameter. */
+        (void)fnam;
+        (void)buf;
+        (void)flag;
+
         int B, C, E, F, H, I;
         int w, i, rv;
         uint16 s;
@@ -188,6 +194,10 @@ static char *mitab[] = {
 t_stat
 fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 {
+        /* Generic symbolic output signature.
+           This implementation does not use every parameter. */
+        (void)uptr;
+
         int ins, op, off;
 
         if (!(sw & SWMASK ('M')))
@@ -354,5 +364,13 @@ fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 t_stat
 parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+        /* Generic symbolic input signature.
+           This implementation does not use every parameter. */
+        (void)addr;
+        (void)cptr;
+        (void)sw;
+        (void)uptr;
+        (void)val;
+
         return SCPE_ARG;
 }

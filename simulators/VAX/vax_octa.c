@@ -621,6 +621,10 @@ return h_rpackh (&b, hflt);                             /* round and pack */
 
 void op_polyh (uint32 *opnd, int32 acc)
 {
+/* Shared instruction helper signature.
+   This implementation does not use every parameter. */
+(void) acc;
+
 UFPH r, a, c;
 int32 deg = opnd[4];
 int32 ptr = opnd[5];

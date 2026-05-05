@@ -117,7 +117,7 @@ DEVICE cp_dev = {
 
 /* Convert SDS BCD character into hollerith code */
 
-uint16 sdsbcd_to_hol(uint8 bcd) {
+static uint16 sdsbcd_to_hol(uint8 bcd) {
     uint16      hol;
 
     /* Handle space correctly */
@@ -303,6 +303,11 @@ t_stat cp_set_chan (UNIT *uptr, int32 val, const char *sptr, void *desc)
 }
 
 t_stat cp_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int n;
 
     if ((n = sim_card_output_hopper_count(uptr)) == 0)

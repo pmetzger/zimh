@@ -1572,6 +1572,12 @@ return IORETURN (outbound_signals, outbound_value);     /* return the outbound s
 
 static t_stat atc_set_endis (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (value)                                              /* if this is an ENABLE request */
     if (atcd_dev.flags & DEV_DIS) {                     /*   then if the device is disabled */
         atcd_dev.flags &= ~DEV_DIS;                     /*     then reenable it */
@@ -1615,6 +1621,11 @@ return atcd_reset (&atcd_dev);                          /* reset the TDI and res
 
 static t_stat atc_set_mode (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+
 DEVICE * const dptr = (DEVICE *) desc;                  /* a pointer to the device */
 
 switch ((DEVICE_MODES) value) {                         /* dispatch based on the mode to set */
@@ -1656,6 +1667,10 @@ return SCPE_OK;
 
 static t_stat atc_show_mode (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 const DEVICE * const dptr = (const DEVICE *) desc;      /* a pointer to the device */
 
 if (value == 0)                                         /* if this is the TDI */
@@ -1723,6 +1738,10 @@ return SCPE_OK;
 
 static t_stat atcd_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tdi_master_reset ();                                    /* perform a master reset */
 
 if (sim_switches & SWMASK ('P')) {                      /* if this is a power-on reset */
@@ -1762,6 +1781,10 @@ return SCPE_OK;
 
 static t_stat atcc_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 channel;
 
 tci_master_reset ();                                        /* perform a master reset */

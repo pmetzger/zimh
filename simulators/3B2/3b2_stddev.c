@@ -76,6 +76,11 @@ DEVICE nvram_dev = {
 
 t_stat nvram_ex(t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+    /* Generic examine signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)sw;
+
     uint32 addr = (uint32) exta;
 
     if ((vptr == NULL) || (addr & 03)) {
@@ -93,6 +98,11 @@ t_stat nvram_ex(t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 
 t_stat nvram_dep(t_value val, t_addr exta, UNIT *uptr, int32 sw)
 {
+    /* Generic deposit signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)sw;
+
     uint32 addr = (uint32) exta;
 
     if (addr & 03) {
@@ -110,6 +120,10 @@ t_stat nvram_dep(t_value val, t_addr exta, UNIT *uptr, int32 sw)
 
 t_stat nvram_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     if (NVRAM == NULL) {
         NVRAM = (uint32 *)calloc(NVRSIZE >> 2, sizeof(uint32));
         memset(NVRAM, 0, sizeof(uint32) * NVRSIZE >> 2);
@@ -125,11 +139,21 @@ t_stat nvram_reset(DEVICE *dptr)
 
 const char *nvram_description(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "Non-Volatile RAM.\n";
 }
 
 t_stat nvram_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic device help signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)flag;
+    (void)cptr;
+
     fprintf(st, "Non-Volatile RAM\n\n");
     fprintf(st, "The %s device is a small battery-backed, non-volatile RAM\n", dptr->name);
     fprintf(st, "used by the 3B2 to hold system configuration and diagnostic data.\n\n");
@@ -320,6 +344,10 @@ static void tod_resync(UNIT *uptr)
 
 t_stat tod_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     int32 t;
 
     if (tod_unit.filebuf == NULL) {
@@ -485,6 +513,10 @@ static void tod_tick(UNIT *uptr)
 
 uint32 tod_read(uint32 pa, size_t size)
 {
+    /* Shared memory access signature.
+       This implementation does not use every parameter. */
+    (void)size;
+
     uint8 reg, val;
     TOD_DATA *td = (TOD_DATA *)(tod_unit.filebuf);
 
@@ -558,6 +590,10 @@ uint32 tod_read(uint32 pa, size_t size)
 
 void tod_write(uint32 pa, uint32 val, size_t size)
 {
+    /* Shared memory access signature.
+       This implementation does not use every parameter. */
+    (void)size;
+
     uint32 reg;
     TOD_DATA *td = (TOD_DATA *)(tod_unit.filebuf);
 
@@ -646,6 +682,10 @@ void tod_write(uint32 pa, uint32 val, size_t size)
 
 const char *tod_description(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
 #if defined(REV3)
     return("MM58274C real time clock");
 #else
@@ -655,6 +695,12 @@ const char *tod_description(DEVICE *dptr)
 
 t_stat tod_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic device help signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)flag;
+    (void)cptr;
+
     char dname[10];
 
 #if defined(REV3)
@@ -770,6 +816,10 @@ static uint32 mem_size(uint8 slot) {
 
 uint32 flt_read(uint32 pa, size_t size)
 {
+    /* Shared memory access signature.
+       This implementation does not use every parameter. */
+    (void)size;
+
     sim_debug(EXECUTE_MSG, &flt_dev,
               "Read from FLT Register at %x\n",
               pa);
@@ -795,6 +845,10 @@ uint32 flt_read(uint32 pa, size_t size)
 
 void flt_write(uint32 pa, uint32 val, size_t size)
 {
+    /* Shared memory access signature.
+       This implementation does not use every parameter. */
+    (void)size;
+
     sim_debug(EXECUTE_MSG, &flt_dev,
               "Write to FLT Register at %x (val=%x)\n",
               pa, val);
@@ -804,6 +858,12 @@ void flt_write(uint32 pa, uint32 val, size_t size)
 
 t_stat flt_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic device help signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)flag;
+    (void)cptr;
+
     fprintf(st, "Fault Register\n\n");
     fprintf(st, "The %s device is a pair of 32-bit registers that hold information about\n", dptr->name);
     fprintf(st, "system memory faults.\n");
@@ -814,6 +874,10 @@ t_stat flt_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr
 
 const char *flt_description(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "Fault Register";
 }
 

@@ -63,13 +63,13 @@ t_stat tto_svc(UNIT *);
 t_stat tti_reset(DEVICE *);
 t_stat tto_reset(DEVICE *);
 
-void TTIstate(const char *, DEVICE *, IO_DEVICE *);
-void TTOstate(const char *, DEVICE *, IO_DEVICE *);
-void TTstate(const char *, DEVICE *, IO_DEVICE *);
+static void TTIstate(const char *, DEVICE *, IO_DEVICE *);
+static void TTOstate(const char *, DEVICE *, IO_DEVICE *);
+static void TTstate(const char *, DEVICE *, IO_DEVICE *);
 uint16 TTrebuild(void);
-t_bool TTreject(IO_DEVICE *, t_bool, uint8);
-enum IOstatus TTin(IO_DEVICE *, uint8);
-enum IOstatus TTout(IO_DEVICE *, uint8);
+static t_bool TTreject(IO_DEVICE *, t_bool, uint8);
+static enum IOstatus TTin(IO_DEVICE *, uint8);
+static enum IOstatus TTout(IO_DEVICE *, uint8);
 
 t_stat tt_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 
@@ -286,8 +286,13 @@ DEVICE tto_dev = {
 /*
  * Dump the current state of the TTI device
  */
-void TTIstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
+static void TTIstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
 {
+  /* Registered device state dump signature.
+     This implementation does not use every parameter. */
+  (void) dev;
+  (void) iod;
+
   char temp[32];
 
   temp[0] = '\0';
@@ -421,6 +426,10 @@ t_stat tti_svc(UNIT *uptr)
 
 t_stat tti_reset(DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   /*** Reset TT? ***/
   TTIdev.STATUS = IO_1711_RMODE;
   TTIdev.iod_holdFull = FALSE;
@@ -435,8 +444,13 @@ t_stat tti_reset(DEVICE *dptr)
 
 /* Perform I/O */
 
-enum IOstatus TTIin(IO_DEVICE *iod, uint8 reg)
+static enum IOstatus TTIin(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+  (void) reg;
+
   /*
    * The logical TT device driver only passes INP operations for the data
    * register (0x90).
@@ -453,7 +467,7 @@ enum IOstatus TTIin(IO_DEVICE *iod, uint8 reg)
   return IO_REPLY;
 }
 
-void TTIcint(void)
+static void TTIcint(void)
 {
   /*
    * Clear all interrupt enables
@@ -469,7 +483,7 @@ void TTIcint(void)
     TTIdev.STATUS |= IO_ST_DATA;
 }
 
-void TTIccont(void)
+static void TTIccont(void)
 {
   tti_reset(&tti_dev);
   TTIdev.iod_holdFull = FALSE;
@@ -484,8 +498,13 @@ void TTIccont(void)
 /*
  * Dump the current state of the TTO device
  */
-void TTOstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
+static void TTOstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
 {
+  /* Registered device state dump signature.
+     This implementation does not use every parameter. */
+  (void) dev;
+  (void) iod;
+
   char temp[32];
 
   temp[0] = '\0';
@@ -536,6 +555,10 @@ t_stat tto_svc(UNIT *uptr)
 
 t_stat tto_reset(DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   /*** Reset TT? ***/
   TTOdev.STATUS = IO_ST_DATA;
   TTOdev.iod_holdFull = FALSE;
@@ -545,8 +568,13 @@ t_stat tto_reset(DEVICE *dptr)
 
 /* Perform I/O */
 
-enum  IOstatus TTOout(IO_DEVICE *iod, uint8 reg)
+static enum  IOstatus TTOout(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+  (void) reg;
+
   /*
    * The logical TT device driver only passes OUT operations for the data
    * register (0x90).
@@ -564,7 +592,7 @@ enum  IOstatus TTOout(IO_DEVICE *iod, uint8 reg)
   return IO_REPLY;
 }
 
-void TTOcint(void)
+static void TTOcint(void)
 {
   /*
    * Clear all interrupt enables
@@ -581,7 +609,7 @@ void TTOcint(void)
     TTOdev.STATUS |= IO_ST_DATA;
 }
 
-void TTOccont(void)
+static void TTOccont(void)
 {
   tto_reset(&tto_dev);
   sim_cancel(&tto_unit);
@@ -598,8 +626,12 @@ void TTOccont(void)
  * not used by this routine since it is a logical device which has no
  * associated physical device.
  */
-void TTstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
+static void TTstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
 {
+  /* Registered device state dump signature.
+     This implementation does not use every parameter. */
+  (void) dev;
+
   fprintf(DBGOUT,
           "%s[TT %s: Func: %04X, Sta: %04X, Mode: %c]\r\n",
           INTprefix, where, iod->FUNCTION, iod->STATUS,
@@ -615,7 +647,7 @@ void TTstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
 /*
  * Reset routine
  */
-void TTreset(void)
+static void TTreset(void)
 {
   TTdev.STATUS = IO_1711_MON | IO_ST_READY;
   TTdev.iod_rmode = TRUE;
@@ -636,8 +668,12 @@ uint16 TTrebuild(void)
 
 /* Check if I/O should be rejected */
 
-t_bool TTreject(IO_DEVICE *iod, t_bool output, uint8 reg)
+static t_bool TTreject(IO_DEVICE *iod, t_bool output, uint8 reg)
 {
+  /* Registered I/O reject signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   if (reg == 0) {
     if (output)
       return (TTdev.STATUS & IO_ST_BUSY) != 0;
@@ -667,8 +703,12 @@ t_bool TTreject(IO_DEVICE *iod, t_bool output, uint8 reg)
 
 /* Perform I/O */
 
-enum IOstatus TTin(IO_DEVICE *iod, uint8 reg)
+static enum IOstatus TTin(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   /*
    * Certain invalid operations will already have been rejected in TTreject().
    */
@@ -679,7 +719,7 @@ enum IOstatus TTin(IO_DEVICE *iod, uint8 reg)
   return IO_REPLY;
 }
 
-enum IOstatus TTout(IO_DEVICE *iod, uint8 reg)
+static enum IOstatus TTout(IO_DEVICE *iod, uint8 reg)
 {
   t_bool rmode, changed = FALSE;
   DEVICE *dptr;
@@ -787,8 +827,9 @@ t_stat ptr_reset(DEVICE *);
 t_stat ptr_attach(UNIT *, const char *);
 t_stat ptr_detach(UNIT *);
 
-enum IOstatus PTRin(IO_DEVICE *, uint8);
-enum IOstatus PTRout(IO_DEVICE *, uint8);
+static void PTRstate(const char *, DEVICE *, IO_DEVICE *);
+static enum IOstatus PTRin(IO_DEVICE *, uint8);
+static enum IOstatus PTRout(IO_DEVICE *, uint8);
 
 t_stat ptr_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 
@@ -917,7 +958,7 @@ const char *PTRprivateState[2] = {
   "", "In Motion"
 };
 
-void PTRstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
+static void PTRstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
 {
   fprintf(DBGOUT,
           "%s[%s %s: Func: %04X, Sta: %04X, Ena: %04X, Private: %s\r\n",
@@ -980,6 +1021,10 @@ t_stat ptr_svc(UNIT *uptr)
 
 t_stat ptr_reset(DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   DEVRESET(&PTRdev);
 
   PTRdev.iod_PTRmotion = IODP_PTRSTOPPED;
@@ -1017,8 +1062,13 @@ t_stat ptr_detach(UNIT *uptr)
 
 /* Perform I/O */
 
-enum IOstatus PTRin(IO_DEVICE *iod, uint8 reg)
+static enum IOstatus PTRin(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+  (void) reg;
+
   if ((ptr_dev.dctrl & DBG_DSTATE) != 0)
     PTRstate("before", &ptr_dev, &PTRdev);
 
@@ -1035,8 +1085,12 @@ enum IOstatus PTRin(IO_DEVICE *iod, uint8 reg)
   return IO_REPLY;
 }
 
-enum IOstatus PTRout(IO_DEVICE *iod, uint8 reg)
+static enum IOstatus PTRout(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   if ((ptr_dev.dctrl & DBG_DSTATE) != 0)
     PTRstate("before", &ptr_dev, &PTRdev);
 
@@ -1093,8 +1147,9 @@ t_stat ptr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr
 t_stat ptp_svc(UNIT *);
 t_stat ptp_reset(DEVICE *);
 
-enum IOstatus PTPin(IO_DEVICE *, uint8);
-enum IOstatus PTPout(IO_DEVICE *, uint8);
+static void PTPstate(const char *, DEVICE *, IO_DEVICE *);
+static enum IOstatus PTPin(IO_DEVICE *, uint8);
+static enum IOstatus PTPout(IO_DEVICE *, uint8);
 
 t_stat ptp_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 
@@ -1224,7 +1279,7 @@ const char *PTPprivateState[4] = {
   "", "INTRWAIT", "DATAWAIT", "DATAWAIT,INTRWAIT"
 };
 
-void PTPstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
+static void PTPstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
 {
   fprintf(DBGOUT,
           "%s[%s %s: Func: %04X, Sta: %04X, Ena: %04X, Private: %s\r\n",
@@ -1284,6 +1339,10 @@ t_stat ptp_svc(UNIT *uptr)
 
 t_stat ptp_reset(DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   DEVRESET(&PTPdev);
 
   PTPdev.iod_PTPdelay = 0;
@@ -1297,16 +1356,25 @@ t_stat ptp_reset(DEVICE *dptr)
 
 /* Perform I/O */
 
-enum IOstatus PTPin(IO_DEVICE *iod, uint8 reg)
+static enum IOstatus PTPin(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+  (void) reg;
+
   /*
    * The framework only passes IN operations for the data register (0x90)
    */
   return IO_REJECT;
 }
 
-enum IOstatus PTPout(IO_DEVICE *iod, uint8 reg)
+static enum IOstatus PTPout(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   if ((ptp_dev.dctrl & DBG_DSTATE) != 0)
     PTPstate("before", &ptp_dev, &PTPdev);
 
@@ -1403,6 +1471,10 @@ t_stat ptp_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr
  */
 uint16 dev1INTR(DEVICE *dptr)
 {
+  /* Generic device interrupt signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   uint16 status;
 
   status = TTIdev.STATUS |  TTOdev.STATUS | PTRdev.STATUS | PTPdev.STATUS;

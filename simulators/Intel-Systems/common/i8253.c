@@ -47,6 +47,10 @@ extern uint8 unreg_dev(uint16);
 /* globals */
 
 static const char* i8253_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return i8253_NAME;
 }
 int     i8253_num = 0;
@@ -158,6 +162,10 @@ DEVICE i8253_dev = {
 
 t_stat i8253_cfg(uint16 base, uint16 devnum, uint8 dummy)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) dummy;
+
     UNIT *uptr;
 
     uptr = i8253_dev.units;
@@ -197,6 +205,11 @@ t_stat i8253_clr(void)
 
 t_stat i8253_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int i;
 
     if (uptr == NULL)
@@ -345,6 +358,10 @@ t_stat i8253_svc (UNIT *uptr)
 
 t_stat i8253_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
 
     for (i = 0; i < 4; i++)

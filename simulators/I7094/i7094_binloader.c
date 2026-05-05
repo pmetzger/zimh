@@ -93,6 +93,11 @@ extern uint32 PC;
 t_stat
 binloader (FILE *fd, const char *file, int loadpt)
 {
+#ifndef DEBUGLOADER
+   /* Shared loader signature.
+      This build variant does not use every parameter. */
+   (void) file;
+#endif
 #ifdef DEBUGLOADER
    FILE *lfd;
 #endif

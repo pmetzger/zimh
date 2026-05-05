@@ -686,6 +686,10 @@ return;
 
 t_stat mt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 i;
 
 for (i = 0; i < MT_NUMDR; i++) {

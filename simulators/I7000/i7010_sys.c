@@ -219,6 +219,13 @@ const char          mem_to_ascii[64] = {
 t_stat
 sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
 {
+    /* Generic loader signature.
+       This implementation does not use every parameter. */
+    (void)fnam;
+    (void)cptr;
+    (void)fileref;
+    (void)flag;
+
     return SCPE_NOFNC;
 }
 
@@ -531,7 +538,7 @@ const char *chname[] = {
 
 
 /* Print out a address plus index */
-t_stat fprint_addr (FILE *of, uint32 addr) {
+static t_stat fprint_addr (FILE *of, uint32 addr) {
     int i;
     int reg;
 
@@ -545,7 +552,7 @@ t_stat fprint_addr (FILE *of, uint32 addr) {
 }
 
 /* Print out a 1401 address plus index */
-t_stat fprint_addr_1401 (FILE *of, uint32 addr) {
+static t_stat fprint_addr_1401 (FILE *of, uint32 addr) {
     int reg;
     int v = 0;
 
@@ -579,6 +586,10 @@ t_stat fprint_addr_1401 (FILE *of, uint32 addr) {
 
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+
 int32   i, t;
 uint32  a, b;
 uint8   op, mod, flags;
@@ -915,7 +926,7 @@ fprintf (of, (t & WM)? "~%02o ": " %02o ", t & 077);
 return 0;
 }
 
-t_opcode           *
+static t_opcode           *
 find_opcode(char *op, t_opcode * tab)
 {
     while (tab->name != NULL) {
@@ -941,6 +952,11 @@ find_opcode(char *op, t_opcode * tab)
 t_stat
 parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+    (void)uptr;
+
     int                 i;
     t_value             d;
     char                buffer[100];

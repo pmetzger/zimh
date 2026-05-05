@@ -235,7 +235,7 @@ shadowwr(int v, int dat)
 /*
  * MOR - memory out of range.  Addressing non-existent memory.
  */
-void
+static void
 morerr(int addr, int why, int pesval)
 {
         if (pea_locked == 0) {
@@ -401,6 +401,10 @@ mm_wrpcr(void)
 t_stat
 mm_reset(DEVICE *dptr)
 {
+        /* Generic device reset signature.
+           This implementation does not use every parameter. */
+        (void) dptr;
+
         return 0;
 }
 

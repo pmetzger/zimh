@@ -342,7 +342,7 @@ uint8   op_1401[64] = {
         O_C|O_B,0, O_AB|O_DBL,O_A,O_AB|O_DBL,      0,     0,    0,   /* 70 */
 };
 
-uint8 FetchP(uint32 MA) {
+static uint8 FetchP(uint32 MA) {
       uint32 MAR = MA & AMASK;
 
       if (reloc && (MA & BBIT) == 0 && MAR > 100) {
@@ -369,7 +369,7 @@ uint8 FetchP(uint32 MA) {
 }
 
 
-uint8 ReadP(uint32 MA) {
+static uint8 ReadP(uint32 MA) {
       uint32 MAR = MA & AMASK;
 
       if (fault)
@@ -403,7 +403,7 @@ uint8 ReadP(uint32 MA) {
       return M[MAR];
 }
 
-void WriteP(uint32 MA, uint8 v) {
+static void WriteP(uint32 MA, uint8 v) {
       uint32 MAR = MA & AMASK;
 
       if (fault)
@@ -437,7 +437,7 @@ void WriteP(uint32 MA, uint8 v) {
       M[MAR] = v;
 }
 
-void ReplaceMask(uint32 MA, uint8 v, uint8 mask) {
+static void ReplaceMask(uint32 MA, uint8 v, uint8 mask) {
       uint32 MAR = MA & AMASK;
 
       if (fault)
@@ -473,7 +473,7 @@ void ReplaceMask(uint32 MA, uint8 v, uint8 mask) {
 }
 
 
-void SetBit(uint32 MA, uint8 v) {
+static void SetBit(uint32 MA, uint8 v) {
       uint32 MAR = MA & AMASK;
 
       if (fault)
@@ -507,7 +507,7 @@ void SetBit(uint32 MA, uint8 v) {
       M[MAR] |= v;
 }
 
-void ClrBit(uint32 MA, uint8 v) {
+static void ClrBit(uint32 MA, uint8 v) {
       uint32 MAR = MA & AMASK;
 
       if (fault)
@@ -3846,6 +3846,10 @@ rtc_srv(UNIT * uptr)
 t_stat
 cpu_reset(DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     IAR = 1;
     AAR = 0;
     BAR = 0;
@@ -3863,6 +3867,11 @@ cpu_reset(DEVICE * dptr)
 t_stat
 cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)sw;
+    (void)uptr;
+
     if (addr >= MEMSIZE)
         return SCPE_NXM;
     if (vptr != NULL)
@@ -3876,6 +3885,11 @@ cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)sw;
+    (void)uptr;
+
     if (addr >= MEMSIZE)
         return SCPE_NXM;
     M[addr] = val & (077 | WM);
@@ -3885,6 +3899,12 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)desc;
+    (void)uptr;
+
     uint8            mc = 0;
     int32            i;
     int32            v;
@@ -3912,6 +3932,12 @@ cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)uptr;
+    (void)val;
+
     int32               i, lnt;
     t_stat              r;
 
@@ -3945,6 +3971,11 @@ cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+
     int32               k, i, di, lnt, pc;
     char               *cptr = (char *) desc;
     t_stat              r;
@@ -3989,12 +4020,22 @@ cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 const char *
 cpu_description (DEVICE *dptr)
 {
+       /* Generic device description signature.
+          This implementation does not use every parameter. */
+       (void)dptr;
+
        return "IBM 7010 CPU";
 }
 
 t_stat
 cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)flag;
+    (void)uptr;
+
     fprintf (st, "The CPU can be set to a IBM 1401 or IBM 1410/7010\n");
     fprintf (st, "The type of CPU can be set by one of the following commands\n\n");
     fprintf (st, "   sim> set CPU 1401        sets IBM 1401 emulation\n");

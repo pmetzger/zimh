@@ -1462,7 +1462,7 @@ uba_debug_dma_in (dpy_ba, dpy_pa10, pa10);
 return 0;
 }
 
-void
+static void
 uba_debug_dma (int32 mask, uint32 ba, a10 pa_start, a10 pa_end)
 {
 int32 i;
@@ -1575,6 +1575,10 @@ return 0;
 
 t_stat ubmap_rd (int32 *val, int32 pa, int32 mode)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) mode;
+
 int32 n = iocmap[GET_IOUBA (pa)];
 
 if (n < 0)
@@ -1585,6 +1589,10 @@ return SCPE_OK;
 
 t_stat ubmap_wr (int32 val, int32 pa, int32 mode)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) mode;
+
 int32 n = iocmap[GET_IOUBA (pa)];
 
 if (n < 0)
@@ -1597,6 +1605,10 @@ return SCPE_OK;
 
 t_stat ubs_rd (int32 *val, int32 pa, int32 mode)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) mode;
+
 int32 n = iocmap[GET_IOUBA (pa)];
 
 if (n < 0)
@@ -1611,6 +1623,10 @@ return SCPE_OK;
 
 t_stat ubs_wr (int32 val, int32 pa, int32 mode)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) mode;
+
 int32 n = iocmap[GET_IOUBA (pa)];
 
 if (n < 0)
@@ -1647,12 +1663,23 @@ return SCPE_OK;
 
 t_stat rd_zro (int32 *val, int32 pa, int32 mode)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) mode;
+
 *val = 0;
 return SCPE_OK;
 }
 
 t_stat wr_nop (int32 val, int32 pa, int32 mode)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) pa;
+(void) mode;
+
 return SCPE_OK;
 }
 
@@ -1660,6 +1687,10 @@ return SCPE_OK;
 
 t_stat uba_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) sw;
+
 int32 uba = uptr - uba_unit;
 
 if (addr >= UMAP_MEMSIZE)
@@ -1670,6 +1701,10 @@ return SCPE_OK;
 
 t_stat uba_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) sw;
+
 int32 uba = uptr - uba_unit;
 
 if (addr >= UMAP_MEMSIZE)
@@ -1680,6 +1715,10 @@ return SCPE_OK;
 
 t_stat uba_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i, uba;
 
 int_req = 0;
@@ -1696,6 +1735,10 @@ return SCPE_OK;
 
 t_stat set_addr (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 uint32 newba;
@@ -1727,6 +1770,11 @@ return SCPE_OK;
 
 t_stat show_addr (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 
@@ -1753,6 +1801,11 @@ return SCPE_OK;
 
 t_stat set_vec (UNIT *uptr, int32 arg, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) arg;
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 uint32 newvec;
@@ -1782,6 +1835,10 @@ return SCPE_OK;
 
 t_stat show_vec (FILE *st, UNIT *uptr, int32 arg, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 uint32 i, j, vec, numvec, br_bit;
@@ -1831,7 +1888,7 @@ return show_vec (st, uptr, ((mp->lines * 2) / arg), desc);
 
 /* Test for conflict in device addresses */
 
-t_bool dev_conflict (DIB *curr)
+static t_bool dev_conflict (DIB *curr)
 {
 uint32 i, end;
 DEVICE *dptr;
@@ -1857,7 +1914,7 @@ return FALSE;
 
 /* Build interrupt tables */
 
-void build_int_vec (int32 vloc, int32 ivec, int32 (*iack)(void) )
+static void build_int_vec (int32 vloc, int32 ivec, int32 (*iack)(void) )
 {
 if (iack != NULL)
     int_ack[vloc] = iack;
@@ -1909,6 +1966,12 @@ return SCPE_OK;
 
 t_stat show_iospace (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i, j, done = 0;
 DEVICE *dptr;
 DIB *dibt;
@@ -2289,6 +2352,11 @@ return SCPE_OK;
 
 t_stat set_addr_flt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 
 if (cptr != NULL)

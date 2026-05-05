@@ -88,6 +88,10 @@ DEVICE              chan_dev = {
 t_stat
 chan_reset(DEVICE * dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int                 i;
     int                 j = 1;
 
@@ -139,7 +143,7 @@ chan_release(int chan) {
      cstatus &= ~(1 << chan);
 }
 
-int
+static int
 chan_advance(int chan) {
     uint16      addr = (uint16)(D[chan] & CORE);
 
@@ -651,6 +655,10 @@ int chan_read_char(int chan, uint8 *ch, int flags) {
    nor do we advance it.
 */
 int chan_read_disk(int chan, uint8 *ch, int flags) {
+        /* Shared channel read signature.
+           This implementation does not use every parameter. */
+        (void) flags;
+
         uint8   c;
 
         if (CC[chan] == 0) {
@@ -675,7 +683,7 @@ int chan_read_disk(int chan, uint8 *ch, int flags) {
         return 0;
 }
 
-int
+static int
 chan_advance_drum(int chan) {
     uint16      addr = (uint16)(D[chan] & CORE);
     uint16      wc = WC(D[chan]);

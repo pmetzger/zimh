@@ -124,6 +124,10 @@ DEVICE ptp_dev = {
 
 t_stat sio_svc (UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     int32 temp;
 
     sim_activate (&sio_unit, sio_unit.wait);            /* continue poll */
@@ -141,11 +145,19 @@ t_stat sio_svc (UNIT *uptr)
 
 t_stat ptr_svc (UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     return SCPE_OK;
 }
 
 t_stat ptp_svc (UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     return SCPE_OK;
 }
 
@@ -154,6 +166,10 @@ t_stat ptp_svc (UNIT *uptr)
 
 t_stat sio_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     sio_unit.buf = 0;                                   /* Data */
     sio_unit.u3 = 0x02;                                 /* Status */
     sim_activate (&sio_unit, sio_unit.wait);            /* activate unit */
@@ -163,6 +179,10 @@ t_stat sio_reset (DEVICE *dptr)
 
 t_stat ptr_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     ptr_unit.buf = 0;
     ptr_unit.u3 = 0x02;
     sim_cancel (&ptr_unit);                             /* deactivate unit */
@@ -171,6 +191,10 @@ t_stat ptr_reset (DEVICE *dptr)
 
 t_stat ptp_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     ptp_unit.buf = 0;
     ptp_unit.u3 = 0x02;
     sim_cancel (&ptp_unit);                             /* deactivate unit */

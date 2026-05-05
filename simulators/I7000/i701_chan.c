@@ -93,6 +93,11 @@ DEVICE              chan_dev = {
 /* Nothing special to do, just return true if cmd is write and we got here */
 uint32 dly_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
+    /* Generic device command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)dev;
+
     if (cmd == IO_WRS)
         return SCPE_OK;
     return SCPE_NODEV;
@@ -398,10 +403,22 @@ chan_read_char(int chan, uint8 * data, int flags)
 void
 chan9_set_error(int chan, uint32 mask)
 {
+    /* Shared channel hook signature.
+       This implementation does not use every parameter. */
+    (void)chan;
+    (void)mask;
+
 }
 
 t_stat
 chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr) {
+   /* Generic help signature.
+      This implementation does not use every parameter. */
+   (void)dptr;
+   (void)uptr;
+   (void)flag;
+   (void)cptr;
+
    fprintf(st, "IBM 701 Channel\n\n");
    fprintf(st, "Psuedo device to display IBM 701 I/O. The IBM 701 used polled");
    fprintf(st, " I/O,\nThe assembly register and the flags can be displayed\n");
@@ -410,6 +427,10 @@ chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr) {
 }
 
 const char          *chan_description (DEVICE *dptr) {
+   /* Generic description signature.
+      This implementation does not use every parameter. */
+   (void)dptr;
+
    return "IBM 701 Psuedo Channel";
 }
 

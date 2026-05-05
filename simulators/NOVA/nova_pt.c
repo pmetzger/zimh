@@ -157,6 +157,10 @@ DEVICE ptp_dev =
 
 int32 ptr (int32 pulse, int32 code, int32 AC)
 {
+/* I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) AC;
+
 int32   iodata;
 
 iodata = (code == ioDIA)?
@@ -187,6 +191,10 @@ return iodata;
 
 t_stat ptr_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32   temp;
 
 if ((ptr_unit.flags & UNIT_ATT) == 0)                   /* attached? */
@@ -215,6 +223,10 @@ return SCPE_OK;
 
 t_stat ptr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ptr_unit.buf = 0;                                       /* <not DG compatible> */
 DEV_CLR_BUSY( INT_PTR ) ;
 DEV_CLR_DONE( INT_PTR ) ;
@@ -271,6 +283,10 @@ return 0;
 
 t_stat ptp_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 DEV_CLR_BUSY( INT_PTP ) ;
 DEV_SET_DONE( INT_PTP ) ;
 DEV_UPDATE_INTR ;
@@ -290,6 +306,10 @@ return SCPE_OK;
 
 t_stat ptp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ptp_unit.buf = 0;                                       /* <not DG compatible> */
 DEV_CLR_BUSY( INT_PTP ) ;
 DEV_CLR_DONE( INT_PTP ) ;

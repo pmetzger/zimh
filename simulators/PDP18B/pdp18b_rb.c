@@ -145,6 +145,10 @@ DEVICE rb_dev = {
 
 int32 rb71 (int32 dev, int32 pulse, int32 AC)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 tow, t, sb = pulse & 060;
 
 if (pulse & 001) {
@@ -296,6 +300,10 @@ return rb_sta;
 
 t_stat rb_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 rb_sta = rb_da = 0;
 rb_wc = rb_ma = 0;
 rb_updsta (0);

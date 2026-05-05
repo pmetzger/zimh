@@ -223,6 +223,10 @@ static MEMORY_WORD *M = NULL;                           /* the pointer to the ma
 
 t_stat mem_examine (t_value *eval_array, t_addr address, UNIT *uptr, int32 switches)
 {
+/* Generic memory examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if (switches & SIM_SW_STOP)                             /* if entry is for a simulator stop */
     address = TO_PA (PBANK, address);                   /*   then form a PBANK-based physical address */
 
@@ -252,6 +256,11 @@ else {                                                  /* otherwise */
 
 t_stat mem_deposit (t_value value, t_addr address, UNIT *uptr, int32 switches)
 {
+/* Generic memory deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) switches;
+
 if (address >= MEMSIZE)                                 /* if the address is beyond memory limits */
     return SCPE_NXM;                                    /*   then return non-existent memory status */
 

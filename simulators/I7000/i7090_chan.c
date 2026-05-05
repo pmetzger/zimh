@@ -223,6 +223,11 @@ DEVICE              chan_dev = {
 /* Nothing special to do, just return true if cmd is write and we got here */
 uint32 dly_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dev;
+    (void)uptr;
+
     if (cmd == IO_WRS)
         return SCPE_OK;
     return SCPE_NODEV;
@@ -1681,6 +1686,12 @@ t_stat
 chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
 #ifdef I7090
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)flag;
+    (void)uptr;
+
    fprintf(st, "%s\n\n", chan_description(dptr));
    fprintf (st, "The 7090 supports up to 8 channels. Channel models include\n\n");
    fprintf (st, "        Unit record     Polled mode I/O devices\n");
@@ -1695,16 +1706,28 @@ chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
    fprint_set_help(st, dptr);
    fprint_show_help(st, dptr);
 #else
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)cptr;
+   (void)dptr;
+   (void)flag;
+   (void)uptr;
+
    fprintf(st, "IBM 704 Channel\n\n");
    fprintf(st, "Psuedo device to display IBM 704 I/O. The IBM 704 used polled");
    fprintf(st, " I/O,\nThe assembly register and the flags can be displayed\n");
    fprintf(st, "There are no options for the this device\n");
 #endif
+
 return SCPE_OK;
 }
 
 const char *
 chan_description(DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "IBM 7090 channel controller";
 }

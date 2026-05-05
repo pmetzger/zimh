@@ -249,6 +249,10 @@ static t_stat mty_output_svc (UNIT *uptr)
 
 static t_stat mty_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
 
     sim_debug(DEBUG_CMD, &mty_dev, "Reset\n");
@@ -338,6 +342,10 @@ static t_stat mty_help (FILE *st, DEVICE *dptr, UNIT *uptr,
 
 static const char *mty_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Morton box: Terminal multiplexor";
 }
 #endif

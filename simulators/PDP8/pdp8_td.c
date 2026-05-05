@@ -582,6 +582,10 @@ return SCPE_OK;
 
 int32 td_header (UNIT *uptr, int32 blk, int32 line)
 {
+/* Shared tape word helper signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 nibp;
 
 switch (line) {
@@ -672,6 +676,10 @@ return;
 
 t_stat td_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 UNIT *uptr;
 
@@ -745,6 +753,10 @@ static const uint16 boot_rom[] = {
 
 t_stat td_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 if (unitno)
@@ -933,6 +945,11 @@ return k;
 
 t_stat td_show_pos (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 if ((uptr->flags & UNIT_ATT) == 0) return SCPE_UNATT;
 if (uptr->pos < DT_EZLIN)                               /* rev end zone? */
     fprintf (st, "Reverse end zone\n");
@@ -956,5 +973,9 @@ return SCPE_OK;
 
 const char *td_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "TD8E/TU56 DECtape";
 }

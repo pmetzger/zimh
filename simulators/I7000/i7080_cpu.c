@@ -334,7 +334,7 @@ uint16          next_half[6 * 256];     /* Forward half loop locations */
 #define Prev(reg)       reg++; if (reg == EMEMSIZE) reg = 0
 
 /* Read 1 character from memory, checking for reducancy error. */
-uint8   ReadP(uint32 addr, uint16 flag) {
+static uint8   ReadP(uint32 addr, uint16 flag) {
     uint8       value;
     addr %= EMEMSIZE;
     if ((flags & EMU40K) != 0) {
@@ -352,7 +352,7 @@ uint8   ReadP(uint32 addr, uint16 flag) {
 }
 
 /* Read 5 characters from memory starting at addr */
-uint32  Read5(uint32 addr, uint16 flag) {
+static uint32  Read5(uint32 addr, uint16 flag) {
     uint32      value;
 
     value =  ReadP(addr-4, flag) << (4 * 6);
@@ -364,7 +364,7 @@ uint32  Read5(uint32 addr, uint16 flag) {
 }
 
 /* Write 1 character to memory. */
-void  WriteP(uint32 addr, uint8 value) {
+static void  WriteP(uint32 addr, uint8 value) {
     addr %= EMEMSIZE;
     if ((flags & EMU40K) != 0) {
        addr %= 40000;
@@ -373,7 +373,7 @@ void  WriteP(uint32 addr, uint8 value) {
 }
 
 /* Write 5 characters from memory starting at addr */
-void  Write5(uint32 addr, uint32 value) {
+static void  Write5(uint32 addr, uint32 value) {
     WriteP(addr-4, 077 & (value >> (4 * 6)));
     WriteP(addr-3, 077 & (value >> (3 * 6)));
     WriteP(addr-2, 077 & (value >> (2 * 6)));
@@ -2513,7 +2513,7 @@ uint32 load_addr(uint32 *loc) {
 }
 
 /* Store converted hex address in storage */
-void store_hex(uint32 addr, uint32 *loc) {
+static void store_hex(uint32 addr, uint32 *loc) {
    /* Convert address into BCD first */
     AC[*loc] = bin_bcd[addr & 0xf];
     *loc = next_addr[*loc];
@@ -2526,7 +2526,7 @@ void store_hex(uint32 addr, uint32 *loc) {
 }
 
 /* Read hex address from storage */
-uint32 load_hex(uint32 *loc) {
+static uint32 load_hex(uint32 *loc) {
     uint8       t;
     uint8       f;
     uint32      addr;
@@ -3400,6 +3400,11 @@ cpu_reset(DEVICE * dptr)
 t_stat
 cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)sw;
+    (void)uptr;
+
     if (addr >= MEMSIZE)
         return SCPE_NXM;
     if (vptr != NULL)
@@ -3413,6 +3418,11 @@ cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)sw;
+    (void)uptr;
+
     if (addr >= MEMSIZE)
         return SCPE_NXM;
     M[addr] = val & 077;
@@ -3422,6 +3432,12 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)desc;
+    (void)uptr;
+
     t_uint64            mc = 0;
     uint32              size;
     uint32              i;
@@ -3453,6 +3469,12 @@ cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)uptr;
+    (void)val;
+
     int32               i, lnt;
     t_stat              r;
 
@@ -3486,6 +3508,11 @@ cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+
     int32               k, di, lnt;
     char               *cptr = (char *) desc;
     int                 len;
@@ -3547,12 +3574,22 @@ cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 const char *
 cpu_description (DEVICE *dptr)
 {
+       /* Generic callback signature.
+          This implementation does not use every parameter. */
+       (void)dptr;
+
        return "IBM 7080 CPU";
 }
 
 t_stat
 cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)flag;
+    (void)uptr;
+
     fprintf (st, "The CPU can be set to a IBM 702, IBM 705, IBM 705/3 or IBM 7080\n");
     fprintf (st, "The type of CPU can be set by one of the following commands\n\n");
     fprintf (st, "   sim> set CPU 702         sets IBM 704 emulation\n");

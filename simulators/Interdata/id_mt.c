@@ -465,6 +465,10 @@ return SCPE_OK;
 
 t_stat mt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 u;
 UNIT *uptr;
 
@@ -530,6 +534,10 @@ static uint8 boot_rom[] = {
 
 t_stat mt_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 extern DIB sch_dib;
 uint32 sch_dev;
 

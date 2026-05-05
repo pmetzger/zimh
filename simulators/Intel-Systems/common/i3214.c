@@ -59,6 +59,10 @@ uint8 EPROM_enable = 1;
 uint8 BUS_OVERRIDE = 0;
 uint8 monitor_boot = 0x00;
 static const char* i3214_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return i3214_NAME;
 }
 int   i3214_baseport = -1;              //base port
@@ -144,6 +148,11 @@ DEVICE i3214_dev = {
 
 t_stat i3214_cfg(uint16 base, uint16 devnum, uint8 dummy)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+    (void) dummy;
+
     i3214_baseport = base & BYTEMASK;
     sim_printf("    i3214: at base port 0%02XH\n",
         i3214_baseport);
@@ -170,6 +179,11 @@ t_stat i3214_clr(void)
 
 t_stat i3214_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_ARG;
     fprintf(st, "%s, Base port 0%04XH, Interrupt # %d, %s",
@@ -184,6 +198,10 @@ t_stat i3214_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat i3214_svc (UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     return SCPE_OK;
 }
 
@@ -191,6 +209,10 @@ t_stat i3214_svc (UNIT *uptr)
 
 t_stat i3214_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     uint8 devnum;
 
     for (devnum=0; devnum<1; devnum++) {
@@ -213,6 +235,10 @@ t_stat i3214_reset_dev (uint8 devnum)
 
 uint8 i3214_do_mask(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0)                        //read port
         return i3214_mask;
     else                                //write port
@@ -222,6 +248,11 @@ uint8 i3214_do_mask(t_bool io, uint8 data, uint8 devnum)
 
 uint8 i3214_do_status(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+    (void) devnum;
+
     if (io == 0)                        //read port
         return 0;
     else {                              //write port
@@ -232,6 +263,10 @@ uint8 i3214_do_status(t_bool io, uint8 data, uint8 devnum)
 
 uint8 i3214_cpu_bus_override(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0)                        //read port
         return 0;
     else                                //write port
@@ -241,6 +276,10 @@ uint8 i3214_cpu_bus_override(t_bool io, uint8 data, uint8 devnum)
 
 uint8 i3214_monitor_do_boot(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     UNIT *uptr;
     static uint8 onetime = 1;
 

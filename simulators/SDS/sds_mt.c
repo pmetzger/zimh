@@ -460,6 +460,10 @@ return;
 
 t_stat mt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 chan_disc (mt_dib.chan);                                /* disconnect */
@@ -501,6 +505,10 @@ return sim_tape_detach (uptr);
 
 t_stat mt_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 extern uint32 P, M[];
 
 if (unitno)                                             /* only unit 0 */

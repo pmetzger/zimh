@@ -508,6 +508,12 @@ return r;
 
 t_stat pas_vlines (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 newln, i, t;
 t_stat r;
 
@@ -565,6 +571,10 @@ return;
 
 void pas_ini (t_bool dtpl)
 {
+/* Device initialization signature.
+   This implementation does not use every parameter. */
+(void) dtpl;
+
 int32 i, j;
 
 for (i = j = 0; i < PAS_ENAB; i++) {

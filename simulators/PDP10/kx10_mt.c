@@ -439,7 +439,7 @@ t_stat mt_devio(uint32 dev, uint64 *data) {
 }
 
 /* Wrapper to handle reading of hold register or via DF10 */
-void mt_df10_read(DEVICE *dptr, UNIT *uptr) {
+static void mt_df10_read(DEVICE *dptr, UNIT *uptr) {
      if (dptr->flags & MTDF_TYPEB) {
          if (!df10_read(&mt_df10)) {
              uptr->CNTRL |= MT_STOP;
@@ -466,7 +466,7 @@ void mt_df10_read(DEVICE *dptr, UNIT *uptr) {
 }
 
 /* Wrapper to handle writing of hold register or via DF10 */
-void mt_df10_write(DEVICE *dptr, UNIT *uptr) {
+static void mt_df10_write(DEVICE *dptr, UNIT *uptr) {
      if (dptr->flags & MTDF_TYPEB) {
         if (hri_mode) {
             mt_hold_reg = mt_df10.buf;
@@ -494,7 +494,7 @@ void mt_df10_write(DEVICE *dptr, UNIT *uptr) {
 
 
 /* Map simH errors into machine errors */
-t_stat mt_error(UNIT * uptr, t_stat r, DEVICE * dptr)
+static t_stat mt_error(UNIT * uptr, t_stat r, DEVICE * dptr)
 {
        switch (r) {
        case MTSE_OK:            /* no error */
@@ -886,7 +886,7 @@ t_stat mt_srv(UNIT * uptr)
     return SCPE_OK;
 }
 
-void mt_read_word(UNIT *uptr) {
+static void mt_read_word(UNIT *uptr) {
      int i, cc, ch, cc_max;
 
      mt_df10.buf = 0;
@@ -971,7 +971,12 @@ mt_boot(int32 unit_num, DEVICE * dptr)
 
 t_stat mt_set_mta (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) desc;
+
     DEVICE *dptr;
+
     dptr = find_dev_from_unit (uptr);
     if (dptr == NULL)
        return SCPE_IERR;
@@ -985,6 +990,10 @@ t_stat mt_set_mta (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat mt_show_mta (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) desc;
+
    DEVICE *dptr;
 
    if (uptr == NULL)
@@ -1005,6 +1014,12 @@ t_stat mt_show_mta (FILE *st, UNIT *uptr, int32 val, const void *desc)
 /* set MPX level number */
 t_stat mt_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32 mpx;
     t_stat r;
 
@@ -1019,6 +1034,11 @@ t_stat mt_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat mt_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) val;
+   (void) desc;
+
    if (uptr == NULL)
       return SCPE_IERR;
 
@@ -1030,7 +1050,12 @@ t_stat mt_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc)
 t_stat
 mt_reset(DEVICE * dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
+
     for (i = 0 ; i < 8; i++) {
         UNIT    *uptr = &mt_unit[i];
 
@@ -1079,7 +1104,11 @@ return SCPE_OK;
 
 const char *mt_description (DEVICE *dptr)
 {
-return "MT10 magnetic tape controller" ;
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
+    return "MT10 magnetic tape controller" ;
 }
 
 #endif

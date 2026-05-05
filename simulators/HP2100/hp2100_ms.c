@@ -507,6 +507,10 @@ DEVICE msc_dev = {
 
 static SIGNALS_VALUE msd_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
 SIGNALS_VALUE  outbound    = { ioNONE, 0 };
@@ -657,6 +661,10 @@ return outbound;                                        /* return the outbound s
 
 static SIGNALS_VALUE msc_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 static const uint8 map_sel [16] = {
     0, 0, 1, 1, 2, 2, 2, 2,
     3, 3, 3, 3, 3, 3, 3, 3
@@ -1264,6 +1272,12 @@ return sim_tape_detach (uptr);                          /* detach unit */
 
 static t_stat msc_online (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) value;
+(void) cptr;
+(void) desc;
+
 if (uptr->flags & UNIT_ATT) return SCPE_OK;
 else return SCPE_UNATT;
 }
@@ -1283,6 +1297,11 @@ for (i = 0; i < (sizeof (timers) / sizeof (timers[0])); i++)
 
 static t_stat ms_set_timing (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if ((val < 0) || (val > 1) || (cptr != NULL)) return SCPE_ARG;
 ms_timing = val;
 ms_config_timing ();
@@ -1293,6 +1312,12 @@ return SCPE_OK;
 
 static t_stat ms_show_timing (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (ms_timing) fputs ("fast timing", st);
 else fputs ("realistic timing", st);
 return SCPE_OK;
@@ -1302,6 +1327,10 @@ return SCPE_OK;
 
 static t_stat ms_settype (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 int32 i;
 
 if ((val < 0) || (val > 1) || (cptr != NULL)) return SCPE_ARG;
@@ -1321,6 +1350,12 @@ return SCPE_OK;
 
 static t_stat ms_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (ms_ctype == A13183)
     fprintf (st, "13183B");
 else

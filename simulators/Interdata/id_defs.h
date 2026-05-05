@@ -480,10 +480,26 @@ t_bool sch_actv (uint32 sch, uint32 devno);
 void sch_stop (uint32 sch);
 uint32 sch_wrmem (uint32 sch, uint8 *buf, uint32 cnt);
 uint32 sch_rdmem (uint32 sch, uint8 *buf, uint32 cnt);
+t_bool sch_blk (uint32 dev);
+void int_eval (void);
+uint32 int_getdev (void);
+t_bool devtab_init (void);
 t_stat set_sch (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat set_dev (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat show_sch (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat show_dev (FILE *st, UNIT *uptr, int32 val, const void *desc);
+t_stat id_dboot (int32 u, DEVICE *dptr);
+t_stat lp_load (FILE *fileref, const char *cptr, const char *fnam);
+t_stat pt_dump (FILE *of, const char *cptr, const char *fnam);
+uint32 f_l (uint32 op, uint32 r1, uint32 r2, uint32 ea);
+uint32 f_c (uint32 op, uint32 r1, uint32 r2, uint32 ea);
+uint32 f_as (uint32 op, uint32 r1, uint32 r2, uint32 ea);
+uint32 f_m (uint32 op, uint32 r1, uint32 r2, uint32 ea);
+uint32 f_d (uint32 op, uint32 r1, uint32 r2, uint32 ea);
+uint32 f_fix (uint32 op, uint32 r1, uint32 r2);
+uint32 f_fix32 (uint32 op, uint32 r1, uint32 r2);
+uint32 f_flt (uint32 op, uint32 r1, uint32 r2);
+uint32 f_flt32 (uint32 op, uint32 r1, uint32 r2);
 
 int32 lfc_cosched (int32 wait);
 

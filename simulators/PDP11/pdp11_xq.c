@@ -586,7 +586,7 @@ void xq_debug_turbo_setup(CTLR* xq);
 
 /* Multicontroller support */
 
-CTLR* xq_unit2ctlr(UNIT* uptr)
+static CTLR* xq_unit2ctlr(UNIT* uptr)
 {
   unsigned int i,j;
   for (i=0; i<XQ_MAX_CONTROLLERS; i++)
@@ -597,7 +597,7 @@ CTLR* xq_unit2ctlr(UNIT* uptr)
   return 0;
 }
 
-CTLR* xq_dev2ctlr(DEVICE* dptr)
+static CTLR* xq_dev2ctlr(DEVICE* dptr)
 {
   int i;
   for (i=0; i<XQ_MAX_CONTROLLERS; i++)
@@ -607,7 +607,7 @@ CTLR* xq_dev2ctlr(DEVICE* dptr)
   return 0;
 }
 
-CTLR* xq_pa2ctlr(uint32 PA)
+static CTLR* xq_pa2ctlr(uint32 PA)
 {
   int i;
   for (i=0; i<XQ_MAX_CONTROLLERS; i++)
@@ -622,6 +622,10 @@ CTLR* xq_pa2ctlr(uint32 PA)
 /* stop simh from reading non-existant unit data stream */
 t_stat xq_ex (t_value* vptr, t_addr addr, UNIT* uptr, int32 sw)
 {
+  /* Generic examine signature.
+     This implementation does not use every parameter. */
+  (void) sw;
+
   /* on PDP-11, allow EX command to look at bootrom */
   CTLR* xq = xq_unit2ctlr(uptr);
   uint16 *bootrom = NULL;
@@ -644,11 +648,23 @@ t_stat xq_ex (t_value* vptr, t_addr addr, UNIT* uptr, int32 sw)
 /* stop simh from writing non-existant unit data stream */
 t_stat xq_dep (t_value val, t_addr addr, UNIT* uptr, int32 sw)
 {
+  /* Generic deposit signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) addr;
+  (void) uptr;
+  (void) sw;
+
   return SCPE_NOFNC;
 }
 
 t_stat xq_showmac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
   char  buffer[20];
 
@@ -657,7 +673,7 @@ t_stat xq_showmac (FILE* st, UNIT* uptr, int32 val, const void* desc)
   return SCPE_OK;
 }
 
-void xq_make_checksum(CTLR* xq)
+static void xq_make_checksum(CTLR* xq)
 {
   /* checksum calculation routine detailed in vaxboot.zip/xqbtdrivr.mar */
   uint32  checksum = 0;
@@ -682,6 +698,11 @@ void xq_make_checksum(CTLR* xq)
 
 t_stat xq_setmac (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   t_stat status;
   CTLR* xq = xq_unit2ctlr(uptr);
 
@@ -698,6 +719,11 @@ t_stat xq_setmac (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat xq_set_stats (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   /* this sets all ints in the stats structure to the integer passed */
   CTLR* xq = xq_unit2ctlr(uptr);
 
@@ -723,6 +749,11 @@ static void xq_fprint_stat (FILE* st, const char* label, int value)
 
 t_stat xq_show_stats (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
 
   fprintf(st, "XQ Ethernet statistics:\n");
@@ -745,6 +776,11 @@ t_stat xq_show_stats (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat xq_show_filters (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
   char  buffer[20];
   int i;
@@ -780,6 +816,11 @@ t_stat xq_show_filters (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat xq_show_type (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
   fprintf(st, "type=");
   switch (xq->var->type) {
@@ -800,6 +841,11 @@ t_stat xq_show_type (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat xq_set_type (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
   if (!cptr) return SCPE_IERR;
   if (uptr->flags & UNIT_ATT) return SCPE_ALATT;
@@ -818,6 +864,11 @@ t_stat xq_set_type (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat xq_show_poll (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
   if (xq->var->poll)
     fprintf(st, "poll=%d", xq->var->poll);
@@ -831,6 +882,11 @@ t_stat xq_show_poll (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat xq_set_poll (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
   if (!cptr) return SCPE_IERR;
   if (uptr->flags & UNIT_ATT) return SCPE_ALATT;
@@ -864,6 +920,11 @@ t_stat xq_set_poll (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat xq_show_sanity (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
 
   fprintf(st, "sanity=%s", (xq->var->sanity.enabled & XQ_SAN_HW_SW) ? "ON" : "OFF");
@@ -872,6 +933,11 @@ t_stat xq_show_sanity (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat xq_set_sanity (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
   if (!cptr) return SCPE_IERR;
   if (uptr->flags & UNIT_ATT) return SCPE_ALATT;
@@ -886,6 +952,11 @@ t_stat xq_set_sanity (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat xq_show_throttle (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
 
   if (xq->var->throttle_delay == ETH_THROT_DISABLED_DELAY)
@@ -897,6 +968,11 @@ t_stat xq_show_throttle (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat xq_set_throttle (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
   char tbuf[CBUFSIZE], gbuf[CBUFSIZE];
   const char *tptr = cptr;
@@ -958,6 +1034,11 @@ t_stat xq_set_throttle (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat xq_show_lockmode (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
 
   if (xq->var->type == XQ_T_DEQNA) return SCPE_NOFNC;
@@ -967,6 +1048,11 @@ t_stat xq_show_lockmode (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat xq_set_lockmode (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
   if (!cptr) return SCPE_IERR;
   if (uptr->flags & UNIT_ATT) return SCPE_ALATT;
@@ -983,6 +1069,11 @@ t_stat xq_set_lockmode (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat xq_show_leds (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   CTLR* xq = xq_unit2ctlr(uptr);
 
   fprintf(st, "leds=(%s,%s,%s)", xq->var->setup.l1 ? "ON" : "OFF",
@@ -993,7 +1084,7 @@ t_stat xq_show_leds (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 /*============================================================================*/
 
-t_stat xq_nxm_error(CTLR* xq)
+static t_stat xq_nxm_error(CTLR* xq)
 {
   const uint16 set_bits = XQ_CSR_NI | XQ_CSR_XI | XQ_CSR_XL | XQ_CSR_RL;
   sim_debug(DBG_WRN, xq->dev, "Non Existent Memory Error!\n");
@@ -1011,7 +1102,7 @@ t_stat xq_nxm_error(CTLR* xq)
 /*
 ** write callback
 */
-void xq_write_callback (CTLR* xq, int status)
+static void xq_write_callback (CTLR* xq, int status)
 {
   int32 wstatus;
   const uint16 TDR = (uint16)(100 + xq->var->write_buffer.len * 8); /* arbitrary value */
@@ -1103,7 +1194,7 @@ t_stat xq_rd(int32* data, int32 PA, int32 access)
 /* dispatch ethernet read request
    procedure documented in sec. 3.2.2 */
 
-t_stat xq_process_rbdl(CTLR* xq)
+static t_stat xq_process_rbdl(CTLR* xq)
 {
   int32 rstatus, wstatus;
   uint16 b_length, w_length, rbl;
@@ -1309,7 +1400,7 @@ t_stat xq_process_rbdl(CTLR* xq)
   return SCPE_OK;
 }
 
-t_stat xq_process_mop(CTLR* xq)
+static t_stat xq_process_mop(CTLR* xq)
 {
   uint32 address;
   int32 wstatus;
@@ -1365,7 +1456,7 @@ t_stat xq_process_mop(CTLR* xq)
   return SCPE_OK;
 }
 
-t_stat xq_process_setup(CTLR* xq)
+static t_stat xq_process_setup(CTLR* xq)
 {
   int i,j;
   int count = 0;
@@ -1676,7 +1767,7 @@ void xq_show_debug_bdl(CTLR* xq, uint32 bdl_ba)
   sim_debug(DBG_TRC, xq->dev, "    descriptor=0x%X, flags=0x%04X, bits=0x%04X\n", bdl_ba, bdl_buf[0], bdl_buf[1] & 0xFFC0);
 }
 
-t_stat xq_dispatch_rbdl(CTLR* xq)
+static t_stat xq_dispatch_rbdl(CTLR* xq)
 {
   sim_debug(DBG_TRC, xq->dev, "xq_dispatch_rbdl()\n");
 
@@ -1983,7 +2074,7 @@ t_stat xq_process_turbo_xbdl(CTLR* xq)
   return status;
 }
 
-t_stat xq_process_loopback(CTLR* xq, ETH_PACK* pack)
+static t_stat xq_process_loopback(CTLR* xq, ETH_PACK* pack)
 {
   ETH_PACK  response;
   ETH_MAC   *physical_address;
@@ -2035,7 +2126,7 @@ t_stat xq_process_loopback(CTLR* xq, ETH_PACK* pack)
   return status;
 }
 
-t_stat xq_process_remote_console (CTLR* xq, ETH_PACK* pack)
+static t_stat xq_process_remote_console (CTLR* xq, ETH_PACK* pack)
 {
   t_stat status;
   ETH_MAC source;
@@ -2076,7 +2167,7 @@ t_stat xq_process_remote_console (CTLR* xq, ETH_PACK* pack)
   return SCPE_NOFNC;
 }
 
-t_stat xq_process_local (CTLR* xq, ETH_PACK* pack)
+static t_stat xq_process_local (CTLR* xq, ETH_PACK* pack)
 {
   /* returns SCPE_OK if local processing occurred,
      otherwise returns SCPE_NOFNC or some other code */
@@ -2099,7 +2190,7 @@ t_stat xq_process_local (CTLR* xq, ETH_PACK* pack)
   return SCPE_NOFNC;
 }
 
-void xq_read_callback(CTLR* xq, int status)
+static void xq_read_callback(CTLR* xq, int status)
 {
   xq->var->stats.recv += 1;
 
@@ -2185,7 +2276,7 @@ void xq_sw_reset(CTLR* xq)
 
 /* write registers: */
 
-t_stat xq_wr_var(CTLR* xq, int32 data)
+static t_stat xq_wr_var(CTLR* xq, int32 data)
 {
   uint16 save_var = xq->var->var;
   sim_debug(DBG_REG, xq->dev, "xq_wr_var(data=0x%04X)\n", data);
@@ -2233,7 +2324,7 @@ t_stat xq_wr_var(CTLR* xq, int32 data)
   return SCPE_OK;
 }
 
-t_stat xq_process_bootrom (CTLR* xq)
+static t_stat xq_process_bootrom (CTLR* xq)
 {
   /*
   NOTE: BOOT ROMs are a PDP-11ism, since they contain PDP-11 binary code.
@@ -2292,7 +2383,7 @@ t_stat xq_process_bootrom (CTLR* xq)
   return SCPE_OK;
 }
 
-t_stat xq_wr_csr(CTLR* xq, int32 data)
+static t_stat xq_wr_csr(CTLR* xq, int32 data)
 {
   uint16 set_bits = data & XQ_CSR_RW;                      /* set RW set bits */
   uint16 clr_bits = ((data ^ XQ_CSR_RW) & XQ_CSR_RW)       /* clear RW cleared bits */
@@ -2368,7 +2459,7 @@ void xq_stop_receiver(CTLR* xq)
     eth_clr_async(xq->var->etherface);
 }
 
-t_stat xq_wr_srqr_set(CTLR* xq, int32 data)
+static t_stat xq_wr_srqr_set(CTLR* xq, int32 data)
 {
   uint16 set_bits = data & XQ_SRQR_RW;                     /* set RW set bits */
 
@@ -2379,7 +2470,7 @@ t_stat xq_wr_srqr_set(CTLR* xq, int32 data)
   return sim_activate (&xq->unit[4], xq->var->startup_delay);
 }
 
-t_stat xq_wr_srqr_action(CTLR* xq)
+static t_stat xq_wr_srqr_action(CTLR* xq)
 {
   sim_debug(DBG_REG, xq->dev, "xq_wr_srqr_action(data=0x%04X)\n", xq->var->srr);
 
@@ -2435,7 +2526,7 @@ t_stat xq_wr_srqr_action(CTLR* xq)
   return SCPE_OK;
 }
 
-t_stat xq_wr_arqr(CTLR* xq, int32 data)
+static t_stat xq_wr_arqr(CTLR* xq, int32 data)
 {
   sim_debug(DBG_REG, xq->dev, "xq_wr_arqr(data=0x%04X)\n", data);
 
@@ -2459,7 +2550,7 @@ t_stat xq_wr_arqr(CTLR* xq, int32 data)
   return SCPE_OK;
 }
 
-t_stat xq_wr_icr(CTLR* xq, int32 data)
+static t_stat xq_wr_icr(CTLR* xq, int32 data)
 {
   uint16 old_icr = xq->var->icr;
 
@@ -3153,6 +3244,11 @@ void xq_debug_turbo_setup(CTLR* xq)
 
 t_stat xq_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic simulator boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 #ifdef VM_PDP11
 size_t i;
 extern int32 REGFILE[6][2];                 /* R0-R5, two sets */

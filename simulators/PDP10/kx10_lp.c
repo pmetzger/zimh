@@ -180,7 +180,7 @@ t_stat lpt_devio(uint32 dev, uint64 *data) {
 }
 
 
-void
+static void
 lpt_printline(UNIT *uptr, int nl) {
     int   trim = 0;
     /* Trim off trailing blanks */
@@ -290,7 +290,7 @@ uint16 waits_code[32] = {
  };
 
 /* Unit service */
-void
+static void
 lpt_output(UNIT *uptr, char c) {
 
     if (c == 0)
@@ -440,7 +440,12 @@ t_stat lpt_svc (UNIT *uptr)
 
 t_stat lpt_reset (DEVICE *dptr)
 {
+    /* Generic reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     UNIT *uptr = &lpt_unit;
+
     uptr->POS = 0;
     uptr->COL = 0;
     uptr->LINE = 1;
@@ -481,8 +486,14 @@ t_stat lpt_detach (UNIT *uptr)
 t_stat
 lpt_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     t_value   i;
     t_stat    r;
+
     if (cptr == NULL)
         return SCPE_ARG;
     if (uptr == NULL)
@@ -498,6 +509,11 @@ lpt_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 lpt_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) v;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "linesperpage=%d", uptr->capac);
@@ -507,8 +523,14 @@ lpt_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 t_stat
 lpt_setdev(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     t_value   i;
     t_stat    r;
+
     if (cptr == NULL)
         return SCPE_ARG;
     if (uptr == NULL)
@@ -525,6 +547,11 @@ lpt_setdev(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 lpt_getdev(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) v;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "dev=%03o", lpt_dib.dev_num);
@@ -533,6 +560,12 @@ lpt_getdev(FILE *st, UNIT *uptr, int32 v, const void *desc)
 
 t_stat lpt_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
 fprintf (st, "Line Printer (LPT)\n\n");
 fprintf (st, "The line printer (LPT) writes data to a disk file.  The POS register specifies\n");
 fprintf (st, "the number of the next data item to be written.  Thus, by changing POS, the\n");
@@ -550,6 +583,10 @@ return SCPE_OK;
 
 const char *lpt_description (DEVICE *dptr)
 {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "LP10 line printer" ;
 }
 

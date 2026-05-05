@@ -174,6 +174,10 @@ void rtc_setup(uint32 ss, uint32 level)
 /* Clock reset */
 t_stat rtc_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     rtc_pie = 0;                            /* disable pulse */
     /* initialize clock calibration */
     sim_rtcn_init_unit(&rtc_unit, rtc_unit.wait, TMR_RTC);
@@ -184,6 +188,11 @@ t_stat rtc_reset(DEVICE *dptr)
 /* Set frequency */
 t_stat rtc_set_freq(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) desc;
+
     if (cptr)                               /* if chars, bad */
         return SCPE_ARG;                    /* ARG error */
     if ((val != 50) && (val != 60) && (val != 100) && (val != 120))
@@ -195,6 +204,12 @@ t_stat rtc_set_freq(UNIT *uptr, int32 val, const char *cptr, void *desc)
 /* Show frequency */
 t_stat rtc_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     /* print the current frequency setting */
     if (rtc_tps < 100)
         fprintf (st, (rtc_tps == 50)? "50Hz": "60Hz");
@@ -206,6 +221,12 @@ t_stat rtc_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 /* sho help rtc */
 t_stat rtc_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     fprintf(st, "SEL 32 IOP/MFP realtime clock at 0x7F06\r\n");
     fprintf(st, "Use:\r\n");
     fprintf(st, "    sim> SET RTC [50][60][100][120]\r\n");
@@ -218,6 +239,10 @@ t_stat rtc_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr
 /* device description */
 const char *rtc_desc(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "SEL IOP/MFP realtime clock @ address 0x7F06";
 }
 
@@ -292,6 +317,10 @@ DEVICE itm_dev = {
 /* cause interrupt */
 t_stat itm_srv (UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     if (itm_pie) {                          /* interrupt enabled? */
         sim_debug(DEBUG_CMD, &itm_dev,
             "Intv Timer expired status %08x lev %02x cnt %x\n",
@@ -653,6 +682,10 @@ void itm_setup(uint32 ss, uint32 level)
 /* Clock reset */
 t_stat itm_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     itm_pie = 0;                            /* disable pulse */
     itm_run = 0;                            /* not running */
     itm_load = 0;                           /* not loaded */
@@ -666,6 +699,11 @@ t_stat itm_reset (DEVICE *dptr)
 /* Set frequency */
 t_stat itm_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) desc;
+
     if (cptr)                               /* if chars, bad */
         return SCPE_ARG;                    /* ARG error */
     if ((val != 3840) && (val != 7680))
@@ -677,6 +715,12 @@ t_stat itm_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc)
 /* Show frequency */
 t_stat itm_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     /* print the current interval count setting */
     fprintf (st, "%0.2fus", (itm_tick_size_x_100 / 100.0));
     return SCPE_OK;
@@ -685,6 +729,12 @@ t_stat itm_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 /* sho help rtc */
 t_stat itm_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     fprintf(st, "SEL 32 IOP/MFP interval timer at 0x7F04\r\n");
     fprintf(st, "Use:\r\n");
     fprintf(st, "    sim> SET ITM [3840][7680]\r\n");
@@ -697,6 +747,10 @@ t_stat itm_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr
 /* device description */
 const char *itm_desc(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "SEL IOP/MFP Interval Timer @ address 0x7F04";
 }
 

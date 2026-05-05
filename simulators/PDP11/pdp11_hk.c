@@ -709,6 +709,10 @@ DEVICE hk_dev = {
 
 t_stat hk_rd (int32 *data, int32 PA, int32 access)
 {
+/* Generic I/O page read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 drv, i, j;
 
 drv = GET_UNIT (hkcs2);                                 /* get current unit */
@@ -798,6 +802,10 @@ return SCPE_OK;
 
 t_stat hk_wr (int32 data, int32 PA, int32 access)
 {
+/* Generic I/O page write signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 drv, i, j, old_val = 0, new_val = 0;
 
 drv = GET_UNIT (hkcs2);                                 /* get current unit */
@@ -1363,7 +1371,7 @@ return hk_dib.vec;                                      /* return vector */
    It's unclear whether the drivers actually use these values, but the
    Emulex controller bothers to implement them, so we will too */
 
-int32 hk_mrpar (int32 v)
+static int32 hk_mrpar (int32 v)
 {
 int32 bit, wrk;
 
@@ -1466,6 +1474,10 @@ return hk_mrpar (v);
 
 t_stat hk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 UNIT *uptr;
 
@@ -1553,6 +1565,10 @@ return sim_disk_detach (uptr);
 
 t_stat hk_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 if ((val < 0) || (cptr && *cptr))
     return SCPE_ARG;
 if (uptr->flags & UNIT_ATT)
@@ -1566,6 +1582,11 @@ return SCPE_OK;
 
 t_stat hk_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 fprintf (st, "%s", drv_tab[GET_DTYPE (uptr->flags)].name);
 return SCPE_OK;
 }
@@ -1574,6 +1595,12 @@ return SCPE_OK;
 
 t_stat hk_set_bad (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) cptr;
+(void) desc;
+
 return pdp11_bad_block (uptr, HK_NUMSC, HK_NUMWD);
 }
 
@@ -1622,6 +1649,10 @@ static const uint16 boot_rom[] = {
 
 t_stat hk_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 for (i = 0; i < BOOT_LEN; i++)
@@ -1636,6 +1667,11 @@ return SCPE_OK;
 
 t_stat hk_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 return SCPE_NOFNC;
 }
 
@@ -1643,6 +1679,12 @@ return SCPE_NOFNC;
 
 t_stat hk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "RK611/RK06,RK07 Cartridge Disk (HK)\n\n");
 fprintf (st, "RK611  options include the ability to set units write enabled or write locked,\n");
 fprintf (st, "to set the drive type to RK06, RK07, or autosize, and to write a DEC standard\n");
@@ -1667,5 +1709,9 @@ return SCPE_OK;
 
 const char *hk_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "RK611/RK06(7) cartridge disk controller";
 }

@@ -216,7 +216,6 @@ struct ec_device {
 #define LOOP_MSK 0x3ff
 
 extern  int32 tmxr_poll;
-extern  uint32  readfull(CHANP *chp, uint32 maddr, uint32 *word);
 extern  uint32  cont_chan(uint16 chsa);
 
 static const ETH_MAC broadcast_ethaddr = {0xff,0xff,0xff,0xff,0xff,0xff};

@@ -80,6 +80,10 @@ DEVICE              drm_dev = {
 /* Start off a disk command */
 t_stat drm_cmd(uint16 cmd, uint16 dev, uint8 chan, uint16 *wc, uint8 rd_flg)
 {
+    /* Shared device command signature.
+       This implementation does not use every parameter. */
+    (void) wc;
+
     UNIT        *uptr;
     int         u = (dev==DRUM1_DEV)? 0: 1;
 
@@ -164,6 +168,10 @@ t_stat drm_srv(UNIT * uptr)
 t_stat
 drm_boot(int32 unit_num, DEVICE * dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int         dev = (unit_num)? DRUM2_DEV:DRUM1_DEV;
     t_uint64    desc;
 
@@ -207,6 +215,12 @@ drm_detach(UNIT * uptr)
 
 t_stat
 set_drum(UNIT * uptr, int32 val, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     if ((uptr->flags & AUXMEM) == 0)
         return SCPE_OK;
     if (uptr->flags & UNIT_ATT)
@@ -217,6 +231,12 @@ set_drum(UNIT * uptr, int32 val, const char *cptr, void *desc) {
 
 t_stat
 set_auxmem(UNIT * uptr, int32 val, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     int                 u = uptr - drm_unit;
 
     if (uptr->flags & AUXMEM)
@@ -240,6 +260,12 @@ set_auxmem(UNIT * uptr, int32 val, const char *cptr, void *desc) {
 t_stat
 drm_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+  /* Generic help signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) flag;
+  (void) cptr;
+
   fprintf (st, "B430 Magnetic Drum or B6500 memory module\n\n");
   fprintf (st, "There are up to two drum units DR0 and DR1. These can either\n");
   fprintf (st, "be attached to a file or set to AUXMEM. Setting to AUXMEM causes\n");
@@ -256,6 +282,10 @@ drm_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 drm_description (DEVICE *dptr)
 {
+   /* Generic description signature.
+      This implementation does not use every parameter. */
+   (void) dptr;
+
    return "B430 Magnetic Drum or B6500 memory module";
 }
 #endif

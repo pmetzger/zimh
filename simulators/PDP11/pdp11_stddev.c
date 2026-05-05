@@ -296,6 +296,10 @@ DEVICE clk_dev = {
 
 t_stat tti_rd (int32 *data, int32 PA, int32 access)
 {
+/* Memory-mapped I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 01) {                               /* decode PA<1> */
 
     case 00:                                            /* tti csr */
@@ -320,6 +324,10 @@ return SCPE_OK;
 
 t_stat tti_wr (int32 data, int32 PA, int32 access)
 {
+/* Memory-mapped I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 01) {                               /* decode PA<1> */
 
     case 00:                                            /* tti csr */
@@ -398,6 +406,10 @@ return auto_config (dptr->name, (dptr->flags & DEV_DIS) ? 0 : 1);
 
 t_stat tto_rd (int32 *data, int32 PA, int32 access)
 {
+/* Memory-mapped I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 01) {                               /* decode PA<1> */
 
     case 00:                                            /* tto csr */
@@ -414,6 +426,10 @@ return SCPE_NXM;
 
 t_stat tto_wr (int32 data, int32 PA, int32 access)
 {
+/* Memory-mapped I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 01) {                               /* decode PA<1> */
 
     case 00:                                            /* tto csr */
@@ -472,6 +488,10 @@ return auto_config (dptr->name, (dptr->flags & DEV_DIS) ? 0 : 1);
 
 t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 sim_tt_set_mode (&tti_unit, val, cptr, desc);
 sim_tt_set_mode (&tto_unit, val, cptr, desc);
 return SCPE_OK;
@@ -479,6 +499,10 @@ return SCPE_OK;
 
 t_stat tty_set_parity (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 sim_tt_set_parity (&tti_unit, val, cptr, desc);
 sim_tt_set_parity (&tto_unit, val, cptr, desc);
 tti_unit.flags = (tti_unit.flags & ~TT_PAR) | val;
@@ -498,6 +522,11 @@ return SCPE_OK;
 
 t_stat clk_rd (int32 *data, int32 PA, int32 access)
 {
+/* Memory-mapped I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) PA;
+(void) access;
+
 int32 orig_csr = clk_csr;
 
 if (clk_fnxm)                                           /* not there??? */
@@ -511,6 +540,10 @@ return SCPE_OK;
 
 t_stat clk_wr (int32 data, int32 PA, int32 access)
 {
+/* Memory-mapped I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 orig_csr = clk_csr;
 
 if (clk_fnxm)                                           /* not there??? */
@@ -561,6 +594,10 @@ return clk_dib.vec;
 
 t_stat clk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (CPUT (HAS_LTCR))                                    /* reg there? */
     clk_fie = clk_fnxm = 0;
 else {
@@ -581,6 +618,11 @@ return SCPE_OK;
 
 t_stat clk_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if (cptr)
     return SCPE_ARG;
 if ((val != 50) && (val != 60))
@@ -593,12 +635,22 @@ return SCPE_OK;
 
 t_stat clk_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "%dHz", clk_tps);
 return SCPE_OK;
 }
 
 const char *clk_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "KW11-L line frequency clock";
 }
 

@@ -90,6 +90,10 @@ static REG net_reg[] = {
 };
 
 static const char* net_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Network";
 }
 
@@ -120,6 +124,11 @@ DEVICE net_dev = {
 };
 
 static t_stat set_net(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     char temp[CBUFSIZE];
     if ((net_unit.flags & UNIT_ATT) && ((net_unit.flags & UNIT_SERVER) != (uint32)value)) {
         strncpy(temp, net_unit.filename, CBUFSIZE - 1); /* save name for later attach */
@@ -155,6 +164,10 @@ static t_stat net_reset(DEVICE *dptr) {
 }
 
 static t_stat net_attach(UNIT *uptr, const char *cptr) {
+    /* Generic attach signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     uint32 i;
     char host[CBUFSIZE], port[CBUFSIZE];
 
@@ -183,6 +196,10 @@ static t_stat net_attach(UNIT *uptr, const char *cptr) {
 }
 
 static t_stat net_detach(UNIT *uptr) {
+    /* Generic detach signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     uint32 i;
     if (!(net_unit.flags & UNIT_ATT))
         return SCPE_OK;       /* if not attached simply return */
@@ -199,6 +216,10 @@ static t_stat net_detach(UNIT *uptr) {
 
 /* cannot use sim_check_conn to check whether read will return an error */
 static t_stat net_svc(UNIT *uptr) {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     int32 i, j, k, r;
     SOCKET s;
     static char svcBuffer[BUFFER_LENGTH];
@@ -262,6 +283,10 @@ static t_stat net_svc(UNIT *uptr) {
 }
 
 int32 netStatus(const int32 port, const int32 io, const int32 data) {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) data;
+
     uint32 i;
     if ((net_unit.flags & UNIT_ATT) == 0)
         return 0;

@@ -389,6 +389,10 @@ DEVICE mtc_dev = {
 
 static SIGNALS_VALUE mtd_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
 SIGNALS_VALUE  outbound    = { ioNONE, 0 };
@@ -502,6 +506,10 @@ return outbound;                                        /* return the outbound s
 
 static SIGNALS_VALUE mtc_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 uint32         i, data;
 int32          valid;
 INBOUND_SIGNAL signal;

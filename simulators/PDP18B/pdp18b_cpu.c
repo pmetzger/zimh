@@ -1775,6 +1775,10 @@ return d;
 
 t_stat Read (int32 ma, int32 *dat, int32 cyc)
 {
+/* Shared memory helper signature.
+   This build variant does not use every parameter. */
+(void) cyc;
+
 ma = ma & AMASK;
 if (MEM_ADDR_OK (ma))
     *dat = M[ma] & DMASK;
@@ -1784,6 +1788,10 @@ return MM_OK;
 
 t_stat Write (int32 ma, int32 dat, int32 cyc)
 {
+/* Shared memory helper signature.
+   This build variant does not use every parameter. */
+(void) cyc;
+
 ma = ma & AMASK;
 if (MEM_ADDR_OK (ma))
     M[ma] = dat & DMASK;
@@ -2156,6 +2164,11 @@ return;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+#if !defined (PDP15)
+/* Generic examine signature.
+   This build variant does not use every parameter. */
+(void) sw;
+#endif
 /* Generic callback signature.
    This implementation does not use every parameter. */
 (void) uptr;
@@ -2181,6 +2194,11 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+#if !defined (PDP15)
+/* Generic deposit signature.
+   This build variant does not use every parameter. */
+(void) sw;
+#endif
 /* Generic callback signature.
    This implementation does not use every parameter. */
 (void) uptr;

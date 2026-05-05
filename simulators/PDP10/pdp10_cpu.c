@@ -623,7 +623,7 @@ static t_stat jrst_tab[16] = {
 #define POPF            if (LRZ (AC(ac)) == RMASK) SETF (F_T2)
 #define DMOVNF          if (rs[1] == 0) { MOVNF (rs[0]); }
 
-t_value pdp10_pc_value (void)
+static t_value pdp10_pc_value (void)
 {
 return (t_value)pager_PC;
 }
@@ -2193,6 +2193,10 @@ return FALSE;
 
 t_bool wrapr (a10 ea, int32 prv)
 {
+/* Generic instruction handler signature.
+   This implementation does not use every parameter. */
+(void) prv;
+
 int32 bits = APR_GETF (ea);
 
 apr_lvl = ea & APR_M_LVL;
@@ -2221,11 +2225,19 @@ return FALSE;
 
 t_bool czapr (a10 ea, int32 prv)
 {
+/* Generic instruction handler signature.
+   This implementation does not use every parameter. */
+(void) prv;
+
 return ((APRHWORD & ea)? FALSE: TRUE);
 }
 
 t_bool coapr (a10 ea, int32 prv)
 {
+/* Generic instruction handler signature.
+   This implementation does not use every parameter. */
+(void) prv;
+
 return ((APRHWORD & ea)? TRUE: FALSE);
 }
 
@@ -2278,6 +2290,10 @@ return;
 
 t_bool wrpi (a10 ea, int32 prv)
 {
+/* Generic instruction handler signature.
+   This implementation does not use every parameter. */
+(void) prv;
+
 int32 lvl = ea & PI_M_LVL;
 
 if (ea & PI_INIT)
@@ -2306,11 +2322,19 @@ return FALSE;
 
 t_bool czpi (a10 ea, int32 prv)
 {
+/* Generic instruction handler signature.
+   This implementation does not use every parameter. */
+(void) prv;
+
 return ((PIHWORD & ea)? FALSE: TRUE);
 }
 
 t_bool copi (a10 ea, int32 prv)
 {
+/* Generic instruction handler signature.
+   This implementation does not use every parameter. */
+(void) prv;
+
 return ((PIHWORD & ea)? TRUE: FALSE);
 }
 
@@ -2457,6 +2481,10 @@ switch (GET_OP(inst))
 
 t_stat cpu_ex (t_value *vptr, t_addr ea, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if (vptr == NULL)
     return SCPE_ARG;
 if (ea < AC_NUM)
@@ -2478,6 +2506,10 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr ea, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if (ea < AC_NUM)
     AC(ea) = val & DMASK;
 else {
@@ -2512,6 +2544,12 @@ return;
 
 t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i, lnt;
 t_stat r;
 
@@ -2543,6 +2581,11 @@ return SCPE_OK;
 
 t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 k, di, lnt;
 const char *cptr = (const char *) desc;
 t_stat r;
@@ -2582,6 +2625,12 @@ return SCPE_OK;
 
 t_stat cpu_set_serial (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 lnt;
 t_stat r;
 
@@ -2600,6 +2649,12 @@ return SCPE_OK;
 
 t_stat cpu_show_serial (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "Serial: " );
 if( (apr_serial == -1) || (!Q_ITS && apr_serial < 4096) ) {
     fprintf (st, "%d (default)", (Q_ITS)? UC_SERITS: UC_SERDEC);

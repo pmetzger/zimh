@@ -1526,6 +1526,11 @@ return SCPE_OK;
 
 t_stat dev_set_sbs (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 *lvl = (int32 *) desc;
 int32 newlvl;
 t_stat r;
@@ -1541,6 +1546,11 @@ return SCPE_OK;
 
 t_stat dev_show_sbs (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 const int32 *lvl = (const int32 *) desc;
 
 if (lvl == NULL)
@@ -1584,6 +1594,11 @@ return SCPE_OK;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE)
     return SCPE_NXM;
 if (vptr != NULL)
@@ -1595,6 +1610,11 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE)
     return SCPE_NXM;
 M[addr] = val & DMASK;
@@ -1605,6 +1625,12 @@ return SCPE_OK;
 
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 mc = 0;
 uint32 i;
 
@@ -1624,6 +1650,12 @@ return SCPE_OK;
 
 t_stat cpu_set_1d (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) cptr;
+(void) desc;
+
 uptr->flags |= UNIT_SBS|UNIT_MDV;
 return SCPE_OK;
 }
@@ -1632,6 +1664,12 @@ return SCPE_OK;
 
 t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i, lnt;
 t_stat r;
 
@@ -1663,6 +1701,11 @@ return SCPE_OK;
 
 t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 ov, pf, op, k, di, lnt;
 const char *cptr = (const char *) desc;
 t_stat r;

@@ -197,7 +197,7 @@ t_stat parse_sym(const char *, t_addr, UNIT *, t_value *, int32);
 
 
 /* Load BCD card image into memory, following 705 standard load format */
-int
+static int
 load_rec(uint8 *image) {
     extern uint8       bcd_bin[16];
     extern uint32      IC;
@@ -239,6 +239,11 @@ load_rec(uint8 *image) {
 t_stat
 sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
 {
+    /* Generic loader signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)flag;
+
     char                buffer[160];
     int                 i, j;
 
@@ -448,9 +453,14 @@ t_stat fprint_addr (FILE *of, uint32 addr) {
         inst    =       mask bits
 */
 
-t_stat
+static t_stat
 fprint_reg (FILE *of, uint32 rdx, t_value *val, UNIT *uptr, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)sw;
+    (void)uptr;
+
     fprintf(of, "Register(%d, %x)", rdx, *val);
     return SCPE_OK;
 }
@@ -569,7 +579,7 @@ fprintf (of, " %02o ", val[0] & 077);
 return SCPE_OK;
 }
 
-t_opcode           *
+static t_opcode           *
 find_opcode(char *op, t_opcode * tab)
 {
     while (tab->name != NULL) {
@@ -595,6 +605,11 @@ find_opcode(char *op, t_opcode * tab)
 t_stat
 parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+    (void)uptr;
+
     int                 i;
     t_value             d;
     char                buffer[100];

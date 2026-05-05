@@ -501,6 +501,12 @@ t_stat sim_instr (void)
 static t_stat
 cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   t_stat r;
   uint32 x;
 
@@ -524,6 +530,12 @@ cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 static t_stat
 cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   t_value insn;
   uint32 i, j;
 
@@ -553,6 +565,11 @@ cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 static t_stat cpu_ex (t_value *vptr, t_addr ea, UNIT *uptr, int32 sw)
 {
+  /* Generic examine signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) sw;
+
   if (vptr == NULL)
     return SCPE_ARG;
   if (ea >= 040000)
@@ -563,6 +580,11 @@ static t_stat cpu_ex (t_value *vptr, t_addr ea, UNIT *uptr, int32 sw)
 
 static t_stat cpu_dep (t_value val, t_addr ea, UNIT *uptr, int32 sw)
 {
+  /* Generic deposit signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) sw;
+
   if (ea >= 040000)
     return SCPE_NXM;
   M[ea] = val & 0177777;
@@ -585,6 +607,10 @@ static t_bool cpu_is_pc_a_subroutine_call (t_addr **ret_addrs)
 static t_stat
 cpu_reset (DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   sim_brk_types = SWMASK('D') | SWMASK('E') | SWMASK('R') | SWMASK('W');
   sim_brk_dflt = SWMASK ('E');
   sim_vm_is_subroutine_call = &cpu_is_pc_a_subroutine_call;
@@ -642,6 +668,12 @@ rom_data (uint16 *data)
 static t_stat
 rom_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   t_stat r = SCPE_OK;
   if (strcmp (cptr, "NONE") == 0) {
     rom_type = ROM_NONE;
@@ -662,6 +694,12 @@ rom_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 static t_stat
 rom_show_type (FILE *st, UNIT *up, int32 v, const void *dp)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) up;
+  (void) v;
+  (void) dp;
+
   switch (rom_type) {
   case ROM_NONE:
     fprintf (st, "TYPE=NONE");
@@ -694,11 +732,21 @@ cpu_get_switches (unsigned long *p1, unsigned long *p2)
 void
 cpu_set_switches (unsigned long p1, unsigned long p2)
 {
+  /* Display library callback signature.
+     This implementation does not use every parameter. */
+  (void) p2;
+
   DS = p1 & 0177777;
 }
 
 static t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) cptr;
+  (void) desc;
+
   cpu_unit.capac = (uint32)val * 4096;
   memmask = cpu_unit.capac - 1;
   return SCPE_OK;

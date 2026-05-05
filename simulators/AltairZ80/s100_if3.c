@@ -112,6 +112,10 @@ static REG if3_reg[] = {
 #define IF3_NAME    "Compupro Interfacer 3"
 
 static const char* if3_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return IF3_NAME;
 }
 
@@ -146,6 +150,11 @@ DEVICE if3_dev = {
 
 static t_stat set_if3_connect(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     if(uptr->flags & UNIT_DISABLE) {
         sim_debug(ERROR_MSG, &if3_dev, "IF3[%d]: not enabled.\n", uptr->u3);
         return SCPE_OK;

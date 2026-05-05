@@ -154,6 +154,10 @@ DEVICE tto1_dev = {
 
 int32 tti1 (int32 pulse, int32 code, int32 AC)
 {
+/* I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) AC;
+
 int32 iodata;
 
 iodata = (code == ioDIA)? tti1_unit.buf & 0377: 0;
@@ -254,6 +258,10 @@ return 0;
 
 t_stat tto1_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 c;
 
 dev_busy = dev_busy & ~INT_TTO1;                        /* clear busy */
@@ -290,6 +298,12 @@ return SCPE_OK;
 
 t_stat ttx1_setmod (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 tti1_unit.flags = (tti1_unit.flags & ~UNIT_DASHER) | val;
 tto1_unit.flags = (tto1_unit.flags & ~UNIT_DASHER) | val;
 return SCPE_OK;

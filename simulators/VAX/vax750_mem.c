@@ -146,6 +146,10 @@ DEVICE mctl_dev = {
 
 t_stat mctl_rdreg (int32 *val, int32 pa, int32 lnt)
 {
+/* Nexus register read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 ofs;
 ofs = NEXUS_GETOFS (pa);                                /* get offset */
 
@@ -177,6 +181,10 @@ return SCPE_OK;
 
 t_stat mctl_wrreg (int32 val, int32 pa, int32 lnt)
 {
+/* Nexus register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 ofs;
 
 ofs = NEXUS_GETOFS (pa);                                /* get offset */
@@ -219,6 +227,10 @@ return;
 
 t_stat mctl_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 large_slot_size = MEM_SIZE_16K, large_slots;
 uint32 small_slot_size, small_slots;
 uint32 boards, board_mask;
@@ -254,11 +266,21 @@ else
 
 const char *mctl_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Memory controller";
 }
 
 t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 baseaddr = 0;
 struct {
     uint32 capacity;

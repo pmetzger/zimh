@@ -419,6 +419,10 @@ static t_stat mmu_check_perm(uint8 flags, uint8 r_acc)
  */
 t_stat mmu_init(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     flush_caches();
     return SCPE_OK;
 }
@@ -428,6 +432,10 @@ t_stat mmu_init(DEVICE *dptr)
  */
 uint32 mmu_read(uint32 pa, size_t size)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint8 entity, index;
     uint32 data = 0;
 
@@ -540,6 +548,10 @@ uint32 mmu_read(uint32 pa, size_t size)
 
 void mmu_write(uint32 pa, uint32 val, size_t size)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint32 index, entity, i;
 
     /* Register entity */
@@ -776,8 +788,8 @@ static t_stat mmu_update_history(uint32 va, uint8 r_acc, uint32 pdc_idx, t_bool 
  * "WE 32201 Memory Management Unit Information Manual", AT&T Select
  * Code 307-706, February 1987; Figure 2-18, pages 2-24 through 2-25.
  */
-t_stat mmu_pdc_miss(uint32 va, uint8 r_acc, t_bool fc,
-                    uint32 *pd, uint32 *pdc_idx)
+static t_stat mmu_pdc_miss(uint32 va, uint8 r_acc, t_bool fc,
+                           uint32 *pd, uint32 *pdc_idx)
 {
     uint32 sd_ptr, sd_hi, sd_lo, pd_addr;
     uint32 indirect_count = 0;
@@ -1073,6 +1085,10 @@ void mmu_disable(void)
 
 const char *mmu_description(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "WE32201 MMU";
 }
 
@@ -1081,6 +1097,12 @@ const char *mmu_description(DEVICE *dptr)
  */
 t_stat mmu_show_sdc(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     uint32 sd_lo, sd_hi, base, pages, i;
 
     fprintf(st, "\nSegment Descriptor Cache\n\n");
@@ -1110,6 +1132,12 @@ t_stat mmu_show_sdc(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat mmu_show_pdc(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     uint32 i, pdc_hi, pdc_lo;
 
     fprintf(st, "\nPage Descriptor Cache\n\n");
@@ -1139,6 +1167,11 @@ t_stat mmu_show_pdc(FILE *st, UNIT *uptr, int32 val, const void *desc)
  */
 t_stat mmu_show_sdt(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     uint32 addr, len, sd_lo, sd_hi, base, pages, i;
     uint8 sec;
     char *cptr = (char *) desc;

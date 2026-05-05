@@ -1747,6 +1747,12 @@ int     i, j, a;                        /* Array subscripts          */
 
 int32 cpu (int32 op, int32 m, int32 n, int32 data)
 {
+    /* Generic I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) m;
+    (void) n;
+    (void) data;
+
     int32 iodata = 0;
 
     switch (op) {
@@ -1774,6 +1780,12 @@ int32 cpu (int32 op, int32 m, int32 n, int32 data)
 
 int32 nulldev (int32 opcode, int32 m, int32 n, int32 data)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) m;
+(void) n;
+(void) data;
+
 if (opcode == 1)
     return SCPE_OK;                                     /* Ok to LIO unconfigured devices? */
 return STOP_INVDEV;
@@ -1783,6 +1795,10 @@ return STOP_INVDEV;
 
 t_stat cpu_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int_req = 0;
 level = 8;
 sim_brk_types = sim_brk_dflt = SWMASK ('E');
@@ -1793,6 +1809,11 @@ return SCPE_OK;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE) return SCPE_NXM;
 if (vptr != NULL) *vptr = M[addr] & 0xff;
 return SCPE_OK;
@@ -1802,6 +1823,11 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE) return SCPE_NXM;
 M[addr] = val & 0xff;
 return SCPE_OK;
@@ -1809,6 +1835,12 @@ return SCPE_OK;
 
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 mc = 0;
 uint32 i;
 
@@ -1824,6 +1856,11 @@ return SCPE_OK;
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 level = 8;
 IAR[8] = 0;
 return SCPE_OK;

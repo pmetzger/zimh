@@ -2113,6 +2113,10 @@ static CTAB aux_cmds [] = {
 
 t_stat sim_load (FILE *fptr, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void)fnam;
+
 const int    reclen [2] = { TO_WORD (57, 0),            /* the two DUMP record length words */
                             TO_WORD (7, 0) };
 const int    reccnt [2] = { 57, 7 };                    /* the two DUMP record word counts */

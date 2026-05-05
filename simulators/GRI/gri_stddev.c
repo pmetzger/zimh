@@ -214,11 +214,19 @@ DEVICE rtc_dev = {
 
 uint32 tty_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 return tti_unit.buf;                                    /* return data */
 }
 
 t_stat tty_wr (uint32 dst, uint32 val)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
+
 tto_unit.buf = val & 0377;                              /* save char */
 dev_done = dev_done & ~INT_TTO;                         /* clear ready */
 sim_activate (&tto_unit, tto_unit.wait);                /* activate unit */
@@ -280,6 +288,10 @@ return SCPE_OK;
 
 t_stat tti_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmxr_set_console_units (&tti_unit, &tto_unit);
 tti_unit.buf = 0;                                       /* clear buffer */
 dev_done = dev_done & ~INT_TTI;                         /* clear ready */
@@ -289,6 +301,10 @@ return SCPE_OK;
 
 t_stat tto_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tto_unit.buf = 0;                                       /* clear buffer */
 dev_done = dev_done | INT_TTO;                          /* set ready */
 sim_cancel (&tto_unit);                                 /* deactivate unit */
@@ -297,6 +313,12 @@ return SCPE_OK;
 
 t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 tti_unit.flags = (tti_unit.flags & ~TT_MODE) | val;
 tto_unit.flags = (tto_unit.flags & ~TT_MODE) | val;
 return SCPE_OK;
@@ -306,11 +328,19 @@ return SCPE_OK;
 
 uint32 hsrp_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 return hsr_unit.buf;                                    /* return data */
 }
 
 t_stat hsrp_wr (uint32 dst, uint32 val)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
+
 hsp_unit.buf = val & 0377;                              /* save char */
 dev_done = dev_done & ~INT_HSP;                         /* clear ready */
 sim_activate (&hsp_unit, hsp_unit.wait);                /* activate unit */
@@ -338,6 +368,10 @@ return 0;
 
 t_stat hsr_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 temp;
 
 if ((hsr_unit.flags & UNIT_ATT) == 0)                   /* attached? */
@@ -360,6 +394,10 @@ return SCPE_OK;
 
 t_stat hsp_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 dev_done = dev_done | INT_HSP;                          /* set ready */
 if ((hsp_unit.flags & UNIT_ATT) == 0)                   /* attached? */
     return IORETURN (hsp_stopioe, SCPE_UNATT);
@@ -376,6 +414,10 @@ return SCPE_OK;
 
 t_stat hsr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 hsr_unit.buf = 0;                                       /* clear buffer */
 dev_done = dev_done & ~INT_HSR;                         /* clear ready */
 sim_cancel (&hsr_unit);                                 /* deactivate unit */
@@ -384,6 +426,10 @@ return SCPE_OK;
 
 t_stat hsp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 hsp_unit.buf = 0;                                       /* clear buffer */
 dev_done = dev_done | INT_HSP;                          /* set ready */
 sim_cancel (&hsp_unit);                                 /* deactivate unit */
@@ -412,6 +458,10 @@ return 0;
 
 t_stat rtc_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 M[RTC_CTR] = (M[RTC_CTR] + 1) & DMASK;                  /* incr counter */
 if (M[RTC_CTR] == 0)                                    /* ovflo? set ready */
     dev_done = dev_done | INT_RTC;
@@ -421,6 +471,10 @@ return SCPE_OK;
 
 t_stat rtc_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_register_clock_unit (&rtc_unit);                    /* declare clock unit */
 dev_done = dev_done & ~INT_RTC;                         /* clear ready */
 sim_cancel (&rtc_unit);                                 /* stop clock */

@@ -242,7 +242,7 @@ HIDB   *const hi_hidbs  [HI_NUM] = {&hi1_db,   &hi2_db,   &hi3_db,   &hi4_db  };
 #define ISHDBG(l,f)    ((PDEVICE(l)->dctrl & (f)) != 0)
 
 // Reset receiver (clear flags AND initialize all data) ...
-void hi_reset_rx (uint16 host)
+static void hi_reset_rx (uint16 host)
 {
   PHIDB(host)->iloop = PHIDB(host)->error = FALSE;
   PHIDB(host)->ready = FALSE;
@@ -253,7 +253,7 @@ void hi_reset_rx (uint16 host)
 }
 
 // Reset transmitter (clear flags AND initialize all data) ...
-void hi_reset_tx (uint16 host)
+static void hi_reset_tx (uint16 host)
 {
   PHIDB(host)->iloop = PHIDB(host)->enabled = PHIDB(host)->full = FALSE;
   PHIDB(host)->txtotal = 0;
@@ -262,7 +262,7 @@ void hi_reset_tx (uint16 host)
 }
 
 // Get the DMC control words (starting address, end and length) for the channel.
-void hi_get_dmc (uint16 dmc, uint16 *pnext, uint16 *plast, uint16 *pcount)
+static void hi_get_dmc (uint16 dmc, uint16 *pnext, uint16 *plast, uint16 *pcount)
 {
   uint16 dmcad;
   if ((dmc<DMC1) || (dmc>(DMC1+DMC_MAX-1))) {
@@ -275,7 +275,7 @@ void hi_get_dmc (uint16 dmc, uint16 *pnext, uint16 *plast, uint16 *pcount)
 }
 
 // Update the DMC words to show "count" words transferred.
-void hi_update_dmc (uint32 dmc, uint32 count)
+static void hi_update_dmc (uint32 dmc, uint32 count)
 {
   uint16 dmcad, next;
   if ((dmc<DMC1) || (dmc>(DMC1+DMC_MAX-1))) return;
@@ -285,7 +285,7 @@ void hi_update_dmc (uint32 dmc, uint32 count)
 }
 
 // Link error recovery ...
-void hi_link_error (uint16 line)
+static void hi_link_error (uint16 line)
 {
   //   Any physical I/O error, either for the UDP link or a COM port, prints a
   // message and detaches the modem.  It's up to the user to decide what to do
@@ -303,7 +303,7 @@ void hi_link_error (uint16 line)
 ////////////////////////////////////////////////////////////////////////////////
 
 // Log a modem input or output including DMC words ...
-void hi_debug_hio (uint16 line, uint32 dmc, const char *ptext)
+static void hi_debug_hio (uint16 line, uint32 dmc, const char *ptext)
 {
   uint16 next, last, count;
   if (!ISHDBG(line, IMP_DBG_IOT)) return;
@@ -314,7 +314,7 @@ void hi_debug_hio (uint16 line, uint32 dmc, const char *ptext)
 }
 
 // Log the contents of a message sent or received ...
-void hi_debug_msg (uint16 line, uint16 next, uint16 count, const char *ptext)
+static void hi_debug_msg (uint16 line, uint16 next, uint16 count, const char *ptext)
 {
   uint16 i;  char buf[CBUFSIZE];  int len = 0;
   if (!ISHDBG(line, HI_DBG_MSG)) return;
@@ -450,7 +450,7 @@ static uint16 hi_convert_short_to_long(uint16 line, uint16 *data, uint16 count)
 }
 
 // Start the transmitter ...
-void hi_start_tx (uint16 line, uint16 flags)
+static void hi_start_tx (uint16 line, uint16 flags)
 {
   //   This handles all the work of the "start host output" OCP, including
   // extracting the packet from H316 memory, EXCEPT for actually setting the
@@ -503,7 +503,7 @@ void hi_start_tx (uint16 line, uint16 flags)
 }
 
 // Poll for transmitter done interrupts ...
-void hi_poll_tx (uint16 line, uint32 quantum)
+static void hi_poll_tx (uint16 line, uint32 quantum)
 {
   //   This routine is called, via the RTC service, to count down the interval
   // until the transmitter finishes.  When it hits zero, an interrupt occurs.
@@ -516,7 +516,7 @@ void hi_poll_tx (uint16 line, uint32 quantum)
 }
 
 // Start the receiver ...
-void hi_start_rx (uint16 line)
+static void hi_start_rx (uint16 line)
 {
   //   "Starting" the receiver simply sets the RX pending flag.  Nothing else
   // needs to be done (nothing else _can_ be done!) until we actually receive
@@ -532,7 +532,7 @@ void hi_start_rx (uint16 line)
 }
 
 // Poll for receiver data ...
-void hi_poll_rx (uint16 line)
+static void hi_poll_rx (uint16 line)
 {
   //   This routine is called by hi_rx_service to poll for any packets received.
   // This is done regardless of whether a receive is pending on the line.  If
@@ -648,6 +648,10 @@ int32 hi4_io(int32 inst, int32 fnc, int32 dat, int32 dev)  {return hi_io(4, inst
 // Common I/O simulation routine ...
 int32 hi_io (uint16 host, int32 inst, int32 fnc, int32 dat, int32 dev)
 {
+  /* Generic I/O device handler signature.
+     This implementation does not use every parameter. */
+  (void) dev;
+
   uint16 tmp;
   //   This routine is invoked by the CPU module whenever the code executes any
   // I/O instruction (OCP, SKS, INA or OTA) with one of our modem's device
@@ -828,12 +832,22 @@ t_stat hi_detach (UNIT *uptr)
 
 t_stat hi_set_convert (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic modifier signature.
+     This implementation does not use every parameter. */
+  (void) cptr;
+  (void) desc;
+
   PHIDB(uptr->hline)->convert = !val;
   return SCPE_OK;
 }
 
 t_stat hi_show_convert (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   if (PHIDB(uptr->hline)->convert)
     fprintf (st, "Convert short leaders");
   else

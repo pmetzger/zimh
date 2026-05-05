@@ -144,6 +144,10 @@ uart_r_svc(UNIT *uptr)
 static t_stat
 uart_t_svc(UNIT *uptr)
 {
+  /* Generic unit service signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   int32 ch;
 
   tmxr_poll_tx (&uart_desc);
@@ -166,6 +170,10 @@ uart_t_svc(UNIT *uptr)
 static t_stat
 uart_reset (DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   flag_off (INT_RRD);
   flag_on (FLAG_RSD);
   return SCPE_OK;
@@ -205,6 +213,10 @@ uart_detach (UNIT *uptr)
 
 static uint16 uart_read (uint16 reg)
 {
+  /* Generic TTDEV read signature.
+     This implementation does not use every parameter. */
+  (void) reg;
+
   sim_debug (DBG_RX, &uart_dev, "Read character %03o\n", RBUF);
   flag_off (INT_RRD);
   sim_activate_after (&uart_unit[0], 200);
@@ -224,6 +236,10 @@ static uint16 reverse (uint16 data)
 
 static void uart_write (uint16 reg, uint16 data)
 {
+  /* Generic TTDEV write signature.
+     This implementation does not use every parameter. */
+  (void) reg;
+
   data &= 0377;
   if (uart_unit[0].flags & UART_REVERSE)
     data = reverse (data);

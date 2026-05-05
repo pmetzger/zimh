@@ -324,7 +324,7 @@ return SCPE_OK;
         val     =       output value
 */
 
-t_value get_sint (char *cptr, int32 *sign, t_stat *status)
+static t_value get_sint (char *cptr, int32 *sign, t_stat *status)
 {
 *sign = 1;
 if (*cptr == '+') {
@@ -351,6 +351,14 @@ return get_uint (cptr, 8, DMASK, status);
 */
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+/* Generic symbolic input signature.
+   This implementation does not use every parameter. */
+(void) addr;
+(void) cptr;
+(void) sw;
+(void) uptr;
+(void) val;
+
 #if 0
     int32 cflag, d, i, j, k, sign;
 t_stat r;

@@ -920,6 +920,11 @@ return SCPE_OK;
 
 t_stat di_set_cable (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+
 DEVICE *dptr = (DEVICE *) desc;
 
 if (value) {                                            /* is the diagnostic cable selected? */
@@ -945,6 +950,11 @@ return SCPE_OK;
 
 t_stat di_show_cable (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) value;
+
 const DEVICE *dptr = (const DEVICE *) desc;
 
 if (dptr->flags & DEV_DIAG)                             /* is the cable connected for diagnostics? */

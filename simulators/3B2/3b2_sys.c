@@ -62,6 +62,10 @@ const char *sim_stop_messages[SCPE_BASE] = {
  */
 t_stat sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+    /* Generic loader signature.
+       This implementation does not use every parameter. */
+    (void)fnam;
+
     t_stat r;
     int32 i;
     uint32 origin = 0, limit = 0;
@@ -113,6 +117,10 @@ t_stat sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
 
 t_stat parse_sym(const char *cptr, t_addr exta, UNIT *uptr, t_value *val, int32 sw)
 {
+    /* Generic symbolic input signature.
+       This implementation does not use every parameter. */
+    (void)exta;
+
     DEVICE *dptr;
     t_stat r;
     int32 k, num, vp;
@@ -153,6 +161,10 @@ t_stat parse_sym(const char *cptr, t_addr exta, UNIT *uptr, t_value *val, int32 
 
 t_stat fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 {
+    /* Generic symbolic output signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+
     uint32 len = 4;
     int32 k, vp, num;
     unsigned int c;

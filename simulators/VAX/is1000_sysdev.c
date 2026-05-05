@@ -287,7 +287,7 @@ return 0;
 
 /* Map an address via the translation map */
 
-t_bool dma_map_addr (uint32 da, uint32 *ma, t_bool map)
+static t_bool dma_map_addr (uint32 da, uint32 *ma, t_bool map)
 {
 if (map) {                                              /* using map? */
     int32 dblk = (da >> VA_V_VPN);                      /* DMA blk */
@@ -496,6 +496,10 @@ return val;
 
 void dz_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa >> 2) & 0x7;
 
 switch (rg) {
@@ -525,13 +529,22 @@ switch (rg) {
 SET_IRQL;
 }
 
-int32 cfg_rd (int32 pa)
+static int32 cfg_rd (int32 pa)
 {
+/* Register read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+
 return ka_cfgtst;
 }
 
-void led_wr (int32 pa, int32 val, int32 lnt)
+static void led_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) val;
+(void) lnt;
 }
 
 /* Read IS1000 specific IPR's */
@@ -666,6 +679,10 @@ struct reglink regtable[] = {
 
 int32 ReadReg (uint32 pa, int32 lnt)
 {
+/* Register read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 struct reglink *p;
 for (p = &regtable[0]; p->low != 0; p++) {
     if ((pa >= p->low) && (pa < p->high) && p->read)
@@ -685,6 +702,10 @@ return 0xFFFFFFFF;
 
 int32 ReadRegU (uint32 pa, int32 lnt)
 {
+/* Unaligned register read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 return ReadReg (pa & ~03, L_LONG);
 }
 
@@ -787,6 +808,10 @@ return val;
 
 void ka_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa >> 2) & 0x1B;                            /* registers appear multiple times */
 
 switch (rg) {
@@ -833,7 +858,7 @@ switch (rg) {
 return;
 }
 
-int32 sysd_hlt_enb (void)
+static int32 sysd_hlt_enb (void)
 {
 return 1;
 }
@@ -842,6 +867,11 @@ return 1;
 
 int32 machine_check (int32 p1, int32 opc, int32 cc, int32 delta)
 {
+/* VAX machine-check handler signature.
+   This implementation does not use every parameter. */
+(void) opc;
+(void) delta;
+
 int32 p2, acc;
 
 if (in_ie) {
@@ -910,6 +940,11 @@ return run_cmd (flag, "CPU");
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 t_stat r;
 
 PC = ROMBASE;
@@ -931,6 +966,10 @@ return SCPE_OK;
 
 t_stat sysd_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ka_hltcod = 0;
 ka_cfgtst = 0xFFAB;
 ka_mapbase = 0;
@@ -944,6 +983,10 @@ return SCPE_OK;
 
 const char *sysd_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "system devices";
 }
 
@@ -1002,6 +1045,10 @@ return SCPE_OK;
 
 t_stat dz_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmxr_set_console_units (&dz_unit[0], &dz_unit[1]);
 dz_unit[0].buf = 0;
 dz_unit[1].buf = 0;
@@ -1013,6 +1060,12 @@ return SCPE_OK;
 
 t_stat dz_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Console Terminal (DZ)\n\n");
 fprintf (st, "The terminal input (DZ) polls the console keyboard for input.\n\n");
 fprintf (st, "When the console terminal is attached to a Telnet session or the simulator is\n");
@@ -1028,11 +1081,20 @@ return SCPE_OK;
 
 const char *dz_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "console terminal";
 }
 
 t_stat auto_config (const char *name, int32 nctrl)
 {
+/* Generic autoconfiguration signature.
+   This implementation does not use every parameter. */
+(void) name;
+(void) nctrl;
+
 return SCPE_OK;
 }
 
@@ -1043,6 +1105,13 @@ return SCPE_OK;
 
 t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) cptr;
+(void) desc;
+
 return SCPE_ARG;
 }
 
@@ -1054,6 +1123,13 @@ return SCPE_OK;
 
 t_stat cpu_model_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Initial memory size is 4MB.\n\n");
 fprintf (st, "The simulator is booted with the BOOT command:\n\n");
 fprintf (st, "   sim> BOOT\n\n");

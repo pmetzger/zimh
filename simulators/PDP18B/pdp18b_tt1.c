@@ -350,6 +350,12 @@ return;
 
 int32 ttx_getln (int32 dev, int32 pulse)
 {
+#if !defined (PDP15)
+/* Shared helper signature.
+   This build variant does not use every parameter. */
+(void) pulse;
+#endif
+
 int32 rdno = ((dev - ttix_dib.dev) >> 1) & 3;
 
 #if defined (PDP15)                                     /* PDP-15? */
@@ -425,6 +431,12 @@ return r;
 
 t_stat ttx_vlines (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 newln, i, t;
 t_stat r;
 
@@ -458,5 +470,4 @@ else {
 ttx_lines = newln;
 return SCPE_OK;
 }
-
 

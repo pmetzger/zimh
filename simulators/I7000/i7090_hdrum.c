@@ -169,12 +169,20 @@ t_stat hsdrm_srv(UNIT * uptr)
 void
 hsdrm_ini(UNIT * uptr, t_bool f)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)f;
+
     uptr->u5 = 0;
 }
 
 t_stat
 hsdrm_reset(DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return SCPE_OK;
 }
 
@@ -182,6 +190,11 @@ hsdrm_reset(DEVICE * dptr)
 t_stat
 set_hunits(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)val;
+
     int                 i;
 
     if (cptr == NULL)
@@ -206,6 +219,11 @@ set_hunits(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 get_hunits(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)v;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "Units=%d", uptr->u3);
@@ -233,6 +251,12 @@ hsdrm_detach(UNIT * uptr)
 t_stat
 hsdrm_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)cptr;
+   (void)flag;
+   (void)uptr;
+
    fprintf (st, "%s\n\n", hsdrm_description(dptr));
    fprintf (st, "The High speed drum supports up to %d units of storage\n", NUM_UNITS_HD);
    fprintf (st, "Each unit held 265k words of data\n");
@@ -246,6 +270,10 @@ hsdrm_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 hsdrm_description (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "IBM 7320A Drum for CTSS";
 }
 

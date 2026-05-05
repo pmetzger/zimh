@@ -1015,6 +1015,10 @@ void putreg(int32 reg, int32 val)
  */
 t_stat cpu_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 Cflag = 0;
 Zflag = 0;
 saved_PCreg = 0;
@@ -1027,6 +1031,11 @@ return SCPE_OK;
  */
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE)
     return SCPE_NXM;
 if (vptr != NULL)
@@ -1038,6 +1047,11 @@ return SCPE_OK;
  */
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic deposit signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     if (addr >= MEMSIZE) return SCPE_NXM;
     Mem[addr] = val & 0377;
     return SCPE_OK;
@@ -1047,6 +1061,12 @@ t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
  */
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 mc = 0;
 uint32 i;
 
@@ -1076,6 +1096,10 @@ return SCPE_OK;
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
     UNIT *uptr, int32 sw)
 {
+/* Generic symbolic output signature.
+   This implementation does not use every parameter. */
+(void)addr;
+
 int32 cflag, c1, c2, inst, adr;
 
 cflag = (uptr == NULL) || (uptr == &cpu_unit);
@@ -1130,6 +1154,10 @@ return -(oplen[inst] - 1);
 */
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+/* Generic symbolic input signature.
+   This implementation does not use every parameter. */
+(void)addr;
+
 int32 cflag, i = 0, j, r;
 char gbuf[CBUFSIZE];
 int32 opcode_inp = 0;

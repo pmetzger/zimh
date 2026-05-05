@@ -183,6 +183,10 @@ DEVICE ucb_dev = {
 
 t_stat uca_rd (int32 *data, int32 PA, int32 access)
 {
+/* Bus read dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 03) {                               /* case on PA<2:1> */
 
 case 0:                                                 /* CSR */
@@ -233,6 +237,10 @@ return SCPE_NXM;
 
 t_stat ucb_rd (int32 *data, int32 PA, int32 access)
 {
+/* Bus read dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 03) {                               /* case on PA<2:1> */
 
 case 0:                                                 /* CSR */
@@ -414,6 +422,11 @@ return SCPE_OK;
 
 t_stat uc15_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= UC15_STATE_SIZE)
     return SCPE_NXM;
 if (vptr != NULL)
@@ -423,6 +436,11 @@ return SCPE_OK;
 
 t_stat uc15_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= UC15_STATE_SIZE)
     return SCPE_NXM;
 UC15_SHARED_WR ((int32) addr, (int32) val);
@@ -433,6 +451,11 @@ return SCPE_OK;
 
 t_stat uc15_attach (UNIT *uptr, const char *cptr)
 {
+/* Generic attach signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+
 return SCPE_NOFNC;
 }
 
@@ -440,6 +463,10 @@ return SCPE_NOFNC;
 
 t_stat uc15_detach (UNIT *uptr)
 {
+/* Generic detach signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if ((sim_switches & SIM_SW_SHUT) == 0)                  /* only if shutdown */
     return SCPE_NOFNC;
 sim_shmem_close (uc15_shmem);                           /* release shared state */

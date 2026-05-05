@@ -183,6 +183,10 @@ DEVICE fhd_dev = {
 
 int32 fhdio (int32 inst, int32 fnc, int32 dat, int32 dev)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 switch (inst) {                                         /* case on opcode */
 
     case ioOCP:                                         /* control */
@@ -441,6 +445,10 @@ return cs;
 
 t_stat fhd_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 fhd_busy = 0;                                           /* reset state */
 fhd_rdy = 0;
 fhd_ace = 0;
@@ -476,6 +484,11 @@ return attach_unit (uptr, cptr);
 
 t_stat fhd_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (val < 0)
     return SCPE_IERR;
 if (uptr->flags & UNIT_ATT)

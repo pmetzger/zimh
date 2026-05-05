@@ -29,7 +29,7 @@
 #include "lgp_defs.h"
 #include <ctype.h>
 
-t_stat parse_sym_m (const char *cptr, t_value *val, int32 sw);
+static t_stat parse_sym_m (const char *cptr, t_value *val, int32 sw);
 void lgp_init (void);
 
 extern DEVICE cpu_dev;
@@ -92,7 +92,7 @@ const char *sim_stop_messages[SCPE_BASE] = {
 
 /* Utility routine - read characters until ' (conditional stop) */
 
-t_stat load_getw (FILE *fi, uint32 *wd)
+static t_stat load_getw (FILE *fi, uint32 *wd)
 {
 int32 flex, c;
 
@@ -114,7 +114,7 @@ return SCPE_FMT;
 
 /* Utility routine - convert ttss decimal address to binary */
 
-t_stat load_geta (uint32 wd, uint32 *ad)
+static t_stat load_geta (uint32 wd, uint32 *ad)
 {
 uint32 n1, n2, n3, n4, tr, sc;
 
@@ -136,6 +136,12 @@ return SCPE_OK;
 
 t_stat sim_load (FILE *fi, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void) fnam;
+(void) cptr;
+(void) flag;
+
 uint32 wd, origin, amod, csum, cnt, tr, sc, ad, cmd;
 
 origin = amod = 0;
@@ -221,7 +227,7 @@ static const char opcode[] = "ZBYRIDNMPEUTHCAS";
 
 static const char hex_decode[] = "0123456789FGJKQW";
 
-void lgp_sprint_addr (char *buf, DEVICE *dptr, t_addr addr)
+static void lgp_sprint_addr (char *buf, DEVICE *dptr, t_addr addr)
 {
 if ((dptr == sim_devices[0]) &&
     ((sim_switches & SWMASK ('T')) ||
@@ -230,7 +236,7 @@ if ((dptr == sim_devices[0]) &&
 else sprint_val (buf, addr, dptr->aradix, dptr->awidth, PV_LEFT);
 }
 
-void lgp_fprint_addr (FILE *st, DEVICE *dptr, t_addr addr)
+static void lgp_fprint_addr (FILE *st, DEVICE *dptr, t_addr addr)
 {
 char buf[64];
 
@@ -238,7 +244,7 @@ lgp_sprint_addr (buf, dptr, addr);
 fprintf (st, "%s", buf);
 }
 
-t_addr lgp_parse_addr (DEVICE *dptr, const char *cptr, const char **tptr)
+static t_addr lgp_parse_addr (DEVICE *dptr, const char *cptr, const char **tptr)
 {
 t_addr ad, ea;
 
@@ -279,6 +285,10 @@ return;
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
     UNIT *uptr, int32 sw)
 {
+/* Generic symbolic output signature.
+   This implementation does not use every parameter. */
+(void) addr;
+
 int32 i, c;
 uint32 inst, op, ea;
 
@@ -334,6 +344,10 @@ return SCPE_ARG;
 
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+/* Generic symbolic input signature.
+   This implementation does not use every parameter. */
+(void) addr;
+
 int32 i, c;
 const char *tptr;
 
@@ -378,8 +392,12 @@ return SCPE_ARG;
 
 /* Instruction parse */
 
-t_stat parse_sym_m (const char *cptr, t_value *val, int32 sw)
+static t_stat parse_sym_m (const char *cptr, t_value *val, int32 sw)
 {
+/* Shared symbolic parser signature.
+   This implementation does not use every parameter. */
+(void) sw;
+
 uint32 ea, sgn;
 const char *tptr;
 char gbuf[CBUFSIZE];

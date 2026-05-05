@@ -271,7 +271,7 @@ DEVICE  qty_dev =
     /*        qty_tmxr_putc         */
     /*------------------------------*/
 
-int qty_tmxr_putc( int line, TMLN * lp, int kar )
+static int qty_tmxr_putc( int line, TMLN * lp, int kar )
     {
     int     a ;
 
@@ -318,7 +318,7 @@ int qty_tmxr_putc( int line, TMLN * lp, int kar )
     /*                 qty_update_rcvi              */
     /*----------------------------------------------*/
 
-int qty_update_rcvi( TMXR * mp )
+static int qty_update_rcvi( TMXR * mp )
     {
     int     line ;
     TMLN *      lp ;
@@ -361,7 +361,7 @@ int qty_update_rcvi( TMXR * mp )
     /*                qty_update_xmti               */
     /*----------------------------------------------*/
 
-int qty_update_xmti( TMXR * mp )
+static int qty_update_xmti( TMXR * mp )
     {
     int     line ;
     TMLN *      lp ;
@@ -400,7 +400,7 @@ int qty_update_xmti( TMXR * mp )
     /*                qty_update_status             */
     /*----------------------------------------------*/
 
-int qty_update_status( DIB * dibp, TMXR * tmxr_desc )
+static int qty_update_status( DIB * dibp, TMXR * tmxr_desc )
     {
     int     line ;
     int     status ;
@@ -524,7 +524,7 @@ t_stat qty_detach( UNIT * unitp )
     /*                             qty_clear                        */
     /*--------------------------------------------------------------*/
 
-t_stat qty_clear( t_bool flag )
+static t_stat qty_clear( t_bool flag )
     {
     int line ;
 
@@ -546,7 +546,7 @@ t_stat qty_clear( t_bool flag )
     /*                 qty_common_reset             */
     /*----------------------------------------------*/
 
-t_stat qty_common_reset( DIB * dibp, UNIT * unitp, DEVICE * dptr )
+static t_stat qty_common_reset( DIB * dibp, UNIT * unitp, DEVICE * dptr )
     {
     if ((dptr->flags & DEV_DIS) == 0)
         {
@@ -593,7 +593,7 @@ t_stat qty_reset( DEVICE * dptr )
     /*                  qty_common_svc              */
     /*----------------------------------------------*/
 
-t_stat qty_common_svc( DIB * dibp, UNIT * unitp )
+static t_stat qty_common_svc( DIB * dibp, UNIT * unitp )
     {
     int     line ;
     int     newln ;
@@ -753,9 +753,16 @@ int32 qty( int32 pulse, int32 code, int32 AC )
 
 t_stat qty_setnl( UNIT * uptr, int32 val, const char * cptr, void * desc )
     {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr ;
+    (void) val ;
+    (void) desc ;
+
     int32   newln, i, t ;
 
     t_stat  r ;
+
     if ( cptr == NULL )
         {
         return ( SCPE_ARG ) ;

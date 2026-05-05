@@ -78,6 +78,12 @@ DEVICE sagecpu_dev = {
 
 static t_stat sagecpu_set_bios(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+    (void) desc;
+
     FILE* fp;
     if (cptr==NULL) return SCPE_ARG;
     if ((fp=fopen(cptr,"r"))==0) return SCPE_OPENERR;
@@ -94,6 +100,12 @@ static t_stat sagecpu_set_bios(UNIT *uptr, int32 value, const char *cptr, void *
 
 static t_stat sagecpu_show_bios(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf(st, "BIOS=%s", biosfile);
     return SCPE_OK;
 }
@@ -130,8 +142,6 @@ static void sage_trapcallback(DEVICE* dptr,int trapnum)
 static t_stat sagecpu_reset(DEVICE* dptr)
 {
     t_stat rc;
-    extern void m68k_sim_init(void);
-
 
     m68k_sim_init();
 

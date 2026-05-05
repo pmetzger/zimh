@@ -702,6 +702,10 @@ return SCPE_OK;
 
 t_stat dz_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 if (sys_model) {                                        /* VAXstation? */
@@ -803,6 +807,11 @@ return tmxr_detach (&dz_desc, uptr);
 
 t_stat dz_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 t_stat r;
 char gbuf[CBUFSIZE];
 int32 ln;
@@ -822,6 +831,11 @@ return tmxr_set_log (NULL, ln, cptr, desc);
 
 t_stat dz_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 t_stat r;
 int32 ln;
 
@@ -837,6 +851,11 @@ return tmxr_set_nolog (NULL, ln, NULL, desc);
 
 t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 i;
 
 for (i = 0; i < dz_desc.lines; i++) {
@@ -849,6 +868,12 @@ return SCPE_OK;
 
 t_stat dz_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "DZ Terminal Multiplexer (DZ)\n\n");
 fprintf (st, "The DZ is a %d line terminal multiplexor.\n", DZ_LINES);
 fprintf (st, "For the MicroVAX, one of these lines is dedicated to the console and\n");
@@ -902,5 +927,9 @@ return SCPE_OK;
 
 const char *dz_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "DZ 4-line terminal multiplexer";
 }

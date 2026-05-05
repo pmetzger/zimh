@@ -206,6 +206,10 @@ t_stat imx_devio(uint32 dev, uint64 *data)
 
 t_stat imx_svc (UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     uint64 max_samples;
 
     if (status & IMX_PACK) {
@@ -237,6 +241,12 @@ t_stat imx_svc (UNIT *uptr)
 /* set MPX level number */
 t_stat imx_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32 mpx;
     t_stat r;
 
@@ -251,6 +261,11 @@ t_stat imx_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat imx_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) val;
+   (void) desc;
+
    if (uptr == NULL)
       return SCPE_IERR;
 
@@ -261,6 +276,12 @@ t_stat imx_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat imx_set_channel (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   int chan, unit, axis, negate = 0;
   char gbuf[CBUFSIZE];
   const char *tptr;
@@ -305,6 +326,11 @@ t_stat imx_set_channel (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat imx_show_channel (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   int nothing = 1;
   const char *negate, *comma = "";
   int chan, i, j;
@@ -337,6 +363,10 @@ t_stat imx_show_channel (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 const char *imx_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "A/D input multiplexor";
 }
 #endif

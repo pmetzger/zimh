@@ -422,6 +422,10 @@ DEVICE dt_dev = {
 
 t_stat dt_rd (int32 *data, int32 PA, int32 access)
 {
+/* Generic I/O page read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 j, unum, mot, fnc;
 
 j = (PA >> 1) & 017;                                    /* get reg offset */
@@ -840,6 +844,10 @@ return FALSE;
 
 t_stat dt_svcdone (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 DT_SETDONE;
 return SCPE_OK;
 }
@@ -1152,6 +1160,10 @@ return 0;                                               /* all others */
 
 t_stat dt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i, prev_mot;
 UNIT *uptr;
 
@@ -1231,6 +1243,10 @@ static const uint16 boot_rom[] = {
 
 t_stat dt_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 dt_unit[unitno].pos = DT_EZLIN;
@@ -1246,6 +1262,11 @@ return SCPE_OK;
 
 t_stat dt_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 return SCPE_NOFNC;
 }
 
@@ -1419,6 +1440,12 @@ return detach_unit (uptr);
 
 t_stat dt_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 const char *text2;
 const char *const text =
 /*567901234567890123456789012345678901234567890123456789012345678901234567890*/
@@ -1567,5 +1594,9 @@ return SCPE_OK;
 
 const char *dt_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "TC11/TU56 DECtape controller";
 }

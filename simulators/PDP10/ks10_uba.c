@@ -416,6 +416,11 @@ uba_set_parity(uint16 ctl)
 t_stat
 uba_set_addr(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE  *dptr;
     DIB     *dibp;
     t_value  newaddr;
@@ -444,8 +449,14 @@ uba_set_addr(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 uba_show_addr (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE  *dptr = find_dev_from_unit(uptr);
     DIB     *dibp = (DIB *) dptr->ctxt;
+
     if (dibp == NULL)
         return SCPE_IERR;
     fprintf(st, "addr=%07o", dibp->uba_addr);
@@ -455,6 +466,11 @@ uba_show_addr (FILE *st, UNIT *uptr, int32 val, const void *desc)
 t_stat
 uba_set_br(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE  *dptr;
     DIB     *dibp;
     t_value  br;
@@ -486,8 +502,14 @@ uba_set_br(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 uba_show_br (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE  *dptr = find_dev_from_unit(uptr);
     DIB *dibp = (DIB *) dptr->ctxt;
+
     if (dibp == NULL)
         return SCPE_IERR;
     fprintf(st, "br=%o", dibp->uba_br);
@@ -497,6 +519,11 @@ uba_show_br (FILE *st, UNIT *uptr, int32 val, const void *desc)
 t_stat
 uba_set_vect(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE  *dptr;
     DIB     *dibp;
     t_value  vect;
@@ -526,8 +553,14 @@ uba_set_vect(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 uba_show_vect (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE  *dptr = find_dev_from_unit(uptr);
     DIB *dibp = (DIB *) dptr->ctxt;
+
     if (dibp == NULL)
         return SCPE_IERR;
     fprintf(st, "vect=%03o", dibp->uba_vect);
@@ -537,6 +570,11 @@ uba_show_vect (FILE *st, UNIT *uptr, int32 val, const void *desc)
 t_stat
 uba_set_ctl(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE  *dptr;
     DIB     *dibp;
     t_value  ctl;
@@ -568,8 +606,14 @@ uba_set_ctl(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 uba_show_ctl (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE  *dptr = find_dev_from_unit(uptr);
     DIB *dibp = (DIB *) dptr->ctxt;
+
     if (dibp == NULL)
         return SCPE_IERR;
     fprintf(st, "uba%o", dibp->uba_ctl);

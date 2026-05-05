@@ -247,6 +247,16 @@ void m68k_set_bkpt_ack_callback(void (*callback)(unsigned int data));
  */
 void m68k_set_reset_instr_callback(void  (*callback)(void));
 
+/* Set the callback for a CMPI.L #v, Dn instruction.
+ * Default behavior: do nothing.
+ */
+void m68k_set_cmpild_instr_callback(void  (*callback)(unsigned int, int));
+
+/* Set the callback for the RTE instruction.
+ * Default behavior: do nothing.
+ */
+void m68k_set_rte_instr_callback(void  (*callback)(void));
+
 
 /* Set the callback for informing of a large PC change.
  * You must enable M68K_MONITOR_PC in m68kconf.h.
@@ -384,6 +394,9 @@ unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned int cpu_
  * via the read/write interfaces.
  */
 unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);
+
+/* Quick disassembly into a static buffer for logging. */
+char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type);
 
 
 /* ======================================================================== */

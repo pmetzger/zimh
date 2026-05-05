@@ -55,6 +55,10 @@
 uint8 *URLContents(const char *URL, uint32 *length);
 #ifndef URL_READER_SUPPORT
 uint8 *URLContents(const char *URL, uint32 *length) {
+    /* Stub URL reader signature.
+       This implementation does not use every parameter. */
+    (void) URL;
+
     *length = 0;
     return (uint8*)NULL;
 }
@@ -256,6 +260,13 @@ static void processDirEntry (const char *directory,
                              t_offset FileSize,
                              const struct stat *filestat,
                              void *context) {
+    /* Directory traversal callback signature.
+       This implementation does not use every parameter. */
+    (void) directory;
+    (void) FileSize;
+    (void) filestat;
+    (void) context;
+
     if (filename != NULL) {
         NameNode_t *top = (NameNode_t *)malloc(sizeof(NameNode_t));
         if (top) {
@@ -375,6 +386,10 @@ static MTAB sio_mod[] = {
 };
 
 static const char* sio_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Serial Input Output";
 }
 
@@ -406,6 +421,10 @@ static REG ptr_reg[] = {
 };
 
 static const char* ptr_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Paper Tape Reader";
 }
 
@@ -429,6 +448,10 @@ static REG ptp_reg[] = {
 };
 
 static const char* ptp_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Paper Tape Puncher";
 }
 
@@ -520,6 +543,10 @@ static MTAB simh_mod[] = {
 };
 
 const char* simh_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Pseudo Device";
 }
 
@@ -569,6 +596,10 @@ static void pollConnection(void) {
 
 /* reset routines */
 static t_stat sio_reset(DEVICE *dptr) {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int32 i;
     sim_debug(VERBOSE_MSG, &sio_dev, "SIO: " ADDRESS_FORMAT " Reset\n", PCX);
     sio_unit.u3 = FALSE;                                    /* no character in terminal input buffer    */
@@ -1014,6 +1045,12 @@ static uint32 equalSIP(SIO_PORT_INFO x, SIO_PORT_INFO y) {
 }
 
 static t_stat ptpptr_dev_set_port(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+    (void) desc;
+
     int32 result, n, statusPort, dataPort;
     if (cptr == NULL)
         return SCPE_ARG;
@@ -1036,11 +1073,23 @@ static t_stat ptpptr_dev_set_port(UNIT *uptr, int32 value, const char *cptr, voi
 }
 
 static t_stat ptpptr_dev_show_port(FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf(st, "\n\tStatus port = 0x%02x\n\t  Data port = 0x%02x\n", ptpptrStatusPort, ptpptrDataPort);
     return SCPE_OK;
 }
 
 static t_stat sio_dev_set_port(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+    (void) desc;
+
     int32 result, n, position, isDataPort;
     SIO_PORT_INFO sip = { 0 }, old;
     char hasReset, hasOUT;
@@ -1107,6 +1156,12 @@ static t_stat sio_dev_set_port(UNIT *uptr, int32 value, const char *cptr, void *
 }
 
 static t_stat sio_dev_show_port(FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32 i, first = TRUE;
     for (i = 0; port_table[i].port != -1; i++)
         if (!port_table[i].isBuiltin) {
@@ -1122,17 +1177,35 @@ static t_stat sio_dev_show_port(FILE *st, UNIT *uptr, int32 val, const void *des
 }
 
 static t_stat sio_dev_set_interrupton(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+    (void) cptr;
+    (void) desc;
+
     keyboardInterrupt = FALSE;
     return sim_activate(&sio_unit, sio_unit.wait);          /* activate unit */
 }
 
 static t_stat sio_dev_set_interruptoff(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+    (void) cptr;
+    (void) desc;
+
     keyboardInterrupt = FALSE;
     sim_cancel(&sio_unit);
     return SCPE_OK;
 }
 
 static t_stat sio_svc(UNIT *uptr) {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     int32 ch;
     const SIO_PORT_INFO spi = lookupPortInfo(kbdIrqPort, &ch);
     ASSURE(spi.port == kbdIrqPort);
@@ -1170,6 +1243,10 @@ int32 nulldev(const int32 port, const int32 io, const int32 data) {
 }
 
 int32 sr_dev(const int32 port, const int32 io, const int32 data) {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+
     if (io == 0) {
         return SR;
     }
@@ -1363,16 +1440,34 @@ static void warnNoRealTimeClock(void) {
 }
 
 static t_stat simh_dev_set_timeron(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+    (void) cptr;
+    (void) desc;
+
     timeOfNextInterrupt = sim_os_msec() + timerDelta;
     return sim_activate(&simh_unit, simh_unit.wait);    /* activate unit */
 }
 
 static t_stat simh_dev_set_timeroff(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+    (void) cptr;
+    (void) desc;
+
     timerInterrupt = FALSE;
     return SCPE_OK;
 }
 
 static t_stat simh_svc(UNIT *uptr) {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     if (simh_unit.flags & UNIT_SIMH_TIMERON) {
         uint32 now = sim_os_msec();
         if (now >= timeOfNextInterrupt) {

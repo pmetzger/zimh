@@ -698,6 +698,11 @@ return outbound;                                        /* return the outbound s
 
 static t_stat set_mode (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (uptr == &ptr_unit)                                  /* if the reader mode is being set */
     if (value == 0)                                     /*   then if optimized timing is desired */
         uptr->wait = fast_read_time;                    /*     then use the current fast time setting */

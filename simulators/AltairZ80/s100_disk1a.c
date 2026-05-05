@@ -117,6 +117,10 @@ static REG disk1a_reg[] = {
 #define DISK1A_NAME "Compupro Floppy Controller"
 
 static const char* disk1a_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return DISK1A_NAME;
 }
 
@@ -735,6 +739,11 @@ static t_stat disk1a_reset(DEVICE *dptr)
 
 static t_stat disk1a_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+    (void) dptr;
+
     bootstrap &= 0xF;
     DBG_PRINT(("Booting DISK1A Controller, bootstrap=%d\n", bootstrap));
 

@@ -121,6 +121,11 @@ DEVICE              lpr_dev = {
 t_stat
 lpr_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)val;
+
     int i;
     if (cptr == NULL)
         return SCPE_ARG;
@@ -142,13 +147,18 @@ lpr_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 lpr_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)v;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "linesperpage=%d", uptr->u6);
     return SCPE_OK;
 }
 
-t_stat
+static t_stat
 print_line(UNIT * uptr, int chan, int unit)
 {
 /* Convert word record into column image */
@@ -486,6 +496,10 @@ lpr_srv(UNIT *uptr) {
 
 void
 lpr_ini(UNIT *uptr, t_bool f) {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)f;
+
     if (uptr->u6 == 0) {
         uptr->u6 = 55;
     }
@@ -516,6 +530,11 @@ lpr_detach(UNIT * uptr)
 t_stat
 lpr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)cptr;
+   (void)flag;
+   (void)uptr;
 
    fprintf (st, "%s\n\n", lpr_description(dptr));
    fprintf (st, "The line printer output can be echoed to the console to check");
@@ -547,6 +566,10 @@ lpr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 lpr_description(DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
 #ifdef I7010
    return "1403 Line Printer";
 #endif

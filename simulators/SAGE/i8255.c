@@ -38,6 +38,10 @@ static t_stat i8255_error(const char* err)
 
 t_stat i8255_io(IOHANDLER* ioh,uint32* value,uint32 rw,uint32 mask)
 {
+    /* Shared I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) mask;
+
     int port = ioh->offset;
     I8255* chip = (I8255*)ioh->ctxt;
     if (rw==MEM_WRITE) {

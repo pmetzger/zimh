@@ -51,6 +51,10 @@ extern void set_cpuint(int32 irq_num);
 
 int32   mbirq = 0;                      /* set no multibus interrupts */
 static const char* irq_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return irq_NAME;
 }
 
@@ -117,6 +121,10 @@ DEVICE irq_dev = {
 
 t_stat irq_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
 //    if (SBC_reset(NULL) == 0) {
 //        sim_printf("  Interrupt: Reset\n");
         sim_activate (&irq_unit, irq_unit.wait); /* activate unit */
@@ -131,6 +139,10 @@ t_stat irq_reset(DEVICE *dptr)
 
 t_stat irq_svc(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     switch (mbirq) {
         case INT_2:
             set_cpuint(INT_R);

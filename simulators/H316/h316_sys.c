@@ -108,6 +108,13 @@ const char *sim_stop_messages[SCPE_BASE] = {
 
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void) fnam;
+(void) cptr;
+(void) fileref;
+(void) flag;
+
 return SCPE_FMT;
 }
 
@@ -227,7 +234,7 @@ static const int32 opc_val[] = {
         status  =       space needed
 */
 
-void fprint_opr (FILE *of, int32 inst, int32 Class)
+static void fprint_opr (FILE *of, int32 inst, int32 Class)
 {
 int32 i, j, sp;
 

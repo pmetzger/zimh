@@ -581,6 +581,10 @@ return 0;
 
 t_stat map_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 i;
 
 for (i = 0; i < VA_NUM_PAG; i++) {                      /* clear mmc arrays */

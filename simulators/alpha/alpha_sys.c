@@ -75,6 +75,10 @@ const char *sim_stop_messages[SCPE_BASE] = {
 
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void)fnam;
+
 t_stat r;
 int32 i;
 t_uint64 origin;

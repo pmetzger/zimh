@@ -549,6 +549,12 @@ t_stat sim_instr (void)
 static t_stat
 cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   t_stat r;
   uint32 x;
 
@@ -572,6 +578,12 @@ cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 static t_stat
 cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   t_value insn;
   uint32 i, j;
 
@@ -597,6 +609,10 @@ cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 static t_stat cpu_ex (t_value *vptr, t_addr ea, UNIT *uptr, int32 sw)
 {
+  /* Generic memory examine signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   if (vptr == NULL)
     return SCPE_ARG;
   if (sw & SIM_SW_STOP)
@@ -615,6 +631,10 @@ static t_stat cpu_ex (t_value *vptr, t_addr ea, UNIT *uptr, int32 sw)
 
 static t_stat cpu_dep (t_value val, t_addr ea, UNIT *uptr, int32 sw)
 {
+  /* Generic memory deposit signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   if (sw & SWMASK ('C')) {
     if (ea >= 4096)
       return SCPE_NXM;
@@ -643,6 +663,10 @@ static t_bool cpu_is_pc_a_subroutine_call (t_addr **ret_addrs)
 static t_stat
 cpu_reset (DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   ROM = 1;
   PC = 0;
   IR = 010000;

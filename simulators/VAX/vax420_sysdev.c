@@ -477,14 +477,14 @@ else {
     }
 }
 
-int32 ddb_rd (int32 pa)
+static int32 ddb_rd (int32 pa)
 {
 int32 rg = ((pa - D128BASE) >> 2);
 rg = rg & ((buf_sel == 0) ? 0xFFF : 0x7FFF);
 return ddb[rg];
 }
 
-void ddb_wr (int32 pa, int32 val, int32 lnt)
+static void ddb_wr (int32 pa, int32 val, int32 lnt)
 {
 int32 rg = ((pa - D128BASE) >> 2);
 rg = rg & ((buf_sel == 0) ? 0xFFF : 0x7FFF);
@@ -497,34 +497,63 @@ else ddb[rg] = val;
 return;
 }
 
-int32 buf_sel_rd (int32 pa)
+static int32 buf_sel_rd (int32 pa)
 {
+/* Register read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+
 return buf_sel;
 }
 
-void buf_sel_wr (int32 pa, int32 val, int32 lnt)
+static void buf_sel_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) lnt;
+
 buf_sel = val;
 return;
 }
 
-int32 null_rd (int32 pa)
+static int32 null_rd (int32 pa)
 {
+/* Register read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+
 return 0;
 }
 
-void null_wr (int32 pa, int32 val, int32 lnt)
+static void null_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) val;
+(void) lnt;
+
 return;
 }
 
-int32 cfg_rd (int32 pa)
+static int32 cfg_rd (int32 pa)
 {
+/* Register read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+
 return ka_cfgtst;
 }
 
-void ioreset_wr (int32 pa, int32 val, int32 lnt)
+static void ioreset_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) val;
+(void) lnt;
+
 reset_all (7);
 }
 
@@ -832,6 +861,10 @@ return 0;
 
 void ka_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa - KABASE) >> 2;
 
 switch (rg) {
@@ -901,6 +934,10 @@ return cur_tir;
 
 t_stat tmr_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 tmr_sched ();                                           /* reactivate */
 return SCPE_OK;
 }
@@ -927,6 +964,11 @@ else {
 
 int32 machine_check (int32 p1, int32 opc, int32 cc, int32 delta)
 {
+/* VAX machine-check handler signature.
+   This implementation does not use every parameter. */
+(void) opc;
+(void) delta;
+
 int32 i, st1, st2, p2, hsir, acc;
 
 if (in_ie)                                              /* in exc? panic */
@@ -1000,6 +1042,11 @@ return run_cmd (flag, "CPU");
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 t_stat r;
 DEVICE *cdptr;
 int32 i;
@@ -1037,6 +1084,10 @@ return SCPE_OK;
 
 t_stat sysd_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int unit;
 
 sim_cancel (&sysd_unit);
@@ -1081,11 +1132,20 @@ return SCPE_OK;
 
 const char *sysd_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "system devices";
 }
 
 t_stat auto_config (const char *name, int32 nctrl)
 {
+/* Generic autoconfiguration signature.
+   This implementation does not use every parameter. */
+(void) name;
+(void) nctrl;
+
 return SCPE_OK;
 }
 
@@ -1096,6 +1156,12 @@ return SCPE_OK;
 
 t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 char gbuf[CBUFSIZE];
 
 if ((cptr == NULL) || (!*cptr))
@@ -1209,6 +1275,13 @@ return SCPE_OK;
 
 t_stat cpu_model_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Initial memory size is 16MB.\n\n");
 fprintf (st, "The simulator is booted with the BOOT command:\n\n");
 fprintf (st, "   sim> BOOT\n\n");

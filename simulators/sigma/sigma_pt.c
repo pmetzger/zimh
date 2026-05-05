@@ -284,6 +284,10 @@ return SCPE_OK;
 
 t_stat pt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_cancel (&pt_unit[PTR]);                            /* stop dev thread */
 pt_cmd = 0;
 chan_reset_dev (pt_dib.dva);                           /* clr int, active */

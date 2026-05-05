@@ -152,6 +152,10 @@ DEVICE tym_dev = {
 
 static t_stat tym_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     if (tym_unit[0].flags & UNIT_ATT) {
         sim_activate(&tym_unit[2], 1000);
         sim_activate(&tym_unit[3], 1000);
@@ -289,32 +293,68 @@ static void send_orange (int port)
 
 static void recv_ans(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, "system is answering\n");
     sim_activate(&tym_unit[0], 1000);
 }
 
 static void recv_sht(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, "system is up but shut\n");
 }
 
 static void recv_crs(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, "sender is crashed\n");
 }
 
 static void recv_die(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, "recipient should crash\n");
 }
 
 static void recv_nsp(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, "base taken over by new supervisor\n");
 }
 
 static void recv_log(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, "login\n");
     //next 4 data chrs are the info about terminal type, and port or
     //origin, then name, etc.
@@ -322,26 +362,55 @@ static void recv_log(int port, int subtype, int data)
 
 static void recv_aux(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, "supervisor response to establishing auxillary circuit\n");
 }
 
 static void recv_nop(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " backpressure on\n");
 }
 
 static void recv_oup(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " backpressure off\n");
 }
 
 static void recv_gob(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " character gobbler\n");
 }
 
 static void recv_zap(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, "Zap circuit, port %d\n", port);
     tmxr_reset_ln (&tym_ldsc[port]);
     tym_ldsc[port].rcve = 0;
@@ -350,52 +419,111 @@ static void recv_zap(int port, int subtype, int data)
 
 static void recv_edc(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " enter defered echo mode\n");
 }
 
 static void recv_ldc(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " leave deferred echo mode\n");
 }
 
 static void recv_grn(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " green ball\n");
 }
 
 static void recv_red(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " red ball\n");
 }
 
 static void recv_yel(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " yellow ball\n");
     send_orange (port);
 }
 
 static void recv_org(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " orange ball\n");
 }
 
 static void recv_hng(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " hang character - not used\n");
 }
 
 static void recv_etm(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " enter 2741 transparent mode\n");
 }
 
 static void recv_ltm(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " leave 2741 transparent mode\n");
 }
 
 static void recv_los(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " lost ball\n");
     //data has been lost from buffers. the data filed may tell how
     //many were lost
@@ -403,46 +531,100 @@ static void recv_los(int port, int subtype, int data)
 
 static void recv_sup(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " supervisor request(aux circuits)\n");
 }
 
 static void recv_sur(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " supervisor response(aux circuits)\n");
 }
 
 static void recv_axc(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " supervisor string character\n");
 }
 
 static void recv_tsp(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " test pattern probe\n");
 }
 
 static void recv_tsr(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " test pattern response\n");
 }
 
 static void recv_sad(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " host sad\n");
 }
 
 static void recv_ecn(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " echo on\n");
 }
 
 static void recv_ecf(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " echo off\n");
 }
 
 static void recv_tcs(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " term characteristics\n");
     //first data byte indicates which characteristics second data byte
     //indicates value to set to
@@ -450,12 +632,24 @@ static void recv_tcs(int port, int subtype, int data)
 
 static void recv_tcp(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " term characteristcs probe\n");
     //data byte indicates which terminal characteristic were requested
 }
 
 static void recv_tcr(int port, int subtype, int data)
 {
+    /* Tymbase receive dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+    (void) subtype;
+    (void) data;
+
     sim_debug(DEBUG_CMD, &tym_dev, " term characteristcs response\n");
     //data is just like tcs, comes in response to a probe; also is
     //reflected by remote when terminal characteristics are sent
@@ -585,6 +779,10 @@ static void check(const char *name, int offset, uint64 *value)
 
 static t_stat tym_interface_srv(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     check("Dump location", DUMP, &dump);
     check("Input ring location", IRNG, &irng);
     check("Input ring size", ISIZ, &isiz);
@@ -606,6 +804,10 @@ static t_stat tym_interface_srv(UNIT *uptr)
 
 static t_stat tym_alive_srv(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     if (M[tym_base + LOCK] == tym_key) {
         M[tym_base + LOCK] = 1;
     }
@@ -616,6 +818,10 @@ static t_stat tym_alive_srv(UNIT *uptr)
 
 static t_stat tym_input_srv(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     int32 ch;
     int i;
 
@@ -654,6 +860,10 @@ static t_stat tym_input_srv(UNIT *uptr)
 
 static t_stat tym_output_srv(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     uint64 data;
     int c;
 
@@ -679,6 +889,10 @@ static t_stat tym_output_srv(UNIT *uptr)
 
 static const char *tym_description(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Tymnet interface";
 }
 #endif

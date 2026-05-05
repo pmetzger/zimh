@@ -184,6 +184,10 @@ static UNIT i8272_unit[] = {
 #define I8272_NAME  "Intel/NEC(765) FDC Core"
 
 static const char* i8272_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return I8272_NAME;
 }
 

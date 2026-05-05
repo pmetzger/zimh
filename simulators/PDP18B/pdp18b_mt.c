@@ -211,6 +211,10 @@ DEVICE mt_dev = {
 
 int32 mt (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 f, sb;
 UNIT *uptr;
 
@@ -483,6 +487,10 @@ return SCPE_OK;
 
 t_stat mt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 u;
 UNIT *uptr;
 

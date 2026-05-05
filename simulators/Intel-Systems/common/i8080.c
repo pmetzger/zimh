@@ -204,6 +204,10 @@ int32 hst_lnt = 0;                      /* history length */
 InstHistory *hst = NULL;                /* instruction history */
 
 static const char* i8080_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return i8080_NAME;
 }
 
@@ -1283,6 +1287,10 @@ void putpair(int32 reg, int32 val)
 
 t_stat i8080_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     PSW = PSW_ALWAYS_ON;
     CLR_FLAG(CF);
     CLR_FLAG(ZF);
@@ -1412,6 +1420,10 @@ int32 sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
 t_stat fprint_sym(FILE *of, t_addr addr, t_value *val,
     UNIT *uptr, int32 sw)
 {
+    /* Generic symbolic output signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+
     int32 cflag, c1, c2, inst, adr;
 
     cflag = (uptr == NULL) || (uptr == &i8080_unit);
@@ -1459,6 +1471,10 @@ t_stat fprint_sym(FILE *of, t_addr addr, t_value *val,
 
 t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+    /* Generic symbolic input signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+
     int32 cflag, i = 0, j, r;
     char gbuf[CBUFSIZE];
 
@@ -1545,6 +1561,12 @@ t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 
 
 t_stat cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int i, lnt;
     t_stat r;
 
@@ -1576,6 +1598,11 @@ t_stat cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     int k, di, lnt, ir;
     const char *cptr = (const char *) desc;
     t_stat r;
@@ -1610,6 +1637,11 @@ t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat i8080_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic examine signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     if (addr >= MEMSIZE)
         return SCPE_NXM;
     if (vptr != NULL)
@@ -1621,6 +1653,11 @@ t_stat i8080_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 
 t_stat i8080_dep(t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic deposit signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     if (addr >= MEMSIZE)
         return SCPE_NXM;
     put_mbyte(addr, val);

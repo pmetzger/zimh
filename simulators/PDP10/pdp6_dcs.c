@@ -312,6 +312,10 @@ t_stat dcs_doscan (UNIT *uptr) {
 
 t_stat dcs_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     if (dcs_unit.flags & UNIT_ATT)                           /* if attached, */
         sim_activate (&dcs_unit, tmxr_poll);                 /* activate */
     else
@@ -332,6 +336,12 @@ t_stat dcs_reset (DEVICE *dptr)
 
 t_stat dcs_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32 newln, i, t;
     t_stat r;
 
@@ -365,6 +375,11 @@ t_stat dcs_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat dcs_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     t_stat r;
     char gbuf[CBUFSIZE];
     int32 ln;
@@ -384,6 +399,11 @@ t_stat dcs_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat dcs_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     t_stat r;
     int32 ln;
 
@@ -399,6 +419,11 @@ t_stat dcs_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat dcs_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     int32 i;
 
     for (i = 0; i < dcs_desc.lines; i++) {
@@ -476,6 +501,10 @@ return SCPE_OK;
 
 const char *dcs_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Type 630 asynchronous line interface";
 }
 

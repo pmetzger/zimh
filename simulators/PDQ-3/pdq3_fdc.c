@@ -361,7 +361,7 @@ static void fdc_update_rdonly(DRVDATA *curdrv) {
     clrbit(reg_fdc_status,FDC_ST1_WRTPROT);
 }
 
-t_bool fdc_driveready(DRVDATA *curdrv) {
+static t_bool fdc_driveready(DRVDATA *curdrv) {
   /* some drive selected, and disk in drive? */
   if (curdrv==NULL || curdrv->dr_ready == 0) {
     setbit(reg_fdc_status,FDC_ST1_NOTREADY);
@@ -671,6 +671,10 @@ static t_stat fdc_restartmulti(DRVDATA *curdrv,int wait) {
 
 /* process the FDC commands, and restart, if necessary */
 t_stat fdc_svc(UNIT *uptr) {
+  /* Generic unit service signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   DRVDATA *curdrv = fdc_selected==-1 ? NULL : &fdc_drv[fdc_selected];
   t_bool rdy = fdc_driveready(curdrv);
   t_bool um_flg; /* update or multi bit */
@@ -931,7 +935,7 @@ static t_stat fdc_docmd(uint16 data) {
   return SCPE_OK;
 }
 
-void dma_docmd(uint16 data) {
+static void dma_docmd(uint16 data) {
   reg_dma_ctrl = data & 0xff;
   reg_dma_status &= 0x8f;
   reg_dma_status |= (reg_dma_ctrl & 0x70);

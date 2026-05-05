@@ -90,6 +90,10 @@ static REG selchan_reg[] = {
 };
 
 static const char* selchan_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Compupro Selector Channel";
 }
 
@@ -140,6 +144,12 @@ static t_stat selchan_reset(DEVICE *dptr)
 
 static int32 selchandev(const int32 port, const int32 io, const int32 data)
 {
+#ifndef DBG_MSG
+    /* Shared I/O handler signature.
+       This build variant does not use every parameter. */
+    (void) port;
+#endif
+
     DBG_PRINT(("SELCHAN: IO %s, Port %02x\n", io ? "WR" : "RD", port));
     if(io) {
         selchan_info->selchan <<= 8;

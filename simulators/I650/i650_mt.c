@@ -61,6 +61,12 @@ t_stat              mt_set_len (UNIT *uptr, int32 val, const char *cptr, void *d
 t_stat              mt_show_len (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat              mt_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
 const char          *mt_description (DEVICE *dptr);
+static int          mt_read_numeric_word(uint8 *buf, t_int64 *d, int *ZeroNeg);
+static int          mt_read_alpha_word(uint8 *buf, t_int64 *d);
+static int          mt_transfer_tape_rec_to_IAS(uint8 *buf, t_mtrlnt reclen, char mode);
+static void         mt_write_numeric_word(uint8 *buf, t_int64 d, int ZeroNeg);
+static void         mt_write_alpha_word(uint8 *buf, t_int64 d);
+static void         mt_transfer_IAS_to_tape_rec(uint8 *buf, t_mtrlnt *reclen, char mode);
 
 UNIT                mt_unit[6] = {
     {UDATA(&mt_srv, UNIT_MT, 0), 0}, /* 0 */
@@ -118,6 +124,12 @@ int mt_ready(int n)
 /* Rewind tape drive */
 t_stat mt_rew(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     /* If drive is offline or not attached return not ready */
     if ((uptr->flags & UNIT_ATT) == 0)
         return SCPE_NOATT;
@@ -126,7 +138,7 @@ t_stat mt_rew(UNIT * uptr, int32 val, const char *cptr, void *desc)
     return sim_tape_rewind(uptr);
 }
 
-int mt_read_numeric_word(uint8 * buf, t_int64 * d, int * ZeroNeg)
+static int mt_read_numeric_word(uint8 * buf, t_int64 * d, int * ZeroNeg)
 {
     int i, neg;
     char c;
@@ -151,7 +163,7 @@ int mt_read_numeric_word(uint8 * buf, t_int64 * d, int * ZeroNeg)
     return 0;
 }
 
-int mt_read_alpha_word(uint8 * buf, t_int64 * d)
+static int mt_read_alpha_word(uint8 * buf, t_int64 * d)
 {
     int i, n;
     char c;
@@ -166,7 +178,7 @@ int mt_read_alpha_word(uint8 * buf, t_int64 * d)
     return 0;
 }
 
-int mt_transfer_tape_rec_to_IAS(uint8 * buf, t_mtrlnt reclen, char mode)
+static int mt_transfer_tape_rec_to_IAS(uint8 * buf, t_mtrlnt reclen, char mode)
 {
     int n, r, ZeroNeg;
     t_mtrlnt ic;
@@ -251,7 +263,7 @@ int mt_transfer_tape_rec_to_IAS(uint8 * buf, t_mtrlnt reclen, char mode)
     return 0;
 }
 
-void mt_write_numeric_word(uint8 * buf, t_int64 d, int ZeroNeg)
+static void mt_write_numeric_word(uint8 * buf, t_int64 d, int ZeroNeg)
 {
     int i, neg;
     char c;
@@ -274,7 +286,7 @@ void mt_write_numeric_word(uint8 * buf, t_int64 d, int ZeroNeg)
     }
 }
 
-void mt_write_alpha_word(uint8 * buf, t_int64 d)
+static void mt_write_alpha_word(uint8 * buf, t_int64 d)
 {
     int i, n;
     char c;
@@ -286,7 +298,7 @@ void mt_write_alpha_word(uint8 * buf, t_int64 d)
     }
 }
 
-void mt_transfer_IAS_to_tape_rec(uint8 * buf, t_mtrlnt * reclen, char mode)
+static void mt_transfer_IAS_to_tape_rec(uint8 * buf, t_mtrlnt * reclen, char mode)
 {
     int n,ic,ZeroNeg;
     t_int64 d, CtrlWord;
@@ -585,6 +597,10 @@ t_stat mt_srv(UNIT * uptr)
 
 void mt_ini(UNIT * uptr, t_bool f)
 {
+    /* Shared device initialization signature.
+       This implementation does not use every parameter. */
+    (void) f;
+
     if (uptr->flags & UNIT_ATT) {
         uptr->u5 = MT_RDY;
     } else {
@@ -596,6 +612,10 @@ void mt_ini(UNIT * uptr, t_bool f)
 
 t_stat mt_reset(DEVICE * dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
     for (i = 0; i < 6; i++) {
         mt_ini(&mt_unit[i], 0);
@@ -626,6 +646,11 @@ t_stat mt_detach(UNIT * uptr)
 
 t_stat mt_set_len (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int len;
     t_stat r;
 
@@ -641,6 +666,11 @@ t_stat mt_set_len (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat mt_show_len (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     fprintf (st, "length %d foot", uptr->u4 * 2400 / 28800);
     return SCPE_OK;
 }
@@ -662,6 +692,10 @@ mt_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 mt_description(DEVICE *dptr)
 {
+   /* Generic device description signature.
+      This implementation does not use every parameter. */
+   (void) dptr;
+
    return "IBM 727 Magnetic tape unit";
 }
 

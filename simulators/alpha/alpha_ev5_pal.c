@@ -179,6 +179,10 @@ DEVICE ev5pal_dev = {
 
 t_stat pal_proc_intr (uint32 lvl)
 {
+/* Shared PAL dispatch signature.
+   This implementation does not use every parameter. */
+(void) lvl;
+
 return ev5_palent (PC, PALO_INTR);
 }
 
@@ -187,6 +191,10 @@ return ev5_palent (PC, PALO_INTR);
 
 t_stat pal_proc_trap (uint32 summ)
 {
+/* Shared PAL dispatch signature.
+   This implementation does not use every parameter. */
+(void) summ;
+
 return ev5_palent (PC, PALO_TRAP);
 }
 
@@ -407,6 +415,10 @@ return SCPE_OK;
 
 t_stat pal_1e (uint32 ir)
 {
+/* Shared PAL instruction signature.
+   This implementation does not use every parameter. */
+(void) ir;
+
 uint32 new_pal = ((uint32) ev5_excaddr) & 1;
 
 if (!pal_mode && (!(itlb_cm == MODE_K) ||               /* pal mode, or kernel */
@@ -778,6 +790,10 @@ return SCPE_OK;
 
 t_stat pal_proc_reset_hwre (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ev5_palbase = 0;
 ev5_mchk = 0;
 ev5_pwrfl = 0;
@@ -824,7 +840,7 @@ static struct pal_opt rei_opt[] = {
 
 /* Print options for hardware PAL instruction */
 
-void fprint_opt_ev5 (FILE *of, uint32 inst, struct pal_opt opt[])
+static void fprint_opt_ev5 (FILE *of, uint32 inst, struct pal_opt opt[])
 {
 uint32 i;
 
@@ -839,7 +855,7 @@ return;
 
 /* Parse options for hardware PAL instruction */
 
-const char *parse_opt_ev5 (const char *cptr, uint32 *val, struct pal_opt opt[])
+static const char *parse_opt_ev5 (const char *cptr, uint32 *val, struct pal_opt opt[])
 {
 uint32 i;
 char *tptr, gbuf[CBUFSIZE];

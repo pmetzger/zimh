@@ -436,6 +436,10 @@ return st;
 
 uint32 dk_tdv_status (uint32 un)
 {
+/* Device status helper signature.
+   This implementation does not use every parameter. */
+(void) un;
+
 return dk_flags | (dk_inv_ad (NULL)? DKV_BADS: 0);
 }
 
@@ -486,6 +490,10 @@ return SCPE_OK;
 
 t_stat dk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 i;
 
 for (i = 0; i < DK_NUMDR; i++) {

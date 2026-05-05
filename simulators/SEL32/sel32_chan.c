@@ -104,7 +104,7 @@ int     test_write_byte_end(uint16 chsa);
 t_stat  checkxio(uint16 chsa, uint32 *status);  /* check XIO */
 t_stat  startxio(uint16 chsa, uint32 *status);  /* start XIO */
 t_stat  testxio(uint16 chsa, uint32 *status);   /* test XIO */
-t_stat  stoptxio(uint16 chsa, uint32 *status);  /* stop XIO */
+t_stat  stopxio(uint16 chsa, uint32 *status);   /* stop XIO */
 t_stat  rschnlxio(uint16 chsa, uint32 *status); /* reset channel XIO */
 t_stat  haltxio(uint16 chsa, uint32 *status);   /* halt XIO */
 t_stat  grabxio(uint16 chsa, uint32 *status);   /* grab XIO n/u */
@@ -139,7 +139,7 @@ int16   post_csw(CHANP *chp, uint32 rstat);
 /* initialize FIFO to empty in boot channel code */
 
 /* add an entry to the start of the FIFO */
-int32 FIFO_Push(uint16 chsa, uint32 entry)
+static int32 FIFO_Push(uint16 chsa, uint32 entry)
 {
     int32 num;                                  /* number of entries */
     DIB *dibp = dib_chan[get_chan(chsa)];       /* get DIB pointer for channel */
@@ -460,7 +460,7 @@ int readfull(CHANP *chp, uint32 maddr, uint32 *word)
  * Return 1 if fail.
  * Return 0 if success.
  */
-int readbuff(CHANP *chp)
+static int readbuff(CHANP *chp)
 {
     uint32 addr = chp->ccw_addr;                /* channel buffer address */
 
@@ -480,7 +480,7 @@ int readbuff(CHANP *chp)
  * Return 1 if fail.
  * Return 0 if success.
  */
-int writebuff(CHANP *chp)
+static int writebuff(CHANP *chp)
 {
     uint32 addr = chp->ccw_addr;
 
@@ -502,7 +502,7 @@ int writebuff(CHANP *chp)
 /* load in the IOCD and process the commands */
 /* return = 0 OK */
 /* return = 1 error, chan_status will have reason */
-int32 load_ccw(CHANP *chp, int32 tic_ok)
+static int32 load_ccw(CHANP *chp, int32 tic_ok)
 {
     uint32      word1 = 0;
     uint32      word2 = 0;
@@ -2991,6 +2991,11 @@ t_stat chan_set_devs(void) {
 
 /* Validate and set the device onto a given channel */
 t_stat set_dev_addr(UNIT *uptr, int32 val, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE  *dptr;                              /* device pointer */
     DIB     *dibp;                              /* dib pointer */
     UNIT    *tuptr;                             /* temp unit pointer */
@@ -3047,6 +3052,11 @@ t_stat set_dev_addr(UNIT *uptr, int32 val, const char *cptr, void *desc) {
 
 /* display channel/sub-address for device */
 t_stat show_dev_addr(FILE *st, UNIT *uptr, int32 v, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) v;
+    (void) desc;
+
     DEVICE      *dptr;
     int         chsa;
 

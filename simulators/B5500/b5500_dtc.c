@@ -224,6 +224,10 @@ DEVICE              dtc_dev = {
 /* Start off a terminal controller command */
 t_stat dtc_cmd(uint16 cmd, uint16 dev, uint8 chan, uint16 *wc)
 {
+    /* Shared device command signature.
+       This implementation does not use every parameter. */
+    (void) dev;
+
     UNIT        *uptr;
     int         ttu;
     int         buf;
@@ -761,6 +765,10 @@ dtco_srv(UNIT * uptr)
 
 t_stat
 dtc_reset(DEVICE *dptr) {
+   /* Generic device reset signature.
+      This implementation does not use every parameter. */
+   (void) dptr;
+
    if (dtc_unit[0].flags & UNIT_ATT) {
        sim_activate(&dtc_unit[1], 100); /* quick poll */
        iostatus |= DTC_FLAG;
@@ -811,6 +819,12 @@ dtc_detach(UNIT * uptr)
 
 t_stat dtc_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32 newln, i, t;
     t_stat r;
 
@@ -844,6 +858,11 @@ t_stat dtc_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat dtc_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     t_stat r;
     char gbuf[CBUFSIZE];
     int32 ln;
@@ -863,6 +882,11 @@ t_stat dtc_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat dtc_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     t_stat r;
     int32 ln;
 
@@ -878,6 +902,11 @@ t_stat dtc_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat dtc_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     int32 i;
 
     for (i = 0; i < dtc_desc.lines; i++) {
@@ -892,6 +921,12 @@ t_stat dtc_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat dtc_set_buf (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     t_stat r;
     int32 bufsiz;
 
@@ -911,15 +946,26 @@ t_stat dtc_set_buf (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat dtc_show_buf (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     fprintf (st, "bufsize=%d ", dtc_bufsize);
     return SCPE_OK;
 }
 
 /* Show summary processor */
 
-t_stat
+static t_stat
 dtc_summ(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     uint32              i, t;
 
     t = 0;
@@ -934,9 +980,14 @@ dtc_summ(FILE * st, UNIT * uptr, int32 val, const void *desc)
 
 /* SHOW CONN/STAT processor */
 
-t_stat
+static t_stat
 dtc_show(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) desc;
+
     int32               i, cc;
 
     for (cc = 0; (cc < DTC_MLINES) && dtc_ldsc[cc].conn; cc++) ;
@@ -1003,6 +1054,10 @@ return SCPE_OK;
 
 const char *dtc_description (DEVICE *dptr)
 {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "B249 Terminal Control Unit";
 }
 

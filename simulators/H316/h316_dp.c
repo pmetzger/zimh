@@ -360,6 +360,10 @@ DEVICE dp_dev = {
 
 int32 dpio (int32 inst, int32 fnc, int32 dat, int32 dev)
 {
+/* Generic I/O device handler signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 ch = dp_dib.chan - 1;                             /* DMA/DMC chan */
 int32 u;
 UNIT *uptr;
@@ -885,6 +889,10 @@ return SCPE_OK;
 
 t_stat dp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 dp_fnc = 0;
@@ -926,6 +934,11 @@ return dp_showformat (stdout, uptr, 0, NULL);
 
 t_stat dp_settype (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 int32 i;
 
 if ((val < 0) || (val >= DP_NUMTYP) || (cptr != NULL))
@@ -943,6 +956,12 @@ return SCPE_OK;
 
 t_stat dp_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (dp_ctype >= DP_NUMTYP)
     return SCPE_IERR;
 fprintf (st, "%s", dp_tab[dp_ctype].name);
@@ -973,6 +992,11 @@ return SCPE_OK;
 
 t_stat dp_setformat (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 uint32 h, c, cntr, rptr;
 int32 i, nr, nw, inp;
 uint16 tbuf[DP_TRKLEN];
@@ -1030,6 +1054,11 @@ return SCPE_OK;
 
 t_stat dp_showformat (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 uint32 c, h, rptr, rlnt, sec;
 uint32 minrec = DP_TRKLEN;
 uint32 maxrec = 0;

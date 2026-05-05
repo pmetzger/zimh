@@ -316,6 +316,10 @@ static DEBTAB scp_debug[] = {
 
 static const char *sim_scp_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "SCP Event and Internal Command Processing and Testing";
 }
 
@@ -601,6 +605,10 @@ static SCHTAB sim_staba;                                /* Memory search specifi
 
 static const char *sim_int_step_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Step/Next facility";
 }
 
@@ -615,6 +623,10 @@ DEVICE sim_step_dev = {
 
 static const char *sim_int_runlimit_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Run time limit facility";
 }
 
@@ -640,6 +652,10 @@ DEVICE sim_runlimit_dev = {
 
 static const char *sim_int_flush_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Open File Flush facility";
 }
 
@@ -2927,6 +2943,10 @@ return stat;
 
 t_stat set_prompt (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 char gbuf[CBUFSIZE], *gptr;
 
 if ((NULL == cptr) || (*cptr == '\0'))
@@ -2977,6 +2997,10 @@ return sim_oline != NULL;
 
 t_stat exit_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 t_stat r = SCPE_EXIT;
 
 if (cptr && *cptr) {
@@ -2986,7 +3010,7 @@ if (cptr && *cptr) {
 return r;
 }
 
-t_stat help_cmd_output (int32 flag, const char *help, const char *help_base)
+static t_stat help_cmd_output (int32 flag, const char *help, const char *help_base)
 {
 switch (help[0]) {
     case '*':
@@ -3160,6 +3184,10 @@ return SCPE_OK;
 
 t_stat spawn_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 t_stat status;
 
 if ((cptr == NULL) || (strlen (cptr) == 0))
@@ -3179,6 +3207,10 @@ return status;
 
 t_stat screenshot_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 if ((cptr == NULL) || (strlen (cptr) == 0))
     return sim_messagef (SCPE_ARG, "Missing screen shot filename\n");
 return vid_screenshot (cptr);
@@ -3188,6 +3220,10 @@ return vid_screenshot (cptr);
 
 t_stat echo_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 sim_printf ("%s\n", cptr);
 return SCPE_OK;
 }
@@ -3196,6 +3232,10 @@ return SCPE_OK;
 
 t_stat echof_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 char gbuf[CBUFSIZE];
 const char *tptr;
 TMLN *lp = NULL;
@@ -4008,6 +4048,10 @@ return SCPE_OK;
 
 t_stat sleep_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 char *tptr;
 double wait;
 
@@ -4055,6 +4099,10 @@ return SCPE_OK;
 
 t_stat goto_cmd (int32 flag, const char *fcptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 char cbuf[CBUFSIZE], gbuf[CBUFSIZE], gbuf1[CBUFSIZE];
 const char *cptr;
 long fpos;
@@ -4113,6 +4161,11 @@ return sim_messagef (SCPE_ARG, "goto target '%s' not found\n", gbuf1);
 
 t_stat return_cmd (int32 flag, const char *fcptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+(void) fcptr;
+
 return sim_messagef (SCPE_UNK, "Invalid Command\n"); /* only valid inside of do_cmd */
 }
 
@@ -4125,6 +4178,11 @@ return sim_messagef (SCPE_UNK, "Invalid Command\n"); /* only valid inside of do_
 
 t_stat shift_cmd (int32 flag, const char *fcptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+(void) fcptr;
+
 return SCPE_UNK;                                        /* only valid inside of do_cmd */
 }
 
@@ -4154,6 +4212,10 @@ return do_cmd_label (flag, cbuf, gbuf);
 
 t_stat on_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 char gbuf[CBUFSIZE];
 t_stat cond;
 
@@ -4187,6 +4249,10 @@ return SCPE_OK;
 
 t_stat noop_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 if (cptr && (*cptr != 0))                               /* now eol? */
     return SCPE_2MARG;
 return SCPE_OK;                                         /* we're happy doing nothing */
@@ -4268,6 +4334,10 @@ return SCPE_OK;
 
 t_stat sim_set_asynch (int32 flag, const char *cptr)
 {
+/* Shared command signature.
+   This build variant does not use every parameter. */
+(void) flag;
+
 if (cptr && (*cptr != 0))                               /* now eol? */
     return SCPE_2MARG;
 #ifdef SIM_ASYNCH_IO
@@ -4319,6 +4389,12 @@ return SCPE_NOFNC;
 
 t_stat sim_show_asynch (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
 #ifdef SIM_ASYNCH_IO
@@ -4339,6 +4415,10 @@ return SCPE_OK;
 
 t_stat set_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 uint32 lvl = 0;
 t_stat r;
 char gbuf[CBUFSIZE], *cvptr;
@@ -4495,6 +4575,10 @@ return NULL;
 
 t_stat set_dev_radix (DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if (cptr)
     return SCPE_ARG;
 dptr->dradix = flag & 037;
@@ -4505,6 +4589,10 @@ return SCPE_OK;
 
 t_stat set_dev_enbdis (DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 UNIT *up;
 uint32 i;
 
@@ -4546,6 +4634,10 @@ else return SCPE_OK;
 
 t_stat set_unit_enbdis (DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (cptr)
     return SCPE_ARG;
 if (!(uptr->flags & UNIT_DISABLE))                      /* allowed? */
@@ -4616,6 +4708,12 @@ return r;
 
 t_stat set_unit_append (DEVICE *dptr, UNIT *uptr, int32 flags, const char *cptr)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) flags;
+(void) cptr;
+
 if (!(uptr->flags & UNIT_SEQ))
     return sim_messagef (SCPE_NOFNC, "%s is not a sequential device.\n", sim_uname (uptr));
 if (uptr->flags & UNIT_BUF)
@@ -4776,7 +4874,7 @@ return NULL;
 static size_t dev_name_len;
 static size_t unit_name_len;
 
-const char *_sim_name_prefix (const char *name, const char *prefix, size_t max_name_len)
+static const char *_sim_name_prefix (const char *name, const char *prefix, size_t max_name_len)
 {
 static char nambuf[CBUFSIZE];
 size_t prefix_len = prefix ? strlen (prefix) : 0;
@@ -4790,32 +4888,32 @@ snprintf (nambuf, sizeof (nambuf), "%s%*s", prefix ? prefix : "",
 return nambuf;
 }
 
-const char *_sim_dname_prefix (DEVICE *dptr, const char *prefix)
+static const char *_sim_dname_prefix (DEVICE *dptr, const char *prefix)
 {
 return _sim_name_prefix (sim_dname (dptr), prefix, dev_name_len);
 }
 
-const char *_sim_uname_prefix (UNIT *uptr, const char *prefix)
+static const char *_sim_uname_prefix (UNIT *uptr, const char *prefix)
 {
 return _sim_name_prefix (sim_uname (uptr), prefix, unit_name_len);
 }
 
-const char *_sim_dname (DEVICE *dptr)
+static const char *_sim_dname (DEVICE *dptr)
 {
 return _sim_dname_prefix (dptr, "");
 }
 
-const char *_sim_uname (UNIT *uptr)
+static const char *_sim_uname (UNIT *uptr)
 {
 return _sim_uname_prefix (uptr, "");
 }
 
-const char *_sim_dname_space (void)
+static const char *_sim_dname_space (void)
 {
 return _sim_dname_prefix (NULL, "");
 }
 
-void _set_dname_len (DEVICE *dptr)
+static void _set_dname_len (DEVICE *dptr)
 {
 uint32 i;
 
@@ -5086,6 +5184,11 @@ void sim_fprint_regex_support (FILE *st)
 
 t_stat show_version (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+
 const char *build = "";
 const char *arch = "";
 
@@ -5313,6 +5416,11 @@ return SCPE_OK;
 
 t_stat show_config (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) dnotused;
+(void) unotused;
+
 size_t i;
 DEVICE *dptr;
 t_bool only_enabled = (sim_switches & SWMASK ('E'));
@@ -5341,6 +5449,12 @@ return SCPE_OK;
 
 t_stat show_log_names (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) dnotused;
+(void) unotused;
+(void) flag;
+
 int32 i;
 DEVICE *dptr;
 
@@ -5353,6 +5467,11 @@ return SCPE_OK;
 
 t_stat show_dev_logicals (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+
 if (dptr->lname)
     fprintf (st, "%s -> %s\n", dptr->lname, dptr->name);
 else if (!flag)
@@ -5434,6 +5553,12 @@ return SCPE_OK;
 
 t_stat show_time (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+
 if (cptr && (*cptr != 0))
     return SCPE_2MARG;
 fprintf (st, "Time:\t%.0f\n", sim_gtime());
@@ -5442,6 +5567,12 @@ return SCPE_OK;
 
 t_stat show_break (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+
 t_stat r;
 
 if (cptr && (*cptr != 0))
@@ -5453,12 +5584,22 @@ return r;
 
 t_stat show_dev_radix (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Radix=%d\n", dptr->dradix);
 return SCPE_OK;
 }
 
 t_stat show_dev_debug (FILE *st, DEVICE *dptr, UNIT *uptr, int32 uflag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+
 DEBTAB *dep;
 uint32 unit;
 int32 any = 0;
@@ -5520,6 +5661,11 @@ else return SCPE_NOFNC;
 
 t_stat show_on (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+
 int32 lvl, i;
 
 if (cptr && (*cptr != 0)) return SCPE_2MARG;            /* now eol? */
@@ -5559,6 +5705,10 @@ return SCPE_OK;
 
 t_stat show_do (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 int32 lvl;
 
 if (cptr && (*cptr != 0)) return SCPE_2MARG;            /* now eol? */
@@ -5598,6 +5748,11 @@ return SCPE_OK;
 
 t_stat show_mod_names (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) dnotused;
+(void) unotused;
+
 int32 i;
 DEVICE *dptr;
 
@@ -5612,6 +5767,12 @@ return SCPE_OK;
 
 t_stat show_dev_modifiers (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprint_set_help (st, dptr);
 return SCPE_OK;
 }
@@ -5658,6 +5819,11 @@ return r;
 
 t_stat show_show_commands (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) dnotused;
+(void) unotused;
+
 int32 i;
 DEVICE *dptr;
 
@@ -5672,6 +5838,12 @@ return SCPE_OK;
 
 t_stat show_dev_show_commands (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprint_show_help (st, dptr);
 return SCPE_OK;
 }
@@ -5680,6 +5852,13 @@ return SCPE_OK;
 
 t_stat show_default (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 char buffer[PATH_MAX];
 char *wd = sim_getcwd(buffer, PATH_MAX);
 
@@ -5689,6 +5868,10 @@ return SCPE_OK;
 
 t_stat set_default_cmd (int32 flg, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flg;
+
 char gbuf[4*CBUFSIZE];
 
 if (sim_is_running)
@@ -5706,6 +5889,11 @@ return SCPE_OK;
 
 t_stat pwd_cmd (int32 flg, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flg;
+(void) cptr;
+
 return show_cmd (0, "DEFAULT");
 }
 
@@ -5777,6 +5965,10 @@ sim_printf (" %s\n", filename);
 
 t_stat dir_cmd (int32 flg, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flg;
+
 DIR_CTX dir_state;
 t_stat r;
 char *WildName;
@@ -5826,6 +6018,12 @@ static void sim_type_entry (const char *directory,
                             const struct stat *filestat,
                             void *context)
 {
+/* Generic directory scan callback signature.
+   This implementation does not use every parameter. */
+(void) FileSize;
+(void) filestat;
+(void) context;
+
 char FullPath[PATH_MAX + 1];
 FILE *file;
 long lines = 0;
@@ -5849,6 +6047,10 @@ fclose (file);
 
 t_stat type_cmd (int32 flg, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flg;
+
 FILE *file;
 long lines = 0;
 char lbuf[4*CBUFSIZE];
@@ -5914,6 +6116,11 @@ static void sim_delete_entry (const char *directory,
                               const struct stat *filestat,
                               void *context)
 {
+/* Generic directory scan callback signature.
+   This implementation does not use every parameter. */
+(void) FileSize;
+(void) filestat;
+
 DEL_CTX *ctx = (DEL_CTX *)context;
 char FullPath[PATH_MAX + 1];
 
@@ -5926,6 +6133,10 @@ ctx->stat = sim_messagef (SCPE_ARG, "%s\n", strerror (errno));
 
 t_stat delete_cmd (int32 flg, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flg;
+
 DEL_CTX del_state;
 t_stat stat;
 
@@ -5951,6 +6162,11 @@ static void sim_copy_entry (const char *directory,
                             const struct stat *filestat,
                             void *context)
 {
+/* Generic directory scan callback signature.
+   This implementation does not use every parameter. */
+(void) FileSize;
+(void) filestat;
+
 COPY_CTX *ctx = (COPY_CTX *)context;
 struct stat deststat;
 char FullPath[PATH_MAX + 1];
@@ -5978,6 +6194,10 @@ else
 
 t_stat copy_cmd (int32 flg, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flg;
+
 char sname[CBUFSIZE];
 COPY_CTX copy_state;
 t_stat stat;
@@ -5998,6 +6218,10 @@ return copy_state.stat;
 
 t_stat rename_cmd (int32 flg, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flg;
+
 char sname[CBUFSIZE], dname[CBUFSIZE];
 
 if ((!cptr) || (*cptr == 0))
@@ -6014,6 +6238,10 @@ return sim_messagef (SCPE_ARG, "Can't rename '%s' to '%s': %s\n\n", sname, dname
 
 t_stat mkdir_cmd (int32 flg, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flg;
+
 char path[CBUFSIZE];
 char *c;
 struct stat filestat;
@@ -6053,6 +6281,10 @@ return SCPE_OK;
 
 t_stat rmdir_cmd (int32 flg, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flg;
+
 GET_SWITCHES (cptr);                                    /* get switches */
 if ((!cptr) || (*cptr == '\0'))
     return sim_messagef (SCPE_2FARG, "Must specify a directory\n");
@@ -6190,6 +6422,10 @@ static t_bool run_cmd_did_reset = FALSE;
 
 t_stat reset_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 char gbuf[CBUFSIZE];
 DEVICE *dptr;
 
@@ -6291,6 +6527,13 @@ return runlimit_cmd (flag, cptr);
 
 t_stat show_runlimit (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic show command signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 if (sim_runlimit_enabled) {
     if (sim_runlimit_switches & SWMASK ('T')) {
         if (sim_runlimit_d_initial != sim_runlimit_d) {
@@ -6433,6 +6676,11 @@ return r;
 
 t_stat set_writelock (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (((uptr->flags & UNIT_WPRT) != 0) == val)        /* Already set as desired? */
     return SCPE_OK;                                 /* Do nothing */
 if (val) {                                          /* Lock? */
@@ -6453,6 +6701,11 @@ return SCPE_OK;
 
 t_stat show_writelock (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 fprintf (st, "write %s", (uptr->flags & UNIT_WPRT) ? "locked" : "enabled");
 return SCPE_OK;
 }
@@ -6532,6 +6785,10 @@ return reason;
 
 t_stat attach_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 char gbuf[4*CBUFSIZE];
 DEVICE *dptr;
 UNIT *uptr;
@@ -6586,6 +6843,10 @@ return attach_unit (uptr, (const char *)cptr);          /* no, std routine */
 
 t_stat detach_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 char gbuf[CBUFSIZE];
 DEVICE *dptr;
 UNIT *uptr;
@@ -6663,6 +6924,10 @@ return detach_unit (uptr);                              /* no, standard */
 
 t_stat assign_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 char gbuf[CBUFSIZE];
 DEVICE *dptr;
 
@@ -6701,6 +6966,10 @@ return SCPE_OK;
 
 t_stat deassign_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 char gbuf[CBUFSIZE];
 DEVICE *dptr;
 
@@ -6730,6 +6999,10 @@ return SCPE_OK;
 
 t_stat save_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 FILE *sfile;
 t_stat r;
 char gbuf[4*CBUFSIZE];
@@ -6893,6 +7166,10 @@ return (ferror (sfile))? SCPE_IOERR: SCPE_OK;           /* error during save? */
 
 t_stat restore_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 FILE *rfile;
 t_stat r;
 char gbuf[4*CBUFSIZE];
@@ -7674,6 +7951,10 @@ fprint_stopped_gen (st, v, sim_PC, sim_dflt_dev);
 
 t_stat step_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 return SCPE_STEP;
 }
 
@@ -7682,6 +7963,10 @@ return SCPE_STEP;
 
 t_stat runlimit_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 return SCPE_RUNTIME;
 }
 
@@ -8384,6 +8669,10 @@ return reason;
 
 t_stat eval_cmd (int32 flg, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flg;
+
 DEVICE *dptr = sim_dflt_dev;
 int32 i, rdx, a, lim;
 t_stat r;
@@ -11043,11 +11332,19 @@ else
 
 t_stat tar_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 return _process_cmd ("tar", cptr);
 }
 
 t_stat curl_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 return _process_cmd ("curl", cptr);
 }
 
@@ -11124,7 +11421,7 @@ MOpen (void)
 return (MFILE *)calloc (1, sizeof (MFILE));
 }
 
-void
+static void
 MFlush (MFILE *f)
 {
 f->pos = 0;
@@ -11589,6 +11886,10 @@ return SCPE_OK;
 
 t_stat test_lib_cmd (int32 flag, const char *cptr)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) flag;
+
 int i;
 DEVICE *dptr;
 int32 saved_switches = sim_switches & ~SWMASK ('T');

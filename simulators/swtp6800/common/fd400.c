@@ -234,6 +234,10 @@ DEVICE fd400_dsk_dev = {
 
 t_stat fd400_dsk_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
 
     for (i=0; i<NUM_DISK; i++) {
@@ -320,6 +324,11 @@ int32 fd400_fdcstatus(int32 io, int32 data)
 
 int32 fd400_cstatus(int32 io, int32 data)
 {
+    /* Memory-mapped I/O callback signature.
+       This implementation does not use every parameter. */
+    (void) io;
+    (void) data;
+
     // controller allways ready, byte read from sector allways ready
     // writing to is set the sync byte. This is not implemented
     return 128+1;
@@ -489,6 +498,10 @@ int32 fd400_cursect(int32 io, int32 data)
 
 int32 fd400_startrw(int32 io, int32 data)
 {
+    /* Memory-mapped I/O callback signature.
+       This implementation does not use every parameter. */
+    (void) data;
+
     UNIT * uptr;
 
     uptr = &fd400_dsk_unit[fd400.cur_dsk];

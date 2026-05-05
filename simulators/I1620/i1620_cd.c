@@ -280,6 +280,11 @@ const int8 alp_to_cdp[256] = {
 
 t_stat cdr (uint32 op, uint32 pa, uint32 f0, uint32 f1)
 {
+/* Shared I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) f0;
+(void) f1;
+
 int32 i;
 int8 cdc;
 t_stat r, sta;
@@ -391,6 +396,10 @@ return attach_unit (uptr, cptr);
 
 t_stat cdr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ind[IN_LAST] = 0;                                       /* clear last card */
 return SCPE_OK;
 }
@@ -401,6 +410,11 @@ return SCPE_OK;
 
 t_stat cdr_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic bootstrap signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 t_stat r;
 uint32 old_io_stop;
 extern uint32 saved_PC;
@@ -424,6 +438,11 @@ return SCPE_OK;
 
 t_stat cdp (uint32 op, uint32 pa, uint32 f0, uint32 f1)
 {
+/* Shared I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) f0;
+(void) f1;
+
 int32 i;
 int8 cdc;
 uint8 z, d;
@@ -543,5 +562,9 @@ return SCPE_OK;
 
 t_stat cdp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return SCPE_OK;
 }

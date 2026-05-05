@@ -114,6 +114,10 @@ DEVICE pt_dev = {
 
 uint32 pt (uint32 dev, uint32 op, uint32 dat)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 uint32 t, old_rd, old_run;
 
 switch (op) {                                           /* case IO op */
@@ -239,6 +243,10 @@ return SCPE_OK;
 
 t_stat pt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_cancel (&pt_unit[PTR]);                             /* deactivate units */
 sim_cancel (&pt_unit[PTP]);
 pt_rd = 1;                                              /* read */
@@ -284,6 +292,11 @@ static uint8 boot3_rom[] = {
 
 t_stat pt_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 if (decrom[0xD5] & dec_flgs)                            /* AL defined? */
     IOWriteBlk (BOOT3_START, BOOT3_LEN, boot3_rom);     /* no, 50 seq */
 else IOWriteBlk (BOOT_START, BOOT_LEN, boot_rom);       /* copy AL boot */
@@ -340,6 +353,10 @@ static uint8 load_rom[] = {
 
 t_stat pt_dump (FILE *of, const char *cptr, const char *fnam)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void) fnam;
+
 uint32 i, lo, hi, cs;
 const char *tptr;
 extern DEVICE cpu_dev;

@@ -126,6 +126,10 @@ DEVICE tto_dev = {
 
 int32 tti (int32 pulse, int32 code, int32 AC)
 {
+/* Device IOT signature.
+   This implementation does not use every parameter. */
+(void) AC;
+
 int32 iodata;
 
 iodata = (code == ioDIA)? tti_unit.buf & 0377: 0;
@@ -151,6 +155,10 @@ return iodata;
 
 t_stat tti_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 temp;
 
 sim_activate (&tti_unit, tti_unit.wait);                /* continue poll */
@@ -193,6 +201,10 @@ void translate_in(void)
 
 t_stat tti_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmxr_set_console_units (&tti_unit, &tto_unit);
 tti_unit.buf = 0;
 dev_busy = dev_busy & ~INT_TTI;                         /* clear busy */
@@ -231,6 +243,10 @@ return 0;
 
 t_stat tto_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 c, temp;
 
 dev_busy = dev_busy & ~INT_TTO;                         /* clear busy */
@@ -414,6 +430,10 @@ int32 putseq(char *seq)
 
 t_stat tto_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tto_unit.buf = 0;
 dev_busy = dev_busy & ~INT_TTO;                         /* clear busy */
 dev_done = dev_done & ~INT_TTO;                         /* clear done, int */
@@ -424,6 +444,12 @@ return SCPE_OK;
 
 t_stat ttx_setmod (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 tti_unit.flags = (tti_unit.flags & ~UNIT_DASHER) | value;
 tto_unit.flags = (tto_unit.flags & ~UNIT_DASHER) | value;
 return SCPE_OK;

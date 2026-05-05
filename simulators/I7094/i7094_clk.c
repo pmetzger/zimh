@@ -126,6 +126,10 @@ return d1;
 
 t_stat clk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_register_clock_unit (&clk_unit);                    /* declare clock unit */
 chtr_clk = 0;
 if (clk_dev.flags & DEV_DIS)

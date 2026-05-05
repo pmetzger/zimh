@@ -109,6 +109,10 @@ DEVICE mb_dev = {
 t_stat
 mb_rd(int32 *data, int32 PA, int32 access)
 {
+  /* Device I/O dispatch signature.
+     This implementation does not use every parameter. */
+  (void) access;
+
   t_stat stat = SCPE_OK;
   switch (PA & 017) {
   case 000:
@@ -143,6 +147,10 @@ mb_rd(int32 *data, int32 PA, int32 access)
 t_stat
 mb_wr(int32 data, int32 PA, int32 access)
 {
+  /* Device I/O dispatch signature.
+     This implementation does not use every parameter. */
+  (void) access;
+
   switch (PA & 017) {
   case 000:
     sim_debug (DBG_IO, &mb_dev, "WRITE MBCSR %06o\n", data);
@@ -174,6 +182,10 @@ mb_wr(int32 data, int32 PA, int32 access)
 
 t_stat mb_reset(DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   if (MBCSR & MBNOIN)
     return SCPE_OK;
 
@@ -183,5 +195,9 @@ t_stat mb_reset(DEVICE *dptr)
 
 const char *mb_description (DEVICE *dptr)
 {
+  /* Generic device description signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   return "MB11 MAR and history";
 }

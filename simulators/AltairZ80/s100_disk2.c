@@ -164,6 +164,10 @@ static REG disk2_reg[] = {
 #define DISK2_NAME  "Compupro Hard Disk Controller"
 
 static const char* disk2_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return DISK2_NAME;
 }
 

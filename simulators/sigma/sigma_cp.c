@@ -133,6 +133,9 @@ DEVICE cp_dev = {
 /* Card Punch : IO Dispatch rotine*/
 
 uint32 cp_disp (uint32 op, uint32 dva, uint32 *dvst) {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) dva;
 
     switch (op) {
 
@@ -302,6 +305,9 @@ t_stat cp_chan_err (uint32 st)
 
 t_stat cp_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
 
     sim_cancel (&cp_unit);                          /* stop dev thread */
     cp_bptr = 0;
@@ -324,6 +330,12 @@ t_stat cp_detach(UNIT * uptr) {
 
 
 t_stat cp_show_cap (FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int n;
 
     if ((n = cp_stacker1) == 0)

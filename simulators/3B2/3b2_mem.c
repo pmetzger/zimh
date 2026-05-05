@@ -49,7 +49,14 @@ static t_bool ecc_err;   /* ECC multi-bit error */
  */
 static inline void check_ecc(uint32 pa, t_bool write, uint8 src)
 {
-#if defined(REV3)
+#if !defined(REV3)
+    /* Shared helper signature.
+       This build variant does not use every parameter. */
+    (void) pa;
+    (void) write;
+    (void) src;
+
+#else
     /* Force ECC Syndrome mode enables a diagnostic mode on the AM2960
        data correction ICs */
     if (write && !CSR(CSRFECC)) {

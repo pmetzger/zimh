@@ -38,7 +38,7 @@ extern UNIT cpu_unit;
 
 /* Local quadword physical read - <no> exceptions or IO space lookups */
 
-t_stat l_ReadPQ (t_uint64 pa, t_uint64 *dat)
+static t_stat l_ReadPQ (t_uint64 pa, t_uint64 *dat)
 {
 if (ADDR_IS_MEM (pa)) {
     *dat = M[pa >> 3];
@@ -58,7 +58,7 @@ return FALSE;
                         EXC_TNV for TNV on intermediate level
 */
 
-uint32 cons_find_pte_srm (t_uint64 va, t_uint64 *l3pte)
+static uint32 cons_find_pte_srm (t_uint64 va, t_uint64 *l3pte)
 {
 t_uint64 vptea, l1ptea, l2ptea, l3ptea, l1pte, l2pte;
 uint32 vpte_vpn;
@@ -99,7 +99,7 @@ return 0;
                         EXC_TNV for TNV on intermediate level
 */
 
-uint32 cons_find_pte_nt (t_uint64 va, t_uint64 *l3pte)
+static uint32 cons_find_pte_nt (t_uint64 va, t_uint64 *l3pte)
 {
 t_uint64 vptea, l3ptea;
 uint32 vpte_vpn;

@@ -122,7 +122,6 @@ LOCAL  t_stat Mem_write(uint32 addr, uint32 *data);
 
 /* external definitions */
 extern uint16 loading;                                  /* set when doing IPL */
-extern int fprint_inst(FILE *of, uint32 val, int32 sw); /* instruction print function */
 
 /* floating point subroutines definitions */
 extern uint32   s_fixw(uint32 val, uint32 *cc);
@@ -1797,6 +1796,10 @@ LOCAL uint32  TPSD[2];                              /* Temp PSD */
 /* Opcode definitions */
 /* called from IPU thread */
 void *ipu_sim_instr(void *value) {
+    /* Generic thread entry signature.
+       This implementation does not use every parameter. */
+    (void)value;
+
     t_stat              reason = 0;                 /* reason for stopping */
     t_uint64            dest = 0;                   /* Holds destination/source register */
     t_uint64            source = 0;                 /* Holds source or memory data */
@@ -6893,6 +6896,10 @@ LOCAL uint32 def_tape = 0x1000;                     /* tape device 10, device 0 
 /* do any one time initialization here for ipu */
 t_stat ipu_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     int     i;
     t_stat  devs = SCPE_OK;
 
@@ -6986,6 +6993,10 @@ t_stat ipu_reset(DEVICE *dptr)
 /* examine a 32bit memory location and return a byte */
 t_stat ipu_ex(t_value *vptr, t_addr baddr, UNIT *uptr, int32 sw)
 {
+    /* Generic examine signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+
     uint32 status, realaddr, prot;
     uint32 addr = (baddr & 0xfffffc) >> 2;          /* make 24 bit byte address into word address */
 
@@ -7013,6 +7024,11 @@ t_stat ipu_ex(t_value *vptr, t_addr baddr, UNIT *uptr, int32 sw)
 /* address is byte address with bits 30,31 = 0 */
 t_stat ipu_dep(t_value val, t_addr baddr, UNIT *uptr, int32 sw)
 {
+    /* Generic deposit signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)sw;
+
     uint32 addr = (baddr & 0xfffffc) >> 2;          /* make 24 bit byte address into word address */
     static const uint32 bmasks[4] = {0x00FFFFFF, 0xFF00FFFF, 0xFFFF00FF, 0xFFFFFF00};
 
@@ -7026,6 +7042,10 @@ t_stat ipu_dep(t_value val, t_addr baddr, UNIT *uptr, int32 sw)
 
 t_stat ipu_set_ipu(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+
     sim_printf("ipu_set_ipu sval %x cptr %s desc %s\n", sval, cptr, (char *)desc);
     if ((CPU_MODEL == MODEL_55) || (CPU_MODEL == MODEL_27))
        sim_printf("IPU not available for model 32/55 or 32/27\n");
@@ -7038,6 +7058,13 @@ t_stat ipu_set_ipu(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 
 t_stat ipu_clr_ipu(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)sval;
+    (void)cptr;
+    (void)desc;
+
 //  sim_printf("ipu_clr_ipu sval %x cptr %s desc %s\n", sval, cptr, (char *)desc);
     ipu_unit.flags &= ~UNIT_IPU;                    /* disable IPU for this MODEL */
     sim_printf("IPU disabled\n");
@@ -7046,6 +7073,13 @@ t_stat ipu_clr_ipu(UNIT *uptr, int32 sval, const char *cptr, void *desc)
 
 t_stat ipu_show_ipu(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show command signature.
+       This implementation does not use every parameter. */
+    (void)st;
+    (void)uptr;
+    (void)val;
+    (void)desc;
+
     if (IPU_MODEL)
         sim_printf("IPU enabled\n");
     else
@@ -7059,6 +7093,12 @@ t_stat ipu_show_ipu(FILE *st, UNIT *uptr, int32 val, const void *desc)
 t_stat
 ipu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+    (void)desc;
+
     int32               i, lnt;
     t_stat              r;
 
@@ -7090,6 +7130,11 @@ ipu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
 /* Show history */
 t_stat ipu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+
     int32               k, di, lnt;
     char               *cptr = (char *) desc;
     t_stat              r;
@@ -7147,11 +7192,22 @@ t_stat ipu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 /* return description for the specified device */
 const char *ipu_description (DEVICE *dptr)
 {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "SEL 32 IPU";                            /* return description */
 }
 
 t_stat ipu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+    (void)uptr;
+    (void)flag;
+    (void)cptr;
+
     fprintf(st, "The IPU can maintain a history of the most recently executed instructions.\n");
     fprintf(st, "This is controlled by the SET IPU HISTORY and SHOW IPU HISTORY commands:\n\n");
     fprintf(st, "   sim> SET IPU HISTORY            clear history buffer\n");

@@ -2902,6 +2902,10 @@ DEVICE mmdm_dev = {
 
 
 static const char* mmd_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return MMD_NAME;
 }
 
@@ -3314,6 +3318,10 @@ static t_stat mmd_config_line(DEVICE *dev, TMLN *tmln, int baud)
 
 static t_stat mmd_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+
     sim_debug(VERBOSE_MSG, dptr, "Booting using ROM at 0x%04x\n", mmd_ctx->rom_base);
 
     /* Enable ROM */
@@ -3326,6 +3334,12 @@ static t_stat mmd_boot(int32 unitno, DEVICE *dptr)
 
 static t_stat mmd_set_diag(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int i;
 
     if (!cptr) return SCPE_IERR;
@@ -3352,6 +3366,12 @@ static t_stat mmd_set_diag(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 static t_stat mmd_show_diag(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (mmd_ctx->diagEnabled) {
         fprintf(st, "DIAG");
     } else {
@@ -3363,6 +3383,12 @@ static t_stat mmd_show_diag(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 static t_stat mmd_set_rom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
 
@@ -3386,6 +3412,12 @@ static t_stat mmd_set_rom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 static t_stat mmd_show_rom(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (mmd_rom == mmd_rom_13) {
         fprintf(st, "ROM=v1.3");
     } else if (mmd_rom == mmd_rom_23) {

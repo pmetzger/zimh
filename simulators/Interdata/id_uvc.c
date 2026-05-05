@@ -176,6 +176,10 @@ DEVICE lfc_dev = {
 
 uint32 pic (uint32 dev, uint32 op, uint32 dat)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 t;
 
 switch (op) {                                           /* case IO op */
@@ -236,6 +240,10 @@ return 0;
 
 t_stat pic_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 t_bool rate_chg = FALSE;
 
 if (pic_cnti)                                           /* one shot? */
@@ -309,6 +317,10 @@ return pic_cic;
 
 t_stat pic_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_cancel (&pic_unit);                                 /* cancel unit */
 pic_ric = pic_cic = 0;
 pic_db = 0;
@@ -326,6 +338,10 @@ return SCPE_OK;
 
 uint32 lfc (uint32 dev, uint32 op, uint32 dat)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 switch (op) {                                           /* case IO op */
 
     case IO_ADR:                                        /* select */
@@ -364,6 +380,10 @@ return (t? t - 1: wait);
 
 t_stat lfc_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 lfc_poll = sim_rtcn_init (lfc_unit.wait, TMR_LFC);
 sim_activate (&lfc_unit, lfc_poll);                     /* init clock */
 CLR_INT (v_LFC);                                        /* clear int */
@@ -376,6 +396,11 @@ return SCPE_OK;
 
 t_stat lfc_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if (cptr)
     return SCPE_ARG;
 if ((val != 100) && (val != 120))
@@ -388,6 +413,12 @@ return SCPE_OK;
 
 t_stat lfc_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, (lfc_tps == 100)? "50Hz": "60Hz");
 return SCPE_OK;
 }

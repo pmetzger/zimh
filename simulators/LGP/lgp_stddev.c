@@ -301,7 +301,7 @@ DEVICE ptp_dev = {
 
 /* Input instruction */
 
-void op_i_strt (uint32 dev)
+static void op_i_strt (uint32 dev)
 {
 switch (dev) {                                          /* case on device */
 
@@ -582,6 +582,10 @@ return SCPE_OK;
 
 t_stat tti_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_activate (&tti_unit[0], tt_wait);
 sim_cancel (&tti_unit[1]);
 tti_buf = 0;
@@ -591,6 +595,10 @@ return SCPE_OK;
 
 t_stat tto_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_cancel (&tto_unit[0]);
 tto_buf = 0;
 tto_uc = 0;
@@ -599,6 +607,10 @@ return SCPE_OK;
 
 t_stat ptr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_cancel (&ptr_unit);
 ptr_unit.buf = 0;
 ptr_rdy = 0;
@@ -607,6 +619,10 @@ return SCPE_OK;
 
 t_stat ptp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_cancel (&ptp_unit);
 ptp_unit.buf = 0;
 return SCPE_OK;
@@ -633,6 +649,12 @@ return SCPE_OK;
 
 t_stat tap_attable (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) cptr;
+(void) desc;
+
 if (uptr->flags & UNIT_ATTABLE)
     return SCPE_OK;
 return SCPE_NOFNC;
@@ -642,6 +664,12 @@ return SCPE_NOFNC;
 
 t_stat tti_rdrss (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (val) {
     if ((tti_unit[1].flags & UNIT_ATT) == 0)
         return SCPE_UNATT;
@@ -655,6 +683,11 @@ return SCPE_OK;
 
 t_stat punch_feed (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 int32 cnt;
 t_stat r;
 
@@ -678,6 +711,13 @@ return SCPE_OK;
 
 t_stat send_start (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) cptr;
+(void) desc;
+
 if (inp_strt)
     inp_done = 1;
 else if (out_strt)

@@ -1202,6 +1202,13 @@ static CTAB aux_cmds [] = {
 
 t_stat sim_load (FILE *fptr, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void)fnam;
+(void)cptr;
+(void)flag;
+(void)fptr;
+
 return SCPE_ARG;                                        /* return an error if called inadvertently */
 }
 
@@ -1330,6 +1337,10 @@ return SCPE_ARG;                                        /* return an error if ca
 
 t_stat fprint_sym (FILE *ofile, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 {
+/* Generic symbolic output signature.
+   This implementation does not use every parameter. */
+(void)uptr;
+
 int32  formats, modes;
 uint32 radix;
 
@@ -1541,6 +1552,10 @@ else                                                    /* otherwise */
 
 t_stat hp_set_dib (UNIT *uptr, int32 code, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 DIB *const dibptr = (DIB *) desc;                       /* a pointer to the associated DIB */
 t_stat     status = SCPE_OK;
 t_value    value;
@@ -1632,6 +1647,10 @@ return status;                                          /* return the validation
 
 t_stat hp_show_dib (FILE *st, UNIT *uptr, int32 code, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 const DIB *const dibptr = (const DIB *) desc;           /* a pointer to the associated DIB */
 uint32           mask, value;
 
@@ -2957,6 +2976,10 @@ return exdep_cmd (arg, buf);                            /* return the result of 
 
 static t_stat hp_run_cmd (int32 arg, const char *buf)
 {
+/* Generic command signature.
+   This implementation does not use every parameter. */
+(void) arg;
+
 parse_config = apcDefault_PBANK;                        /* set the default bank register to PBANK */
 
 cpu_front_panel (SWCH, Run);                            /* set up run request */
@@ -3752,5 +3775,13 @@ return status;                                          /* return the applicable
 
 static t_stat parse_cpu (const char *cptr, t_addr address, UNIT *uptr, t_value *value, int32 switches)
 {
+/* Generic symbolic parser signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) address;
+(void) uptr;
+(void) value;
+(void) switches;
+
 return SCPE_ARG;                                        /* mnemonic support is not present in this release */
 }

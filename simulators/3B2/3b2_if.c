@@ -104,6 +104,10 @@ static inline void if_activate(uint32 delay_us)
 
 t_stat if_svc(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     uint32 lba; /* Logical block address for write */
     t_seccnt sectswritten;
 
@@ -149,6 +153,10 @@ t_stat if_svc(UNIT *uptr)
 
 t_stat if_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     if_state.status = IF_TK_0;
     if_state.track = 0;
     if_state.sector = 1;
@@ -168,6 +176,10 @@ t_stat if_detach(UNIT *uptr)
 }
 
 uint32 if_read(uint32 pa, size_t size) {
+    /* Bus read callback signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint8 reg, data;
     UNIT *uptr;
 
@@ -509,6 +521,10 @@ void if_handle_command(void)
 
 void if_write(uint32 pa, uint32 val, size_t size)
 {
+    /* Bus write callback signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     UNIT *uptr;
     uint8 reg;
 
@@ -594,22 +610,42 @@ void if_write(uint32 pa, uint32 val, size_t size)
 #if defined(REV3)
 uint32 if_csr_read(uint32 pa, size_t size)
 {
+    /* Bus read callback signature.
+       This implementation does not use every parameter. */
+    (void) pa;
+    (void) size;
+
     return (uint32)(if_state.csr);
 }
 
 void if_csr_write(uint32 pa, uint32 val, size_t size)
 {
+    /* Bus write callback signature.
+       This implementation does not use every parameter. */
+    (void) pa;
+    (void) size;
+
     if_state.csr = val & 0xff;
 }
 #endif
 
 const char *if_description(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Integrated Floppy Disk";
 }
 
 t_stat if_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     fprintf(st, "Integrated Floppy Disk (IFLOPPY)\n\n");
     fprintf(st, "The IFLOPPY device implements the integrated 720 KB floppy disk\n");
     fprintf(st, "of the 3B2/400. A single floppy disk is supported on the controller.\n\n");

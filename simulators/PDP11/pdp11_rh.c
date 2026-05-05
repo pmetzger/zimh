@@ -333,6 +333,10 @@ DEVICE mba_dev[] = {
 
 t_stat mba_rd (int32 *val, int32 pa, int32 mode)
 {
+/* I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) mode;
+
 int32 ofs, dat, mb, drv;
 t_stat r;
 
@@ -859,6 +863,11 @@ if (!(dptr->flags & DEV_DIS))       /* Enabling? */
 
 t_stat mba_show_num (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = find_dev_from_unit (uptr);
 DIB *dibp;
 
@@ -929,6 +938,12 @@ return build_ubus_tab (&mba_dev[idx], (DIB *)mba_dev[idx].ctxt);
 
 t_stat rh_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 const char *const text =
 /*567901234567890123456789012345678901234567890123456789012345678901234567890*/
 " RH70/RH11 Massbus adapters (RHA, RHB, RHC)\n"

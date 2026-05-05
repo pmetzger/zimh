@@ -112,6 +112,10 @@ DEVICE lpt_dev = {
 
 int32 lpt (int32 inst, int32 dev, int32 dat)
 {
+/* Generic IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 i;
 
 if (lpt_dev.flags & DEV_DIS)                            /* disabled? */
@@ -207,6 +211,10 @@ return SCPE_OK;
 
 t_stat lpt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 lpt_bptr = 0;                                           /* clear buffer ptr */
@@ -236,6 +244,12 @@ return detach_unit (uptr);
 
 t_stat lpt_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Line Printer (LPT)\n\n");
 fprintf (st, "The line printer (LPT) writes data to a disk file.  The POS register specifies\n");
 fprintf (st, "the number of the next data item to be written.  Thus, by changing POS, the\n");
@@ -255,5 +269,9 @@ return SCPE_OK;
 
 const char *lpt_description (DEVICE *dptr)
 {
+/* Generic description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Type 62 Line Printer";
 }

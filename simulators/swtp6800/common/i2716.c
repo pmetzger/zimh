@@ -139,6 +139,10 @@ t_stat i2716_attach (UNIT *uptr, const char *cptr)
 
 t_stat i2716_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int32 i, base;
     UNIT *uptr;
 

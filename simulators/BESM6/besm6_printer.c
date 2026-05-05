@@ -89,6 +89,10 @@ DEVICE printer_dev = {
  */
 t_stat printer_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     memset(acpu, 0, sizeof (acpu));
     acpu[0].rampup = acpu[1].rampup = SLOW_START;
     sim_cancel (&printer_unit[0]);

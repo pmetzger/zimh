@@ -141,6 +141,10 @@ ptr_iot (uint16 insn, uint16 AC)
 static uint16
 ptp_iot (uint16 insn, uint16 AC)
 {
+  /* Generic IOT handler signature.
+     This implementation does not use every parameter. */
+  (void) AC;
+
   if ((insn & 0771) == 0271) { /* PUN */
     ;
   }
@@ -159,6 +163,11 @@ rom_ptr (void)
 static t_stat
 ptr_boot (int32 u, DEVICE *dptr)
 {
+  /* Generic boot signature.
+     This implementation does not use every parameter. */
+  (void) u;
+  (void) dptr;
+
   uint16 *PC = (uint16 *)sim_PC->loc;
   set_cmd (0, "ROM TYPE=PTR");
   *PC = 040;

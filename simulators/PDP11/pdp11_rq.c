@@ -1983,6 +1983,10 @@ return rq_putpkt (cp, pkt, TRUE);
 
 t_bool rq_abo (MSC *cp, uint16 pkt, t_bool q)
 {
+/* Shared command handler signature.
+   This implementation does not use every parameter. */
+(void) q;
+
 uint16 lu = cp->pak[pkt].d[CMD_UN];                     /* unit # */
 uint16 cmd = GETP (pkt, CMD_OPC, OPC);                  /* opcode */
 uint32 ref = GETP32 (pkt, ABO_REFL);                    /* cmd ref # */
@@ -2058,6 +2062,10 @@ return rq_putpkt (cp, pkt, TRUE);
 
 t_bool rq_gcs (MSC *cp, uint16 pkt, t_bool q)
 {
+/* Shared command handler signature.
+   This implementation does not use every parameter. */
+(void) q;
+
 uint16 lu = cp->pak[pkt].d[CMD_UN];                     /* unit # */
 uint16 cmd = GETP (pkt, CMD_OPC, OPC);                  /* opcode */
 uint32 ref = GETP32 (pkt, GCS_REFL);                    /* ref # */
@@ -2085,6 +2093,10 @@ return rq_putpkt (cp, pkt, TRUE);
 
 t_bool rq_gus (MSC *cp, uint16 pkt, t_bool q)
 {
+/* Shared command handler signature.
+   This implementation does not use every parameter. */
+(void) q;
+
 uint16 lu = cp->pak[pkt].d[CMD_UN];                     /* unit # */
 uint16 cmd = GETP (pkt, CMD_OPC, OPC);                  /* opcode */
 uint16 dtyp, sts, rbpar;
@@ -2128,6 +2140,10 @@ return rq_putpkt (cp, pkt, TRUE);
 
 t_bool rq_onl (MSC *cp, uint16 pkt, t_bool q)
 {
+/* Shared command handler signature.
+   This implementation does not use every parameter. */
+(void) q;
+
 uint16 lu = cp->pak[pkt].d[CMD_UN];                     /* unit # */
 uint16 cmd = GETP (pkt, CMD_OPC, OPC);                  /* opcode */
 uint16 sts;
@@ -2165,6 +2181,10 @@ return rq_putpkt (cp, pkt, TRUE);
 
 t_bool rq_scc (MSC *cp, uint16 pkt, t_bool q)
 {
+/* Shared command handler signature.
+   This implementation does not use every parameter. */
+(void) q;
+
 uint16 sts, cmd;
 
 sim_debug (DBG_TRC, rq_devmap[cp->cnum], "rq_scc\n");
@@ -2349,7 +2369,7 @@ return 0;                                               /* success! */
 
 /* I/O completion callback */
 
-void rq_io_complete (UNIT *uptr, t_stat status)
+static void rq_io_complete (UNIT *uptr, t_stat status)
 {
 MSC *cp = rq_ctxmap[uptr->cnum];
 
@@ -2365,6 +2385,13 @@ sim_activate_notbefore (uptr, uptr->iostarttime+rq_xtime);
 
 uint32 rq_map_ba (uint32 ba, uint32 ma)
 {
+#if !defined (VM_VAX)
+/* Shared VAX/PDP-11 buffer mapping signature.
+   This build variant does not use every parameter. */
+(void) ba;
+(void) ma;
+#endif
+
 #if defined (VM_VAX)                                    /* VAX version */
 int32 idx;
 uint32 rg;
@@ -2381,6 +2408,12 @@ return 0;
 
 int32 rq_readb (uint32 ba, int32 bc, uint32 ma, uint8 *buf)
 {
+#if !defined (VM_VAX)
+/* Shared VAX/PDP-11 buffer transfer signature.
+   This build variant does not use every parameter. */
+(void) ma;
+#endif
+
 #if defined (VM_VAX)                                    /* VAX version */
 int32 lbc, t, tbc = 0;
 uint32 pba;
@@ -2407,6 +2440,12 @@ return Map_ReadB (ba, bc, buf);                         /* unmapped xfer */
 
 int32 rq_readw (uint32 ba, int32 bc, uint32 ma, uint16 *buf)
 {
+#if !defined (VM_VAX)
+/* Shared VAX/PDP-11 buffer transfer signature.
+   This build variant does not use every parameter. */
+(void) ma;
+#endif
+
 #if defined (VM_VAX)                                    /* VAX version */
 int32 lbc, t, tbc = 0;
 uint32 pba;
@@ -2433,6 +2472,12 @@ return Map_ReadW (ba, bc, buf);                         /* unmapped xfer */
 
 int32 rq_writew (uint32 ba, int32 bc, uint32 ma, uint16 *buf)
 {
+#if !defined (VM_VAX)
+/* Shared VAX/PDP-11 buffer transfer signature.
+   This build variant does not use every parameter. */
+(void) ma;
+#endif
+
 #if defined (VM_VAX)                                    /* VAX version */
 int32 lbc, t, tbc = 0;
 uint32 pba;
@@ -3093,6 +3138,10 @@ return set_writelock (uptr, val, cptr, desc);
 
 t_stat rq_show_wlk (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 uint32 dtyp = GET_DTYPE (uptr->flags);                  /* get drive type */
 
 if (drv_tab[dtyp].flgs & RQDF_RO)
@@ -3106,6 +3155,10 @@ return SCPE_OK;
 
 t_stat rq_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 uint32 cap;
 uint32 max = sim_toffset_64? RA8U_EMAXC: RA8U_MAXC;
 t_stat r;
@@ -3131,6 +3184,11 @@ return SCPE_OK;
 
 t_stat rq_show_plug (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 fprintf (st, "UNIT=%d", uptr->unit_plug);
 return SCPE_OK;
 }
@@ -3139,6 +3197,11 @@ return SCPE_OK;
 
 t_stat rq_set_plug (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 int32 plug;
 uint32 i;
 t_stat r;
@@ -3162,6 +3225,11 @@ return SCPE_OK;
 
 t_stat rq_set_drives (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 uint32 new_drives;
 uint32 i;
 t_stat r;
@@ -3199,6 +3267,11 @@ return SCPE_OK;
 
 t_stat rq_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 fprintf (st, "%s", drv_tab[GET_DTYPE (uptr->flags)].name);
 return SCPE_OK;
 }
@@ -3207,6 +3280,11 @@ return SCPE_OK;
 
 t_stat rq_set_ctype (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 MSC *cp = rq_ctxmap[uptr->cnum];
 
 if (val < 0)
@@ -3219,6 +3297,11 @@ return SCPE_OK;
 
 t_stat rq_show_ctype (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 MSC *cp = rq_ctxmap[uptr->cnum];
 fprintf (st, "%s", ctlr_tab[cp->ctype].name);
 return SCPE_OK;
@@ -3460,13 +3543,18 @@ return SCPE_OK;
 
 t_stat rq_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 return SCPE_NOFNC;
 }
 #endif
 
 /* Special show commands */
 
-void rq_show_ring (FILE *st, struct uq_ring *rp)
+static void rq_show_ring (FILE *st, struct uq_ring *rp)
 {
 uint32 i, desc;
 uint16 d[2];
@@ -3493,7 +3581,7 @@ for (i = 0; i < (rp->lnt >> 2); i++) {
 return;
 }
 
-void rq_show_pkt (FILE *st, MSC *cp, int32 pkt)
+static void rq_show_pkt (FILE *st, MSC *cp, int32 pkt)
 {
 int32 i, j;
 uint32 cr = GETP (pkt, UQ_HCTC, CR);
@@ -3517,6 +3605,11 @@ return;
 
 t_stat rq_show_unitq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 MSC *cp = rq_ctxmap[uptr->cnum];
 DEVICE *dptr = rq_devmap[uptr->cnum];
 int32 pkt, u;

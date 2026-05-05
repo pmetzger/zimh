@@ -247,11 +247,23 @@ static t_stat set_gr(const char* cptr, uint32* sw)
 
 static t_stat set_groupa(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     return set_gr(cptr,&groupa);
 }
 
 static t_stat set_groupb(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     return set_gr(cptr,&groupb);
 }
 
@@ -266,11 +278,23 @@ static t_stat show_gr(FILE* st, const char* prefix, uint32 gr)
 
 static t_stat show_groupa(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     return show_gr(st, "GROUPA=", groupa);
 }
 
 static t_stat show_groupb(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     return show_gr(st, "GROUPB=", groupb);
 }
 
@@ -304,6 +328,10 @@ static t_stat u22_callb(I8255* chip,int rw)
 /* callback handler for FDC bits */
 static t_stat u22_callc(I8255* chip,int rw)
 {
+    /* Chip callback signature.
+       This implementation does not use every parameter. */
+    (void) rw;
+
     /* bit0: TC+ positive enforce that internal data counter of FDC is reset
      * bit1: RDY+ positive enable the FDC
      * bit2: FDIE+ positive enable FDC interrupt (handled directly by reading portc in sage_fd.c)
@@ -494,6 +522,10 @@ DEVICE sagetimer1_dev = {
 
 static t_stat timer1_svc(UNIT* uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     int32 wait;
     I8253CNTR* t1c0 = &u75.cntr[0];
     I8253CNTR* t2c0 = &u74.cntr[0];
@@ -522,12 +554,21 @@ static t_stat timer1_svc(UNIT* uptr)
 
 static t_stat u75_ckmode(I8253* chip,uint32 mode)
 {
+    /* Chip callback signature.
+       This implementation does not use every parameter. */
+    (void) chip;
+    (void) mode;
+
     /* @TODO check valid modes */
     return SCPE_OK;
 }
 
 static t_stat u75_call0(I8253* chip,int rw,uint32* value)
 {
+    /* Chip callback signature.
+       This implementation does not use every parameter. */
+    (void) value;
+
     if (rw==1) {
         I8253CNTR* cntr = &chip->cntr[0];
         if ((cntr->mode & I8253_BOTH) && (cntr->state & I8253_ST_MSBNEXT)) {
@@ -591,12 +632,21 @@ static t_stat sagetimer2_reset(DEVICE* dptr)
 
 static t_stat u74_ckmode(I8253* chip,uint32 mode)
 {
+    /* Chip callback signature.
+       This implementation does not use every parameter. */
+    (void) chip;
+    (void) mode;
+
     /* @TODO check valid modes */
     return SCPE_OK;
 }
 
 static t_stat u74_call1(I8253* chip,int rw,uint32* value)
 {
+    /* Chip callback signature.
+       This implementation does not use every parameter. */
+    (void) value;
+
     if (rw==1) {
         I8253CNTR* cntr = &chip->cntr[1];
         if ((cntr->mode & I8253_BOTH) && (cntr->state & I8253_ST_MSBNEXT)) {
@@ -612,6 +662,10 @@ static t_stat u74_call1(I8253* chip,int rw,uint32* value)
 
 static t_stat timer2_svc(UNIT* uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     int32 wait;
     I8253CNTR* t2c1 = &u74.cntr[1];
     I8253CNTR* t2c2 = &u74.cntr[2];

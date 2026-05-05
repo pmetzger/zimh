@@ -72,7 +72,7 @@ const char *sim_stop_messages[SCPE_BASE] = {
 
 /* SSEM binary dump */
 
-t_stat ssem_dump (FILE *fi)
+static t_stat ssem_dump (FILE *fi)
 {
 if (sim_fwrite(A, sizeof(int32), 1, fi) != 1 ||
     sim_fwrite(C, sizeof(uint32), 1, fi) != 1 ||
@@ -84,7 +84,7 @@ return SCPE_OK;
 
 /* SSEM binary loader */
 
-t_stat ssem_load_dmp (FILE *fi)
+static t_stat ssem_load_dmp (FILE *fi)
 {
 C[1] = 0;
 if (sim_fread(A, sizeof(int32), 1, fi) != 1 ||
@@ -108,6 +108,10 @@ return SCPE_OK;
 
 t_stat sim_load (FILE *fi, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+
 size_t len;
 
 len = strlen(fnam);
@@ -119,7 +123,7 @@ return ssem_load_dmp(fi);
 
 /* Utility routine - prints number in decimal */
 
-t_stat ssem_fprint_decimal (FILE *of, uint32 inst)
+static t_stat ssem_fprint_decimal (FILE *of, uint32 inst)
 {
 if (inst & SMASK)
     fprintf (of, "%d [%u]", inst, inst);
@@ -130,7 +134,7 @@ return SCPE_OK;
 
 /* Utility routine - prints number in backward binary */
 
-t_stat ssem_fprint_binary_number (FILE *of, uint32 inst, uint8 nbits)
+static t_stat ssem_fprint_binary_number (FILE *of, uint32 inst, uint8 nbits)
 {
 int i;
 uint32 n;
@@ -145,7 +149,7 @@ return SCPE_OK;
 
 /* Utility routine - prints instruction in backward binary */
 
-t_stat ssem_fprint_binary (FILE *of, uint32 inst, int flag)
+static t_stat ssem_fprint_binary (FILE *of, uint32 inst, int flag)
 {
 uint32 op, ea;
 
@@ -171,7 +175,7 @@ return SCPE_OK;
     http://www.computer50.org/mark1/prog98/ssemref.html
 */
 
-t_stat ssem_fprint_competition_mnemonic (FILE *of, uint32 inst)
+static t_stat ssem_fprint_competition_mnemonic (FILE *of, uint32 inst)
 {
 uint32 op, ea;
 
@@ -232,6 +236,11 @@ return SCPE_OK;
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
     UNIT *uptr, int32 sw)
 {
+/* Generic symbolic output signature.
+   This implementation does not use every parameter. */
+(void) addr;
+(void) uptr;
+
 uint32 inst;
 
 if (sw & SWMASK ('H')) return SCPE_ARG;    /* hexadecimal? */
@@ -257,7 +266,7 @@ static const char *opcode[] = {
 
 /* Utility function - parses decimal number. */
 
-t_stat parse_sym_d (const char *cptr, t_value *val)
+static t_stat parse_sym_d (const char *cptr, t_value *val)
 {
 const char *start;
 int n;
@@ -288,7 +297,7 @@ return SCPE_OK;
     http://www.computer50.org/mark1/prog98/ssemref.html
 */
 
-t_stat parse_sym_m (const char *cptr, t_value *val)
+static t_stat parse_sym_m (const char *cptr, t_value *val)
 {
 uint32 n,a;
 char gbuf[CBUFSIZE];
@@ -322,7 +331,7 @@ return SCPE_OK;
 
 /* Utility function - parses binary backward number. */
 
-t_stat parse_sym_b (const char *cptr, t_value *val)
+static t_stat parse_sym_b (const char *cptr, t_value *val)
 {
 int count;
 t_value n;
@@ -343,7 +352,7 @@ return SCPE_OK;
 
 /* Utility function - parses binary backward instruccion. */
 
-t_stat parse_sym_i (const char *cptr, t_value *val)
+static t_stat parse_sym_i (const char *cptr, t_value *val)
 {
 int count;
 t_value a,n;
@@ -396,6 +405,11 @@ return SCPE_OK;
 
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+/* Generic symbolic input signature.
+   This implementation does not use every parameter. */
+(void) addr;
+(void) uptr;
+
 
 if (sw & SWMASK ('H')) return SCPE_ARG;    /* hexadecimal? */
 

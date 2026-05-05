@@ -258,6 +258,10 @@ DEVICE rc_dev = {
 
 static t_stat rc_rd (int32 *data, int32 PA, int32 access)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) access;
+
     uint32      t;
 
     switch ((PA >> 1) & 07) {                           /* decode PA<3:1> */
@@ -554,6 +558,10 @@ static uint32 update_rccs (uint32 newcs, uint32 newer)
 
 static t_stat rc_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     rc_cs = RCCS_DONE;
     rc_la = rc_da = 0;
     rc_er = 0;
@@ -583,6 +591,11 @@ static t_stat rc_attach (UNIT *uptr, const char *cptr)
 
 static t_stat rc_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     if (val < 0)
         return (SCPE_IERR);
     if (uptr->flags & UNIT_ATT)
@@ -594,11 +607,20 @@ static t_stat rc_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 static t_stat rc_show_size (FILE *st, UNIT *uptr, int32 flag, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) flag;
+(void) desc;
+
 fprintf (st, "%dP", UNIT_GETP (uptr->flags));
 return SCPE_OK;
 }
 
 static const char *rc_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "RC11/RS64 fixed head disk controller";
 }

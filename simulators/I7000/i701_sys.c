@@ -125,6 +125,11 @@ DEBTAB              crd_debug[] = {
 t_stat
 sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
 {
+    /* Generic loader signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)flag;
+
     t_uint64            wd;
     t_uint64            mask;
     int                 addr = 0;
@@ -266,7 +271,7 @@ const char *chname[] = { "*" };
         address with sign.
 */
 
-t_addr
+static t_addr
 parse_addr(DEVICE *dptr, const char *cptr, const char **tptr) {
     t_addr      v;
     int         s = 0;
@@ -316,6 +321,11 @@ void sys_init(void) {
 t_stat
 fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
 {
+    /* Generic symbolic output signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+    (void)uptr;
+
     t_uint64            inst = *val;
 
 /* Print value in octal first */
@@ -371,7 +381,7 @@ fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
     return SCPE_OK;
 }
 
-t_opcode           *
+static t_opcode    *
 find_opcode(char *op, t_opcode * tab)
 {
     while (tab->name != NULL) {
@@ -397,6 +407,11 @@ find_opcode(char *op, t_opcode * tab)
 t_stat
 parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int32 sw)
 {
+    /* Generic symbolic input signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+    (void)uptr;
+
     int                 i;
     t_value             d;
     t_addr              tag;

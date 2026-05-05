@@ -134,6 +134,10 @@ return AC;
 
 t_stat tsc_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tsc_ir = 0;
 tsc_pc = 0;
 tsc_cdf = 0;
@@ -144,5 +148,9 @@ return SCPE_OK;
 
 const char *tsc_description (DEVICE *dptr)
 {
+/* Generic description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "TSC8-75 option board";
 }

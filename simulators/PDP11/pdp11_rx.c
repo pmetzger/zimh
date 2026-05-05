@@ -211,6 +211,10 @@ DEVICE rx_dev = {
 
 t_stat rx_rd (int32 *data, int32 PA, int32 access)
 {
+/* Memory-mapped I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 1) {                                /* decode PA<1> */
 
     case 0:                                             /* RXCS */
@@ -522,6 +526,10 @@ static const uint16 boot_rom[] = {
 
 t_stat rx_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 for (i = 0; i < BOOT_LEN; i++)

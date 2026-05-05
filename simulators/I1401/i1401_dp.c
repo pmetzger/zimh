@@ -632,6 +632,10 @@ return;
 
 t_stat dp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 for (i = 0; i < DP_NUMDR; i++)                          /* reset cylinder */

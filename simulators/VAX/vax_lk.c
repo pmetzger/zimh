@@ -186,6 +186,7 @@ t_stat lk_reset (DEVICE *dptr);
 void lk_reset_mode (void);
 void lk_cmd (void);
 const char *lk_description (DEVICE *dptr);
+static LK_KEYDATA lk_map_key (int key);
 t_stat lk_put_fifo (LK_FIFO *fifo, uint8 data);
 t_stat lk_get_fifo (LK_FIFO *fifo, uint8 *data);
 void lk_clear_fifo (LK_FIFO *fifo);
@@ -418,7 +419,7 @@ else {
 lk_clear_fifo (&lk_rcvf);
 }
 
-LK_KEYDATA lk_map_key (int key)
+static LK_KEYDATA lk_map_key (int key)
 {
 LK_KEYDATA lk_key;
 
@@ -800,6 +801,10 @@ lk_mode[14] = LK_MODE_AUTODOWN;                         /* 14 = function keys: f
 
 t_stat lk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 lk_clear_fifo (&lk_sndf);
 lk_clear_fifo (&lk_rcvf);
 lk_keysdown = 0;
@@ -859,6 +864,10 @@ switch (mode) {
 
 const char *lk_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "  VCB01 - LK Keyboard interface";
 }
 

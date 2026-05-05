@@ -462,6 +462,10 @@ DEVICE drc_dev = {
 
 static SIGNALS_VALUE drd_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 int32          t;
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
@@ -576,6 +580,10 @@ return outbound;                                        /* return the outbound s
 
 static SIGNALS_VALUE drc_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 int32          sec;
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
@@ -815,6 +823,12 @@ return result;                                          /* return the result of 
 
 t_stat dr_set_prot (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 count;
 t_stat status;
 
@@ -851,6 +865,12 @@ return SCPE_OK;
 
 t_stat dr_show_prot (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "protected tracks=%d", drc_pcount);
 return SCPE_OK;
 }
@@ -859,6 +879,11 @@ return SCPE_OK;
 
 t_stat dr_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 int32 sz;
 int32 szindex;
 
@@ -1024,6 +1049,10 @@ static const LOADER_ARRAY dr_loaders = {
 
 t_stat drc_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 start;
 
 if (unitno != 0)                                        /* a BOOT DRC for a non-zero unit */

@@ -55,6 +55,10 @@ void isbc064_put_mbyte(uint16 addr, uint8 val);
 /* local globals */
 
 static const char* isbc064_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return isbc064_NAME;
 }
 
@@ -143,6 +147,10 @@ DEVICE isbc064_dev = {
 
 t_stat isbc064_cfg(uint16 base, uint16 size, uint8 dummy)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) dummy;
+
     isbc064_unit.capac = size;
     isbc064_unit.u3 = base;
     isbc064_dev.units->filebuf = (uint8 *)calloc(isbc064_unit.capac, sizeof(uint8)); //alloc buffer
@@ -167,6 +175,12 @@ t_stat isbc064_clr(void)
 
 t_stat isbc064_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     uint32 size, result, i;
 
     if (cptr == NULL)
@@ -190,6 +204,12 @@ t_stat isbc064_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc064_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     uint32 size, result, i;
 
     if (cptr == NULL)
@@ -213,6 +233,12 @@ t_stat isbc064_set_base(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc064_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf(st, "Device %s, Base address=0%04XH, Size=0%04XH  ",
         ((isbc064_dev.flags & DEV_DIS) == 0) ? "Enabled" : "Disabled",
         isbc064_unit.u3, isbc064_unit.capac);

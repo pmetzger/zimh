@@ -313,6 +313,10 @@ return SCPE_OK;
 
 t_stat drm_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if ((drm_dev.flags & DEV_DIS) == 0)
     drp_dev.flags = drp_dev.flags | DEV_DIS;
 drm_da = drm_ma = drm_err = 0;
@@ -358,6 +362,10 @@ return SCPE_OK;
 
 t_stat drp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if ((drp_dev.flags & DEV_DIS) == 0)
     drm_dev.flags = drm_dev.flags | DEV_DIS;
 drp_ta = 0;

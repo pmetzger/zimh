@@ -157,7 +157,7 @@ DEVICE ch10_dev = {
     &ch10_description
   };
 
-uint16 ch10_checksum (const uint8 *p, int count)
+static uint16 ch10_checksum (const uint8 *p, int count)
 {
   int32 sum = 0;
 
@@ -177,7 +177,7 @@ uint16 ch10_checksum (const uint8 *p, int count)
 }
 
 
-int ch10_test_int (void)
+static int ch10_test_int (void)
 {
   if ((ch10_status & (RXD|RXIE)) == (RXD|RXIE) ||
       (ch10_status & (TXD|TXIE)) == (TXD|TXIE)) {
@@ -192,7 +192,7 @@ int ch10_test_int (void)
   }
 }
 
-void ch10_validate (const uint8 *p, int count)
+static void ch10_validate (const uint8 *p, int count)
 {
   uint16 chksum;
   int size;
@@ -220,7 +220,7 @@ void ch10_validate (const uint8 *p, int count)
     sim_debug (DBG_TRC, &ch10_dev, "Checksum: %05o\n", chksum);
 }
 
-t_stat ch10_transmit (void)
+static t_stat ch10_transmit (void)
 {
   size_t len;
   t_stat r;
@@ -256,7 +256,7 @@ t_stat ch10_transmit (void)
   return SCPE_OK;
 }
 
-int ch10_receive (void)
+static int ch10_receive (void)
 {
   size_t count;
   const uint8 *p;
@@ -295,7 +295,7 @@ int ch10_receive (void)
   return 1;
 }
 
-void ch10_clear (void)
+static void ch10_clear (void)
 {
   ch10_status = TXD;
   rx_count = 0;
@@ -311,7 +311,7 @@ void ch10_clear (void)
   ch10_test_int ();
 }
 
-void ch10_command (uint32 data)
+static void ch10_command (uint32 data)
 {
   if (data & RXD) {
      sim_debug (DBG_REG, &ch10_dev, "Clear RX\n");
@@ -458,6 +458,10 @@ t_stat ch10_detach (UNIT *uptr)
 
 t_stat ch10_reset (DEVICE *dptr)
 {
+  /* Generic reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   ch10_clear ();
   if (ch10_unit[0].flags & UNIT_ATT)
       sim_activate (&ch10_unit[0], 100);
@@ -466,12 +470,24 @@ t_stat ch10_reset (DEVICE *dptr)
 
 t_stat ch10_show_peer (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   fprintf (st, "peer=%s", peer[0] ? peer : "unspecified");
   return SCPE_OK;
 }
 
 t_stat ch10_set_peer (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   char host[256], port[256];
 
   if ((cptr == NULL) || (*cptr == 0))
@@ -489,6 +505,12 @@ t_stat ch10_set_peer (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat ch10_show_node (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   if (address == -1)
     fprintf (st, "node=unspecified");
   else
@@ -498,6 +520,11 @@ t_stat ch10_show_node (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat ch10_set_node (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   t_stat r;
   int x;
 
@@ -516,6 +543,10 @@ t_stat ch10_set_node (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 const char *ch10_description (DEVICE *dptr)
 {
+  /* Generic description signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   return "CH11 Chaosnet interface";
 }
 
@@ -543,6 +574,13 @@ t_stat ch10_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cp
 
 t_stat ch10_help_attach (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+  /* Generic help signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+  (void) uptr;
+  (void) flag;
+  (void) cptr;
+
   fprintf (st, "To configure CH10, first set the local Chaosnet node address, and\n");
   fprintf (st, "the peer:\n\n");
   fprintf (st, "  sim> SET CH NODE=<octal address>\n");

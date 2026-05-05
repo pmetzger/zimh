@@ -102,6 +102,11 @@ get_octal_word(FILE *fileref, uint16 *x)
 t_stat
 sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+  /* Generic loader signature.
+     This implementation does not use every parameter. */
+  (void)fnam;
+  (void)flag;
+
   t_stat (*get_word)(FILE *fileref, uint16 *x) = get_binary_word;
   t_addr addr, length = MEMSIZE, start = 0, end;
   int16 forward_offset = 0, reverse_offset;
@@ -335,11 +340,19 @@ static void fprint_opr(FILE *of, uint16 insn)
 
 static void fprint_lmb(FILE *of, uint16 insn)
 {
+  /* Shared helper signature.
+     This implementation does not use every parameter. */
+  (void)insn;
+
   fprintf(of, "LMB ");
 }
 
 static void fprint_umb(FILE *of, uint16 insn)
 {
+  /* Shared helper signature.
+     This implementation does not use every parameter. */
+  (void)insn;
+
   fprintf(of, "UMB ");
 }
 
@@ -485,6 +498,10 @@ static void fprint_jmp(FILE *of, uint16 insn)
 
 t_stat fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 {
+  /* Generic symbolic output signature.
+     This implementation does not use every parameter. */
+  (void)uptr;
+
   t_stat stat;
 
   if ((sw & SWMASK ('M')) == 0)

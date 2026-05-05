@@ -563,6 +563,10 @@ return SCPE_OK;
 
 t_stat mta_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 u;
 UNIT *uptr;
 
@@ -626,6 +630,11 @@ return sim_tape_detach (uptr);
 
 t_stat mta_vlock (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if ((uptr->flags & UNIT_ATT) && (val || sim_tape_wrp (uptr)))
     mta_upddsta (uptr, uptr->USTAT | STA_WLK);
 else mta_upddsta (uptr, uptr->USTAT & ~STA_WLK);

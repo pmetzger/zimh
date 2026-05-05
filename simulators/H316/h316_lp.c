@@ -145,6 +145,10 @@ DEVICE lpt_dev = {
 
 int32 lptio (int32 inst, int32 fnc, int32 dat, int32 dev)
 {
+/* Shared I/O routine signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 ch = lpt_dib.chan - 1;                            /* DMA/DMC chan */
 int32 chr;
 
@@ -351,6 +355,10 @@ return SCPE_OK;
 
 t_stat lpt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 lpt_wdpos = lpt_drpos = lpt_crpos = 0;                  /* clear positions */

@@ -161,6 +161,10 @@ tty_r_svc(UNIT *uptr)
 static t_stat
 tty_t_svc(UNIT *uptr)
 {
+  /* Generic unit service signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   int32 ch;
 
   tmxr_poll_tx (&tty_desc);
@@ -207,6 +211,12 @@ tty_iot (uint16 insn, uint16 AC)
 static t_stat
 tty_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   t_stat r = SCPE_OK;
   if (strcmp (cptr, "FILE") == 0)
     tty_type = TTY_FILE;
@@ -220,6 +230,12 @@ tty_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 static t_stat
 tty_show_type (FILE *st, UNIT *up, int32 v, const void *dp)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) up;
+  (void) v;
+  (void) dp;
+
   switch (tty_type) {
   case TTY_FILE:
     fprintf (st, "TYPE=FILE");
@@ -246,6 +262,11 @@ void rom_stty (void)
 
 static t_stat tty_boot (int32 u, DEVICE *dptr)
 {
+  /* Generic boot signature.
+     This implementation does not use every parameter. */
+  (void) u;
+  (void) dptr;
+
   uint16 *PC = (uint16 *)sim_PC->loc;
   if (sim_switches & SWMASK ('T'))
     set_cmd (0, "ROM TYPE=TTY");

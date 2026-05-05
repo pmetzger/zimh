@@ -6,6 +6,8 @@
 #include "test_cmocka.h"
 
 #include "vax_defs.h"
+#include "vax_lk.h"
+#include "vax_vs.h"
 #include "sim_tmxr.h"
 
 #define DZ_LINES 4

@@ -112,6 +112,10 @@ extern uint8 parity_tab[];
 
 static void i86op_illegal_op(PC_ENV *m)
 {
+    /* Instruction handler signature.
+       This implementation does not use every parameter. */
+    (void) m;
+
     intr |= INTR_ILLEGAL_OPCODE;
 }
 

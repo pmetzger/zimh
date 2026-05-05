@@ -183,6 +183,11 @@ return TRUE;
 
 t_stat rom_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if (vptr == NULL) return SCPE_ARG;
@@ -195,6 +200,11 @@ return SCPE_OK;
 
 t_stat rom_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if (addr >= ROMSIZE) return SCPE_NXM;
@@ -206,6 +216,10 @@ return SCPE_OK;
 
 t_stat rom_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (rom == NULL) rom = (t_uint64 *) calloc (ROMSIZE >> 3, sizeof (t_uint64));
 if (rom == NULL) return SCPE_MEM;
 return SCPE_OK;

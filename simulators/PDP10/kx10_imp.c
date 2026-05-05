@@ -999,6 +999,10 @@ t_stat imp_devio(uint32 dev, uint64 *data)
 /* Handle KL style interrupt vectors for ITS */
 t_addr
 imp_devirq(uint32 dev, t_addr addr) {
+    /* Generic device interrupt signature.
+       This implementation does not use every parameter. */
+    (void) dev;
+
     if ((cpu_unit[0].flags & UNIT_ITSPAGE) != 0 && (imp_data.pia & 7) == 1) {
         if (imp_unit[0].STATUS & IMPID && (imp_unit[0].STATUS & IMPLW) == 0)
             return 070|RSIGN;
@@ -1218,7 +1222,7 @@ t_stat imp_srv(UNIT * uptr)
     return SCPE_OK;
 }
 
-void
+static void
 ip_checksum(uint8 *chksum, uint8 *ptr, int len)
 {
    /*
@@ -1250,7 +1254,7 @@ ip_checksum(uint8 *chksum, uint8 *ptr, int len)
 /*
  * Update the checksum based on code from RFC1631
  */
-void
+static void
 checksumadjust(uint8 *chksum, uint8 *optr,
    int olen, uint8 *nptr, int nlen)
    /* assuming: unsigned char is 8 bits, long is 32 bits.
@@ -1871,6 +1875,10 @@ imp_packet_out(struct imp_device *imp, ETH_PACK *packet) {
 
 
 void imp_packet_debug(struct imp_device *imp, const char *action, ETH_PACK *packet) {
+    /* Shared IMP helper signature.
+       This implementation does not use every parameter. */
+    (void) imp;
+
     struct imp_eth_hdr *eth = (struct imp_eth_hdr *)&packet->msg[0];
     struct arp_hdr     *arp = (struct arp_hdr *)eth;
     struct ip          *ip = (struct ip *)&packet->msg[sizeof(struct imp_eth_hdr)];
@@ -2343,6 +2351,12 @@ struct arp_entry *imp_arp_lookup(struct imp_device *imp, in_addr_T ipaddr)
 
 t_stat imp_set_arp (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     char abuf[CBUFSIZE];
     in_addr_T ip;
     ETH_MAC mac_addr;
@@ -2364,6 +2378,12 @@ t_stat imp_set_arp (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat imp_show_arp (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     struct arp_entry  *tabptr;
     int                i;
 
@@ -2410,7 +2430,7 @@ static const char  *dhcp_opr_names[16] = {
                     };
 
 /* Send out a DHCP packet, fill in IP and Ethernet data. */
-void
+static void
 imp_do_send_dhcp(struct imp_device *imp,
                  const char *op,
                  ETH_PACK *packet,
@@ -2923,6 +2943,12 @@ int ipv4_inet_aton(const char *str, struct in_addr *inp)
 #if MPX_DEV
 t_stat imp_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32 mpx;
     t_stat r;
 
@@ -2937,6 +2963,11 @@ t_stat imp_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat imp_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) val;
+   (void) desc;
+
    if (uptr == NULL)
       return SCPE_IERR;
 
@@ -2947,7 +2978,14 @@ t_stat imp_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat imp_show_mac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     char buffer[20];
+
     eth_mac_fmt(imp_data.mac, buffer);
     fprintf(st, "MAC=%s", buffer);
     return SCPE_OK;
@@ -2955,6 +2993,11 @@ t_stat imp_show_mac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat imp_set_mac (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     t_stat status;
 
     if (!cptr) return SCPE_IERR;
@@ -2970,7 +3013,14 @@ t_stat imp_set_mac (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat imp_show_ip (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) uptr;
+   (void) val;
+   (void) desc;
+
    struct in_addr ip;
+
    ip.s_addr = imp_data.ip;
    fprintf (st, "IP=%s/%d", ipv4_inet_ntoa(ip), imp_data.maskbits);
    return SCPE_OK;
@@ -2978,6 +3028,11 @@ t_stat imp_show_ip (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat imp_set_ip (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     char abuf[CBUFSIZE];
     struct in_addr  ip;
 
@@ -3007,6 +3062,12 @@ t_stat imp_set_ip (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat imp_show_gwip (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) uptr;
+   (void) val;
+   (void) desc;
+
    struct in_addr ip;
 
    ip.s_addr = imp_data.gwip;
@@ -3016,7 +3077,13 @@ t_stat imp_show_gwip (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat imp_set_gwip (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     struct in_addr  ip;
+
     if (!cptr) return SCPE_IERR;
     if (uptr->flags & UNIT_ATT) return SCPE_ALATT;
 
@@ -3033,6 +3100,11 @@ t_stat imp_set_gwip (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat imp_show_dhcpip (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     if (!(uptr->flags & UNIT_DHCP)) {
         fprintf (st, "DHCP disabled");
     } else {
@@ -3051,6 +3123,12 @@ t_stat imp_show_dhcpip (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat imp_show_hostip (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) uptr;
+   (void) val;
+   (void) desc;
+
    struct in_addr ip;
 
    ip.s_addr = imp_data.hostip;
@@ -3060,7 +3138,13 @@ t_stat imp_show_hostip (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat imp_set_hostip (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
    struct in_addr ip;
+
     if (!cptr) return SCPE_IERR;
     if (uptr->flags & UNIT_ATT) return SCPE_ALATT;
 
@@ -3269,6 +3353,10 @@ return SCPE_OK;
 
 const char *imp_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "KA Host/IMP interface";
 }
 #endif

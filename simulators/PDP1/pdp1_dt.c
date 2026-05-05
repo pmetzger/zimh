@@ -361,6 +361,10 @@ DEVICE dt_dev = {
 
 int32 dt (int32 IR, int32 dev, int32 dat)
 {
+/* Generic IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void)dev;
+
 int32 pulse = (IR >> 6) & 037;
 int32 fnc, mot, unum;
 UNIT *uptr = NULL;
@@ -937,6 +941,10 @@ return 0;                                               /* all others */
 
 t_stat dt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void)dptr;
+
 int32 i, prev_mot;
 UNIT *uptr;
 

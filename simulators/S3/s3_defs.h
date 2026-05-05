@@ -92,3 +92,11 @@ struct opdef {
                                                            2 - 2-address (0x<0,1,2,4,5,6,8,9,A>x)
                                                            3 - 1-address B (0x<3,7,B>x) */
 };
+
+/* Function prototypes */
+
+int32 crd (int32 op, int32 m, int32 n, int32 data);
+int32 pkb (int32 op, int32 m, int32 n, int32 data);
+int32 lpt (int32 op, int32 m, int32 n, int32 data);
+int32 dsk1 (int32 op, int32 m, int32 n, int32 data);
+int32 dsk2 (int32 op, int32 m, int32 n, int32 data);

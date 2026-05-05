@@ -357,6 +357,12 @@ uint8               parity_table[64] = {
 t_stat
 mt_rew(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)desc;
+    (void)val;
+
     /* If drive is offline or not attached return not ready */
     if ((uptr->flags & (UNIT_ATT | MTUF_ONLINE)) == 0)
         return SCPE_NOATT;
@@ -632,7 +638,7 @@ uint32 mt_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 
 #if I7090 | I704 | I701
 /* Read a word from tape, used during boot read */
-int
+static int
 mt_read_buff(UNIT * uptr, int cmd, DEVICE * dptr, t_uint64 *word)
 {
     int                 chan = UNIT_G_CHAN(uptr->flags);
@@ -682,7 +688,7 @@ mt_read_buff(UNIT * uptr, int cmd, DEVICE * dptr, t_uint64 *word)
 #endif
 
 /* Map simH errors into machine errors */
-t_stat mt_error(UNIT * uptr, int chan, t_stat r, DEVICE * dptr)
+static t_stat mt_error(UNIT * uptr, int chan, t_stat r, DEVICE * dptr)
 {
     switch (r) {
     case MTSE_OK:               /* no error */
@@ -775,7 +781,7 @@ t_stat mt_srv(UNIT * uptr)
                 /* We hit tapemark, Back up so next read hits it */
                 /* Or write starts just before it */
                 /* This is due to SIMH returning mark after read */
-                    (void) sim_tape_sprecr(uptr, &reclen);
+                    (void)sim_tape_sprecr(uptr, &reclen);
                     uptr->u5 &= ~MT_MARK;
                     uptr->u3 -= GAP_LEN + reclen;
                 }
@@ -1344,6 +1350,10 @@ mt_boot(int32 unit_num, DEVICE * dptr)
 void
 mt_ini(UNIT * uptr, t_bool f)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)f;
+
     int                 chan = UNIT_G_CHAN(uptr->flags);
 
     if (uptr->flags & UNIT_ATT)
@@ -1357,12 +1367,21 @@ mt_ini(UNIT * uptr, t_bool f)
 t_stat
 mt_reset(DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return SCPE_OK;
 }
 
 t_stat
 mt_tape_density(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)desc;
+
 return sim_tape_set_dens(uptr, (val == MTUF_LDN) ? MT_DENS_200 : MT_DENS_556, NULL, NULL);
 }
 
@@ -1408,6 +1427,10 @@ mt_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 mt_description(DEVICE *dptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)dptr;
+
    return "IBM 729 Magnetic tape unit";
 }
 

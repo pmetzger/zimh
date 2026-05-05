@@ -271,6 +271,10 @@ DEVICE dco_dev = {
 
 t_stat dcx_rd (int32 *data, int32 PA, int32 access)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 ln = ((PA - dci_dib.ba) >> 3);
 
 if (ln > DCX_MAXMUX)                                    /* validate line number */
@@ -597,6 +601,12 @@ return;
 
 t_stat dcx_set_lines (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 newln, i, t;
 t_stat r;
 

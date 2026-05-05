@@ -261,6 +261,10 @@ return FALSE;
 
 t_stat tlb_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) sw;
+
 int32 tlbn = uptr - tlb_unit;
 uint32 idx = (uint32) addr >> 1;
 
@@ -276,6 +280,10 @@ return SCPE_OK;
 
 t_stat tlb_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) sw;
+
 int32 tlbn = uptr - tlb_unit;
 uint32 idx = (uint32) addr >> 1;
 
@@ -296,6 +304,10 @@ return SCPE_OK;
 
 t_stat tlb_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 for (i = 0; i < VA_TBSIZE; i++)
@@ -305,5 +317,9 @@ return SCPE_OK;
 
 const char *tlb_description (DEVICE *dptr)
     {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "translation buffer";
     }

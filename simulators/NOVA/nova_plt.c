@@ -132,6 +132,10 @@ return 0;
 
 t_stat plt_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 DEV_CLR_BUSY( INT_PLT ) ;
 DEV_SET_DONE( INT_PLT ) ;
 DEV_UPDATE_INTR ;
@@ -151,6 +155,10 @@ return SCPE_OK;
 
 t_stat plt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 plt_unit.buf = 0;                                       /*  <not DG compatible>  */
 DEV_CLR_BUSY( INT_PLT ) ;
 DEV_CLR_DONE( INT_PLT ) ;

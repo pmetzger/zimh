@@ -51,6 +51,10 @@ uint8 unreg_dev(uint16 port);
 /* local globals */
 
 static const char* port_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return port_NAME;
 }
 
@@ -113,6 +117,10 @@ DEVICE port_dev = {
 
 t_stat port_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
 //    if (SBC_reset(NULL) == 0) {
 //        sim_printf("  Port: Reset\n");
         sim_activate (&port_unit, port_unit.wait); /* activate unit */
@@ -127,6 +135,10 @@ t_stat port_reset(DEVICE *dptr)
 
 t_stat port_svc(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     sim_activate (&port_unit, port_unit.wait); /* continue poll */
     return SCPE_OK;
 }
@@ -211,6 +223,12 @@ struct idev dev_table[256] = {
 
 uint8 nulldev(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) io;
+    (void) data;
+    (void) devnum;
+
     SET_XACK(0);                        //clear xack
 //    return 0xff;                        /* multibus has active high pullups and inversion */
     return 0;                           //corrects "illegal disk at port X8H" error in ISIS
@@ -219,6 +237,10 @@ uint8 nulldev(t_bool io, uint8 data, uint8 devnum)
 uint8 reg_dev(uint8 (*routine)(t_bool io, uint8 data, uint8 devnum),
     uint16 port, uint16 devnum, uint8 dummy)
 {
+    /* Shared registration signature.
+       This implementation does not use every parameter. */
+    (void) dummy;
+
     if (dev_table[port].routine != &nulldev) { /* port already assigned */
         if (dev_table[port].routine != routine)
             sim_printf("    I/O Port %02X is already assigned\n", port);

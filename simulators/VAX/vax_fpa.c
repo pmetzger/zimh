@@ -1523,6 +1523,10 @@ return rpackg (&b, rh);                                 /* round and pack */
 
 void op_polyf (uint32 *opnd, int32 acc)
 {
+/* Shared instruction helper signature.
+   This implementation does not use every parameter. */
+(void) acc;
+
 UFP r, a, c;
 int32 deg = opnd[1];
 int32 ptr = opnd[2];
@@ -1552,6 +1556,10 @@ return;
 
 void op_polyd (uint32 *opnd, int32 acc)
 {
+/* Shared instruction helper signature.
+   This implementation does not use every parameter. */
+(void) acc;
+
 UFP r, a, c;
 int32 deg = opnd[2];
 int32 ptr = opnd[3];
@@ -1586,6 +1594,10 @@ return;
 
 void op_polyg (uint32 *opnd, int32 acc)
 {
+/* Shared instruction helper signature.
+   This implementation does not use every parameter. */
+(void) acc;
+
 UFP r, a, c;
 int32 deg = opnd[2];
 int32 ptr = opnd[3];

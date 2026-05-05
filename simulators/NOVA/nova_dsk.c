@@ -274,6 +274,10 @@ return SCPE_OK;
 
 t_stat dsk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 dsk_stat = dsk_da = dsk_ma = 0;
 DEV_CLR_BUSY( INT_DSK ) ;
 DEV_CLR_DONE( INT_DSK ) ;
@@ -297,6 +301,11 @@ static const int32 boot_rom[] = {
 
 t_stat dsk_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 size_t i;
 
 for (i = 0; i < BOOT_LEN; i++) M[BOOT_START + i] = (uint16) boot_rom[i];
@@ -328,6 +337,11 @@ return attach_unit (uptr, cptr);
 
 t_stat dsk_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (val < 0)
     return SCPE_IERR;
 if (uptr->flags & UNIT_ATT)

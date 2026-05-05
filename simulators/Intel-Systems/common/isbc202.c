@@ -230,6 +230,10 @@ void isbc202_diskio(void);      //do actual disk i/o
 
 int isbc202_onetime = 1;
 static const char* isbc202_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return isbc202_NAME;
 }
 
@@ -332,6 +336,10 @@ DEVICE isbc202_dev = {
 
 t_stat isbc202_cfg(uint16 baseport, uint16 devnum, uint8 intnum)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     int i;
     UNIT *uptr;
 
@@ -374,6 +382,11 @@ t_stat isbc202_clr(void)
 
 t_stat isbc202_set_mode(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_ARG;
     if (uptr->flags & UNIT_ATT)
@@ -395,6 +408,11 @@ t_stat isbc202_set_mode(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc202_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     uint32 size, result;
 
     if (uptr == NULL)
@@ -415,6 +433,11 @@ t_stat isbc202_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc202_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     uint32 size, result;
 
     if (uptr == NULL)
@@ -429,6 +452,11 @@ t_stat isbc202_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc202_set_verb(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_ARG;
     if (cptr == NULL)
@@ -448,6 +476,11 @@ t_stat isbc202_set_verb(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc202_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int i = 0;
 
     if (uptr == NULL)
@@ -546,6 +579,11 @@ t_stat isbc202_attach (UNIT *uptr, const char *cptr)
 
 uint8 isbc202r0(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+    (void) devnum;
+
     if (io == 0) {                      /* read ststus*/
          return fdc202.stat;
     }
@@ -554,6 +592,10 @@ uint8 isbc202r0(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc202r1(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read data port */
         fdc202.intff = 0;               //clear interrupt FF
         fdc202.stat &= ~FDCINT;
@@ -567,6 +609,10 @@ uint8 isbc202r1(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc202r2(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read data port */
         ;
     } else {                            /* write data port */
@@ -580,6 +626,11 @@ uint8 isbc202r2(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc202r3(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+    (void) devnum;
+
     if (io == 0) {                      /* read data port */
         if (fdc202.rtype == ROK) {
             return fdc202.rbyte0;
@@ -598,6 +649,11 @@ uint8 isbc202r3(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc202r7(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+    (void) devnum;
+
     if (io == 0) {                      /* read data port */
         ;
     } else {                            /* write data port */

@@ -199,6 +199,10 @@ DEVICE wdt_dev = {
 // RTC IO routine ...
 int32 rtc_io (int32 inst, int32 fnc, int32 dat, int32 dev)
 {
+  /* Device I/O dispatch signature.
+     This implementation does not use every parameter. */
+  (void) dev;
+
   switch (inst) {
     case ioOCP:
       if (fnc == 010) {
@@ -260,6 +264,10 @@ t_stat rtc_service (UNIT *uptr)
 // WDT IO routine ...
 int32 wdt_io (int32 inst, int32 fnc, int32 dat, int32 dev)
 {
+  /* Device I/O dispatch signature.
+     This implementation does not use every parameter. */
+  (void) dev;
+
   if ((inst == ioOCP) && (fnc == 0)) {
     // Reset WDT ...
     sim_debug(IMP_DBG_IOT, &wdt_dev, "reset (PC=%06o)\n", PC-1);
@@ -280,6 +288,10 @@ int32 wdt_io (int32 inst, int32 fnc, int32 dat, int32 dev)
 // WDT unit service ...
 t_stat wdt_service (UNIT *uptr)
 {
+  /* Generic unit service signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   return SCPE_OK;
 }
 
@@ -305,6 +317,10 @@ t_stat rtc_reset (DEVICE *dptr)
 // WDT reset routine ...
 t_stat wdt_reset (DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   // Clear the WDT countdown and turn off all the lights ...
   wdt_count = 0;  wdt_lights = 0;
   sim_cancel (&wdt_unit);
@@ -320,6 +336,11 @@ t_stat wdt_reset (DEVICE *dptr)
 // Set/Show RTC interval ...
 t_stat rtc_set_interval (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   uint32 newint, newtps;  t_stat ret;
   if (cptr == NULL) return SCPE_ARG;
   newint = get_uint (cptr, 10, 1000000, &ret);
@@ -334,6 +355,12 @@ t_stat rtc_set_interval (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat rtc_show_interval (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   fprintf(st,"interval=%d (us)", rtc_interval);
   return SCPE_OK;
 }
@@ -341,6 +368,11 @@ t_stat rtc_show_interval (FILE *st, UNIT *uptr, int32 val, const void *desc)
 // Set/Show RTC quantum ...
 t_stat rtc_set_quantum (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   uint32 newquant, newtps;  t_stat ret;
   if (cptr == NULL) return SCPE_ARG;
   newquant = get_uint (cptr, 10, 1000000, &ret);
@@ -355,6 +387,12 @@ t_stat rtc_set_quantum (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat rtc_show_quantum (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   fprintf(st,"quantum=%d (ticks)", rtc_quantum);
   return SCPE_OK;
 }
@@ -362,6 +400,12 @@ t_stat rtc_show_quantum (FILE *st, UNIT *uptr, int32 val, const void *desc)
 // Set/Show WDT delay ...
 t_stat wdt_set_delay (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   uint32 newint;  t_stat ret;
   if (cptr == NULL) return SCPE_ARG;
   newint = get_uint (cptr, 10, 65535, &ret);
@@ -375,6 +419,12 @@ t_stat wdt_set_delay (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat wdt_show_delay (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   if (wdt_delay > 0)
     fprintf(st,"delay=%d (ms)", wdt_delay);
   else

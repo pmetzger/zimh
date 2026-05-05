@@ -292,6 +292,10 @@ DEVICE g2out_dev = {
 /* real device could have done bitwise decode?! */
 int32 g2kb_iot (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if (pulse == 001) {                     /* sck */
     if (g2kb_done) {
         dat = dat | IOT_SKP;
@@ -309,6 +313,10 @@ return dat;
 /* Button Box IOT routine */
 int32 g2bb_iot (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if (pulse == 001) {                     /* "spb" -- skip on push button flag */
     if (g2bb_flag)
         dat = dat | IOT_SKP;
@@ -448,6 +456,10 @@ return 1;
 /* Device 05 IOT routine */
 int32 g2d1_iot (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 /*
  * UNIX text display command lists always end with a TRAP
  * and display output is restarted periodicly in timer PI service code

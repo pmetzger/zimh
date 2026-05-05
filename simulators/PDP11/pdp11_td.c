@@ -758,6 +758,10 @@ return SCPE_OK;
 
 t_stat td_wr_i_buf (CTLR *ctlr, int32 data)
 {
+/* Shared register write signature.
+   This implementation does not use every parameter. */
+(void) data;
+
 sim_debug_bits_hdr(TDDEB_IWR, ctlr->dptr, "RX_BUF", rx_buf_bits, ctlr->rx_buf, ctlr->rx_buf, 1);
 return SCPE_OK;
 }
@@ -1431,6 +1435,10 @@ return auto_config (tdc_dev.name, td_ctrls);    /* auto config */
 
 static const char *td_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "TU58 cartridge";
 }
 
@@ -1438,6 +1446,12 @@ return "TU58 cartridge";
 
 static t_stat td_set_ctrls (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 newln, i;
 t_stat r;
 DEVICE *dli_dptr = find_dev ("DLI");
@@ -1474,12 +1488,24 @@ return td_reset (&tdc_dev);
 
 t_stat td_show_ctlrs (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "controllers=%d", td_ctrls);
 return SCPE_OK;
 }
 
 static t_stat td_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "%s (%s)\n\n", dptr->description (dptr), dptr->name);
 fprintf (st, "DECtape TU58 Cartridge .\n\n");
 fprint_set_help (st, dptr);
@@ -1560,6 +1586,10 @@ return td_reset_ctlr (ctlr);
 
 static t_stat td_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 for (i = 0; i < BOOT_LEN; i++)
@@ -1574,6 +1604,11 @@ return SCPE_OK;
 
 static t_stat td_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 return SCPE_NOFNC;
 }
 

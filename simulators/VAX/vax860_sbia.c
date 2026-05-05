@@ -123,6 +123,10 @@ DEVICE sbia_dev = {
 
 int32 sbia_rd (int32 pa, int32 lnt)
 {
+    /* Register dispatch signature.
+       This implementation does not use every parameter. */
+    (void) lnt;
+
     int32 rg = (pa >> 2) & 0x1F;
 
     switch (rg) {
@@ -168,6 +172,10 @@ int32 sbia_rd (int32 pa, int32 lnt)
 
 void sbia_wr (int32 pa, int32 val, int32 lnt)
 {
+    /* Register dispatch signature.
+       This implementation does not use every parameter. */
+    (void) lnt;
+
     int32 rg = (pa >> 2) & 0x1F;
 
     switch (rg) {
@@ -282,6 +290,10 @@ return;
 
 t_stat sbia_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sbi_fs = 0;
 sbi_sc = 0;
 sbi_mt = 0;
@@ -293,6 +305,10 @@ return SCPE_OK;
 
 const char *sbia_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "SBI adapter";
 }
 
@@ -300,6 +316,11 @@ return "SBI adapter";
 
 t_stat show_nexus (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 fprintf (st, "nexus=%d, address=%X", val, NEXUSBASE + ((1 << REG_V_NEXUS) * val));
 return SCPE_OK;
 }

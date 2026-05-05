@@ -145,9 +145,13 @@ bcd_2d(int n, uint8 * b2)
     *b2 = d2;
 }
 
-void
+static void
 chron_read_buff(UNIT * uptr, int cmd)
 {
+    /* Shared helper signature.
+       This implementation does not use every parameter. */
+    (void)cmd;
+
     time_t              curtim;
     struct tm          *tptr;
     int                 ms;
@@ -224,6 +228,10 @@ t_stat chron_srv(UNIT * uptr)
 t_stat
 chron_reset(DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     chron_unit[0].u5 = MT_RDY;
     return SCPE_OK;
 }
@@ -232,6 +240,11 @@ chron_reset(DEVICE * dptr)
 t_stat
 set_addr(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)val;
+
     int                 i;
 
     if (cptr == NULL)
@@ -255,6 +268,11 @@ set_addr(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 get_addr(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)v;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "Unit=%d", uptr->u3);
@@ -264,6 +282,12 @@ get_addr(FILE * st, UNIT * uptr, int32 v, const void *desc)
 t_stat
 chron_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+  /* Generic callback signature.
+     This implementation does not use every parameter. */
+  (void)cptr;
+  (void)flag;
+  (void)uptr;
+
   fprintf (st, "Chronoclock\n\n");
   fprintf (st, "The Chronoclock replaces one of your tape drives, and is\n");
   fprintf (st, "for CTSS operation\n\n");
@@ -284,6 +308,10 @@ chron_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 chron_description (DEVICE *dptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)dptr;
+
    return "Chronoclock";
 }
 

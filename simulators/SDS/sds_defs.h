@@ -200,6 +200,25 @@ struct sdsdib {
 
 typedef struct sdsdib DIB;
 
+/* I/O support */
+
+t_bool io_init (void);
+t_stat op_wyim (uint32 inst, uint32 *dat);
+t_stat op_miwy (uint32 inst, uint32 dat);
+t_stat op_pin (uint32 *dat);
+t_stat op_pot (uint32 dat);
+t_stat op_eomd (uint32 inst);
+t_stat op_sks (uint32 inst, uint32 *skp);
+t_stat pot_RL1 (uint32 num, uint32 *dat);
+t_stat pot_RL2 (uint32 num, uint32 *dat);
+t_stat pot_RL4 (uint32 num, uint32 *dat);
+t_stat pin_rads (uint32 num, uint32 *dat);
+t_stat pot_rada (uint32 num, uint32 *dat);
+t_stat pin_dsk (uint32 num, uint32 *dat);
+t_stat pot_dsk (uint32 num, uint32 *dat);
+t_stat pin_mux (uint32 num, uint32 *dat);
+t_stat pot_mux (uint32 num, uint32 *dat);
+
 /* Channels */
 
 #define NUM_CHAN        8                               /* max num chan */
@@ -429,6 +448,11 @@ t_stat set_chan (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat show_chan (FILE *st, UNIT *uptr, int32 val, const void *desc);
 t_stat chan_process (void);
 t_bool chan_testact (void);
+
+/* Character conversion function prototypes */
+
+int8 sds_to_ascii (int8 c);
+int8 ascii_to_sds (int8 ch);
 
 /* Translation tables */
 extern const int8 odd_par[64];

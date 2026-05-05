@@ -220,6 +220,10 @@ return SCPE_OK;
  */
 static t_stat kaf_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if (M[FE_KEEPA] & INT64_C(0020000000000)) {              /* KSRLD - "Forced" (actually, requested) reload */
     uint32 oldsw = sim_switches;
     DEVICE *bdev = NULL;
@@ -293,6 +297,10 @@ return SCPE_OK;
 
 t_stat fe_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmxr_set_console_units (&fei_unit, &feo_unit);
 fei_unit.buf = feo_unit.buf = 0;
 
@@ -312,6 +320,13 @@ return SCPE_OK;
 
 t_stat fe_stop_os (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) cptr;
+(void) desc;
+
 M[FE_SWITCH] = IOBA_RP;                                 /* tell OS to stop */
 return SCPE_OK;
 }

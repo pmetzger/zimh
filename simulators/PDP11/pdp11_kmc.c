@@ -2797,6 +2797,11 @@ static void *remqueue (QH *entry, int32 *count) {
 
 #if KMC_UNITS > 1
 static t_stat kmc_setDeviceCount (UNIT *txup, int32 val, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int32 newln;
     uint32 dupidx;
     t_stat r;
@@ -2827,6 +2832,11 @@ static t_stat kmc_setDeviceCount (UNIT *txup, int32 val, const char *cptr, void 
 
 #if KMC_UNITS > 1
 static t_stat kmc_showDeviceCount (FILE *st, UNIT *txup, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE *dev = find_dev_from_unit(txup);
 
     if (dev->flags & DEV_DIS) {
@@ -2861,6 +2871,12 @@ static t_stat kmc_showDeviceCount (FILE *st, UNIT *txup, int32 val, const void *
  */
 
 static t_stat kmc_setLineSpeed (UNIT *txup, int32 val, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) txup;
+    (void) val;
+    (void) desc;
+
     dupstate *d;
     int32 dupidx, newspeed;
     char gbuf[CBUFSIZE];
@@ -2892,6 +2908,12 @@ static t_stat kmc_setLineSpeed (UNIT *txup, int32 val, const char *cptr, void *d
 }
 
 static t_stat kmc_showLineSpeed (FILE *st, UNIT *txup, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) txup;
+    (void) val;
+    (void) desc;
+
     int dupidx;
 
     fprintf (st, "DUP KMC Line   Speed\n"
@@ -2916,6 +2938,11 @@ static t_stat kmc_showLineSpeed (FILE *st, UNIT *txup, int32 val, const void *de
 /* Show KMC status */
 
 t_stat kmc_showStatus (FILE *st, UNIT *up, int32 v,  const void *dp) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) v;
+    (void) dp;
+
     int32 k = up->unit_kmc;
     int32 line;
     t_bool first = TRUE;

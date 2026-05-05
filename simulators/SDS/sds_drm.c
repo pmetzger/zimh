@@ -292,6 +292,10 @@ return SCPE_OK;
 
 t_stat drm_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 drm_da = 0;                                             /* clear state */
 drm_ca = 0;
 drm_wc = 0;

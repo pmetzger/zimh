@@ -189,7 +189,13 @@ REG disk_reg[] = {
 };
 
 static FILE * syslog = NULL;
-t_stat disk_setsyslog (UNIT *up, int32 v, const char *cp, void *dp) {
+static t_stat disk_setsyslog (UNIT *up, int32 v, const char *cp, void *dp) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) up;
+    (void) v;
+    (void) dp;
+
     if (syslog) {
         fclose(syslog);
         syslog = NULL;
@@ -207,7 +213,12 @@ t_stat disk_setsyslog (UNIT *up, int32 v, const char *cp, void *dp) {
 #define DISK_TYPE_29M  (1 << UNIT_V_UF)
 #define IS_29MB(u) (((u)->flags & DISK_TYPE_MASK) == DISK_TYPE_29M)
 
-t_stat disk_set_type (UNIT *up, int32 v, const char *cp, void *dp) {
+static t_stat disk_set_type (UNIT *up, int32 v, const char *cp, void *dp) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cp;
+    (void) dp;
+
     int first_unit = (up->dptr - md_dev) * 8;
     int unit;
     for (unit = first_unit; unit < first_unit + 8; ++unit) {
@@ -222,7 +233,12 @@ t_stat disk_set_type (UNIT *up, int32 v, const char *cp, void *dp) {
     return SCPE_OK;
 }
 
-t_stat disk_show_type (FILE *f, UNIT *up, int32 v, const void *dp) {
+static t_stat disk_show_type (FILE *f, UNIT *up, int32 v, const void *dp) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) v;
+    (void) dp;
+
     fprintf(f, IS_29MB(up) ? "EC-5061" : "EC-5052");
     return SCPE_OK;
 }
@@ -416,7 +432,7 @@ t_stat disk_detach (UNIT *u)
     return detach_unit (u);
 }
 
-t_value spread (t_value val)
+static t_value spread (t_value val)
 {
     int i, j;
     t_value res = 0;
@@ -468,7 +484,7 @@ static unsigned sum_with_right_carry (unsigned a, unsigned b)
 /*
  * Запись на диск.
  */
-void disk_write (UNIT *u)
+static void disk_write (UNIT *u)
 {
     KMD *c = unit_to_ctlr (u);
     int cnum = c - controller;
@@ -490,7 +506,7 @@ void disk_write (UNIT *u)
         longjmp (cpu_halt, SCPE_IOERR);
 }
 
-void disk_write_track (UNIT *u)
+static void disk_write_track (UNIT *u)
 {
     KMD *c = unit_to_ctlr (u);
     int cnum = c - controller;
@@ -512,7 +528,7 @@ void disk_write_track (UNIT *u)
 /*
  * Форматирование дорожки.
  */
-void disk_format (UNIT *u)
+static void disk_format (UNIT *u)
 {
     KMD *c = unit_to_ctlr (u);
     t_value fmtbuf[5];
@@ -558,7 +574,7 @@ void disk_format (UNIT *u)
 /*
  * Чтение с диска.
  */
-void disk_read (UNIT *u)
+static void disk_read (UNIT *u)
 {
     KMD *c = unit_to_ctlr (u);
     int cnum = c - controller;
@@ -590,7 +606,7 @@ void disk_read (UNIT *u)
         longjmp (cpu_halt, SCPE_IOERR);
 }
 
-t_value collect (t_value val)
+static t_value collect (t_value val)
 {
     int i, j;
     t_value res = 0;
@@ -602,7 +618,7 @@ t_value collect (t_value val)
     return res & BITS48;
 }
 
-void disk_read_track (UNIT *u)
+static void disk_read_track (UNIT *u)
 {
     KMD *c = unit_to_ctlr (u);
     int cnum = c - controller;
@@ -633,7 +649,7 @@ void disk_read_track (UNIT *u)
 /*
  * Чтение заголовка дорожки.
  */
-void disk_read_header (UNIT *u)
+static void disk_read_header (UNIT *u)
 {
     KMD *c = unit_to_ctlr (u);
     t_value *sysdata = IS_29MB(u) ? c->sysdata : c->sysdata + 4*c->track;

@@ -593,6 +593,11 @@ wr_end:
 t_stat
 rs_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     int         i;
 
     if (uptr == NULL) return SCPE_IERR;
@@ -607,6 +612,10 @@ rs_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 rs_reset(DEVICE * rstr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) rstr;
+
     int ctlr;
     for (ctlr = 0; ctlr < NUM_DEVS_RS; ctlr++) {
         rs_rh[ctlr].status = 0;
@@ -704,6 +713,12 @@ t_stat rs_detach (UNIT *uptr)
 
 t_stat rs_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "RS04 Disk Pack Drives (RS)\n\n");
 fprintf (st, "The RS controller implements the Massbus family of fast disk drives.  RS\n");
 fprintf (st, "options include the ability to set units write enabled or write locked, to\n");
@@ -719,6 +734,10 @@ return SCPE_OK;
 
 const char *rs_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "RS04 Massbus disk controller";
 }
 

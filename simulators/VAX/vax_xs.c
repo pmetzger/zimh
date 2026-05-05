@@ -194,6 +194,10 @@ return data;
 
 void xs_wr (int32 pa, int32 data, int32 access)
 {
+/* Generic memory write signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 CTLR *xs = &xs_ctrl[0];
 int32 rg = (pa >> 2) & 3;
 
@@ -682,6 +686,10 @@ CLR_INT (XS1);
 
 void xs_read_callback(int status)
 {
+/* Generic Ethernet packet callback signature.
+   This implementation does not use every parameter. */
+(void) status;
+
 CTLR *xs = &xs_ctrl[0];
 
 if (DEBUG_PRI (xs_dev, DBG_PCK))
@@ -701,6 +709,10 @@ xs->var->write_buffer.status = status;
 
 t_stat xs_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 t_stat status;
 CTLR *xs = &xs_ctrl[0];
 
@@ -831,5 +843,9 @@ return SCPE_OK;
 
 const char *xs_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "LANCE Ethernet controller";
 }

@@ -479,6 +479,10 @@ dz_checkirq(struct pdp_dib   *dibp)
 t_stat
 dz_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int      i;
 
     if (dz_unit.flags & UNIT_ATT)                           /* if attached, */
@@ -504,6 +508,12 @@ dz_reset (DEVICE *dptr)
 t_stat
 dz_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32 newln, i, t;
     t_stat r;
 
@@ -538,6 +548,11 @@ dz_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 dz_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     t_stat r;
     char gbuf[CBUFSIZE];
     int32 ln;
@@ -558,6 +573,11 @@ dz_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 dz_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     t_stat r;
     int32 ln;
 
@@ -573,6 +593,11 @@ dz_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     int32 i;
 
     for (i = 0; i < dz_desc.lines; i++) {
@@ -660,6 +685,10 @@ return SCPE_OK;
 
 const char *dz_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "DZ11 asynchronous line interface";
 }
 

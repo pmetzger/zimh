@@ -544,7 +544,7 @@ t_stat dt_devio(uint32 dev, uint64 *data) {
      return SCPE_OK;
 }
 
-void dt_getword(uint64 *data, int req) {
+static void dt_getword(uint64 *data, int req) {
     clr_interrupt(DT_DEVNUM|4);
     if (dtsb & DTB_DATREQ) {
         dtsb |= DTB_MIS;
@@ -557,7 +557,7 @@ void dt_getword(uint64 *data, int req) {
     }
 }
 
-void dt_putword(uint64 *data) {
+static void dt_putword(uint64 *data) {
     clr_interrupt(DT_DEVNUM|4);
     if (dtsb & DTB_DATREQ) {
         dtsb |= DTB_MIS;
@@ -1105,6 +1105,12 @@ dt_boot(int32 unit_num, DEVICE * dptr)
 /* set MPX level number */
 t_stat dt_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32 mpx;
     t_stat r;
 
@@ -1119,6 +1125,11 @@ t_stat dt_set_mpx (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat dt_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) val;
+   (void) desc;
+
    if (uptr == NULL)
       return SCPE_IERR;
 
@@ -1131,6 +1142,10 @@ t_stat dt_show_mpx (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat dt_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int   i;
 
     dtsb = dtsa = 0;                                    /* clear status */

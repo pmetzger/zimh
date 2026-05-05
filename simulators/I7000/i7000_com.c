@@ -414,6 +414,12 @@ DEVICE              coml_dev = {
 /* COM: channel select */
 uint32 com_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cmd;
+    (void)dev;
+    (void)uptr;
+
     /* Activate the com device */
     sim_activate(&com_unit[COM_CHU], 10);
 #if 0 /* Commented out until I can detect hangup signal */
@@ -1226,6 +1232,12 @@ com_detach(UNIT * uptr)
 t_stat
 com_summ(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)uptr;
+    (void)val;
+
     uint32              i, t;
 
     t = 0;
@@ -1243,6 +1255,11 @@ com_summ(FILE * st, UNIT * uptr, int32 val, const void *desc)
 t_stat
 com_show(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)uptr;
+
     int32               i, cc;
 
     for (cc = 0; (cc < COM_MLINES) && com_ldsc[cc].conn; cc++) ;
@@ -1278,12 +1295,22 @@ com_reset_ln(uint32 ln)
 const char *
 coml_description(DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "IBM 7750 terminal";
 }
 
 t_stat
 coml_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)flag;
+    (void)uptr;
+
 fprintf (st, "Each COM line can be set to a given type of terminal\n\n");
 fprintf (st, "   sim> SET COMLn KSR-37     Standard connection\n");
 fprintf (st, "   sim> SET COMLn KSR-35     Allows only upper case\n");
@@ -1296,6 +1323,10 @@ return SCPE_OK;
 const char *
 com_description(DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "IBM 7750 terminal controller";
 }
 

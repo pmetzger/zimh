@@ -634,21 +634,38 @@ return dev_tab[dst].Dst (dst, t & DMASK);               /* store dst */
 
 uint32 no_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 return 0;
 }
 
 t_stat no_wr (uint32 dst, uint32 dat)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
+(void) dat;
+
 return stop_opr;
 }
 
 t_stat no_fo (uint32 fnc)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) fnc;
+
 return stop_opr;
 }
 
 uint32 no_sf (uint32 fnc)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) fnc;
+
 return (stop_opr << SF_V_REASON);
 }
 
@@ -656,11 +673,20 @@ return (stop_opr << SF_V_REASON);
 
 uint32 zero_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 return 0;
 }
 
 t_stat zero_wr (uint32 dst, uint32 val)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
+(void) val;
+
 return SCPE_OK;
 }
 
@@ -699,6 +725,10 @@ return 0;
 
 uint32 ir_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 return IR;
 }
 
@@ -713,11 +743,19 @@ return SCPE_OK;
 
 uint32 trp_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 return TRP;
 }
 
 t_stat trp_wr (uint32 dst, uint32 val)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
+
 TRP = val;
 return SCPE_OK;
 }
@@ -726,11 +764,19 @@ return SCPE_OK;
 
 uint32 isr_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 return ISR;
 }
 
 t_stat isr_wr (uint32 dst, uint32 dat)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
+
 ISR = dat;
 return SCPE_OK;
 }
@@ -746,6 +792,10 @@ return SCPE_OK;
 
 uint32 isr_sf (uint32 op)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) op;
+
 return 0;
 }
 
@@ -753,6 +803,10 @@ return 0;
 
 uint32 ma_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 return MA;
 }
 
@@ -760,11 +814,18 @@ return MA;
 
 uint32 mem_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 return M[MA];
 }
 
 t_stat mem_wr (uint32 dst, uint32 dat)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
 
 if (MEM_ADDR_OK (MA))
     M[MA] = dat;
@@ -775,11 +836,19 @@ return SCPE_OK;
 
 uint32 sc_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 return SC;
 }
 
 t_stat sc_wr (uint32 dst, uint32 dat)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
+
 SCQ_ENTRY;
 SC = IDX_ADD (dat);
 return SCPE_OK;
@@ -789,6 +858,10 @@ return SCPE_OK;
 
 uint32 swr_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 return SWR;
 }
 
@@ -796,11 +869,19 @@ return SWR;
 
 uint32 msr_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 return MSR & MSR_RW;
 }
 
 t_stat msr_wr (uint32 src, uint32 dat)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 MSR = dat & MSR_RW;                                     /* new MSR */
 ao_update ();                                           /* update SOV,AOV */
 return SCPE_OK;
@@ -842,6 +923,10 @@ return AO;
 
 uint32 ax_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 if (cpu_unit.flags & UNIT_AO)
     return AX;
 else return 0;
@@ -849,6 +934,10 @@ else return 0;
 
 t_stat ax_wr (uint32 dst, uint32 dat)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
+
 if (cpu_unit.flags & UNIT_AO) {
     AX = dat;
     ao_update ();
@@ -859,6 +948,10 @@ return stop_opr;
 
 uint32 ay_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 if (cpu_unit.flags & UNIT_AO)
     return AY;
 else return 0;
@@ -866,6 +959,10 @@ else return 0;
 
 t_stat ay_wr (uint32 dst, uint32 dat)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
+
 if (cpu_unit.flags & UNIT_AO) {
     AY = dat;
     ao_update ();
@@ -876,6 +973,10 @@ return stop_opr;
 
 uint32 ao_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 if (cpu_unit.flags & UNIT_AO)
     return ao_update ();
 else return 0;
@@ -961,6 +1062,10 @@ return SCPE_OK;
 
 uint32 xr_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 if (cpu_unit.flags & UNIT_GRI99)
     return XR;
 else return 0;
@@ -968,6 +1073,10 @@ else return 0;
 
 t_stat xr_wr (uint32 dst, uint32 val)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
+
 if (cpu_unit.flags & UNIT_GRI99) {
     XR = val;
     return SCPE_OK;
@@ -979,6 +1088,10 @@ return stop_opr;
 
 uint32 atrp_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 if (cpu_unit.flags & UNIT_GRI99)
     return TRP;
 else return 0;
@@ -986,6 +1099,10 @@ else return 0;
 
 t_stat atrp_wr (uint32 dst, uint32 val)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
+
 if (cpu_unit.flags & UNIT_GRI99) {
     TRP = val;
     return SCPE_OK;
@@ -997,6 +1114,10 @@ return stop_opr;
 
 uint32 bsw_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 if (cpu_unit.flags & UNIT_BSWPK)
     return BSW;
 else return 0;
@@ -1004,6 +1125,10 @@ else return 0;
 
 t_stat bsw_wr (uint32 dst, uint32 val)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
+
 if (cpu_unit.flags & UNIT_BSWPK) {
     BSW = ((val >> 8) & 0377) | ((val & 0377) << 8);
     return SCPE_OK;
@@ -1015,6 +1140,10 @@ return stop_opr;
 
 uint32 bpk_rd (uint32 src)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) src;
+
 if (cpu_unit.flags & UNIT_BSWPK)
     return BPK;
 else return 0;
@@ -1022,6 +1151,10 @@ else return 0;
 
 t_stat bpk_wr (uint32 dst, uint32 val)
 {
+/* Device dispatch signature.
+   This implementation does not use every parameter. */
+(void) dst;
+
 if (cpu_unit.flags & UNIT_BSWPK) {
     BPK = ((BPK & 0377) << 8) | (val & 0377);
     return SCPE_OK;
@@ -1075,6 +1208,11 @@ return SCPE_OK;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE)
     return SCPE_NXM;
 if (vptr != NULL)
@@ -1086,6 +1224,11 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE)
     return SCPE_NXM;
 M[addr] = val & DMASK;
@@ -1094,6 +1237,12 @@ return SCPE_OK;
 
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 mc = 0;
 uint32 i;
 

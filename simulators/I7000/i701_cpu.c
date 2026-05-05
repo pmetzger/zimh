@@ -765,6 +765,10 @@ store:
 t_stat
 cpu_reset(DEVICE * dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     extern void sys_init(void);
 
     sys_init();
@@ -783,6 +787,11 @@ cpu_reset(DEVICE * dptr)
 t_stat
 cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic memory examine signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)sw;
+
     if (addr >= (MEMSIZE * 2))
         return SCPE_NXM;
     if (vptr == NULL)
@@ -805,6 +814,11 @@ cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic memory deposit signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)sw;
+
     t_addr      a = (addr >> 1) & 03777;
 
     if (addr >= (MEMSIZE * 2))
@@ -828,6 +842,12 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+    (void)desc;
+
     int32               i, lnt;
     t_stat              r;
 
@@ -861,6 +881,11 @@ cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+
     int32               k, di, lnt;
     char               *cptr = (char *) desc;
     t_stat              r;
@@ -940,12 +965,22 @@ cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 const char *
 cpu_description (DEVICE *dptr)
 {
+       /* Generic description signature.
+          This implementation does not use every parameter. */
+       (void)dptr;
+
        return "IBM 701 CPU";
 }
 
 t_stat
 cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)flag;
+    (void)cptr;
+
     fprintf (st, "The CPU behaves as a IBM 701\n");
     fprintf (st, "These switches are recognized when examining or depositing in CPU memory:\n\n");
     fprintf (st, "      -c      examine/deposit characters, 6 per word\n");

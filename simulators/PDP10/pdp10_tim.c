@@ -423,6 +423,10 @@ return;
 
 static t_stat tim_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_debug (DEB_TRC, &tim_dev, "tim_reset()\n");
 
 tim_base[0] = tim_base[1] = 0;                          /* clear timebase (HW does) */
@@ -454,6 +458,11 @@ return SCPE_OK;
 
 t_stat tim_set_mod (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (val & (UNIT_T20|UNIT_KLAD)) {
     clk_tps = TIM_TPS_T20;
     update_interval(((d10)(1000*4096))/clk_tps);
@@ -483,6 +492,10 @@ return SCPE_OK;
 
 static t_stat tcu_rd (int32 *data, int32 PA, int32 access)
 {
+/* Unibus read dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 time_t curtim;
 struct tm *tptr;
 t_stat st = SCPE_OK;

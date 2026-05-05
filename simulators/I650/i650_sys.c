@@ -229,6 +229,13 @@ vm_init(void) {
 t_stat
 sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
 {
+   /* Generic loader signature.
+      This implementation does not use every parameter. */
+   (void)fnam;
+   (void)cptr;
+   (void)fileref;
+   (void)flag;
+
    /* Currently not implimented until I know format of load files */
     return SCPE_NOFNC;
 }
@@ -349,7 +356,7 @@ t_opcode  base_ops[100] = {
 };
 
 /* Print out an instruction */
-void
+static void
 print_opcode(FILE * of, t_int64 val)
 {
 
@@ -390,6 +397,11 @@ print_opcode(FILE * of, t_int64 val)
 t_stat
 fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
 {
+    /* Generic symbolic output signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+    (void)uptr;
+
     t_int64            d, inst;
     int                NegZero;
     int ch;
@@ -427,7 +439,7 @@ fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
     return SCPE_OK;
 }
 
-int
+static int
 find_opcode(char *op)
 {
     int i;
@@ -452,7 +464,7 @@ find_opcode(char *op)
         d       =       parsed value
 */
 
-const char * parse_sgn(int *neg, const char *cptr)
+static const char * parse_sgn(int *neg, const char *cptr)
 {
     *neg=0;
     while (isspace(*cptr)) cptr++;
@@ -464,7 +476,7 @@ const char * parse_sgn(int *neg, const char *cptr)
     return cptr;
 }
 
-const char * parse_n(t_int64 *d, const char *cptr, int n)
+static const char * parse_n(t_int64 *d, const char *cptr, int n)
 {
     int i = 0;
 
@@ -511,6 +523,11 @@ int ascii_to_NN(int ch)
 
 t_stat parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int32 sw)
 {
+    /* Generic symbolic input signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+    (void)uptr;
+
     t_int64             d;
     int                 op, da, ia;
     char                ch, opcode[100];
@@ -708,7 +725,7 @@ int Shift_Digits(t_int64 * d, int nDigits)
 /*
  * Allocate space for a card deck of nCards cards.
  */
-uint16 *deck_alloc(int nCards)
+static uint16 *deck_alloc(int nCards)
 {
     return malloc(nCards * 80 * sizeof(uint16));
 }
@@ -716,7 +733,7 @@ uint16 *deck_alloc(int nCards)
 /*
  * Free a deck previously obtained from deck_alloc().
  */
-void deck_free(uint16 *deck)
+static void deck_free(uint16 *deck)
 {
     free(deck);
 }
@@ -727,7 +744,7 @@ void deck_free(uint16 *deck)
 // MAX_CARDS_IN_DECK, but there is potential to make this flexible
 // and reduce the size to actually used size).
 // Uses cdr0 device/unit.
-t_stat deck_load(const char *fn, uint16 ** DeckImagePtr, int * nCards)
+static t_stat deck_load(const char *fn, uint16 ** DeckImagePtr, int * nCards)
 {
     UNIT *              uptr = &cdr_unit[0];
     uint16 * DeckImage;
@@ -786,7 +803,7 @@ t_stat deck_load(const char *fn, uint16 ** DeckImagePtr, int * nCards)
 
 // write nCards starting at card from DeckImage array to file fn
 // uses cdr0 device/unit
-t_stat deck_save(const char *fn, uint16 * DeckImage, int card, int nCards)
+static t_stat deck_save(const char *fn, uint16 * DeckImage, int card, int nCards)
 {
     UNIT *              uptr = &cdr_unit[0];
     uint16 image[80];
@@ -823,7 +840,7 @@ t_stat deck_save(const char *fn, uint16 * DeckImage, int card, int nCards)
 
 // echo/print nCards from DeckImage array
 // uses cdp0 device/unit
-void deck_print_echo(uint16 * DeckImage, int nCards, int bPrint, int bEcho)
+static void deck_print_echo(uint16 * DeckImage, int nCards, int bPrint, int bEcho)
 {
     char line[81];
     int i,c,nc;
@@ -1218,6 +1235,10 @@ static t_stat deck_echolast_cmd(const char *cptr)
 
 static t_stat ibm650_deck_cmd(int32 arg, const char *buf)
 {
+    /* Generic command signature.
+       This implementation does not use every parameter. */
+    (void)arg;
+
     char gbuf[4*CBUFSIZE];
     const char *cptr;
 

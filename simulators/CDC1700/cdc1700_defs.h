@@ -666,8 +666,44 @@ typedef struct io_device IO_DEVICE;
  */
 typedef uint16 devINTR(DEVICE *);
 
-void buildDCtables(void);
+int disassem(char *, uint16, t_bool, t_bool, t_bool);
+
+enum IOstatus doIO(t_bool, DEVICE **);
+t_bool doDirectorFunc(DEVICE *, t_bool);
+void rebuildPending(void);
+void buildIOtable(void);
+void loadBootstrap(uint16 *, int, uint16, uint16);
+
+void fw_init(void);
+enum IOstatus fw_doIO(DEVICE *, t_bool);
+enum IOstatus fw_doBDCIO(IO_DEVICE *, uint16 *, t_bool, uint8);
+void fw_IOintr(t_bool, DEVICE *, IO_DEVICE *, uint16, uint16, uint16,
+               const char *);
+void fw_IOunderwayData(IO_DEVICE *, uint16);
+void fw_IOcompleteData(t_bool, DEVICE *, IO_DEVICE *, uint16, const char *);
+void fw_IOunderwayEOP(IO_DEVICE *, uint16);
+void fw_IOcompleteEOP(t_bool, DEVICE *, IO_DEVICE *, uint16, const char *);
+void fw_IOunderwayEOP2(IO_DEVICE *, uint16);
+void fw_IOcompleteEOP2(t_bool, DEVICE *, IO_DEVICE *, uint16, const char *);
+void fw_IOalarm(t_bool, DEVICE *, IO_DEVICE *, const char *);
+void fw_setForced(IO_DEVICE *, uint16);
+void fw_clearForced(IO_DEVICE *, uint16);
+t_bool fw_reject(IO_DEVICE *, t_bool, uint8);
+void fw_state(char *, DEVICE *, IO_DEVICE *);
+IO_DEVICE *fw_findChanDevice(IO_DEVICE *, uint16);
+
+uint16 cpuINTR(DEVICE *);
+uint16 dev1INTR(DEVICE *);
+void dev1Interrupts(char *);
+
 uint16 dcINTR(void);
+void buildDCtables(void);
+
+t_stat show_addr(FILE *, UNIT *, int32, const void *);
+t_stat set_stoponrej(UNIT *, int32, const char *, void *);
+t_stat clr_stoponrej(UNIT *, int32, const char *, void *);
+t_stat set_protected(UNIT *, int32, const char *, void *);
+t_stat clear_protected(UNIT *, int32, const char *, void *);
 
 /*
  * Generic device flags
@@ -1157,5 +1193,27 @@ uint16 dcINTR(void);
 
 #define RDR_IN_WAIT      200                    /* Card reader feed wait */
 #define PUN_OUT_WAIT     200                    /* Card punch feed wait */
+
+/*
+ * System helpers shared by CDC1700 modules.
+ */
+void VMinit(void);
+t_stat set_equipment(UNIT *, int32, const char *, void *);
+t_stat checkReset(DEVICE *, uint8);
+void MSOS5request(uint16, uint16);
+
+t_bool inProtectedMode(void);
+void RaiseExternalInterrupt(DEVICE *);
+uint16 LoadFromMem(uint16);
+t_bool IOStoreToMem(uint16, uint16, t_bool);
+uint16 doADDinternal(uint16, uint16);
+t_stat disEffectiveAddr(uint16, uint16, uint16 *, uint16 *);
+
+/*
+ * Autoload helpers.
+ */
+t_stat CDautoload(void);
+t_stat DPautoload(void);
+t_stat DRMautoload(void);
 
 #endif

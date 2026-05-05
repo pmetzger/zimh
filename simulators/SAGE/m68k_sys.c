@@ -35,6 +35,11 @@
 
 t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE* dptr;
     PNP_INFO* pnp;
     t_stat rc;
@@ -63,6 +68,11 @@ t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE *dptr;
     PNP_INFO *pnp;
 
@@ -76,6 +86,11 @@ t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat m68k_set_cpu(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     if (value < 0 || value > CPU_TYPE_68030)
         return SCPE_ARG;
 
@@ -87,6 +102,11 @@ t_stat m68k_set_cpu(UNIT *uptr, int32 value, const char *cptr, void *desc)
 
 t_stat m68k_show_cpu(FILE* st,UNIT *uptr, int32 value, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+
     fprintf(st,"TYPE=%s",(const char *)desc);
     return SCPE_OK;
 }
@@ -102,6 +122,11 @@ t_stat m68k_alloc_mem(void)
 
 t_stat m68k_set_size(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     t_stat rc;
     uptr->capac = value;
     if ((rc=m68k_alloc_mem()) != SCPE_OK) return rc;
@@ -110,23 +135,43 @@ t_stat m68k_set_size(UNIT *uptr, int32 value, const char *cptr, void *desc)
 
 t_stat m68k_set_fpu(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     uptr->flags |= value;
     return SCPE_OK;
 }
 t_stat m68k_set_nofpu(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     uptr->flags |= value;
     return SCPE_OK;
 }
 
 t_stat m68kcpu_set_flag(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     uptr->flags |= value;
     return SCPE_OK;
 }
 
 t_stat m68kcpu_set_noflag(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     uptr->flags &= ~value;
     return SCPE_OK;
 }
@@ -134,6 +179,10 @@ t_stat m68kcpu_set_noflag(UNIT *uptr, int32 value, const char *cptr, void *desc)
 
 t_stat m68kcpu_ex(t_value* eval_array, t_addr addr, UNIT* uptr, int32 sw)
 {
+    /* Generic examine signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     uint32 val = 0;
     t_stat rc = (sw & SWMASK('V')) ? ReadVW(addr,&val) : ReadPW(addr,&val);
     if (rc==SCPE_OK) *eval_array = val;
@@ -142,6 +191,10 @@ t_stat m68kcpu_ex(t_value* eval_array, t_addr addr, UNIT* uptr, int32 sw)
 
 t_stat m68kcpu_dep(t_value value, t_addr addr, UNIT* uptr, int32 sw)
 {
+    /* Generic deposit signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     return (sw & SWMASK('V')) ? WriteVW(addr,value) : WritePW(addr,value);
 }
 
@@ -233,6 +286,10 @@ error:
 
 t_stat sim_load(FILE* fptr, const char* cptr, const char* fnam, t_bool flag)
 {
+    /* Generic loader signature.
+       This implementation does not use every parameter. */
+    (void)fnam;
+
     int i,len,rc;
     uint16 data;
     uint8 s;
@@ -705,6 +762,11 @@ static t_stat _fsym6(FILE* of,t_value inst,t_addr addr,t_value* rest)
 
 static t_stat _fsym7(FILE* of,t_value inst,t_addr addr,t_value* rest)
 {
+    /* Instruction formatter dispatch signature.
+       This implementation does not use every parameter. */
+    (void) addr;
+    (void) rest;
+
     int reg9 = REG9_CHAR(inst);
     switch (inst & 000400) {
     case 000000:
@@ -795,6 +857,11 @@ static t_stat _fsym9(FILE* of,t_value inst,t_addr addr,t_value* rest)
 
 static t_stat _fsyma(FILE* of,t_value inst,t_addr addr,t_value* rest)
 {
+    /* Instruction formatter dispatch signature.
+       This implementation does not use every parameter. */
+    (void) addr;
+    (void) rest;
+
     fprintf(of,"trapa #$%x",inst&0xfff); return -1;
 }
 
@@ -948,11 +1015,20 @@ static t_stat _fsyme(FILE* of,t_value inst,t_addr addr,t_value* rest)
 
 static t_stat _fsymf(FILE* of,t_value inst,t_addr addr,t_value* rest)
 {
+    /* Instruction formatter dispatch signature.
+       This implementation does not use every parameter. */
+    (void) addr;
+    (void) rest;
+
     fprintf(of,"trapf #$%x",inst&0xfff); return -1;
 }
 
 t_stat fprint_sym(FILE* of, t_addr addr, t_value* val, UNIT* uptr, int32 sw)
 {
+    /* Generic symbolic output signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+
     int32 c1, c2, inst;
 
     c1 = (val[0] >> 8) & 0177;

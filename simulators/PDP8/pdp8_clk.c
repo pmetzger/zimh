@@ -170,6 +170,10 @@ return SCPE_OK;
 
 t_stat clk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 dev_done = dev_done & ~INT_CLK;                         /* clear done, int */
 int_req = int_req & ~INT_CLK;
 int_enable = int_enable & ~INT_CLK;                     /* clear enable */
@@ -184,6 +188,11 @@ return SCPE_OK;
 
 t_stat clk_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if (cptr)
     return SCPE_ARG;
 if ((val != 50) && (val != 60))
@@ -196,11 +205,21 @@ return SCPE_OK;
 
 t_stat clk_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, (clk_tps == 50)? "50Hz": "60Hz");
 return SCPE_OK;
 }
 
 const char *clk_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "real time clock";
 }

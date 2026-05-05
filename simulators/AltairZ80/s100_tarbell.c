@@ -282,6 +282,10 @@ static REG tarbell_reg[] = {
 #define TARBELL_SNAME "TARBELL"
 
 static const char* tarbell_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return TARBELL_NAME;
 }
 
@@ -542,6 +546,12 @@ static t_stat tarbell_detach(UNIT *uptr)
 
 static t_stat tarbell_set_dmabase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     uint32 newba;
     t_stat r;
 
@@ -575,6 +585,12 @@ static t_stat tarbell_set_dmabase(UNIT *uptr, int32 val, const char *cptr, void 
 
 static t_stat tarbell_show_dmabase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (tarbell_info->ddEnabled) {
         fprintf(st, "DMA=0x%02X-0x%02X", tarbell_info->dma_base, tarbell_info->dma_base+tarbell_info->dma_size-1);
     } else {
@@ -586,6 +602,12 @@ static t_stat tarbell_show_dmabase(FILE *st, UNIT *uptr, int32 val, const void *
 
 static t_stat tarbell_set_model(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!cptr) return SCPE_IERR;
 
     /* this assumes that the parameter has already been upcased */
@@ -613,6 +635,12 @@ static t_stat tarbell_set_model(UNIT *uptr, int32 val, const char *cptr, void *d
 
 static t_stat tarbell_show_model(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf(st, "MODEL=%s", (tarbell_info->ddEnabled) ? "DD" : "SD");
 
     return SCPE_OK;
@@ -620,6 +648,12 @@ static t_stat tarbell_show_model(FILE *st, UNIT *uptr, int32 val, const void *de
 
 static t_stat tarbell_set_prom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
 
@@ -637,6 +671,12 @@ static t_stat tarbell_set_prom(UNIT *uptr, int32 val, const char *cptr, void *de
 
 static t_stat tarbell_show_prom(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf(st, "%s", (tarbell_info->promEnabled) ? "PROM" : "NOPROM");
 
     return SCPE_OK;
@@ -644,6 +684,9 @@ static t_stat tarbell_show_prom(FILE *st, UNIT *uptr, int32 val, const void *des
 
 static t_stat tarbell_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
 
     PNP_INFO *pnp = (PNP_INFO *)dptr->ctxt;
 
@@ -1430,6 +1473,12 @@ static int32 tarbellprom(int32 Addr, int32 rw, int32 Data)
 
 static int32 tarbelldma(int32 Addr, int32 rw, int32 data)
 {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) Addr;
+    (void) rw;
+    (void) data;
+
     return 0x00;    /* DMA is not implemented */
 }
 

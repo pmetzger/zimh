@@ -345,7 +345,7 @@ DEVICE va_dev = {
     &va_description
     };
 
-void va_fcc_fifo_clr (void)
+static void va_fcc_fifo_clr (void)
 {
 sim_debug (DBG_FCC, &va_dev, "fcc_fifo_clr\n");
 va_fcc_fifo_wp = 0;                                     /* reset pointers */
@@ -353,7 +353,7 @@ va_fcc_fifo_rp = 0;
 va_fcc_fifo_sz = 0;                                     /* empty */
 }
 
-void va_fcc_fifo_wr (uint32 val)
+static void va_fcc_fifo_wr (uint32 val)
 {
 sim_debug (DBG_FCC, &va_dev, "fcc_fifo_wr: %d, %X (%d) at %08X\n", va_fcc_fifo_wp, val, (va_fcc_fifo_sz + 1), fault_PC);
 if (va_fcc_fifo_sz == RAM_SIZE) {                       /* writing full fifo? */
@@ -366,7 +366,7 @@ if (va_fcc_fifo_wp == RAM_SIZE)                         /* pointer wrap? */
 va_fcc_fifo_sz++;
 }
 
-uint32 va_fcc_fifo_rd (void)
+static uint32 va_fcc_fifo_rd (void)
 {
 uint32 val;
 
@@ -384,8 +384,12 @@ if (va_fcc_fifo_sz == 0)
 return val;
 }
 
-void va_ccr_wr (int32 pa, int32 val, int32 lnt)
+static void va_ccr_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa >> 1) & 0x1F;
 
 if (rg <= 0xF)
@@ -458,7 +462,7 @@ switch (rg) {
 }
 
 #if defined(BT458)
-int32 va_dac_rd (int32 pa)
+static int32 va_dac_rd (int32 pa)
 {
 uint32 rg = (pa >> 1) & 0x3F;
 uint32 data = 0;
@@ -505,8 +509,12 @@ switch (rg) {
 return data;
 }
 
-void va_dac_wr (int32 pa, int32 val, int32 lnt)
+static void va_dac_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 uint32 rg = (pa >> 1) & 0x3F;
 int32 i;
 
@@ -553,7 +561,7 @@ switch (rg) {
         }
 }
 #else
-int32 va_dac_rd (int32 pa)
+static int32 va_dac_rd (int32 pa)
 {
 uint32 rg = (pa >> 1) & 0x3F;
 uint32 data = 0;
@@ -566,8 +574,12 @@ else
 return data;
 }
 
-void va_dac_wr (int32 pa, int32 val, int32 lnt)
+static void va_dac_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 uint32 rg = (pa >> 1) & 0x3F;
 int32 red, grn, blu, i;
 
@@ -591,7 +603,7 @@ if (rg < 0x28) {                                        /* active colour map? */
 }
 #endif
 
-int32 va_fcc_rd (int32 pa)
+static int32 va_fcc_rd (int32 pa)
 {
 uint32 rg = (pa >> 1) & 0xF;
 uint32 data = 0;
@@ -660,8 +672,12 @@ else
 return data;
 }
 
-void va_fcc_wr (int32 pa, int32 val, int32 lnt)
+static void va_fcc_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 uint32 rg = (pa >> 1) & 0xF;
 
 if (rg <= FCC_MAXREG)
@@ -1031,7 +1047,7 @@ if ((c = sim_poll_kbd ()) < SCPE_KFLAG)                 /* no char or error? */
 return SCPE_OK;
 }
 
-t_bool va_fcc_rdn (uint32 *data, uint32 bits)
+static t_bool va_fcc_rdn (uint32 *data, uint32 bits)
 {
 int32 mask = (1u << bits) - 1;
 if (va_fcc_sc == 0) {                                   /* need to read FIFO? */
@@ -1044,7 +1060,7 @@ va_fcc_sc = (va_fcc_sc + bits) & 0xF;
 return TRUE;
 }
 
-t_bool va_fcc_wrn (uint32 data, uint32 bits)
+static t_bool va_fcc_wrn (uint32 data, uint32 bits)
 {
 int32 mask = (1u << bits) - 1;
 mask = mask << va_fcc_sc;
@@ -1060,7 +1076,7 @@ if (va_fcc_sc == 0) {                                   /* need to write FIFO? *
 return TRUE;
 }
 
-void va_fcc_decomp (UNIT *uptr)
+static void va_fcc_decomp (UNIT *uptr)
 {
 uint32 pix, last_pix, len1, len2, i, sc, temp;
 
@@ -1095,7 +1111,7 @@ for (;uptr->CMD != 0;) {
     }
 }
 
-void va_fcc_comp (UNIT *uptr)
+static void va_fcc_comp (UNIT *uptr)
 {
 uint32 pix, last_pix, len1, len2, temp;
 
@@ -1326,6 +1342,10 @@ return SCPE_OK;
 
 t_stat va_detach (UNIT *uptr)
 {
+/* Generic detach signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if ((va_dev.flags & DEV_DIS) == 0) {
     va_dev.flags |= DEV_DIS;
     va_reset(&va_dev);
@@ -1335,6 +1355,12 @@ return SCPE_OK;
 
 t_stat va_set_yoff (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i;
 t_stat r;
 
@@ -1348,12 +1374,24 @@ return r;
 
 t_stat va_show_yoff (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "%d", va_yoff);
 return SCPE_OK;
 }
 
 t_stat va_set_dpln (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i;
 t_stat r;
 
@@ -1371,17 +1409,35 @@ return r;
 
 t_stat va_show_dpln (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "%d", va_dpln);
 return SCPE_OK;
 }
 
 t_stat va_set_enable (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 return cpu_set_model (NULL, 0, (val ? "VAXSTATIONGPX" : "MICROVAX"), NULL);
 }
 
 t_stat va_set_capture (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (vid_active)
     return sim_messagef (SCPE_ALATT, "Capture Mode Can't be changed with device enabled\n");
 va_input_captured = val;
@@ -1401,6 +1457,12 @@ return SCPE_OK;
 
 t_stat va_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "GPX 8-Bit Colour Video Subsystem (%s)\n\n", dptr->name);
 fprintf (st, "Use the Control-Right-Shift key combination to regain focus from the simulated\n");
 fprintf (st, "video display\n");
@@ -1412,5 +1474,9 @@ return SCPE_OK;
 
 const char *va_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "GPX Colour Graphics Adapter";
 }

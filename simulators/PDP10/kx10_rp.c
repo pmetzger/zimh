@@ -1049,6 +1049,11 @@ wr_end:
 t_stat
 rp_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     int         i;
 
     if (uptr == NULL) return SCPE_IERR;
@@ -1294,6 +1299,10 @@ return SCPE_OK;
 
 const char *rp_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "RP04/05/06/07 Massbus disk controller";
 }
 

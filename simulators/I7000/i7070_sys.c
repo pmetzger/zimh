@@ -219,6 +219,13 @@ char    mem_ascii[256] = {
 t_stat
 sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
 {
+   /* Generic loader signature.
+      This implementation does not use every parameter. */
+   (void)fnam;
+   (void)cptr;
+   (void)fileref;
+   (void)flag;
+
    /* Currently not implimented until I know format of load files */
     return SCPE_NOFNC;
 }
@@ -491,7 +498,7 @@ const char *chname[11] = {
 };
 
 /* Print out an instruction */
-void
+static void
 print_opcode(FILE * of, t_value val, t_opcode * tab)
 {
     uint32      MA;
@@ -789,6 +796,11 @@ print_opcode(FILE * of, t_value val, t_opcode * tab)
 t_stat
 fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+    (void)uptr;
+
     t_uint64            inst = *val;
 
 /* Print value in decimal first */
@@ -820,7 +832,7 @@ fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
     return SCPE_OK;
 }
 
-t_opcode           *
+static t_opcode           *
 find_opcode(char *op, t_opcode * tab)
 {
     while (tab->name != NULL) {
@@ -846,6 +858,11 @@ find_opcode(char *op, t_opcode * tab)
 t_stat
 parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+    (void)uptr;
+
     int                 i;
     int                 idx;
     t_value             a, opr, d;

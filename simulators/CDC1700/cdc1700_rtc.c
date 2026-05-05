@@ -194,6 +194,12 @@ DEVICE rtc_dev = {
 
 t_stat rtc_show_rate(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   struct RTCtimebase *tb = timeBase;
 
   while (tb->name != NULL) {
@@ -208,6 +214,12 @@ t_stat rtc_show_rate(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat rtc_set_rate(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   if (cptr) {
     struct RTCtimebase *tb = timeBase;
 
@@ -237,6 +249,10 @@ uint16 RTCraised(DEVICE *dptr)
 
 t_stat rtc_svc(UNIT *uptr)
 {
+  /* Generic unit service signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   if (RTCdev.iod_RTCstate != IODP_RTCIDLE) {
     if ((RTCdev.iod_RTCstate & IODP_RTCRUNNING) != 0) {
       RTCdev.COUNTER++;
@@ -275,6 +291,11 @@ t_stat rtc_reset(DEVICE * dptr)
 
 enum IOstatus RTCin(IO_DEVICE *iod, uint8 reg)
 {
+  /* Generic I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+  (void) reg;
+
   /*
    * The framework only passes IN operations for the data register.
    */
@@ -283,6 +304,10 @@ enum IOstatus RTCin(IO_DEVICE *iod, uint8 reg)
 
 enum IOstatus RTCout(IO_DEVICE *iod, uint8 reg)
 {
+  /* Generic I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   switch (reg) {
     case 0x00:
       RTCdev.HOLDREG = Areg;

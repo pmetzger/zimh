@@ -360,6 +360,11 @@ DEVICE mba_dev[] = {
 
 t_stat mba_rdreg (int32 *val, int32 pa, int32 lnt)
 {
+#if defined (VAX_750)
+/* Shared bus read signature.
+   This build variant does not use every parameter. */
+(void) lnt;
+#endif
 int32 mb, ofs, drv, rtype;
 uint32 t;
 t_stat r;
@@ -862,6 +867,12 @@ return build_dib_tab();
 
 t_stat mba_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Massbus Adapters (MBA0, MBA1)\n\n");
 fprintf (st, "The Massbus adapters (MBA0, MBA1) simulate RH780's.  RP disk drives get\n");
 fprintf (st, "assigned to MBA0 if it is enabled, and TU tape drives get assigned to\n");
@@ -898,6 +909,11 @@ return buf;
 
 t_stat mba_show_num (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = find_dev_from_unit (uptr);
 DIB *dibp;
 

@@ -148,6 +148,10 @@ int32 imp_io (int32 inst, int32 fnc, int32 dat, int32 dev)
 // Unit service ...
 t_stat imp_service (UNIT *uptr)
 {
+  /* Generic unit service signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   return SCPE_OK;
 }
 
@@ -160,6 +164,10 @@ t_stat imp_service (UNIT *uptr)
 // Reset routine ...
 t_stat imp_reset (DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   // The simh RESET command clears both the interrupt request and enable...
   CLR_TASK_IRQ();  CLR_TASK_IEN();
   return SCPE_OK;
@@ -174,6 +182,12 @@ t_stat imp_reset (DEVICE *dptr)
 // Show the station number ...
 t_stat imp_show_station (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   fprintf(st,"station=%d", imp_station);
   return SCPE_OK;
 }
@@ -181,6 +195,12 @@ t_stat imp_show_station (FILE *st, UNIT *uptr, int32 val, const void *desc)
 // Set the station number ...
 t_stat imp_set_station (UNIT *uptr, int32 val, const char *cptr, void *dp)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) dp;
+
   uint32 newnum;  t_stat sts;
   if (cptr == NULL) return SCPE_ARG;
   newnum = get_uint (cptr, 10, 9999, &sts);

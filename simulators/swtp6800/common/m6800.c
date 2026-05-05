@@ -141,6 +141,10 @@ int32 hst_lnt = 0;                      /* history length */
 InstHistory *hst = NULL;                /* instruction history */
 int32 reason;                           //reason for halting processor
 static const char* m6800_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return m6800_NAME;
 }
 
@@ -1963,6 +1967,10 @@ void condevalHa(int32 op1, int32 op2)
 
 t_stat m6800_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     CC = CC_ALWAYS_ON | IF;
     NMI = 0, IRQ = 0;
     sim_brk_types = sim_brk_dflt = SWMASK ('E');
@@ -1983,6 +1991,10 @@ t_stat m6800_reset(DEVICE *dptr)
 
 int32 sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+    /* Generic loader signature.
+       This implementation does not use every parameter. */
+    (void) fnam;
+
     int32 i, addr = 0, addr0 = 0, cnt = 0, cnt0 = 0, start = 0x10000;
     int32 addr1 = 0, end = 0, byte, chk, rtype, flag0 = 1;
     char buf[128], data[128], *p;
@@ -2102,6 +2114,10 @@ int32 sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag)
 */
 t_stat fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 {
+    /* Generic symbolic output signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     int i, inst, inst1;
 
     if (sw & SWMASK ('D')) {            // dump memory
@@ -2157,6 +2173,14 @@ t_stat fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 
 t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+    /* Generic symbolic input signature.
+       This implementation does not use every parameter. */
+    (void) addr;
+    (void) cptr;
+    (void) sw;
+    (void) uptr;
+    (void) val;
+
     return (1);
 }
 
@@ -2164,6 +2188,12 @@ t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 
 
 t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int i, lnt;
     t_stat r;
 
@@ -2195,6 +2225,11 @@ t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     int k, di, lnt, ir;
     const char *cptr = (const char *) desc;
     t_stat r;
@@ -2228,6 +2263,11 @@ t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat m6800_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic memory examine signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     if (addr >= MAXMEMSIZE)
         return SCPE_NXM;
     if (vptr != NULL)
@@ -2239,6 +2279,11 @@ t_stat m6800_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 
 t_stat m6800_dep(t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic memory deposit signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     if (addr >= MAXMEMSIZE)
         return SCPE_NXM;
     CPU_BD_put_mbyte(addr, val);

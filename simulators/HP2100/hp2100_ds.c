@@ -458,6 +458,10 @@ DEVICE ds_dev = {
 
 static SIGNALS_VALUE ds_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 static const char * const output_state [] = { "Data", "Command" };
 const char * const hold_or_clear = (inbound_signals & ioCLF ? ",C" : "");
 INBOUND_SIGNAL signal;
@@ -1410,6 +1414,11 @@ else                                                    /* otherwise */
 
 static t_stat ds_load_unload (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 const t_bool load = (value != UNIT_UNLOAD);             /* true if the heads are loading */
 
 return dl_load_unload (&mac_cntlr, uptr, load);         /* load or unload the heads */

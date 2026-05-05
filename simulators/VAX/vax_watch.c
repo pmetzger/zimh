@@ -304,6 +304,10 @@ if (lnt == 4)
 
 t_stat wtc_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (sim_switches & SWMASK ('P')) {                      /* powerup? */
     wtc_csra = 0;
     wtc_csrb = 0;
@@ -316,6 +320,12 @@ return SCPE_OK;
 
 t_stat wtc_set (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 char gbuf[CBUFSIZE];
 
 if (cptr != NULL) {
@@ -336,6 +346,12 @@ return SCPE_OK;
 
 t_stat wtc_show (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf(st, "time=%s", (wtc_mode ? "vms" :"std"));
 return SCPE_OK;
 }
@@ -354,6 +370,13 @@ wtc_csrd &= ~WTC_CSRD_VRT;
 
 t_stat wtc_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Watch Chip (WTC)\n\n");
 fprintf (st, "The WTC simulates the MC146818 watch chip.  It recognizes the following options:\n\n");
 fprintf (st, "  SET WTC TIME=STD            standard time mode\n");
@@ -367,5 +390,9 @@ return SCPE_OK;
 
 const char *wtc_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "watch chip";
 }

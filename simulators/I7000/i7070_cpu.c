@@ -222,7 +222,7 @@ t_uint64 dmask[11] = {
 #define sdigit(d, v) ((((t_uint64)v) & 0xFLL) << ((d) * 4))
 #define mdigit(d)    (0xFLL << ((d) * 4))
 
-t_uint64 ReadP(uint32 addr) {
+static t_uint64 ReadP(uint32 addr) {
     sim_interval -= (CPU_MODEL == 0x0)? 2: 1;
     if (emode) {
         if (addr > MAXMEMSIZE) {
@@ -248,7 +248,7 @@ t_uint64 ReadP(uint32 addr) {
     return 0LL;
 }
 
-void WriteP(uint32 addr, t_uint64 value) {
+static void WriteP(uint32 addr, t_uint64 value) {
     sim_interval -= (CPU_MODEL == 0x0)? 2: 1;
     if (emode) {
         if (addr > MAXMEMSIZE) {
@@ -2779,6 +2779,10 @@ mem_init(void) {
 t_stat
 cpu_reset(DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     static int  initialized = 0;
 
     if (initialized == 0) {
@@ -2819,6 +2823,10 @@ rtc_srv(UNIT * uptr)
 t_stat
 rtc_reset(DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     if (cpu_unit.flags & OPTION_TIMER) {
         sim_activate(&cpu_unit, cpu_unit.wait);
     }
@@ -2830,6 +2838,11 @@ rtc_reset(DEVICE * dptr)
 t_stat
 cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)sw;
+    (void)uptr;
+
     if (addr > MEMSIZE)
         return SCPE_NXM;
     if (vptr != NULL)
@@ -2843,6 +2856,11 @@ cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)sw;
+    (void)uptr;
+
     if (addr > MEMSIZE)
         return SCPE_NXM;
     M[addr] = val;
@@ -2852,6 +2870,12 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)desc;
+    (void)uptr;
+
     t_uint64            mc = 0;
     uint32              i;
     int32               v;
@@ -2882,6 +2906,12 @@ cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)uptr;
+    (void)val;
+
     int32               i, lnt;
     t_stat              r;
 
@@ -2915,6 +2945,11 @@ cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+
     int32               k, di, lnt;
     char               *cptr = (char *) desc;
     t_stat              r;
@@ -2977,6 +3012,12 @@ cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 
 t_stat
 cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr) {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)flag;
+    (void)uptr;
+
     fprintf (st, "The CPU can be set to a IBM 7070 or IBM 7074\n");
     fprintf (st, "The type of CPU can be set by one of the following commands\n\n");
     fprintf (st, "   sim> set CPU 7070        sets IBM 7070 emulation\n");
@@ -3006,6 +3047,10 @@ cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr) {
 
 const char *
 cpu_description (DEVICE *dptr) {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "IBM 7070 CPU";
 }
 

@@ -129,6 +129,10 @@ static REG n8vem_reg[] = {
 #define N8VEM_NAME  "Single-Board Computer"
 
 static const char* n8vem_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return N8VEM_NAME;
 }
 
@@ -194,6 +198,11 @@ static t_stat n8vem_reset(DEVICE *dptr)
 
 static t_stat n8vem_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+    (void) dptr;
+
     sim_debug(VERBOSE_MSG, &n8vem_dev, "N8VEM: Boot.\n");
 
     /* Clear the RAM and ROM mapping registers */

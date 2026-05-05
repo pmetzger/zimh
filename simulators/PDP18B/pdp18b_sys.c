@@ -210,7 +210,7 @@ const char *sim_stop_messages[SCPE_BASE] = {
 
 /* Binary loaders */
 
-int32 getword (FILE *fileref, int32 *hi)
+static int32 getword (FILE *fileref, int32 *hi)
 {
 int32 word, bits, st, ch;
 
@@ -240,7 +240,7 @@ return word;
         jmp addr or hlt
 */
 
-t_stat rim_load_47 (FILE *fileref, const char *cptr)
+static t_stat rim_load_47 (FILE *fileref, const char *cptr)
 {
 int32 origin, val;
 
@@ -277,7 +277,7 @@ return SCPE_OK;                                         /* done */
         word to execute (bit 1 of last character set)
 */
 
-t_stat hri_load_7915 (FILE *fileref, const char *cptr)
+static t_stat hri_load_7915 (FILE *fileref, const char *cptr)
 {
 int32 bits, origin, val;
 char gbuf[CBUFSIZE];
@@ -323,7 +323,7 @@ return SCPE_OK;
         endblock/       origin (< 0)
 */
 
-t_stat bin_load_915 (FILE *fileref, const char *cptr)
+static t_stat bin_load_915 (FILE *fileref, const char *cptr)
 {
 int32 i, val, bits, origin, count, cksum;
 
@@ -922,7 +922,7 @@ static const int32 opc_val[] = {
         status  =       space needed?
 */
 
-int32 fprint_opr (FILE *of, int32 inst, int32 clss, int32 sp)
+static int32 fprint_opr (FILE *of, int32 inst, int32 clss, int32 sp)
 {
 int32 i, j;
 
@@ -1133,7 +1133,7 @@ return SCPE_ARG;
         val     =       output value
 */
 
-t_value get_sint (char *cptr, int32 *sign, t_stat *status)
+static t_value get_sint (char *cptr, int32 *sign, t_stat *status)
 {
 *sign = 0;
 if (*cptr == '+') {

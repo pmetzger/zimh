@@ -181,6 +181,10 @@ static UNIT dsk_unit[] = {
 #define MHDSK_NAME  "MITS Hard Disk"
 
 static const char* mhdsk_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return MHDSK_NAME;
 }
 
@@ -245,6 +249,11 @@ static int32 bootrom_mhdsk[BOOTROM_SIZE_MHDSK] = {
 };
 
 static t_stat mhdsk_boot(int32 unitno, DEVICE *dptr) {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+    (void) dptr;
+
     const t_bool installSuccessful = (install_bootrom(bootrom_mhdsk, BOOTROM_SIZE_MHDSK,
                                                       MHDSK_BOOT_ADDRESS, FALSE) == SCPE_OK);
     ASSURE(installSuccessful);
@@ -307,6 +316,11 @@ static t_stat dsk_reset(DEVICE *dptr) {
 ---------------------------------------------------------------------------------------*/
 static int32 hdReturnReady(const int32 port, const int32 io, const int32 data)
 {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) io;
+    (void) data;
+
     sim_debug(VERBOSE_MSG, &mhdsk_dev, "MHDSK: " ADDRESS_FORMAT
               " IN(%02X = %s) = 0x80.\n",
               PCX, port, (port == 0xa0 ? "CREADY" : (port == 0xa2 ? "ACSTA" :
@@ -327,6 +341,11 @@ static int32 hdReturnReady(const int32 port, const int32 io, const int32 data)
 -------------------------------------------------------------*/
 static int32 hdCstat(const int32 port, const int32 io, const int32 data)
 {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) io;
+    (void) data;
+
     sim_debug(VERBOSE_MSG, &mhdsk_dev, "MHDSK: " ADDRESS_FORMAT
               " IN(%02X = %s) = %02x.\n", PCX, port, (port == 0xa1 ? "CSTAT" : "?????"), cstat);
     return(cstat);
@@ -455,6 +474,10 @@ static int32 hdAcmd(const int32 port, const int32 io, const int32 data)
 -------------------------------------------------------------*/
 static int32 hdCdata(const int32 port, const int32 io, const int32 data)
 {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) data;
+
     if (io == IO_IN) {
         if (bufferIdx < maxBufferIdx) {
             const int32 result = diskBuf[selectedBuffer][bufferIdx];

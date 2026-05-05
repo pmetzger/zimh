@@ -195,6 +195,11 @@ disk_write(UNIT *uptr, uint64 *buffer, int sector, int wps)
 /* Set disk format */
 t_stat disk_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int f;
 
     if (uptr == NULL) return SCPE_IERR;
@@ -213,6 +218,11 @@ t_stat disk_set_fmt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat disk_show_fmt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int fmt = GET_FMT(uptr->flags);
     int f;
 
@@ -259,6 +269,12 @@ t_stat disk_detach (UNIT *uptr)
 
 t_stat disk_attach_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic attach help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     fprintf (st, "%s Disk Attach Help\n\n", dptr->name);
 
     fprintf (st, "Disk container files can be one of 3 different types:\n\n");

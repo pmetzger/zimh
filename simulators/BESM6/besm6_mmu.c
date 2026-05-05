@@ -215,8 +215,15 @@ MTAB mmu_mod[] = {
 
 t_stat mmu_reset (DEVICE *dptr);
 
-t_stat mmu_examine (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
+static t_stat mmu_examine (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic examine signature.
+       This implementation does not use every parameter. */
+    (void) vptr;
+    (void) addr;
+    (void) uptr;
+    (void) sw;
+
     mmu_print_brz();
     return SCPE_NOFNC;
 }
@@ -234,6 +241,10 @@ DEVICE mmu_dev = {
  */
 t_stat mmu_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
     for (i = 0; i < 8; ++i) {
         BRZ[i] = RP[i] = BAZ[i] = 0;
@@ -289,7 +300,7 @@ static unsigned lose_mask[8] = {
 
 #define set_wins(i) TABST = (TABST & ~lose_mask[i]) | win_mask[i]
 
-void mmu_protection_check (int addr)
+static void mmu_protection_check (int addr)
 {
     /* Защита блокируется в режиме супервизора для физических (!) адресов 1-7 (ТО-8) - WTF? */
     int tmp_prot_disabled = (M[PSW] & PSW_PROT_DISABLE) ||
@@ -304,7 +315,7 @@ void mmu_protection_check (int addr)
     }
 }
 
-void mmu_flush (int idx)
+static void mmu_flush (int idx)
 {
     int waddr = BAZ[idx];
 
@@ -324,7 +335,7 @@ void mmu_flush (int idx)
     }
 }
 
-void mmu_update_oldest (void)
+static void mmu_update_oldest (void)
 {
     int i;
 
@@ -337,7 +348,7 @@ void mmu_update_oldest (void)
     }
 }
 
-int mmu_match (int addr, int fail)
+static int mmu_match (int addr, int fail)
 {
     int i;
 
@@ -354,7 +365,7 @@ int mmu_match (int addr, int fail)
  * по адресам пультовых регистров. Тест УУ проходит дальше всего
  * с mmu_flush_by_age().
  */
-void mmu_flush_by_age(void)
+static void mmu_flush_by_age(void)
 {
     switch (FLUSH) {
     case 0:
@@ -453,7 +464,7 @@ void mmu_store (int addr, t_value val)
     }
 }
 
-t_value mmu_memaccess (int addr)
+static t_value mmu_memaccess (int addr)
 {
     t_value val;
 
@@ -574,7 +585,7 @@ static unsigned brs_lose_mask[8] = {
 
 #define brs_set_wins(i) BRSLRU = (BRSLRU & ~brs_lose_mask[i]) | brs_win_mask[i]
 
-void mmu_fetch_check (int addr)
+static void mmu_fetch_check (int addr)
 {
     /* В режиме супервизора защиты нет */
     if (! IS_SUPERVISOR(RUU)) {

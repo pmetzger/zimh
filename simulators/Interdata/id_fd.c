@@ -204,6 +204,10 @@ DEVICE fd_dev = {
 
 uint32 fd (uint32 dev, uint32 op, uint32 dat)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 u, t, fnc;
 UNIT *uptr;
 
@@ -473,6 +477,10 @@ return crc;
 
 t_stat fd_clr (DEVICE *dptr)
 {
+/* Generic clear signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i, j;
 UNIT *uptr;
 
@@ -514,6 +522,10 @@ static uint8 boot_rom[] = {
 
 t_stat fd_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (decrom[0xD5] & dec_flgs)                            /* AL defined? */
     return SCPE_NOFNC;
 IOWriteBlk (BOOT_START, BOOT_LEN, boot_rom);            /* copy boot */

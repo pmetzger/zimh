@@ -475,7 +475,7 @@ return SCPE_OK;
 
 /* Read and write Unibus I/O space */
 
-int32 ReadUb (uint32 pa)
+static int32 ReadUb (uint32 pa)
 {
 int32 idx, val;
 
@@ -490,7 +490,7 @@ uba_ub_nxm (pa);                                        /* UB nxm */
 return 0;
 }
 
-void WriteUb (uint32 pa, int32 val, int32 mode)
+static void WriteUb (uint32 pa, int32 val, int32 mode)
 {
 int32 idx;
 
@@ -783,7 +783,7 @@ return FALSE;
 
 /* Map an address via the translation map - console version (no status changes) */
 
-t_bool uba_map_addr_c (uint32 ua, uint32 *ma)
+static t_bool uba_map_addr_c (uint32 ua, uint32 *ma)
 {
 uint32 ublk, umap;
 
@@ -912,6 +912,10 @@ return;
 
 t_stat uba_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 uba_int = 0;
@@ -936,6 +940,12 @@ return SCPE_OK;
 
 t_stat uba_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Unibus Adapter (UBA)\n\n");
 fprintf (st, "The Unibus adapter (UBA) simulates the DW780.\n");
 fprint_set_help (st, dptr);
@@ -950,6 +960,10 @@ return SCPE_OK;
 
 const char *uba_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Unibus adapter";
 }
 
@@ -957,6 +971,11 @@ return "Unibus adapter";
 
 t_stat uba_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 ua = (uint32) exta, pa;
 
 if ((vptr == NULL) || (ua >= UBADDRSIZE))
@@ -972,6 +991,11 @@ return SCPE_NXM;
 
 t_stat uba_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 ua = (uint32) exta, pa;
 
 if (ua >= UBADDRSIZE)
@@ -987,6 +1011,11 @@ return SCPE_NXM;
 
 t_stat uba_show_virt (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 t_stat r;
 const char *cptr = (const char *) desc;
 uint32 ua, pa;
@@ -1008,5 +1037,10 @@ return SCPE_OK;
 
 t_stat uba_show_map (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 return show_bus_map (of, (const char *)desc, uba_map, UBA_NMAPR, "Unibus", UBAMAP_VLD);
 }

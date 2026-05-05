@@ -256,6 +256,12 @@ static t_stat load_block (FILE *f, int verbose)
 t_stat
 sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+  /* Generic loader signature.
+     This implementation does not use every parameter. */
+  (void)fnam;
+  (void)cptr;
+  (void)flag;
+
   int verbose = sim_switches & SWMASK ('V');
   t_stat r;
 
@@ -274,11 +280,19 @@ sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 
 static uint16 null_read (uint16 reg)
 {
+  /* Generic TTDEV read signature.
+     This implementation does not use every parameter. */
+  (void) reg;
+
   return 0;
 }
 
 static void null_write (uint16 reg, uint16 data)
 {
+  /* Generic TTDEV write signature.
+     This implementation does not use every parameter. */
+  (void) reg;
+  (void) data;
 }
 
 t_bool build_dev_tab (void)
@@ -456,6 +470,10 @@ fprint_cpu (FILE *of, uint16 insn, uint16 addr)
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
                    UNIT *uptr, int32 sw)
 {
+  /* Generic symbolic output signature.
+     This implementation does not use every parameter. */
+  (void)uptr;
+
   t_stat reason;
 
   if ((reason = build_dev_tab ()) != SCPE_OK)
@@ -477,6 +495,12 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr,
                   t_value *val, int32 sw)
 {
+  /* Generic symbolic input signature.
+     This implementation does not use every parameter. */
+  (void)addr;
+  (void)sw;
+  (void)uptr;
+
   t_stat reason;
   *val = get_uint (cptr, 8, ~0, &reason);
   if (reason != SCPE_OK)

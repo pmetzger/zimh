@@ -488,6 +488,12 @@ return r;
 
 t_stat ttx_vlines (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 newln, i, t;
 t_stat r;
 
@@ -526,6 +532,11 @@ return SCPE_OK;
 /* Show device numbers */
 t_stat ttx_show_devno (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 int32 i, dev_offset;
 DEVICE *dptr;
 
@@ -550,10 +561,18 @@ return SCPE_OK;
 
 const char *ttix_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "PT08/KL8JA terminal input";
 }
 
 const char *ttox_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "PT08/KL8JA terminal output";
 }

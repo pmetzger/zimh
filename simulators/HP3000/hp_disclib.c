@@ -1540,6 +1540,10 @@ return outbound;
 
 static CNTLR_IFN_IBUS start_command (CVPTR cvptr, CNTLR_FLAG_SET inbound_flags, CNTLR_IBUS inbound_data)
 {
+/* Shared controller phase signature.
+   This implementation does not use every parameter. */
+(void) inbound_flags;
+
 UNIT *cuptr, *duptr, *rptr;
 uint32 unit;
 int32 seek_wait_time;
@@ -2841,6 +2845,11 @@ return SCPE_OK;                                         /* return normal complet
 
 t_stat dl_set_model (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (uptr->flags & UNIT_ATT)                             /* if the unit is currently attached */
     return SCPE_ALATT;                                  /*   then the disc model cannot be changed */
 
@@ -2882,6 +2891,10 @@ return SCPE_OK;
 
 t_stat dl_set_protect (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 const uint32 model = uptr->flags & UNIT_MODEL;
 char gbuf [CBUFSIZE];
 
@@ -2935,6 +2948,11 @@ return SCPE_OK;
 
 t_stat dl_show_protect (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) value;
+(void) desc;
+
 const uint32 model = uptr->flags & UNIT_MODEL;
 
 if ((uptr->flags & UNIT_PROT) == 0)                     /* if the protection flags are clear */
@@ -3024,6 +3042,10 @@ return SCPE_OK;
 
 t_stat dl_set_diag (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 typedef struct {
     t_value  max;                               /* maximum allowed value */
     uint32   radix;                             /* numeric parsing radix */
@@ -3202,6 +3224,10 @@ return SCPE_OK;
 
 t_stat dl_show_diag (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 const CNTLR_VARS *cvptr = (const CNTLR_VARS *) desc;    /* the controller pointer is supplied */
 DIAG_ENTRY *entry;
 
@@ -3272,6 +3298,10 @@ return SCPE_OK;
 
 t_stat dl_set_timing (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+
 CVPTR  cvptr = (CVPTR) desc;                            /* the controller pointer is supplied */
 const  DELAY_PROPS *dpptr;
 DRIVE_TYPE model;
@@ -3332,6 +3362,11 @@ return SCPE_OK;
 
 t_stat dl_show_timing (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) value;
+
 const CNTLR_VARS *cvptr = (const CNTLR_VARS *) desc;    /* the controller pointer is supplied */
 
 if (cvptr->device->flags & DEV_REALTIME)                /* if the real time flag is set */

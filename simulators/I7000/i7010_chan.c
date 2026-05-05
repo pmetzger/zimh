@@ -151,6 +151,11 @@ struct urec_t {
 t_stat
 set_urec(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)val;
+
     int                 chan;
     int                 i;
 
@@ -173,6 +178,11 @@ set_urec(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 get_urec(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)v;
+
     int                 chan;
     int                 i;
 
@@ -232,7 +242,7 @@ chan_boot(int32 unit_num, DEVICE * dptr)
     return SCPE_OK;
 }
 
-t_stat
+static t_stat
 chan_issue_cmd(uint16 chan, uint16 dcmd, uint16 dev) {
     DEVICE            **dptr;
     DIB                *dibp;
@@ -434,10 +444,18 @@ void chan_set_attn_urec(int chan, uint16 addr) {
 }
 
 void chan_set_attn_inq(int chan) {
+    /* Shared helper signature.
+       This build variant does not use every parameter. */
+    (void)chan;
+
     inquiry = 1;
 }
 
 void chan_clear_attn_inq(int chan) {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)chan;
+
     inquiry = 0;
 }
 
@@ -543,6 +561,12 @@ chan_cmd(uint16 dev, uint16 dcmd, uint32 addr)
 int
 chan_write(int chan, t_uint64 * data, int flags)
 {
+    /* Shared helper signature.
+       This build variant does not use every parameter. */
+    (void)chan;
+    (void)data;
+    (void)flags;
+
     /* Not implimented on this machine */
     return TIME_ERROR;
 }
@@ -553,6 +577,12 @@ chan_write(int chan, t_uint64 * data, int flags)
 int
 chan_read(int chan, t_uint64 * data, int flags)
 {
+    /* Shared helper signature.
+       This build variant does not use every parameter. */
+    (void)chan;
+    (void)data;
+    (void)flags;
+
     /* Not implimented on this machine */
     return TIME_ERROR;
 }
@@ -717,6 +747,12 @@ chan9_set_error(int chan, uint32 mask)
 t_stat
 chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)flag;
+    (void)uptr;
+
     fprintf (st, "%s\n\n", chan_description(dptr));
     fprintf (st, "The 7010 supports up to 4 channels.  Channel models include\n\n");
     fprintf (st, "   Channel * is for unit record devices.\n");
@@ -730,6 +766,10 @@ chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 chan_description(DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "IBM 7010 channel controller";
 }
 

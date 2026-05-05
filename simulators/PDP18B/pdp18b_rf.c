@@ -191,6 +191,10 @@ DEVICE rf_dev = {
 
 int32 rf70 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 t, sb;
 
 sb = pulse & 060;                                       /* subopcode */
@@ -245,6 +249,10 @@ return dat;
 
 int32 rf72 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 sb = pulse & 060;
 
 if (pulse & 02) {
@@ -332,6 +340,10 @@ return rf_sta;
 
 t_stat rf_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 rf_sta = rf_da = rf_dbuf = 0;
 rf_updsta (0);
 sim_cancel (&rf_unit);
@@ -367,6 +379,11 @@ return attach_unit (uptr, cptr);
 
 t_stat rf_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (val < 0)
     return SCPE_IERR;
 if (uptr->flags & UNIT_ATT)

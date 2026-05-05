@@ -512,6 +512,10 @@ REG cpu_reg[] = {
 };
 
 static const char* cpu_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "Central Processing Unit";
 }
 
@@ -6646,6 +6650,11 @@ t_stat install_bootrom(const int32 bootrom[], const int32 size, const int32 addr
 
 /* memory examine */
 static t_stat cpu_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw) {
+    /* Generic examine signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)sw;
+
     switch (chiptype) {
         case CHIP_TYPE_8080:
         case CHIP_TYPE_Z80: {
@@ -6674,6 +6683,11 @@ static t_stat cpu_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw) {
 
 /* memory deposit */
 static t_stat cpu_dep(t_value val, t_addr addr, UNIT *uptr, int32 sw) {
+    /* Generic deposit signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)sw;
+
     switch (chiptype) {
         case CHIP_TYPE_8080:
         case CHIP_TYPE_Z80: {
@@ -6772,6 +6786,12 @@ static const char* m68kVariantToString[] = {
 };
 
 static t_stat chip_show(FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+    (void)desc;
+
     fprintf(st, cpu_unit.flags & UNIT_CPU_OPSTOP ? "ITRAP, " : "NOITRAP, ");
     if ((chiptype >= 0) && (chiptype < NUM_CHIP_TYPE)) {
         fprintf(st, "%s", cpu_mod[chiptype].mstring);
@@ -6787,6 +6807,12 @@ static t_stat chip_show(FILE *st, UNIT *uptr, int32 val, const void *desc) {
 }
 
 static t_stat cpu_show(FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+    (void)desc;
+
     uint32 i, maxBanks, first = TRUE;
     MDEV m;
     maxBanks = ((cpu_unit.flags & UNIT_CPU_BANKED) ||
@@ -6861,22 +6887,50 @@ static void cpu_clear(t_bool unmap) {
 }
 
 static t_stat cpu_clear_command(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)value;
+    (void)cptr;
+    (void)desc;
+
     cpu_clear(TRUE);
     return SCPE_OK;
 }
 
 static t_stat cpu_set_altairrom(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)value;
+    (void)cptr;
+    (void)desc;
+
     install_ALTAIRbootROM();
     return SCPE_OK;
 }
 
 static t_stat cpu_set_noaltairrom(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)value;
+    (void)cptr;
+    (void)desc;
+
     mmu_table[ALTAIR_ROM_LOW >> LOG2PAGESIZE] = MEMORYSIZE < MAXBANKSIZE ?
         EMPTY_PAGE : RAM_PAGE;
     return SCPE_OK;
 }
 
 static t_stat cpu_set_nommu(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)value;
+    (void)cptr;
+    (void)desc;
+
     if (chiptype == CHIP_TYPE_8086) {
         sim_printf("Cannot switch off MMU for 8086 CPU.\n");
         return SCPE_ARG;
@@ -6895,6 +6949,13 @@ static t_stat cpu_set_nommu(UNIT *uptr, int32 value, const char *cptr, void *des
 }
 
 static t_stat cpu_set_banked(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)value;
+    (void)cptr;
+    (void)desc;
+
     if ((chiptype == CHIP_TYPE_8080) || (chiptype == CHIP_TYPE_Z80)) {
         if (MEMORYSIZE <= MAXBANKSIZE)
             previousCapacity = MEMORYSIZE;
@@ -6909,6 +6970,13 @@ static t_stat cpu_set_banked(UNIT *uptr, int32 value, const char *cptr, void *de
 }
 
 static t_stat cpu_set_nonbanked(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)value;
+    (void)cptr;
+    (void)desc;
+
     if ((chiptype == CHIP_TYPE_8080) || (chiptype == CHIP_TYPE_Z80)) {
         MEMORYSIZE = previousCapacity;
         cpu_dev.awidth = MAXBANKSIZELOG2;
@@ -6918,6 +6986,10 @@ static t_stat cpu_set_nonbanked(UNIT *uptr, int32 value, const char *cptr, void 
 }
 
 static int32 bankseldev(const int32 port, const int32 io, const int32 data) {
+    /* Generic I/O callback signature.
+       This implementation does not use every parameter. */
+    (void)port;
+
     if (io) {
         switch(ramtype) {
             case RAM_TYPE_HRAM:
@@ -7049,6 +7121,12 @@ static void cpu_set_chiptype_short(const int32 value) {
 }
 
 static t_stat cpu_set_chiptype(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)cptr;
+    (void)desc;
+
     cpu_set_chiptype_short(value);
     cpu_clear(TRUE);
     return SCPE_OK;
@@ -7087,6 +7165,12 @@ static int32 switchcpu_io(const int32 port, const int32 io, const int32 data) {
 }
 
 static t_stat cpu_show_switcher(FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+    (void)desc;
+
     if ((cpu_unit.flags & UNIT_CPU_SWITCHER) && (switcherPort >= 0))
         fprintf(st, "SWITCHER=0x%02x", switcherPort);
     else
@@ -7095,6 +7179,13 @@ static t_stat cpu_show_switcher(FILE *st, UNIT *uptr, int32 val, const void *des
 }
 
 static t_stat cpu_set_switcher(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)value;
+    (void)cptr;
+    (void)desc;
+
     struct idev safe;
     switcherPort &= 0xff;
     safe = dev_table[switcherPort];
@@ -7107,6 +7198,13 @@ static t_stat cpu_set_switcher(UNIT *uptr, int32 value, const char *cptr, void *
 }
 
 static t_stat cpu_reset_switcher(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)value;
+    (void)cptr;
+    (void)desc;
+
     if (sim_map_resource(switcherPort, 1, RESOURCE_TYPE_IO, oldSwitcherDevice.routine, oldSwitcherDevice.name, FALSE)) {
         sim_printf("%s: error mapping I/O resource at 0x%04x\n", __FUNCTION__, switcherPort);
         return SCPE_ARG;
@@ -7115,6 +7213,11 @@ static t_stat cpu_reset_switcher(UNIT *uptr, int32 value, const char *cptr, void
 }
 
 static t_stat cpu_set_ramtype(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)cptr;
+    (void)desc;
 
     if (value == ramtype) {
         if (cpu_unit.flags & UNIT_CPU_VERBOSE)
@@ -7210,10 +7313,22 @@ static t_stat set_size(uint32 size, t_bool unmap) {
 }
 
 static t_stat cpu_set_size(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)cptr;
+    (void)desc;
+
     return set_size(value, TRUE);
 }
 
 static t_stat cpu_set_memory(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)value;
+    (void)desc;
+
     uint32 size, result, i;
     if (cptr == NULL) {
         sim_printf("Memory size must be provided as SET CPU MEMORY=xK\n");
@@ -7228,6 +7343,12 @@ static t_stat cpu_set_memory(UNIT *uptr, int32 value, const char *cptr, void *de
 }
 
 static t_stat cpu_resize_memory(UNIT *uptr, int32 value, const char *cptr, void *desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)value;
+    (void)desc;
+
     uint32 size, result, i;
     if (cptr == NULL) {
         sim_printf("Memory size must be provided as SET CPU RESIZEMEMORY=xK\n");
@@ -7242,6 +7363,11 @@ static t_stat cpu_resize_memory(UNIT *uptr, int32 value, const char *cptr, void 
 }
 
 static t_stat m68k_set_chiptype(UNIT* uptr, int32 value, const char* cptr, void* desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)cptr;
+    (void)desc;
 
     if (value < 0)
         return SCPE_ARG;
@@ -7257,6 +7383,12 @@ static t_stat m68k_set_chiptype(UNIT* uptr, int32 value, const char* cptr, void*
 }
 
 static t_stat cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc) {
+    /* Generic set command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+    (void)desc;
+
     uint32 i, lnt;
     t_stat r;
 
@@ -7321,6 +7453,11 @@ static t_stat cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc) 
 
 t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show command signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+
     int32 k, di, lnt;
     const char *cptr = (const char *) desc;
     t_stat r;
@@ -7393,7 +7530,7 @@ t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
     return SCPE_OK;
 }
 
-t_value altairz80_pc_value (void) {
+static t_value altairz80_pc_value (void) {
     return (t_value)PCX;
 }
 
@@ -7520,6 +7657,11 @@ t_stat sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag) {
    https://deramp.com/downloads/misc_software/hex-binary utilities for the PC/
 */
 static t_stat cpu_hex_load(FILE *fileref, const char *cptr, const char *fnam, int flag) {
+    /* Generic loader signature.
+       This implementation does not use every parameter. */
+    (void)fnam;
+    (void)flag;
+
     char gbuf[CBUFSIZE];
     char linebuf[1024], datastr[1024], *bufptr;
     int32 bytecnt, rectype, databyte, chksum, line = 0, cnt = 0;
@@ -7602,6 +7744,10 @@ void cpu_raise_interrupt(uint32 irq) {
 static t_addr disp_addr = 0;
 
 static t_stat cpu_cmd_memory(int32 flag, const char *cptr) {
+    /* Generic command signature.
+       This implementation does not use every parameter. */
+    (void)flag;
+
     char abuf[16];
     t_addr lo, hi, max, last;
     t_value byte;
@@ -7659,6 +7805,11 @@ static t_stat cpu_cmd_memory(int32 flag, const char *cptr) {
 
 static t_stat cpu_cmd_reg(int32 flag, const char *cptr)
 {
+    /* Generic command signature.
+       This implementation does not use every parameter. */
+    (void)flag;
+    (void)cptr;
+
     t_value op[INST_MAX_BYTES];
     int i;
 

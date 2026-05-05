@@ -234,6 +234,10 @@ static t_stat tk10_svc (UNIT *uptr)
 
 static t_stat tk10_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
 
     sim_debug(DEBUG_CMD, &tk10_dev, "Reset\n");
@@ -317,6 +321,10 @@ static t_stat tk10_help (FILE *st, DEVICE *dptr, UNIT *uptr,
 
 static const char *tk10_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Knight kludge: TTY scanner";
 }
 

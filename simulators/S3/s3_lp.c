@@ -111,6 +111,10 @@ DEVICE lpt_dev = {
 
 int32 lpt (int32 op, int32 m, int32 n, int32 data)
 {
+    /* Generic I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) m;
+
     int32 iodata;
     switch (op) {
         case 0:                                         /* SIO 1403 */
@@ -346,6 +350,10 @@ return SCPE_OK;
 
 t_stat lpt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 cctptr = 0;                                             /* clear cct ptr */
 lines = linectr = lflag = 0;                            /* no cc action */
 lpterror = 0;

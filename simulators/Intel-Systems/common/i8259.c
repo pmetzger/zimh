@@ -50,6 +50,10 @@ t_stat i8259_reset (DEVICE *dptr);
 /* external globals */
 
 static const char* i8259_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return i8259_NAME;
 }
 int     i8259_num = 0;
@@ -152,6 +156,10 @@ DEVICE i8259_dev = {
 
 t_stat i8259_cfg(uint16 base, uint16 devnum, uint8 dummy)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) dummy;
+
     i8259_baseport[devnum] = base & BYTEMASK;
     sim_printf("    i8259%d: installed at base port 0%02XH\n",
         devnum, i8259_baseport[devnum]);
@@ -180,6 +188,11 @@ t_stat i8259_clr(void)
 
 t_stat i8259_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int i;
 
     if (uptr == NULL)
@@ -201,6 +214,10 @@ t_stat i8259_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat i8259_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     uint8 devnum;
 
     for (devnum=0; devnum < 4; devnum++) {

@@ -630,6 +630,10 @@ DEVICE dpc_dev = {
 
 static SIGNALS_VALUE dpd_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
 SIGNALS_VALUE  outbound    = { ioNONE, 0 };
@@ -814,6 +818,10 @@ return outbound;                                        /* return the outbound s
 
 static SIGNALS_VALUE dpc_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 int32          i, fnc, drv;
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
@@ -1430,6 +1438,11 @@ return detach_unit (uptr);                              /* detach unit */
 
 t_stat dpc_load_unload (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 int32 drv;
 
 if ((uptr->flags & UNIT_ATT) == 0) return SCPE_UNATT;   /* must be attached to load */
@@ -1453,6 +1466,11 @@ return SCPE_OK;
 
 t_stat dp_settype (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 int32 i;
 
 if ((val < 0) || (val > 1) || (cptr != NULL))
@@ -1475,6 +1493,12 @@ return SCPE_OK;
 
 t_stat dp_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (dp_ctype == A13210)
     fprintf (st, "13210A");
 else

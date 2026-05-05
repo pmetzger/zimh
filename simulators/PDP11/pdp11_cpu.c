@@ -718,7 +718,7 @@ DEVICE cpu_dev = {
     cpu_breakpoints
     };
 
-t_value pdp11_pc_value (void)
+static t_value pdp11_pc_value (void)
 {
 return (t_value)PC;
 }
@@ -3110,6 +3110,10 @@ return pa;
 
 t_stat MMR012_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((pa >> 1) & 3) {                                /* decode pa<2:1> */
 
     case 0:                                             /* SR */
@@ -3152,12 +3156,21 @@ switch ((pa >> 1) & 3) {                                /* decode pa<2:1> */
 
 t_stat MMR3_rd (int32 *data, int32 pa, int32 access)    /* MMR3 */
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) access;
+
 *data = MMR3 & cpu_tab[cpu_model].mm3;
 return SCPE_OK;
 }
 
 t_stat MMR3_wr (int32 data, int32 pa, int32 access)     /* MMR3 */
 {
+/* Generic I/O write signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 if (pa & 1)
     return SCPE_OK;
 MMR3 = data & cpu_tab[cpu_model].mm3;
@@ -3186,6 +3199,10 @@ return SCPE_OK;
 
 t_stat APR_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 t_stat left, idx;
 
 idx = (pa >> 1) & 017;                                  /* dspace'page */
@@ -3227,6 +3244,10 @@ return SCPE_OK;
 
 t_stat PSW_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+
 if (access == READC)
     *data = PSW;
 else *data = get_PSW ();
@@ -3388,7 +3409,7 @@ static const char *pdp11_clock_precalibrate_commands[] = {
 
 */
 
-t_stat pdp11_boot (int32 flag, const char *ptr)
+static t_stat pdp11_boot (int32 flag, const char *ptr)
 {
 char gbuf[CBUFSIZE];
 
@@ -3412,6 +3433,10 @@ CTAB pdp11_cmd[] = {
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic simulator boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 DEVICE *rom = find_dev ("ROM");
 
 if ((rom == NULL) ||
@@ -3527,6 +3552,10 @@ return;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 iodata;
 t_stat stat;
 
@@ -3554,6 +3583,10 @@ return stat;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if (sw & SWMASK ('V')) {                                /* -v */
     if (addr >= VASIZE)
         return SCPE_NXM;
@@ -3590,6 +3623,12 @@ return;
 
 t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i, lnt;
 t_stat r;
 
@@ -3621,6 +3660,11 @@ return SCPE_OK;
 
 t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 j, k, di, lnt, ir;
 const char *cptr = (const char *) desc;
 t_value sim_eval[HIST_ILNT];
@@ -3666,6 +3710,11 @@ return SCPE_OK;
 
 t_stat cpu_show_virt (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 t_stat r;
 const char *cptr = (const char *) desc;
 uint32 va, pa;
@@ -3686,11 +3735,21 @@ return SCPE_OK;
 
 const char *cpu_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "PDP-11 CPU";
 }
 
 t_stat cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 int i;
 
 fprintf (st, "The %s (%s) device help\n\n", dptr->description (dptr), dptr->name);

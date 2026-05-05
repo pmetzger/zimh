@@ -619,6 +619,11 @@ t_stat dte_devio(uint32 dev, uint64 *data) {
 /* Handle KL style interrupt vectors */
 t_addr
 dte_devirq(uint32 dev, t_addr addr) {
+    /* Generic device interrupt signature.
+       This implementation does not use every parameter. */
+    (void) dev;
+    (void) addr;
+
     return 0142;
 }
 
@@ -1896,6 +1901,10 @@ dtertc_srv(UNIT * uptr)
 
 t_stat dte_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     dte_unit[0].STATUS = DTE_SEC;
     dte_unit[1].STATUS = 0;
     dte_unit[2].STATUS = 0;
@@ -1910,6 +1919,11 @@ t_stat dte_reset (DEVICE *dptr)
 t_stat
 dte_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     DEVICE *dptr;
     dptr = find_dev_from_unit (uptr);
     if (dptr == NULL)
@@ -1922,6 +1936,11 @@ dte_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 dte_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) val;
+   (void) desc;
+
    DEVICE *dptr;
 
    if (uptr == NULL)
@@ -1939,18 +1958,38 @@ dte_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat dte_stop_os (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     M[CTY_SWITCH] = 1;                                 /* tell OS to stop */
     return SCPE_OK;
 }
 
 t_stat tty_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
+
     dte_unit[0].flags = (dte_unit[0].flags & ~TT_MODE) | val;
     return SCPE_OK;
 }
 
 t_stat dte_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "To stop the cpu use the command:\n\n");
 fprintf (st, "    sim> SET CTY STOP\n\n");
 fprintf (st, "This will write a 1 to location %03o, causing TOPS10 to stop\n\n", CTY_SWITCH);
@@ -1971,13 +2010,17 @@ return SCPE_OK;
 
 const char *dte_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Console TTY Line";
 }
 
 
 #if (NUM_DEVS_LP20 > 0)
 
-void
+static void
 lp20_printline(UNIT *uptr, int nl) {
     int     trim = 0;
 
@@ -2011,7 +2054,7 @@ lp20_printline(UNIT *uptr, int nl) {
 
 
 /* Unit service */
-void
+static void
 lp20_output(UNIT *uptr, char c) {
 
     if (c == 0)
@@ -2139,8 +2182,13 @@ t_stat lp20_svc (UNIT *uptr)
 
 t_stat lp20_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     UNIT *uptr = &lp20_unit;
     int   i;
+
     uptr->POS = 0;
     uptr->COL = 0;
     uptr->LINE = 1;
@@ -2187,8 +2235,14 @@ t_stat lp20_detach (UNIT *uptr)
 t_stat
 lp20_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     t_value   i;
     t_stat    r;
+
     if (cptr == NULL)
         return SCPE_ARG;
     if (uptr == NULL)
@@ -2204,6 +2258,11 @@ lp20_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 lp20_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) v;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "linesperpage=%d", uptr->capac);
@@ -2213,6 +2272,12 @@ lp20_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 t_stat lp20_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
         const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Line Printer (LP20)\n\n");
 fprintf (st, "The line printer (LP20) writes data to a disk file.\n");
 fprintf (st, "The Line printer can be configured to any number of lines per page with the:\n");
@@ -2226,6 +2291,10 @@ return SCPE_OK;
 
 const char *lp20_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "LP20 line printer" ;
 }
 
@@ -2331,7 +2400,12 @@ t_stat ttyo_svc (UNIT *uptr)
 
 t_stat tty_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int  i;
+
     for (i = 0; i < tty_desc.lines; i++) {
          tty_done[i] = 0;
          tty_out[i].out_ptr = tty_out[i].in_ptr = 0;
@@ -2345,6 +2419,12 @@ t_stat tty_reset (DEVICE *dptr)
 
 t_stat tty_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32 newln, i, t;
     t_stat r;
 
@@ -2379,6 +2459,11 @@ t_stat tty_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat tty_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     t_stat r;
     char gbuf[CBUFSIZE];
     int32 ln;
@@ -2398,6 +2483,11 @@ t_stat tty_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat tty_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     t_stat r;
     int32 ln;
 
@@ -2413,6 +2503,11 @@ t_stat tty_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat tty_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+
     int32 i;
 
     for (i = 0; i < tty_desc.lines; i++) {
@@ -2490,6 +2585,10 @@ return SCPE_OK;
 
 const char *tty_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "FE asynchronous line interface";
 }
 

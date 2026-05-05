@@ -66,6 +66,12 @@ DEVICE crt_dev = {
 static t_stat
 crt_svc(UNIT *uptr)
 {
+#ifndef USE_DISPLAY
+  /* Shared helper signature.
+     This build variant does not use every parameter. */
+  (void)uptr;
+#endif
+
 #ifdef USE_DISPLAY
   display_age (100, 0);
   sim_activate_after (uptr, 100);
@@ -85,6 +91,12 @@ static void crt_quit_callback (void)
 static t_stat
 crt_reset (DEVICE *dptr)
 {
+#ifndef USE_DISPLAY
+  /* Generic device reset signature.
+     This build variant does not use every parameter. */
+  (void)dptr;
+#endif
+
 #ifdef USE_DISPLAY
   if ((dptr->flags & DEV_DIS) != 0 || (sim_switches & SWMASK('P')) != 0) {
     display_close (dptr);

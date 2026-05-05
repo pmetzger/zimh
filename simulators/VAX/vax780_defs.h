@@ -184,6 +184,7 @@
                         { UNIT_MSIZE, (1u << 27), NULL, "128M", &cpu_set_size, NULL, NULL, "Set Memory to 128M bytes" },            \
                         { MTAB_XTD|MTAB_VDV|MTAB_NMO, 0, "MEMORY", NULL, NULL, &cpu_show_memory, NULL, "Display memory configuration" }
 extern t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc);
+extern t_stat vax780_fload (int32 flag, const char *cptr);
 #define CPU_MODEL_MODIFIERS                                                                     \
                         { MTAB_XTD|MTAB_VDV, 0, "MODEL", "MODEL={780|785}",                     \
                           &cpu_set_model, &cpu_show_model, NULL, "Set/Show the simulator CPU Model" },
@@ -449,6 +450,8 @@ int32 mba_rdbufW (uint32 mbus, int32 bc, uint16 *buf);
 int32 mba_wrbufW (uint32 mbus, int32 bc, const uint16 *buf);
 int32 mba_chbufW (uint32 mbus, int32 bc, uint16 *buf);
 int32 mba_get_bc (uint32 mbus);
+void init_mbus_tab (void);
+t_stat build_mbus_tab (DEVICE *dptr, DIB *dibp);
 void mba_upd_ata (uint32 mbus, uint32 val);
 void mba_set_exc (uint32 mbus);
 void mba_set_don (uint32 mbus);

@@ -646,6 +646,10 @@ else return MAXMEMSIZE;
 
 t_bool clrpt (a10 ea, int32 prv)
 {
+/* Instruction dispatch signature.
+   This implementation does not use every parameter. */
+(void) prv;
+
 int32 vpn = PAG_GETVPN (ea);                            /* get page num */
 
 if (Q_ITS) {                                            /* ITS? */
@@ -663,6 +667,10 @@ return FALSE;
 
 t_bool wrebr (a10 ea, int32 prv)
 {
+/* Instruction dispatch signature.
+   This implementation does not use every parameter. */
+(void) prv;
+
 ebr = ea & EBR_MASK;                                    /* store EBR */
 pag_reset (&pag_dev);                                   /* clear page tables */
 set_dyn_ptrs ();                                        /* set dynamic ptrs */
@@ -770,11 +778,20 @@ return FALSE;
 
 t_bool clrcsh (a10 ea, int32 prv)
 {
+/* Instruction dispatch signature.
+   This implementation does not use every parameter. */
+(void) ea;
+(void) prv;
+
 return FALSE;
 }
 
 t_bool ldbr1 (a10 ea, int32 prv)
 {
+/* Instruction dispatch signature.
+   This implementation does not use every parameter. */
+(void) prv;
+
 dbr1 = ea;
 pag_reset (&pag_dev);
 return FALSE;
@@ -788,6 +805,10 @@ return FALSE;
 
 t_bool ldbr2 (a10 ea, int32 prv)
 {
+/* Instruction dispatch signature.
+   This implementation does not use every parameter. */
+(void) prv;
+
 dbr2 = ea;
 pag_reset (&pag_dev);
 return FALSE;
@@ -801,6 +822,10 @@ return FALSE;
 
 t_bool ldbr3 (a10 ea, int32 prv)
 {
+/* Instruction dispatch signature.
+   This implementation does not use every parameter. */
+(void) prv;
+
 dbr3 = ea;
 pag_reset (&pag_dev);
 return FALSE;
@@ -814,6 +839,10 @@ return FALSE;
 
 t_bool ldbr4 (a10 ea, int32 prv)
 {
+/* Instruction dispatch signature.
+   This implementation does not use every parameter. */
+(void) prv;
+
 dbr4 = ea;
 pag_reset (&pag_dev);
 return FALSE;
@@ -863,6 +892,10 @@ return FALSE;
 
 t_stat pag_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) sw;
+
 int32 tbln = uptr - pag_unit;
 
 if (addr >= PTBL_MEMSIZE)
@@ -873,6 +906,10 @@ return SCPE_OK;
 
 t_stat pag_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) sw;
+
 int32 tbln = uptr - pag_unit;
 
 if (addr >= PTBL_MEMSIZE)
@@ -885,6 +922,10 @@ return SCPE_OK;
 
 t_stat pag_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 for (i = 0; i < PTBL_MEMSIZE; i++) {

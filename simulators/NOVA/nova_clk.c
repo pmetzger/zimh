@@ -153,6 +153,10 @@ return SCPE_OK;
 
 t_stat clk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_register_clock_unit (&clk_unit);                    /* declare clock unit */
 clk_sel = 0;
 DEV_CLR_BUSY( INT_CLK ) ;
@@ -168,6 +172,11 @@ return SCPE_OK;
 
 t_stat clk_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if (cptr)
     return SCPE_ARG;
 if ((val != 50) && (val != 60))
@@ -180,6 +189,12 @@ return SCPE_OK;
 
 t_stat clk_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, (clk_tps[0] == 50)? "50Hz": "60Hz");
 return SCPE_OK;
 }

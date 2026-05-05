@@ -149,6 +149,12 @@ t_stat del_iohandler(void* ctxt)
 /* default handler */
 t_stat m68k_translateaddr(t_addr in,t_addr* out, IOHANDLER** ioh,int rw,int fc,int dma)
 {
+    /* Shared address translation signature.
+       This implementation does not use every parameter. */
+    (void) rw;
+    (void) fc;
+    (void) dma;
+
     t_addr ma = in & addrmask;
     t_addr idx = MAKEIOHASH(ma);
     IOHANDLER* i = iohash[idx];

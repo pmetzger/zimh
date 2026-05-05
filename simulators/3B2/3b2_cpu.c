@@ -822,6 +822,11 @@ const uint32 shift_32_table[65] =
 
 t_stat cpu_show_stack(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+
     uint32 i, j;
     uint32 addr, v, count;
     uint8 tmp;
@@ -857,6 +862,12 @@ t_stat cpu_show_stack(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat cpu_show_cio(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+    (void)desc;
+
     uint32 slot;
 
     fprintf(st, "  SLOT     DEVICE\n");
@@ -937,6 +948,11 @@ static t_stat cpu_load_builtin_rom(void)
 
 t_stat cpu_boot(int32 unit_num, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void)unit_num;
+    (void)dptr;
+
     /*
      *  page 2-52 (pdf page 85)
      *
@@ -986,6 +1002,10 @@ t_stat cpu_boot(int32 unit_num, DEVICE *dptr)
 
 t_stat cpu_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic examine signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+
     uint32 uaddr = (uint32) addr;
     uint8 value;
     t_stat succ;
@@ -1011,6 +1031,10 @@ t_stat cpu_ex(t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 
 t_stat cpu_dep(t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic deposit signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+
     uint32 uaddr = (uint32) addr;
 
     if (sw & EX_V_FLAG) {
@@ -1075,6 +1099,10 @@ static void build_int_map(void)
 
 t_stat cpu_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     int i;
 
     sim_debug(EXECUTE_MSG, &cpu_dev, "CPU Reset.\n");
@@ -1176,6 +1204,10 @@ t_bool cpu_is_pc_a_subroutine_call (t_addr **ret_addrs)
 
 t_stat fprint_sym_m(FILE *of, t_addr addr, t_value *val)
 {
+    /* Shared symbolic output signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+
     uint8 desc, mode, reg, etype;
     uint32 w;
     int32 vp, inst, i;
@@ -1470,6 +1502,11 @@ void fprint_sym_hist(FILE *st, instr *ip)
 
 t_stat cpu_show_virt(FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+
     uint32 va, pa;
     t_stat r;
 
@@ -1497,6 +1534,12 @@ t_stat cpu_show_virt(FILE *of, UNIT *uptr, int32 val, const void *desc)
 
 t_stat cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+    (void)desc;
+
     uint32 i, size;
     t_stat result;
 
@@ -1547,6 +1590,11 @@ t_stat cpu_set_hist(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat cpu_show_hist(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+
     uint32 i;
     size_t j, count;
     char *cptr = (char *) desc;
@@ -1773,6 +1821,12 @@ void cpu_show_operand(FILE *st, operand *op)
 
 t_stat cpu_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)cptr;
+    (void)desc;
+
     uint32 uval = (uint32) val;
     uint8 *nRAM = NULL;
 
@@ -4889,6 +4943,10 @@ void cpu_abort(uint8 et, uint8 isc)
 
 const char *cpu_description(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
 #if defined(REV3)
     return "3B2/700 CPU (WE 32200)";
 #else
@@ -4898,6 +4956,12 @@ const char *cpu_description(DEVICE *dptr)
 
 t_stat cpu_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic device help signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)flag;
+    (void)cptr;
+
 #if defined(REV3)
     fprintf(st, "3B2/700 CPU Help\n\n");
     fprintf(st, "The 3B2/700 CPU simulates a WE 32200 at 22 MHz.\n\n");

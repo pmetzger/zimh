@@ -37,6 +37,10 @@ int     num_devs[NUM_CHAN];
 t_stat
 chan_set_devs(DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     int                 i;
 
     for(i = 0; i < NUM_CHAN; i++) {
@@ -129,6 +133,14 @@ chan_set_devs(DEVICE * dptr)
 /* Print help for "SET dev CHAN" based on allowed types */
 void help_set_chan_type(FILE *st, DEVICE *dptr, const char *name)
 {
+#if NUM_CHAN <= 1
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+    (void)name;
+    (void)st;
+#endif
+
 #if NUM_CHAN > 1
    DIB        *dibp = (DIB *) dptr->ctxt;
    int        ctype = dibp->ctype;
@@ -166,6 +178,11 @@ void help_set_chan_type(FILE *st, DEVICE *dptr, const char *name)
 t_stat
 set_chan(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)val;
+
     DEVICE             *dptr;
     DIB                *dibp;
     int                 newch;
@@ -301,6 +318,11 @@ set_chan(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 print_chan(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)v;
+
     int                 chan = uptr - chan_unit;
     int                 i;
 
@@ -339,6 +361,11 @@ print_chan(FILE * st, UNIT * uptr, int32 v, const void *desc)
 t_stat
 get_chan(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)v;
+
     DEVICE             *dptr;
     DIB                *dibp;
     int                 chan;
@@ -359,6 +386,11 @@ get_chan(FILE * st, UNIT * uptr, int32 v, const void *desc)
 t_stat
 chan9_set_select(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)val;
+
     int                 newsel;
     DEVICE             *dptr;
     DIB                *dibp;
@@ -405,6 +437,11 @@ chan9_set_select(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 chan9_get_select(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)v;
+
     if (uptr == NULL)
         return SCPE_IERR;
     if (uptr->flags & UNIT_SELECT)

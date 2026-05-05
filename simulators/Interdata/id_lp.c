@@ -126,6 +126,10 @@ DEVICE lpt_dev = {
 
 uint32 lpt (uint32 dev, uint32 op, uint32 dat)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 t;
 
 switch (op) {                                           /* case IO op */
@@ -271,6 +275,10 @@ return SCPE_OK;
 
 t_stat lpt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 sim_cancel (&lpt_unit);                                 /* deactivate */
@@ -298,6 +306,10 @@ return attach_unit (uptr, cptr);
 
 t_stat lp_load (FILE *fileref, const char *cptr, const char *fnam)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void) fnam;
+
 int32 col, ptr, mask, vfubuf[VFU_LNT];
 uint32 rpt;
 t_stat r;

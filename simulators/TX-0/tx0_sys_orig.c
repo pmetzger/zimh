@@ -98,6 +98,12 @@ const OPMAP opmap_orig [] = {
 t_stat fprint_sym_orig (FILE *of, t_addr addr, t_value *val,
     UNIT *uptr, int32 sw)
 {
+/* Generic symbolic output signature.
+   This implementation does not use every parameter. */
+(void) addr;
+(void) uptr;
+(void) sw;
+
 int32 i, inst, op;
 
 inst = val[0];

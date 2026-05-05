@@ -39,7 +39,7 @@ DEBTAB i8253_dt[] = {
 
 static const char* rltype[] = { "latch","8bitL","8bitH", "16bit" };
 
-t_stat i8253_write(I8253* chip, int addr, uint32 value)
+static t_stat i8253_write(I8253* chip, int addr, uint32 value)
 {
     I8253CNTR* cntr;
     t_stat rc;
@@ -94,7 +94,7 @@ t_stat i8253_write(I8253* chip, int addr, uint32 value)
     return SCPE_OK;
 }
 
-t_stat i8253_read(I8253* chip,int addr,uint32* value)
+static t_stat i8253_read(I8253* chip,int addr,uint32* value)
 {
     t_stat rc;
     I8253CNTR* cntr = &chip->cntr[addr];
@@ -136,6 +136,10 @@ t_stat i8253_reset(I8253* chip)
 
 t_stat i8253_io(IOHANDLER* ioh,uint32* value,uint32 rw,uint32 mask)
 {
+    /* Shared I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) mask;
+
     int port = ioh->offset;
     I8253* chip = (I8253*)ioh->ctxt;
     return rw==MEM_WRITE ? i8253_write(chip,port,*value) : i8253_read(chip,port,value);

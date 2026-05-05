@@ -71,6 +71,12 @@ DEVICE tcu_dev = {
 int
 tcu_write(DEVICE *dptr, t_addr addr, uint16 data, int32 access)
 {
+    /* Unibus write dispatch signature.
+       This implementation does not use every parameter. */
+    (void) addr;
+    (void) data;
+    (void) access;
+
     if ((dptr->units[0].flags & UNIT_DIS) != 0)
        return 1;
 
@@ -125,11 +131,23 @@ tcu_read(DEVICE *dptr, t_addr addr, uint16 *data, int32 access)
 
 t_stat tcu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) st;
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 return SCPE_OK;
 }
 
 const char *tcu_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "TCU150 Time of day clock";
 }
 

@@ -172,6 +172,10 @@ DEVICE dsk_dev = {
 
 t_stat dsk_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 return SCPE_OK;
 }
 
@@ -179,6 +183,10 @@ return SCPE_OK;
 
 t_stat dsk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 cur_disk = 0;
 return SCPE_OK;
 }

@@ -518,6 +518,10 @@ dp_insn (uint16 insn)
 static t_stat
 dp_svc(UNIT * uptr)
 {
+  /* Generic unit service signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   uint16 insn;
 
   if (sim_brk_summ && sim_brk_test(DPC, SWMASK('D'))) {
@@ -548,6 +552,10 @@ dp_svc(UNIT * uptr)
 static t_stat
 dp_reset(DEVICE * uptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   sim_activate_abs (&dp_unit, 0);
   return SCPE_OK;
 }
@@ -555,6 +563,10 @@ dp_reset(DEVICE * uptr)
 static t_stat
 sync_svc (UNIT *uptr)
 {
+  /* Generic unit service signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   sim_debug (DBG, &sync_dev, "Display sync (%d Hz)\n", HZ);
   SYNC = 1;
   if (SYNC && HALT)

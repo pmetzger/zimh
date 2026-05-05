@@ -2133,7 +2133,7 @@ pmp_reset(DEVICE * dptr)
 /*
  * Format the pack for WAITS. 22 128 word sectors per track. Or 576 bytes per sector.
  */
-int
+static int
 pmp_format(UNIT * uptr, int flag) {
     struct pmp_header  hdr;
     struct pmp_t       *data;
@@ -2317,6 +2317,11 @@ pmp_detach(UNIT * uptr)
 t_stat
 pmp_set_type(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int                 i;
 
     if (cptr == NULL)
@@ -2339,6 +2344,11 @@ pmp_set_type(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 pmp_get_type(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) v;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fputs("TYPE=", st);
@@ -2350,6 +2360,11 @@ pmp_get_type(FILE * st, UNIT * uptr, int32 v, const void *desc)
 t_stat
 pmp_set_dev_addr(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     t_value             newdev;
     t_stat              r;
 
@@ -2374,6 +2389,11 @@ pmp_set_dev_addr(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 pmp_get_dev_addr(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) v;
+    (void) desc;
+
     int                 addr;
 
     if (uptr == NULL)
@@ -2387,7 +2407,14 @@ t_stat
 pmp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
     const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     int i;
+
     fprintf (st, "PMP Disk File Controller\n\n");
     fprintf (st, "Use:\n\n");
     fprintf (st, "    sim> SET %sn TYPE=type\n", dptr->name);
@@ -2413,6 +2440,10 @@ pmp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
 
 const char *pmp_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "PMP disk file controller";
 }
 

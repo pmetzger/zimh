@@ -382,7 +382,7 @@ switch (rg) {
         }
 }
 
-void va_vdp_wr (uint32 cn, uint32 rg, uint32 val)
+static void va_vdp_wr (uint32 cn, uint32 rg, uint32 val)
 {
 VDP *vptr = &va_vdp[cn];
 
@@ -398,7 +398,7 @@ else
 
 /* Initialise line drawing */
 
-void va_line_init (VA_LINE *ln, int32 dx, int32 dy, int32 pix)
+static void va_line_init (VA_LINE *ln, int32 dx, int32 dy, int32 pix)
 {
 ln->x = 0;
 ln->y = 0;
@@ -413,7 +413,7 @@ ln->err = (abs(dx) > abs(dy)) ? (ln->xstep * -dx) : (ln->ystep * -dy);
 
 /* Step to the next point on a line */
 
-t_bool va_line_step (VA_LINE *ln)
+static t_bool va_line_step (VA_LINE *ln)
 {
 if ((ln->dx == 0) && (ln->dy == 0))                     /* null line? */
     return TRUE;                                        /* done */
@@ -458,7 +458,7 @@ if ((ln->x == ln->dx) && (ln->y == ln->dy)) {           /* finished? */
 return FALSE;                                           /* more steps to do */
 }
 
-void va_viper_rop (int32 cn, uint32 sc, uint32 *pix)
+static void va_viper_rop (int32 cn, uint32 sc, uint32 *pix)
 {
 uint32 cmd = va_adp[ADP_CMD1];
 uint32 lu = (cmd >> 4) & 0x3;
@@ -554,7 +554,7 @@ dest = (dest << va_vdp[cn].rg[VDP_PA]);
 *pix = (*pix & ~mask) | (dest & mask);
 }
 
-t_stat va_fill (UNIT *uptr)
+static t_stat va_fill (UNIT *uptr)
 {
 uint32 cmd = va_adp[ADP_CMD1];
 int32 old_y, x0, x1;
@@ -693,7 +693,7 @@ for (;;) {
     }
 }
 
-t_stat va_rop (UNIT *uptr)
+static t_stat va_rop (UNIT *uptr)
 {
 uint32 cmd = va_adp[ADP_CMD1];
 int32 sel, cn;
@@ -1365,7 +1365,7 @@ switch (adp_opc) {                                      /* address processor opc
 sim_debug (DBG_ROP, gpx_dev, "Scroll Command: Unknown(%02X)\n", cmd);
 }
 
-void va_scroll (void)
+static void va_scroll (void)
 {
 uint32 x_min, x_max, y_min, y_max, x_lim;
 uint32 src, dest;
@@ -1849,6 +1849,10 @@ return SCPE_OK;
 
 t_stat va_adp_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 va_adpstat (ADPSTAT_VB, 0);                             /* vertical blanking */
 
 va_adp[ADP_OXI] = va_adp[ADP_NXI];                      /* load pending index values */

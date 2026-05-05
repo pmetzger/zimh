@@ -290,13 +290,13 @@ t_stat mt_boot(int32, DEVICE *);
 t_stat mt_attach(UNIT *, const char *);
 t_stat mt_detach(UNIT *);
 
-void MTstate(const char *, DEVICE *, IO_DEVICE *);
-void MTclear(DEVICE *);
-t_bool MTreject(IO_DEVICE *, t_bool, uint8);
-enum IOstatus MTin(IO_DEVICE *, uint8);
-enum IOstatus MTout(IO_DEVICE *, uint8);
-enum IOstatus MTBDCin(IO_DEVICE *, uint16 *, uint8);
-enum IOstatus MTBDCout(IO_DEVICE *, uint16 *, uint8);
+static void MTstate(const char *, DEVICE *, IO_DEVICE *);
+static void MTclear(DEVICE *);
+static t_bool MTreject(IO_DEVICE *, t_bool, uint8);
+static enum IOstatus MTin(IO_DEVICE *, uint8);
+static enum IOstatus MTout(IO_DEVICE *, uint8);
+static enum IOstatus MTBDCin(IO_DEVICE *, uint16 *, uint8);
+static enum IOstatus MTBDCout(IO_DEVICE *, uint16 *, uint8);
 
 t_stat mt_help(FILE *, DEVICE *, UNIT *, int32, const char *);
 
@@ -559,7 +559,7 @@ DEVICE mt_dev = {
 
 /* MT trace routine */
 
-void mt_trace(UNIT *uptr, const char *what, t_stat st, t_bool xfer)
+static void mt_trace(UNIT *uptr, const char *what, t_stat st, t_bool xfer)
 {
   int32 u = uptr - mt_dev.units;
   const char *status = NULL;
@@ -626,7 +626,7 @@ void mt_trace(UNIT *uptr, const char *what, t_stat st, t_bool xfer)
 
 /* MT trace routine (DSA mode) */
 
-void mt_DSAtrace(UNIT *uptr, const char *what)
+static void mt_DSAtrace(UNIT *uptr, const char *what)
 {
   int32 u = uptr - mt_dev.units;
 
@@ -636,7 +636,7 @@ void mt_DSAtrace(UNIT *uptr, const char *what)
 
 /* Tape library routine trace */
 
-void mtio_trace(UNIT *uptr, const char *what, t_stat st, t_bool lvalid, t_mtrlnt len)
+static void mtio_trace(UNIT *uptr, const char *what, t_stat st, t_bool lvalid, t_mtrlnt len)
 {
   int32 u = uptr - mt_dev.units;
   t_bool bot = FALSE, eot = FALSE;
@@ -726,7 +726,7 @@ char chars[128] = {
   'x', 'y', 'z', '{', ' ', '}', '~', ' '
 };
 
-void mt_dump(void)
+static void mt_dump(void)
 {
   t_mtrlnt offset = 0, count = MTremain;
   char msg[80], text[16];
@@ -759,7 +759,7 @@ void mt_dump(void)
   }
 }
 
-void mt_DSAdump(uint16 lwa, t_bool rw)
+static void mt_DSAdump(uint16 lwa, t_bool rw)
 {
   uint16 cwa = MTdev.iod_FWA;
   int idx;
@@ -802,7 +802,7 @@ const char *MTstateStr[] = {
   "Idle", "Reading", "Writing", "Read Timeout", "Write Timeout", "DSA Done"
 };
 
-void MTstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
+static void MTstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
 {
   char device[16];
 
@@ -823,7 +823,7 @@ void MTstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
           iod->iod_wasWriting ? ", Was writing" : "");
 }
 
-void mt_data(UNIT *uptr, t_bool output, uint16 data)
+static void mt_data(UNIT *uptr, t_bool output, uint16 data)
 {
   int32 u = uptr - mt_dev.units;
 
@@ -832,6 +832,12 @@ void mt_data(UNIT *uptr, t_bool output, uint16 data)
 
 t_stat mt_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   switch (MTdev.iod_type) {
     case DEVTYPE_1732_A:
       fprintf(st, "1732-A Magnetic Tape Controller");
@@ -849,6 +855,11 @@ t_stat mt_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat mt_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   if (!cptr)
     return SCPE_IERR;
   if ((uptr->flags & UNIT_ATT) != 0)
@@ -877,6 +888,11 @@ t_stat mt_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
  */
 t_stat mt_show_transport(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   if (uptr == NULL)
     return SCPE_IERR;
 
@@ -897,6 +913,12 @@ t_stat mt_show_transport(FILE *st, UNIT *uptr, int32 val, const void *desc)
  */
 t_stat mt_set_9track(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) cptr;
+  (void) desc;
+
   if (uptr == NULL)
     return SCPE_IERR;
 
@@ -912,6 +934,12 @@ t_stat mt_set_9track(UNIT *uptr, int32 val, const char *cptr, void *desc)
  */
 t_stat mt_set_7track(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) cptr;
+  (void) desc;
+
   if (uptr == NULL)
     return SCPE_IERR;
 
@@ -927,7 +955,7 @@ t_stat mt_set_7track(UNIT *uptr, int32 val, const char *cptr, void *desc)
  * will be dependent on the density of the tape and the speed of the drive
  * (in this case we assume 37.5 inches per sec).
  */
-int32 mt_densityTimeout(t_bool loose)
+static int32 mt_densityTimeout(t_bool loose)
 {
   int32 result = MT_200_WAIT;
 
@@ -1437,6 +1465,10 @@ t_stat mt_reset(DEVICE *dptr)
 
 t_stat mt_boot(int32 unitno, DEVICE *dptr)
 {
+  /* Generic boot signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   if (unitno != 0) {
     sim_printf("Can only boot from drive 0\n");
     return SCPE_ARG;
@@ -1532,8 +1564,12 @@ t_stat mt_detach(UNIT *uptr)
  * Perform a "Clear Controller" operation. Basically this is similar to a
  * device reset except it does not forget the currently selected transport.
  */
-void MTclear(DEVICE *dptr)
+static void MTclear(DEVICE *dptr)
 {
+  /* Registered device clear signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   UNIT *uptr;
 
   DEVRESET(&MTdev);
@@ -1575,7 +1611,7 @@ void MTclear(DEVICE *dptr)
  * If a data I/O (register 0) is performed after the tape motion has timed
  * out, we need to generate an ALARM + LOST data status.
  */
-t_bool MTreject(IO_DEVICE *iod, t_bool output, uint8 reg)
+static t_bool MTreject(IO_DEVICE *iod, t_bool output, uint8 reg)
 {
   switch (reg) {
     case 0:
@@ -1612,8 +1648,12 @@ t_bool MTreject(IO_DEVICE *iod, t_bool output, uint8 reg)
 /* Perform an input operation on a selected drive. This can be performed
    by issuing a command directly to the device or via a 1706 */
 
-enum IOstatus doMTIn(UNIT *uptr, uint16 *data, t_bool via1706)
+static enum IOstatus doMTIn(UNIT *uptr, uint16 *data, t_bool via1706)
 {
+  /* Shared helper signature.
+     This implementation does not use every parameter. */
+  (void) via1706;
+
   uint16 result;
 
   /*
@@ -1666,8 +1706,12 @@ enum IOstatus doMTIn(UNIT *uptr, uint16 *data, t_bool via1706)
 /* Perform an output operation on a selected drive. This can be performed
    by issuing a command directly to the device or via a 1706 */
 
-enum IOstatus doMTOut(UNIT *uptr, uint16 *data, t_bool via1706)
+static enum IOstatus doMTOut(UNIT *uptr, uint16 *data, t_bool via1706)
 {
+  /* Shared helper signature.
+     This implementation does not use every parameter. */
+  (void) via1706;
+
   uint16 temp = *data;
   t_mtrlnt need = ((MTdev.iod_mode & IO_1732_ASSEM) != 0) ? 2 : 1;
 
@@ -1708,8 +1752,12 @@ enum IOstatus doMTOut(UNIT *uptr, uint16 *data, t_bool via1706)
 
 /* Perform control function */
 
-enum IOstatus doMTFunction(DEVICE *dev)
+static enum IOstatus doMTFunction(DEVICE *dev)
 {
+  /* Shared helper signature.
+     This implementation does not use every parameter. */
+  (void) dev;
+
   UNIT *uptr;
   t_stat st;
 
@@ -1841,8 +1889,13 @@ enum IOstatus doMTFunction(DEVICE *dev)
 
 /* Perform I/O */
 
-enum IOstatus MTin(IO_DEVICE *iod, uint8 reg)
+static enum IOstatus MTin(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+  (void) reg;
+
   UNIT *uptr = MTdev.iod_unit;
 
   /*
@@ -1856,8 +1909,12 @@ enum IOstatus MTin(IO_DEVICE *iod, uint8 reg)
   return IO_REJECT;
 }
 
-enum IOstatus MTout(IO_DEVICE *iod, uint8 reg)
+static enum IOstatus MTout(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   UNIT *uptr = MTdev.iod_unit;
   uint16 unit;
 
@@ -2010,8 +2067,12 @@ enum IOstatus MTout(IO_DEVICE *iod, uint8 reg)
 
 /* Perform I/O initiated through a 1706 buffered data channel */
 
-enum IOstatus MTBDCin(IO_DEVICE *iod, uint16 *data, uint8 reg)
+static enum IOstatus MTBDCin(IO_DEVICE *iod, uint16 *data, uint8 reg)
 {
+  /* Registered buffered-data-channel signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   UNIT *uptr = MTdev.iod_unit;
 
   if ((mt_dev.dctrl & DBG_DTRACE) != 0) {
@@ -2033,8 +2094,12 @@ enum IOstatus MTBDCin(IO_DEVICE *iod, uint16 *data, uint8 reg)
   return IO_REJECT;
 }
 
-enum IOstatus MTBDCout(IO_DEVICE *iod, uint16 *data, uint8 reg)
+static enum IOstatus MTBDCout(IO_DEVICE *iod, uint16 *data, uint8 reg)
 {
+  /* Registered buffered-data-channel signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   UNIT *uptr = MTdev.iod_unit;
 
   if ((mt_dev.dctrl & DBG_DTRACE) != 0) {

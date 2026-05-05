@@ -85,6 +85,11 @@ DEVICE clk_dev = {
 
 int32 clk (int32 inst, int32 dev, int32 dat)
 {
+/* Generic IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) inst;
+(void) dev;
+
 int32 used, incr;
 
 if (clk_dev.flags & DEV_DIS)                            /* disabled? */
@@ -116,6 +121,10 @@ return SCPE_OK;
 
 t_stat clk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (clk_dev.flags & DEV_DIS) sim_cancel (&clk_unit);    /* disabled? */
 else {
     tmxr_poll = sim_rtcn_init_unit (&clk_unit, clk_unit.wait, TMR_CLK);/* init timer */

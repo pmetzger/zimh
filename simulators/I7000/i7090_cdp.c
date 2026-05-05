@@ -90,6 +90,10 @@ DEVICE              cdp_dev = {
 
 uint32 cdp_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dev;
+
     int                 chan = UNIT_G_CHAN(uptr->flags);
     int                 u = (uptr - cdp_unit);
     extern uint16   IC;
@@ -241,12 +245,20 @@ t_stat cdp_srv(UNIT * uptr)
 void
 cdp_ini(UNIT * uptr, t_bool f)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)f;
+
     uptr->u5 = 0;
 }
 
 t_stat
 cdp_reset(DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return SCPE_OK;
 }
 
@@ -300,6 +312,10 @@ cdp_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 cdp_description(DEVICE *dptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)dptr;
+
    return "721 Card Punch";
 }
 

@@ -292,17 +292,32 @@ DEVICE rb_dev = {
 
 t_stat rb_rd16 (int32 *data, int32 PA, int32 access)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) PA;
+(void) access;
+
 *data = 0;
 return SCPE_OK;
 }
 
 t_stat rb_wr16 (int32 data, int32 PA, int32 access)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) data;
+(void) PA;
+(void) access;
+
 return SCPE_OK;
 }
 
 t_stat rb_rd32 (int32 *data, int32 PA, int32 access)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 UNIT *uptr;
 
 switch ((PA >> 2) & 07) {
@@ -352,6 +367,10 @@ return SCPE_OK;
 
 t_stat rb_wr32 (int32 data, int32 PA, int32 access)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 UNIT *uptr;
 
 sim_debug(DBG_REG, &rb_dev, "reg %d write, value = %X\n", (PA >> 2) & 07, data);
@@ -615,6 +634,10 @@ return;
 
 t_stat rb_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 UNIT *uptr;
 
@@ -636,6 +659,10 @@ return SCPE_OK;
 
 const char *rb_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "RB730 disk controller";
 }
 
@@ -665,6 +692,11 @@ return SCPE_OK;
 
 t_stat rb_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (uptr->flags & UNIT_ATT)
     return SCPE_ALATT;
 uptr->capac = (val & UNIT_RB80)? RB80_SIZE: RB02_SIZE;
@@ -675,5 +707,11 @@ return SCPE_OK;
 
 t_stat rb_set_bad (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) cptr;
+(void) desc;
+
 return pdp11_bad_block (uptr, RB_NUMSC(uptr), RB_NUMWD(uptr));
 }

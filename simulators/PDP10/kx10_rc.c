@@ -466,7 +466,13 @@ t_stat rc_svc (UNIT *uptr)
 t_stat
 rc_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     int         i;
+
     if (uptr == NULL) return SCPE_IERR;
     for (i = 0; rc_drv_tab[i].wd_seg != 0; i++) {
         if ((val >> UNIT_V_DTYPE) == rc_drv_tab[i].devtype) {
@@ -552,6 +558,12 @@ return detach_unit (uptr);
 
 t_stat rc_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
 fprintf (st, "RD10/RM10  Disk Pack Drives (RC)\n\n");
 fprintf (st, "The RC controller implements the RC-10 disk controller that talked\n");
 fprintf (st, "to either RD10 mountable pack or RM10 drum drives.\n");
@@ -567,7 +579,11 @@ return SCPE_OK;
 
 const char *rc_description (DEVICE *dptr)
 {
-return "RD10/RM10 disk controller";
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
+    return "RD10/RM10 disk controller";
 }
 
 #endif

@@ -2258,6 +2258,10 @@ return SCPE_OK;
 
 t_stat cpu_ex (t_value *vptr, t_addr ea, UNIT *uptr, int32 sw)
 {
+/* Generic memory examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if (vptr == NULL)
     return SCPE_ARG;
 if ((sw & (SWMASK ('A') | SWMASK ('B')))? (ea > AMASK): (ea >= MEMSIZE))
@@ -2272,6 +2276,10 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr ea, UNIT *uptr, int32 sw)
 {
+/* Generic memory deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if ((sw & (SWMASK ('A') | SWMASK ('B')))? (ea > AMASK): (ea >= MEMSIZE))
     return SCPE_NXM;
 if (sw & SWMASK ('B'))
@@ -2284,6 +2292,11 @@ return SCPE_OK;
 
 t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 UNIT *chuptr = mt_dev[CHRONO_CH].units + CHRONO_UNIT;
 extern DEVICE clk_dev;
 
@@ -2307,6 +2320,12 @@ return SCPE_OK;
 
 t_stat cpu_show_model (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (cpu_model & I_CT)
     fputs ("CTSS", st);
 else if (cpu_model & I_94)
@@ -2363,6 +2382,12 @@ return;
 
 t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i, lnt;
 t_stat r;
 
@@ -2450,6 +2475,11 @@ return SCPE_OK;
 
 t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 k, di, lnt;
 const char *cptr = (const char *) desc;
 t_stat r;

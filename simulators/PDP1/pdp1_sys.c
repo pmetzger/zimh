@@ -116,7 +116,7 @@ const char *sim_stop_messages[SCPE_BASE] = {
 
 /* Binary loader - supports both RIM format and Macro block format */
 
-int32 pdp1_getw (FILE *inf)
+static int32 pdp1_getw (FILE *inf)
 {
 int32 i, tmp, word;
 
@@ -132,7 +132,7 @@ for (i = 0; i < 3;) {
 return word;
 }
 
-t_stat rim_load (FILE *inf, int32 fld)
+static t_stat rim_load (FILE *inf, int32 fld)
 {
 int32 origin, val;
 
@@ -155,7 +155,7 @@ for (;;) {
 return SCPE_OK;                                         /* done */
 }
 
-t_stat blk_load (FILE *inf, int32 fld)
+static t_stat blk_load (FILE *inf, int32 fld)
 {
 int32 val, start, count, csum;
 
@@ -414,7 +414,7 @@ static const int32 opc_val[] = {
         status  =       space needed?
 */
 
-int32 fprint_opr (FILE *of, int32 inst, int32 Class, int32 sp)
+static int32 fprint_opr (FILE *of, int32 inst, int32 Class, int32 sp)
 {
 int32 i, j;
 
@@ -548,7 +548,7 @@ return SCPE_ARG;
         val     =       output value
 */
 
-t_value get_sint (char *cptr, int32 *sign, t_stat *status)
+static t_value get_sint (char *cptr, int32 *sign, t_stat *status)
 {
 *sign = 1;
 if (*cptr == '+') {

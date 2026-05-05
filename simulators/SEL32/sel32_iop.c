@@ -133,6 +133,10 @@ DEVICE          iop_dev = {
 /* initialize the console chan/unit */
 void iop_ini(UNIT *uptr, t_bool f)
 {
+    /* Generic device initialization signature.
+       This implementation does not use every parameter. */
+    (void) f;
+
     int     unit = (uptr - iop_unit);       /* unit 0 */
     DEVICE *dptr = &iop_dev;                /* one and only dummy device */
 
@@ -158,6 +162,10 @@ t_stat  iop_rschnlio(UNIT *uptr) {
 
 /* start an iop operation */
 t_stat iop_preio(UNIT *uptr, uint16 chan) {
+    /* Generic channel pre-I/O signature.
+       This implementation does not use every parameter. */
+    (void) chan;
+
     DEVICE      *dptr = get_dev(uptr);
     int         unit = (uptr - dptr->units);
     uint16      chsa = GET_UADDR(uptr->u3);
@@ -281,6 +289,10 @@ t_stat iop_srv(UNIT *uptr)
 
 t_stat iop_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     /* add reset code here */
     return SCPE_OK;
 }
@@ -288,6 +300,13 @@ t_stat iop_reset(DEVICE *dptr)
 /* sho help iop */
 t_stat iop_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     fprintf(st, "SEL-32 IOP Model 8000 Channel Controller at 0x7E00\r\n");
     fprintf(st, "The IOP fields all interrupts and status posting\r\n");
     fprintf(st, "for each of the controllers on the system.\r\n");
@@ -297,6 +316,10 @@ t_stat iop_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr
 
 const char *iop_desc(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return("SEL-32 IOP Model 8000 Channel Controller @ 0x7E00");
 }
 

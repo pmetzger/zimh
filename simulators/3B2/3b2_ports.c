@@ -265,6 +265,12 @@ static void lpt_out(uint8 c)
  */
 t_stat ports_setnl(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     int32 newln, i, t;
     t_stat r = SCPE_OK;
 
@@ -323,6 +329,10 @@ t_stat ports_setnl(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 static void ports_cmd(uint8 slot, cio_entry *rentry, uint8 *rapp_data)
 {
+    /* Shared CIO command signature.
+       This implementation does not use every parameter. */
+    (void)rapp_data;
+
     cio_entry centry = {0};
     uint32 ln, i;
     PORTS_OPTIONS opts;
@@ -704,6 +714,10 @@ t_stat ports_reset(DEVICE *dptr)
 
 t_stat ports_cio_svc(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     sim_debug(TRACE_DBG, &ports_dev,
               "[ports_cio_svc] IRQ for board %d device %d\n",
               ports_int_slot, ports_int_subdev);
@@ -938,6 +952,10 @@ t_stat ports_detach(UNIT *uptr)
 
 t_stat lpt_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     /* No-op */
     return SCPE_OK;
 }
@@ -965,6 +983,13 @@ t_stat lpt_detach(UNIT *uptr)
 
 t_stat lpt_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     fprintf(st, "Line Printer (LPT)\n\n");
     fprintf(st, "The line printer (LPT) simulates an AT&T 470 120cps line printer\n");
     fprintf(st, "connected to the Centronics port of the first installed PORTS card. It\n");
@@ -989,5 +1014,9 @@ t_stat lpt_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr
 
 const char *lpt_description(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "AT&T 470 120cps Dot Matrix Printer";
 }

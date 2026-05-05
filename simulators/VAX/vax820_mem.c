@@ -112,6 +112,10 @@ DEVICE mctl_dev[] = {
 
 t_stat mctl_rdreg (int32 *val, int32 pa, int32 lnt)
 {
+/* Nexus register read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 mctl, ofs;
 
 mctl = NEXUS_GETNEX (pa) - TR_MCTL0;                    /* get mctl num */
@@ -156,6 +160,11 @@ return SCPE_OK;
 
 t_stat mctl_wrreg (int32 val, int32 pa, int32 lnt)
 {
+/* Nexus register write signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) lnt;
+
 int32 mctl, ofs;
 
 mctl = NEXUS_GETNEX (pa) - TR_MCTL0;                    /* get mctl num */
@@ -183,6 +192,11 @@ return SCPE_OK;
 
 void rom_wr_B (int32 pa, int32 val)
 {
+/* Shared ROM write hook.
+   This model does not use every parameter. */
+(void) pa;
+(void) val;
+
 return;
 }
 
@@ -190,6 +204,10 @@ return;
 
 t_stat mctl_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 for (i = 0; i < MCTL_NUM; i++) {                        /* init for MS820 */
     mcsr_1[i] = (MCSR1_M_SIZE << MCSR1_V_SIZE);
@@ -200,11 +218,22 @@ return SCPE_OK;
 
 const char *mctl_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "memory controller";
 }
 
 t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) st;
+(void) uptr;
+(void) val;
+(void) desc;
+
 // TODO
 return SCPE_OK;
 }

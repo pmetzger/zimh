@@ -139,6 +139,10 @@ DEVICE tto_dev = {
 
 int32 tti (int32 pulse, int32 code, int32 AC)
 {
+/* I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) AC;
+
 int32 iodata;
 
 
@@ -192,6 +196,10 @@ return SCPE_OK;
 
 t_stat tti_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmxr_set_console_units (&tti_unit, &tto_unit);
 tti_unit.buf = 0;                                       /* <not DG compatible> */
 DEV_CLR_BUSY( INT_TTI ) ;
@@ -253,6 +261,10 @@ return SCPE_OK;
 
 t_stat tto_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tto_unit.buf = 0;                                       /* <not DG compatible!>  */
 DEV_CLR_BUSY( INT_TTO ) ;
 DEV_CLR_DONE( INT_TTO ) ;
@@ -263,6 +275,12 @@ return SCPE_OK;
 
 t_stat ttx_setmod (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 tti_unit.flags = (tti_unit.flags & ~UNIT_DASHER) | val;
 tto_unit.flags = (tto_unit.flags & ~UNIT_DASHER) | val;
 return SCPE_OK;
@@ -270,6 +288,12 @@ return SCPE_OK;
 
 t_stat ttx_setpar (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 tti_unit.flags = (tti_unit.flags & ~TT_PAR) | val;
 tto_unit.flags = (tto_unit.flags & ~TT_PAR) | val;
 return SCPE_OK;

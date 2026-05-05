@@ -882,6 +882,10 @@ return r;
 
 t_stat dz_show_vec (FILE *st, UNIT *uptr, int32 arg, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) arg;
+
 const TMXR *mp = (const TMXR *) desc;
 
 return show_vec (st, uptr, ((mp->lines * 2) / DZ_LINES), desc);
@@ -892,6 +896,12 @@ return show_vec (st, uptr, ((mp->lines * 2) / DZ_LINES), desc);
 
 t_stat dz_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 newln, i, t;
 t_stat r;
 
@@ -929,6 +939,11 @@ return dz_reset (&dz_dev);                              /* setup lines and auto 
 
 t_stat dz_set_log (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 t_stat r;
 char gbuf[CBUFSIZE];
 int32 ln;
@@ -948,6 +963,11 @@ return tmxr_set_log (NULL, ln, cptr, desc);
 
 t_stat dz_set_nolog (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 t_stat r;
 int32 ln;
 
@@ -963,6 +983,11 @@ return tmxr_set_nolog (NULL, ln, NULL, desc);
 
 t_stat dz_show_log (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 i;
 
 for (i = 0; i < dz_desc.lines; i++) {
@@ -1034,5 +1059,9 @@ return SCPE_OK;
 
 const char *dz_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return (UNIBUS) ? "DZ11 8-line terminal multiplexer" : "DZV11 4-line terminal multiplexer";
 }

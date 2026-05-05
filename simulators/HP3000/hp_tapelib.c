@@ -1365,6 +1365,11 @@ return sim_tape_detach (uptr);                          /* detach the tape image
 
 t_stat tl_set_timing (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+
 DEVICE *const dptr = ((CVPTR) desc)->device;            /* a pointer to the controlling device */
 
 if (value)                                              /* if realistic timing is requested */
@@ -1386,6 +1391,10 @@ return SCPE_OK;
 
 t_stat tl_set_model (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+
 const CVPTR cvptr = (CVPTR) desc;                       /* the controller state structure pointer */
 const DRIVE_TYPE new_drive = GET_MODEL (value);         /* the new model ID */
 
@@ -1404,6 +1413,10 @@ return validate_drive (cvptr, uptr, new_drive, 0);      /* verify the model chan
 
 t_stat tl_set_density (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) value;
+
 const CVPTR cvptr = (CVPTR) desc;                       /* the controller state structure pointer */
 const DRIVE_TYPE model = GET_MODEL (uptr->flags);       /* the current drive model ID */
 uint32 new_bpi;
@@ -1523,6 +1536,11 @@ else {                                                  /* otherwise a size is s
 
 t_stat tl_show_timing (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) value;
+
 DEVICE *const dptr = ((const CNTLR_VARS *) desc)->device;   /* a pointer to the controlling device */
 
 if (dptr->flags & DEV_REALTIME)                         /* if the real time flag is set */
@@ -1543,6 +1561,11 @@ return SCPE_OK;
 
 t_stat tl_show_density (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) value;
+(void) desc;
+
 fprintf (st, "%u bpi", drive_props [PROP_INDEX (uptr)].bpi);
 
 return SCPE_OK;

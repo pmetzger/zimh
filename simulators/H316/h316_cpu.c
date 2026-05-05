@@ -400,17 +400,18 @@ DEVICE cpu_dev = {
     &cpu_dib, 0
     };
 
+static t_stat Ea (int32 inst, int32 *addr);
+static t_stat Write (int32 addr, int32 val);
+static int32 Add16 (int32 val1, int32 val2);
+static int32 Add31 (int32 val1, int32 val2);
+static int32 Operate (int32 MB, int32 AR);
+
 t_stat sim_instr (void)
 {
 int32 AR, BR, MB, Y = 0, t1, t2, t3, skip, dev;
 uint32 ut;
 t_bool iack;                                            // [RLA] TRUE if an interrupt was taken this cycle
 t_stat reason;
-t_stat Ea (int32 inst, int32 *addr);
-t_stat Write (int32 addr, int32 val);                   // [RLA] Write() can now cause a break
-int32 Add16 (int32 val1, int32 val2);
-int32 Add31 (int32 val1, int32 val2);
-int32 Operate (int32 MB, int32 AR);
 
 #define Read(ad)        M[(ad)]
 #define GETDBL_S(h,l)   (((h) << 15) | ((l) & MMASK))
@@ -1066,7 +1067,7 @@ return reason;
    masked at exit.
 */
 
-t_stat Ea (int32 IR, int32 *addr)
+static t_stat Ea (int32 IR, int32 *addr)
 {
 int32 i;
 int32 Y = IR & (IA | DISP);                             /* ind + disp */
@@ -1098,7 +1099,7 @@ return SCPE_OK;
 
 /* Write memory */
 
-t_stat Write (int32 addr, int32 val)
+static t_stat Write (int32 addr, int32 val)
 {
 // [RLA] Write() now checks for address breaks ...
 if (((addr == 0) || (addr >= 020)) && MEM_ADDR_OK (addr))
@@ -1114,7 +1115,7 @@ else
 
 /* Add */
 
-int32 Add16 (int32 v1, int32 v2)
+static int32 Add16 (int32 v1, int32 v2)
 {
 int32 r = v1 + v2;
 
@@ -1124,7 +1125,7 @@ else C = 0;
 return (r & DMASK);
 }
 
-int32 Add31 (int32 v1, int32 v2)
+static int32 Add31 (int32 v1, int32 v2)
 {
 int32 r = v1 + v2;
 
@@ -1186,6 +1187,12 @@ int32 cpu_ext_interrupt (void) {
 
 int32 undio (int32 op, int32 fnc, int32 val, int32 dev)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) op;
+(void) fnc;
+(void) dev;
+
 return ((stop_dev << IOT_V_REASON) | val);
 }
 
@@ -1193,6 +1200,10 @@ return ((stop_dev << IOT_V_REASON) | val);
 
 int32 sim_ota_2024 (int32 inst, int32 fnc, int32 dat, int32 dev)
 {
+  /* Generic I/O dispatch signature.
+     This implementation does not use every parameter. */
+  (void) inst;
+
   //   OTA instructions with a device code of 20 or 24 are really SMK
   // (Set interrupt Mask) instructions.  OTA 20 sets the standard H316
   // interrupt mask, and OTA 120, OTA 220 and OTA 320 set the extended
@@ -1250,6 +1261,10 @@ int32 sim_ota_2024 (int32 inst, int32 fnc, int32 dat, int32 dev)
 
 int32 dmaio (int32 inst, int32 fnc, int32 dat, int32 dev)
 {
+/* Generic I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 ch = (fnc - 1) & 03;
 
 switch (inst) {                                         /* case on opcode */
@@ -1344,7 +1359,7 @@ return dat;
                         (m8xm9)
 */
 
-int32 Operate (int32 MB, int32 AR)
+static int32 Operate (int32 MB, int32 AR)
 {
 int32 D, jamkn, eiki7, easbm, eastl, setaz;
 int32 clatr, cla1r, edahs, edals, etahs, etals, eda1r;
@@ -1459,6 +1474,11 @@ return SCPE_OK;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE)
     return SCPE_NXM;
 if (vptr != NULL)
@@ -1470,6 +1490,11 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE)
     return SCPE_NXM;
 if (addr == 0)
@@ -1482,6 +1507,13 @@ return SCPE_OK;
 
 t_stat cpu_set_noext (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) cptr;
+(void) desc;
+
 if (MEMSIZE > (NX_AMASK + 1))
     return SCPE_ARG;
 return SCPE_OK;
@@ -1489,6 +1521,12 @@ return SCPE_OK;
 
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 mc = 0;
 uint32 i;
 
@@ -1509,6 +1547,12 @@ return SCPE_OK;
 
 t_stat cpu_set_interrupts (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   uint32 newint;  t_stat ret;
   if (cptr == NULL) return SCPE_ARG;
   newint = get_uint (cptr, 10, 49, &ret);
@@ -1520,6 +1564,12 @@ t_stat cpu_set_interrupts (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat cpu_show_interrupts (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   if (ext_ints == 0)
     fprintf(st,"standard interrupts");
   else
@@ -1529,6 +1579,12 @@ t_stat cpu_show_interrupts (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat cpu_set_nchan (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 i, newmax;
 t_stat r;
 
@@ -1549,6 +1605,12 @@ return SCPE_OK;
 
 t_stat cpu_show_nchan (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (dma_nch)
     fprintf (st, "DMA channels = %d", dma_nch);
 else fprintf (st, "no DMA");
@@ -1559,6 +1621,11 @@ return SCPE_OK;
 
 t_stat cpu_show_dma (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if ((val < 0) || (val >= DMA_MAX))
     return SCPE_IERR;
 fputs ((dma_ad[val] & DMA_IN)? "Input": "Output", st);
@@ -1571,6 +1638,10 @@ return SCPE_OK;
 
 t_stat io_set_iobus (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 
@@ -1588,6 +1659,11 @@ return SCPE_OK;
 
 t_stat io_set_dma (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 uint32 newc;
@@ -1612,6 +1688,11 @@ return SCPE_OK;
 
 t_stat io_set_dmc (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 uint32 newc;
@@ -1638,6 +1719,11 @@ return SCPE_OK;
 
 t_stat io_show_chan (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 
@@ -1660,7 +1746,7 @@ return SCPE_OK;
 /* Set up I/O dispatch and channel maps */
 // [RLA] Check for DMC conflicts (on both DMC channels!) ...
 
-t_bool set_chanmap (DEVICE *dptr, DIB *dibp, uint32 dno, uint32 chan)
+static t_bool set_chanmap (DEVICE *dptr, DIB *dibp, uint32 dno, uint32 chan)
 {
   if ((chan < DMC_V_DMC1) && (chan >= dma_nch)) {
     sim_printf ("%s configured for DMA channel %d\n", sim_dname (dptr), chan + 1);
@@ -1725,6 +1811,12 @@ return FALSE;
 
 t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i, lnt;
 t_stat r;
 
@@ -1756,6 +1848,11 @@ return SCPE_OK;
 
 t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 cr, k, di, op, lnt;
 const char *cptr = (const char *) desc;
 t_stat r;

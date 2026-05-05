@@ -164,7 +164,6 @@ t_stat      mt_attach(UNIT *uptr, const char *);
 t_stat      mt_detach(UNIT *uptr);
 t_stat      mt_help(FILE *, DEVICE *dptr, UNIT *uptr, int32, const char *);
 const char  *mt_description(DEVICE *);
-extern      uint32  readfull(CHANP *chp, uint32 maddr, uint32 *word);
 extern      uint16  loading;            /* set when doing IPL */
 extern      int     irq_pend;           /* pending interrupt flag */
 extern      uint32  cont_chan(uint16 chsa);
@@ -638,6 +637,10 @@ loop:
 
 /* start a tape operation */
 t_stat mt_preio(UNIT *uptr, uint16 chan) {
+    /* Generic channel pre-I/O signature.
+       This implementation does not use every parameter. */
+    (void) chan;
+
     DEVICE      *dptr = get_dev(uptr);
     int         unit = (uptr - dptr->units);
     uint16      chsa = GET_UADDR(uptr->CMD);
@@ -766,7 +769,7 @@ t_stat mt_startcmd(UNIT *uptr, uint16 chan,  uint8 cmd)
 }
 
 /* Map simH errors into machine errors */
-t_stat mt_error(UNIT *uptr, uint16 chsa, t_stat r, DEVICE *dptr)
+static t_stat mt_error(UNIT *uptr, uint16 chsa, t_stat r, DEVICE *dptr)
 {
     sim_debug(DEBUG_CMD, dptr, "mt_error status %08x\n", r);
     mt_busy[GET_DEV_BUF(dptr->flags)] &= ~1;    /* not busy anymore */
@@ -1496,6 +1499,10 @@ rewrite:
 /* initialize the tape chan/unit */
 void mt_ini(UNIT *uptr, t_bool f)
 {
+    /* Generic device initialization signature.
+       This implementation does not use every parameter. */
+    (void) f;
+
     DEVICE *dptr = get_dev(uptr);
     if (MT_DENS(uptr->dynflags) == 0)
         uptr->dynflags |= MT_DENS_6250 << UNIT_S_DF_TAPE;
@@ -1690,6 +1697,10 @@ t_stat mt_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 
 const char *mt_description(DEVICE *dptr)
 {
+   /* Generic device description signature.
+      This implementation does not use every parameter. */
+   (void) dptr;
+
    return "8051 Buffered Tape Processor";
 }
 

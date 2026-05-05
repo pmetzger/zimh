@@ -321,7 +321,7 @@ MIDB   *const mi_midbs  [MI_NUM] = {&mi1_db,   &mi2_db,   &mi3_db,   &mi4_db,   
 #define ISLDBG(l,f)    ((PDEVICE(l)->dctrl & (f)) != 0)
 
 // Reset receiver (clear flags AND initialize all data) ...
-void mi_reset_rx (uint16 line)
+static void mi_reset_rx (uint16 line)
 {
   PMIDB(line)->iloop = PMIDB(line)->lloop = FALSE;
   udp_set_link_loopback (PDEVICE(line), PMIDB(line)->link, FALSE);
@@ -331,7 +331,7 @@ void mi_reset_rx (uint16 line)
 }
 
 // Reset transmitter (clear flags AND initialize all data) ...
-void mi_reset_tx (uint16 line)
+static void mi_reset_tx (uint16 line)
 {
   PMIDB(line)->iloop = PMIDB(line)->lloop = FALSE;
   udp_set_link_loopback (PDEVICE(line), PMIDB(line)->link, FALSE);
@@ -340,7 +340,7 @@ void mi_reset_tx (uint16 line)
 }
 
 // Get the DMC control words (starting address, end and length) for the channel.
-void mi_get_dmc (uint16 dmc, uint16 *pnext, uint16 *plast, uint16 *pcount)
+static void mi_get_dmc (uint16 dmc, uint16 *pnext, uint16 *plast, uint16 *pcount)
 {
   uint16 dmcad;
   if ((dmc<DMC1) || (dmc>(DMC1+DMC_MAX-1))) {
@@ -352,7 +352,7 @@ void mi_get_dmc (uint16 dmc, uint16 *pnext, uint16 *plast, uint16 *pcount)
 }
 
 // Update the DMC words to show "count" words transferred.
-void mi_update_dmc (uint32 dmc, uint32 count)
+static void mi_update_dmc (uint32 dmc, uint32 count)
 {
   uint16 dmcad, next;
   if ((dmc<DMC1) || (dmc>(DMC1+DMC_MAX-1))) return;
@@ -362,7 +362,7 @@ void mi_update_dmc (uint32 dmc, uint32 count)
 }
 
 // Link error recovery ...
-void mi_link_error (uint16 line)
+static void mi_link_error (uint16 line)
 {
   //   Any physical I/O error, either for the UDP link or a COM port, prints a
   // message and detaches the modem.  It's up to the user to decide what to do
@@ -380,7 +380,7 @@ void mi_link_error (uint16 line)
 ////////////////////////////////////////////////////////////////////////////////
 
 // Log a modem input or output including DMC words ...
-void mi_debug_mio (uint16 line, uint32 dmc, const char *ptext)
+static void mi_debug_mio (uint16 line, uint32 dmc, const char *ptext)
 {
   uint16 next, last, count;
   if (!ISLDBG(line, IMP_DBG_IOT)) return;
@@ -391,7 +391,7 @@ void mi_debug_mio (uint16 line, uint32 dmc, const char *ptext)
 }
 
 // Log the contents of a message sent or received ...
-void mi_debug_msg (uint16 line, uint16 next, uint16 count, const char *ptext)
+static void mi_debug_msg (uint16 line, uint16 next, uint16 count, const char *ptext)
 {
   uint16 i;  char buf[CBUFSIZE];  int len = 0;
   if (!ISLDBG(line, MI_DBG_MSG)) return;
@@ -411,7 +411,7 @@ void mi_debug_msg (uint16 line, uint16 next, uint16 count, const char *ptext)
 ////////////////////////////////////////////////////////////////////////////////
 
 // Start the transmitter ...
-void mi_start_tx (uint16 line)
+static void mi_start_tx (uint16 line)
 {
   //   This handles all the work of the "start modem output" OCP, including
   // extracting the packet from H316 memory, EXCEPT for actually setting the
@@ -448,7 +448,7 @@ void mi_start_tx (uint16 line)
 }
 
 // Poll for transmitter done interrupts ...
-void mi_poll_tx (uint16 line, uint32 quantum)
+static void mi_poll_tx (uint16 line, uint32 quantum)
 {
   //   This routine is called, via the RTC service, to count down the interval
   // until the transmitter finishes.  When it hits zero, an interrupt occurs.
@@ -461,7 +461,7 @@ void mi_poll_tx (uint16 line, uint32 quantum)
 }
 
 // Start the receiver ...
-void mi_start_rx (uint16 line)
+static void mi_start_rx (uint16 line)
 {
   //   "Starting" the receiver simply sets the RX pending flag.  Nothing else
   // needs to be done (nothing else _can_ be done!) until we actually receive
@@ -477,7 +477,7 @@ void mi_start_rx (uint16 line)
 }
 
 // Poll for receiver data ...
-void mi_poll_rx (uint16 line)
+static void mi_poll_rx (uint16 line)
 {
   //   This routine is called by mi_service to poll for any packets received.
   // This is done regardless of whether a receive is pending on the line.  If
@@ -571,6 +571,10 @@ int32 mi5_io(int32 inst, int32 fnc, int32 dat, int32 dev)  {return mi_io(5, inst
 // Common I/O simulation routine ...
 int32 mi_io (uint16 line, int32 inst, int32 fnc, int32 dat, int32 dev)
 {
+  /* Generic I/O device handler signature.
+     This implementation does not use every parameter. */
+  (void) dev;
+
   //   This routine is invoked by the CPU module whenever the code executes any
   // I/O instruction (OCP, SKS, INA or OTA) with one of our modem's device
   // address.
@@ -737,6 +741,11 @@ t_stat mi_detach (UNIT *uptr)
 
 t_stat mi_set_loopback (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic modifier signature.
+     This implementation does not use every parameter. */
+  (void) cptr;
+  (void) desc;
+
   t_stat ret = SCPE_OK; uint16 line = uptr->mline;
 
   switch (val) {
@@ -759,6 +768,11 @@ t_stat mi_set_loopback (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat mi_show_loopback (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   uint16 line = uptr->mline;
 
   if (PMIDB(line)->iloop)

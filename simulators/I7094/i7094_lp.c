@@ -209,6 +209,10 @@ return SCPE_OK;
 
 t_stat lpt_chwr (uint32 ch, t_uint64 val, uint32 eorfl)
 {
+/* Shared channel write signature.
+   This implementation does not use every parameter. */
+(void) ch;
+
 uint32 u = (lpt_cmd & CMD_BIN)? U_LPBIN: U_LPBCD;       /* reconstruct unit */
 
 lpt_chob = val & DMASK;                                 /* store data */
@@ -356,6 +360,10 @@ return SCPE_OK;
 
 t_stat lpt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 i;
 
 for (i = 0; i < LPT_BINLNT; i++)                        /* clear bin buf */

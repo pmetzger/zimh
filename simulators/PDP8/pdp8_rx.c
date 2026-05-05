@@ -611,6 +611,11 @@ return attach_unit (uptr, cptr);
 
 t_stat rx_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (uptr->flags & UNIT_ATT)
     return SCPE_ALATT;
 if ((rx_28 == 0) && val)                                /* not on RX8E */
@@ -623,6 +628,11 @@ return SCPE_OK;
 
 t_stat rx_settype (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 int32 i;
 
 if ((val < 0) || (val > 1) || (cptr != NULL))
@@ -647,6 +657,12 @@ return SCPE_OK;
 
 t_stat rx_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (rx_28) fprintf (st, "RX28");
 else fprintf (st, "RX8E");
 return SCPE_OK;
@@ -736,6 +752,10 @@ static const uint16 boot2_rom[] = {
 
 t_stat rx_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 extern uint16 M[];
 
@@ -757,5 +777,9 @@ return SCPE_OK;
 
 const char *rx_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "RX8E/RX01, RX28/RX02 floppy disk";
 }

@@ -386,6 +386,10 @@ DEVICE          coml_dev = {
 /* 8-line serial routines */
 void coml_ini(UNIT *uptr, t_bool f)
 {
+    /* Generic device initialization signature.
+       This implementation does not use every parameter. */
+    (void) f;
+
     /* set SNS_RLSDS SNS_DSRS SNS_CTSS SNS_RTS SNS_CTS */
     uptr->SNS = 0x0000b003;                     /* status is online & ready */
     uptr->CMD &= LMASK;                         /* leave only chsa */
@@ -407,6 +411,10 @@ t_stat  coml_rschnlio(UNIT *uptr) {
 /* 8-line serial routines */
 void com_ini(UNIT *uptr, t_bool f)
 {
+    /* Generic device initialization signature.
+       This implementation does not use every parameter. */
+    (void) f;
+
     DEVICE *dptr = get_dev(uptr);
 
     sim_debug(DEBUG_CMD, dptr,
@@ -429,6 +437,10 @@ t_stat  com_rschnlio(UNIT *uptr) {
 
 /* start a com operation */
 t_stat coml_preio(UNIT *uptr, uint16 chan) {
+    /* Generic channel pre-I/O signature.
+       This implementation does not use every parameter. */
+    (void) chan;
+
     DEVICE      *dptr = get_dev(uptr);
     int         unit = (uptr - dptr->units);
     uint16      chsa = GET_UADDR(uptr->CMD);    /* get channel/sub-addr */
@@ -1203,6 +1215,10 @@ t_stat coml_haltio(UNIT *uptr) {
 /* Reset routine */
 t_stat com_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int32 i;
 
     if (com_dev.flags & DEV_DIS)                /* master disabled? */
@@ -1302,6 +1318,10 @@ fprintf (st, "are lost when the simulator shuts down or DCI is detached.\n");
 /* description of controller */
 const char *com_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "SEL-32 8512 8-Line async communications controller";
 }
 

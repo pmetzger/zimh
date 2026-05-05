@@ -926,6 +926,10 @@ static REG dj2d_reg[] = {
 #define DJ2D_SNAME "DJ2D"
 
 static const char* dj2d_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return DJ2D_NAME;
 }
 
@@ -1200,6 +1204,12 @@ static t_stat dj2d_svc(UNIT *uptr)
 */
 static t_stat dj2d_set_prombase(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     uint32 newba;
     t_stat r;
 
@@ -1253,6 +1263,11 @@ static t_stat dj2d_set_prombase(UNIT *uptr, int32 val, const char *cptr, void *d
 /* Show Base Address routine */
 t_stat dj2d_show_prombase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     DEVICE *dptr;
     DJ2D_INFO *pInfo;
 
@@ -1275,6 +1290,11 @@ t_stat dj2d_show_prombase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 static t_stat dj2d_set_model(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     char base[5];
 
     if (!cptr) return SCPE_IERR;
@@ -1297,6 +1317,12 @@ static t_stat dj2d_set_model(UNIT *uptr, int32 val, const char *cptr, void *desc
 
 static t_stat dj2d_show_model(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf(st, "MODEL=%s", (dj2d_info->modelB) ? "B" : "A");
 
     return SCPE_OK;
@@ -1304,6 +1330,11 @@ static t_stat dj2d_show_model(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 static t_stat dj2d_set_sides(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int i;
 
     if (!cptr) return SCPE_IERR;
@@ -1332,6 +1363,11 @@ static t_stat dj2d_set_sides(UNIT *uptr, int32 val, const char *cptr, void *desc
 
 static t_stat dj2d_show_sides(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int i;
 
     for (i = 0; i < DJ2D_MAX_DRIVES; i++) {
@@ -1455,6 +1491,11 @@ static t_stat dj2d_detach(UNIT *uptr)
 
 static t_stat dj2d_set_baud(UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) value;
+    (void) desc;
+
     int32 baud;
     t_stat r = SCPE_ARG;
 
@@ -1487,6 +1528,11 @@ static t_stat dj2d_set_baud(UNIT *uptr, int32 value, const char *cptr, void *des
 
 static t_stat dj2d_show_baud(FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) value;
+    (void) desc;
+
     if (uptr->flags & UNIT_ATT) {
         fprintf(st, "Baud rate: %d", dj2d_info->DJ2D.uart_baud);
     }
@@ -1513,6 +1559,12 @@ static t_stat dj2d_config_line(void)
 
 static t_stat dj2d_set_prom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
 
@@ -1534,6 +1586,12 @@ static t_stat dj2d_set_prom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 static t_stat dj2d_show_prom(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (dj2d_info->promEnabled) {
         fprintf(st, "PROM");
     } else {
@@ -1545,6 +1603,9 @@ static t_stat dj2d_show_prom(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 static t_stat dj2d_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
 
     DJ2D_INFO *pInfo = (DJ2D_INFO *)dptr->ctxt;
 

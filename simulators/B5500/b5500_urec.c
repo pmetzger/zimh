@@ -248,6 +248,10 @@ DEVICE              con_dev = {
 #if ((NUM_DEVS_CDR > 0) | (NUM_DEVS_CDP > 0))
 t_stat
 cdr_ini(DEVICE *dptr) {
+     /* Generic device reset signature.
+        This implementation does not use every parameter. */
+     (void) dptr;
+
      int                i;
 
      for(i = 0; i < NUM_DEVS_CDR; i++) {
@@ -505,6 +509,12 @@ cdr_detach(UNIT * uptr)
 t_stat
 cdr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+   /* Generic help signature.
+      This implementation does not use every parameter. */
+   (void) uptr;
+   (void) flag;
+   (void) cptr;
+
    fprintf (st, "B124 Card Reader\n\n");
    fprintf (st, "The system supports up to two card readers, the second one is disabled\n");
    fprintf (st, "by default. To have the card reader return the EOF flag when the deck\n");
@@ -517,6 +527,10 @@ cdr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 cdr_description(DEVICE *dptr)
 {
+   /* Generic description signature.
+      This implementation does not use every parameter. */
+   (void) dptr;
+
    return "B124 Card Reader";
 }
 
@@ -529,6 +543,10 @@ cdr_description(DEVICE *dptr)
 /* Handle transfer of data for card punch */
 t_stat
 cdp_ini(DEVICE *dptr) {
+     /* Generic device reset signature.
+        This implementation does not use every parameter. */
+     (void) dptr;
+
      int                i;
 
      for(i = 0; i < NUM_DEVS_CDP; i++) {
@@ -637,6 +655,12 @@ cdp_detach(UNIT * uptr)
 t_stat
 cdp_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+   /* Generic help signature.
+      This implementation does not use every parameter. */
+   (void) uptr;
+   (void) flag;
+   (void) cptr;
+
    fprintf (st, "B303 Card Punch\n\n");
    fprintf (st, "The B303 Card Punch is only capable of punching text decks, binary decks\n");
    fprintf (st, "where not supported.\n");
@@ -648,6 +672,10 @@ cdp_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 cdp_description(DEVICE *dptr)
 {
+   /* Generic description signature.
+      This implementation does not use every parameter. */
+   (void) dptr;
+
    return "B303 Card Punch";
 }
 
@@ -658,6 +686,10 @@ cdp_description(DEVICE *dptr)
 */
 t_stat
 lpr_ini(DEVICE *dptr) {
+     /* Generic device reset signature.
+        This implementation does not use every parameter. */
+     (void) dptr;
+
      int                i;
 
      for(i = 0; i < NUM_DEVS_LPR; i++) {
@@ -674,6 +706,11 @@ lpr_ini(DEVICE *dptr) {
 t_stat
 lpr_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     int i;
     if (cptr == NULL)
         return SCPE_ARG;
@@ -695,13 +732,18 @@ lpr_setlpp(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 lpr_getlpp(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) v;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "linesperpage=%d", uptr->LPP);
     return SCPE_OK;
 }
 
-void
+static void
 print_line(UNIT * uptr, int unit)
 {
 /* Convert word record into column image */
@@ -931,6 +973,12 @@ lpr_detach(UNIT * uptr)
 t_stat
 lpr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+   /* Generic help signature.
+      This implementation does not use every parameter. */
+   (void) uptr;
+   (void) flag;
+   (void) cptr;
+
    fprintf (st, "B320 Line Printer\n\n");
    fprintf (st, "The system supports up to two line printers, the second one is disabled\n");
    fprintf (st, "by default. The B320 Line printer can be configured to any number of\n");
@@ -958,6 +1006,10 @@ lpr_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 lpr_description(DEVICE *dptr)
 {
+   /* Generic description signature.
+      This implementation does not use every parameter. */
+   (void) dptr;
+
    return "B320 Line Printer";
 }
 
@@ -972,6 +1024,10 @@ lpr_description(DEVICE *dptr)
  */
 t_stat
 con_ini(DEVICE *dptr) {
+     /* Generic device reset signature.
+        This implementation does not use every parameter. */
+     (void) dptr;
+
      UNIT               *uptr = &con_unit[0];
      uptr->CMD = 0;
      iostatus |= SPO_FLAG;
@@ -983,6 +1039,11 @@ con_ini(DEVICE *dptr) {
 t_stat
 con_cmd(uint16 cmd, uint16 dev, uint8 chan, uint16 *wc)
 {
+    /* Shared device command signature.
+       This implementation does not use every parameter. */
+    (void) dev;
+    (void) wc;
+
     UNIT        *uptr = &con_unit[0];
 
     /* Are we currently tranfering? */
@@ -1104,6 +1165,13 @@ con_srv(UNIT *uptr) {
 t_stat
 con_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+   /* Generic help signature.
+      This implementation does not use every parameter. */
+   (void) dptr;
+   (void) uptr;
+   (void) flag;
+   (void) cptr;
+
    fprintf (st, "Supervisory Printer\n\n");
    fprintf (st, "This is the interface from the operator to the system. The printer\n");
    fprintf (st, "operated in a half duplex mode. To request the system to accept input\n");
@@ -1118,6 +1186,10 @@ con_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 con_description(DEVICE *dptr)
 {
+   /* Generic description signature.
+      This implementation does not use every parameter. */
+   (void) dptr;
+
    return "Supervisory Printer";
 }
 

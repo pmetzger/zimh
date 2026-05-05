@@ -176,6 +176,10 @@ DEVICE cdp_dev = {
 
 t_stat cdr_chsel (uint32 ch, uint32 sel, uint32 unit)
 {
+/* Channel select callback signature.
+   This implementation does not use every parameter. */
+(void) unit;
+
 if (sel & CHSL_NDS)                                     /* nds? nop */
     return ch6_end_nds (ch);
 
@@ -269,6 +273,10 @@ return SCPE_OK;
 
 t_stat cdr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 i;
 
 for (i = 0; i < CD_BINLNT; i++)                         /* clear buffer */
@@ -294,6 +302,11 @@ static const t_uint64 boot_rom[] = {
 
 t_stat cdr_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic bootstrap signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 uint32 i;
 extern t_uint64 *M;
 
@@ -327,6 +340,12 @@ return SCPE_OK;
 
 t_stat cd_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) cptr;
+(void) desc;
+
 return (uptr->flags & UNIT_ATT)? SCPE_NOFNC: SCPE_OK;
 }
 
@@ -334,6 +353,10 @@ return (uptr->flags & UNIT_ATT)? SCPE_NOFNC: SCPE_OK;
 
 t_stat cdp_chsel (uint32 ch, uint32 sel, uint32 unit)
 {
+/* Channel select callback signature.
+   This implementation does not use every parameter. */
+(void) unit;
+
 if (sel & CHSL_NDS)                                     /* nds? nop */
     return ch6_end_nds (ch);
 
@@ -358,6 +381,10 @@ return SCPE_OK;
 
 t_stat cdp_chwr (uint32 ch, t_uint64 val, uint32 eorfl)
 {
+/* Channel write callback signature.
+   This implementation does not use every parameter. */
+(void) ch;
+
 cdp_chob = val & DMASK;                                 /* store data */
 cdp_chob_v = 1;                                         /* buffer valid */
 if (cdp_sta == CDS_DATA) {
@@ -465,6 +492,10 @@ return SCPE_OK;
 
 t_stat cdp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 i;
 
 for (i = 0; i < 24; i++)                                /* clear buffer */

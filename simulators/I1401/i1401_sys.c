@@ -127,6 +127,10 @@ const char *sim_stop_messages[SCPE_BASE] = {
 
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void)fnam;
+
 int32 col, rpt, ptr, mask, cctbuf[CCT_LNT];
 t_stat r;
 extern int32 cctlnt, cctptr, cct[CCT_LNT];
@@ -181,7 +185,7 @@ const char *opcode[64] = {
 
 /* Print an address from three characters */
 
-void fprint_addr (FILE *of, t_value *dig)
+static void fprint_addr (FILE *of, t_value *dig)
 {
 int32 addr, xa;
 
@@ -197,7 +201,7 @@ return;
 
 /* Print unknown opcode as data */
 
-t_stat dcw (FILE *of, int32 op, t_value *val, int32 sw)
+static t_stat dcw (FILE *of, int32 op, t_value *val, int32 sw)
 {
 int32 i;
 t_bool use_h = sw & SWMASK ('F');
@@ -230,6 +234,10 @@ return -(i - 1);                                        /* return # chars */
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
     UNIT *uptr, int32 sw)
 {
+/* Generic symbolic output signature.
+   This implementation does not use every parameter. */
+(void)addr;
+
 int32 op, flags, ilnt, i, t;
 int32 wmch = conv_old? '~': '`';
 t_bool use_h = sw & SWMASK ('F');
@@ -306,7 +314,7 @@ return -(ilnt - 1);                                     /* return # chars */
 
 /* get_addr - get address + index pair */
 
-t_stat get_addr (const char *cptr, t_value *val)
+static t_stat get_addr (const char *cptr, t_value *val)
 {
 int32 addr, index;
 t_stat r;
@@ -333,7 +341,7 @@ return SCPE_OK;
 
 /* get_io - get I/O address */
 
-t_stat get_io (char *cptr, t_value *val)
+static t_stat get_io (char *cptr, t_value *val)
 {
 if ((cptr[0] != '%') || (cptr[3] != 0) ||
     !isalnum (cptr[1]) || !isalnum (cptr[2]))
@@ -359,6 +367,10 @@ return SCPE_OK;
 
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+/* Generic symbolic input signature.
+   This implementation does not use every parameter. */
+(void)addr;
+
 int32 i, op, ilnt, t, cflag, wm_seen;
 int32 wmch = conv_old? '~': '`';
 char gbuf[CBUFSIZE];

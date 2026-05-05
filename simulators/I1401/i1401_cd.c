@@ -362,6 +362,13 @@ return SCPE_OK;
 
 t_stat cdp_npr (UNIT *notused, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) notused;
+(void) val;
+(void) cptr;
+(void) desc;
+
 UNIT *uptr;
 
 if (cdp_buf_full == 0)                                  /* any card? */
@@ -469,6 +476,10 @@ return SCPE_OK;
 
 t_stat cd_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ind[IN_LST] = ind[IN_READ] = ind[IN_PNCH] = 0;          /* clear indicators */
 s1sel = s2sel = s4sel = s8sel = 0;                      /* clear stacker sel */
 sim_cancel (&cdr_unit);                                 /* clear reader event */
@@ -481,6 +492,12 @@ return SCPE_OK;
 
 t_stat cdr_chg_cons (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (val == 0)                                           /* clear? */
     cdr_unit.flags |= UNIT_ATTABLE;                     /* attachable on */
 else if ((cdr_unit.flags & UNIT_ATT) == 0)              /* set, unattached? */
@@ -527,6 +544,11 @@ static const unsigned char boot_rom[] = {
 
 t_stat cdr_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 int32 i;
 extern int32 saved_IS;
 

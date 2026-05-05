@@ -79,6 +79,11 @@ PANEL *
 sim_panel_add_device_panel (PANEL *simulator_panel,
                             const char *device_name);
 
+PANEL *
+sim_panel_add_device_panel_debug (PANEL *simulator_panel,
+                                  const char *device_name,
+                                  const char *debug_file);
+
 /**
 
     sim_panel_destroy   to shutdown a panel or sub panel.

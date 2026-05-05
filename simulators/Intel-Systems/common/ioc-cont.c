@@ -92,6 +92,10 @@ extern uint8 unreg_dev(uint16);
 /* globals */
 
 static const char* ioc_cont_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return ioc_cont_NAME;
 }
 uint8   dbb_stat;
@@ -155,6 +159,11 @@ DEVICE ioc_cont_dev = {
 
 t_stat ioc_cont_cfg(uint16 base, uint16 devnum, uint8 dummy)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+    (void) dummy;
+
     sim_printf("    ioc-cont: installed at base port 0%02XH\n",
         base & BYTEMASK);
     ioc_cont_baseport = base & BYTEMASK;
@@ -175,6 +184,11 @@ t_stat ioc_cont_clr(void)
 
 t_stat ioc_cont_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_ARG;
     fprintf(st, "%s, Base port 0%04XH",
@@ -187,6 +201,10 @@ t_stat ioc_cont_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat ioc_cont_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     dbb_stat = 0x00;                /* clear DBB status */
     return SCPE_OK;
 }
@@ -199,6 +217,10 @@ t_stat ioc_cont_reset(DEVICE *dptr)
 
 uint8 ioc_cont0(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                      /* read data port */
         dbb_stat &= ~OBF;               //reset OBF flag
         return dbb_out;
@@ -213,6 +235,10 @@ uint8 ioc_cont0(t_bool io, uint8 data, uint8 devnum)
 
 uint8 ioc_cont1(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     int temp;
 
     if (io == 0) {                      /* read status port */

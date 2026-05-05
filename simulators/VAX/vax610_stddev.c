@@ -317,6 +317,12 @@ else
 
 t_stat cpu_show_leds (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "leds=%d(%s,%s,%s)", tto_leds, tto_leds&4 ? "ON" : "OFF",
                                             tto_leds&2 ? "ON" : "OFF",
                                             tto_leds&1 ? "ON" : "OFF");
@@ -356,6 +362,10 @@ return SCPE_OK;
 
 t_stat tti_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmxr_set_console_units (&tti_unit, &tto_unit);
 tti_unit.buf = 0;
 tti_csr = 0;
@@ -366,6 +376,12 @@ return SCPE_OK;
 
 t_stat tti_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Console Terminal Input (TTI)\n\n");
 fprintf (st, "The terminal input (TTI) polls the console keyboard for input.\n\n");
 fprint_set_help (st, dptr);
@@ -376,6 +392,10 @@ return SCPE_OK;
 
 const char *tti_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "console terminal input";
 }
 
@@ -406,6 +426,10 @@ return SCPE_OK;
 
 t_stat tto_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tto_unit.buf = 0;
 tto_csr = CSR_DONE;
 CLR_INT (TTO);
@@ -415,6 +439,12 @@ return SCPE_OK;
 
 t_stat tto_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Console Terminal Output (TTO)\n\n");
 fprintf (st, "The terminal output (TTO) writes to the simulator console.\n\n");
 fprint_set_help (st, dptr);
@@ -425,6 +455,10 @@ return SCPE_OK;
 
 const char *tto_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "console terminal output";
 }
 
@@ -452,6 +486,10 @@ return SCPE_OK;
 
 t_stat clk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 t;
 
 clk_csr = 0;
@@ -465,6 +503,10 @@ return SCPE_OK;
 
 const char *clk_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "100hz clock tick";
 }
 

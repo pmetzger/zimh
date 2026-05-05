@@ -141,6 +141,9 @@ enum opcodes {
 
 uint32 Read (uint32 ea);
 void Write (uint32 ea, uint32 dat);
+void lgp_vm_init (void);
+t_stat op_i (uint32 dev, uint32 ch, uint32 sh4);
+t_stat op_p (uint32 dev, uint32 ch);
 
 /* Translation Tables */
 

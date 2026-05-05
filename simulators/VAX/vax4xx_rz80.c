@@ -829,6 +829,10 @@ return SCPE_OK;
 
 t_stat rz_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 CTLR *rz = rz_ctxmap[uptr->cnum];
 uint32 cap;
 uint32 max = sim_toffset_64? RZU_EMAXC: RZU_MAXC;
@@ -857,6 +861,11 @@ return SCPE_OK;
 
 t_stat rz_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 fprintf (st, "%s", rzdev_tab[GET_DTYPE (uptr->flags)].name);
 return SCPE_OK;
 }
@@ -888,5 +897,9 @@ return scsi_attach_ex (uptr, cptr, drv_types);
 
 const char *rz_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "NCR 5380 SCSI controller";
 }

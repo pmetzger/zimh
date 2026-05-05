@@ -468,6 +468,12 @@ DEVICE cpu_dev = {
 
 t_stat cpu_show_model (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "model=");
 return cpu_print_model (st);
 }
@@ -3405,6 +3411,10 @@ switch (sim_eval[0])
 
 t_stat cpu_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 st;
 uint32 addr = (uint32) exta;
 
@@ -3451,6 +3461,12 @@ return SCPE_NXM;
 
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 mc = 0;
 uint32 i, clim, uval = (uint32)val;
 uint32 *nM = NULL;
@@ -3478,6 +3494,11 @@ return SCPE_OK;
 
 t_stat cpu_show_virt (FILE *of, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 t_stat r;
 const char *cptr = (const char *) desc;
 uint32 va, pa;
@@ -3530,6 +3551,12 @@ return ACC_MASK (md);
 
 t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i, lnt;
 char gbuf[CBUFSIZE];
 t_stat r;
@@ -3586,6 +3613,11 @@ return SCPE_OK;
 
 t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 di, lnt;
 const char *cptr = (const char *) desc;
 t_stat r;
@@ -3807,6 +3839,12 @@ static struct {
 
 t_stat cpu_set_instruction_set (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (!cptr || !*cptr)
     return SCPE_ARG;
 while (1) {
@@ -3843,7 +3881,7 @@ const char **b = (const char **)pb;
 return strcmp (*a, *b);
 }
 
-t_stat cpu_show_instruction_group (FILE *st, int32 groupmask)
+static t_stat cpu_show_instruction_group (FILE *st, int32 groupmask)
 {
 int opc;
 int group;
@@ -3869,6 +3907,12 @@ return SCPE_OK;
 
 t_stat cpu_show_instruction_set (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int i;
 
 fprintf (st, "Implementing: ");

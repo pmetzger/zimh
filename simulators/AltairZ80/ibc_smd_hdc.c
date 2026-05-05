@@ -305,6 +305,11 @@ static t_stat ibc_smd_detach(UNIT *uptr)
 /* Set geometry of the disk drive */
 static t_stat ibc_smd_unit_set_geometry(UNIT* uptr, int32 value, const char* cptr, void* desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) value;
+    (void) desc;
+
     IBC_SMD_DRIVE_INFO* pDrive;
     int32 i;
     int32 result;
@@ -358,6 +363,11 @@ static t_stat ibc_smd_unit_set_geometry(UNIT* uptr, int32 value, const char* cpt
 /* Show geometry of the disk drive */
 static t_stat ibc_smd_unit_show_geometry(FILE* st, UNIT* uptr, int32 value, const void* desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) value;
+    (void) desc;
+
     IBC_SMD_DRIVE_INFO* pDrive;
     int32 i;
 

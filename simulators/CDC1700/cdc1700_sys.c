@@ -110,6 +110,10 @@ CTAB cdc1700_cmd[] = {
  */
 static void postUpdate(t_bool from_scp)
 {
+  /* Generic command post-processing signature.
+     This implementation does not use every parameter. */
+  (void) from_scp;
+
   /*
    * Rebuild the I/O device and buffered data channel tables in case the
    * command changed the configuration.
@@ -179,6 +183,11 @@ static t_bool checkDuplicate(DEVICE *dptr, uint8 equipment)
  */
 t_stat set_equipment(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   DEVICE *dptr;
   IO_DEVICE *iod;
   t_value v;
@@ -223,6 +232,10 @@ t_stat checkReset(DEVICE *dptr, uint8 equipment)
 
 t_stat sim_load(FILE *fileref, const char *cptr, const char *fname, int flag)
 {
+  /* Generic loader signature.
+     This implementation does not use every parameter. */
+  (void)fname;
+
   t_addr lo, hi;
 
   if (flag == 0)
@@ -289,6 +302,10 @@ t_stat sim_load(FILE *fileref, const char *cptr, const char *fname, int flag)
 
 t_stat fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
 {
+  /* Generic symbolic output signature.
+     This implementation does not use every parameter. */
+  (void)uptr;
+
   int32 inst = val[0];
   t_bool target = (sw & SWMASK('T')) != 0;
   char buf[128];
@@ -323,6 +340,10 @@ t_stat fprint_sym(FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw)
  */
 t_stat autoload(int32 flag, const char *ptr)
 {
+  /* Generic command signature.
+     This implementation does not use every parameter. */
+  (void) flag;
+
   char gbuf[CBUFSIZE];
   DEVICE *dptr;
 

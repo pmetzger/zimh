@@ -968,6 +968,10 @@ return rval;
 
 t_stat dkp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 u;
 UNIT *uptr;
 
@@ -1012,6 +1016,11 @@ return SCPE_OK;
 
 t_stat dkp_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (uptr->flags & UNIT_ATT)
     return SCPE_ALATT;
 uptr->capac = drv_tab[GET_DTYPE (val)].size;
@@ -1083,6 +1092,11 @@ static const int32 boot_rom[] = {
 
 t_stat dkp_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 size_t i;
 
 for (i = 0; i < BOOT_LEN; i++)

@@ -270,6 +270,10 @@ cp_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 cp_description(DEVICE *dptr)
 {
+   /* Generic device description signature.
+      This implementation does not use every parameter. */
+   (void) dptr;
+
    return "Card Punch";
 }
 

@@ -336,11 +336,20 @@ cdp_srv(UNIT *uptr) {
 
 t_stat
 cdp_reset(DEVICE *dptr) {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return sim_register_internal_device (&cdp_input_dev);
 }
 
 void
 cdp_ini(UNIT *uptr, t_bool f) {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)f;
+    (void)uptr;
+
 }
 
 t_stat
@@ -382,6 +391,11 @@ cdp_detach(UNIT * uptr)
 t_stat
 cdp_set_input(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)val;
+
     int       nflag = 1;
     int       num = 0;
     char      gbuf[30];
@@ -459,6 +473,11 @@ cdp_set_input(UNIT *uptr, int32 val, const char *cptr, void *desc)
 t_stat
 cdp_get_input(FILE *st, UNIT *uptr, int32 v, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)v;
+
     int u = (uptr - cdp_unit);
     UNIT *iuptr = &cdp_input_unit[u];
 
@@ -503,6 +522,10 @@ stk_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 stk_description(DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
    return "Card stacking device";
 }
 #endif
@@ -533,6 +556,10 @@ cdp_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 cdp_description(DEVICE *dptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)dptr;
+
 #ifdef I7010
    return "1402 Card Punch";
 #endif

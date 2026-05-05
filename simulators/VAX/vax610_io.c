@@ -101,7 +101,7 @@ int32 int_vec[IPL_HLVL][32];                            /* int req to vector */
         - write: machine check (?)
 */
 
-int32 ReadQb (uint32 pa)
+static int32 ReadQb (uint32 pa)
 {
 int32 idx, val;
 
@@ -117,7 +117,7 @@ MACH_CHECK (MCHK_READ);
 return 0;
 }
 
-void WriteQb (uint32 pa, int32 val, int32 mode)
+static void WriteQb (uint32 pa, int32 val, int32 mode)
 {
 int32 idx;
 
@@ -342,6 +342,10 @@ return 0;
 
 void ioreset_wr (int32 data)
 {
+/* Shared bus write signature.
+   This implementation does not use every parameter. */
+(void) data;
+
 reset_all (5);                                          /* from qba on... */
 return;
 }
@@ -350,6 +354,10 @@ return;
 
 t_stat qba_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 for (i = 0; i < IPL_HLVL; i++)
@@ -359,6 +367,10 @@ return SCPE_OK;
 
 const char *qba_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Qbus adapter";
 }
 

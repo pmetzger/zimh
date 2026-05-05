@@ -800,6 +800,10 @@ return;
 
 void sel_service (uint32 ticks_elapsed)
 {
+/* Shared channel service signature.
+   This implementation does not use every parameter. */
+(void) ticks_elapsed;
+
 HP_WORD      inbound_data, outbound_data;
 INBOUND_SET  inbound_signals;
 SIGNALS_DATA outbound;
@@ -1213,6 +1217,10 @@ return;
 
 static t_stat sel_timer (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 SIGNALS_DATA outbound;
 
 outbound = abort_channel ("a CHANSR timeout");          /* abort the transfer in progress */
@@ -1237,6 +1245,10 @@ return SCPE_OK;
 
 static t_stat sel_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 rollover = CLEAR;                                       /* clear the word count rollover flip-flop */
 
 sel_is_idle = TRUE;                                     /* the channel is now inactive */

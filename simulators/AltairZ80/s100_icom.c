@@ -610,6 +610,10 @@ static REG icom_reg[] = {
 #define ICOM_SNAME "ICOM"
 
 static const char* icom_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return ICOM_NAME;
 }
 
@@ -743,6 +747,10 @@ static t_stat icom_reset(DEVICE *dptr)
 /* Service routine */
 static t_stat icom_svc(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     icom_info->ICOM.status &= ~ICOM_STAT_BUSY;
 
     return SCPE_OK;
@@ -866,6 +874,12 @@ static t_stat icom_set_membase(UNIT *uptr, int32 val, const char *cptr, void *de
 /* Show Base Address routine */
 t_stat icom_show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (icom_info->mem_base) {
         fprintf(st, "MEM=0x%04X-0x%04X", icom_info->mem_base, icom_info->mem_base+icom_info->mem_size-1);
     }
@@ -882,6 +896,12 @@ t_stat icom_show_membase(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 static t_stat icom_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!cptr) return SCPE_IERR;
 
     if (!strcmp(cptr, "3812")) {
@@ -902,6 +922,12 @@ static t_stat icom_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 static t_stat icom_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf(st, "TYPE=%s", (icom_info->boardType == ICOM_TYPE_3812) ? "3812" : "3712");
 
     return SCPE_OK;
@@ -909,6 +935,12 @@ static t_stat icom_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 static t_stat icom_set_prom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
 
@@ -931,6 +963,12 @@ static t_stat icom_set_prom(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 static t_stat icom_show_prom(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf(st, "%s", (icom_info->promEnabled) ? "PROM" : "NOPROM");
 
     return SCPE_OK;
@@ -938,6 +976,10 @@ static t_stat icom_show_prom(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 static t_stat icom_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+
     sim_debug(VERBOSE_MSG, dptr, "Booting using PROM at 0x%04x\n", icom_info->prom_base);
 
     *((int32 *) sim_PC->loc) = icom_info->prom_base;
@@ -1471,6 +1513,11 @@ static uint8 ICOM_Command(UNIT *uptr, ICOM_REG *pICOM, int32 Data)
 
 static int32 icomprom(int32 Addr, int32 rw, int32 Data)
 {
+    /* Memory resource handler signature.
+       This implementation does not use every parameter. */
+    (void) rw;
+    (void) Data;
+
     /*
     ** The iCOM controller PROM occupies 1024 bytes (1K) of RAM at
     ** location F000H.

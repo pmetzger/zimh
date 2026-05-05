@@ -479,5 +479,27 @@ uint32 WritePB (uint32 ba, uint32 dat);
 uint32 ReadPW (uint32 pa, uint32 *dat);
 uint32 WritePW (uint32 pa, uint32 dat);
 uint32 ReadHist (uint32 bva, uint32 *dat, uint32 *dat1, uint32 acc, uint32 lnt);
+uint32 cis_dec (uint32 op, uint32 rn, uint32 bva);
+uint32 cis_ebs (uint32 rn, uint32 disp);
+uint32 map_lra (uint32 rn, uint32 inst);
+uint32 map_mmc (uint32 rn, uint32 map);
+uint32 map_lms (uint32 rn, uint32 bva);
+uint32 fp (uint32 op, uint32 rn, uint32 bva);
+void ShiftF (uint32 rn, uint32 stype, uint32 sc);
+uint32 io_rwd (uint32 op, uint32 rn, uint32 bva);
+uint32 io_sio (uint32 rn, uint32 bva);
+uint32 io_tio (uint32 rn, uint32 bva);
+uint32 io_tdv (uint32 rn, uint32 bva);
+uint32 io_hio (uint32 rn, uint32 bva);
+uint32 io_aio (uint32 rn, uint32 bva);
+uint32 io_eval_int (void);
+t_bool io_poss_int (void);
+uint32 io_actv_int (void);
+uint32 io_ackn_int (uint32 hireq);
+uint32 io_rels_int (uint32 hiact, t_bool arm);
+t_stat io_set_pint (void);
+t_stat io_init (void);
+t_stat io_set_nchan (UNIT *uptr, int32 val, const char *cptr, void *desc);
+t_stat io_show_nchan (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 #endif

@@ -141,6 +141,10 @@ DEVICE dr15_dev = {
 
 int32 dr60 (int32 dev, int32 pulse, int32 AC)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if (((pulse & 01) != 0) && (dr15_tcb_ack != 0))         /* SIOA */
     AC |= IOT_SKP;
 if ((pulse & 02) != 0)                                  /* CIOP */
@@ -154,6 +158,10 @@ return AC;
 
 int32 dr61 (int32 dev, int32 pulse, int32 AC)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 subdev = (pulse >> 4) & 03;
 
 if (pulse & 01) {                                       /* SAPIn */
@@ -301,6 +309,11 @@ return SCPE_OK;
 
 t_stat dr15_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= UC15_STATE_SIZE)
     return SCPE_NXM;
 if (vptr != NULL) {
@@ -313,6 +326,11 @@ return SCPE_OK;
 
 t_stat dr15_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= UC15_STATE_SIZE)
     return SCPE_NXM;
 if (uc15_shmem != NULL)
@@ -324,6 +342,11 @@ return SCPE_OK;
 
 t_stat dr15_attach (UNIT *uptr, const char *cptr)
 {
+/* Generic attach signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+
 return SCPE_NOFNC;
 }
 
@@ -331,6 +354,10 @@ return SCPE_NOFNC;
 
 t_stat dr15_detach (UNIT *uptr)
 {
+/* Generic detach signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if ((sim_switches & SIM_SW_SHUT) == 0)                  /* only if shutdown */
     return SCPE_NOFNC;
 sim_shmem_close (uc15_shmem);                           /* release shared state */

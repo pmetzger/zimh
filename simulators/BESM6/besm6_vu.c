@@ -75,8 +75,14 @@ REG vu_reg[] = {
     { 0 }
 };
 
-t_stat vu_set_coldly (UNIT *u, int32 val, const char *cptr, void *desc)
+static t_stat vu_set_coldly (UNIT *u, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) u;
+    (void) val;
+    (void) desc;
+
     if (cptr && atoi(cptr) > 0) {
         vu_col_dly = atoi(cptr);
         return SCPE_OK;
@@ -85,8 +91,14 @@ t_stat vu_set_coldly (UNIT *u, int32 val, const char *cptr, void *desc)
     return SCPE_ARG;
 }
 
-t_stat vu_set_enddly (UNIT *u, int32 val, const char *cptr, void *desc)
+static t_stat vu_set_enddly (UNIT *u, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) u;
+    (void) val;
+    (void) desc;
+
     if (cptr && atoi(cptr) > 0) {
         vu_end_dly = atoi(cptr);
         return SCPE_OK;
@@ -95,8 +107,14 @@ t_stat vu_set_enddly (UNIT *u, int32 val, const char *cptr, void *desc)
     return SCPE_ARG;
 }
 
-t_stat vu_set_carddly (UNIT *u, int32 val, const char *cptr, void *desc)
+static t_stat vu_set_carddly (UNIT *u, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) u;
+    (void) val;
+    (void) desc;
+
     if (cptr && atoi(cptr) > 0) {
         vu_card_dly = atoi(cptr);
         return SCPE_OK;
@@ -105,26 +123,49 @@ t_stat vu_set_carddly (UNIT *u, int32 val, const char *cptr, void *desc)
     return SCPE_ARG;
 }
 
-t_stat vu_show_coldly (FILE *st, UNIT *u, int32 v, const void *dp)
+static t_stat vu_show_coldly (FILE *st, UNIT *u, int32 v, const void *dp)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) u;
+    (void) v;
+    (void) dp;
+
     fprintf(st, "Column delay is %d", vu_col_dly);
     return SCPE_OK;
 }
 
-t_stat vu_show_enddly (FILE *st, UNIT *u, int32 v, const void *dp)
+static t_stat vu_show_enddly (FILE *st, UNIT *u, int32 v, const void *dp)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) u;
+    (void) v;
+    (void) dp;
+
     fprintf(st, "Delay before the end of card is %d", vu_end_dly);
     return SCPE_OK;
 }
 
-t_stat vu_show_carddly (FILE *st, UNIT *u, int32 v, const void *dp)
+static t_stat vu_show_carddly (FILE *st, UNIT *u, int32 v, const void *dp)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) u;
+    (void) v;
+    (void) dp;
+
     fprintf(st, "Card delay is %d", vu_card_dly);
     return SCPE_OK;
 }
 
-t_stat vu_set_updk (UNIT *u, int32 val, const char *cptr, void *desc)
+static t_stat vu_set_updk (UNIT *u, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     unsigned start, end;
     int num = u - vu_unit;
     if (!cptr) {
@@ -143,8 +184,13 @@ t_stat vu_set_updk (UNIT *u, int32 val, const char *cptr, void *desc)
     return SCPE_OK;
 }
 
-t_stat vu_show_updk (FILE *st, UNIT *u, int32 v, const void *dp)
+static t_stat vu_show_updk (FILE *st, UNIT *u, int32 v, const void *dp)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) v;
+    (void) dp;
+
     int num = u - vu_unit;
     if (vu_updkstart[num] == 0 && vu_updkend[num] == 0)
         fprintf(st, "UPDK disabled");
@@ -209,6 +255,10 @@ unsigned int vu_cardcnt[2];
  */
 t_stat vu_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     sim_cancel (&vu_unit[0]);
     sim_cancel (&vu_unit[1]);
     vu_state[0] = vu_state[1] = VU_IDLE;
@@ -434,7 +484,7 @@ static int chad (int num, int bit, char val)
     }
 }
 
-int
+static int
 prettycard (UNIT *u)
 {
     int bit, ch;

@@ -493,7 +493,7 @@ tu_read(DEVICE *dptr, struct rh_if *rhc, int reg, uint32 *data) {
 
 
 /* Map simH errors into machine errors */
-void tu_error(UNIT * uptr, t_stat r)
+static void tu_error(UNIT * uptr, t_stat r)
 {
     int           ctlr = GET_CNTRL_RH(uptr->flags);
     DEVICE       *dptr = tu_devs[ctlr];
@@ -855,7 +855,7 @@ tu_reset(DEVICE * dptr)
     return SCPE_OK;
 }
 
-void tu_read_word(UNIT *uptr) {
+static void tu_read_word(UNIT *uptr) {
      int i, cc, ch;
 
      tu_boot_buffer = 0;
@@ -1012,6 +1012,10 @@ return SCPE_OK;
 
 const char *tu_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "TU04/05/06/07 Massbus disk controller";
 }
 

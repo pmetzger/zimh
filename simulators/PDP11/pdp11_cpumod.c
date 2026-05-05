@@ -360,12 +360,22 @@ DEVICE sys_dev = {
 
 t_stat SR_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) access;
+
 *data = SR;
 return SCPE_OK;
 }
 
 t_stat DR_wr (int32 data, int32 pa, int32 access)
 {
+/* Generic I/O write signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) access;
+
 DR = data;
 return SCPE_OK;
 }
@@ -374,6 +384,10 @@ return SCPE_OK;
 
 t_stat REG_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 *data = R[pa & 07];
 return SCPE_OK;
 }
@@ -394,6 +408,10 @@ return SCPE_OK;
 
 t_stat CPU24_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((pa >> 1) & 017) {                              /* decode pa<4:1> */
 
     case 013:                                           /* CPUERR */
@@ -407,6 +425,11 @@ return SCPE_NXM;                                        /* unimplemented */
 
 t_stat CPU24_wr (int32 data, int32 pa, int32 access)
 {
+/* Generic I/O write signature.
+   This implementation does not use every parameter. */
+(void) data;
+(void) access;
+
 switch ((pa >> 1) & 017) {                              /* decode pa<4:1> */
 
     case 013:                                           /* CPUERR */
@@ -420,6 +443,10 @@ return SCPE_NXM;                                        /* unimplemented */
 
 t_stat CPU44_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((pa >> 1) & 017) {                              /* decode pa<4:1> */
 
     case 002:                                           /* MEMERR */
@@ -498,6 +525,10 @@ return SCPE_NXM;                                        /* unimplemented */
 
 t_stat CPU45_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((pa >> 1) & 017) {                              /* decode pa<4:1> */
 
     case 014:                                           /* MBRK */
@@ -541,6 +572,10 @@ return SCPE_NXM;                                        /* unimplemented */
 
 t_stat CPU60_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((pa >> 1) & 017) {                              /* decode pa<4:1> */
 
     case 000:                                           /* WCS */
@@ -616,6 +651,10 @@ return SCPE_NXM;                                        /* unimplemented */
 
 t_stat CPU70_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((pa >> 1) & 017) {                              /* decode pa<4:1> */
 
     case 000:                                           /* low error */
@@ -743,6 +782,10 @@ return SCPE_NXM;                                        /* unimplemented */
 
 t_stat CPUJ_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((pa >> 1) & 017) {                              /* decode pa<4:1> */
 
     case 002:                                           /* MEMERR */
@@ -821,6 +864,10 @@ return SCPE_NXM;                                        /* unimplemented */
 
 t_stat CTLFB_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((pa >> 1) & 03) {                               /* decode pa<2:1> */
 
     case 0:                                             /* PCR */
@@ -867,6 +914,10 @@ return SCPE_NXM;
 
 t_stat CTLJB_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((pa >> 1) & 03) {                               /* decode pa<2:1> */
 
    case 0:                                              /* CSR */
@@ -925,6 +976,10 @@ return SCPE_NXM;
 
 t_stat CTLJD_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((pa >> 1) & 03) {                               /* decode pa<2:1> */
 
     case 0:                                             /* CSR */
@@ -953,6 +1008,10 @@ return SCPE_NXM;
 
 t_stat CTLJE_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((pa >> 1) & 03) {                               /* decode pa<2:1> */
 
     case 0:                                             /* CSR */
@@ -1022,6 +1081,10 @@ return SCPE_NXM;
 
 t_stat UBA24_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((pa >> 1) & 03) {                               /* decode pa<2:1> */
 
     case 2:                                             /* LMAL */
@@ -1053,6 +1116,10 @@ return SCPE_NXM;
 
 t_stat UBAJ_rd (int32 *data, int32 pa, int32 access)
 {
+/* Generic I/O read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((pa >> 1) & 03) {                               /* decode pa<2:1> */
 
     case 0:                                             /* DCR */
@@ -1164,6 +1231,10 @@ return SCPE_OK;
 
 t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 if (cptr != NULL)
     return SCPE_ARG;
 if (val >= MOD_MAX)
@@ -1184,6 +1255,12 @@ return SCPE_OK;
 
 t_stat cpu_show_model (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 i, all_opt;
 
 fprintf (st, "%s", cpu_tab[cpu_model].name);
@@ -1200,6 +1277,11 @@ return SCPE_OK;
 
 t_stat cpu_set_opt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if (cptr)
     return SCPE_ARG;
 if ((val & cpu_tab[cpu_model].opt) == 0) {
@@ -1219,6 +1301,11 @@ return SCPE_OK;
 
 t_stat cpu_clr_opt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if (cptr)
     return SCPE_ARG;
 if ((val & cpu_tab[cpu_model].opt) == 0) {
@@ -1240,6 +1327,12 @@ return SCPE_OK;
 
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 mc = 0;
 uint32 i, clim;
 uint16 *nM;
@@ -1295,6 +1388,10 @@ return SCPE_OK;
 
 t_stat sys_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 CCR = 0;
@@ -1327,6 +1424,12 @@ return SCPE_OK;
 
 t_stat sys_set_jclk_dflt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 i;
 
 if ((CPUT (CPUT_JB|CPUT_JE)) && cptr) {
@@ -1342,6 +1445,12 @@ return SCPE_ARG;
 
 t_stat sys_show_jclk_dflt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (CPUT (CPUT_JB|CPUT_JE))
     fprintf (st, "JCLK default=%s\n", jcsr_val[CSRJ_LTCSEL (JCSR_dflt)]);
 else fprintf (st, "Not implemented\n");
@@ -1350,11 +1459,21 @@ return SCPE_OK;
 
 const char *sys_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "PDP-11 model options";
 }
 
 t_stat sys_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "The %s (%s) device help\n\n", dptr->description (dptr), dptr->name);
 fprintf (st, "The SYSTEM device implements registers that vary among CPU types:\n");
 fprint_reg_help (st, dptr);

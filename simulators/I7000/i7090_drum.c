@@ -199,12 +199,20 @@ drm_boot(int32 unit_num, DEVICE * dptr)
 void
 drm_ini(UNIT * uptr, t_bool f)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)f;
+
     uptr->u5 = 0;
 }
 
 t_stat
 drm_reset(DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return SCPE_OK;
 }
 
@@ -212,6 +220,11 @@ drm_reset(DEVICE * dptr)
 t_stat
 set_units(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)val;
+
     int                 i;
 
     if (cptr == NULL)
@@ -236,6 +249,11 @@ set_units(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 get_units(FILE * st, UNIT * uptr, int32 v, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)v;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "Units=%d", uptr->u3);
@@ -262,6 +280,12 @@ drm_detach(UNIT * uptr)
 t_stat
 drm_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)cptr;
+   (void)flag;
+   (void)uptr;
+
    fprintf (st, "%s\n\n", drm_description(dptr));
    fprintf (st, "Up to %d units of drum could be used\n", NUM_UNITS_DR);
    fprintf (st, "    sim> set %s UNITS=n  to set number of units\n", dptr->name);
@@ -276,6 +300,10 @@ drm_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 drm_description (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     return "IBM 704/709 Drum";
 }
 

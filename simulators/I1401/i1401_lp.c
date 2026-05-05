@@ -268,6 +268,10 @@ return SCPE_UNATT;
 
 t_stat lpt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 cctptr = 0;                                             /* clear cct ptr */
 lines = lflag = 0;                                      /* no cc action */
 ind[IN_LPT] = 0;

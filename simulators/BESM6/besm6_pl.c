@@ -60,6 +60,10 @@ DEVICE pl_dev = {
 
 t_stat pl_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     sim_cancel (&pl_unit[0]);
     sim_cancel (&pl_unit[1]);
     CLR_RDY2(PL1_READY | PL2_READY);

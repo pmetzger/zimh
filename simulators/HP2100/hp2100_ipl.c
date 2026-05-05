@@ -1170,6 +1170,11 @@ else                                                    /* otherwise */
 
 static t_stat ipl_set_diag (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (value) {                                            /* if this is an entry into diagnostic mode */
     ipl_detach (uptr);                                  /*   then detach it first */
     uptr->flags |= UNIT_DIAG;                           /*     before setting the flag */
@@ -1248,6 +1253,12 @@ return SCPE_OK;
 
 static t_stat ipl_set_sync (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 const uint32 wait_time = 1000;                          /* the wait time in milliseconds */
 t_bool signaled;
 
@@ -1290,6 +1301,10 @@ else {                                                  /* otherwise it's a WAIT
 
 static void abort_handler (int signal)
 {
+/* Signal handler signature.
+   This implementation does not use every parameter. */
+(void) signal;
+
 wait_aborted = TRUE;                                    /* the user has aborted the event wait */
 return;
 }
@@ -1922,6 +1937,11 @@ else                                                    /* otherwise the event w
 
 static uint32 create_event (const char *name, EVENT *event)
 {
+/* Process synchronization stub signature.
+   This implementation does not use every parameter. */
+(void) name;
+(void) event;
+
 tprintf (ipli_dev, TRACE_CMD, "Synchronization is unsupported on this system; using fallback\n");
 return 0;
 }
@@ -1929,18 +1949,32 @@ return 0;
 
 static uint32 destroy_event (const char *name, EVENT *event)
 {
+/* Process synchronization stub signature.
+   This implementation does not use every parameter. */
+(void) name;
+(void) event;
+
 return 0;
 }
 
 
 static t_bool event_is_undefined (EVENT event)
 {
+/* Process synchronization stub signature.
+   This implementation does not use every parameter. */
+(void) event;
+
 return FALSE;
 }
 
 
 static uint32 wait_event (EVENT event, uint32 wait_in_ms, t_bool *signaled)
 {
+/* Process synchronization stub signature.
+   This implementation does not use every parameter. */
+(void) event;
+(void) wait_in_ms;
+
 sim_os_sleep (2);                                       /* wait for two seconds */
 
 *signaled = TRUE;                                       /* then indicate a signaled completion */
@@ -1950,6 +1984,10 @@ return 0;                                               /*   and return success 
 
 static uint32 signal_event (EVENT event)
 {
+/* Process synchronization stub signature.
+   This implementation does not use every parameter. */
+(void) event;
+
 return 0;
 }
 

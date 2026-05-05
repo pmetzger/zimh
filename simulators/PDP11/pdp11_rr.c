@@ -569,6 +569,10 @@ RP03 disk drives on the same controller.
 
 static t_stat rr_rd (int32 *data, int32 PA, int32 access)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) access;
+
     /* offset by base then decode <4:1> */
     int32 rn = (((PA - rr_dib.ba) & (RP_IOLN - 1)) >> 1) - RP_IOFF;
     BITFIELD* bits = 0;
@@ -1339,6 +1343,10 @@ static t_stat rr_detach (UNIT *uptr)
 
 static t_stat rr_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) desc;
+
     assert(find_dev_from_unit(uptr) == &rr_dev);
     if ((val & ~UNIT_RP03)  ||  cptr)
         return SCPE_ARG;
@@ -1355,6 +1363,11 @@ static t_stat rr_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 static t_stat rr_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     fputs(drv_tab[GET_DTYPE(uptr->flags)].name, st);
     return SCPE_OK;
 }
@@ -1363,6 +1376,11 @@ static t_stat rr_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 static t_stat rr_set_wloa (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     assert(find_dev_from_unit(uptr) == &rr_dev);
     if (!cptr  ||  !*cptr)
         return SCPE_2FARG;
@@ -1455,6 +1473,12 @@ static t_stat rr_boot (int32 unitno, DEVICE *dptr)
 
 static t_stat rr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     size_t i, n;
     assert(dptr == &rr_dev);
     fputs(
@@ -1533,6 +1557,10 @@ static const char *rr_description (DEVICE *dptr)
 
 static t_stat rr_set_ctrl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) desc;
+
     size_t i;
     assert(find_dev_from_unit(uptr) == &rr_dev);
     if ((val & ~DEV_RP11CE)  ||  cptr)
@@ -1558,6 +1586,11 @@ static t_stat rr_set_ctrl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 static t_stat rr_show_ctrl (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     assert(find_dev_from_unit(uptr) == &rr_dev);
     fputs(rr_dev.flags & DEV_RP11CE ? RP_RP11CE : RP_RP11, st);
     return SCPE_OK;

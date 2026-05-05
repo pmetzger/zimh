@@ -93,6 +93,10 @@ uint32 dma_address(uint8 channel, uint32 offset) {
 
 t_stat dmac_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
 
     memset(&dma_state, 0, sizeof(dma_state));
@@ -202,7 +206,7 @@ uint32 dmac_read(uint32 pa, size_t size)
 /*
  * Program the DMAC
  */
-void dmac_program(uint8 reg, uint8 val)
+static void dmac_program(uint8 reg, uint8 val)
 {
     uint8 channel_id, i, chan_num;
     dma_channel *channel;
@@ -339,7 +343,7 @@ void dmac_program(uint8 reg, uint8 val)
     }
 }
 
-void dmac_page_update(uint8 base, uint8 reg, uint8 val)
+static void dmac_page_update(uint8 base, uint8 reg, uint8 val)
 {
     uint8 shift = 0;
 
@@ -383,6 +387,10 @@ void dmac_page_update(uint8 base, uint8 reg, uint8 val)
 
 void dmac_write(uint32 pa, uint32 val, size_t size)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint8 reg, base;
 
     base = (uint8) (pa >> 12);

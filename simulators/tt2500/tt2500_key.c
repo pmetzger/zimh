@@ -95,6 +95,10 @@ DEVICE key_dev = {
 
 static t_stat key_svc (UNIT *uptr)
 {
+  /* Generic unit service signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   t_stat ch = sim_poll_kbd ();
 
   if ((ch & SCPE_KFLAG) == 0) {
@@ -531,6 +535,10 @@ key_reset (DEVICE *dptr)
 
 static uint16 key_read (uint16 reg)
 {
+  /* Generic TTDEV read signature.
+     This implementation does not use every parameter. */
+  (void) reg;
+
   uint16 code = KBUF;
   sim_debug (DBG, &key_dev, "Read key %o\n", code);
   if (suffix == NOKEY) {
@@ -546,4 +554,8 @@ static uint16 key_read (uint16 reg)
 
 static void key_write (uint16 reg, uint16 data)
 {
+  /* Generic TTDEV write signature.
+     This implementation does not use every parameter. */
+  (void) reg;
+  (void) data;
 }

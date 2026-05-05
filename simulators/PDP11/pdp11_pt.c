@@ -182,6 +182,10 @@ DEVICE ptp_dev = {
 
 t_stat ptr_rd (int32 *data, int32 PA, int32 access)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 01) {                               /* decode PA<1> */
 
     case 0:                                             /* ptr csr */
@@ -200,6 +204,10 @@ return SCPE_NXM;                                        /* can't get here */
 
 t_stat ptr_wr (int32 data, int32 PA, int32 access)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 01) {                               /* decode PA<1> */
 
     case 0:                                             /* ptr csr */
@@ -230,6 +238,10 @@ return SCPE_NXM;                                        /* can't get here */
 
 t_stat ptr_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 temp;
 
 ptr_csr = (ptr_csr | CSR_ERR) & ~CSR_BUSY;
@@ -286,6 +298,10 @@ return detach_unit (uptr);
 
 t_stat ptp_rd (int32 *data, int32 PA, int32 access)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 01) {                               /* decode PA<1> */
 
     case 0:                                             /* ptp csr */
@@ -302,6 +318,10 @@ return SCPE_NXM;                                        /* can't get here */
 
 t_stat ptp_wr (int32 data, int32 PA, int32 access)
 {
+/* Device I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 switch ((PA >> 1) & 01) {                               /* decode PA<1> */
 
     case 0:                                             /* ptp csr */
@@ -332,6 +352,10 @@ return SCPE_NXM;                                        /* can't get here */
 
 t_stat ptp_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 ptp_csr = ptp_csr | CSR_ERR | CSR_DONE;
 if (ptp_csr & CSR_IE)
     SET_INT (PTP);
@@ -379,6 +403,12 @@ return detach_unit (uptr);
 
 t_stat ptr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "PC11 Paper Tape Reader (PTR)\n\n");
 fprintf (st, "The paper tape reader (PTR) reads data from a disk file.  The POS register\n");
 fprintf (st, "specifies the number of the next data item to be read.  Thus, by changing\n");
@@ -398,11 +428,21 @@ return SCPE_OK;
 
 const char *ptr_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "PC11 paper tape reader";
 }
 
 t_stat ptp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "PC11 Paper Tape Punch (PTP)\n\n");
 fprintf (st, "The paper tape punch (PTP) writes data to a disk file.  The POS register\n");
 fprintf (st, "specifies the number of the next data item to be written.  Thus, by changing\n");
@@ -422,5 +462,9 @@ return SCPE_OK;
 
 const char *ptp_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "PC11 paper tape punch";
 }

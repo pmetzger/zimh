@@ -113,6 +113,7 @@ extern DEBTAB m68kcpu_dt[];
 extern uint8    *M;
 extern int16    cputype;
 extern t_addr   saved_PC;
+void m68k_sim_init(void);
 #define PCX     saved_PC
 
 /* breakpoint space for data accesses (R=read, W=write) */

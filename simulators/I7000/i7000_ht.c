@@ -219,6 +219,11 @@ DEVICE              htb_dev = {
 
 uint32 ht_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cmd;
+    (void)dev;
+
     DEVICE             *dptr = find_dev_from_unit(uptr);
     int                 chan = UNIT_G_CHAN(dptr->units[0].flags);
     UNIT               *u = &dptr->units[NUM_UNITS_HT];
@@ -887,6 +892,13 @@ ht_tape_cmd(DEVICE * dptr, UNIT * uptr)
 t_stat
 ht_boot(int unit_num, DEVICE * dptr)
 {
+#ifndef I7090
+    /* Build-variant boot signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+    (void)unit_num;
+#endif
+
 #ifdef I7090
     UNIT               *uptr = &dptr->units[unit_num];
     int                 chan = UNIT_G_CHAN(uptr->flags) - 1;
@@ -944,6 +956,10 @@ ht_boot(int unit_num, DEVICE * dptr)
 t_stat
 ht_reset(DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     int                 i;
 
     for (i = 0; i < NUM_CHAN; i++) {
@@ -976,6 +992,12 @@ ht_detach(UNIT * uptr)
 t_stat
 ht_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)cptr;
+   (void)flag;
+   (void)uptr;
+
    fprintf (st, "IBM 7340 Hypertape unit\n\n");
    help_set_chan_type(st, dptr, "IBM 7340 Hypertape");
    fprint_set_help(st, dptr);
@@ -986,6 +1008,10 @@ ht_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 ht_description(DEVICE *dptr)
 {
+   /* Generic callback signature.
+      This implementation does not use every parameter. */
+   (void)dptr;
+
    return "IBM 7340 Hypertape unit";
 }
 

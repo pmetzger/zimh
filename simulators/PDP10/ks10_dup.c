@@ -463,6 +463,10 @@ static const char *dup_wr_regs[] =
 
 static int dup_rd (DEVICE *dptr, t_addr PA, uint16 *data, int32 access)
 {
+/* Generic I/O page read signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 static BITFIELD* bitdefs[] = {dup_rxcsr_bits, dup_rxdbuf_bits, dup_txcsr_bits, dup_txdbuf_bits};
 static uint16 *regs[] = {dup_rxcsr, dup_rxdbuf, dup_txcsr, dup_txdbuf};
 struct pdp_dib   *dibp = (DIB *)dptr->ctxt;
@@ -1246,6 +1250,11 @@ return r;
 
 static t_stat dup_showspeed (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = DUPDPTR;
 int32 dup = (int32)(uptr-dptr->units);
 
@@ -1258,6 +1267,11 @@ return SCPE_OK;
 
 static t_stat dup_setspeed (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = DUPDPTR;
 int32 dup = (int32)(uptr-dptr->units);
 t_stat r;
@@ -1276,6 +1290,11 @@ return SCPE_OK;
 
 static t_stat dup_showcorrupt (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = DUPDPTR;
 int32 dup = (int32)(uptr-dptr->units);
 
@@ -1288,6 +1307,11 @@ return SCPE_OK;
 
 static t_stat dup_setcorrupt (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = DUPDPTR;
 int32 dup = (int32)(uptr-dptr->units);
 t_stat r;
@@ -1306,6 +1330,11 @@ return SCPE_OK;
 
 static t_stat dup_show_W3 (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = DUPDPTR;
 int32 dup = (int32)(uptr-dptr->units);
 
@@ -1318,6 +1347,11 @@ return SCPE_OK;
 
 static t_stat dup_set_W3 (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 DEVICE *dptr = DUPDPTR;
 int32 dup = (int32)(uptr-dptr->units);
 
@@ -1329,6 +1363,11 @@ return SCPE_OK;
 
 static t_stat dup_show_W5 (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = DUPDPTR;
 int32 dup = (int32)(uptr-dptr->units);
 
@@ -1341,6 +1380,11 @@ return SCPE_OK;
 
 static t_stat dup_set_W5 (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 DEVICE *dptr = DUPDPTR;
 int32 dup = (int32)(uptr-dptr->units);
 
@@ -1352,6 +1396,11 @@ return SCPE_OK;
 
 static t_stat dup_show_W6 (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr = DUPDPTR;
 int32 dup = (int32)(uptr-dptr->units);
 
@@ -1364,6 +1413,11 @@ return SCPE_OK;
 
 static t_stat dup_set_W6 (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 DEVICE *dptr = DUPDPTR;
 int32 dup = (int32)(uptr-dptr->units);
 
@@ -1375,6 +1429,12 @@ return SCPE_OK;
 
 static t_stat dup_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 newln, l;
 uint32 i;
 t_stat r;
@@ -1594,11 +1654,19 @@ return scp_help (st, dptr, uptr, flag, helpString, cptr, "Unibus", devcount, con
 
 static t_stat dup_help_attach (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device attach-help signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+
 return dup_help (st, dptr, uptr, flag, DUP_HLP_ATTACH);
 }
 
 static const char *dup_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "DUP11 bit synchronous interface" ;
 }
 #endif

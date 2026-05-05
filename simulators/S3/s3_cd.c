@@ -151,6 +151,10 @@ DEVICE stack_dev = {
 
 int32 crd (int32 op, int32 m, int32 n, int32 data)
 {
+    /* Generic I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) m;
+
     int32 iodata;
     switch (op) {
         case 0:                                         /* SIO 1442 */
@@ -422,6 +426,10 @@ return SCPE_OK;
 
 t_stat cd_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 lastcard = carderr = notready = pcherror = 0;           /* clear indicators */
 s1sel = s2sel = 0;                                      /* clear stacker sel */
 sim_cancel (&cdr_unit);                                 /* clear reader event */
@@ -440,6 +448,11 @@ return attach_unit (uptr, cptr);
 
 t_stat cdr_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 cdr_ebcdic = 1;
 DAR = 0;
 LCR = 80;

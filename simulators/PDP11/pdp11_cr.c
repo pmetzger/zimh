@@ -966,6 +966,10 @@ t_stat cr_rd (  int32   *data,
                 int32   PA,
                 int32   access    )
 {
+    /* Generic I/O page read signature.
+       This implementation does not use every parameter. */
+    (void) access;
+
     switch ((PA >> 1) & 03) {
     case 0:        /* CSR */
         if (cdst & (CDCSR_ANYERR))
@@ -1576,6 +1580,11 @@ t_stat cr_set_type (    UNIT    *uptr,
                         const char    *cptr,
                         void    *desc    )
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     DEVICE *dptr = find_dev_from_unit (uptr);
     DIB *dibp;
 
@@ -1610,6 +1619,11 @@ t_stat cr_set_aieco (    UNIT    *uptr,
                         const char    *cptr,
                         void    *desc    )
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     /* disallow eco change if currently attached or not CD20 */
 
     if (uptr->flags & UNIT_ATT || !CD20_CTL(uptr))
@@ -1625,6 +1639,12 @@ t_stat cr_show_format ( FILE    *st,
                         int32   val,
                         const void    *desc    )
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf (st, "%s format", cardFormat);
     return (SCPE_OK);
 }
@@ -1634,6 +1654,11 @@ t_stat cr_set_rate (    UNIT    *uptr,
                         const char    *cptr,
                         void    *desc    )
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     t_stat    status = SCPE_OK;
     int32    i;
 
@@ -1660,6 +1685,12 @@ t_stat cr_show_rate (   FILE    *st,
                         int32   val,
                         const void    *desc    )
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf (st, "%d cards per minute", cpm);
     return (SCPE_OK);
 }
@@ -1674,6 +1705,13 @@ t_stat cr_set_reset (   UNIT    *uptr,
                         const char    *cptr,
                         void    *desc    )
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     if (DEBUG_PRS (cr_dev))
         fprintf (sim_deb, "cr_set_reset\n");
 /*
@@ -1730,6 +1768,13 @@ t_stat cr_set_stop (    UNIT    *uptr,
                         const char    *cptr,
                         void    *desc    )
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     if (DEBUG_PRS (cr_dev))
         fprintf (sim_deb, "set_stop\n");
     crs &= ~CRCSR_ONLINE;
@@ -1751,6 +1796,13 @@ t_stat cr_set_eof (    UNIT    *uptr,
                         const char    *cptr,
                         void    *desc    )
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     if (DEBUG_PRS (cr_dev))
         fprintf (sim_deb, "set_eof\n");
     eofPending = 1;
@@ -1763,6 +1815,12 @@ t_stat cr_show_eof ( FILE    *st,
                      int32   val,
                      const void    *desc    )
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf (st, (eofPending? "EOF pending": "no EOF pending"));
     return (SCPE_OK);
 }
@@ -1772,6 +1830,12 @@ t_stat cr_set_trans (   UNIT    *uptr,
                         const char    *cptr,
                         void    *desc    )
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     size_t  i;
 
     if (!cptr)
@@ -1793,6 +1857,12 @@ t_stat cr_show_trans (  FILE    *st,
                         int32   val,
                         const void    *desc    )
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     size_t i;
 
     for (i = 1; i < NTRANS; i++ )
@@ -1841,6 +1911,12 @@ if (bits)
 
 static t_stat cr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 char devtype[MAXDESCRIP];
 int32 crtypes;
 
@@ -1993,6 +2069,10 @@ return SCPE_OK;
 
 const char *cr_description (DEVICE *dptr)
 {
+  /* Generic device description signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   /* Not thread-safe, but malloc() would be leak. */
   static char desc[MAXDESCRIP+sizeof(" card reader")-1] = "";
 

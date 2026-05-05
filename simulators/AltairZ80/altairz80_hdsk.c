@@ -437,6 +437,10 @@ static REG hdsk_reg[] = {
 #define HDSK_NAME   "Hard Disk"
 
 static const char* hdsk_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return HDSK_NAME;
 }
 
@@ -645,6 +649,11 @@ static t_stat hdsk_detach(UNIT *uptr) {
 
 /* Set disk geometry routine */
 static t_stat set_geom(UNIT *uptr, int32 val, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     uint32 numberOfTracks, numberOfSectors, sectorSize;
     int result, n;
 
@@ -671,6 +680,11 @@ static t_stat set_geom(UNIT *uptr, int32 val, const char *cptr, void *desc) {
 
 /* Show disk geometry routine */
 static t_stat show_geom(FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "T:%d/N:%d/S:%d", uptr -> HDSK_NUMBER_OF_TRACKS,
@@ -682,6 +696,11 @@ static t_stat show_geom(FILE *st, UNIT *uptr, int32 val, const void *desc) {
 #define QUOTE2(text) QUOTE1(text)
 /* Set disk format routine */
 static t_stat set_format(UNIT *uptr, int32 val, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     char fmtname[DPB_NAME_LENGTH + 1];
     int32 i;
 
@@ -718,6 +737,11 @@ static t_stat set_format(UNIT *uptr, int32 val, const char *cptr, void *desc) {
 
 /* Show disk format routine */
 static t_stat show_format(FILE *st, UNIT *uptr, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_IERR;
     fprintf(st, "%s", dpb[uptr -> HDSK_FORMAT_TYPE].name);

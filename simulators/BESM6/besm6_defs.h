@@ -129,6 +129,7 @@ enum {
 extern UNIT cpu_unit;
 extern UNIT tty_unit[];
 extern UNIT clocks[];
+void uni2utf8 (unsigned short ch, char buf[5]);
 extern t_value memory [MEMSIZE];
 extern t_value pult [11][8];
 extern unsigned pult_packet_switch; /* selector of hardwired programs */
@@ -318,6 +319,7 @@ extern void mmu_print_brz (void);
 /*
  * Utility functions
  */
+extern unsigned short gost_to_unicode(unsigned char);
 extern void gost_putc(unsigned char, FILE *);
 extern int odd_parity(unsigned char);
 

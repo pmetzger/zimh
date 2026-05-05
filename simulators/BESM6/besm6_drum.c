@@ -97,6 +97,10 @@ DEVICE drum_dev = {
  */
 t_stat drum_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     drum_op = 0;
     drum_zone = 0;
     drum_sector = 0;
@@ -173,7 +177,7 @@ static void log_io (UNIT *u)
 /*
  * Запись на барабан.
  */
-void drum_write (UNIT *u)
+static void drum_write (UNIT *u)
 {
     int ctlr;
     t_value *sysdata;
@@ -188,7 +192,7 @@ void drum_write (UNIT *u)
         longjmp (cpu_halt, SCPE_IOERR);
 }
 
-void drum_write_sector (UNIT *u)
+static void drum_write_sector (UNIT *u)
 {
     int ctlr;
     t_value *sysdata;
@@ -210,7 +214,7 @@ void drum_write_sector (UNIT *u)
 /*
  * Чтение с барабана.
  */
-void drum_read (UNIT *u)
+static void drum_read (UNIT *u)
 {
     int ctlr;
     t_value *sysdata;
@@ -233,7 +237,7 @@ void drum_read (UNIT *u)
         longjmp (cpu_halt, SCPE_IOERR);
 }
 
-void drum_read_sector (UNIT *u)
+static void drum_read_sector (UNIT *u)
 {
     int ctlr;
     t_value *sysdata;

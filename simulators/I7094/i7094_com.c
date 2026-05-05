@@ -392,6 +392,10 @@ DEVICE coml_dev = {
 
 t_stat com_chsel (uint32 ch, uint32 sel, uint32 unit)
 {
+/* Channel select callback signature.
+   This implementation does not use every parameter. */
+(void) unit;
+
 com_ch = ch;                                            /* save channel */
 if (sim_is_active (&com_unit[COM_CHU]) ||               /* not idle? */
     sim_is_active (&com_unit[COM_SNS])) {
@@ -425,6 +429,10 @@ return SCPE_OK;
 
 t_stat com_chwr (uint32 ch, t_uint64 val, uint32 stopf)
 {
+/* Channel write callback signature.
+   This implementation does not use every parameter. */
+(void) ch;
+
 if (stopf)
     com_stop = 1;
 else {
@@ -1127,7 +1135,7 @@ return;
 
 /* Special show commands */
 
-uint32 com_show_qsumm (FILE *st, uint16 *lh, const char *name)
+static uint32 com_show_qsumm (FILE *st, uint16 *lh, const char *name)
 {
 uint32 i, next;
 
@@ -1147,7 +1155,7 @@ fprintf (st, "%s is corrupt\n", name);
 return 0;
 }
 
-void com_show_char (FILE *st, uint32 ch)
+static void com_show_char (FILE *st, uint32 ch)
 {
 uint32 c;
 
@@ -1160,12 +1168,22 @@ return;
 
 t_stat com_show_freeq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 com_show_qsumm (st, com_free, "Free queue");
 return SCPE_OK;
 }
 
 t_stat com_show_oneq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 uint32 entc, ln, i, next;
 uint16 *lh;
 char name[20];
@@ -1189,6 +1207,10 @@ return SCPE_OK;
 
 t_stat com_show_allq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 uint32 i;
 
 for (i = 0; i < COM_TLINES; i++)

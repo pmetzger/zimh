@@ -297,7 +297,7 @@ t_stat dsk_srv(UNIT * uptr)
     return SCPE_OK;
 }
 
-void esu_set_end(UNIT *uptr, int err) {
+static void esu_set_end(UNIT *uptr, int err) {
         int             chan = uptr->CMD & DK_CHAN;
         int             dsk = ((uptr->CMD & DK_CTRL) != 0);
         DEVICE          *dptr = find_dev_from_unit(uptr);
@@ -447,6 +447,11 @@ t_stat esu_srv(UNIT * uptr)
 
 t_stat
 set_mod(UNIT *uptr, int32 val, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     if (uptr == NULL)   return SCPE_IERR;
     if (val == MODIB)
         uptr->wait = DK_MAXSEGS2;
@@ -461,6 +466,10 @@ set_mod(UNIT *uptr, int32 val, const char *cptr, void *desc) {
 t_stat
 dsk_boot(int32 unit_num, DEVICE * dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int         dev = (unit_num)? DSK2_DEV:DSK1_DEV;
     t_uint64    desc;
     int         i;
@@ -536,6 +545,12 @@ esu_detach(UNIT * uptr)
 t_stat
 dsk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+  /* Generic help signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) flag;
+  (void) cptr;
+
   fprintf (st, "B5470 Disk Controller\n\n");
   fprintf (st, "By default the second disk controller is not enabled.\n\n");
   fprintf (st, "     sim> SET DK1 ENABLE     to enable second disk controller for use\n");
@@ -560,12 +575,22 @@ dsk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 dsk_description (DEVICE *dptr)
 {
+   /* Generic description signature.
+      This implementation does not use every parameter. */
+   (void) dptr;
+
    return "B5470 disk controller module";
 }
 
 t_stat
 esu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+  /* Generic help signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) flag;
+  (void) cptr;
+
   fprintf (st, "B471 ESU with 5 B457 storage units\n\n");
   fprintf (st, "Each ESU unit represents the electronics unit and 5 storage units\n");
   fprintf (st, "MOD I units could handle about 48 million characters.\n");
@@ -586,6 +611,10 @@ esu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 esu_description (DEVICE *dptr)
 {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return  "B471 electrontics unit and 5 B457 storage units.";
 }
 #endif

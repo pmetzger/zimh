@@ -485,6 +485,8 @@ int mul_sf(SHORT_FLOAT *fl, SHORT_FLOAT *mul_fl);
 int mul_lf(LONG_FLOAT *fl, LONG_FLOAT *mul_fl);
 int div_sf(SHORT_FLOAT *fl, SHORT_FLOAT *div_fl);
 int div_lf(LONG_FLOAT *fl, LONG_FLOAT *div_fl);
+static int over_under_flow_sf(SHORT_FLOAT *fl);
+static int over_under_flow_lf(LONG_FLOAT *fl);
 
 /* Special Debugging Info */
 
@@ -511,6 +513,14 @@ t_stat map_svc (UNIT *uptr);
 t_stat fpu_svc (UNIT *uptr);
 int32 GetMap(int32 addr);
 int32 PutMap(int32 addr, int32 data);
+static int32 effective(int32 PC, int32 index, int32 disp);
+static int32 indirect(int32 d);
+static int32 LEFmode(int32 PC, int32 index, int32 disp, int32 indirect);
+static int32 LoadMap(int32 w);
+static int32 Bytepointer(int32 PC, int32 index);
+static int32 unimp(int32 PC);
+static int32 pushrtn(int32 pc);
+static void mask_out (int32 mask);
 int32 Debug_Entry(int32 PC, int32 inst, int32 inst2, int32 AC0, int32 AC1, int32 AC2, int32 AC3, int32 flags);
 t_stat build_devtab (void);
 
@@ -700,7 +710,6 @@ int16 sAC0, sAC1, sAC2;
 int32 sddata, mi1, mi2, fpnum32;
 t_int64 fpnum, expon;
 t_value simeval[20];
-void mask_out (int32 mask);
 /* char debstr[128]; */
 /* char debadd[64]; */
 char debmap[4], debion[4];
@@ -710,14 +719,6 @@ int32 DisMap, debpc;
 int cmdptr, cmsptr, cmopt, cmptr;
 int16 cmslen, cmdlen;
 int tabaddr, tabptr;
-int32 effective(int32 PC, int32 index, int32 disp);
-int32 indirect(int32 d);
-int32 LEFmode(int32 PC, int32 index, int32 disp, int32 indirect);
-int32 LoadMap(int32 w);
-int32 Bytepointer(int32 PC, int32 index);
-int32 unimp(int32 PC);
-int32 pushrtn(int32 pc);
-
 /* Restore register state */
 
 if (build_devtab () != SCPE_OK) return SCPE_IERR;       /* build dispatch */
@@ -5329,7 +5330,7 @@ return reason;
    program counter, index, and a displacement.
 */
 
-int32 effective(int32 PC, int32 index, int32 disp)
+static int32 effective(int32 PC, int32 index, int32 disp)
 {
     int32 i, MA;
 
@@ -5375,7 +5376,7 @@ int32 effective(int32 PC, int32 index, int32 disp)
    opposed to the ELEF instruction.
 */
 
-int32 LEFmode(int32 PC, int32 index, int32 disp, int32 indirect)
+static int32 LEFmode(int32 PC, int32 index, int32 disp, int32 indirect)
 {
     int32 i, MA;
     int16 sMA;
@@ -5429,7 +5430,7 @@ int32 LEFmode(int32 PC, int32 index, int32 disp, int32 indirect)
 /* Computes a "Byte pointer" for the Character Instruction set */
 /* This address in 'PC' must point to the displacement word of the instruction */
 
-int32 Bytepointer(int32 PC, int32 index)
+static int32 Bytepointer(int32 PC, int32 index)
 {
     int32 MA;
 
@@ -5456,7 +5457,7 @@ int32 Bytepointer(int32 PC, int32 index)
    or follows an indirection chain until bit 0 is 0
 */
 
-int32 indirect(int32 d)
+static int32 indirect(int32 d)
 {
     int i;
 
@@ -5486,7 +5487,7 @@ int32 indirect(int32 d)
 
 /* Push a standard return block onto the stack */
 
-int32 pushrtn(int32 pc)
+static int32 pushrtn(int32 pc)
 {
     int32 t;
 
@@ -5659,7 +5660,7 @@ int32 MapAddr(int32 map, int32 addr)
 
 /* Loads a word into the Eclipse Maps */
 
-int32 LoadMap(int32 w)
+static int32 LoadMap(int32 w)
 {
     int32 m;
 
@@ -5697,7 +5698,7 @@ int32 LoadMap(int32 w)
 
 /* Displays an error on a unimplemented (in this sim) instr. */
 
-int32 unimp(int32 PC)
+static int32 unimp(int32 PC)
 {
     if (Debug_Flags)
          printf("\n\r\007<<<Unimplemented instruction: [%o] %o>>>\n\r", PC - 1, GetMap(PC - 1));
@@ -5706,7 +5707,7 @@ int32 unimp(int32 PC)
 
 /* New priority mask out */
 
-void mask_out (int32 newmask)
+static void mask_out (int32 newmask)
 {
 int32 i;
 
@@ -5723,6 +5724,10 @@ return;
 
 t_stat cpu_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int_req = int_req & ~INT_ION;
 pimask = 0;
 dev_disable = 0;
@@ -5735,6 +5740,10 @@ return SCPE_OK;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if (sw & SWMASK ('V')) {
     if (addr > 077777) return SCPE_NXM;
     if (vptr != NULL) *vptr = GetMap (addr);
@@ -5750,6 +5759,10 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if (sw & SWMASK ('V')) {
     if (addr > 077777) return SCPE_NXM;
     PutMap (addr, (int32) val);
@@ -5765,6 +5778,12 @@ return SCPE_OK;
 
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 mc = 0;
 t_addr i;
 
@@ -5782,6 +5801,10 @@ return SCPE_OK;
 
 t_stat map_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 return SCPE_OK;
 }
 
@@ -5789,6 +5812,10 @@ return SCPE_OK;
 
 t_stat map_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) sw;
+
 if ((addr & 077) >= 037 || addr > 737) return SCPE_NXM;
 uptr->u4 = -2;  /* signal to print_sys in eclipse_sys.c: do not map */
 if (vptr != NULL) *vptr = Map[(addr >> 6) & 3][addr & 037] & 0177777;
@@ -5799,6 +5826,10 @@ return SCPE_OK;
 
 t_stat map_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) sw;
+
 if ((addr & 077) >= 037 || addr > 0737) return SCPE_NXM;
 uptr->u4 = -2;  /* signal to print_sys in eclipse_sys.c: do not map */
 Map[(addr >> 6) & 3][addr & 037] = (int32)val & 0177777;
@@ -5809,6 +5840,10 @@ return SCPE_OK;
 
 t_stat fpu_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 return SCPE_OK;
 }
 
@@ -5853,6 +5888,10 @@ return iodata;
 
 t_stat pit_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 t;
 t = sim_rtcn_calb (pit_tps, 1);                         /* calibrate delay */
 sim_activate (&pit_unit, t);                            /* reactivate unit */
@@ -5871,6 +5910,10 @@ return SCPE_OK;
 
 t_stat pit_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 pit_counter = 0;                                        /* clear counter */
 dev_busy = dev_busy & ~INT_PIT;                         /* clear busy */
 dev_done = dev_done & ~INT_PIT;                         /* clear done, int */
@@ -5926,6 +5969,11 @@ static const int32 boot_rom[] = {
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 size_t i;
 extern int32 saved_PC;
 
@@ -5954,11 +6002,24 @@ int32 Debug_Entry(int32 PC, int32 inst, int32 inst2, int32 AC0, int32 AC1, int32
 
 t_stat Debug_Dump(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     return SCPE_OK;
 }
 
 t_stat Dump_History (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     char debmap[4], debion[4];
     t_value simeval[20];
     int debcar;
@@ -6185,7 +6246,7 @@ int underflow_lf(LONG_FLOAT *fl)
 
 /* Check Short for Over/Under flow */
 
-int over_under_flow_sf(SHORT_FLOAT *fl)
+static int over_under_flow_sf(SHORT_FLOAT *fl)
 {
     if (fl->expo > 127) {
         fl->expo &= 0x007F;
@@ -6204,7 +6265,7 @@ int over_under_flow_sf(SHORT_FLOAT *fl)
 
 /* Check Long for Over/Under flow */
 
-int over_under_flow_lf(LONG_FLOAT *fl)
+static int over_under_flow_lf(LONG_FLOAT *fl)
 {
     if (fl->expo > 127) {
         fl->expo &= 0x007F;

@@ -482,12 +482,23 @@ t_stat ch11_reset (DEVICE *dptr)
 
 t_stat ch11_show_peer (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   fprintf (st, "peer=%s", peer[0] ? peer : "unspecified");
   return SCPE_OK;
 }
 
 t_stat ch11_set_peer (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   char host[256], port[256];
 
   if ((cptr == NULL) || (*cptr == 0))
@@ -505,6 +516,12 @@ t_stat ch11_set_peer (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 t_stat ch11_show_node (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   if (address == -1)
     fprintf (st, "node=unspecified");
   else
@@ -514,6 +531,11 @@ t_stat ch11_show_node (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat ch11_set_node (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   t_stat r;
   int x;
 
@@ -532,6 +554,10 @@ t_stat ch11_set_node (UNIT* uptr, int32 val, const char* cptr, void* desc)
 
 const char *ch11_description (DEVICE *dptr)
 {
+  /* Generic device description signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   return "CH11 Chaosnet interface";
 }
 
@@ -559,6 +585,13 @@ t_stat ch11_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cp
 
 t_stat ch11_help_attach (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+  /* Generic attach help signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+  (void) uptr;
+  (void) flag;
+  (void) cptr;
+
   fprintf (st, "To configure CH11, first set the local Chaosnet node address, and\n");
   fprintf (st, "the peer:\n\n");
   fprintf (st, "  sim> SET CH NODE=<octal address>\n");

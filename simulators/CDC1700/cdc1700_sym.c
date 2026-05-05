@@ -132,6 +132,10 @@ static uint16 instInter[] = {
 
 t_stat parse_sym(const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+  /* Generic symbolic input signature.
+     This implementation does not use every parameter. */
+  (void)uptr;
+
   int32 i, j, l, rdx;
   t_bool neg;
   t_value temp;

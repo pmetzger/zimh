@@ -157,6 +157,11 @@
                         { MTAB_XTD|MTAB_VDV, 0, "MODEL", "MODEL={8200|8250}",                   \
                               &cpu_set_model, &cpu_show_model, NULL, "Set/Display processor model" },
 
+int32 rxcd_rd (void);
+void rxcd_wr (int32 val);
+int32 pcsr_rd (int32 pa);
+void pcsr_wr (int32 pa, int32 val, int32 lnt);
+
 /* Memory */
 
 #define MAXMEMWIDTH     22                              /* max mem, std MS820 */
@@ -437,6 +442,8 @@ void mba_set_enbdis (DEVICE *dptr);
 t_stat mba_show_num (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
 t_stat show_nexus (FILE *st, UNIT *uptr, int32 val, const void *desc);
+void init_nexus_tab (void);
+t_stat build_nexus_tab (DEVICE *dptr, DIB *dibp);
 
 /* Function prototypes for system-specific unaligned support
    8200 treats unaligned like aligned? */

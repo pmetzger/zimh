@@ -66,6 +66,11 @@ static void build_vector_tab (void);
 
 t_stat set_autocon (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if (cptr != NULL)
     return SCPE_ARG;
 if (autcon_enb == val)
@@ -90,6 +95,12 @@ return auto_config (NULL, 0);
 
 t_stat show_autocon (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "autoconfiguration ");
 fprintf (st, autcon_enb? "enabled": "disabled");
 return SCPE_OK;
@@ -99,6 +110,10 @@ return SCPE_OK;
 
 t_stat set_addr (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 uint32 newba;
@@ -129,6 +144,11 @@ return SCPE_OK;
 
 t_stat show_addr (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 uint32 radix = DEV_RDX;
@@ -170,6 +190,11 @@ return SCPE_OK;
 
 t_stat set_addr_flt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 DEVICE *dptr;
 
 if (cptr != NULL)
@@ -186,6 +211,10 @@ return auto_config (NULL, 0);                           /* autoconfigure */
 
 t_stat show_mapped_addr (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+
 fprintf (st, "address=%p-%p", desc, ((const char *)desc) + uptr->capac - 1);
 return SCPE_OK;
 }
@@ -194,6 +223,11 @@ return SCPE_OK;
 
 t_stat set_vec (UNIT *uptr, int32 arg, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) arg;
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 uint32 newvec;
@@ -223,6 +257,10 @@ return SCPE_OK;
 
 t_stat show_vec (FILE *st, UNIT *uptr, int32 arg, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 DEVICE *dptr;
 DIB *dibp;
 uint32 vec, numvec, br_lvl, radix = DEV_RDX;
@@ -445,6 +483,12 @@ return SCPE_OK;
 
 t_stat show_iospace (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 i, j;
 DEVICE *dptr;
 DIB *dibp;

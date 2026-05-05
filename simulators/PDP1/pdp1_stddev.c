@@ -468,6 +468,10 @@ return in & 0377;
 
 t_stat ptr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ptr_state = 0;                                          /* clear state */
 ptr_wait = 0;
 ptr_hold = 0;
@@ -494,7 +498,7 @@ return attach_unit (uptr, cptr);
 
 /* Bootstrap routine */
 
-int32 ptr_getw (UNIT *uptr)
+static int32 ptr_getw (UNIT *uptr)
 {
 int32 i, tmp, word;
 
@@ -512,6 +516,11 @@ return word;
 
 t_stat ptr_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 int32 origin, val;
 int32 fld = TA & EPCMASK;
 
@@ -536,6 +545,12 @@ return SCPE_OK;                                         /* done */
 
 t_stat ptr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Paper Tape Reader (PTR)\n\n");
 fprintf (st, "The paper tape reader (PTR) reads data from a disk file.  The POS register\n");
 fprintf (st, "specifies the number of the next data item to be read.  Thus, by changing\n");
@@ -553,6 +568,10 @@ return SCPE_OK;
 
 const char *ptr_description (DEVICE *dptr)
 {
+/* Generic description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Paper Tape Reader";
 }
 
@@ -620,6 +639,10 @@ return SCPE_OK;
 
 t_stat ptp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 ptp_unit.buf = 0;                                       /* clear state */
 ptp_uc = 0;
 cpls = cpls & ~CPLS_PTP;
@@ -641,6 +664,12 @@ return attach_unit (uptr, cptr);
 
 t_stat ptp_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Paper Tape Punch (PTP)\n\n");
 fprintf (st, "The paper tape punch (PTP) writes data to a disk file.  The POS register\n");
 fprintf (st, "specifies the number of the next data item to be written.  Thus, by changing\n");
@@ -657,6 +686,10 @@ return SCPE_OK;
 
 const char *ptp_description (DEVICE *dptr)
 {
+/* Generic description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Paper Tape Punch";
 }
 
@@ -664,6 +697,11 @@ return "Paper Tape Punch";
 
 int32 tti (int32 inst, int32 dev, int32 dat)
 {
+/* Generic IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+(void) dat;
+
 iosta = iosta & ~IOS_TTI;                               /* clear flag */
 if (inst & (IO_WAIT | IO_CPLS))                         /* wait or sync? */
     return (STOP_RSRV << IOT_V_REASON) | (tty_buf & 077);
@@ -672,6 +710,10 @@ return tty_buf & 077;
 
 int32 tto (int32 inst, int32 dev, int32 dat)
 {
+/* Generic IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 iosta = iosta & ~IOS_TTO;                               /* clear flag */
 tty_buf = dat & TT_WIDTH;                               /* load buffer */
 if (GEN_CPLS (inst)) {                                  /* comp pulse? */
@@ -723,7 +765,7 @@ uptr->pos = uptr->pos + 1;
 return SCPE_OK;
 }
 
-void tto_puts (const char *cptr)
+static void tto_puts (const char *cptr)
 {
 int32 c;
 
@@ -772,6 +814,10 @@ return SCPE_OK;
 
 t_stat tty_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmxr_set_console_units (&tti_unit, &tto_unit);
 tty_buf = 0;                                            /* clear buffer */
 tty_ribbon = FIODEC_BLACK;                              /* start black */

@@ -532,6 +532,10 @@ return SCPE_OK;
 
 t_stat rad_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 i;
 
 for (i = 0; i < RAD_NUMDR; i++)
@@ -547,6 +551,12 @@ return SCPE_OK;
 
 t_stat rad_settype (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 uint32 i;
 
 for (i = 0; i < RAD_NUMDR; i++) {                       /* all units unatt? */
@@ -564,6 +574,12 @@ return SCPE_OK;
 
 t_stat rad_showtype (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, (rad_model == RAD_7212)? "7211/7212": "7231/7232");
 return SCPE_OK;
 }

@@ -163,6 +163,10 @@ return SCPE_OK;
 
 t_stat lpt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 lpt_unit.buf = 0;
 dev_done = dev_done & ~INT_LPT;                         /* clear done, int */
 int_req = int_req & ~INT_LPT;
@@ -194,5 +198,9 @@ return detach_unit (uptr);
 
 const char *lpt_description (DEVICE *dptr)
 {
+/* Generic description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "LP8E line printer";
 }

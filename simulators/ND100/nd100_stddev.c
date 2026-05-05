@@ -107,6 +107,10 @@ DEVICE tto_dev = {
 t_stat
 tti_reset(DEVICE *dptr)
 {
+        /* Generic device reset signature.
+           This implementation does not use every parameter. */
+        (void) dptr;
+
         sim_cancel(&tti_unit);
         return SCPE_OK;
 }
@@ -114,6 +118,10 @@ tti_reset(DEVICE *dptr)
 t_stat
 tto_reset(DEVICE *dptr)
 {
+        /* Generic device reset signature.
+           This implementation does not use every parameter. */
+        (void) dptr;
+
         sim_cancel(&tto_unit);
         tto_status |= TT_OSTAT_RDY;
         return SCPE_OK;
@@ -122,6 +130,10 @@ tto_reset(DEVICE *dptr)
 t_stat
 tti_svc(UNIT *uptr)
 {
+        /* Generic unit service signature.
+           This implementation does not use every parameter. */
+        (void) uptr;
+
         int temp;
 
         sim_activate (&tti_unit, tti_unit.wait);
@@ -278,6 +290,10 @@ iox_clk(int addr)
 t_stat
 clk_reset (DEVICE *dptr)
 {
+        /* Generic device reset signature.
+           This implementation does not use every parameter. */
+        (void) dptr;
+
         sim_rtc_init(1000000/CLK_PER_SEC);
         return SCPE_OK;
 }
@@ -285,6 +301,10 @@ clk_reset (DEVICE *dptr)
 t_stat
 clk_svc(UNIT *uptr)
 {
+        /* Generic unit service signature.
+           This implementation does not use every parameter. */
+        (void) uptr;
+
         sim_rtc_calb(CLK_PER_SEC);
         sim_activate_after(&clk_unit, 1000000/CLK_PER_SEC);
         dev_ready = 1;

@@ -217,7 +217,7 @@ mt_cmd(uint16 cmd, uint16 dev, uint8 chan, uint16 *wc)
 
 
 /* Map simH errors into machine errors */
-t_stat mt_error(UNIT * uptr, int chan, t_stat r, DEVICE * dptr)
+static t_stat mt_error(UNIT * uptr, int chan, t_stat r, DEVICE * dptr)
 {
     switch (r) {
     case MTSE_OK:               /* no error */
@@ -592,6 +592,10 @@ mt_detach(UNIT * uptr)
 t_stat
 mt_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
 
     /* Scan all devices and enable those that
@@ -614,6 +618,12 @@ mt_reset(DEVICE *dptr)
 t_stat
 mt_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+   /* Generic help signature.
+      This implementation does not use every parameter. */
+   (void) uptr;
+   (void) flag;
+   (void) cptr;
+
    fprintf (st, "B422/B423 Magnetic tape unit\n\n");
    fprintf (st, "The magnetic tape controller assumes that all tapes are 7 track\n");
    fprintf (st, "with valid parity. Tapes are assumed to be 555.5 characters per\n");
@@ -628,6 +638,10 @@ mt_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 mt_description(DEVICE *dptr)
 {
+   /* Generic description signature.
+      This implementation does not use every parameter. */
+   (void) dptr;
+
    return "B422/B423 Magnetic tape unit";
 }
 #endif

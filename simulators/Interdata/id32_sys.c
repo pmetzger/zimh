@@ -300,7 +300,7 @@ static const uint32 opc_val[] = {
 
 /* Print an RX specifier */
 
-t_stat fprint_addr (FILE *of, t_addr addr, uint32 rx, uint32 ea1,
+static t_stat fprint_addr (FILE *of, t_addr addr, uint32 rx, uint32 ea1,
     uint32 ea2)
 {
 uint32 rx2;
@@ -490,7 +490,7 @@ return SCPE_ARG;                                        /* no match */
         rnum    =       output register number, -1 if error
 */
 
-int32 get_reg (char *cptr, char **optr, int32 rtype)
+static int32 get_reg (char *cptr, char **optr, int32 rtype)
 {
 int32 reg;
 
@@ -529,7 +529,7 @@ return reg;
         sta     =       status
 */
 
-t_stat get_imm (char *cptr, uint32 *imm, uint32 *inst, uint32 max)
+static t_stat get_imm (char *cptr, uint32 *imm, uint32 *inst, uint32 max)
 {
 char *tptr;
 int32 idx;
@@ -561,7 +561,7 @@ return SCPE_OK;
         status  =       SCPE_OK if ok, else error code
 */
 
-t_stat get_addr (char *cptr, char **tptr, t_addr *ea, t_addr addr)
+static t_stat get_addr (char *cptr, char **tptr, t_addr *ea, t_addr addr)
 {
 int32 sign = 1;
 

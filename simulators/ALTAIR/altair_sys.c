@@ -155,6 +155,10 @@ int32 oplen[256] = {
 
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void)fnam;
+
 int32 i, addr = 0, cnt = 0;
 
 if ((*cptr != 0) || (flag != 0)) return SCPE_ARG;
@@ -183,6 +187,10 @@ return (SCPE_OK);
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
     UNIT *uptr, int32 sw)
 {
+/* Generic symbolic output signature.
+   This implementation does not use every parameter. */
+(void)addr;
+
 int32 cflag, c1, c2, inst, adr;
 
 cflag = (uptr == NULL) || (uptr == &cpu_unit);
@@ -231,6 +239,10 @@ return -(oplen[inst] - 1);
 
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+/* Generic symbolic input signature.
+   This implementation does not use every parameter. */
+(void)addr;
+
 int32 cflag, i = 0, j, r;
 char gbuf[CBUFSIZE];
 

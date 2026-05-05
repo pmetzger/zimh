@@ -680,20 +680,44 @@ void besm6_draw_panel (int force)
 #else /* HAVE_LIBSDL */
 t_stat besm6_init_panel (UNIT *u, int32 val, const char *cptr, void *desc)
 {
+    /* Shared build-variant signature.
+       This build variant does not use every parameter. */
+    (void) u;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     return sim_messagef(SCPE_OPENERR, "Need SDL and SDLttf libraries\n");
 }
 
 t_stat besm6_close_panel (UNIT *u, int32 val, const char *cptr, void *desc)
 {
+    /* Shared build-variant signature.
+       This build variant does not use every parameter. */
+    (void) u;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     return SCPE_UNATT;
 }
 
 t_stat besm6_show_panel (FILE *st, UNIT *up, int32 v, const void *dp)
 {
+    /* Shared build-variant signature.
+       This build variant does not use every parameter. */
+    (void) st;
+    (void) up;
+    (void) v;
+    (void) dp;
+
     return SCPE_UNATT;
 }
 
 void besm6_draw_panel (int force)
 {
+    /* Shared build-variant signature.
+       This build variant does not use every parameter. */
+    (void) force;
 }
 #endif /* HAVE_LIBSDL */

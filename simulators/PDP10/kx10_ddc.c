@@ -382,6 +382,12 @@ t_stat ddc_detach (UNIT *uptr)
 
 t_stat ddc_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "DDC-10  Drum  Drives (DDC)\n\n");
 fprintf (st, "The DDC controller implements the RES-10 disk controller that talked\n");
 fprintf (st, "to drum drives.\n");
@@ -396,6 +402,10 @@ return SCPE_OK;
 
 const char *ddc_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "DDC-10 disk controller";
 }
 

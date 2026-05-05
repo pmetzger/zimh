@@ -67,8 +67,6 @@ t_stat tto (uint32 fnc, uint32 inst, uint32 *dat);
 t_stat tto_svc (UNIT *uptr);
 t_stat tto_reset (DEVICE *dptr);
 t_stat tto_out (int32 dat);
-int8 ascii_to_sds(int8 ch);
-int8 sds_to_ascii(int8 ch);
 
 /* PTR data structures
 
@@ -271,6 +269,10 @@ return SCPE_OK;
 
 t_stat ptr_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 temp;
 
 if ((ptr_unit.flags & UNIT_ATT) == 0) {                 /* attached? */
@@ -315,6 +317,10 @@ return;
 
 t_stat ptr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 chan_disc (ptr_dib.chan);                               /* disconnect */
 ptr_sor = 0;                                            /* clear state */
 ptr_unit.buf = 0;
@@ -327,6 +333,11 @@ return SCPE_OK;
 
 t_stat ptr_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 extern uint32 P, M[];
 
 M[0] = 077777771;                                       /* -7B */
@@ -394,6 +405,10 @@ return SCPE_OK;
 
 t_stat ptp_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 i;
 t_stat r = SCPE_OK;
 
@@ -441,6 +456,10 @@ return;
 
 t_stat ptp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 chan_disc (ptp_dib.chan);                               /* disconnect */
 ptp_ldr = 0;                                            /* clear state */
 ptp_unit.buf = 0;
@@ -500,6 +519,10 @@ return SCPE_OK;
 
 t_stat tti_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 temp;
 
 sim_activate (&tti_unit, tti_unit.wait);                /* continue poll */
@@ -522,6 +545,10 @@ return SCPE_OK;
 
 t_stat tti_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 tmxr_set_console_units (&tti_unit, &tto_unit);
 chan_disc (tti_dib.chan);                               /* disconnect */
 tti_unit.buf = 0;                                       /* clear state */
@@ -636,6 +663,10 @@ return SCPE_OK;
 
 t_stat tto_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 chan_disc (tto_dib.chan);                               /* disconnect */
 tto_unit.buf = 0;                                       /* clear state */
 tto_ldr = 0;

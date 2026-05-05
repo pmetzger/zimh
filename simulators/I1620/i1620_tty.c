@@ -252,6 +252,11 @@ const char alp_to_tto[256] = {
 
 t_stat tty (uint32 op, uint32 pa, uint32 f0, uint32 f1)
 {
+/* Shared I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) f0;
+
 switch (op) {                                           /* case on op */
 
     case OP_K:                                          /* control */
@@ -501,6 +506,10 @@ return SCPE_OK;
 
 t_stat tty_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 DEFIO_ACTIVATE(&tty_unit[UTTI]);                        /* activate poll */
 sim_cancel (&tty_unit[UTTO]);                           /* cancel output */
 tti_unlock = tti_flag = 0;                              /* tty locked */
@@ -512,6 +521,12 @@ return SCPE_OK;
 
 t_stat tty_set_fixtabs (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 i;
 
 for (i = 0; i < TTO_COLMAX; i++) {
@@ -526,6 +541,12 @@ return SCPE_OK;
 
 t_stat tty_set_12digit (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 tty_unit[UTTI].flags = (tty_unit[UTTI].flags & ~UF_1DIG) | val;
 tty_unit[UTTO].flags = (tty_unit[UTTO].flags & ~UF_1DIG) | val;
 return SCPE_OK;

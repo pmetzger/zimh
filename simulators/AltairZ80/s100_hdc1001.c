@@ -191,6 +191,10 @@ static REG hdc1001_reg[] = {
 #define HDC1001_NAME    "ADC HDC-1001 Hard Disk Controller"
 
 static const char* hdc1001_description(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return HDC1001_NAME;
 }
 
@@ -332,6 +336,11 @@ static t_stat hdc1001_detach(UNIT *uptr)
 /* Set geometry of the disk drive */
 static t_stat hdc1001_unit_set_geometry(UNIT* uptr, int32 value, const char* cptr, void* desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) value;
+    (void) desc;
+
     HDC1001_DRIVE_INFO* pDrive;
     int32 i;
     int32 result;
@@ -385,6 +394,11 @@ static t_stat hdc1001_unit_set_geometry(UNIT* uptr, int32 value, const char* cpt
 /* Show geometry of the disk drive */
 static t_stat hdc1001_unit_show_geometry(FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     HDC1001_DRIVE_INFO* pDrive;
     int32 i;
 

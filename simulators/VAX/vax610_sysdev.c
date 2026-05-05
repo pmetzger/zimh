@@ -281,6 +281,10 @@ struct reglink regtable[] = {
 
 int32 ReadReg (uint32 pa, int32 lnt)
 {
+/* Model-dependent register read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 struct reglink *p;
 
 for (p = &regtable[0]; p->low != 0; p++) {
@@ -301,6 +305,10 @@ MACH_CHECK (MCHK_READ);
 
 int32 ReadRegU (uint32 pa, int32 lnt)
 {
+/* Model-dependent unaligned register read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 return ReadReg (pa & ~03, L_LONG);
 }
 
@@ -467,6 +475,11 @@ return 1;
 
 int32 machine_check (int32 p1, int32 opc, int32 cc, int32 delta)
 {
+/* Model-dependent machine check signature.
+   This implementation does not use every parameter. */
+(void) opc;
+(void) delta;
+
 int32 p2, acc;
 
 if (in_ie)                                              /* in exc? panic */
@@ -488,6 +501,10 @@ return cc;
 
 int32 con_halt (int32 code, int32 cc)
 {
+/* Model-dependent console halt signature.
+   This implementation does not use every parameter. */
+(void) code;
+
 if ((vax610_boot_parse (0, cpu_boot_cmd) != SCPE_OK) || /* reparse the boot cmd */
     (reset_all (0) != SCPE_OK) ||                       /* reset the world */
     (cpu_boot (0, NULL) != SCPE_OK))                    /* set up boot code */
@@ -500,6 +517,11 @@ return cc;
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic CPU boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 t_stat r;
 
 r = cpu_load_bootcode (BOOT_CODE_FILENAME, BOOT_CODE_ARRAY, BOOT_CODE_SIZE, FALSE, 0x200);
@@ -512,6 +534,10 @@ return SCPE_OK;
 
 t_stat vax610_set_instruction_set (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) desc;
+
 char gbuf[CBUFSIZE];
 
 if (!cptr || !*cptr)
@@ -529,17 +555,31 @@ return sim_messagef (SCPE_ARG, "Unknown/Unsupported instruction set: %s\n", gbuf
 
 t_stat sysd_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_vm_cmd = vax610_cmd;
 return SCPE_OK;
 }
 
 const char *sysd_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "system devices";
 }
 
 t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 char gbuf[CBUFSIZE];
 
 if ((cptr == NULL) || (!*cptr))
@@ -580,6 +620,13 @@ return SCPE_OK;
 
 t_stat cpu_model_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Initial memory size is 4MB.\n\n");
 fprintf (st, "The simulator is booted with the BOOT command:\n\n");
 fprintf (st, "   sim> BO{OT} <device>{/R5:flags}\n\n");

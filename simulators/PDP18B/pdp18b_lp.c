@@ -140,6 +140,10 @@ DEVICE lp62_dev = {
 
 int32 lp62_65 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 i;
 
 if ((pulse & 01) && TST_INT (LPT))                      /* LPSF */
@@ -165,6 +169,10 @@ return dat;
 
 int32 lp62_66 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if ((pulse & 01) && TST_INT (LPTSPC))                   /* LSSF */
     dat = IOT_SKP | dat;
 if (pulse & 02)                                         /* LSCF */
@@ -225,6 +233,10 @@ return SCPE_OK;
 
 t_stat lp62_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 CLR_INT (LPT);                                          /* clear intrs */
@@ -336,6 +348,10 @@ DEVICE lp647_dev = {
 
 int32 lp647_65 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 i, sb;
 
 sb = pulse & 060;                                       /* subcode */
@@ -391,6 +407,10 @@ return dat;
 
 int32 lp647_66 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if ((pulse & 01) && lp647_err)                          /* LPSE */
     dat = IOT_SKP | dat;
 if (pulse & 02) {                                       /* LPCF */
@@ -466,6 +486,10 @@ return SCPE_OK;
 
 t_stat lp647_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 
 lp647_don = 0;                                          /* clear done */
@@ -571,6 +595,10 @@ DEVICE lp09_dev = {
 
 int32 lp09_66 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 sb = pulse & 060;                                 /* subopcode */
 
 if (pulse & 001) {
@@ -638,6 +666,10 @@ return SCPE_OK;
 
 t_stat lp09_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 lp09_don = 0;                                           /* clear done */
 lp09_err = (lp09_unit.flags & UNIT_ATT)? 0: 1;          /* compute error */
 lp09_ie = 1;                                            /* set enable */
@@ -758,6 +790,10 @@ DEVICE lp15_dev = {
 
 int32 lp15_65 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 int32 header, sb;
 
 sb = pulse & 060;                                       /* subopcode */
@@ -789,6 +825,10 @@ return dat;
 
 int32 lp15_66 (int32 dev, int32 pulse, int32 dat)
 {
+/* IOT dispatch signature.
+   This implementation does not use every parameter. */
+(void) dev;
+
 if (pulse == 021)                                       /* LPCD */
     lp15_sta = lp15_sta & ~STA_DON;
 if (pulse == 041)                                       /* LPCF */
@@ -885,6 +925,10 @@ return lp15_sta;
 
 t_stat lp15_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 lp15_mode = lp15_lc = lp15_bp = 0;                      /* clear controls */
 sim_cancel (&lp15_unit);                                /* deactivate unit */
 lp15_sta = 0;                                           /* clear status */

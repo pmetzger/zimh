@@ -4168,6 +4168,11 @@ prottrap:
 /* Nothing special to do, just return true if cmd is write and we got here */
 uint32 cpu_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dev;
+    (void)uptr;
+
     if (cmd == OP_WRS)
         return 1;
     return -1;
@@ -4179,6 +4184,10 @@ uint32 cpu_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 t_stat
 cpu_reset(DEVICE * dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
     int                 i;
 
     AC = 0;
@@ -4226,6 +4235,11 @@ rtc_srv(UNIT * uptr)
 t_stat
 cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)sw;
+    (void)uptr;
+
     if (addr >= MAXMEMSIZE)
         return SCPE_NXM;
     if (vptr != NULL)
@@ -4239,6 +4253,11 @@ cpu_ex(t_value * vptr, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)sw;
+    (void)uptr;
+
     if (addr >= MAXMEMSIZE)
         return SCPE_NXM;
     M[addr] = val & 0777777777777LL;
@@ -4248,6 +4267,12 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
 t_stat
 cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)desc;
+    (void)uptr;
+
     t_uint64            mc = 0;
     uint32              i;
     int32               v;
@@ -4277,6 +4302,12 @@ cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+    (void)uptr;
+    (void)val;
+
     int32               i, lnt;
     t_stat              r;
 
@@ -4310,6 +4341,11 @@ cpu_set_hist(UNIT * uptr, int32 val, const char *cptr, void *desc)
 t_stat
 cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)uptr;
+    (void)val;
+
     int32               k, di, lnt;
     char               *cptr = (char *) desc;
     t_stat              r;
@@ -4395,6 +4431,10 @@ cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
 const char *
 cpu_description (DEVICE *dptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)dptr;
+
 #ifdef I7090
        return "IBM 709x CPU";
 #else
@@ -4405,6 +4445,12 @@ cpu_description (DEVICE *dptr)
 t_stat
 cpu_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic callback signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)flag;
+    (void)uptr;
+
 #ifdef I7090
 fprintf (st, "The CPU can be set to a IBM 704, IBM 709, IBM 7090 or IBM 7094\n");
 fprintf (st, "The type of CPU can be set by one of the following commands\n\n");

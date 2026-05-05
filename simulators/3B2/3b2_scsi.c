@@ -158,8 +158,12 @@ DEVICE ha_dev = {
     NULL,
 };
 
-void ha_cio_reset(uint8 slot)
+static void ha_cio_reset(uint8 slot)
 {
+    /* Generic CIO reset callback signature.
+       This implementation does not use every parameter. */
+    (void)slot;
+
     sim_debug(HA_TRACE, &ha_dev,
               "Handling CIO reset\n");
     ha_state.pump_state = PUMP_NONE;
@@ -434,6 +438,10 @@ void ha_express(uint8 slot)
 
 void ha_full(uint8 slot)
 {
+    /* Generic CIO full request callback signature.
+       This implementation does not use every parameter. */
+    (void)slot;
+
     sim_debug(HA_TRACE, &ha_dev,
               "[ha_full] Handling Full Request (INT3)\n");
 
@@ -1480,6 +1488,10 @@ void ha_fcm_express(uint8 tc)
 
 t_stat ha_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void)desc;
+
     if (val < 0 || cptr || val > HA_MAX_DTYPE) {
         return SCPE_ARG;
     }
@@ -1500,6 +1512,11 @@ t_stat ha_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat ha_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void)val;
+    (void)desc;
+
     fprintf(st, "%s", ha_tab[GET_DTYPE(uptr->flags)].name);
 
     return SCPE_OK;

@@ -279,6 +279,12 @@ DEVICE lp_dev = {
 
 t_stat lp_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   switch (LPdev.iod_type) {
     case DEVTYPE_1740:
       fprintf(st, "1740 Line Printer Controller");
@@ -296,6 +302,11 @@ t_stat lp_show_type(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat lp_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) val;
+  (void) desc;
+
   if (!cptr)
     return SCPE_IERR;
   if ((uptr->flags & UNIT_ATT) != 0)
@@ -341,6 +352,10 @@ void LPstate(const char *where, DEVICE *dev, IO_DEVICE *iod)
 
 t_stat lp_svc(UNIT *uptr)
 {
+  /* Generic unit service signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   if ((lp_dev.dctrl & DBG_DTRACE) != 0) {
     fprintf(DBGOUT, "%s[LP: lp_svc() entry]\r\n", INTprefix);
     if ((lp_dev.dctrl & DBG_DSTATE) != 0)
@@ -460,6 +475,11 @@ t_stat lp_reset(DEVICE *dptr)
 
 enum IOstatus LPin(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+  (void) reg;
+
   /*
    * The framework only passes IN operations for the data register.
    */

@@ -125,6 +125,10 @@ const char *sim_stop_messages[SCPE_BASE] = {
 
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void) fnam;
+
 uint32 col, mask, cctbuf[CCT_LNT];
 int32 ptr, rpt;
 t_stat r;
@@ -280,7 +284,7 @@ struct opc opcode[] = {
 
 /* Print an address from five characters */
 
-void fprint_addr (FILE *of, int32 spc, t_value *dig, t_bool flg)
+static void fprint_addr (FILE *of, int32 spc, t_value *dig, t_bool flg)
 {
 int32 i, idx;
 
@@ -449,7 +453,7 @@ return -(INST_LEN - 1);
 
 /* parse_addr - get sign + address + index */
 
-t_stat parse_addr (char *cptr, t_value *val, int32 flg)
+static t_stat parse_addr (char *cptr, t_value *val, int32 flg)
 {
 int32 i, sign = 0, addr, index;
 static int32 idx_tst[ADDR_LEN] = { 0, 4, 2, 1, 0 };

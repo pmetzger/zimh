@@ -226,6 +226,12 @@ const int8 alp_to_ptp[256] = {
 
 t_stat ptr (uint32 op, uint32 pa, uint32 f0, uint32 f1)
 {
+/* Shared I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) f0;
+(void) f1;
+
 if ((op != OP_RN) && (op != OP_RA))                     /* RN & RA only */
     return STOP_INVFNC;
 if ((ptr_unit.flags & UNIT_ATT) == 0)                   /* catch unattached */
@@ -239,6 +245,12 @@ return SCPE_OK;
 
 t_stat btr (uint32 op, uint32 pa, uint32 f0, uint32 f1)
 {
+/* Shared I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) f0;
+(void) f1;
+
 if (op != OP_RA)                                        /* RA only */
     return STOP_INVFNC;
 if ((ptr_unit.flags & UNIT_ATT) == 0)                   /* catch unattached */
@@ -362,6 +374,10 @@ return SCPE_OK;
 
 t_stat ptr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_cancel (&ptr_unit);
 ptr_mode = 0;
 return SCPE_OK;
@@ -378,6 +394,11 @@ static const uint8 boot_rom[] = {
 
 t_stat ptr_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic bootstrap signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 size_t i;
 extern uint32 saved_PC;
 
@@ -391,6 +412,12 @@ return SCPE_OK;
 
 t_stat ptp (uint32 op, uint32 pa, uint32 f0, uint32 f1)
 {
+/* Shared I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) f0;
+(void) f1;
+
 if ((op != OP_WN) && (op != OP_WA) && (op != OP_DN))
     return STOP_INVFNC;
 if ((ptp_unit.flags & UNIT_ATT) == 0)                   /* catch unattached */
@@ -404,6 +431,12 @@ return SCPE_OK;
 
 t_stat btp (uint32 op, uint32 pa, uint32 f0, uint32 f1)
 {
+/* Shared I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) f0;
+(void) f1;
+
 if (op != OP_WA)                                        /* WA only */
     return STOP_INVFNC;
 if ((ptp_unit.flags & UNIT_ATT) == 0)                   /* catch unattached */
@@ -515,6 +548,10 @@ return SCPE_OK;
 
 t_stat ptp_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_cancel (&ptp_unit);
 ptp_mode = 0;
 return SCPE_OK;

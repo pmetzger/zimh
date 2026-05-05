@@ -298,12 +298,24 @@ DEVICE iu_timer_dev = {
 
 t_stat iu_timer_show_mult(FILE *st, UNIT *uptr, int val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf(st, "mult=%d", (int) iu_timer_multiplier);
     return SCPE_OK;
 }
 
 t_stat iu_timer_set_mult(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     t_stat r;
     t_value v;
     v = get_uint(cptr, 10, 8, &r);
@@ -390,6 +402,10 @@ void increment_modep_b(void)
 
 t_stat tti_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     memset(&iu_state, 0, sizeof(IU_STATE));
     memset(&iu_console, 0, sizeof(IU_PORT));
 
@@ -407,6 +423,10 @@ t_stat tti_reset(DEVICE *dptr)
 
 t_stat contty_reset(DEVICE *dtpr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dtpr;
+
     sim_set_uname(&contty_unit[0], "CONTTY-RCV");
     sim_set_uname(&contty_unit[1], "CONTTY-XMT");
 
@@ -495,6 +515,10 @@ static uint8 iu_rx_getc(IU_PORT *port)
 
 t_stat iu_timer_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     memset(&iu_timer_state, 0, sizeof(IU_TIMER_STATE));
 
     return SCPE_OK;
@@ -705,6 +729,10 @@ t_stat iu_svc_contty_xmt(UNIT *uptr)
 
 t_stat iu_svc_timer(UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+
     iu_state.isr |= ISTS_CRI;
 
     sim_debug(EXECUTE_MSG, &iu_timer_dev,
@@ -739,6 +767,10 @@ t_stat iu_svc_timer(UNIT *uptr)
 
 uint32 iu_read(uint32 pa, size_t size)
 {
+    /* Generic memory-mapped read signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint8 reg, modep;
     uint32 data = 0;
 
@@ -811,6 +843,10 @@ uint32 iu_read(uint32 pa, size_t size)
 
 void iu_write(uint32 pa, uint32 val, size_t size)
 {
+    /* Generic memory-mapped write signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint8 reg;
     uint8 modep;
     uint8 bval = (uint8) val;
@@ -1068,6 +1104,10 @@ static void iu_w_cmd(IU_PORT *port, uint8 cmd)
  */
 void iu_dma_console(uint8 channel, uint32 service_address)
 {
+    /* Generic DMAC handler signature.
+       This implementation does not use every parameter. */
+    (void) service_address;
+
     uint8 data;
     uint32 addr;
     t_stat status = SCPE_OK;
@@ -1109,6 +1149,10 @@ void iu_dma_console(uint8 channel, uint32 service_address)
 
 void iu_dma_contty(uint8 channel, uint32 service_address)
 {
+    /* Generic DMAC handler signature.
+       This implementation does not use every parameter. */
+    (void) service_address;
+
     uint8 data;
     uint32 addr;
     t_stat status = SCPE_OK;

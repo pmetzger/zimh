@@ -769,6 +769,10 @@ static t_stat kmc_reset(DEVICE* dptr) {
  */
 
 static t_stat kmc_readCsr(DEVICE *dptr, t_addr PA, uint16* data, int32 access) {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int32 k;
 
     k = ((PA-((DIB *)kmc_dev.ctxt)->uba_addr) / IOLN_KMC);
@@ -809,6 +813,10 @@ static t_stat kmc_readCsr(DEVICE *dptr, t_addr PA, uint16* data, int32 access) {
  * Write registers:
  */
 static t_stat kmc_writeCsr(DEVICE *dptr, t_addr PA, uint16 data, int32 access) {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     uint32 changed;
     int reg = PA & 07;
     int sel = (PA >> 1) & 03;
@@ -2829,6 +2837,12 @@ static t_stat kmc_showDeviceCount (FILE *st, UNIT *txup, int32 val, const void *
  */
 
 static t_stat kmc_setLineSpeed (UNIT *txup, int32 val, const char *cptr, void *desc) {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) txup;
+    (void) val;
+    (void) desc;
+
     dupstate *d;
     int32 dupidx, newspeed;
     char gbuf[CBUFSIZE];
@@ -2860,6 +2874,12 @@ static t_stat kmc_setLineSpeed (UNIT *txup, int32 val, const char *cptr, void *d
 }
 
 static t_stat kmc_showLineSpeed (FILE *st, UNIT *txup, int32 val, const void *desc) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) txup;
+    (void) val;
+    (void) desc;
+
     int dupidx;
 
     fprintf (st, "DUP KMC Line   Speed\n"
@@ -2884,6 +2904,11 @@ static t_stat kmc_showLineSpeed (FILE *st, UNIT *txup, int32 val, const void *de
 /* Show KMC status */
 
 t_stat kmc_showStatus (FILE *st, UNIT *up, int32 v,  const void *dp) {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) v;
+    (void) dp;
+
     int32 k = up->unit_kmc;
     int32 line;
     t_bool first = TRUE;

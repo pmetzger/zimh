@@ -110,26 +110,53 @@ pclk_srv(UNIT * uptr)
 
 const char *pclk_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Stanford A.I.Lab Phil Petit calendar clock crock";
 }
 
 t_stat pclk_set_on(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     DEVICE *dptr = &pclk_dev;
+
     dptr->flags &= ~PCLK_OFF;
     return SCPE_OK;
 }
 
 t_stat pclk_set_off(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     DEVICE *dptr = &pclk_dev;
+
     dptr->flags |= PCLK_OFF;
     return SCPE_OK;
 }
 
 t_stat pclk_show_on(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     DEVICE *dptr = &pclk_dev;
+
     fprintf (st, "%s", (dptr->flags & PCLK_OFF) ? "off" : "on");
     return SCPE_OK;
 }

@@ -267,6 +267,12 @@ dct_write (int dev, uint64 *data, int cnt)
 t_stat
 dct_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Data Controller Type 136 is a data buffer between fast ");
 fprintf (st, "devices and the PDP6. Individual devices are hooked up to ports ");
 fprintf (st, "on each DCT.\n");
@@ -278,6 +284,10 @@ return SCPE_OK;
 const char *
 dct_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Data Controller Type 136";
 }
 

@@ -634,7 +634,7 @@ void nia_disable(void)
 /*
  * Copy a MAC address from string to memory word.
  */
-void nia_cpy_mac(uint64 word1, uint64 word2, ETH_MAC mac)
+static void nia_cpy_mac(uint64 word1, uint64 word2, ETH_MAC mac)
 {
     mac[0] = (unsigned char)((word1 >> 28) & 0xff);
     mac[1] = (unsigned char)((word1 >> 20) & 0xff);
@@ -647,7 +647,7 @@ void nia_cpy_mac(uint64 word1, uint64 word2, ETH_MAC mac)
 /*
  * Copy memory to a packet.
  */
-uint8 *nia_cpy_to(t_addr addr, uint8 *data, int len)
+static uint8 *nia_cpy_to(t_addr addr, uint8 *data, int len)
 {
     uint64    word;
     /* Copy full words */
@@ -683,7 +683,7 @@ uint8 *nia_cpy_to(t_addr addr, uint8 *data, int len)
 /*
  * Copy a packet to memory.
  */
-uint8 *nia_cpy_from(t_addr addr, uint8 *data, int len)
+static uint8 *nia_cpy_from(t_addr addr, uint8 *data, int len)
 {
     uint64    word;
 
@@ -725,7 +725,7 @@ uint8 *nia_cpy_from(t_addr addr, uint8 *data, int len)
  * Return entry in *entry and 1 if successfull.
  * Returns 0 if fail, queue locked or memory out of bounds.
  */
-int nia_getq(t_addr head, t_addr *entry)
+static int nia_getq(t_addr head, t_addr *entry)
 {
     uint64    temp;
     t_addr    flink;
@@ -788,7 +788,7 @@ int nia_getq(t_addr head, t_addr *entry)
  * Return entry in *entry and 1 if successfull.
  * Returns 0 if fail, queue locked or memory out of bounds.
  */
-int nia_putq(t_addr head, t_addr *entry)
+static int nia_putq(t_addr head, t_addr *entry)
 {
     uint64    temp;
     t_addr    blink;
@@ -934,7 +934,7 @@ void nia_load_mcast(void)
 /*
  * Pretty print a packet for debugging.
  */
-void nia_packet_debug(struct nia_device *nia, const char *action,
+static void nia_packet_debug(struct nia_device *nia, const char *action,
      ETH_PACK *packet) {
     struct nia_eth_hdr *eth = (struct nia_eth_hdr *)&packet->msg[0];
     struct arp_hdr     *arp = (struct arp_hdr *)eth;
@@ -1092,7 +1092,7 @@ void nia_packet_debug(struct nia_device *nia, const char *action,
 /*
  * Send out a packet.
  */
-int nia_send_pkt(uint64 cmd)
+static int nia_send_pkt(uint64 cmd)
 {
     uint64    word1, word2;
     struct    nia_eth_hdr  *hdr = (struct nia_eth_hdr *)(&nia_data.snd_buff.msg[0]);
@@ -1365,7 +1365,7 @@ t_stat nia_cmd_srv(UNIT * uptr)
 }
 
 
-int
+static int
 nia_rec_pkt(void)
 {
     struct nia_eth_hdr  *hdr;
@@ -1546,7 +1546,14 @@ t_stat nia_rec_srv(UNIT * uptr)
 
 t_stat nia_show_mac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     char buffer[20];
+
     eth_mac_fmt(nia_data.mac, buffer);
     fprintf(st, "MAC=%s", buffer);
     return SCPE_OK;
@@ -1554,6 +1561,11 @@ t_stat nia_show_mac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 
 t_stat nia_set_mac (UNIT* uptr, int32 val, const char* cptr, void* desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     t_stat status;
 
     if (!cptr) return SCPE_IERR;
@@ -1669,6 +1681,10 @@ return SCPE_OK;
 
 const char *nia_description (DEVICE *dptr)
 {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "KL NIA interface";
 }
 #endif

@@ -135,6 +135,17 @@ struct gdev {
     uint32      (*SF)(uint32);                          /* skip func */
 };
 
+extern uint32 tty_rd (uint32 src);
+extern t_stat tty_wr (uint32 dst, uint32 val);
+extern t_stat tty_fo (uint32 op);
+extern uint32 tty_sf (uint32 op);
+extern uint32 hsrp_rd (uint32 src);
+extern t_stat hsrp_wr (uint32 dst, uint32 val);
+extern t_stat hsrp_fo (uint32 op);
+extern uint32 hsrp_sf (uint32 op);
+extern t_stat rtc_fo (uint32 op);
+extern uint32 rtc_sf (uint32 op);
+
 /* Trap (jump) */
 
 #define TRP_DIR         00                              /* direct */

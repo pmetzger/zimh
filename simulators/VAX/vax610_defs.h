@@ -103,6 +103,8 @@
                             { MTAB_XTD|MTAB_VDV, 0, "INSTRUCTIONS", NULL,                                                                    \
                               NULL,                     &cpu_show_instruction_set, NULL, "Show the CPU Instruction Set (SHOW -V)" },
 t_stat vax610_set_instruction_set (UNIT *uptr, int32 val, const char *cptr, void *desc);
+int32 sysd_hlt_enb (void);
+void ioreset_wr (int32 data);
 
 /* QVSS memory space */
 

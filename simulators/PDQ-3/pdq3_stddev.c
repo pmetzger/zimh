@@ -185,11 +185,20 @@ static t_stat con_reset(DEVICE* dptr)
 }
 
 t_stat con_attach(UNIT* uptr, char* cptr) {
+  /* Generic attach signature.
+     This implementation does not use every parameter. */
+  (void)uptr;
+  (void)cptr;
+
   setbit(con_status, CONS_DSR|CONS_DSC);
   return SCPE_OK;
 }
 
 t_stat con_detach(UNIT* uptr) {
+  /* Generic detach signature.
+     This implementation does not use every parameter. */
+  (void)uptr;
+
   clrbit(con_status, CONS_DSR);
   setbit(con_status, CONS_DSC);
   return SCPE_OK;
@@ -565,6 +574,10 @@ static t_stat tim1_svc(UNIT* uptr)
  * this is triggered by timer1 - svc is ignored here */
 static t_stat tim2_svc(UNIT* uptr)
 {
+  /* Generic unit service signature.
+     This implementation does not use every parameter. */
+  (void)uptr;
+
   sim_debug(DBG_TIM_SVC, &tim_dev, DBG_PCFORMAT2 "Timer2: SVC call - should not occur\n", DBG_PC);
   return SCPE_OK;
 }

@@ -137,7 +137,6 @@ void uba_eval_int (void);
 t_stat vax780_boot (int32 flag, const char *ptr);
 t_stat vax780_boot_parse (int32 flag, const char *ptr);
 
-extern t_stat vax780_fload (int32 flag, const char *cptr);
 extern int32 iccs_rd (void);
 extern int32 nicr_rd (void);
 extern int32 icr_rd (void);

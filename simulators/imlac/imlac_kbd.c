@@ -109,6 +109,10 @@ static int32 kbd_translate (int32 ch)
 
 static t_stat kbd_svc (UNIT *uptr)
 {
+  /* Generic unit service signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   t_stat ch = sim_poll_kbd ();
 
   if ((ch & SCPE_KFLAG) == 0) {
@@ -616,6 +620,12 @@ kbd_iot (uint16 insn, uint16 AC)
 static t_stat
 kbd_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+  (void) val;
+  (void) desc;
+
   if (strcmp (cptr, "DISPLAY") == 0)
     kbd_type = KBD_DISPLAY;
   else if (strcmp (cptr, "CONSOLE") == 0)
@@ -628,6 +638,12 @@ kbd_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 static t_stat
 kbd_show_type (FILE *st, UNIT *up, int32 v, const void *dp)
 {
+  /* Generic show modifier signature.
+     This implementation does not use every parameter. */
+  (void) up;
+  (void) v;
+  (void) dp;
+
   switch (kbd_type) {
   case KBD_DISPLAY:
     fprintf (st, "TYPE=DISPLAY");

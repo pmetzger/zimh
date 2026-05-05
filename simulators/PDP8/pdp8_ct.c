@@ -587,6 +587,10 @@ return crc;
 
 t_stat ct_map_err (UNIT *uptr, t_stat st)
 {
+/* Shared tape error mapping signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 switch (st) {
 
     case MTSE_FMT:                                      /* illegal fmt */
@@ -630,6 +634,10 @@ return SCPE_OK;
 
 t_stat ct_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 uint32 u;
 UNIT *uptr;
 
@@ -723,6 +731,10 @@ static const uint16 boot_rom[] = {
 
 t_stat ct_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 extern uint16 M[];
 
@@ -736,5 +748,9 @@ return SCPE_OK;
 
 const char *ct_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "TA8E/TU60 cassette tape";
 }

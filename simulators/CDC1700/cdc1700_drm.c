@@ -593,7 +593,7 @@ static enum drmio_status DrumIOWrite(UNIT *uptr)
 /*
  * Perform read/write sector operations from within the unit service routine.
  */
-void DrumIO(UNIT *uptr, uint8 iotype)
+static void DrumIO(UNIT *uptr, uint8 iotype)
 {
   const char *error = "Unknown";
   enum drmio_status status = DRMIO_ADDRERR;
@@ -693,6 +693,10 @@ t_stat drm_svc(UNIT *uptr)
 
 t_stat drm_reset(DEVICE *dptr)
 {
+  /* Generic device reset signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   DRMdev.STATUS = 0;
   if ((drm_unit.flags & UNIT_ATT) != 0)
     DRMdev.STATUS |= IO_ST_READY | IO_ST_DATA;
@@ -764,6 +768,11 @@ t_stat drm_detach(UNIT *uptr)
  */
 t_stat drm_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+  /* Generic set modifier signature.
+     This implementation does not use every parameter. */
+  (void) cptr;
+  (void) desc;
+
   if ((uptr->flags & UNIT_ATT) != 0)
     return SCPE_ALATT;
 
@@ -776,6 +785,10 @@ t_stat drm_set_size(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_bool DRMreject(IO_DEVICE *iod, t_bool output, uint8 reg)
 {
+  /* Registered I/O reject signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   if (output) {
     if (reg != 0x1)
       return (DRMdev.STATUS & IO_ST_BUSY) != 0;
@@ -787,6 +800,10 @@ t_bool DRMreject(IO_DEVICE *iod, t_bool output, uint8 reg)
 
 enum IOstatus DRMin(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   /*
    * The I/O framework passes input requests for the Director Status register
    * and the Sector Address Status register so that we can return values
@@ -831,6 +848,10 @@ enum IOstatus DRMin(IO_DEVICE *iod, uint8 reg)
 
 enum IOstatus DRMout(IO_DEVICE *iod, uint8 reg)
 {
+  /* Registered I/O handler signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   switch (reg) {
     case 0x00:
       /*
@@ -893,6 +914,10 @@ enum IOstatus DRMout(IO_DEVICE *iod, uint8 reg)
  */
 void DRMclear(DEVICE *dptr)
 {
+  /* Registered device clear signature.
+     This implementation does not use every parameter. */
+  (void) dptr;
+
   DRMdev.STATUS = 0;
   if ((drm_unit.flags & UNIT_ATT) != 0)
     DRMdev.STATUS |= IO_ST_READY | IO_ST_DATA;
@@ -911,6 +936,10 @@ void DRMclear(DEVICE *dptr)
  */
 uint8 DRMdecode(IO_DEVICE *iod, t_bool output, uint8 reg)
 {
+  /* Registered address decode signature.
+     This implementation does not use every parameter. */
+  (void) iod;
+
   if (output && ((reg & 0x01) != 0))
     reg &= 0x01;
   return reg;

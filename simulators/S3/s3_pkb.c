@@ -239,6 +239,10 @@ int32 pkb (int32 op, int32 m, int32 n, int32 data)
 
 t_stat pkb_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 int32 temp, ac, ec;
 
 sim_activate (&pkb_unit, pkb_unit.wait);                /* continue poll */
@@ -300,6 +304,10 @@ return SCPE_OK;
 
 t_stat pkb_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 pkb_unit.buf = 0;
 int_req = int_req & ~0x02;                              /* reset interrupt */
 sim_activate (&pkb_unit, pkb_unit.wait);                /* activate unit */

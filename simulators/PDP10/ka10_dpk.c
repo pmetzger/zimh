@@ -335,6 +335,10 @@ static t_stat dpk_output_svc (UNIT *uptr)
 
 static t_stat dpk_reset (DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
 
     sim_debug(DEBUG_CMD, &dpk_dev, "Reset\n");
@@ -422,5 +426,9 @@ static t_stat dpk_help (FILE *st, DEVICE *dptr, UNIT *uptr,
 
 static const char *dpk_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Systems Concepts DK-10, Datapoint kludge";
 }

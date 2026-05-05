@@ -71,7 +71,7 @@ struct armrec {
 } Arm[4][3];
 
 
-int dsk_read_numeric_word(char * buf, t_int64 * d, int * ZeroNeg)
+static int dsk_read_numeric_word(char * buf, t_int64 * d, int * ZeroNeg)
 {
     int i, neg;
     char c;
@@ -92,7 +92,7 @@ int dsk_read_numeric_word(char * buf, t_int64 * d, int * ZeroNeg)
 
 
 
-void dsk_write_numeric_word(char * buf, t_int64 d, int ZeroNeg)
+static void dsk_write_numeric_word(char * buf, t_int64 d, int ZeroNeg)
 {
     int i, neg;
     char c;
@@ -111,7 +111,7 @@ void dsk_write_numeric_word(char * buf, t_int64 d, int ZeroNeg)
 // perform the operation (Read, Write) on RAMAC unit file
 // init file if len=0 (flat format)
 //
-t_stat dsk_operation(int cmd, int unit, int arm, int disk, int track)
+static t_stat dsk_operation(int cmd, int unit, int arm, int disk, int track)
 {
 
     FILE *f;
@@ -186,7 +186,7 @@ int dsk_ready(int unit, int arm)
     return 0;
 }
 
-void dsk_set_mov_seq(int unit,int arm)
+static void dsk_set_mov_seq(int unit,int arm)
 {
     // set arm movement sequence to its destination
     //
@@ -436,6 +436,10 @@ t_stat dsk_srv(UNIT * uptr)
 
 void dsk_ini(UNIT * uptr, t_bool f)
 {
+    /* Generic device initialization signature.
+       This implementation does not use every parameter. */
+    (void) f;
+
     DEVICE             *dptr = find_dev_from_unit(uptr);
     int                 unit = (uptr - dptr->units);
 
@@ -444,6 +448,10 @@ void dsk_ini(UNIT * uptr, t_bool f)
 
 t_stat dsk_reset(DEVICE * dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     int i;
     for (i = 0; i < 4; i++) {
         dsk_ini(&dsk_unit[i], 0);
@@ -476,6 +484,12 @@ t_stat dsk_detach(UNIT * uptr)
 t_stat
 dsk_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+   /* Generic help signature.
+      This implementation does not use every parameter. */
+   (void) uptr;
+   (void) flag;
+   (void) cptr;
+
    fprintf (st, "%s\n\n", dsk_description(dptr));
    fprintf (st, "RAMAC Magnetic storage disk.\n\n");
    fprint_set_help(st, dptr);
@@ -486,6 +500,10 @@ dsk_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 const char *
 dsk_description(DEVICE *dptr)
 {
+   /* Generic device description signature.
+      This implementation does not use every parameter. */
+   (void) dptr;
+
    return "IBM 355 RAMAC Disk Storage Unit";
 }
 

@@ -386,7 +386,7 @@ DEVICE cpu_dev = {
     cpu_dt, NULL
     };
 
-int32 compute_index (int32 y, int32 XR)
+static int32 compute_index (int32 y, int32 XR)
 {
     int32 sum;
 
@@ -419,7 +419,7 @@ typedef struct {
 INST_CTRS inst_ctr;
 
 
-void tx0_dump_regs(const char *desc)
+static void tx0_dump_regs(const char *desc)
 {
     TRACE_PRINT(TRACE_MSG, ("%s: AC=%06o, MAR=%05o, MBR=%06o, LR=%06o, XR=%05o\n", desc, AC, MAR, MBR, LR, XR));
 
@@ -1051,6 +1051,11 @@ static t_stat cpu_reset (DEVICE *dptr)
 
 static t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic memory examine signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     if (addr >= MEMSIZE) return SCPE_NXM;
     if (vptr != NULL) *vptr = M[addr] & DMASK;
 
@@ -1061,6 +1066,11 @@ static t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 
 static t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+    /* Generic memory deposit signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) sw;
+
     if (addr >= MEMSIZE) return SCPE_NXM;
 
     M[addr] = val & DMASK;
@@ -1072,6 +1082,12 @@ static t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 
 static t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
+
     int32 mc = 0;
     uint32 i;
 
@@ -1089,6 +1105,12 @@ static t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat cpu_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
+
     if (val == UNIT_MODE_TEST) {
         mode_tst = 1;
         mode_rdin = 0;
@@ -1108,12 +1130,26 @@ t_stat cpu_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 static t_stat cpu_set_ext (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     sim_printf("Set CPU Extended Mode\n");
     return SCPE_OK;
 }
 
 static t_stat cpu_set_noext (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     sim_printf("Set CPU Non-Extended Mode\n");
     return SCPE_OK;
 }
@@ -1129,6 +1165,12 @@ int32 cpu_get_mode (void)
 
 static t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i, lnt;
 t_stat r;
 
@@ -1157,6 +1199,11 @@ return SCPE_OK;
 
 static t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 ov, pf, op, k, di, lnt;
 const char *cptr = (const char *) desc;
 t_stat r;
@@ -1213,6 +1260,10 @@ cpu_get_switches(unsigned long *p1, unsigned long *p2)
 #endif
 
 t_stat sim_load(FILE *fileref, const char *cptr, const char *fnam, int flag) {
+    /* Generic loader signature.
+       This implementation does not use every parameter. */
+    (void) fnam;
+
     uint32 word;
     t_addr j, lo, hi, sz, sz_words;
     const char *result;

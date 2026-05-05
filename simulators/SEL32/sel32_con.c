@@ -155,6 +155,10 @@ DEVICE  con_dev = {
  */
 /* initialize the console chan/unit */
 void con_ini(UNIT *uptr, t_bool f) {
+    /* Generic device initialization signature.
+       This implementation does not use every parameter. */
+    (void) f;
+
     int     unit = (uptr - con_unit);       /* unit 0 */
 
     uptr->u4 = 0;                           /* no input count */
@@ -169,6 +173,10 @@ void con_ini(UNIT *uptr, t_bool f) {
 
 /* start a console operation */
 t_stat con_preio(UNIT *uptr, uint16 chan) {
+    /* Generic channel pre-I/O signature.
+       This implementation does not use every parameter. */
+    (void) chan;
+
     DEVICE         *dptr = get_dev(uptr);
     int            unit = (uptr - dptr->units);
 
@@ -640,6 +648,10 @@ t_stat con_srvi(UNIT *uptr) {
 }
 
 t_stat  con_reset(DEVICE *dptr) {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     tmxr_set_console_units (&con_unit[0], &con_unit[1]);
     return SCPE_OK;
 }

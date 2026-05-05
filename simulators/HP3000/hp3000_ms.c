@@ -1029,6 +1029,10 @@ return result;
 
 static t_stat ms_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (sim_switches & SWMASK ('P')) {                      /* if this is a power-on reset */
     fast_times.rewind_start = MS_REW_START;             /*   then reset the rewind initiation time, */
     fast_times.rewind_rate  = MS_REW_RATE;              /*     the rewind time per inch, */
@@ -1060,6 +1064,10 @@ return tl_reset (&ms_cntlr);                            /* reset the controller 
 
 static t_stat ms_boot (int32 unit_number, DEVICE *dptr)
 {
+/* Generic simulator boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (unit_number != 0)                                   /* if a unit other than 0 is specified */
     return SCPE_ARG;                                    /*   then fail with an invalid argument error */
 
@@ -1131,6 +1139,11 @@ else                                                    /* otherwise */
 
 static t_stat ms_onoffline (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 const t_bool online = (value != UNIT_OFFLINE);          /* TRUE if the drive is being put online */
 t_stat result;
 

@@ -96,6 +96,11 @@ CTAB pdq3_cmds[] = {
 /* Loader proper */
 t_stat sim_load (FILE *fi, const char *cptr, const char *fnam, int flag)
 {
+  /* Generic loader signature.
+     This implementation does not use every parameter. */
+  (void) fnam;
+  (void) cptr;
+
   int rombase;
   int c1, c2, i;
   if (flag == 1) /* don't dump */
@@ -194,6 +199,10 @@ return;
 
 static t_stat pdq3_cmd_exstack(int32 arg, const char *buf)
 {
+  /* Generic command signature.
+     This implementation does not use every parameter. */
+  (void) arg;
+
   t_stat rc;
   uint16 data;
   int i;
@@ -211,18 +220,30 @@ static t_stat pdq3_cmd_exstack(int32 arg, const char *buf)
 
 static t_stat pdq3_cmd_exmscw(int32 arg, const char *buf)
 {
+  /* Generic command signature.
+     This implementation does not use every parameter. */
+  (void) arg;
+
   const char* next;
   return dbg_dump_mscw(stdout, buf[0] ? pdq3_parse_addr(&cpu_dev, buf, &next) : reg_mp);
 }
 
 static t_stat pdq3_cmd_extib(int32 arg, const char *buf)
 {
+  /* Generic command signature.
+     This implementation does not use every parameter. */
+  (void) arg;
+
   const char* next;
   return dbg_dump_tib(stdout, buf[0] ? pdq3_parse_addr(&cpu_dev, buf, &next) : reg_ctp);
 }
 
 static t_stat pdq3_cmd_exseg(int32 arg, const char *buf)
 {
+  /* Generic command signature.
+     This implementation does not use every parameter. */
+  (void) arg;
+
   t_stat rc;
   uint16 nsegs;
   uint16 segnum, segptr;
@@ -251,10 +272,19 @@ static t_stat pdq3_cmd_exseg(int32 arg, const char *buf)
 }
 
 static t_stat pdq3_cmd_calltree(int32 arg, const char *buf) {
+  /* Generic command signature.
+     This implementation does not use every parameter. */
+  (void) arg;
+  (void) buf;
+
   return dbg_calltree(stdout);
 }
 
 static t_stat pdq3_cmd_namealias(int32 arg, const char *buf) {
+  /* Generic command signature.
+     This implementation does not use every parameter. */
+  (void) arg;
+
   char* name, *alias, gbuf[2*CBUFSIZE];
 
   if (buf[0]==0)
@@ -428,7 +458,7 @@ static uint16 B(t_value arg1, t_value arg2, int* sz) {
   }
 }
 
-t_stat print_hd(FILE *of, t_value val, t_bool hexdec, t_bool isbyte)
+static t_stat print_hd(FILE *of, t_value val, t_bool hexdec, t_bool isbyte)
 {
   uint16 data = isbyte ? (val & 0xff) : (val & 0xffff);
 
@@ -442,6 +472,10 @@ t_stat print_hd(FILE *of, t_value val, t_bool hexdec, t_bool isbyte)
 t_stat fprint_sym_m (FILE *of, t_addr addr, t_value *val,
     UNIT *uptr, int32 sw)
 {
+  /* Generic symbolic output signature.
+     This implementation does not use every parameter. */
+  (void) uptr;
+
   uint16 op, arg1, arg2, arg3;
   int16 sarg;
   t_stat size = 0;
@@ -624,5 +658,13 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
 */
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+  /* Generic symbolic input signature.
+     This implementation does not use every parameter. */
+  (void) addr;
+  (void) cptr;
+  (void) sw;
+  (void) uptr;
+  (void) val;
+
   return SCPE_ARG;
 }

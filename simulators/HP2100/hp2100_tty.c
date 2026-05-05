@@ -416,6 +416,10 @@ DEVICE tty_dev = {
 
 static SIGNALS_VALUE tty_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
 SIGNALS_VALUE  outbound    = { ioNONE, 0 };
@@ -594,6 +598,11 @@ return outbound;                                        /* return the outbound s
 
 static t_stat set_filter (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) cptr;
+(void) desc;
+
 if (uptr == &punch_unit)                                /* filters are not valid */
     return SCPE_NOFNC;                                  /*   for the punch */
 
@@ -620,6 +629,12 @@ else {
 
 static t_stat set_auto (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) value;
+(void) cptr;
+(void) desc;
+
 if (uptr == &key_unit)                                  /* if this is the keyboard unit */
     return SCPE_OK;                                     /*   then allow the setting */
 else                                                    /* otherwise auto LF mode is not valid */
@@ -638,6 +653,12 @@ else                                                    /* otherwise auto LF mod
 
 static t_stat set_mode (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (value == DEV_REALTIME)                              /* if realistic timing mode is selected */
     tty_dev.flags |= DEV_REALTIME;                      /*   then set the real-time flag */
 else                                                    /* otherwise optimized timing mode is selected */
@@ -665,6 +686,12 @@ return SCPE_OK;                                         /* mode changes always s
 
 static t_stat set_endis (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (value)                                              /* if this is an ENABLE request */
     if (tty_dev.flags & DEV_DIS)                        /*   then if the device is disabled */
         tty_dev.flags &= ~DEV_DIS;                      /*     then reenable it */
@@ -691,6 +718,12 @@ return tty_reset (&tty_dev);                            /* reset the TTY and res
 
 static t_stat show_mode (FILE *st, UNIT *uptr, int32 value, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) value;
+(void) desc;
+
 if (tty_dev.flags & DEV_REALTIME)                       /* if the current mode is real time */
     fputs ("realistic timing", st);                     /*   then report it */
 else                                                    /* otherwise */

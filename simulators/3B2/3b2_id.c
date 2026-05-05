@@ -328,6 +328,12 @@ t_stat id_unit_svc(UNIT *uptr)
 
 t_stat id_set_large(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) cptr;
+    (void) desc;
+
     id_large = (t_bool)val;
 
     if (!id_large && (ID_GET_DTYPE(id_unit[0].flags) > ID_HD135_DTYPE ||
@@ -340,6 +346,11 @@ t_stat id_set_large(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat id_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     if (val < 0 || val > ID_MAX_DTYPE) {
         return SCPE_ARG;
     }
@@ -364,6 +375,11 @@ t_stat id_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat id_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     fprintf(st, "%s%s",
             id_dtab[ID_GET_DTYPE(uptr->flags)].name,
             id_large ? " (Large Disk Support Enabled)" : "");
@@ -372,6 +388,10 @@ t_stat id_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 t_stat id_reset(DEVICE *dptr)
 {
+    /* Generic device reset signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     id_clear_fifo();
     return SCPE_OK;
 }
@@ -441,6 +461,10 @@ static inline void id_update_chs(void)
 
 uint32 id_read(uint32 pa, size_t size)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint8 reg, id;
     uint16 cyl;
     t_lba lba;
@@ -573,6 +597,10 @@ uint32 id_read(uint32 pa, size_t size)
 
 void id_write(uint32 pa, uint32 val, size_t size)
 {
+    /* Device I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) size;
+
     uint8 reg, id;
     uint16 cyl;
     t_lba lba;
@@ -969,11 +997,21 @@ void id_after_dma(void)
 
 const char *id_description(DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Integrated Hard Disk";
 }
 
 t_stat id_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     fprintf(st, "Integrated Hard Disk (IDISK)\n\n");
     fprintf(st, "The IDISK device implements the integrated MFM hard disk of the\n");
     fprintf(st, "3B2/400. Up to two drives are supported on a single controller.\n\n");

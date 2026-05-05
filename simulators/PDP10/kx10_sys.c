@@ -306,7 +306,7 @@ DEBTAB              crd_debug[] = {
    also ignored.
 
 */
-t_stat load_dmp (FILE *fileref)
+static t_stat load_dmp (FILE *fileref)
 {
    char    buffer[100];
    char    *p;
@@ -333,7 +333,7 @@ t_stat load_dmp (FILE *fileref)
 }
 
 
-int get_evac(FILE *fileref, uint64 *word)
+static int get_evac(FILE *fileref, uint64 *word)
 {
     static uint64 data = 0;
     static int bits = 0;
@@ -428,7 +428,7 @@ int get_evac(FILE *fileref, uint64 *word)
    The SBLK format is similar to SAV.  However, ITS files stored as
    octet streams are usually in the "evacuate" format.
 */
-t_stat load_sblk (FILE *fileref)
+static t_stat load_sblk (FILE *fileref)
 {
     uint64 word;
     uint64 check;
@@ -488,7 +488,7 @@ t_stat load_sblk (FILE *fileref)
 */
 
 #define RIM_EOF 0xFFFFFFFFFFFFFFFFLL
-uint64 getrimw (FILE *fileref)
+static uint64 getrimw (FILE *fileref)
 {
     int32 i, tmp;
     uint64 word;
@@ -506,7 +506,7 @@ uint64 getrimw (FILE *fileref)
 }
 #define TSTS(x) SMASK & (x)
 #define AOB(x) FMASK & ((x) + 01000001LL)
-t_stat load_rim (FILE *fileref)
+static t_stat load_rim (FILE *fileref)
 {
     uint64        count, cksm, data;
     t_bool        its_rim;
@@ -567,7 +567,7 @@ t_stat load_rim (FILE *fileref)
 }
 
 
-int get_word(FILE *fileref, uint64 *word, int ftype)
+static int get_word(FILE *fileref, uint64 *word, int ftype)
 {
     char cbuf[5];
 
@@ -604,7 +604,7 @@ int get_word(FILE *fileref, uint64 *word, int ftype)
         JRST start
 */
 
-t_stat load_sav (FILE *fileref, int ftype)
+static t_stat load_sav (FILE *fileref, int ftype)
 {
     uint64 data;
     uint32 pa;
@@ -660,7 +660,7 @@ t_stat load_sav (FILE *fileref, int ftype)
 #define PAG_V_PN 9
 #define DIRSIZ  (2 * PAG_SIZE)
 
-t_stat load_exe (FILE *fileref, int ftype)
+static t_stat load_exe (FILE *fileref, int ftype)
 {
     uint64 data, dirbuf[DIRSIZ], pagbuf[PAG_SIZE], entbuf[2];
     int32 ndir, entvec, i, j, k, cont, bsz, bty, rpt, wc;
@@ -749,7 +749,7 @@ t_stat load_exe (FILE *fileref, int ftype)
 }
 
 static int     exb_pos = -1;
-int get_exb_byte (FILE *fileref, int *byt, int ftype)
+static int get_exb_byte (FILE *fileref, int *byt, int ftype)
 {
     static uint64  word;
 
@@ -769,7 +769,7 @@ int get_exb_byte (FILE *fileref, int *byt, int ftype)
     return 0;
 }
 
-t_stat load_exb (FILE *fileref, int ftype)
+static t_stat load_exb (FILE *fileref, int ftype)
 {
     int     odd = 0;
     int     pos = 0;
@@ -836,6 +836,11 @@ t_stat load_exb (FILE *fileref, int ftype)
 
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+    /* Generic loader signature.
+       This implementation does not use every parameter. */
+    (void)cptr;
+    (void)flag;
+
     uint64 data;
     int32 wc, fmt;
     int ftype;
@@ -1189,6 +1194,11 @@ static const char *devnam[NUMDEV] = {
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
     UNIT *uptr, int32 sw)
 {
+    /* Generic symbolic output signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+    (void)uptr;
+
     int32 i, j, c, ac, xr, y, dev;
     uint64 inst;
 
@@ -1266,7 +1276,7 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
         val     =       output value
 */
 
-t_value get_opnd (const char *cptr, t_stat *status)
+static t_value get_opnd (const char *cptr, t_stat *status)
 {
     int32 sign = 0;
     t_value val, xr = 0, ind = 0;
@@ -1316,6 +1326,11 @@ t_value get_opnd (const char *cptr, t_stat *status)
 
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+    /* Generic symbolic input signature.
+       This implementation does not use every parameter. */
+    (void)addr;
+    (void)uptr;
+
     int32 i, j;
     t_value ac, dev;
     t_stat r;

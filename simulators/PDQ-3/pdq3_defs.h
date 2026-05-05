@@ -359,6 +359,10 @@ extern t_stat ReadBEx(t_addr base, t_addr boffset, uint16 *data);
 
 extern t_stat rom_read(t_addr base, uint16 *data);
 extern t_stat rom_write(t_addr base, uint16 data);
+extern void pdq3_sprint_addr (char *buf, DEVICE *dptr, t_addr addr);
+extern void pdq3_fprint_addr (FILE *st, DEVICE *dptr, t_addr addr);
+extern t_addr pdq3_parse_addr (DEVICE *dptr, const char *cptr, const char **tptr);
+extern void pdq3_vm_init (void);
 extern t_stat fprint_sym_m (FILE *of, t_addr addr, t_value *val, UNIT *uptr, int32 sw);
 
 extern t_stat con_read(t_addr ioaddr, uint16 *data);
@@ -405,5 +409,6 @@ extern t_stat set_iovec(UNIT *uptr, int32 val, const char *cptr, void *desc);
 extern t_stat show_iovec(FILE *st, UNIT *uptr, int value, const void *desc);
 extern t_stat set_ioprio(UNIT *uptr, int32 val, const char *cptr, void *desc);
 extern t_stat show_ioprio(FILE *st, UNIT *uptr, int value, const void *desc);
+extern t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc);
 
 #endif

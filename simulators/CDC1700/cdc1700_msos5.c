@@ -142,7 +142,7 @@ const char *charRep[128] = {
 /*
  * Check if a logical unit is a mass storage device.
  */
-t_bool isMassStorage(uint16 lu)
+static t_bool isMassStorage(uint16 lu)
 {
   uint16 extbv4 = M[CREXTB];
   uint16 log1a = M[extbv4 + LOG1A];
@@ -163,7 +163,7 @@ t_bool isMassStorage(uint16 lu)
  * Get the mass storage sector address associated with a read/write
  * request.
  */
-uint32 getMSA(uint16 reqCode, uint16 param)
+static uint32 getMSA(uint16 reqCode, uint16 param)
 {
   if (reqCode == RQ_SYSDIRREAD)
     return M[param + 6];
@@ -335,7 +335,7 @@ static void motion(uint16 param, char *d)
  */
 #define MAXTEXT         50
 
-char *textRep(uint16 start, uint16 len)
+static char *textRep(uint16 start, uint16 len)
 {
   int i;
   static char text[64];

@@ -210,6 +210,10 @@ void isbc206_diskio(void);       //do actual disk i/o
 
 int isbc206_onetime = 1;
 static const char* isbc206_desc(DEVICE *dptr) {
+    /* Generic description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return isbc206_NAME;
 }
 
@@ -310,6 +314,10 @@ DEVICE isbc206_dev = {
 
 t_stat isbc206_cfg(uint16 baseport, uint16 devnum, uint8 intnum)
 {
+    /* Shared configuration signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     int i;
     UNIT *uptr;
 
@@ -353,6 +361,11 @@ t_stat isbc206_clr(void)
 
 t_stat isbc206_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_ARG;
     if (uptr->flags & UNIT_ATT)
@@ -373,6 +386,11 @@ t_stat isbc206_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc206_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     uint32 size, result;
 
     if (uptr == NULL)
@@ -393,6 +411,11 @@ t_stat isbc206_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc206_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     uint32 size, result;
 
     if (uptr == NULL)
@@ -406,6 +429,11 @@ t_stat isbc206_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc206_set_verb(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_ARG;
     if (cptr == NULL)
@@ -426,6 +454,11 @@ t_stat isbc206_set_verb(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat isbc206_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     if (uptr == NULL)
         return SCPE_ARG;
     fprintf(st, "%s Base port at %04X  Interrupt # is %i  %s",
@@ -506,6 +539,11 @@ t_stat isbc206_attach (UNIT *uptr, const char *cptr)
 
 uint8 isbc206r0(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+    (void) devnum;
+
     if (io == 0) {                  /* read status*/
         return hdc206.stat;
     }
@@ -514,6 +552,10 @@ uint8 isbc206r0(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc206r1(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                  /* read data port */
         hdc206.intff = 0;           //clear interrupt FF
         hdc206.stat &= ~(HDCINT + 0x80);
@@ -527,6 +569,10 @@ uint8 isbc206r1(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc206r2(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) devnum;
+
     if (io == 0) {                  /* read data port */
         ;
     } else {                        /* write data port */
@@ -540,6 +586,11 @@ uint8 isbc206r2(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc206r3(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+    (void) devnum;
+
     if (io == 0) {                  /* read data port */
         if (hdc206.rtype == ROK) {
             return hdc206.rbyte0;
@@ -559,6 +610,11 @@ uint8 isbc206r3(t_bool io, uint8 data, uint8 devnum)
 
 uint8 isbc206r7(t_bool io, uint8 data, uint8 devnum)
 {
+    /* Generic I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+    (void) devnum;
+
     if (io == 0) {                  /* read data port */
         ;
     } else {                        /* write data port */

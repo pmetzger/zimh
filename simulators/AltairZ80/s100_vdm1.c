@@ -376,6 +376,11 @@ t_stat vdm1_reset(DEVICE *dptr)
 
 static t_stat vdm1_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+    (void) dptr;
+
     exdep_cmd(EX_D, "-m 00 MVI A,0");
     exdep_cmd(EX_D, "-m 02 OUT 0FEH");
     exdep_cmd(EX_D, "-m 04 MVI C,0");
@@ -401,6 +406,10 @@ static t_stat vdm1_boot(int32 unitno, DEVICE *dptr)
 }
 
 static int32 vdm1_io(const int32 port, const int32 io, const int32 data) {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+
     if (io == 1) {
         vdm1_dstat = data & 0xff;
     }
@@ -426,6 +435,13 @@ static int32 vdm1_mem(int32 addr, int32 rw, int32 data)
 
 t_stat vdm1_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+    /* Generic help signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+    (void) uptr;
+    (void) flag;
+    (void) cptr;
+
     fprintf(st, "\nThe VDM-1 has several switches that control the video display:\n\n");
 
     fprintf(st, "SET VDM1 CTRL=MODEx\n");
@@ -453,6 +469,10 @@ t_stat vdm1_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cp
 
 const char *vdm1_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Processor Technology VDM-1 Display";
 }
 
@@ -551,6 +571,12 @@ static void vdm1_render_char(uint8 byte, uint8 x, uint8 y)
 
 static t_stat vdm1_set_ctrl(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
 
@@ -574,6 +600,12 @@ static t_stat vdm1_set_ctrl(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 static t_stat vdm1_show_ctrl(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!st) return SCPE_IERR;
 
     fprintf(st, "CTRL=");
@@ -605,6 +637,12 @@ static t_stat vdm1_show_ctrl(FILE *st, UNIT *uptr, int32 val, const void *desc)
 
 static t_stat vdm1_set_cursor(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
 
@@ -627,6 +665,12 @@ static t_stat vdm1_set_cursor(UNIT *uptr, int32 val, const char *cptr, void *des
 
 static t_stat vdm1_show_cursor(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!st) return SCPE_IERR;
 
     fprintf(st, "CURSOR=");
@@ -654,6 +698,12 @@ static t_stat vdm1_show_cursor(FILE *st, UNIT *uptr, int32 val, const void *desc
 
 static t_stat vdm1_set_display(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!cptr) return SCPE_IERR;
     if (!strlen(cptr)) return SCPE_ARG;
 
@@ -675,6 +725,12 @@ static t_stat vdm1_set_display(UNIT *uptr, int32 val, const char *cptr, void *de
 
 static t_stat vdm1_show_display(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     if (!st) return SCPE_IERR;
 
     fprintf(st, "DISPLAY=");

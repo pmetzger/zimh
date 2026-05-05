@@ -125,6 +125,10 @@ struct idev dev_table2[8] = {
 
 int32 nulldev(int32 io, int32 data)
 {
+    /* Shared I/O handler signature.
+       This implementation does not use every parameter. */
+    (void) data;
+
     if (io == 0)
         return (0xFF);
     return 0;

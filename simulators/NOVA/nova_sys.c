@@ -178,6 +178,10 @@ internal state machine:
 
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void)fnam;
+
 int32 data, csum, count, state, i;
 int32 origin;
 int pos;
@@ -640,7 +644,7 @@ static const int32 dev_val[] = {
    Outputs:
         return  =       error code
 */
-t_stat fprint_addr (FILE *of, t_addr addr, int32 ind, int32 mode,
+static t_stat fprint_addr (FILE *of, t_addr addr, int32 ind, int32 mode,
     int32 disp, t_bool ext, int32 cflag)
 {
 int32 dsign, dmax;
@@ -859,7 +863,7 @@ return SCPE_ARG;
 #define A_SI    020                                     /* sign seen */
 #define A_MI    040                                     /* - seen */
 
-const char *get_addr (const char *cptr, t_addr addr, t_bool ext, int32 cflag, int32 *val)
+static const char *get_addr (const char *cptr, t_addr addr, t_bool ext, int32 cflag, int32 *val)
 {
 int32 d, x, pflag;
 t_stat r;
@@ -962,7 +966,7 @@ return cptr;
                         NULL if error
 */
 
-const char *get_2reg (const char *cptr, char term, int32 *val)
+static const char *get_2reg (const char *cptr, char term, int32 *val)
 {
 char gbuf[CBUFSIZE];
 t_stat r;

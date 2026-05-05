@@ -180,6 +180,9 @@ int32 tbc_rd (int32 rg);
 void tbc_wr (int32 rg, int32 val, int32 lnt);
 int32 scn_rd (int32 rg);
 void scn_wr (int32 rg, int32 val, int32 lnt);
+static void ve_put_fifo (uint32 id, uint32 data);
+static void ve_get_fifo (uint32 id, uint32 *data);
+static void ve_clear_fifo (uint32 id);
 
 
 /* VE data structures
@@ -454,7 +457,7 @@ if (scrln < VE_YSIZE)
 return;
 }
 
-void ve_put_fifo (uint32 id, uint32 data)
+static void ve_put_fifo (uint32 id, uint32 data)
 {
 if (tbc_fifo[id].count > 0) {
     tbc_fifo[id].buf[tbc_fifo[id].put_ptr++] = data;
@@ -466,7 +469,7 @@ if (tbc_fifo[id].count > 0) {
     }
 }
 
-void ve_get_fifo (uint32 id, uint32 *data)
+static void ve_get_fifo (uint32 id, uint32 *data)
 {
 if (tbc_fifo[id].count < FIFO_LEN) {
     *data = tbc_fifo[id].buf[tbc_fifo[id].get_ptr++];
@@ -478,7 +481,7 @@ else
     *data = 0;
 }
 
-void ve_clear_fifo (uint32 id)
+static void ve_clear_fifo (uint32 id)
 {
 tbc_fifo[id].put_ptr = 0;
 tbc_fifo[id].get_ptr = 0;
@@ -637,6 +640,10 @@ return data;
 
 void tbc_wr (int32 rg, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 uint32 i;
 
 switch (rg) {
@@ -968,6 +975,10 @@ return data;
 
 void scn_wr (int32 rg, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 switch (rg) {
     case 0x40:  /* STATUS */
         sim_debug (DBG_REG, &ve_dev, "scanproc status wr %X at %08X\n", val, fault_PC);
@@ -1099,7 +1110,7 @@ switch (rg) {
         }
 }
 
-void spx_fill_rect (void)
+static void spx_fill_rect (void)
 {
 uint32 xstart, xend, ystart, yend;
 uint32 dstpix;
@@ -1134,7 +1145,7 @@ if ((spx_destloop & 0xFFFF) != 0x2006) {
 cp_int_status |= 0x2;
 }
 
-void spx_copy_rect (void)
+static void spx_copy_rect (void)
 {
 uint32 xstart, xend, ystart, yend;
 uint32 srcpix, dstpix;
@@ -1170,7 +1181,7 @@ for (y = ystart; y < yend; y++) {
 cp_int_status |= 0x2;
 }
 
-void spx_stream_data (void)
+static void spx_stream_data (void)
 {
 uint32 xstart, xend, ystart, yend;
 uint32 dstpix;
@@ -1239,6 +1250,10 @@ else {                                                  /* read */
 
 t_stat ve_micro_svc (UNIT *uptr)
 {
+/* Generic service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 switch (spx_upc) {
 
     case 0x23AE:
@@ -1477,6 +1492,10 @@ return SCPE_OK;
 
 t_stat ve_detach (UNIT *uptr)
 {
+/* Generic detach signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if ((ve_dev.flags & DEV_DIS) == 0) {
     ve_dev.flags |= DEV_DIS;
     ve_reset(&ve_dev);
@@ -1486,11 +1505,23 @@ return SCPE_OK;
 
 t_stat ve_set_enable (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 return cpu_set_model (NULL, 0, (val ? "VAXSTATIONSPX" : "MICROVAX"), NULL);
 }
 
 t_stat ve_set_capture (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (vid_active)
     return sim_messagef (SCPE_ALATT, "Capture Mode Can't be changed with device enabled\n");
 ve_input_captured = val;
@@ -1510,6 +1541,12 @@ return SCPE_OK;
 
 t_stat ve_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "SPX Colour Video Subsystem (%s)\n\n", dptr->name);
 fprintf (st, "Use the Control-Right-Shift key combination to regain focus from the simulated\n");
 fprintf (st, "video display\n");
@@ -1521,5 +1558,9 @@ return SCPE_OK;
 
 const char *ve_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "SPX Colour Graphics Adapter";
 }

@@ -131,6 +131,10 @@ return STOP_CHBKPT;
 
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void)fnam;
+
 extern t_stat binloader (FILE *fd, const char *file, int loadpt);
 
 if (flag == 0)
@@ -593,6 +597,10 @@ static const t_uint64 opc_v[] = {
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
     UNIT *uptr, int32 sw)
 {
+/* Generic symbolic output signature.
+   This implementation does not use every parameter. */
+(void)addr;
+
 uint32 i, j, k, l, fmt, c, fld[3];
 DEVICE *dptr;
 t_uint64 inst;
@@ -699,6 +707,11 @@ else return nine_to_ascii_h[c];
 
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+/* Generic symbolic input signature.
+   This implementation does not use every parameter. */
+(void)addr;
+(void)uptr;
+
 uint32 i, j, c;
 t_uint64 fld[3];
 t_bool ind;

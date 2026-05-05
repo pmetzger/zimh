@@ -880,8 +880,29 @@ void mba_set_exc (uint32 mbus);
 void mba_set_don (uint32 mbus);
 void mba_set_enbdis (DEVICE *dptr);
 t_stat mba_show_num (FILE *st, UNIT *uptr, int32 val, const void *desc);
+void init_mbus_tab (void);
+t_stat build_mbus_tab (DEVICE *dptr, DIB *dibp);
 
 t_stat build_dib_tab (void);
+void fp11 (int32 IR);
+t_stat cis11 (int32 IR);
+t_stat fis11 (int32 IR);
+t_stat iopageR (int32 *data, uint32 addr, int32 access);
+t_stat iopageW (int32 data, uint32 addr, int32 access);
+t_stat cpu_build_dib (void);
+t_stat MMR012_rd (int32 *data, int32 pa, int32 access);
+t_stat MMR012_wr (int32 data, int32 pa, int32 access);
+t_stat MMR3_rd (int32 *data, int32 pa, int32 access);
+t_stat MMR3_wr (int32 data, int32 pa, int32 access);
+t_stat APR_rd (int32 *data, int32 pa, int32 access);
+t_stat APR_wr (int32 data, int32 pa, int32 access);
+t_stat PSW_rd (int32 *data, int32 pa, int32 access);
+t_stat PSW_wr (int32 data, int32 pa, int32 access);
+int32 calc_ints (int32 nipl, int32 trq);
+int32 get_vector (int32 nipl);
+t_stat ubm_rd (int32 *data, int32 addr, int32 access);
+t_stat ubm_wr (int32 data, int32 addr, int32 access);
+uint32 Map_Addr (uint32 ba);
 
 void cpu_set_boot (int32 pc);
 

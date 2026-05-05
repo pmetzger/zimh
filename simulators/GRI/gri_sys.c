@@ -85,6 +85,11 @@ const char *sim_stop_messages[SCPE_BASE] = {
 
 t_stat sim_load (FILE *fileref, const char *cptr, const char *fnam, int flag)
 {
+/* Generic loader signature.
+   This implementation does not use every parameter. */
+(void) fnam;
+(void) flag;
+
 int32 c;
 uint32 org;
 t_stat r;
@@ -290,7 +295,7 @@ static const struct fnc_op fop[] = {
 
 /* Print opcode field for FO, SF */
 
-void fprint_op (FILE *of, uint32 inst, uint32 op)
+static void fprint_op (FILE *of, uint32 inst, uint32 op)
 {
 int32 i, nfirst;
 
@@ -337,6 +342,11 @@ return;
 t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
     UNIT *uptr, int32 sw)
 {
+/* Generic symbolic output signature.
+   This implementation does not use every parameter. */
+(void) addr;
+(void) uptr;
+
 int32 i, j;
 uint32 inst, src, dst, op, bop;
 
@@ -468,7 +478,7 @@ return SCPE_ARG;
         get_op          get optional bus operator
 */
 
-const char *get_fnc (const char *cptr, t_value *val)
+static const char *get_fnc (const char *cptr, t_value *val)
 {
 char gbuf[CBUFSIZE];
 int32 i;
@@ -505,7 +515,7 @@ val[0] = val[0] | (fncv << I_V_OP);                     /* store fnc */
 return cptr;
 }
 
-const char *get_ma (const char *cptr, t_value *val, char term)
+static const char *get_ma (const char *cptr, t_value *val, char term)
 {
 char gbuf[CBUFSIZE];
 t_value d;
@@ -521,7 +531,7 @@ val[1] = d;                                             /* second wd */
 return cptr;
 }
 
-const char *get_sd (const char *cptr, t_value *val, char term, t_bool src)
+static const char *get_sd (const char *cptr, t_value *val, char term, t_bool src)
 {
 char gbuf[CBUFSIZE];
 int32 d;
@@ -542,7 +552,7 @@ val[0] = val[0] | (d << (src? I_V_SRC: I_V_DST));       /* or to inst */
 return cptr;
 }
 
-const char *get_op (const char *cptr, t_value *val, char term)
+static const char *get_op (const char *cptr, t_value *val, char term)
 {
 char gbuf[CBUFSIZE];
 const char *tptr;
@@ -572,6 +582,11 @@ return cptr;                                            /* original ptr */
 
 t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32 sw)
 {
+/* Generic symbolic input signature.
+   This implementation does not use every parameter. */
+(void) addr;
+(void) uptr;
+
 int32 i, j, k;
 char gbuf[CBUFSIZE];
 

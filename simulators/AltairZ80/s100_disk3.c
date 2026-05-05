@@ -228,6 +228,10 @@ static REG disk3_reg[] = {
 #define DISK3_NAME  "Compupro ST-506 Disk Controller"
 
 static const char* disk3_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return DISK3_NAME;
 }
 

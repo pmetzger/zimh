@@ -2235,6 +2235,13 @@ return SCPE_OK;
 
 t_stat cpu_set_release (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) cptr;
+(void) desc;
+
 uint32 i;
 DEVICE *dptr;
 
@@ -2261,6 +2268,12 @@ return SCPE_OK;
 
 t_stat cpu_set_cps (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 i, j, cps;
 DEVICE *dptr;
 t_stat r;
@@ -2284,6 +2297,12 @@ return SCPE_OK;
 
 t_stat cpu_show_cps (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 i;
 DEVICE *dptr;
 
@@ -2298,6 +2317,11 @@ return SCPE_OK;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE)
     return SCPE_NXM;
 if (vptr != NULL)
@@ -2309,6 +2333,11 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE)
     return SCPE_NXM;
 M[addr] = val & (FLAG | DIGIT);
@@ -2319,6 +2348,12 @@ return SCPE_OK;
 
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 mc = 0;
 uint32 i;
 
@@ -2338,6 +2373,12 @@ return SCPE_OK;
 
 t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (val)
     cpu_unit.flags = (cpu_unit.flags & (UNIT_SCP | UNIT_BCD | MII_OPT)) |
         IF_DIV | IF_IA | IF_EDT;
@@ -2349,6 +2390,12 @@ return SCPE_OK;
 
 t_stat cpu_set_opt1 (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 if (cpu_unit.flags & IF_MII) {
     if ((val & IF_RMOK) != 0)
         sim_printf ("Feature is not available on 1620 Model 2\n");
@@ -2362,6 +2409,13 @@ return SCPE_OK;
 
 t_stat cpu_set_opt2 (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) cptr;
+(void) desc;
+
 if (!(cpu_unit.flags & IF_MII)) {
     sim_printf ("Feature is not available on 1620 Model 1\n");
     return SCPE_NOFNC;
@@ -2373,6 +2427,13 @@ return SCPE_OK;
 
 t_stat cpu_set_save (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) cptr;
+(void) desc;
+
 if (saved_PC & 1)
     return SCPE_NOFNC;
 PR1 = saved_PC;
@@ -2383,6 +2444,12 @@ return SCPE_OK;
 
 t_stat cpu_set_table (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 i;
 
 for (i = 0; i < MUL_TABLE_LEN; i++)                     /* set mul table */
@@ -2398,6 +2465,12 @@ return SCPE_OK;
 
 t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i, lnt;
 t_stat r;
 
@@ -2429,6 +2502,11 @@ return SCPE_OK;
 
 t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 i, k, di, lnt;
 const char *cptr = (const char *) desc;
 t_value sim_eval[INST_LEN];

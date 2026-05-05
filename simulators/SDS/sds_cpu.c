@@ -1262,7 +1262,7 @@ return SCPE_OK;
 
 /* Relocate addr for console access */
 
-uint32 RelocC (int32 va, int32 sw)
+static uint32 RelocC (int32 va, int32 sw)
 {
 uint32 mode = cpu_mode;
 uint32 pa, pgn, map;
@@ -1423,6 +1423,10 @@ return;
 
 t_stat pot_RL1 (uint32 num, uint32 *dat)
 {
+/* SDS POT routine signature.
+   This implementation does not use every parameter. */
+(void) num;
+
 RL1 = *dat;
 set_dyn_map ();
 return SCPE_OK;
@@ -1430,6 +1434,10 @@ return SCPE_OK;
 
 t_stat pot_RL2 (uint32 num, uint32 *dat)
 {
+/* SDS POT routine signature.
+   This implementation does not use every parameter. */
+(void) num;
+
 RL2 = *dat;
 set_dyn_map ();
 return SCPE_OK;
@@ -1437,6 +1445,10 @@ return SCPE_OK;
 
 t_stat pot_RL4 (uint32 num, uint32 *dat)
 {
+/* SDS POT routine signature.
+   This implementation does not use every parameter. */
+(void) num;
+
 RL4 = (*dat) & 03737;
 set_dyn_map ();
 return SCPE_OK;
@@ -1657,6 +1669,10 @@ return TRUE;                        /*  and return TRUE       */
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 uint32 pa;
 
 pa = RelocC (addr, sw);
@@ -1673,6 +1689,10 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 uint32 pa;
 
 pa = RelocC (addr, sw);
@@ -1688,6 +1708,12 @@ return SCPE_OK;
 
 t_stat cpu_set_size (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 int32 mc = 0;
 uint32 i;
 
@@ -1707,6 +1733,12 @@ return SCPE_OK;
 
 t_stat cpu_set_type (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 extern t_stat drm_reset (DEVICE *dptr);
 extern DEVICE drm_dev, mux_dev, muxl_dev;
 extern UNIT drm_unit, mux_unit;
@@ -1739,6 +1771,10 @@ return SCPE_OK;
 
 t_stat rtc_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 if (rtc_pie)                                            /* set pulse intr */
     int_req = int_req | INT_RTCP;
 rtc_unit.wait = sim_rtcn_calb (rtc_tps, TMR_RTC);       /* calibrate */
@@ -1775,6 +1811,10 @@ return SCPE_OK;
 
 t_stat rtc_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 rtc_pie = 0;                                            /* disable pulse */
 rtc_unit.wait = sim_rtcn_init (rtc_unit.wait, TMR_RTC); /* initialize clock calibration */
 sim_activate (&rtc_unit, rtc_unit.wait);                /* activate unit */
@@ -1785,6 +1825,11 @@ return SCPE_OK;
 
 t_stat rtc_set_freq (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) desc;
+
 if (cptr)
     return SCPE_ARG;
 if ((val != 50) && (val != 60))
@@ -1797,6 +1842,12 @@ return SCPE_OK;
 
 t_stat rtc_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, (rtc_tps == 50)? "50Hz": "60Hz");
 return SCPE_OK;
 }
@@ -1824,6 +1875,12 @@ return;
 
 t_stat cpu_set_hist (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 int32 i, lnt;
 t_stat r;
 
@@ -1863,6 +1920,11 @@ return SCPE_OK;
 
 t_stat cpu_show_hist (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+
 int32 ov, k, di, lnt;
 const char *cptr = (const char *) desc;
 t_stat r;

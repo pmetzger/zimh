@@ -475,13 +475,21 @@ int32 mba_rdbufW (uint32 mbus, int32 bc, uint16 *buf);
 int32 mba_wrbufW (uint32 mbus, int32 bc, const uint16 *buf);
 int32 mba_chbufW (uint32 mbus, int32 bc, uint16 *buf);
 int32 mba_get_bc (uint32 mbus);
+void init_mbus_tab (void);
+t_stat build_mbus_tab (DEVICE *dptr, DIB *dibp);
 void mba_upd_ata (uint32 mbus, uint32 val);
 void mba_set_exc (uint32 mbus);
 void mba_set_don (uint32 mbus);
 void mba_set_enbdis (DEVICE *dptr);
 t_stat mba_show_num (FILE *st, UNIT *uptr, int32 val, const void *desc);
 
+int32 sbia_rd (int32 pa, int32 lnt);
+void sbia_wr (int32 pa, int32 val, int32 lnt);
+t_stat sbi_rd (int32 pa, int32 *val, int32 lnt);
+t_stat sbi_wr (int32 pa, int32 val, int32 lnt);
 t_stat show_nexus (FILE *st, UNIT *uptr, int32 val, const void *desc);
+void init_nexus_tab (void);
+t_stat build_nexus_tab (DEVICE *dptr, DIB *dibp);
 
 void sbi_set_errcnf (void);
 

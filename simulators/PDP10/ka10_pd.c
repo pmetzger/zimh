@@ -135,26 +135,53 @@ pd_srv(UNIT * uptr)
 
 const char *pd_description (DEVICE *dptr)
 {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return "Paul DeCoriolis clock";
 }
 
 t_stat pd_set_on(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     DEVICE *dptr = &pd_dev;
+
     dptr->flags &= ~PD_OFF;
     return SCPE_OK;
 }
 
 t_stat pd_set_off(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) cptr;
+    (void) desc;
+
     DEVICE *dptr = &pd_dev;
+
     dptr->flags |= PD_OFF;
     return SCPE_OK;
 }
 
 t_stat pd_show_on(FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     DEVICE *dptr = &pd_dev;
+
     fprintf (st, "%s", (dptr->flags & PD_OFF) ? "off" : "on");
     return SCPE_OK;
 }

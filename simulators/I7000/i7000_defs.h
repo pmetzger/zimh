@@ -637,5 +637,6 @@ extern const char mem_to_ascii[64];
 extern const char *cpu_description(DEVICE *dptr);
 extern const char *chan_type_name[];
 extern void help_set_chan_type(FILE *st, DEVICE *dptr, const char *name);
+extern void sys_init(void);
 
 #endif /* _I7000_H_ */

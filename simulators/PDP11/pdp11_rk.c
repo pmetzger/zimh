@@ -472,6 +472,10 @@ DEVICE rk_dev = {
 
 t_stat rk_rd (int32 *data, int32 PA, int32 access)
 {
+/* Memory-mapped I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 UNIT *uptr;
 
 switch ((PA >> 1) & 07) {                               /* decode PA<3:1> */
@@ -893,6 +897,10 @@ return 0;                                               /* passive release */
 
 t_stat rk_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 int32 i;
 UNIT *uptr;
 
@@ -938,6 +946,12 @@ return sim_disk_detach (uptr);
 
 t_stat rk_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "%s", drv_tab[GET_DTYPE (uptr->flags)].name);
 return SCPE_OK;
 }
@@ -948,6 +962,11 @@ return SCPE_OK;
 
 t_stat rk_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 return SCPE_NOFNC;
 }
 
@@ -987,6 +1006,10 @@ static const uint16 boot_rom[] = {
 
 t_stat rk_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 size_t i;
 
 for (i = 0; i < BOOT_LEN; i++)
@@ -1001,6 +1024,12 @@ return SCPE_OK;
 
 t_stat rk_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 const char *const text =
 /*567901234567890123456789012345678901234567890123456789012345678901234567890*/
 " RK11/RKV11 cartridge disk (RK05) controller (RK)\n"
@@ -1049,5 +1078,9 @@ return SCPE_OK;
 
 const char *rk_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "RK11/RKV11 cartridge disk controller";
 }

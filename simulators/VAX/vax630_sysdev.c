@@ -158,6 +158,7 @@ void nvr_wr (int32 pa, int32 val, int32 lnt);
 int32 ka_rd (int32 pa, int32 lnt);
 void ka_wr (int32 pa, int32 val, int32 lnt);
 t_stat sysd_powerup (void);
+int32 sysd_hlt_enb (void);
 int32 con_halt (int32 code, int32 cc);
 
 extern int32 qbmap_rd (int32 pa, int32 lnt);
@@ -292,6 +293,10 @@ DEVICE sysd_dev = {
 
 int32 rom_rd (int32 pa, int32 lnt)
 {
+/* Generic memory read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = ((pa - ROMBASE) & ROMAMASK) >> 2;
 int32 val = rom[rg];
 
@@ -314,6 +319,11 @@ return;
 
 t_stat rom_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if ((vptr == NULL) || (addr & 03))
@@ -328,6 +338,11 @@ return SCPE_OK;
 
 t_stat rom_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if (addr & 03)
@@ -342,6 +357,10 @@ return SCPE_OK;
 
 t_stat rom_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (rom == NULL)
     rom = (uint32 *) calloc (ROMSIZE >> 2, sizeof (uint32));
 if (rom == NULL)
@@ -351,6 +370,12 @@ return SCPE_OK;
 
 t_stat rom_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Read-only memory (ROM)\n\n");
 fprintf (st, "The boot ROM consists of a single unit, simulating the 64KB boot ROM.  It has\n");
 fprintf (st, "no registers.  The boot ROM is loaded with a binary byte stream using the \n");
@@ -375,6 +400,10 @@ return SCPE_OK;
 
 const char *rom_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "read-only memory";
 }
 
@@ -382,6 +411,10 @@ return "read-only memory";
 
 int32 nvr_rd (int32 pa, int32 lnt)
 {
+/* Generic memory read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa + 1 - NVRBASE) >> 1;
 int32 result;
 
@@ -434,6 +467,11 @@ else {
 
 t_stat nvr_ex (t_value *vptr, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if ((vptr == NULL) || (addr & 03))
@@ -448,6 +486,11 @@ return SCPE_OK;
 
 t_stat nvr_dep (t_value val, t_addr exta, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 uint32 addr = (uint32) exta;
 
 if (addr & 03)
@@ -463,6 +506,10 @@ return SCPE_OK;
 
 t_stat nvr_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (nvr == NULL) {
     nvr = (uint8 *) calloc (NVRSIZE, sizeof (*nvr));
     nvr_unit.filebuf = (void *)nvr;
@@ -474,6 +521,13 @@ return SCPE_OK;
 
 t_stat nvr_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Non-volatile Memory (NVR)\n\n");
 fprintf (st, "The NVR simulates %d bytes of battery-backed up memory.\n", NVRSIZE);
 fprintf (st, "When the simulator starts, NVR is cleared to 0, and the battery-low indicator\n");
@@ -533,6 +587,10 @@ return r;
 
 const char *nvr_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "non-volatile memory";
 }
 
@@ -797,6 +855,10 @@ WriteReg (pa & ~03, dat, L_LONG);
 
 int32 ka_rd (int32 pa, int32 lnt)
 {
+/* Generic memory read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa - KABASE) >> 2;
 
 switch (rg) {
@@ -819,6 +881,10 @@ return 0;
 
 void ka_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Generic memory write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa - KABASE) >> 2;
 
 switch (rg) {
@@ -848,6 +914,11 @@ return ka_bdr & BDR_BRKENB;
 
 int32 machine_check (int32 p1, int32 opc, int32 cc, int32 delta)
 {
+/* Generic system machine-check signature.
+   This implementation does not use every parameter. */
+(void) opc;
+(void) delta;
+
 int32 st, p2, acc;
 
 if (in_ie) {
@@ -920,6 +991,11 @@ return run_cmd (flag, "CPU");
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 t_stat r;
 
 PC = ROMBASE;
@@ -939,30 +1015,60 @@ return SCPE_OK;
 
 t_stat sysd_set_diag (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (cptr != NULL) ka_diag_full = strcmp(cptr, "MIN");
 return SCPE_OK;
 }
 
 t_stat sysd_show_diag (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf(st, "DIAG=%s", (ka_diag_full ? "full" :"min"));
 return SCPE_OK;
 }
 
 t_stat sysd_set_halt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 ka_hltenab = val;
 return SCPE_OK;
 }
 
 t_stat sysd_show_halt (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf(st, "%s", ka_hltenab ? "NOAUTOBOOT" : "AUTOBOOT");
 return SCPE_OK;
 }
 
 t_stat sysd_show_leds (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 fprintf (st, "leds=(%s,%s,%s,%s)", ka_bdr&8 ? "ON" : "OFF",
                                    ka_bdr&4 ? "ON" : "OFF",
                                    ka_bdr&2 ? "ON" : "OFF",
@@ -975,6 +1081,10 @@ return SCPE_OK;
 
 t_stat sysd_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 if (sim_switches & SWMASK ('P')) sysd_powerup ();       /* powerup? */
 ka_bdr = (BDR_POK | \
     ((ka_diag_full ? BDC_NORM : BDC_SKPM) << BDR_V_BDC) | \
@@ -992,6 +1102,10 @@ return SCPE_OK;
 
 const char *sysd_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "system devices";
 }
 
@@ -1005,6 +1119,12 @@ return SCPE_OK;
 
 t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 char gbuf[CBUFSIZE];
 
 if ((cptr == NULL) || (!*cptr))
@@ -1074,6 +1194,13 @@ return SCPE_OK;
 
 t_stat cpu_model_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Initial memory size is 16MB.\n\n");
 fprintf (st, "The CPU supports the BOOT command and is the only VAX device to do so.  Note\n");
 fprintf (st, "that the behavior of the bootstrap depends on the capabilities of the console\n");
@@ -1087,6 +1214,12 @@ return SCPE_OK;
 
 t_stat cpu_show_memory (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+/* Generic show signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 uint32 memsize = (uint32)(MEMSIZE>>20);
 uint32 baseaddr = 0;
 struct {

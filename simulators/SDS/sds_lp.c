@@ -68,7 +68,6 @@ t_stat lpt_status (UNIT *uptr, int32 cnt);
 t_stat lpt_bufout (UNIT *uptr);
 void lpt_end_op (int32 fl);
 t_stat lpt (uint32 fnc, uint32 inst, uint32 *dat);
-int8 sds_to_ascii (int8 c);
 
 /* LPT data structures
 
@@ -321,6 +320,10 @@ return cnt;
 
 t_stat lpt_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 chan_disc (lpt_dib.chan);                               /* disconnect */
 lpt_spc = 0;                                            /* clr state */
 lpt_sta = 0;

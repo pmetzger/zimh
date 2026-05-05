@@ -256,6 +256,10 @@ static REG adcs6_reg[] = {
 #define ADCS6_NAME  "ADC Super-Six Single-Board Computer"
 
 static const char* adcs6_description(DEVICE *dptr) {
+    /* Generic device description signature.
+       This implementation does not use every parameter. */
+    (void) dptr;
+
     return ADCS6_NAME;
 }
 t_stat adcs6_show_vectable(FILE* st, UNIT* uptr, int32 val, const void* desc);
@@ -590,6 +594,9 @@ static uint8 motor_timeout = 0;
 /* Unit service routine */
 static t_stat adcs6_svc (UNIT *uptr)
 {
+    /* Generic unit service signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
 
     if(adcs6_info->head_sel == 1) {
         motor_timeout ++;
@@ -724,6 +731,11 @@ static t_stat adcs6_reset(DEVICE *dptr)
 
 static t_stat adcs6_boot(int32 unitno, DEVICE *dptr)
 {
+    /* Generic boot signature.
+       This implementation does not use every parameter. */
+    (void) unitno;
+    (void) dptr;
+
     sim_debug(VERBOSE_MSG, &adcs6_dev, "Booting ADCS6 Controller\n");
 
     adcs6_info->rom_disabled = FALSE;
@@ -779,6 +791,12 @@ static int32 adcs6rom(const int32 Addr, const int32 write, const int32 data)
 /* Set ROM to ADC or DIGITEX */
 static t_stat adcs6_dev_set_rom(UNIT* uptr, int32 value, const char* cptr, void* desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) value;
+    (void) desc;
+
     if (cptr == NULL)
         return SCPE_ARG;
 
@@ -804,6 +822,12 @@ char* adcs6_rom_type_str[] = {
 /* Show current ROM selection */
 static t_stat adcs6_dev_show_rom(FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) uptr;
+    (void) val;
+    (void) desc;
+
     fprintf(st, "ROM=%s", adcs6_rom_type_str[adcs6_info->rom_type]);
 
     return SCPE_OK;
@@ -811,6 +835,11 @@ static t_stat adcs6_dev_show_rom(FILE* st, UNIT* uptr, int32 val, const void* de
 
 t_stat adcs6_show_vectable(FILE* st, UNIT* uptr, int32 val, const void* desc)
 {
+    /* Generic show modifier signature.
+       This implementation does not use every parameter. */
+    (void) val;
+    (void) desc;
+
     uint8 i;
     int32 vectable = (IR_S & 0xFF00);
     int32 vector;
@@ -831,6 +860,10 @@ t_stat adcs6_show_vectable(FILE* st, UNIT* uptr, int32 val, const void* desc)
 /* Disk Control/Flags Register, 0x14 */
 static int32 adcs6_control(const int32 port, const int32 io, const int32 data)
 {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+
     int32 result = 0;
     if(io) { /* I/O Write */
 
@@ -886,6 +919,10 @@ static int32 adcs6_control(const int32 port, const int32 io, const int32 data)
 /* ADC Super Six DMA (Z80-DMA) */
 static int32 adcs6_dma(const int32 port, const int32 io, const int32 data)
 {
+    /* I/O dispatch signature.
+       This implementation does not use every parameter. */
+    (void) port;
+
     int32 result = 0xff;
     if(io) { /* I/O Write */
         sim_debug(DMA_MSG, &adcs6_dev, DEV_NAME ": " ADDRESS_FORMAT

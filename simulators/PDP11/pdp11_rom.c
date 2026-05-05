@@ -29,6 +29,7 @@ t_stat rom_reset (DEVICE *dptr);
 t_stat rom_boot (int32 u, DEVICE *dptr);
 t_stat rom_set_addr (UNIT *, int32, const char *, void *);
 t_stat rom_show_addr (FILE *, UNIT *, int32, const void *);
+static t_stat rom_make_dib (UNIT *uptr);
 t_stat rom_attach (UNIT *uptr, const char *cptr);
 t_stat rom_detach (UNIT *uptr);
 t_stat rom_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr);
@@ -70,6 +71,11 @@ DEVICE rom_dev = {
 
 t_stat rom_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 int32 data;
 t_stat r;
 
@@ -82,6 +88,10 @@ return SCPE_OK;
 
 t_stat rom_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic memory deposit signature.
+   This implementation does not use every parameter. */
+(void) sw;
+
 uint16 *image = (uint16 *)uptr->filebuf;
 
 image[(addr - uptr->unit_base) >> 1] = val;
@@ -90,6 +100,10 @@ return SCPE_OK;
 
 t_stat rom_rd (int32 *data, int32 PA, int32 access)
 {
+/* Bus read callback signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int i;
 for (i = 0; i < ROM_UNITS; i++) {
     if (PA >= rom_unit[i].unit_base && PA < rom_unit[i].unit_end) {
@@ -115,12 +129,21 @@ return SCPE_OK;
 
 t_stat rom_boot (int32 u, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 cpu_set_boot (rom_unit[u].unit_base);
 return SCPE_OK;
 }
 
 t_stat rom_set_addr (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 int32 addr;
 t_stat r;
 
@@ -140,6 +163,11 @@ return SCPE_OK;
 
 t_stat rom_show_addr (FILE *f, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) val;
+(void) desc;
+
 if (uptr == NULL)
     return SCPE_IERR;
 if (uptr->unit_base != uptr->unit_end)
@@ -149,7 +177,7 @@ else
 return SCPE_OK;
 }
 
-t_stat rom_make_dib (UNIT *uptr)
+static t_stat rom_make_dib (UNIT *uptr)
 {
 DIB *dib = &rom_dib[uptr - rom_unit];
 
@@ -199,6 +227,13 @@ return detach_unit (uptr);
 
 t_stat rom_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "ROM, Read-Only Memory\n\n");
 fprintf (st, "The ROM device can be used to add ROM modules to the I/O page.\n");
 fprintf (st, "First the ROM unit ADDRESS has to be set, and then the ATTACH command\n");
@@ -209,6 +244,13 @@ return SCPE_OK;
 
 t_stat rom_help_attach (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic attach help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "The ATTACH command is used to specify the contents of a ROM unit.\n");
 fprintf (st, "Any file can be used.  The file contents must be a flat binary image.\n");
 fprintf (st, "The unit ADDRESS must be set first.\n");
@@ -217,5 +259,9 @@ return SCPE_OK;
 
 const char *rom_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "Read-Only Memory";
 }

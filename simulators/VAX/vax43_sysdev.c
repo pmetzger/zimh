@@ -430,14 +430,14 @@ else {
     }
 }
 
-int32 ddb_rd (int32 pa)
+static int32 ddb_rd (int32 pa)
 {
 int32 rg = ((pa - D128BASE) >> 2);
 rg = rg & 0x7FFF;
 return ddb[rg];
 }
 
-void ddb_wr (int32 pa, int32 val, int32 lnt)
+static void ddb_wr (int32 pa, int32 val, int32 lnt)
 {
 int32 rg = ((pa - D128BASE) >> 2);
 rg = rg & 0x7FFF;
@@ -450,24 +450,34 @@ else ddb[rg] = val;
 return;
 }
 
-int32 sesr_rd (int32 pa)
+static int32 sesr_rd (int32 pa)
 {
+/* Register read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+
 return 0;
 }
 
-void sesr_wr (int32 pa, int32 val, int32 lnt)
+static void sesr_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) val;
+(void) lnt;
+
 return;
 }
 
-int32 cdg_rd (int32 pa)
+static int32 cdg_rd (int32 pa)
 {
 int32 row = CDG_GETROW (pa);
 
 return cdg_dat[row];
 }
 
-void cdg_wr (int32 pa, int32 val, int32 lnt)
+static void cdg_wr (int32 pa, int32 val, int32 lnt)
 {
 int32 row = CDG_GETROW (pa);
 
@@ -480,22 +490,32 @@ if (lnt < L_LONG) {                                     /* byte or word? */
 cdg_dat[row] = val;                                     /* store data */
 }
 
-int32 ctg_rd (int32 pa)
+static int32 ctg_rd (int32 pa)
 {
+/* Register read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+
 return 0;
 }
 
-void ctg_wr (int32 pa, int32 val, int32 lnt)
+static void ctg_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) val;
+(void) lnt;
+
 return;
 }
 
-int32 diag_rd (int32 pa)
+static int32 diag_rd (int32 pa)
 {
 return ReadL (pa & 0xFFFFFF);
 }
 
-void diag_wr (int32 pa, int32 val, int32 lnt)
+static void diag_wr (int32 pa, int32 val, int32 lnt)
 {
 if (lnt >= L_LONG)                                      /* long, quad? */
     WriteL (pa & 0xFFFFFF, val);
@@ -505,8 +525,12 @@ else WriteB (pa & 0xFFFFFF, val);                       /* byte */
 return;
 }
 
-int32 cfg_rd (int32 pa)
+static int32 cfg_rd (int32 pa)
 {
+/* Register read signature.
+   This implementation does not use every parameter. */
+(void) pa;
+
 int32 val = ka_cfgtst | (CFGT_M_SIM << CFGT_V_SIM);
 t_addr mem = MEMSIZE;
 uint32 sc;
@@ -518,8 +542,14 @@ for (sc = CFGT_V_SIM; mem > 0; sc++) {
 return val;
 }
 
-void ioreset_wr (int32 pa, int32 val, int32 lnt)
+static void ioreset_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) pa;
+(void) val;
+(void) lnt;
+
 reset_all (7);
 }
 
@@ -712,6 +742,10 @@ struct reglink regtable[] = {
 
 int32 ReadReg (uint32 pa, int32 lnt)
 {
+/* Register read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 struct reglink *p;
 
 for (p = &regtable[0]; p->low != 0; p++) {
@@ -732,6 +766,10 @@ return 0xFFFFFFFF;
 
 int32 ReadRegU (uint32 pa, int32 lnt)
 {
+/* Unaligned register read signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 return ReadReg (pa & ~03, L_LONG);
 }
 
@@ -810,6 +848,10 @@ return 0;
 
 void ka_wr (int32 pa, int32 val, int32 lnt)
 {
+/* Register write signature.
+   This implementation does not use every parameter. */
+(void) lnt;
+
 int32 rg = (pa - KABASE) >> 2;
 
 switch (rg) {
@@ -875,6 +917,10 @@ return cur_tir;
 
 t_stat tmr_svc (UNIT *uptr)
 {
+/* Generic unit service signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+
 tmr_sched ();                                           /* reactivate */
 return SCPE_OK;
 }
@@ -901,6 +947,11 @@ else {
 
 int32 machine_check (int32 p1, int32 opc, int32 cc, int32 delta)
 {
+/* VAX machine-check handler signature.
+   This implementation does not use every parameter. */
+(void) opc;
+(void) delta;
+
 int32 p2, acc;
 
 if (in_ie) {
@@ -969,6 +1020,11 @@ return run_cmd (flag, "CPU");
 
 t_stat cpu_boot (int32 unitno, DEVICE *dptr)
 {
+/* Generic boot signature.
+   This implementation does not use every parameter. */
+(void) unitno;
+(void) dptr;
+
 t_stat r;
 DEVICE *cdptr;
 int32 i;
@@ -1003,6 +1059,10 @@ return SCPE_OK;
 
 t_stat sysd_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_cancel (&sysd_unit);
 ka_mser = 0;
 ka_mear = 0;
@@ -1028,11 +1088,20 @@ return SCPE_OK;
 
 const char *sysd_description (DEVICE *dptr)
 {
+/* Generic device description signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 return "system devices";
 }
 
 t_stat auto_config (const char *name, int32 nctrl)
 {
+/* Generic autoconfiguration signature.
+   This implementation does not use every parameter. */
+(void) name;
+(void) nctrl;
+
 return SCPE_OK;
 }
 
@@ -1043,6 +1112,12 @@ return SCPE_OK;
 
 t_stat cpu_set_model (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 char gbuf[CBUFSIZE];
 
 if ((cptr == NULL) || (!*cptr))
@@ -1099,6 +1174,13 @@ return SCPE_OK;
 
 t_stat cpu_model_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
+/* Generic device help signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+(void) uptr;
+(void) flag;
+(void) cptr;
+
 fprintf (st, "Initial memory size is 16MB.\n\n");
 fprintf (st, "The simulator is booted with the BOOT command:\n\n");
 fprintf (st, "   sim> BOOT\n\n");

@@ -340,6 +340,10 @@ uba_rh_write(DEVICE *dptr, t_addr addr, uint16 data, int32 access) {
 
 int
 uba_rh_read(DEVICE *dptr, t_addr addr, uint16 *data, int32 access) {
+    /* Generic UBA read signature.
+       This implementation does not use every parameter. */
+    (void) access;
+
     int             r = 1;
     struct pdp_dib  *dibp = (DIB *) dptr->ctxt;
     struct rh_if    *rhc;
@@ -436,8 +440,14 @@ extern uint32  eb_ptr;
 t_stat
 rh_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+    /* Generic set modifier signature.
+       This implementation does not use every parameter. */
+    (void) cptr;
+    (void) desc;
+
     DEVICE *dptr;
     DIB    *dibp;
+
     dptr = find_dev_from_unit (uptr);
     if (dptr == NULL)
        return SCPE_IERR;
@@ -451,6 +461,11 @@ rh_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 t_stat rh_show_type (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+   /* Generic show modifier signature.
+      This implementation does not use every parameter. */
+   (void) val;
+   (void) desc;
+
    DEVICE *dptr;
 
    if (uptr == NULL)
@@ -796,6 +811,12 @@ rh_devirq(uint32 dev, t_addr addr) {
 /* Reset the RH to a known clear condiguration */
 void rh_reset(DEVICE *dptr, struct rh_if *rhc)
 {
+    /* Shared helper signature.
+       This build variant does not use every parameter. */
+#if !KS
+    (void) dptr;
+#endif
+
     rhc->status = 0;
     rhc->attn = 0;
     rhc->rae = 0;
@@ -828,6 +849,12 @@ void rh_setattn(struct rh_if *rhc, int unit)
 
 void rh_error(struct rh_if *rhc)
 {
+    /* Shared helper signature.
+       This build variant does not use every parameter. */
+#if KS
+    (void) rhc;
+#endif
+
 #if !KS
     if (rhc->imode == 2)
        rhc->status |= RH20_DR_EXC;
@@ -837,6 +864,12 @@ void rh_error(struct rh_if *rhc)
 /* Decrement block count for RH20, nop for RH10 */
 int rh_blkend(struct rh_if *rhc)
 {
+     /* Shared helper signature.
+        This build variant does not use every parameter. */
+#if !KL
+     (void) rhc;
+#endif
+
 #if KL
      if (rhc->imode == 2) {
          rhc->cia = (rhc->cia + 1) & 01777;
@@ -862,6 +895,13 @@ void rh_setirq(struct rh_if *rhc) {
 
 /* Generate the DF10 complete word */
 void rh_writecw(struct rh_if *rhc, int nxm) {
+     /* Shared helper signature.
+        This build variant does not use every parameter. */
+#if KS
+     (void) rhc;
+     (void) nxm;
+#endif
+
 #if !KS
      uint64       wrd1;
 #if KL
@@ -991,6 +1031,12 @@ void rh20_setup(struct rh_if *rhc)
 /* Setup for a DF10 transfer */
 void rh_setup(struct rh_if *rhc, uint32 addr)
 {
+     /* Shared helper signature.
+        This build variant does not use every parameter. */
+#if KS
+     (void) addr;
+#endif
+
 #if !KS
      rhc->cia = addr & ICWA;
      rhc->ccw = rhc->cia;
@@ -1001,8 +1047,8 @@ void rh_setup(struct rh_if *rhc, uint32 addr)
 
 
 /* Fetch the next IO control word */
-int rh_fetch(struct rh_if *rhc) {
 #if !KS
+static int rh_fetch(struct rh_if *rhc) {
      uint64      data;
      int         reg;
      DEVICE      *dptr = NULL;
@@ -1059,9 +1105,9 @@ int rh_fetch(struct rh_if *rhc) {
      rhc->wcr = (uint32)((data >> CSHIFT) & WMASK);
      rhc->cda = (uint32)(data & AMASK);
      rhc->ccw = (uint32)((rhc->ccw + 1) & AMASK);
-#endif
      return 1;
 }
+#endif
 
 /* Read next word */
 int rh_read(struct rh_if *rhc) {

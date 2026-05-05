@@ -335,6 +335,10 @@ DEVICE lps_dev = {
 
 static SIGNALS_VALUE lps_interface (const DIB *dibptr, INBOUND_SET inbound_signals, HP_WORD inbound_value)
 {
+/* HP2100 I/O interface signature.
+   This implementation does not use every parameter. */
+(void) dibptr;
+
 INBOUND_SIGNAL signal;
 INBOUND_SET    working_set = inbound_signals;
 SIGNALS_VALUE  outbound    = { ioNONE, 0 };
@@ -624,6 +628,12 @@ return SCPE_OK;
 
 static t_stat lps_restart (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) value;
+(void) cptr;
+(void) desc;
+
 if (lps.control && !sim_is_active (uptr))
     sim_activate (uptr, 1);                             /* reschedule I/O */
 return SCPE_OK;
@@ -633,6 +643,13 @@ return SCPE_OK;
 
 static t_stat lps_poweroff (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) value;
+(void) cptr;
+(void) desc;
+
 lps_power = LPS_OFF;                                    /* change state */
 tprintf (lps_dev, TRACE_STATE, "Power state is OFF\n");
 return SCPE_OK;
@@ -642,6 +659,13 @@ return SCPE_OK;
 
 static t_stat lps_poweron (UNIT *uptr, int32 value, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) value;
+(void) cptr;
+(void) desc;
+
 if (lps_unit.flags & UNIT_DIAG) {                       /* diag mode? */
     lps_power = LPS_ON;                                 /* no delay */
     tprintf (lps_dev, TRACE_STATE, "Power state is ON\n");
@@ -705,6 +729,12 @@ return result;
 
 static t_stat lps_set_timing (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 uint32 i, factor;
 
 lps_fast_timing = (val != 0);                           /* determine choice */
@@ -724,6 +754,12 @@ return SCPE_OK;
 
 static t_stat lps_show_timing (FILE *st, UNIT *uptr, int32 val, const void *desc)
 {
+/* Generic show modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) desc;
+
 if (lps_fast_timing)
     fputs ("fast timing", st);
 else

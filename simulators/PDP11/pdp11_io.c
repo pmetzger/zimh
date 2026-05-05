@@ -127,7 +127,7 @@ return SCPE_NXM;
    Outputs:
         status  =       TRUE or FALSE
 */
-t_bool iopageCPUReg (uint32 pa)
+static t_bool iopageCPUReg (uint32 pa)
 {
 int32 idx;
 DIB *dibp;
@@ -189,6 +189,10 @@ return 0;
 
 t_stat ubm_rd (int32 *data, int32 addr, int32 access)
 {
+/* Memory-mapped I/O dispatch signature.
+   This implementation does not use every parameter. */
+(void) access;
+
 int32 pg = (addr >> 2) & UBM_M_PN;
 
 *data = (addr & 2)? ((ub_map[pg] >> 16) & 077):

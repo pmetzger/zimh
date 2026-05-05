@@ -227,7 +227,7 @@ typedef struct _seginfo {
 SEGINFO* seghash[SEGHASHSIZE];
 #define SEGHASHFUNC(i) (i % SEGHASHSIZE)
 
-t_stat dbg_segtrackinit(void) {
+static t_stat dbg_segtrackinit(void) {
   int i;
   for (i=0; i<SEGHASHSIZE; i++)
     seghash[i] = NULL;
@@ -350,7 +350,7 @@ typedef struct _procinfo {
   uint16 ipc;
 } PROCINFO;
 
-const char* find_procname(PROCINFO* p) {
+static const char* find_procname(PROCINFO* p) {
   ALIASES* a;
   int dummy;
   static char buf[100];
@@ -443,5 +443,4 @@ t_stat dbg_init(void) {
 
   return SCPE_OK;
 }
-
 

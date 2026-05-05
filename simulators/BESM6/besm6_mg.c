@@ -363,7 +363,7 @@ static void log_data (t_value *data, int nwords)
 /*
  * Writing to a tape.
  */
-void mg_write (UNIT *u)
+static void mg_write (UNIT *u)
 {
     KMT *c = unit_to_ctlr (u);
     int unit = u - mg_unit;
@@ -438,7 +438,7 @@ void mg_format (uint32 op)
 /*
  * Reading from a tape.
  */
-void mg_read (UNIT *u)
+static void mg_read (UNIT *u)
 {
     KMT *c = unit_to_ctlr (u);
     t_mtrlnt len;

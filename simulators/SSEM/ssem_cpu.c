@@ -171,6 +171,10 @@ return reason;
 
 t_stat cpu_reset (DEVICE *dptr)
 {
+/* Generic device reset signature.
+   This implementation does not use every parameter. */
+(void) dptr;
+
 sim_brk_types = sim_brk_dflt = SWMASK ('E');
 return SCPE_OK;
 }
@@ -179,6 +183,11 @@ return SCPE_OK;
 
 t_stat cpu_ex (t_value *vptr, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic examine signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE) return SCPE_NXM;
 if (vptr != NULL) *vptr = Read (addr);
 return SCPE_OK;
@@ -188,6 +197,11 @@ return SCPE_OK;
 
 t_stat cpu_dep (t_value val, t_addr addr, UNIT *uptr, int32 sw)
 {
+/* Generic deposit signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) sw;
+
 if (addr >= MEMSIZE) return SCPE_NXM;
 Write (addr, val);
 return SCPE_OK;

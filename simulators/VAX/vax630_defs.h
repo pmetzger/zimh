@@ -432,6 +432,8 @@ int32 Map_ReadB (uint32 ba, int32 bc, uint8 *buf);
 int32 Map_ReadW (uint32 ba, int32 bc, uint16 *buf);
 int32 Map_WriteB (uint32 ba, int32 bc, const uint8 *buf);
 int32 Map_WriteW (uint32 ba, int32 bc, const uint16 *buf);
+int32 va_mem_rd (int32 pa);
+void va_mem_wr (int32 pa, int32 val, int32 lnt);
 
 /* Function prototypes for system-specific unaligned support */
 

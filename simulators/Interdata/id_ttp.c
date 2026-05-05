@@ -257,6 +257,12 @@ return SCPE_OK;
 
 t_stat ttp_set_mode (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 ttp_unit[TTO].flags = (ttp_unit[TTO].flags & ~TT_MODE) | val;
 if (val == TT_MODE_7P)
     val = TT_MODE_7B;
@@ -268,6 +274,13 @@ return SCPE_OK;
 
 t_stat ttp_set_break (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) val;
+(void) cptr;
+(void) desc;
+
 if (ttp_dev.flags & DEV_DIS)
     return SCPE_NOFNC;
 ttp_sta = ttp_sta | STA_FR;
@@ -282,6 +295,12 @@ return SCPE_OK;
 
 t_stat ttp_set_enbdis (UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
+/* Generic set modifier signature.
+   This implementation does not use every parameter. */
+(void) uptr;
+(void) cptr;
+(void) desc;
+
 extern DEVICE tt_dev;
 extern t_stat tt_reset (DEVICE *dptr);
 
