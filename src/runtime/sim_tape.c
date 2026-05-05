@@ -75,6 +75,7 @@
 
 #include "sim_defs.h"
 #include "sim_tape.h"
+#include "sim_tape_internal.h"
 #include <ctype.h>
 
 #if defined SIM_ASYNCH_IO
@@ -360,63 +361,11 @@ return FALSE;
 #define MIN_RECORD_SIZE    14   /* Mag tape records <14 bytes are considered noise */
 #define MAX_RECORD_SIZE 65535   /* DEC tape controllers have a 16-bit byte count reg */
 
-typedef struct VOL1 {
-    char type[3];               /* VOL  */
-    char num;                   /* 1    */
-    char ident[6];              /* <ansi <a> characters blank padded > */
-    char accessibity;           /* blank */
-    char reserved1[13];         /*      */
-    char implement[13];         /*      */
-    char owner[14];             /*      */
-    char reserved2[28];         /*      */
-    char standard;              /* 1,3 or 4  */
-    } VOL1;
+/* Primary ANSI file name field width. */
+#define ANSI_HDR1_FILE_IDENT_LEN (sizeof (((ANSI_HDR1 *)0)->file_ident))
 
-typedef struct HDR1 {       /* Also EOF1, EOV1 */
-    char type[3];               /* HDR|EOF|EOV  */
-    char num;                   /* 1    */
-    char file_ident[17];        /* filename */
-    char file_set[6];           /* label ident */
-    char file_section[4];       /* 0001 */
-    char file_sequence[4];      /* 0001 */
-    char generation_number[4];  /* 0001 */
-    char version_number[2];     /* 00 */
-    char creation_date[6];      /* cyyddd */
-    char expiration_date[6];
-    char accessibility;         /* space */
-    char block_count[6];        /* 000000 */
-    char system_code[13];       /* */
-    char reserved[7];           /* blank */
-    } HDR1;
-
-typedef struct HDR2 {       /* Also EOF2, EOV2 */
-    char type[3];               /* HDR  */
-    char num;                   /* 2    */
-    char record_format;         /* F(fixed)|D(variable)|S(spanned) */
-    char block_length[5];       /* label ident */
-    char record_length[5];      /*  */
-    char reserved_os1[21];      /* */
-    char carriage_control;      /* A - Fortran CC, M - Record contained CC, space - CR/LF to be added */
-    char reserved_os2[13];      /* */
-    char buffer_offset[2];      /* */
-    char reserved_std[28];      /* */
-    } HDR2;
-
-typedef struct HDR3 {       /* Also EOF3, EOV3 */
-    char type[3];               /* HDR  */
-    char num;                   /* 3    */
-    char rms_attributes[64];    /* 32 bytes of RMS attributes, converted to hex */
-    char reserved[12];          /* */
-    } HDR3;
-
-typedef struct HDR4 {       /* Also EOF4, EOV4 */
-    char type[3];               /* HDR  */
-    char num;                   /* 4    */
-    char blank;                 /* blank */
-    char extra_name[62];        /*  */
-    char extra_name_used[2];    /* 99 */
-    char unused[11];
-    } HDR4;
+/* Continuation ANSI file name field width. */
+#define ANSI_HDR4_EXTRA_NAME_LEN (sizeof (((ANSI_HDR4 *)0)->extra_name))
 
 typedef struct TAPE_RECORD {
     size_t size;
@@ -430,7 +379,7 @@ typedef struct MEMORY_TAPE {
     uint32 array_size;      /* allocated size of records array */
     size_t block_size;      /* tape block size */
     TAPE_RECORD **records;
-    VOL1 vol1;
+    ANSI_VOL1 vol1;
     } MEMORY_TAPE;
 
 const char HDR3_RMS_STREAM[] = "HDR3020002040000"
@@ -4579,7 +4528,7 @@ static void to_ansi_a (char *out, const char *in, size_t size)
         }
     }
 
-static void ansi_make_VOL1 (VOL1 *vol, const char *ident, uint32 ansi_type)
+static void ansi_make_VOL1 (ANSI_VOL1 *vol, const char *ident, uint32 ansi_type)
     {
     memset (vol, ' ', sizeof (*vol));
     memcpy (vol->type, "VOL", 3);
@@ -4588,12 +4537,13 @@ static void ansi_make_VOL1 (VOL1 *vol, const char *ident, uint32 ansi_type)
     vol->standard = ansi_args[ansi_type].vol1_standard;
     }
 
-static void ansi_make_HDR1 (HDR1 *hdr1, VOL1 *vol, HDR4 *hdr4, const char *filename, uint32 ansi_type)
+static void ansi_make_HDR1 (ANSI_HDR1 *hdr1, ANSI_VOL1 *vol, ANSI_HDR4 *hdr4, const char *filename, uint32 ansi_type)
     {
     const char *fn;
     struct stat statb;
     char extra_name_used[3] = "00";
     char *fn_cpy, *c, *ext;
+    size_t fn_len;
 
     memset (&statb, 0, sizeof (statb));
     (void)stat (filename, &statb);
@@ -4601,7 +4551,8 @@ static void ansi_make_HDR1 (HDR1 *hdr1, VOL1 *vol, HDR4 *hdr4, const char *filen
         fn = filename;
     else
         ++fn;                                   /* skip over slash or backslash */
-    fn_cpy = (char *)malloc (strlen (fn) + 1);
+    fn_len = strlen (fn);
+    fn_cpy = (char *)malloc (fn_len + 1);
     strcpy (fn_cpy, fn);
     fn = fn_cpy;
     ext = strrchr (fn_cpy, '.');
@@ -4617,10 +4568,15 @@ static void ansi_make_HDR1 (HDR1 *hdr1, VOL1 *vol, HDR4 *hdr4, const char *filen
     memcpy (hdr4->type, "HDR", 3);
     hdr4->num = '4';
     to_ansi_a (hdr1->file_ident, fn, sizeof (hdr1->file_ident));
-    if (strlen (fn) > 17) {
-        to_ansi_a (hdr4->extra_name, fn + 17, sizeof (hdr4->extra_name));
-        (void)snprintf (extra_name_used, sizeof (extra_name_used), "%02d",
-                        (int)(strlen (fn) - 17));
+    if (fn_len > ANSI_HDR1_FILE_IDENT_LEN) {
+        size_t extra_name_len = fn_len - ANSI_HDR1_FILE_IDENT_LEN;
+
+        if (extra_name_len > ANSI_HDR4_EXTRA_NAME_LEN)
+            extra_name_len = ANSI_HDR4_EXTRA_NAME_LEN;
+        to_ansi_a (hdr4->extra_name, fn + ANSI_HDR1_FILE_IDENT_LEN,
+                   ANSI_HDR4_EXTRA_NAME_LEN);
+        (void)snprintf (extra_name_used, sizeof (extra_name_used), "%02u",
+                        (unsigned int)extra_name_len);
         }
     memcpy (hdr4->extra_name_used, extra_name_used, 2);
     memcpy (hdr1->file_set, vol->ident, sizeof (hdr1->file_set));
@@ -4635,7 +4591,7 @@ static void ansi_make_HDR1 (HDR1 *hdr1, VOL1 *vol, HDR4 *hdr4, const char *filen
     free (fn_cpy);
     }
 
-static void ansi_make_HDR2 (HDR2 *hdr, t_bool fixed_record, size_t block_size, size_t record_size, uint32 ansi_type)
+static void ansi_make_HDR2 (ANSI_HDR2 *hdr, t_bool fixed_record, size_t block_size, size_t record_size, uint32 ansi_type)
     {
     char size[12];
     struct ansi_tape_parameters *ansi = &ansi_args[ansi_type];
@@ -4776,6 +4732,17 @@ value += (uint16) (strchr (rad50, *inbuf++) - rad50);
 return value;
 }
 
+/* Fill a DOS11 fallback filename field using the six-digit file count.
+   "name" is a fixed-width field in another string into which the result is
+   copied, not a NUL-terminated C string. */
+void sim_tape_dos11_fallback_name(char name[9], uint32 file_count)
+{
+    char temp[10];
+
+    (void)snprintf(temp, sizeof(temp), "%06u   ", file_count % 1000000);
+    memcpy(name, temp, 9);
+}
+
 /*
  * Sanitize a filename to generate a DOS-11 compatible version. Ignore
  * non-alphanumerics, upper case lower case characters and terminate on '.'
@@ -4901,12 +4868,8 @@ if (ptr != NULL)
  * If we were unable to generate a valid DOS11 filename, generate one based
  * on the file number on the tape (000000 - 999999).
  */
-if (fname[0] == ' ') {
-  char temp[10];
-
-  (void)snprintf (temp, sizeof (temp), "%06u   ", tape->file_count % 100000);
-  memcpy(fname, temp, sizeof(fname));
-}
+if (fname[0] == ' ')
+    sim_tape_dos11_fallback_name(fname, tape->file_count);
 
 hdr.fname[0] = dos11_ascR50 (&fname[0]);
 hdr.fname[1] = dos11_ascR50 (&fname[3]);
@@ -5054,10 +5017,10 @@ char file_sequence[5];
 int block_count = 0;
 char block_count_string[17];
 int error = FALSE;
-HDR1 hdr1;
-HDR2 hdr2;
-HDR3 hdr3;
-HDR4 hdr4;
+ANSI_HDR1 hdr1;
+ANSI_HDR2 hdr2;
+ANSI_HDR3 hdr3;
+ANSI_HDR4 hdr4;
 
 f = tape_open_and_check_file (filename);
 if (f == NULL)
@@ -5105,6 +5068,7 @@ if (max_record_size > tape->block_size) {
     return TRUE;
     }
 ansi_make_HDR1 (&hdr1, &tape->vol1, &hdr4, filename, tape->ansi_type);
+/* TODO: Validate that file_count is representable in file_sequence. */
 (void)snprintf (file_sequence, sizeof (file_sequence), "%04u",
                 1 + tape->file_count);
 memcpy (hdr1.file_sequence, file_sequence, sizeof (hdr1.file_sequence));
@@ -5168,6 +5132,7 @@ memcpy (hdr1.type, "EOF", sizeof (hdr1.type));
 memcpy (hdr2.type, "EOF", sizeof (hdr2.type));
 memcpy (hdr3.type, "EOF", sizeof (hdr3.type));
 memcpy (hdr4.type, "EOF", sizeof (hdr4.type));
+/* TODO: Validate that block_count is representable in block_count. */
 (void)snprintf (block_count_string, sizeof (block_count_string), "%06d",
                 block_count);
 memcpy (hdr1.block_count, block_count_string, sizeof (hdr1.block_count));

@@ -10,6 +10,7 @@
 #include "sim_defs.h"
 #include "sim_fio.h"
 #include "sim_tape.h"
+#include "sim_tape_internal.h"
 #include "test_scp_fixture.h"
 #include "test_simh_personality.h"
 #include "test_support.h"
@@ -809,11 +810,14 @@ static void test_sim_tape_ansi_vms_labels_format_metadata(void **state)
     record_length = read_next_tape_record(&fixture->unit, record,
                                           sizeof(record));
     assert_tape_record_field(record, record_length, 0, "HDR1");
-    assert_tape_record_field(record, record_length, 31, "0001");
+    assert_tape_record_field(record, record_length,
+                             offsetof(ANSI_HDR1, file_sequence), "0001");
     record_length = read_next_tape_record(&fixture->unit, record,
                                           sizeof(record));
     assert_tape_record_field(record, record_length, 0, "HDR2");
-    assert_tape_record_field(record, record_length, 4, "D0204800010");
+    assert_tape_record_field(record, record_length,
+                             offsetof(ANSI_HDR2, record_format),
+                             "D0204800010");
     assert_next_tape_record_field(&fixture->unit, 0, "HDR3");
     assert_int_equal(sim_tape_sprecf(&fixture->unit, &record_length),
                      MTSE_TMK);
@@ -824,7 +828,44 @@ static void test_sim_tape_ansi_vms_labels_format_metadata(void **state)
     record_length = read_next_tape_record(&fixture->unit, record,
                                           sizeof(record));
     assert_tape_record_field(record, record_length, 0, "EOF1");
-    assert_tape_record_field(record, record_length, 54, "000001");
+    assert_tape_record_field(record, record_length,
+                             offsetof(ANSI_HDR1, block_count), "000001");
+}
+
+/* Verify ANSI-VMS HDR4 reports the stored extra file name length. */
+static void test_sim_tape_ansi_vms_long_name_reports_stored_extra(void **state)
+{
+    static const char text[] = "HELLO\n";
+    struct sim_tape_fixture *fixture = *state;
+    char long_name[96];
+    char long_path[1024];
+    char expected_extra_name_used[3];
+    uint8 record[256] = {0};
+    t_mtrlnt record_length;
+
+    (void)snprintf(expected_extra_name_used, sizeof(expected_extra_name_used),
+                   "%02u", (unsigned int)sizeof(((ANSI_HDR4 *)0)->extra_name));
+    memset(long_name, 'a', sizeof(long_name));
+    memcpy(&long_name[sizeof(long_name) - 5], ".txt", 5);
+    assert_int_equal(simh_test_join_path(long_path, sizeof(long_path),
+                                         fixture->temp_dir, long_name),
+                     0);
+    assert_int_equal(simh_test_write_file(long_path, text, sizeof(text) - 1),
+                     0);
+    assert_int_equal(sim_tape_set_fmt(&fixture->unit, 0, "ANSI-VMS", NULL),
+                     SCPE_OK);
+    assert_int_equal(sim_tape_attach(&fixture->unit, long_path), SCPE_OK);
+
+    assert_next_tape_record_field(&fixture->unit, 0, "VOL1");
+    assert_next_tape_record_field(&fixture->unit, 0, "HDR1");
+    assert_next_tape_record_field(&fixture->unit, 0, "HDR2");
+    assert_next_tape_record_field(&fixture->unit, 0, "HDR3");
+    record_length = read_next_tape_record(&fixture->unit, record,
+                                          sizeof(record));
+    assert_tape_record_field(record, record_length, 0, "HDR4");
+    assert_tape_record_field(record, record_length,
+                             offsetof(ANSI_HDR4, extra_name_used),
+                             expected_extra_name_used);
 }
 
 /* Verify DOS11 generated tapes expose a header, data block, and tape mark. */
@@ -854,6 +895,25 @@ static void test_sim_tape_dos11_memory_tape_reads_file(void **state)
     assert_true(record_length > 0);
     assert_int_equal(sim_tape_sprecf(&fixture->unit, &record_length),
                      MTSE_TMK);
+}
+
+/* Verify DOS11 generated names use the full six-digit fallback range. */
+static void test_sim_tape_dos11_fallback_name_uses_six_digits(void **state)
+{
+    char name[9];
+
+    (void)state;
+
+    sim_tape_dos11_fallback_name(name, 0);
+    assert_memory_equal(name, "000000   ", sizeof(name));
+    sim_tape_dos11_fallback_name(name, 99999);
+    assert_memory_equal(name, "099999   ", sizeof(name));
+    sim_tape_dos11_fallback_name(name, 100000);
+    assert_memory_equal(name, "100000   ", sizeof(name));
+    sim_tape_dos11_fallback_name(name, 999999);
+    assert_memory_equal(name, "999999   ", sizeof(name));
+    sim_tape_dos11_fallback_name(name, 1000000);
+    assert_memory_equal(name, "000000   ", sizeof(name));
 }
 
 /* Verify generic positioning can count objects and position by
@@ -1163,8 +1223,13 @@ int main(void)
             test_sim_tape_ansi_vms_labels_format_metadata,
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_tape_ansi_vms_long_name_reports_stored_extra,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_tape_dos11_memory_tape_reads_file,
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test(
+            test_sim_tape_dos11_fallback_name_uses_six_digits),
         cmocka_unit_test(
             test_sim_tape_error_text_covers_named_and_generic_errors),
     };
