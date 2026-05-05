@@ -345,6 +345,11 @@ static const char *sim_get_host_env_uplowcase(const char *gbuf, char *rbuf,
 }
 
 /* Perform :~ and := substring/substitution operations on one value. */
+/* TODO: This fixed-buffer interface is the wrong long-term shape.
+   Rewrite command-variable substitution to use dynamic allocation so
+   callers get complete results or explicit errors instead of silent
+   truncation.  Prefer existing string helpers, or add focused ones,
+   rather than open-coding string assembly in pointer arithmetic. */
 static void sim_subststr_substr(const char *ops, char *rbuf, size_t rbuf_size)
 {
     int rbuf_len = (int)strlen(rbuf);
@@ -385,7 +390,7 @@ static void sim_subststr_substr(const char *ops, char *rbuf, size_t rbuf_size)
             const char *last = tstr;
             const char *curr = tstr;
             char *match = (char *)malloc(1 + (eq - ops));
-            size_t move_size;
+            size_t copy_left = rbuf_size ? rbuf_size - 1 : 0;
             t_bool asterisk_match;
 
             strlcpy(match, ops, 1 + (eq - ops));
@@ -394,22 +399,25 @@ static void sim_subststr_substr(const char *ops, char *rbuf, size_t rbuf_size)
                 memmove(match, match + 1, 1 + strlen(match + 1));
             while ((curr = strstr(last, match))) {
                 if (!asterisk_match) {
-                    move_size = MIN((size_t)(curr - last), rbuf_size);
+                    size_t move_size = MIN((size_t)(curr - last), copy_left);
+
                     memcpy(rbuf, last, move_size);
-                    rbuf_size -= move_size;
+                    copy_left -= move_size;
                     rbuf += move_size;
                 } else
                     asterisk_match = FALSE;
-                move_size = MIN(strlen(eq + 1), rbuf_size);
+                size_t move_size = MIN(strlen(eq + 1), copy_left);
+
                 memcpy(rbuf, eq + 1, move_size);
-                rbuf_size -= move_size;
+                copy_left -= move_size;
                 rbuf += move_size;
                 curr += strlen(match);
                 last = curr;
             }
-            move_size = MIN(strlen(last), rbuf_size);
+            size_t move_size = MIN(strlen(last), copy_left);
+
             memcpy(rbuf, last, move_size);
-            rbuf_size -= move_size;
+            copy_left -= move_size;
             rbuf += move_size;
             if (rbuf_size)
                 *rbuf = '\0';

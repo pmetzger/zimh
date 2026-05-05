@@ -1146,15 +1146,20 @@ static void test_sim_get_env_special_handles_runlimit_edge_cases(void **state)
         _sim_get_env_special("SIM_RUNLIMIT_UNITS", value, sizeof(value)));
 }
 
-/* Verify substitution fixups cope with a caller buffer too small for NUL. */
+/* Verify substitution fixups cope with a truncated caller buffer. */
 static void
 test_sim_get_env_special_handles_exhausted_fixup_buffer(void **state)
 {
     char value[1];
+    char truncated[6];
 
     (void)state;
 
     assert_int_equal(setenv("ZIMH_TEST_EXTERNAL", "abcdef", 1), 0);
+    assert_string_equal(
+        _sim_get_env_special("ZIMH_TEST_EXTERNAL:cd=1234567890123456789",
+                             truncated, sizeof(truncated)),
+        "ab123");
     assert_non_null(_sim_get_env_special(
         "ZIMH_TEST_EXTERNAL:cd=1234567890123456789", value, sizeof(value)));
     assert_string_equal(value, "");
