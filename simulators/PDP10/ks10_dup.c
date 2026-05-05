@@ -470,7 +470,7 @@ static int dup_rd (DEVICE *dptr, t_addr PA, uint16 *data, int32 access)
 static BITFIELD* bitdefs[] = {dup_rxcsr_bits, dup_rxdbuf_bits, dup_txcsr_bits, dup_txdbuf_bits};
 static uint16 *regs[] = {dup_rxcsr, dup_rxdbuf, dup_txcsr, dup_txdbuf};
 struct pdp_dib   *dibp = (DIB *)dptr->ctxt;
-int32  dup = ((PA - dup_dib.uba_addr) >> 3);            /* get line num */
+int32  dup = ((PA - dibp->uba_addr) >> 3);              /* get line num */
 int32  orig_val;
 
 if ((dptr->units[0].flags & UNIT_DIS) != 0)
@@ -515,7 +515,7 @@ static int dup_wr (DEVICE *dptr, t_addr PA, uint16 data, int32 access)
 static BITFIELD* bitdefs[] = {dup_rxcsr_bits, dup_parcsr_bits, dup_txcsr_bits, dup_txdbuf_bits};
 static uint16 *regs[] = {dup_rxcsr, dup_parcsr, dup_txcsr, dup_txdbuf};
 struct pdp_dib   *dibp = (DIB *)dptr->ctxt;
-int32  dup = ((PA - dup_dib.uba_addr) >> 3);            /* get line num */
+int32  dup = ((PA - dibp->uba_addr) >> 3);              /* get line num */
 int32  orig_val;
 
 sim_debug(DEBUG_DETAIL, DUPDPTR, "dup_wr(PA=%010o [%s], data=0x%X) ", PA, dup_wr_regs[(PA >> 1) & 03], data);
@@ -626,6 +626,8 @@ switch ((PA >> 1) & 03) {                               /* case on PA<2:1> */
         break;
     }
 
+sim_debug_bits(DEBUG_DETAIL, DUPDPTR, bitdefs[(PA >> 1) & 03],
+               (uint32)orig_val, (uint32)regs[(PA >> 1) & 03][dup], TRUE);
 dup_get_modem (dup);
 return 0;
 }
