@@ -1027,7 +1027,7 @@ sim_slirp_handle *sim_slirp_open(const char *args, void *opaque,
 
             if (port == 0)
                 continue;
-            sprintf(db_host, "localhost:%d", port);
+            snprintf(db_host, sizeof(db_host), "localhost:%d", port);
             slirp->db_chime = sim_connect_sock_ex(db_host, db_host, NULL, NULL,
                                                   SIM_SOCK_OPT_DATAGRAM |
                                                       SIM_SOCK_OPT_BLOCKING);
