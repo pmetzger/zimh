@@ -12,6 +12,9 @@ static uint32 ks10_dup_debug_bits_reason;
 static BITFIELD *ks10_dup_debug_bits_fields;
 static uint32 ks10_dup_debug_bits_before;
 static uint32 ks10_dup_debug_bits_after;
+static unsigned int ks10_dup_debug_calls;
+static uint32 ks10_dup_debug_reason;
+static DEVICE *ks10_dup_debug_device;
 
 /*
  * Capture register bit-diff tracing so tests can characterize debug-only
@@ -31,9 +34,24 @@ static void ks10_dup_record_debug_bits(uint32 dbits, DEVICE *dptr,
     ks10_dup_debug_bits_after = after;
 }
 
+/*
+ * Capture ordinary debug calls so tests can verify that the source uses the
+ * flags exposed by the DUP debug table, independently of formatted output.
+ */
+static void ks10_dup_record_debug(uint32 dbits, DEVICE *dptr)
+{
+    ++ks10_dup_debug_calls;
+    ks10_dup_debug_reason = dbits;
+    ks10_dup_debug_device = dptr;
+}
+
+#undef sim_debug
+#define sim_debug(dbits, dptr, ...)                                            \
+    ks10_dup_record_debug((dbits), (dptr))
 #define sim_debug_bits ks10_dup_record_debug_bits
 #include "ks10_dup.c"
 #undef sim_debug_bits
+#undef sim_debug
 
 int32 tmxr_poll = 10000;
 
@@ -147,6 +165,19 @@ static void reset_dup_state(void)
     ks10_dup_debug_bits_fields = NULL;
     ks10_dup_debug_bits_before = 0;
     ks10_dup_debug_bits_after = 0;
+    ks10_dup_debug_calls = 0;
+    ks10_dup_debug_reason = 0;
+    ks10_dup_debug_device = NULL;
+}
+
+/* Return the DUP debug-table entry that is exposed under the given name. */
+static DEBTAB *find_dup_debug_option(const char *name)
+{
+    for (DEBTAB *entry = dup_debug; entry->name != NULL; ++entry)
+        if (strcmp(entry->name, name) == 0)
+            return entry;
+
+    return NULL;
 }
 
 /*
@@ -209,7 +240,7 @@ static void test_dup_read_returns_selected_register(void **state)
     assert_int_equal(data, TXCSR_M_TXDONE | TXCSR_M_TXIE);
     assert_int_equal(dup_txcsr[1], TXCSR_M_TXDONE | TXCSR_M_TXIE);
     assert_int_equal(ks10_dup_debug_bits_calls, 1);
-    assert_int_equal(ks10_dup_debug_bits_reason, DEBUG_DETAIL);
+    assert_int_equal(ks10_dup_debug_bits_reason, DBG_REG);
     assert_ptr_equal(ks10_dup_debug_bits_fields, dup_txcsr_bits);
     assert_int_equal(ks10_dup_debug_bits_before, data);
     assert_int_equal(ks10_dup_debug_bits_after, dup_txcsr[1]);
@@ -234,10 +265,58 @@ static void test_dup_write_reports_register_bit_changes(void **state)
 
     assert_int_equal(dup_parcsr[1], 0123);
     assert_int_equal(ks10_dup_debug_bits_calls, 1);
-    assert_int_equal(ks10_dup_debug_bits_reason, DEBUG_DETAIL);
+    assert_int_equal(ks10_dup_debug_bits_reason, DBG_REG);
     assert_ptr_equal(ks10_dup_debug_bits_fields, dup_parcsr_bits);
     assert_int_equal(ks10_dup_debug_bits_before, PARCSR_M_DECMODE);
     assert_int_equal(ks10_dup_debug_bits_after, dup_parcsr[1]);
+}
+
+/*
+ * The DUP-specific debug table exposes REG and INT controls. The code using
+ * those classes of messages should therefore use these masks, not hidden
+ * PDP10-wide masks that cannot be selected with SET DUP DEBUG=<name>.
+ */
+static void test_dup_debug_table_exposes_used_flags(void **state)
+{
+    DEBTAB *reg_entry;
+    DEBTAB *int_entry;
+
+    (void)state;
+
+    reg_entry = find_dup_debug_option("REG");
+    int_entry = find_dup_debug_option("INT");
+
+    assert_non_null(reg_entry);
+    assert_int_equal(reg_entry->mask, DBG_REG);
+    assert_non_null(int_entry);
+    assert_int_equal(int_entry->mask, DBG_INT);
+}
+
+/*
+ * Receive and transmit interrupt tracing should use the INT flag that the DUP
+ * debug table exposes to simulator users.
+ */
+static void test_dup_interrupt_tracing_uses_exposed_int_flag(void **state)
+{
+    (void)state;
+
+    reset_dup_state();
+
+    dup_set_rxint(0);
+
+    assert_int_equal(ks10_dup_debug_calls, 1);
+    assert_int_equal(ks10_dup_debug_reason, DBG_INT);
+    assert_ptr_equal(ks10_dup_debug_device, &dup_dev);
+
+    ks10_dup_debug_calls = 0;
+    ks10_dup_debug_reason = 0;
+    ks10_dup_debug_device = NULL;
+
+    dup_set_txint(0);
+
+    assert_int_equal(ks10_dup_debug_calls, 1);
+    assert_int_equal(ks10_dup_debug_reason, DBG_INT);
+    assert_ptr_equal(ks10_dup_debug_device, &dup_dev);
 }
 
 /*
@@ -297,6 +376,8 @@ int main(void)
         cmocka_unit_test(test_dup_byte_write_preserves_other_byte),
         cmocka_unit_test(test_dup_read_returns_selected_register),
         cmocka_unit_test(test_dup_write_reports_register_bit_changes),
+        cmocka_unit_test(test_dup_debug_table_exposes_used_flags),
+        cmocka_unit_test(test_dup_interrupt_tracing_uses_exposed_int_flag),
         cmocka_unit_test(test_dup_handlers_decode_line_from_device_context),
         cmocka_unit_test(test_dup_write_decodes_line_from_device_context),
     };

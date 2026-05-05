@@ -504,8 +504,8 @@ switch ((PA >> 1) & 03) {                               /* case on PA<2:1> */
         break;
     }
 
-sim_debug(DEBUG_DETAIL, DUPDPTR, "dup_rd(PA=%010o [%s], data=0x%X) ", PA, dup_rd_regs[(PA >> 1) & 03], *data);
-sim_debug_bits(DEBUG_DETAIL, DUPDPTR, bitdefs[(PA >> 1) & 03], (uint32)(orig_val), (uint32)(regs[(PA >> 1) & 03][dup]), TRUE);
+sim_debug(DBG_REG, DUPDPTR, "dup_rd(PA=%010o [%s], data=0x%X) ", PA, dup_rd_regs[(PA >> 1) & 03], *data);
+sim_debug_bits(DBG_REG, DUPDPTR, bitdefs[(PA >> 1) & 03], (uint32)(orig_val), (uint32)(regs[(PA >> 1) & 03][dup]), TRUE);
 
 return 0;
 }
@@ -518,7 +518,7 @@ struct pdp_dib   *dibp = (DIB *)dptr->ctxt;
 int32  dup = ((PA - dibp->uba_addr) >> 3);              /* get line num */
 int32  orig_val;
 
-sim_debug(DEBUG_DETAIL, DUPDPTR, "dup_wr(PA=%010o [%s], data=0x%X) ", PA, dup_wr_regs[(PA >> 1) & 03], data);
+sim_debug(DBG_REG, DUPDPTR, "dup_wr(PA=%010o [%s], data=0x%X) ", PA, dup_wr_regs[(PA >> 1) & 03], data);
 if ((dptr->units[0].flags & UNIT_DIS) != 0)
     return 1;
 
@@ -626,7 +626,7 @@ switch ((PA >> 1) & 03) {                               /* case on PA<2:1> */
         break;
     }
 
-sim_debug_bits(DEBUG_DETAIL, DUPDPTR, bitdefs[(PA >> 1) & 03],
+sim_debug_bits(DBG_REG, DUPDPTR, bitdefs[(PA >> 1) & 03],
                (uint32)orig_val, (uint32)regs[(PA >> 1) & 03][dup], TRUE);
 dup_get_modem (dup);
 return 0;
@@ -1103,7 +1103,7 @@ static void dup_set_rxint (int32 dup)
    int vect;
    vect = dup_dib.uba_vect + (dup * 010);            /* return vector */
    uba_set_irq(&dup_dib, vect);
-   sim_debug(DEBUG_IRQ, DUPDPTR, "dup_set_rxint(dup=%d)\n", dup);
+   sim_debug(DBG_INT, DUPDPTR, "dup_set_rxint(dup=%d)\n", dup);
    return;
 }
 
@@ -1120,7 +1120,7 @@ static void dup_set_txint (int32 dup)
    int vect;
    vect = dup_dib.uba_vect + 4 + (dup * 010);         /* return vector */
    uba_set_irq(&dup_dib, vect);
-   sim_debug(DEBUG_IRQ, DUPDPTR, "dup_set_txint(dup=%d)\n", dup);
+   sim_debug(DBG_INT, DUPDPTR, "dup_set_txint(dup=%d)\n", dup);
    return;
 }
 
