@@ -5037,6 +5037,97 @@ memory_tape_add_block (tape, (uint8 *)&tape->vol1, sizeof (tape->vol1));
 return tape;
 }
 
+/*
+ * Determine the ANSI record size used for import and reject layouts that
+ * cannot be copied into fixed-size tape blocks.
+ */
+static t_bool
+ansi_resolve_record_layout(const struct ansi_tape_parameters *ansi,
+                           const char *filename, size_t block_size,
+                           size_t rms_record_size, t_bool lf_line_endings,
+                           t_bool crlf_line_endings,
+                           size_t *max_record_size)
+{
+    enum {
+        ANSI_FIXED_RECORD_SIZE = 512,
+        ANSI_RCW_SIZE = 4,
+        ANSI_RCW_LIMIT = 9999
+    };
+    t_bool text_file = lf_line_endings || crlf_line_endings;
+
+    if (!text_file) {
+        if (ansi->record_format == 'D') {
+            sim_messagef(SCPE_ARG, "%s format does not support binary files\n",
+                         ansi->name);
+            return FALSE;
+        }
+        *max_record_size = rms_record_size;
+    } else {
+        if (ansi->fixed_text) {
+            ASSURE((block_size == ANSI_FIXED_RECORD_SIZE));
+            *max_record_size = ANSI_FIXED_RECORD_SIZE;
+        } else {
+            *max_record_size =
+                ANSI_RCW_SIZE + rms_record_size +
+                (crlf_line_endings ? 2 - ansi->skip_crlf_line_endings :
+                                     1 - ansi->skip_lf_line_endings);
+            if (*max_record_size > ANSI_RCW_LIMIT) {
+                size_t max_allowed =
+                    ANSI_RCW_LIMIT - ANSI_RCW_SIZE -
+                    (crlf_line_endings ? 2 - ansi->skip_crlf_line_endings :
+                                         1 - ansi->skip_lf_line_endings);
+
+                sim_messagef(
+                    SCPE_ARG,
+                    "Text file: %s has lines longer (%d) than %s format "
+                    "allows (%d)\n",
+                    filename, (int)rms_record_size, ansi->name,
+                    (int)max_allowed);
+                return FALSE;
+            }
+        }
+    }
+
+    if (*max_record_size > block_size) {
+        sim_messagef(SCPE_ARG,
+                     "%s file: %s requires a minimum block size of %d\n",
+                     text_file ? "Text" : "Binary", filename,
+                     (int)*max_record_size);
+        return FALSE;
+    }
+    /* Binary ANSI imports pad fixed-size records inside each tape block. */
+    if (!text_file && (*max_record_size != 0) &&
+        ((block_size % *max_record_size) != 0)) {
+        sim_messagef(SCPE_ARG,
+                     "Binary file block size %" SIZE_T_FMT "u is not a "
+                     "multiple of the ANSI record size %" SIZE_T_FMT "u\n",
+                     block_size, *max_record_size);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
+/* Build the optional RMS attributes header used by DEC ANSI variants. */
+static void
+ansi_make_HDR3(ANSI_HDR3 *hdr, const struct ansi_tape_parameters *ansi,
+               size_t rms_record_size, t_bool lf_line_endings,
+               t_bool crlf_line_endings)
+{
+    char size[5];
+
+    if (!lf_line_endings && !crlf_line_endings) {
+        memcpy(hdr, ansi->hdr3_fixed, sizeof(*hdr));
+    } else {
+        if (lf_line_endings && !ansi->fixed_text)
+            memcpy(hdr, ansi->hdr3_lf_line_endings, sizeof(*hdr));
+        else
+            memcpy(hdr, ansi->hdr3_crlf_line_endings, sizeof(*hdr));
+    }
+    (void)snprintf(size, sizeof(size), "%04x", (uint16)rms_record_size);
+    memcpy(hdr->rms_attributes, size, sizeof(size) - 1);
+}
+
 static int ansi_add_file_to_tape (MEMORY_TAPE *tape, const char *filename)
 {
 FILE *f;
@@ -5058,53 +5149,9 @@ if (f == NULL)
     return TRUE;
 
 tape_classify_file_contents (f, &rms_record_size, &lf_line_endings, &crlf_line_endings);
-if (!lf_line_endings && !crlf_line_endings) {           /* Binary File? */
-    if (ansi->record_format == 'D') {                   /* ANSI format forces 'D' Record Format? */
-        sim_messagef (SCPE_ARG, "%s format does not support binary files\n", ansi->name);
-        fclose (f);
-        return TRUE;
-        }
-    max_record_size = rms_record_size;
-    }
-else {                                                  /* Text file */
-    if (ansi->fixed_text) {
-        /* ANSI-RT11 and ANSI-RSTS text files are unformatted, i.e., a stream of bytes */
-        max_record_size = rms_record_size = 512;
-        /* max_record_size must fit */
-        ASSURE((tape->block_size == 512));              /* ANSI-RT11 and ANSI-RSTS are forced to use -B 512, above */
-        }
-    else {
-        /* All other ANSI formats use D Record Format */
-        /* Add the 4-character ANSI RCW and the length of the line endings to rms_record_size */
-        max_record_size = 4 + rms_record_size +
-                          (crlf_line_endings ? 2 - ansi->skip_crlf_line_endings :
-                                               1 - ansi->skip_lf_line_endings);
-        /* max_record_size must fit in the 4-character ANSI RCW */
-        if (max_record_size > 9999) {
-            size_t max_allowed = 9999 - 4 -
-                                 (crlf_line_endings ? 2 - ansi->skip_crlf_line_endings :
-                                                      1 - ansi->skip_lf_line_endings);
-            sim_messagef (SCPE_ARG, "Text file: %s has lines longer (%d) than %s format allows (%d)\n",
-                                    filename, (int)rms_record_size, ansi->name, (int)max_allowed);
-            fclose (f);
-            return TRUE;
-            }
-        }
-    }
-/* max_record_size must be no greater than the block size */
-if (max_record_size > tape->block_size) {
-    sim_messagef (SCPE_ARG, "%s file: %s requires a minimum block size of %d\n",
-                            (lf_line_endings || crlf_line_endings) ? "Text" : "Binary", filename, (int)max_record_size);
-    fclose (f);
-    return TRUE;
-    }
-/* Binary ANSI imports pad fixed-size records inside each tape block. */
-if (!lf_line_endings && !crlf_line_endings && (max_record_size != 0) &&
-    ((tape->block_size % max_record_size) != 0)) {
-    sim_messagef (SCPE_ARG,
-                  "Binary file block size %" SIZE_T_FMT "u is not a "
-                  "multiple of the ANSI record size %" SIZE_T_FMT "u\n",
-                  tape->block_size, max_record_size);
+if (!ansi_resolve_record_layout(ansi, filename, tape->block_size,
+                                rms_record_size, lf_line_endings,
+                                crlf_line_endings, &max_record_size)) {
     fclose (f);
     return TRUE;
     }
@@ -5136,19 +5183,9 @@ if (!ansi_make_HDR2 (&hdr2, !lf_line_endings && !crlf_line_endings,
     return TRUE;
     }
 
-if (!(ansi->nohdr3)) {               /* Need HDR3? */
-    char size[5];
-    if (!lf_line_endings && !crlf_line_endings)         /* Binary File? */
-        memcpy (&hdr3, ansi->hdr3_fixed, sizeof (hdr3));
-    else {                                              /* Text file */
-        if (lf_line_endings && !(ansi->fixed_text))
-            memcpy (&hdr3, ansi->hdr3_lf_line_endings, sizeof (hdr3));
-        else
-            memcpy (&hdr3, ansi->hdr3_crlf_line_endings, sizeof (hdr3));
-        }
-    (void)snprintf (size, sizeof (size), "%04x", (uint16)rms_record_size);
-    memcpy (hdr3.rms_attributes, size, 4);
-    }
+if (!(ansi->nohdr3))
+    ansi_make_HDR3(&hdr3, ansi, rms_record_size, lf_line_endings,
+                   crlf_line_endings);
 memory_tape_add_block (tape, (uint8 *)&hdr1, sizeof (hdr1));
 if (!(ansi->nohdr2))
     memory_tape_add_block (tape, (uint8 *)&hdr2, sizeof (hdr2));
