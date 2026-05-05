@@ -74,6 +74,7 @@
 */
 
 #include "sim_defs.h"
+#include "sim_dynstr.h"
 #include "sim_tape.h"
 #include "sim_tape_internal.h"
 #include <ctype.h>
@@ -4847,7 +4848,7 @@ static void sim_tape_add_dos11_entry (const char *directory,
                                       void *context)
 {
 MEMORY_TAPE *tape = (MEMORY_TAPE *)context;
-char FullPath[PATH_MAX + 1];
+char *full_path = NULL;
 FILE *f;
 size_t max_record_size;
 t_bool lf_line_endings;
@@ -4879,10 +4880,16 @@ while (year >= 2000)
 
 fileday = 1000 * ((year - 70) % 100) + tm->tm_yday + 1;
 
-(void)snprintf (FullPath, sizeof (FullPath), "%s%s", directory, filename);
-f = tape_open_and_check_file (FullPath);
- if (f == NULL)
+full_path = sim_dynstr_concat_cstrs(directory, filename);
+if (full_path == NULL) {
+    sim_messagef(SCPE_MEM, "Can't allocate full tape input path\n");
     return;
+    }
+f = tape_open_and_check_file (full_path);
+if (f == NULL) {
+    free (full_path);
+    return;
+    }
 
 tape_classify_file_contents (f, &max_record_size, &lf_line_endings, &crlf_line_endings);
 
@@ -4931,7 +4938,8 @@ else {
 fclose (f);
 free (block);
 if (error)
-    sim_messagef (SCPE_IERR, "Error processing input file %s\n", FullPath);
+    sim_messagef (SCPE_IERR, "Error processing input file %s\n", full_path);
+free (full_path);
 memory_tape_add_block (tape, NULL, 0); /* Tape Mark */
 ++tape->file_count;
 }
@@ -5260,16 +5268,21 @@ static void sim_tape_add_ansi_entry (const char *directory,
                                      void *context)
 {
 MEMORY_TAPE *tape = (MEMORY_TAPE *)context;
-char FullPath[PATH_MAX + 1];
+char *full_path = NULL;
 
 /* Generic callback signature.
    This implementation does not use every parameter. */
 (void) FileSize;
 (void) filestat;
 
-(void)snprintf (FullPath, sizeof (FullPath), "%s%s", directory, filename);
+full_path = sim_dynstr_concat_cstrs(directory, filename);
+if (full_path == NULL) {
+    sim_messagef(SCPE_MEM, "Can't allocate full tape input path\n");
+    return;
+    }
 
-(void)ansi_add_file_to_tape (tape, FullPath);
+(void)ansi_add_file_to_tape (tape, full_path);
+free (full_path);
 }
 
 /* export an existing tape to a SIMH tape image */

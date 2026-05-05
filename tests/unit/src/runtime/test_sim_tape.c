@@ -8,6 +8,7 @@
 #include "test_cmocka.h"
 
 #include "sim_defs.h"
+#include "sim_dynstr_internal.h"
 #include "sim_fio.h"
 #include "sim_tape.h"
 #include "sim_tape_internal.h"
@@ -42,6 +43,7 @@ struct sim_tape_callback_state {
 };
 
 static struct sim_tape_callback_state *active_tape_callback_state;
+static int sim_tape_dynstr_realloc_failures;
 
 static int setup_sim_tape_fixture(void **state)
 {
@@ -70,6 +72,7 @@ static int setup_sim_tape_fixture(void **state)
         simh_test_install_devices("zimh-unit-sim-tape", fixture->devices),
         0);
     assert_int_equal(sim_tape_init(), SCPE_OK);
+    sim_dynstr_reset_test_hooks();
 
     *state = fixture;
     return 0;
@@ -84,9 +87,18 @@ static int teardown_sim_tape_fixture(void **state)
     assert_int_equal(chdir(fixture->original_cwd), 0);
     assert_int_equal(simh_test_remove_path(fixture->temp_dir), 0);
     simh_test_reset_simulator_state();
+    sim_dynstr_reset_test_hooks();
     free(fixture);
     *state = NULL;
     return 0;
+}
+
+static void *sim_tape_dynstr_realloc_fail(void *ptr, size_t size)
+{
+    ++sim_tape_dynstr_realloc_failures;
+    (void)ptr;
+    (void)size;
+    return NULL;
 }
 
 static void assert_show_output(t_stat (*show_fn)(FILE *, UNIT *, int32,
@@ -1066,6 +1078,48 @@ static void test_sim_tape_ansi_decimal_fields_validate_width(void **state)
     assert_false(sim_tape_format_ansi_decimal(field, 0, 1));
 }
 
+/* Verify memory tape attach reports path allocation failures cleanly. */
+static void assert_memory_tape_attach_reports_path_alloc_failure(
+    struct sim_tape_fixture *fixture, const char *fmt)
+{
+    static const char text[] = "HELLO\n";
+    struct sim_tape_attach_capture capture;
+    char *output = NULL;
+    size_t output_size = 0;
+
+    assert_int_equal(simh_test_write_file(fixture->tape_path, text,
+                                          sizeof(text) - 1),
+                     0);
+    assert_int_equal(sim_tape_set_fmt(&fixture->unit, 0, fmt, NULL), SCPE_OK);
+
+    sim_tape_dynstr_realloc_failures = 0;
+    sim_dynstr_set_test_realloc_hook(sim_tape_dynstr_realloc_fail);
+    capture.unit = &fixture->unit;
+    capture.path = fixture->tape_path;
+    capture.status = SCPE_OK;
+    assert_int_equal(simh_test_capture_stdout(write_sim_tape_attach_output,
+                                              &capture, &output,
+                                              &output_size),
+                     0);
+    assert_int_equal(SCPE_BARE_STATUS(capture.status), SCPE_ARG);
+    assert_string_contains(output, "Can't allocate full tape input path");
+    assert_false((fixture->unit.flags & UNIT_ATT) != 0);
+    assert_null(fixture->unit.fileref);
+    assert_null(fixture->unit.filename);
+    assert_int_equal(sim_tape_dynstr_realloc_failures, 1);
+    free(output);
+}
+
+static void test_sim_tape_ansi_attach_reports_path_alloc_failure(void **state)
+{
+    assert_memory_tape_attach_reports_path_alloc_failure(*state, "ANSI-VMS");
+}
+
+static void test_sim_tape_dos11_attach_reports_path_alloc_failure(void **state)
+{
+    assert_memory_tape_attach_reports_path_alloc_failure(*state, "DOS11");
+}
+
 /* Verify generic positioning can count objects and position by
    file/record tuples after an optional rewind. */
 static void test_sim_tape_position_tracks_objects_and_files(void **state)
@@ -1391,6 +1445,12 @@ int main(void)
             test_sim_tape_dos11_fallback_name_uses_six_digits),
         cmocka_unit_test(
             test_sim_tape_ansi_decimal_fields_validate_width),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_ansi_attach_reports_path_alloc_failure,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_dos11_attach_reports_path_alloc_failure,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test(
             test_sim_tape_error_text_covers_named_and_generic_errors),
     };
