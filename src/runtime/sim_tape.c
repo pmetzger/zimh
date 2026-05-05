@@ -5098,6 +5098,16 @@ if (max_record_size > tape->block_size) {
     fclose (f);
     return TRUE;
     }
+/* Binary ANSI imports pad fixed-size records inside each tape block. */
+if (!lf_line_endings && !crlf_line_endings && (max_record_size != 0) &&
+    ((tape->block_size % max_record_size) != 0)) {
+    sim_messagef (SCPE_ARG,
+                  "Binary file block size %" SIZE_T_FMT "u is not a "
+                  "multiple of the ANSI record size %" SIZE_T_FMT "u\n",
+                  tape->block_size, max_record_size);
+    fclose (f);
+    return TRUE;
+    }
 ansi_make_HDR1 (&hdr1, &tape->vol1, &hdr4, filename, tape->ansi_type);
 if (tape->file_count >= 9999) {
     sim_messagef (SCPE_ARG,

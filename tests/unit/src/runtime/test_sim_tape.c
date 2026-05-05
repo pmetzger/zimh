@@ -227,6 +227,18 @@ static void assert_next_tape_record_field(UNIT *unit, size_t offset,
     assert_tape_record_field(record, record_length, offset, expected);
 }
 
+/* Write a binary file of a specific size without text line endings. */
+static void write_repeated_binary_file(const char *path, size_t size)
+{
+    uint8 *data;
+
+    data = malloc(size);
+    assert_non_null(data);
+    memset(data, 0xaa, size);
+    assert_int_equal(simh_test_write_file(path, data, size), 0);
+    free(data);
+}
+
 static void assert_string_contains(const char *haystack, const char *needle)
 {
     assert_non_null(strstr(haystack, needle));
@@ -876,6 +888,67 @@ static void test_sim_tape_ansi_vms_rejects_oversized_hdr2_fields(void **state)
     free(output);
 }
 
+/* Verify large ANSI-VMS binary block labels keep record size distinct. */
+static void test_sim_tape_ansi_vms_binary_labels_large_block(void **state)
+{
+    enum { BLOCK_SIZE = 65536 };
+    struct sim_tape_fixture *fixture = *state;
+    uint8 record[256] = {0};
+    t_mtrlnt record_length;
+
+    write_repeated_binary_file(fixture->tape_path, BLOCK_SIZE);
+    assert_int_equal(sim_tape_set_fmt(&fixture->unit, 0, "ANSI-VMS", NULL),
+                     SCPE_OK);
+
+    fixture->unit.recsize = BLOCK_SIZE;
+    assert_int_equal(sim_tape_attach(&fixture->unit, fixture->tape_path),
+                     SCPE_OK);
+    assert_next_tape_record_field(&fixture->unit, 0, "VOL1");
+    assert_next_tape_record_field(&fixture->unit, 0, "HDR1");
+    record_length = read_next_tape_record(&fixture->unit, record,
+                                          sizeof(record));
+    assert_tape_record_field(record, record_length, 0, "HDR2");
+    assert_tape_record_field(record, record_length,
+                             offsetof(ANSI_HDR2, block_length), "65536");
+    assert_tape_record_field(record, record_length,
+                             offsetof(ANSI_HDR2, record_length), "00512");
+    record_length = read_next_tape_record(&fixture->unit, record,
+                                          sizeof(record));
+    assert_tape_record_field(record, record_length, 0, "HDR3");
+    assert_tape_record_field(record, record_length,
+                             offsetof(ANSI_HDR3, rms_attributes), "0200");
+}
+
+/* Verify ANSI-VMS rejects binary block sizes that cannot hold padding. */
+static void test_sim_tape_ansi_vms_rejects_partial_binary_block(void **state)
+{
+    enum { BLOCK_SIZE = 65535 };
+    struct sim_tape_fixture *fixture = *state;
+    struct sim_tape_attach_capture capture;
+    char *output = NULL;
+    size_t output_size = 0;
+
+    write_repeated_binary_file(fixture->tape_path, BLOCK_SIZE);
+    assert_int_equal(sim_tape_set_fmt(&fixture->unit, 0, "ANSI-VMS", NULL),
+                     SCPE_OK);
+
+    fixture->unit.recsize = BLOCK_SIZE;
+    capture.unit = &fixture->unit;
+    capture.path = fixture->tape_path;
+    capture.status = SCPE_OK;
+    assert_int_equal(simh_test_capture_stdout(write_sim_tape_attach_output,
+                                              &capture, &output,
+                                              &output_size),
+                     0);
+    assert_int_equal(SCPE_BARE_STATUS(capture.status), SCPE_ARG);
+    assert_string_contains(output, "Binary file block size 65535");
+    assert_string_contains(output, "ANSI record size 512");
+    assert_false((fixture->unit.flags & UNIT_ATT) != 0);
+    assert_null(fixture->unit.fileref);
+    assert_null(fixture->unit.filename);
+    free(output);
+}
+
 /* Verify ANSI-VMS HDR4 reports the stored extra file name length. */
 static void test_sim_tape_ansi_vms_long_name_reports_stored_extra(void **state)
 {
@@ -1301,6 +1374,12 @@ int main(void)
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_tape_ansi_vms_rejects_oversized_hdr2_fields,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_ansi_vms_binary_labels_large_block,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_ansi_vms_rejects_partial_binary_block,
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_tape_ansi_vms_long_name_reports_stored_extra,
