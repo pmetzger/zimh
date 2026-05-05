@@ -965,6 +965,17 @@ if ((r == SCPE_OK) && (sim_switches & SWMASK ('X')))
 return r;
 }
 
+/* Release memory-backed tape state that does not go through detach_unit. */
+static void
+sim_tape_detach_memory_backed_unit(UNIT *uptr)
+{
+    memory_free_tape((void *)uptr->fileref);
+    uptr->fileref = NULL;
+    free(uptr->filename);
+    uptr->filename = NULL;
+    uptr->flags &= ~UNIT_ATT;
+}
+
 /* Detach tape unit */
 
 t_stat sim_tape_detach (UNIT *uptr)
@@ -991,11 +1002,7 @@ sim_tape_clr_async (uptr);
 
 MT_CLR_INMRK (uptr);                                    /* Not within a TAR tapemark */
 if (MT_GET_FMT (uptr) >= MTUF_F_ANSI) {
-    memory_free_tape ((void *)uptr->fileref);
-    uptr->fileref = NULL;
-    free (uptr->filename);
-    uptr->filename = NULL;
-    uptr->flags &= ~UNIT_ATT;
+    sim_tape_detach_memory_backed_unit (uptr);
     r = SCPE_OK;
     }
 else
@@ -2036,6 +2043,111 @@ AIO_CALL(TOP_RDRR, buf, bc, NULL, max, 0, 0, 0, NULL, callback);
 return r;
 }
 
+/* Return the stored payload size for SIMH/E11 counted tape records. */
+static t_mtrlnt
+sim_tape_counted_record_storage_size(uint32 format, t_mtrlnt record_size)
+{
+    if (format == MTUF_F_STD)
+        return MTR_L((record_size + 1) & ~1);
+    return record_size;
+}
+
+/* Write a SIMH/E11 counted tape record, including metadata and padding. */
+static t_stat
+sim_tape_write_counted_record(UNIT *uptr, uint8 *buf, t_mtrlnt metadata,
+                              t_mtrlnt record_size, t_mtrlnt storage_size)
+{
+    static const uint8 pad = 0;
+    t_mtrlnt padded;
+
+    (void)sim_fwrite(&metadata, sizeof(t_mtrlnt), 1, uptr->fileref);
+    (void)sim_fwrite(buf, sizeof(uint8), record_size, uptr->fileref);
+    for (padded = record_size; padded < storage_size; padded++)
+        (void)sim_fwrite(&pad, sizeof(uint8), 1, uptr->fileref);
+    (void)sim_fwrite(&metadata, sizeof(t_mtrlnt), 1, uptr->fileref);
+    if (ferror(uptr->fileref)) {
+        MT_SET_PNU(uptr);
+        return sim_tape_ioerr(uptr);
+    }
+    uptr->pos = uptr->pos + storage_size + (2 * sizeof(t_mtrlnt));
+    return MTSE_OK;
+}
+
+/* Write a P7B record and its start-of-next-record delimiter. */
+static t_stat
+sim_tape_write_p7b_record(UNIT *uptr, uint8 *buf, t_mtrlnt record_size)
+{
+    uint8 record_start = buf[0] | P7B_SOR;
+
+    (void)sim_fwrite(&record_start, sizeof(uint8), 1, uptr->fileref);
+    if (record_size > 1)
+        (void)sim_fwrite(&buf[1], sizeof(uint8), record_size - 1,
+                         uptr->fileref);
+    (void)sim_fwrite(&record_start, sizeof(uint8), 1, uptr->fileref);
+    if (ferror(uptr->fileref)) {
+        MT_SET_PNU(uptr);
+        return sim_tape_ioerr(uptr);
+    }
+    uptr->pos = uptr->pos + record_size;
+    return MTSE_OK;
+}
+
+/* Check that a tape unit can accept a write operation. */
+static t_stat
+sim_tape_check_write_allowed(UNIT *uptr)
+{
+    MT_CLR_PNU(uptr);
+    if ((uptr->flags & UNIT_ATT) == 0)
+        return MTSE_UNATT;
+    if (sim_tape_wrp(uptr))
+        return MTSE_WRP;
+    return MTSE_OK;
+}
+
+/* Prepare an attached tape for writing at its current logical position. */
+static t_stat
+sim_tape_prepare_write(UNIT *uptr)
+{
+    t_stat status;
+
+    status = sim_tape_check_write_allowed(uptr);
+    if (status != MTSE_OK)
+        return status;
+    if (sim_tape_seek(uptr, uptr->pos))
+        return MTSE_IOERR;
+    return MTSE_OK;
+}
+
+/* Extend the remembered end-of-medium position after a successful write. */
+static void
+sim_tape_update_eom(UNIT *uptr)
+{
+    if (uptr->pos > uptr->tape_eom)
+        uptr->tape_eom = uptr->pos;
+}
+
+/* Write a P7B tape mark as an EOF record with its next-record delimiter. */
+static t_stat
+sim_tape_write_p7b_tape_mark(UNIT *uptr, struct tape_context *ctx)
+{
+    uint8 tape_mark = P7B_EOF;
+    uint32 data_trace = (uptr->dctrl | ctx->dptr->dctrl) & MTSE_DBG_DAT;
+    t_stat status;
+
+    sim_tape_data_trace(uptr, &tape_mark, 1, "Record Write", data_trace,
+                        MTSE_DBG_STR);
+    status = sim_tape_prepare_write(uptr);
+    if (status != MTSE_OK)
+        return status;
+    status = sim_tape_write_p7b_record(uptr, &tape_mark, 1);
+    if (status != MTSE_OK)
+        return status;
+    sim_tape_update_eom(uptr);
+    sim_tape_data_trace(uptr, &tape_mark, 1, "Record Written", data_trace,
+                        MTSE_DBG_STR);
+    return MTSE_OK;
+}
+
 /* Write record forward
 
    Inputs:
@@ -2060,19 +2172,16 @@ uint32 f = MT_GET_FMT (uptr);
 t_mtrlnt sbc;
 t_mtrlnt rbc;
 t_stat status = MTSE_OK;
-static const uint8 pad = 0;
 
 if (ctx == NULL)                                        /* if not properly attached? */
     return sim_messagef (SCPE_IERR, "Bad Attach\n");    /*   that's a problem */
 sim_debug_unit (ctx->dbit, uptr, "sim_tape_wrrecf(unit=%d, buf=%p, bc=%d)\n", (int)(uptr-ctx->dptr->units), buf, bc);
 
 sim_tape_data_trace(uptr, buf, bc, "Record Write", (uptr->dctrl | ctx->dptr->dctrl) & MTSE_DBG_DAT, MTSE_DBG_STR);
-MT_CLR_PNU (uptr);
 sbc = rbc = MTR_L (bc);
-if ((uptr->flags & UNIT_ATT) == 0)                      /* not attached? */
-    return MTSE_UNATT;
-if (sim_tape_wrp (uptr))                                /* write prot? */
-    return MTSE_WRP;
+status = sim_tape_check_write_allowed (uptr);
+if (status != MTSE_OK)
+    return status;
 if (sbc == 0)                                           /* nothing to do? */
     return MTSE_OK;
 if (sim_tape_seek (uptr, uptr->pos))                    /* set pos */
@@ -2080,39 +2189,18 @@ if (sim_tape_seek (uptr, uptr->pos))                    /* set pos */
 switch (f) {                                            /* case on format */
 
     case MTUF_F_STD:                                    /* standard */
-        sbc = MTR_L ((rbc + 1) & ~1);                   /* pad odd length */
-        (void)sim_fwrite (&bc, sizeof (t_mtrlnt), 1, uptr->fileref);
-        (void)sim_fwrite (buf, sizeof (uint8), rbc, uptr->fileref);
-        if (sbc != rbc)
-            (void)sim_fwrite (&pad, sizeof (uint8), 1, uptr->fileref);
-        (void)sim_fwrite (&bc, sizeof (t_mtrlnt), 1, uptr->fileref);
-        if (ferror (uptr->fileref)) {                   /* error? */
-            MT_SET_PNU (uptr);
-            return sim_tape_ioerr (uptr);
-            }
-        uptr->pos = uptr->pos + sbc + (2 * sizeof (t_mtrlnt));  /* move tape */
-        break;
-
+        FALLTHROUGH;
     case MTUF_F_E11:                                    /* E11 */
-        (void)sim_fwrite (&bc, sizeof (t_mtrlnt), 1, uptr->fileref);
-        (void)sim_fwrite (buf, sizeof (uint8), sbc, uptr->fileref);
-        (void)sim_fwrite (&bc, sizeof (t_mtrlnt), 1, uptr->fileref);
-        if (ferror (uptr->fileref)) {                   /* error? */
-            MT_SET_PNU (uptr);
-            return sim_tape_ioerr (uptr);
-            }
-        uptr->pos = uptr->pos + sbc + (2 * sizeof (t_mtrlnt));  /* move tape */
+        sbc = sim_tape_counted_record_storage_size (f, rbc);
+        status = sim_tape_write_counted_record (uptr, buf, bc, rbc, sbc);
+        if (status != MTSE_OK)
+            return status;
         break;
 
     case MTUF_F_P7B:                                    /* Pierce 7B */
-        buf[0] = buf[0] | P7B_SOR;                      /* mark start of rec */
-        (void)sim_fwrite (buf, sizeof (uint8), sbc, uptr->fileref);
-        (void)sim_fwrite (buf, sizeof (uint8), 1, uptr->fileref); /* delimit rec */
-        if (ferror (uptr->fileref)) {                   /* error? */
-            MT_SET_PNU (uptr);
-            return sim_tape_ioerr (uptr);
-            }
-        uptr->pos = uptr->pos + sbc;                    /* move tape */
+        status = sim_tape_write_p7b_record (uptr, buf, sbc);
+        if (status != MTSE_OK)
+            return status;
         break;
     case MTUF_F_AWS:                                    /* AWS */
         status = sim_tape_aws_wrdata (uptr, buf, bc);
@@ -2120,8 +2208,7 @@ switch (f) {                                            /* case on format */
             return status;
         break;
         }
-if (uptr->pos > uptr->tape_eom)
-    uptr->tape_eom = uptr->pos;         /* update EOM as needed */
+sim_tape_update_eom (uptr);
 sim_tape_data_trace(uptr, buf, rbc, "Record Written", (uptr->dctrl | ctx->dptr->dctrl) & MTSE_DBG_DAT, MTSE_DBG_STR);
 return MTSE_OK;
 }
@@ -2214,10 +2301,8 @@ struct tape_context *ctx = (struct tape_context *)uptr->tape_ctx;
 if (ctx == NULL)                                        /* if not properly attached? */
     return sim_messagef (SCPE_IERR, "Bad Attach\n");    /*   that's a problem */
 sim_debug_unit (ctx->dbit, uptr, "sim_tape_wrtmk(unit=%d)\n", (int)(uptr-ctx->dptr->units));
-if (MT_GET_FMT (uptr) == MTUF_F_P7B) {                  /* P7B? */
-    uint8 buf = P7B_EOF;                                /* eof mark */
-    return sim_tape_wrrecf (uptr, &buf, 1);             /* write char */
-    }
+if (MT_GET_FMT (uptr) == MTUF_F_P7B)                    /* P7B? */
+    return sim_tape_write_p7b_tape_mark (uptr, ctx);
 if (MT_GET_FMT (uptr) == MTUF_F_AWS)                    /* AWS? */
     return sim_tape_aws_wrdata (uptr, NULL, 0);
 return sim_tape_wrdata (uptr, MTR_TMK);

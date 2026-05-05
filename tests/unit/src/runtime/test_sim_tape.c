@@ -8,6 +8,7 @@
 #include "test_cmocka.h"
 
 #include "sim_defs.h"
+#include "sim_fio.h"
 #include "sim_tape.h"
 #include "test_scp_fixture.h"
 #include "test_simh_personality.h"
@@ -108,6 +109,24 @@ static void assert_tape_record_equals(const uint8 *actual, t_mtrlnt actual_len,
     assert_memory_equal(actual, expected, expected_len);
 }
 
+/* Verify a counted tape image has matching leading and trailing lengths. */
+static void assert_counted_tape_metadata(const uint8 *actual,
+                                         size_t payload_len,
+                                         t_mtrlnt expected_len)
+{
+    t_mtrlnt leading;
+    t_mtrlnt trailing;
+    size_t header_len = sizeof(t_mtrlnt);
+
+    memcpy(&leading, actual, sizeof(leading));
+    memcpy(&trailing, &actual[header_len + payload_len], sizeof(trailing));
+    sim_buf_swap_data(&leading, sizeof(leading), 1);
+    sim_buf_swap_data(&trailing, sizeof(trailing), 1);
+    assert_int_equal(leading, expected_len);
+    assert_int_equal(trailing, expected_len);
+}
+
+/* Verify a standard tape image stores a record with any required pad byte. */
 static void assert_standard_tape_file_padded_record(
     struct sim_tape_fixture *fixture, const uint8 *expected,
     size_t expected_len)
@@ -124,9 +143,46 @@ static void assert_standard_tape_file_padded_record(
         0);
     actual = actual_data;
     assert_int_equal(actual_len, (2 * header_len) + padded_len);
+    assert_counted_tape_metadata(actual, padded_len, (t_mtrlnt)expected_len);
     assert_memory_equal(&actual[header_len], expected, expected_len);
     if (padded_len != expected_len)
         assert_int_equal(actual[header_len + expected_len], 0);
+    free(actual_data);
+}
+
+/* Verify a counted tape image stores exactly the expected record bytes. */
+static void assert_counted_tape_file_payload(struct sim_tape_fixture *fixture,
+                                             const char *path,
+                                             const uint8 *expected,
+                                             size_t expected_len)
+{
+    void *actual_data;
+    uint8 *actual;
+    size_t actual_len;
+    size_t header_len = sizeof(t_mtrlnt);
+
+    assert_int_equal(sim_tape_detach(&fixture->unit), SCPE_OK);
+    assert_int_equal(simh_test_read_file(path, &actual_data, &actual_len), 0);
+    actual = actual_data;
+    assert_int_equal(actual_len, (2 * header_len) + expected_len);
+    assert_counted_tape_metadata(actual, expected_len, (t_mtrlnt)expected_len);
+    assert_memory_equal(&actual[header_len], expected, expected_len);
+    free(actual_data);
+}
+
+/* Verify a tape image contains exactly the expected bytes. */
+static void assert_tape_file_bytes(struct sim_tape_fixture *fixture,
+                                   const uint8 *expected, size_t expected_len)
+{
+    void *actual_data;
+    size_t actual_len;
+
+    assert_int_equal(sim_tape_detach(&fixture->unit), SCPE_OK);
+    assert_int_equal(
+        simh_test_read_file(fixture->tape_path, &actual_data, &actual_len),
+        0);
+    assert_int_equal(actual_len, expected_len);
+    assert_memory_equal(actual_data, expected, expected_len);
     free(actual_data);
 }
 
@@ -476,6 +532,98 @@ test_sim_tape_standard_odd_record_uses_internal_padding(void **state)
                               sizeof(record));
 
     assert_standard_tape_file_padded_record(fixture, record, sizeof(record));
+}
+
+/* Verify even standard tape records and odd E11 records are not padded
+   in the tape image. */
+static void test_sim_tape_unpadded_record_formats_use_exact_size(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+    char e11_path[1024];
+    uint8 e11_record[] = {0x41, 0x42, 0x43};
+    uint8 standard_record[] = {0x51, 0x52, 0x53, 0x54};
+
+    assert_int_equal(simh_test_join_path(e11_path, sizeof(e11_path),
+                                         fixture->temp_dir, "sample.e11"),
+                     0);
+
+    assert_int_equal(sim_tape_attach(&fixture->unit, fixture->tape_path),
+                     SCPE_OK);
+    assert_int_equal(sim_tape_wrrecf(&fixture->unit, standard_record,
+                                     sizeof(standard_record)),
+                     MTSE_OK);
+    assert_counted_tape_file_payload(fixture, fixture->tape_path,
+                                     standard_record,
+                                     sizeof(standard_record));
+
+    assert_int_equal(sim_tape_set_fmt(&fixture->unit, 0, "E11", NULL),
+                     SCPE_OK);
+    assert_int_equal(sim_tape_attach(&fixture->unit, e11_path), SCPE_OK);
+    assert_int_equal(sim_tape_wrrecf(&fixture->unit, e11_record,
+                                     sizeof(e11_record)),
+                     MTSE_OK);
+    assert_counted_tape_file_payload(fixture, e11_path, e11_record,
+                                     sizeof(e11_record));
+}
+
+/* Verify P7B writes mark record bounds without changing the caller buffer. */
+static void test_sim_tape_p7b_record_write_marks_record_bounds(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+    uint8 record[] = {0x01, 0x02, 0x03};
+    uint8 expected[] = {P7B_SOR | 0x01, 0x02, 0x03, P7B_SOR | 0x01};
+
+    assert_int_equal(sim_tape_set_fmt(&fixture->unit, 0, "P7B", NULL),
+                     SCPE_OK);
+    assert_int_equal(sim_tape_attach(&fixture->unit, fixture->tape_path),
+                     SCPE_OK);
+
+    assert_int_equal(sim_tape_wrrecf(&fixture->unit, record, sizeof(record)),
+                     MTSE_OK);
+    assert_int_equal(record[0], 0x01);
+    assert_tape_file_bytes(fixture, expected, sizeof(expected));
+}
+
+/* Verify P7B tape marks are written as EOF records and read as marks. */
+static void test_sim_tape_p7b_tape_mark_writes_eof_record(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+    uint8 expected[] = {P7B_SOR | P7B_EOF, P7B_SOR | P7B_EOF};
+    uint8 read_buffer[16] = {0};
+    t_mtrlnt record_length;
+
+    assert_int_equal(sim_tape_set_fmt(&fixture->unit, 0, "P7B", NULL),
+                     SCPE_OK);
+    assert_int_equal(sim_tape_attach(&fixture->unit, fixture->tape_path),
+                     SCPE_OK);
+
+    assert_int_equal(sim_tape_wrtmk(&fixture->unit), MTSE_OK);
+    assert_int_equal(fixture->unit.pos, 1);
+    assert_int_equal(fixture->unit.tape_eom, 1);
+    assert_int_equal(sim_tape_rewind(&fixture->unit), MTSE_OK);
+    assert_int_equal(sim_tape_rdrecf(&fixture->unit, read_buffer,
+                                     &record_length, sizeof(read_buffer)),
+                     MTSE_TMK);
+    assert_int_equal(record_length, 0);
+    assert_tape_file_bytes(fixture, expected, sizeof(expected));
+}
+
+/* Verify P7B tape marks honor write protection without moving the tape. */
+static void test_sim_tape_p7b_tape_mark_rejects_write_protect(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+
+    assert_int_equal(sim_tape_set_fmt(&fixture->unit, 0, "P7B", NULL),
+                     SCPE_OK);
+    assert_int_equal(sim_tape_attach(&fixture->unit, fixture->tape_path),
+                     SCPE_OK);
+
+    fixture->unit.flags |= MTUF_WRP;
+    assert_int_equal(sim_tape_wrtmk(&fixture->unit), MTSE_WRP);
+    assert_int_equal(fixture->unit.pos, 0);
+    assert_int_equal(fixture->unit.tape_eom, 0);
+    assert_false(MT_TST_PNU(&fixture->unit));
+    fixture->unit.flags &= ~MTUF_WRP;
 }
 
 /* Verify forward and reverse spacing move across records and file
@@ -870,6 +1018,18 @@ int main(void)
                                         teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_tape_standard_odd_record_uses_internal_padding,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_unpadded_record_formats_use_exact_size,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_p7b_record_write_marks_record_bounds,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_p7b_tape_mark_writes_eof_record,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_p7b_tape_mark_rejects_write_protect,
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_tape_spacing_and_reverse_reads_work,
