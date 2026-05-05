@@ -29,6 +29,12 @@ struct sim_tape_capture {
     t_stat status;
 };
 
+struct sim_tape_attach_capture {
+    UNIT *unit;
+    const char *path;
+    t_stat status;
+};
+
 struct sim_tape_callback_state {
     UNIT *unit;
     t_stat status;
@@ -255,6 +261,13 @@ static void write_sim_tape_self_test_output(void *context)
     assert_int_equal(chdir(capture->fixture->temp_dir), 0);
     capture->status = sim_tape_test(&capture->fixture->device, NULL);
     assert_int_equal(chdir(capture->fixture->original_cwd), 0);
+}
+
+static void write_sim_tape_attach_output(void *context)
+{
+    struct sim_tape_attach_capture *capture = context;
+
+    capture->status = sim_tape_attach(capture->unit, capture->path);
 }
 
 /* Verify the BOT/EOT/write-protect predicates track format, position,
@@ -832,6 +845,37 @@ static void test_sim_tape_ansi_vms_labels_format_metadata(void **state)
                              offsetof(ANSI_HDR1, block_count), "000001");
 }
 
+/* Verify oversized ANSI-VMS HDR2 size fields fail without attaching. */
+static void test_sim_tape_ansi_vms_rejects_oversized_hdr2_fields(void **state)
+{
+    static const char text[] = "HELLO\n";
+    struct sim_tape_fixture *fixture = *state;
+    struct sim_tape_attach_capture capture;
+    char *output = NULL;
+    size_t output_size = 0;
+
+    assert_int_equal(simh_test_write_file(fixture->tape_path, text,
+                                          sizeof(text) - 1),
+                     0);
+    assert_int_equal(sim_tape_set_fmt(&fixture->unit, 0, "ANSI-VMS", NULL),
+                     SCPE_OK);
+
+    fixture->unit.recsize = 100000;
+    capture.unit = &fixture->unit;
+    capture.path = fixture->tape_path;
+    capture.status = SCPE_OK;
+    assert_int_equal(simh_test_capture_stdout(write_sim_tape_attach_output,
+                                              &capture, &output,
+                                              &output_size),
+                     0);
+    assert_int_equal(SCPE_BARE_STATUS(capture.status), SCPE_ARG);
+    assert_non_null(strstr(output, "ANSI-VMS block size does not fit"));
+    assert_false((fixture->unit.flags & UNIT_ATT) != 0);
+    assert_null(fixture->unit.fileref);
+    assert_null(fixture->unit.filename);
+    free(output);
+}
+
 /* Verify ANSI-VMS HDR4 reports the stored extra file name length. */
 static void test_sim_tape_ansi_vms_long_name_reports_stored_extra(void **state)
 {
@@ -933,6 +977,12 @@ static void test_sim_tape_ansi_decimal_fields_validate_width(void **state)
     memcpy(field, "xxxxxx", sizeof(field));
     assert_false(sim_tape_format_ansi_decimal(field, 4, 10000));
     assert_memory_equal(field, "xxxxxx", sizeof(field));
+
+    assert_true(sim_tape_format_ansi_decimal(field, 5, 99999));
+    assert_memory_equal(field, "99999", 5);
+    memcpy(field, "zzzzzz", sizeof(field));
+    assert_false(sim_tape_format_ansi_decimal(field, 5, 100000));
+    assert_memory_equal(field, "zzzzzz", sizeof(field));
 
     assert_true(sim_tape_format_ansi_decimal(field, 6, 999999));
     assert_memory_equal(field, "999999", 6);
@@ -1248,6 +1298,9 @@ int main(void)
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_tape_ansi_vms_labels_format_metadata,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_ansi_vms_rejects_oversized_hdr2_fields,
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_tape_ansi_vms_long_name_reports_stored_extra,

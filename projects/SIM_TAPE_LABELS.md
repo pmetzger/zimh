@@ -2,8 +2,9 @@
 
 The `sim_tape.c` ANSI and DOS11 memory-tape paths construct fixed-width
 on-tape directory and label fields.  Memory-safety issues in this code
-have been repaired, and ANSI file sequence and block count formatting now
-rejects values that do not fit the target label field.
+have been repaired. ANSI file sequence, block count, block length, and
+record length formatting now reject values that do not fit the target
+label field.
 
 Remaining work:
 

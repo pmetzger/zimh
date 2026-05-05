@@ -70,6 +70,6 @@ void sim_tape_dos11_fallback_name(char name[9], uint32 file_count);
 
 /* Format a zero-padded decimal value into a fixed-width ANSI label field. */
 t_bool sim_tape_format_ansi_decimal(char *field, size_t field_size,
-                                    uint32 value);
+                                    t_uint64 value);
 
 #endif

@@ -4591,22 +4591,36 @@ static void ansi_make_HDR1 (ANSI_HDR1 *hdr1, ANSI_VOL1 *vol, ANSI_HDR4 *hdr4, co
     free (fn_cpy);
     }
 
-static void ansi_make_HDR2 (ANSI_HDR2 *hdr, t_bool fixed_record, size_t block_size, size_t record_size, uint32 ansi_type)
+static t_bool ansi_make_HDR2 (ANSI_HDR2 *hdr, t_bool fixed_record,
+                              size_t block_size, size_t record_size,
+                              uint32 ansi_type, const char **field_error)
     {
-    char size[12];
     struct ansi_tape_parameters *ansi = &ansi_args[ansi_type];
 
+    if (field_error != NULL)
+        *field_error = NULL;
     memset (hdr, ' ', sizeof (*hdr));
     memcpy (hdr->type, "HDR", 3);
     hdr->num = '2';
     hdr->record_format = ansi->record_format ? ansi->record_format : (fixed_record ? 'F' : 'D');
-    (void)snprintf (size, sizeof (size), "%05d", (int)block_size);
-    memcpy (hdr->block_length, size, sizeof (hdr->block_length));
-    (void)snprintf (size, sizeof (size), "%05d",
-                    (ansi->zero_record_length) ? 0 : (int)record_size);
-    memcpy (hdr->record_length, size, sizeof (hdr->record_length));
+    if (!sim_tape_format_ansi_decimal (hdr->block_length,
+                                       sizeof (hdr->block_length),
+                                       (t_uint64)block_size)) {
+        if (field_error != NULL)
+            *field_error = "block size";
+        return FALSE;
+        }
+    if (!sim_tape_format_ansi_decimal (hdr->record_length,
+                                       sizeof (hdr->record_length),
+                                       (ansi->zero_record_length) ? 0 :
+                                           (t_uint64)record_size)) {
+        if (field_error != NULL)
+            *field_error = "record size";
+        return FALSE;
+        }
     hdr->carriage_control = ansi->carriage_control ? ansi->carriage_control : (fixed_record ? 'M' : ' ');
     memcpy (hdr->buffer_offset, "00", 2);
+    return TRUE;
     }
 
 static void ansi_fill_text_buffer (FILE *f, char *buf, size_t buf_size, size_t record_skip_ending, t_bool fixed_text)
@@ -4745,14 +4759,15 @@ void sim_tape_dos11_fallback_name(char name[9], uint32 file_count)
 
 /* Format a value that must fit exactly in a fixed-width ANSI label field. */
 t_bool
-sim_tape_format_ansi_decimal(char *field, size_t field_size, uint32 value)
+sim_tape_format_ansi_decimal(char *field, size_t field_size, t_uint64 value)
 {
     char text[16];
     int written;
 
     if ((field == NULL) || (field_size == 0) || (field_size >= sizeof (text)))
         return FALSE;
-    written = snprintf (text, sizeof (text), "%0*u", (int)field_size, value);
+    written = snprintf (text, sizeof (text), "%0*" T_UINT64_FMT "u",
+                        (int)field_size, value);
     if ((written < 0) || ((size_t)written != field_size))
         return FALSE;
     memcpy (field, text, field_size);
@@ -5036,6 +5051,7 @@ ANSI_HDR1 hdr1;
 ANSI_HDR2 hdr2;
 ANSI_HDR3 hdr3;
 ANSI_HDR4 hdr4;
+const char *hdr2_field_error;
 
 f = tape_open_and_check_file (filename);
 if (f == NULL)
@@ -5100,7 +5116,15 @@ if (!sim_tape_format_ansi_decimal (hdr1.file_sequence,
     fclose (f);
     return TRUE;
     }
-ansi_make_HDR2 (&hdr2, !lf_line_endings && !crlf_line_endings, tape->block_size, max_record_size, tape->ansi_type);
+if (!ansi_make_HDR2 (&hdr2, !lf_line_endings && !crlf_line_endings,
+                     tape->block_size, max_record_size, tape->ansi_type,
+                     &hdr2_field_error)) {
+    sim_messagef (SCPE_ARG,
+                  "%s %s does not fit the ANSI label field\n",
+                  ansi->name, hdr2_field_error);
+    fclose (f);
+    return TRUE;
+    }
 
 if (!(ansi->nohdr3)) {               /* Need HDR3? */
     char size[5];
