@@ -75,7 +75,12 @@ t_stat sim_clr_idle (UNIT *uptr, int32 val, const char *cptr, void *desc);
 t_stat sim_show_idle (FILE *st, UNIT *uptr, int32 val, const void *desc);
 void sim_throt_sched (void);
 void sim_throt_cancel (void);
+
+/* Return the current host time as a wrapping millisecond tick counter.
+   The uint32 value intentionally wraps; callers must compare tick values
+   with unsigned subtraction rather than ordering raw timestamps. */
 uint32 sim_os_msec (void);
+
 void sim_os_sleep (unsigned int sec);
 uint32 sim_os_ms_sleep (unsigned int msec);
 uint32 sim_os_ms_sleep_init (void);

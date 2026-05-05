@@ -172,6 +172,28 @@ static void test_sim_os_msec_uses_shared_clock_wrapper (void **state)
     assert_int_equal (simh_test_last_clock_id, CLOCK_REALTIME);
 }
 
+/* Verify epoch-scale seconds produce the expected wrapping millisecond
+   tick value. */
+static void test_sim_os_msec_handles_epoch_scale_seconds (void **state)
+{
+    const time_t epoch_seconds = 1777949713;
+    const long epoch_nsecs = 456000000L;
+    const uint32 expected =
+        (uint32)(((uint64_t)epoch_seconds * 1000u) +
+                 ((uint64_t)epoch_nsecs / 1000000u));
+
+    (void)state;
+
+    simh_test_clock_values[0] = (struct timespec){.tv_sec = epoch_seconds,
+                                                  .tv_nsec = epoch_nsecs};
+    simh_test_clock_value_count = 1;
+    sim_time_set_test_hooks (simh_test_clock_gettime_stub, NULL);
+
+    assert_int_equal (sim_os_msec (), expected);
+    assert_int_equal (simh_test_clock_calls, 1);
+    assert_int_equal (simh_test_last_clock_id, CLOCK_REALTIME);
+}
+
 /* Verify sim_os_ms_sleep uses the shared clock and nanosleep wrappers. */
 static void test_sim_os_ms_sleep_uses_shared_time_wrappers (void **state)
 {
@@ -234,6 +256,9 @@ int main(void)
             setup_sim_timer_fixture, teardown_sim_timer_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_os_msec_uses_shared_clock_wrapper,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_os_msec_handles_epoch_scale_seconds,
             setup_sim_timer_fixture, teardown_sim_timer_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_os_ms_sleep_uses_shared_time_wrappers,

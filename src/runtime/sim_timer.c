@@ -82,6 +82,12 @@
 #define SIM_INTERNAL_UNIT sim_internal_timer_unit
 uint32 sim_idle_ms_sleep (unsigned int msec);
 
+/* Convert a timespec to the current host time as a wrapping millisecond
+   tick counter.  The uint32 value intentionally wraps; callers must
+   compare tick values with unsigned subtraction rather than ordering raw
+   timestamps. */
+/* TODO: Check whether this host tick value can use a machine-sized
+   unsigned integer instead of specifying a 32-bit counter. */
 static uint32 sim_timer_timespec_msec (const struct timespec *tp)
 {
 return (((uint32)tp->tv_sec) * 1000) + (((uint32)tp->tv_nsec) / 1000000);
