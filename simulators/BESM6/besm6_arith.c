@@ -27,6 +27,8 @@
  * authorization from Leonid Broukhis and Serge Vakulenko.
  */
 #include <math.h>
+
+#include "besm6_arith_internal.h"
 #include "besm6_defs.h"
 
 typedef struct {
@@ -219,12 +221,13 @@ void besm6_add (t_value val, int negate_acc, int negate_val)
     } else if (diff <= 40) {
         rnd_rq = (mr = (a1.mantissa << (40 - diff)) & BITS40) != 0;
         a1.mantissa = ((a1.mantissa >> diff) |
-                       (neg ? (~0ll << (40 - diff)) : 0)) & BITS42;
+                       (neg ? besm6_alu_sign_extension_mask(40 - diff) : 0)) &
+                       BITS42;
     } else if (diff <= 80) {
         diff -= 40;
         rnd_rq = a1.mantissa != 0;
         mr = ((a1.mantissa >> diff) |
-              (neg ? (~0ll << (40 - diff)) : 0)) & BITS40;
+              (neg ? besm6_alu_sign_extension_mask(40 - diff) : 0)) & BITS40;
         if (neg) {
             a1.mantissa = BITS42;
         } else
