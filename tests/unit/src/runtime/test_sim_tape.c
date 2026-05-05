@@ -186,6 +186,40 @@ static void assert_tape_file_bytes(struct sim_tape_fixture *fixture,
     free(actual_data);
 }
 
+/* Read the next tape record into a caller-supplied buffer. */
+static t_mtrlnt read_next_tape_record(UNIT *unit, uint8 *record,
+                                      size_t record_size)
+{
+    t_mtrlnt record_length;
+
+    assert_int_equal(sim_tape_rdrecf(unit, record, &record_length,
+                                     (t_mtrlnt)record_size),
+                     MTSE_OK);
+    return record_length;
+}
+
+/* Verify a fixed-position field in a tape record. */
+static void assert_tape_record_field(const uint8 *record,
+                                     t_mtrlnt record_length, size_t offset,
+                                     const char *expected)
+{
+    size_t expected_len = strlen(expected);
+
+    assert_true(record_length >= offset + expected_len);
+    assert_memory_equal(&record[offset], expected, expected_len);
+}
+
+/* Read the next tape record and verify one fixed-position field. */
+static void assert_next_tape_record_field(UNIT *unit, size_t offset,
+                                          const char *expected)
+{
+    uint8 record[256] = {0};
+    t_mtrlnt record_length;
+
+    record_length = read_next_tape_record(unit, record, sizeof(record));
+    assert_tape_record_field(record, record_length, offset, expected);
+}
+
 static void assert_string_contains(const char *haystack, const char *needle)
 {
     assert_non_null(strstr(haystack, needle));
@@ -755,6 +789,73 @@ static void test_sim_tape_memory_format_detach_clears_filename(void **state)
     assert_null(fixture->unit.io_flush);
 }
 
+/* Verify ANSI-VMS generated labels contain stable sequence and size fields. */
+static void test_sim_tape_ansi_vms_labels_format_metadata(void **state)
+{
+    static const char text[] = "HELLO\n";
+    struct sim_tape_fixture *fixture = *state;
+    uint8 record[256] = {0};
+    t_mtrlnt record_length;
+
+    assert_int_equal(simh_test_write_file(fixture->tape_path, text,
+                                          sizeof(text) - 1),
+                     0);
+    assert_int_equal(sim_tape_set_fmt(&fixture->unit, 0, "ANSI-VMS", NULL),
+                     SCPE_OK);
+    assert_int_equal(sim_tape_attach(&fixture->unit, fixture->tape_path),
+                     SCPE_OK);
+
+    assert_next_tape_record_field(&fixture->unit, 0, "VOL1");
+    record_length = read_next_tape_record(&fixture->unit, record,
+                                          sizeof(record));
+    assert_tape_record_field(record, record_length, 0, "HDR1");
+    assert_tape_record_field(record, record_length, 31, "0001");
+    record_length = read_next_tape_record(&fixture->unit, record,
+                                          sizeof(record));
+    assert_tape_record_field(record, record_length, 0, "HDR2");
+    assert_tape_record_field(record, record_length, 4, "D0204800010");
+    assert_next_tape_record_field(&fixture->unit, 0, "HDR3");
+    assert_int_equal(sim_tape_sprecf(&fixture->unit, &record_length),
+                     MTSE_TMK);
+    assert_int_equal(sim_tape_sprecf(&fixture->unit, &record_length),
+                     MTSE_OK);
+    assert_int_equal(sim_tape_sprecf(&fixture->unit, &record_length),
+                     MTSE_TMK);
+    record_length = read_next_tape_record(&fixture->unit, record,
+                                          sizeof(record));
+    assert_tape_record_field(record, record_length, 0, "EOF1");
+    assert_tape_record_field(record, record_length, 54, "000001");
+}
+
+/* Verify DOS11 generated tapes expose a header, data block, and tape mark. */
+static void test_sim_tape_dos11_memory_tape_reads_file(void **state)
+{
+    static const char text[] = "HELLO\n";
+    struct sim_tape_fixture *fixture = *state;
+    char dos11_path[1024];
+    uint8 record[1024] = {0};
+    t_mtrlnt record_length;
+
+    assert_int_equal(simh_test_join_path(dos11_path, sizeof(dos11_path),
+                                         fixture->temp_dir, "!!!"),
+                     0);
+    assert_int_equal(simh_test_write_file(dos11_path, text,
+                                          sizeof(text) - 1),
+                     0);
+    assert_int_equal(sim_tape_set_fmt(&fixture->unit, 0, "DOS11", NULL),
+                     SCPE_OK);
+    assert_int_equal(sim_tape_attach(&fixture->unit, dos11_path), SCPE_OK);
+
+    record_length = read_next_tape_record(&fixture->unit, record,
+                                          sizeof(record));
+    assert_int_equal(record_length, 14);
+    record_length = read_next_tape_record(&fixture->unit, record,
+                                          sizeof(record));
+    assert_true(record_length > 0);
+    assert_int_equal(sim_tape_sprecf(&fixture->unit, &record_length),
+                     MTSE_TMK);
+}
+
 /* Verify generic positioning can count objects and position by
    file/record tuples after an optional rewind. */
 static void test_sim_tape_position_tracks_objects_and_files(void **state)
@@ -1057,6 +1158,12 @@ int main(void)
                                         teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_tape_memory_format_detach_clears_filename,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_ansi_vms_labels_format_metadata,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_dos11_memory_tape_reads_file,
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test(
             test_sim_tape_error_text_covers_named_and_generic_errors),

@@ -3600,7 +3600,7 @@ static char msgbuf[64];
 
 if (stat <= MTSE_MAX_ERR)
     return mtse_errors[stat];
-sprintf(msgbuf, "Error %d", stat);
+(void)snprintf (msgbuf, sizeof (msgbuf), "Error %d", stat);
 return msgbuf;
 }
 
@@ -3959,7 +3959,8 @@ for (density = count = 0; density < BPI_COUNT; density++) {
             strlcat (string, "{", string_size);
         else
             strlcat (string, "|", string_size);
-        sprintf (density_str, "%d", bpi[density]);
+        (void)snprintf (density_str, sizeof (density_str), "%d",
+                        bpi[density]);
         strlcat (string, density_str, string_size);
         }
     }
@@ -4046,55 +4047,55 @@ if (!p7b_parity_inited) {
 buf = (uint8 *)malloc (65536);
 if (buf == NULL)
     return SCPE_MEM;
-sprintf (name, "%s.simh", filename);
+(void)snprintf (name, sizeof (name), "%s.simh", filename);
 fSIMH = fopen (name, "wb");
 if (fSIMH  == NULL)
     goto Done_Files;
-sprintf (name, "%s.e11", filename);
+(void)snprintf (name, sizeof (name), "%s.e11", filename);
 fE11 = fopen (name, "wb");
 if (fE11  == NULL)
     goto Done_Files;
-sprintf (name, "%s.tpc", filename);
+(void)snprintf (name, sizeof (name), "%s.tpc", filename);
 fTPC = fopen (name, "wb");
 if (fTPC  == NULL)
     goto Done_Files;
-sprintf (name, "%s.p7b", filename);
+(void)snprintf (name, sizeof (name), "%s.p7b", filename);
 fP7B = fopen (name, "wb");
 if (fP7B  == NULL)
     goto Done_Files;
-sprintf (name, "%s.tar", filename);
+(void)snprintf (name, sizeof (name), "%s.tar", filename);
 fTAR = fopen (name, "wb");
 if (fTAR  == NULL)
     goto Done_Files;
-sprintf (name, "%s.2.tar", filename);
+(void)snprintf (name, sizeof (name), "%s.2.tar", filename);
 fTAR2 = fopen (name, "wb");
 if (fTAR2  == NULL)
     goto Done_Files;
-sprintf (name, "%s.aws", filename);
+(void)snprintf (name, sizeof (name), "%s.aws", filename);
 fAWS = fopen (name, "wb");
 if (fAWS  == NULL)
     goto Done_Files;
-sprintf (name, "%s.2.aws", filename);
+(void)snprintf (name, sizeof (name), "%s.2.aws", filename);
 fAWS2 = fopen (name, "wb");
 if (fAWS2  == NULL)
     goto Done_Files;
-sprintf (name, "%s.3.aws", filename);
+(void)snprintf (name, sizeof (name), "%s.3.aws", filename);
 fAWS3 = fopen (name, "wb");
 if (fAWS3  == NULL)
     goto Done_Files;
-sprintf (name, "%s.bin.fixed", filename);
+(void)snprintf (name, sizeof (name), "%s.bin.fixed", filename);
 fBIN = fopen (name, "wb");
 if (fBIN  == NULL)
     goto Done_Files;
-sprintf (name, "%s.txt.fixed", filename);
+(void)snprintf (name, sizeof (name), "%s.txt.fixed", filename);
 fTXT = fopen (name, "wb");
 if (fTXT  == NULL)
     goto Done_Files;
-sprintf (name, "%s.txt.ansi-var", filename);
+(void)snprintf (name, sizeof (name), "%s.txt.ansi-var", filename);
 fVAR = fopen (name, "wb");
 if (fVAR  == NULL)
     goto Done_Files;
-sprintf (name, "aws %s.aws.tape", filename);
+(void)snprintf (name, sizeof (name), "aws %s.aws.tape", filename);
 sim_switches = SWMASK ('F') | (sim_switches & SWMASK ('D')) | SWMASK ('N');
 if (sim_switches & SWMASK ('D'))
     uptr->dctrl = MTSE_DBG_STR | MTSE_DBG_DAT;
@@ -4251,8 +4252,8 @@ if (aws_stat == MTSE_OK)
 if (stat == SCPE_OK) {
     char name1[CBUFSIZE], name2[CBUFSIZE];
 
-    sprintf (name1, "\"%s.aws\"", filename);
-    sprintf (name2, "\"%s.aws.tape\"", filename);
+    (void)snprintf (name1, sizeof (name1), "\"%s.aws\"", filename);
+    (void)snprintf (name2, sizeof (name2), "\"%s.aws.tape\"", filename);
     sim_switches = SWMASK ('F');
     if (sim_cmp_string (name1, name2))
         stat = 1;
@@ -4269,12 +4270,15 @@ t_stat stat;
 
 if (recsize) {
     sim_switches |= SWMASK ('B');
-    sprintf (str_recsize, " %d", (int)recsize);
+    (void)snprintf (str_recsize, sizeof (str_recsize), " %d",
+                    (int)recsize);
     }
 if (NULL == strchr (filename, '*'))
-    sprintf (args, "%s%s %s.%s", format, str_recsize, filename, format);
+    (void)snprintf (args, sizeof (args), "%s%s %s.%s", format,
+                    str_recsize, filename, format);
 else
-    sprintf (args, "%s%s %s", format, str_recsize, filename);
+    (void)snprintf (args, sizeof (args), "%s%s %s", format,
+                    str_recsize, filename);
 sim_tape_detach (uptr);
 sim_switches |= SWMASK ('F') | SWMASK ('L');    /* specific-format and detailed record report */
 stat = sim_tape_attach_ex (uptr, args, 0, 0);
@@ -4289,39 +4293,39 @@ static t_stat sim_tape_test_remove_tape_files (const char *filename)
 {
 char name[256];
 
-sprintf (name, "%s.simh", filename);
+(void)snprintf (name, sizeof (name), "%s.simh", filename);
 (void)remove (name);
-sprintf (name, "%s.2.simh", filename);
+(void)snprintf (name, sizeof (name), "%s.2.simh", filename);
 (void)remove (name);
-sprintf (name, "%s.e11", filename);
+(void)snprintf (name, sizeof (name), "%s.e11", filename);
 (void)remove (name);
-sprintf (name, "%s.2.e11", filename);
+(void)snprintf (name, sizeof (name), "%s.2.e11", filename);
 (void)remove (name);
-sprintf (name, "%s.tpc", filename);
+(void)snprintf (name, sizeof (name), "%s.tpc", filename);
 (void)remove (name);
-sprintf (name, "%s.2.tpc", filename);
+(void)snprintf (name, sizeof (name), "%s.2.tpc", filename);
 (void)remove (name);
-sprintf (name, "%s.p7b", filename);
+(void)snprintf (name, sizeof (name), "%s.p7b", filename);
 (void)remove (name);
-sprintf (name, "%s.2.p7b", filename);
+(void)snprintf (name, sizeof (name), "%s.2.p7b", filename);
 (void)remove (name);
-sprintf (name, "%s.aws", filename);
+(void)snprintf (name, sizeof (name), "%s.aws", filename);
 (void)remove (name);
-sprintf (name, "%s.2.aws", filename);
+(void)snprintf (name, sizeof (name), "%s.2.aws", filename);
 (void)remove (name);
-sprintf (name, "%s.3.aws", filename);
+(void)snprintf (name, sizeof (name), "%s.3.aws", filename);
 (void)remove (name);
-sprintf (name, "%s.tar", filename);
+(void)snprintf (name, sizeof (name), "%s.tar", filename);
 (void)remove (name);
-sprintf (name, "%s.2.tar", filename);
+(void)snprintf (name, sizeof (name), "%s.2.tar", filename);
 (void)remove (name);
-sprintf (name, "%s.bin.fixed", filename);
+(void)snprintf (name, sizeof (name), "%s.bin.fixed", filename);
 (void)remove (name);
-sprintf (name, "%s.txt.fixed", filename);
+(void)snprintf (name, sizeof (name), "%s.txt.fixed", filename);
 (void)remove (name);
-sprintf (name, "%s.txt.ansi-var", filename);
+(void)snprintf (name, sizeof (name), "%s.txt.ansi-var", filename);
 (void)remove (name);
-sprintf (name, "%s.aws.tape", filename);
+(void)snprintf (name, sizeof (name), "%s.aws.tape", filename);
 (void)remove (name);
 return SCPE_OK;
 }
@@ -4534,13 +4538,16 @@ static void ansi_date (time_t datetime, char date[6], t_bool y2k_date_bug)
 
     lt = localtime (&datetime);
     if (y2k_date_bug)
-        sprintf (buf, " %c%c%03d", '0' + (lt->tm_year / 10),
-                                   '0' + (lt->tm_year % 10),
-                                   lt->tm_yday + 1);
+        (void)snprintf (buf, sizeof (buf), " %c%c%03d",
+                        '0' + (lt->tm_year / 10),
+                        '0' + (lt->tm_year % 10),
+                        lt->tm_yday + 1);
     else
-        sprintf (buf, "%c%02d%03d", (lt->tm_year < 100) ? ' ' : '0' + (lt->tm_year/100 - 1),
-                                    lt->tm_year % 100,
-                                    lt->tm_yday + 1);
+        (void)snprintf (buf, sizeof (buf), "%c%02d%03d",
+                        (lt->tm_year < 100) ?
+                            ' ' : '0' + (lt->tm_year/100 - 1),
+                        lt->tm_year % 100,
+                        lt->tm_yday + 1);
     memcpy (date, buf, 6);
     }
 
@@ -4612,7 +4619,8 @@ static void ansi_make_HDR1 (HDR1 *hdr1, VOL1 *vol, HDR4 *hdr4, const char *filen
     to_ansi_a (hdr1->file_ident, fn, sizeof (hdr1->file_ident));
     if (strlen (fn) > 17) {
         to_ansi_a (hdr4->extra_name, fn + 17, sizeof (hdr4->extra_name));
-        sprintf (extra_name_used, "%02d", (int)(strlen (fn) - 17));
+        (void)snprintf (extra_name_used, sizeof (extra_name_used), "%02d",
+                        (int)(strlen (fn) - 17));
         }
     memcpy (hdr4->extra_name_used, extra_name_used, 2);
     memcpy (hdr1->file_set, vol->ident, sizeof (hdr1->file_set));
@@ -4636,9 +4644,10 @@ static void ansi_make_HDR2 (HDR2 *hdr, t_bool fixed_record, size_t block_size, s
     memcpy (hdr->type, "HDR", 3);
     hdr->num = '2';
     hdr->record_format = ansi->record_format ? ansi->record_format : (fixed_record ? 'F' : 'D');
-    sprintf (size, "%05d", (int)block_size);
+    (void)snprintf (size, sizeof (size), "%05d", (int)block_size);
     memcpy (hdr->block_length, size, sizeof (hdr->block_length));
-    sprintf (size, "%05d", (ansi->zero_record_length) ? 0 : (int)record_size);
+    (void)snprintf (size, sizeof (size), "%05d",
+                    (ansi->zero_record_length) ? 0 : (int)record_size);
     memcpy (hdr->record_length, size, sizeof (hdr->record_length));
     hdr->carriage_control = ansi->carriage_control ? ansi->carriage_control : (fixed_record ? 'M' : ' ');
     memcpy (hdr->buffer_offset, "00", 2);
@@ -4668,7 +4677,8 @@ static void ansi_fill_text_buffer (FILE *f, char *buf, size_t buf_size, size_t r
                 (void)fseek (f, start, SEEK_SET);
                 break;
                 }
-            sprintf (rec_size_str, "%04u", (int)(rec_size + 4));
+            (void)snprintf (rec_size_str, sizeof (rec_size_str), "%04u",
+                            (unsigned int)(rec_size + 4));
             memcpy (buf + offset, rec_size_str, 4);
             memcpy (buf + offset + 4, tmp, rec_size);
             offset += 4 + rec_size;
@@ -4871,7 +4881,7 @@ while (year >= 2000)
 
 fileday = 1000 * ((year - 70) % 100) + tm->tm_yday + 1;
 
-sprintf (FullPath, "%s%s", directory, filename);
+(void)snprintf (FullPath, sizeof (FullPath), "%s%s", directory, filename);
 f = tape_open_and_check_file (FullPath);
  if (f == NULL)
     return;
@@ -4894,7 +4904,7 @@ if (ptr != NULL)
 if (fname[0] == ' ') {
   char temp[10];
 
-  sprintf(temp, "%06u   ", tape->file_count % 100000);
+  (void)snprintf (temp, sizeof (temp), "%06u   ", tape->file_count % 100000);
   memcpy(fname, temp, sizeof(fname));
 }
 
@@ -5095,7 +5105,8 @@ if (max_record_size > tape->block_size) {
     return TRUE;
     }
 ansi_make_HDR1 (&hdr1, &tape->vol1, &hdr4, filename, tape->ansi_type);
-sprintf (file_sequence, "%04d", 1 + tape->file_count);
+(void)snprintf (file_sequence, sizeof (file_sequence), "%04u",
+                1 + tape->file_count);
 memcpy (hdr1.file_sequence, file_sequence, sizeof (hdr1.file_sequence));
 ansi_make_HDR2 (&hdr2, !lf_line_endings && !crlf_line_endings, tape->block_size, max_record_size, tape->ansi_type);
 
@@ -5109,7 +5120,7 @@ if (!(ansi->nohdr3)) {               /* Need HDR3? */
         else
             memcpy (&hdr3, ansi->hdr3_crlf_line_endings, sizeof (hdr3));
         }
-    sprintf (size, "%04x", (uint16)rms_record_size);
+    (void)snprintf (size, sizeof (size), "%04x", (uint16)rms_record_size);
     memcpy (hdr3.rms_attributes, size, 4);
     }
 memory_tape_add_block (tape, (uint8 *)&hdr1, sizeof (hdr1));
@@ -5157,7 +5168,8 @@ memcpy (hdr1.type, "EOF", sizeof (hdr1.type));
 memcpy (hdr2.type, "EOF", sizeof (hdr2.type));
 memcpy (hdr3.type, "EOF", sizeof (hdr3.type));
 memcpy (hdr4.type, "EOF", sizeof (hdr4.type));
-sprintf (block_count_string, "%06d", block_count);
+(void)snprintf (block_count_string, sizeof (block_count_string), "%06d",
+                block_count);
 memcpy (hdr1.block_count, block_count_string, sizeof (hdr1.block_count));
 memory_tape_add_block (tape, (uint8 *)&hdr1, sizeof (hdr1));
 if (!(ansi->nohdr2))
@@ -5187,7 +5199,7 @@ char FullPath[PATH_MAX + 1];
 (void) FileSize;
 (void) filestat;
 
-sprintf (FullPath, "%s%s", directory, filename);
+(void)snprintf (FullPath, sizeof (FullPath), "%s%s", directory, filename);
 
 (void)ansi_add_file_to_tape (tape, FullPath);
 }
