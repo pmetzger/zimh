@@ -2158,8 +2158,6 @@ if (bufsz < ETH_MAX_JUMBO_FRAME)
 /* attempt to connect device */
 memset(errbuf, 0, PCAP_ERRBUF_SIZE);
 if (0 == strncmp("tap:", savname, 4)) {
-  int  tun = -1;    /* TUN/TAP Socket */
-  int  on = 1;
   const char *devname = savname + 4;
 
   while (isspace(*devname))
@@ -2169,6 +2167,9 @@ if (0 == strncmp("tap:", savname, 4)) {
     return sim_messagef (SCPE_OPENERR, "Eth: Must specify actual tap device name (i.e. tap:tap0)\n");
 #endif
 #if (defined(__linux) || defined(__linux__)) && defined(HAVE_TAP_NETWORK)
+  int  tun = -1;    /* TUN/TAP Socket */
+  int  on = 1;
+
   if ((tun = open("/dev/net/tun", O_RDWR)) >= 0) {
     struct ifreq ifr; /* Interface Requests */
 
@@ -2199,6 +2200,9 @@ if (0 == strncmp("tap:", savname, 4)) {
     tun = -1;
     }
 #elif defined(HAVE_BSDTUNTAP) && defined(HAVE_TAP_NETWORK)
+  int  tun = -1;    /* TUN/TAP Socket */
+  int  on = 1;
+
   if (1) {
     char dev_name[64] = "";
 
