@@ -487,7 +487,6 @@ static unsigned sum_with_right_carry (unsigned a, unsigned b)
 static void disk_write (UNIT *u)
 {
     KMD *c = unit_to_ctlr (u);
-    int cnum = c - controller;
     if (u->dptr->dctrl & DEB_DAT)
         besm6_debug ("::: запись МД %02o зона %04o память %05o-%05o",
                      c->dev, c->zone, c->memory, c->memory + 1023);
@@ -509,7 +508,6 @@ static void disk_write (UNIT *u)
 static void disk_write_track (UNIT *u)
 {
     KMD *c = unit_to_ctlr (u);
-    int cnum = c - controller;
     if (u->dptr->dctrl & DEB_DAT)
         besm6_debug ("::: запись МД %02o полузона %04o.%d память %05o-%05o",
                      c->dev, c->zone, c->track, c->memory, c->memory + 511);
@@ -534,7 +532,6 @@ static void disk_format (UNIT *u)
     t_value fmtbuf[5];
     t_value *ptr;
     int i;
-    int cnum = c - controller;
     /* По сути, эмулятору ничего делать не надо. */
     if (! (u->dptr->dctrl & DEB_DAT))
         return;
@@ -577,7 +574,6 @@ static void disk_format (UNIT *u)
 static void disk_read (UNIT *u)
 {
     KMD *c = unit_to_ctlr (u);
-    int cnum = c - controller;
     if (u->dptr->dctrl & DEB_DAT)
         besm6_debug ((c->op & DISK_READ_SYSDATA) ?
                      "::: чтение МД %02o зона %04o служебные слова" :
@@ -621,7 +617,6 @@ static t_value collect (t_value val)
 static void disk_read_track (UNIT *u)
 {
     KMD *c = unit_to_ctlr (u);
-    int cnum = c - controller;
     if (u->dptr->dctrl & DEB_DAT)
         besm6_debug ((c->op & DISK_READ_SYSDATA) ?
                      "::: чтение МД %02o полузона %04o.%d служебные слова" :
@@ -702,7 +697,6 @@ static void disk_read_header (UNIT *u)
 void disk_io (int ctlr, uint32 cmd)
 {
     KMD *c = &controller [ctlr];
-    int cnum = c - controller;
     uint32 rem = cmd & ~(DISK_PAGE_MODE | DISK_PAGE | DISK_BLOCK | DISK_READ | DISK_READ_SYSDATA);
     if (rem && md_dev[ctlr * 4].dctrl & DEB_RWR) {
         besm6_debug ("::: КМД %c: unknown bits in IO request %08o", ctlr + '3', rem);
