@@ -20,6 +20,7 @@ struct sim_card_fixture {
     UNIT punch_unit;
     DEVICE reader_dev;
     DEVICE punch_dev;
+    int32 saved_sim_switches;
 };
 
 static int setup_sim_card_fixture(void **state)
@@ -50,6 +51,8 @@ static int setup_sim_card_fixture(void **state)
                                "PUN", DEV_CARD, UNIT_ATTABLE | MODE_TEXT, 0, 0);
 
     simh_test_reset_simulator_state();
+    fixture->saved_sim_switches = sim_switches;
+    sim_switches = 0;
     assert_int_equal(simh_test_set_sim_name("zimh-unit-sim-card"), 0);
 
     devices[0] = &fixture->reader_dev;
@@ -73,9 +76,25 @@ static int teardown_sim_card_fixture(void **state)
     }
 
     assert_int_equal(simh_test_remove_path(fixture->temp_dir), 0);
+    sim_switches = fixture->saved_sim_switches;
     free(fixture);
     *state = NULL;
     return 0;
+}
+
+static void assert_punched_output(struct sim_card_fixture *fixture,
+                                  const char *expected)
+{
+    void *output_data;
+    size_t output_size;
+
+    assert_int_equal(sim_card_detach(&fixture->punch_unit), SCPE_OK);
+    assert_int_equal(
+        simh_test_read_file(fixture->output_path, &output_data, &output_size),
+        0);
+    assert_int_equal(output_size, strlen(expected));
+    assert_memory_equal(output_data, expected, output_size);
+    free(output_data);
 }
 
 /* Verify text decks handle CRLF, tab expansion, and EOF cards correctly. */
@@ -85,8 +104,6 @@ static void test_sim_card_text_deck_handles_crlf_and_tabs(void **state)
     static const char expected_output[] = "A       B\nWORLD\n";
     struct sim_card_fixture *fixture = *state;
     uint16 image[80];
-    void *output_data;
-    size_t output_size;
 
     assert_int_equal(simh_test_write_file(fixture->input_path, deck_text,
                                           sizeof(deck_text) - 1),
@@ -110,14 +127,7 @@ static void test_sim_card_text_deck_handles_crlf_and_tabs(void **state)
 
     assert_int_equal(sim_read_card(&fixture->reader_unit, image), CDSE_EOF);
 
-    assert_int_equal(sim_card_detach(&fixture->punch_unit), SCPE_OK);
-
-    assert_int_equal(
-        simh_test_read_file(fixture->output_path, &output_data, &output_size),
-        0);
-    assert_int_equal(output_size, strlen(expected_output));
-    assert_memory_equal(output_data, expected_output, output_size);
-    free(output_data);
+    assert_punched_output(fixture, expected_output);
 }
 
 /* Verify bad text-card bytes are reported as conversion errors. */
@@ -139,6 +149,98 @@ static void test_sim_card_reports_text_conversion_errors(void **state)
     assert_true(sim_card_eof(&fixture->reader_unit));
 }
 
+/* Verify unattached reader queries return stable empty states. */
+static void test_sim_card_unattached_reader_queries_are_empty(void **state)
+{
+    struct sim_card_fixture *fixture = *state;
+    uint16 image[80];
+
+    assert_int_equal(sim_hopper_size(&fixture->reader_unit), 0);
+    assert_int_equal(sim_card_input_hopper_count(&fixture->reader_unit), 0);
+    assert_int_equal(sim_read_card(&fixture->reader_unit, image), CDSE_EMPTY);
+    assert_int_equal(sim_card_eof(&fixture->reader_unit), SCPE_UNATT);
+}
+
+/* Verify -S appends new card images after an existing hopper. */
+static void test_sim_card_append_deck_preserves_read_order(void **state)
+{
+    static const char first_deck[] = "FIRST\n";
+    static const char second_deck[] = "SECOND\n";
+    static const char expected_output[] = "FIRST\nSECOND\n";
+    struct sim_card_fixture *fixture = *state;
+    char second_path[1024];
+    char append_arg[1200];
+    uint16 image[80];
+
+    assert_int_equal(simh_test_join_path(second_path, sizeof(second_path),
+                                         fixture->temp_dir, "second.deck"),
+                     0);
+    assert_int_equal(simh_test_write_file(fixture->input_path, first_deck,
+                                          sizeof(first_deck) - 1),
+                     0);
+    assert_int_equal(simh_test_write_file(second_path, second_deck,
+                                          sizeof(second_deck) - 1),
+                     0);
+    assert_int_equal(snprintf(append_arg, sizeof(append_arg), "-S -E %s",
+                              second_path) < (int)sizeof(append_arg),
+                     1);
+
+    assert_int_equal(
+        sim_card_attach(&fixture->reader_unit, fixture->input_path), SCPE_OK);
+    assert_int_equal(sim_hopper_size(&fixture->reader_unit), 1);
+    assert_int_equal(sim_card_attach(&fixture->reader_unit, append_arg),
+                     SCPE_OK);
+    sim_switches = 0;
+    assert_int_equal(sim_hopper_size(&fixture->reader_unit), 3);
+    assert_int_equal(sim_card_input_hopper_count(&fixture->reader_unit), 2);
+
+    assert_int_equal(
+        sim_card_attach(&fixture->punch_unit, fixture->output_path), SCPE_OK);
+    assert_int_equal(sim_read_card(&fixture->reader_unit, image), CDSE_OK);
+    assert_int_equal(sim_punch_card(&fixture->punch_unit, image), CDSE_OK);
+    assert_int_equal(sim_read_card(&fixture->reader_unit, image), CDSE_OK);
+    assert_int_equal(sim_punch_card(&fixture->punch_unit, image), CDSE_OK);
+    assert_true(sim_card_eof(&fixture->reader_unit));
+    assert_int_equal(sim_read_card(&fixture->reader_unit, image), CDSE_EOF);
+
+    assert_punched_output(fixture, expected_output);
+}
+
+/* Verify a normal reader attach replaces existing hopper images. */
+static void test_sim_card_replace_deck_discards_previous_hopper(void **state)
+{
+    static const char old_deck[] = "OLD\n";
+    static const char new_deck[] = "NEW\n";
+    static const char expected_output[] = "NEW\n";
+    struct sim_card_fixture *fixture = *state;
+    char new_path[1024];
+    uint16 image[80];
+
+    assert_int_equal(simh_test_join_path(new_path, sizeof(new_path),
+                                         fixture->temp_dir, "new.deck"),
+                     0);
+    assert_int_equal(simh_test_write_file(fixture->input_path, old_deck,
+                                          sizeof(old_deck) - 1),
+                     0);
+    assert_int_equal(simh_test_write_file(new_path, new_deck,
+                                          sizeof(new_deck) - 1),
+                     0);
+
+    assert_int_equal(
+        sim_card_attach(&fixture->reader_unit, fixture->input_path), SCPE_OK);
+    assert_int_equal(sim_hopper_size(&fixture->reader_unit), 1);
+    assert_int_equal(sim_card_attach(&fixture->reader_unit, new_path), SCPE_OK);
+    assert_int_equal(sim_hopper_size(&fixture->reader_unit), 1);
+
+    assert_int_equal(
+        sim_card_attach(&fixture->punch_unit, fixture->output_path), SCPE_OK);
+    assert_int_equal(sim_read_card(&fixture->reader_unit, image), CDSE_OK);
+    assert_int_equal(sim_punch_card(&fixture->punch_unit, image), CDSE_OK);
+    assert_int_equal(sim_read_card(&fixture->reader_unit, image), CDSE_EMPTY);
+
+    assert_punched_output(fixture, expected_output);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -147,6 +249,15 @@ int main(void)
             setup_sim_card_fixture, teardown_sim_card_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_card_reports_text_conversion_errors,
+            setup_sim_card_fixture, teardown_sim_card_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_card_unattached_reader_queries_are_empty,
+            setup_sim_card_fixture, teardown_sim_card_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_card_append_deck_preserves_read_order,
+            setup_sim_card_fixture, teardown_sim_card_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_card_replace_deck_discards_previous_hopper,
             setup_sim_card_fixture, teardown_sim_card_fixture),
     };
 

@@ -85,7 +85,7 @@ struct card_context
     uint8               hol_to_ascii[4096]; /* Back conversion table */
     t_addr              hopper_size;     /* Size of hopper */
     t_addr              hopper_cards;    /* Number of cards in hopper */
-    uint16              (*images)[1][80];
+    uint16              (*images)[80];
 };
 
 /* Character conversion tables */
@@ -558,7 +558,7 @@ sim_card_input_hopper_count(UNIT *uptr) {
     if (uptr->pos >= data->hopper_cards)
         return 0;
 
-    col = (*data->images)[data->hopper_cards-1][0];
+    col = data->images[data->hopper_cards-1][0];
 
     return (int)((data->hopper_cards - uptr->pos) - ((col & CARD_EOF) ? 1 : 0));
 }
@@ -589,7 +589,7 @@ sim_read_card(UNIT * uptr, uint16 image[80])
         return CDSE_EMPTY;
 
     dptr = find_dev_from_unit( uptr);
-    img = &(*data->images)[uptr->pos];
+    img = &data->images[uptr->pos];
     if (sim_deb && dptr && ((dptr)->dctrl & DEBUG_CARD)) {
          if (image[0] & CARD_EOF) {
              sim_debug(DEBUG_CARD, dptr, "Read hopper EOF\n");
@@ -641,7 +641,7 @@ sim_card_eof(UNIT *uptr)
     if (uptr->pos >= data->hopper_cards)
         return SCPE_UNATT;
 
-    col = (*data->images)[uptr->pos][0];
+    col = data->images[uptr->pos][0];
 
     if (col & CARD_EOF)
         return 1;
@@ -986,7 +986,7 @@ _sim_read_deck(UNIT * uptr, int eof)
         /* Allocate space for some more cards if needed */
         if (data->hopper_cards >= data->hopper_size) {
             data->hopper_size += DECK_SIZE;
-            data->images = (uint16 (*)[1][80])realloc(data->images,
+            data->images = (uint16 (*)[80])realloc(data->images,
                        (size_t)data->hopper_size * sizeof(*(data->images)));
             memset(&data->images[data->hopper_cards], 0,
                        (size_t)(data->hopper_size - data->hopper_cards) *
@@ -995,7 +995,7 @@ _sim_read_deck(UNIT * uptr, int eof)
 
         /* Process one card */
         cards++;
-        if (_sim_parse_card(uptr, dptr, &buf, &(*data->images)[data->hopper_cards])
+        if (_sim_parse_card(uptr, dptr, &buf, &data->images[data->hopper_cards])
                 != SCPE_OK) {
             r = sim_messagef(SCPE_OPENERR, "%s: %s Error (%s) in card %d\n",
                    sim_uname(uptr), uptr->filename, sim_error_text(r), cards);
@@ -1017,7 +1017,7 @@ _sim_read_deck(UNIT * uptr, int eof)
           /* Allocate space for some more cards if needed */
           if (data->hopper_cards >= data->hopper_size) {
               data->hopper_size += DECK_SIZE;
-              data->images = (uint16 (*)[1][80])realloc(data->images,
+              data->images = (uint16 (*)[80])realloc(data->images,
                          (size_t)data->hopper_size * sizeof(*(data->images)));
               memset(&data->images[data->hopper_cards], 0,
                          (size_t)(data->hopper_size - data->hopper_cards) *
@@ -1025,7 +1025,7 @@ _sim_read_deck(UNIT * uptr, int eof)
           }
 
           /* Create empty card */
-          (*data->images)[data->hopper_cards][0] = CARD_EOF;
+          data->images[data->hopper_cards][0] = CARD_EOF;
           data->hopper_cards++;
        }
     }
