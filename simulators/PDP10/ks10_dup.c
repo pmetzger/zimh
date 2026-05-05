@@ -91,8 +91,6 @@ static t_stat dup_reset (DEVICE *dptr);
 static t_stat dup_attach (UNIT *uptr, const char *ptr);
 static t_stat dup_detach (UNIT *uptr);
 static t_stat dup_clear (int32 dup, t_bool flag);
-static void dup_update_rcvi (void);
-static void dup_update_xmti (void);
 static void dup_clr_rxint (int32 dup);
 static void dup_set_rxint (int32 dup);
 static void dup_clr_txint (int32 dup);
@@ -1151,7 +1149,7 @@ return SCPE_OK;
 
 static t_stat dup_reset (DEVICE *dptr)
 {
-int32 i, ndev, attached = 0;
+int32 i, attached = 0;
 
 sim_debug(DBG_TRC, dptr, "dup_reset()\n");
 
@@ -1189,7 +1187,6 @@ dup_desc.notelnet = TRUE;                               /* We always want raw tc
 dup_desc.dptr = DUPDPTR;                                /* Connect appropriate device */
 dup_desc.uptr = dup_units+dup_desc.lines;               /* Identify polling unit */
 sim_cancel (dup_units+dup_desc.lines);                  /* stop poll */
-ndev = ((dptr->flags & DEV_DIS)? 0: dup_desc.lines );
 if (attached)
     sim_activate_after (dup_units+dup_desc.lines, DUP_CONNECT_POLL*1000000);/* start poll */
 return SCPE_OK;
