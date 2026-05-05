@@ -3,14 +3,116 @@
 
 #include "test_cmocka.h"
 
+#include "sim_frontpanel.h"
+#include "sim_sock.h"
 #include "sim_time.h"
 
+static int simh_test_frontpanel_write_sock(SOCKET sock, const char *msg,
+                                           int nbytes);
+
+#define sim_write_sock simh_test_frontpanel_write_sock
 #include "sim_frontpanel.c"
+#undef sim_write_sock
 
 static int simh_test_frontpanel_clock_calls = 0;
 static int simh_test_frontpanel_sleep_calls = 0;
 static int simh_test_frontpanel_last_clock_id = -1;
 static struct timespec simh_test_frontpanel_last_sleep_req = {0};
+static PANEL *simh_test_frontpanel_active_panel = NULL;
+static PANEL *simh_test_frontpanel_sleep_panel = NULL;
+static int simh_test_frontpanel_write_count = 0;
+static char simh_test_frontpanel_writes[4][4096];
+
+/* Reset the frontpanel socket write recorder and completion hook. */
+static void simh_test_frontpanel_reset_writes(void)
+{
+    simh_test_frontpanel_active_panel = NULL;
+    simh_test_frontpanel_write_count = 0;
+    memset(simh_test_frontpanel_writes, 0,
+           sizeof(simh_test_frontpanel_writes));
+}
+
+/* Provide a PANEL with the locks and response storage used by send helpers. */
+static void simh_test_frontpanel_init_panel(PANEL *panel)
+{
+    memset(panel, 0, sizeof(*panel));
+    panel->sock = 1;
+    assert_int_equal(pthread_mutex_init(&panel->io_lock, NULL), 0);
+    assert_int_equal(pthread_mutex_init(&panel->io_send_lock, NULL), 0);
+    assert_int_equal(pthread_mutex_init(&panel->io_command_lock, NULL), 0);
+    assert_int_equal(pthread_cond_init(&panel->io_done, NULL), 0);
+    assert_int_equal(pthread_cond_init(&panel->startup_done, NULL), 0);
+    panel->io_response_size = 1;
+    panel->io_response = malloc(panel->io_response_size);
+    assert_non_null(panel->io_response);
+    panel->io_response[0] = '\0';
+}
+
+/* Release the synchronization and response storage owned by a test PANEL. */
+static void simh_test_frontpanel_destroy_panel(PANEL *panel)
+{
+    free(panel->io_response);
+    pthread_cond_destroy(&panel->startup_done);
+    pthread_cond_destroy(&panel->io_done);
+    pthread_mutex_destroy(&panel->io_command_lock);
+    pthread_mutex_destroy(&panel->io_send_lock);
+    pthread_mutex_destroy(&panel->io_lock);
+}
+
+/* Store a simulated command response so _panel_sendf() can complete. */
+static void simh_test_frontpanel_complete_command(PANEL *panel,
+                                                 const char *msg)
+{
+    const char *status = strstr(msg, command_status);
+    size_t command_len = status ? (size_t)(status - msg) : strlen(msg);
+    int response_len;
+
+    response_len = snprintf(NULL, 0, "%s%.*s\n%s\r\nStatus:00000000-\r\n",
+                            sim_prompt, (int)command_len, msg,
+                            command_status);
+    assert_true(response_len >= 0);
+    if ((size_t)response_len + 1 > panel->io_response_size) {
+        char *response = realloc(panel->io_response, (size_t)response_len + 1);
+
+        assert_non_null(response);
+        panel->io_response = response;
+        panel->io_response_size = (size_t)response_len + 1;
+    }
+    snprintf(panel->io_response, panel->io_response_size,
+             "%s%.*s\n%s\r\nStatus:00000000-\r\n",
+             sim_prompt, (int)command_len, msg, command_status);
+    panel->io_response_data = (size_t)response_len;
+    panel->io_waiting = 0;
+    pthread_cond_signal(&panel->io_done);
+}
+
+/* Capture panel writes and complete synchronous command requests. */
+static int simh_test_frontpanel_write_sock(SOCKET sock, const char *msg,
+                                           int nbytes)
+{
+    size_t copy_len;
+
+    (void)sock;
+
+    assert_true(nbytes >= 0);
+    assert_true(simh_test_frontpanel_write_count <
+                (int)(sizeof(simh_test_frontpanel_writes) /
+                      sizeof(simh_test_frontpanel_writes[0])));
+    copy_len = (size_t)nbytes;
+    assert_true(copy_len < sizeof(simh_test_frontpanel_writes[0]));
+    memcpy(simh_test_frontpanel_writes[simh_test_frontpanel_write_count],
+           msg, copy_len);
+    simh_test_frontpanel_writes[simh_test_frontpanel_write_count]
+                               [copy_len] = '\0';
+    ++simh_test_frontpanel_write_count;
+
+    if (simh_test_frontpanel_active_panel &&
+        simh_test_frontpanel_active_panel->io_waiting)
+        simh_test_frontpanel_complete_command(
+            simh_test_frontpanel_active_panel, msg);
+
+    return nbytes;
+}
 
 /* Return a deterministic timestamp through the shared time wrapper. */
 static int simh_test_frontpanel_clock(int clock_id, struct timespec *tp)
@@ -43,6 +145,8 @@ static int setup_sim_frontpanel_fixture(void **state)
     simh_test_frontpanel_sleep_calls = 0;
     simh_test_frontpanel_last_clock_id = -1;
     simh_test_frontpanel_last_sleep_req = (struct timespec){0};
+    simh_test_frontpanel_sleep_panel = NULL;
+    simh_test_frontpanel_reset_writes();
     sim_time_reset_test_hooks();
     assert_int_equal(pthread_key_create(&panel_thread_id, NULL), 0);
     return 0;
@@ -54,6 +158,7 @@ static int teardown_sim_frontpanel_fixture(void **state)
     (void)state;
 
     pthread_key_delete(panel_thread_id);
+    simh_test_frontpanel_reset_writes();
     sim_time_reset_test_hooks();
     return 0;
 }
@@ -105,6 +210,98 @@ static void test_frontpanel_debug_flusher_uses_shared_sleep(void **state)
     assert_int_equal(simh_test_frontpanel_last_sleep_req.tv_nsec, 100000000L);
 }
 
+/* Verify register bit collection sends only sampled bit registers. */
+static void test_frontpanel_establishes_register_bit_collection(void **state)
+{
+    PANEL panel;
+    int cpu_bits[2] = {0};
+    int mem_bits[2] = {0};
+    REG regs[] = {
+        {.name = "PC"},
+        {.name = "FLAGS", .device_name = "CPU", .bits = cpu_bits,
+         .bit_count = 2},
+        {.name = "IND", .device_name = "M", .indirect = 1, .bits = mem_bits,
+         .bit_count = 2},
+    };
+
+    (void)state;
+
+    simh_test_frontpanel_init_panel(&panel);
+    panel.reg_count = sizeof(regs) / sizeof(regs[0]);
+    panel.regs = regs;
+    panel.sample_depth = 8;
+    panel.sample_frequency = 125;
+    panel.sample_dither_pct = 3;
+    simh_test_frontpanel_active_panel = &panel;
+
+    assert_int_equal(_panel_establish_register_bits_collection(&panel), 0);
+
+    assert_int_equal(simh_test_frontpanel_write_count, 1);
+    assert_string_equal(
+        simh_test_frontpanel_writes[0],
+        "collect 8 samples every 125 cycles dither 3 percent "
+        "CPU FLAGS,-I M IND\r"
+        "ECHO Status:%STATUS%-%TSTATUS%\r# COMMAND-DONE\r");
+
+    simh_test_frontpanel_active_panel = NULL;
+    simh_test_frontpanel_destroy_panel(&panel);
+}
+
+/* Stop callbacks during sleep to verify repeat setup keeps its interval. */
+static int simh_test_frontpanel_stop_callback_sleep(const struct timespec *req,
+                                                    struct timespec *rem)
+{
+    ++simh_test_frontpanel_sleep_calls;
+    if (req != NULL)
+        simh_test_frontpanel_last_sleep_req = *req;
+    if (rem != NULL)
+        *rem = (struct timespec){0};
+    if ((simh_test_frontpanel_sleep_calls == 2) &&
+        (simh_test_frontpanel_sleep_panel != NULL)) {
+        pthread_mutex_lock(&simh_test_frontpanel_sleep_panel->io_lock);
+        simh_test_frontpanel_sleep_panel->usecs_between_callbacks = 0;
+        pthread_mutex_unlock(&simh_test_frontpanel_sleep_panel->io_lock);
+    }
+    return 0;
+}
+
+/* Verify callback repeat setup uses the interval captured before sleeping. */
+static void test_frontpanel_callback_repeat_uses_captured_interval(void **state)
+{
+    PANEL panel;
+    REG regs[] = {
+        {.name = "PC"},
+    };
+
+    (void)state;
+
+    simh_test_frontpanel_init_panel(&panel);
+    panel.reg_count = sizeof(regs) / sizeof(regs[0]);
+    panel.regs = regs;
+    panel.usecs_between_callbacks = 250000;
+    panel.new_register = 1;
+    panel.State = Run;
+    simh_test_frontpanel_active_panel = &panel;
+    simh_test_frontpanel_sleep_panel = &panel;
+    sim_time_set_test_hooks(NULL, simh_test_frontpanel_stop_callback_sleep);
+
+    (void)_panel_callback(&panel);
+
+    assert_int_equal(simh_test_frontpanel_sleep_calls, 2);
+    assert_int_equal(simh_test_frontpanel_write_count, 2);
+    assert_non_null(strstr(simh_test_frontpanel_writes[0],
+                           "repeat every 250000 usecs "));
+    assert_null(strstr(simh_test_frontpanel_writes[0],
+                       "repeat every 0 usecs "));
+    assert_string_equal(simh_test_frontpanel_writes[1],
+                        "repeat stop all\r"
+                        "ECHO Status:%STATUS%-%TSTATUS%\r# COMMAND-DONE\r");
+
+    simh_test_frontpanel_active_panel = NULL;
+    simh_test_frontpanel_sleep_panel = NULL;
+    simh_test_frontpanel_destroy_panel(&panel);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -113,6 +310,12 @@ int main(void)
             setup_sim_frontpanel_fixture, teardown_sim_frontpanel_fixture),
         cmocka_unit_test_setup_teardown(
             test_frontpanel_debug_flusher_uses_shared_sleep,
+            setup_sim_frontpanel_fixture, teardown_sim_frontpanel_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_frontpanel_establishes_register_bit_collection,
+            setup_sim_frontpanel_fixture, teardown_sim_frontpanel_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_frontpanel_callback_repeat_uses_captured_interval,
             setup_sim_frontpanel_fixture, teardown_sim_frontpanel_fixture),
     };
 

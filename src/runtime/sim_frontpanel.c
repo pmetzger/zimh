@@ -518,7 +518,7 @@ return 0;
 static int
 _panel_establish_register_bits_collection (PANEL *panel)
 {
-size_t i, buf_data, buf_needed = 1, reg_count = 0, bit_reg_count = 0;
+size_t i, buf_data, buf_needed = 1;
 int cmd_stat, bits_count = 0;
 char *buf, *response = NULL;
 
@@ -2374,7 +2374,6 @@ int sched_policy;
 struct sched_param sched_priority;
 char *buf = NULL;
 size_t buf_data = 0;
-unsigned int callback_count = 0;
 int cmd_stat;
 
 /*
@@ -2431,7 +2430,7 @@ while ((p->sock != INVALID_SOCKET) &&
             c += strlen (register_get_start);
             }
         sprintf (repeat, "%s%d%s%s%*.*s", register_repeat_prefix,
-                                     p->usecs_between_callbacks,
+                                     interval,
                                      register_repeat_units,
                                      register_repeat_start,
                                      (int)buf_data, (int)buf_data, c);
