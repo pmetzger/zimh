@@ -10,6 +10,8 @@
 #include <string.h>
 #include <time.h>
 
+#include "sim_defs.h"
+
 #if defined(_WIN32)
 #include <fcntl.h>
 #include <io.h>
@@ -22,7 +24,6 @@
 #include <unistd.h>
 #endif
 
-#include "sim_defs.h"
 #include "sim_host_path.h"
 
 static const char sim_tempfile_chars[] =

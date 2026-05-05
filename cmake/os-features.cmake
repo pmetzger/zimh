@@ -253,9 +253,7 @@ endif (WITH_NETWORK)
 ## time.)
 if (WIN32)
     target_link_libraries(os_features INTERFACE ws2_32 wsock32 winmm)
-    target_compile_definitions(os_features INTERFACE
-        HAVE_WINMM
-        WIN32_LEAN_AND_MEAN)
+    target_compile_definitions(os_features INTERFACE HAVE_WINMM)
     if (NOT ENABLE_WINAPI_DEPRECATION_WARNINGS)
         target_compile_definitions(os_features INTERFACE
             _WINSOCK_DEPRECATED_NO_WARNINGS
