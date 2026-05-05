@@ -13,6 +13,7 @@
 #include "scp.h"
 #include "sim_console.h"
 #include "sim_dynstr.h"
+#include "sim_dynstr_internal.h"
 #include "sim_host_path_internal.h"
 #include "test_simh_personality.h"
 #include "test_support.h"

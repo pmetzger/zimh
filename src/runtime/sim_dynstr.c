@@ -5,6 +5,7 @@
 #include <stdarg.h>
 
 #include "sim_dynstr.h"
+#include "sim_dynstr_internal.h"
 
 /* Tests can replace the allocator to drive allocation-failure paths. */
 static sim_dynstr_realloc_fn sim_dynstr_realloc_hook = NULL;
@@ -157,6 +158,23 @@ char *sim_dynstr_take(sim_dynstr_t *ds)
     ds->len = 0;
     ds->cap = 0;
     return buf;
+}
+
+/* Allocate a new C string containing two concatenated C strings. */
+char *sim_dynstr_concat_cstrs(const char *first, const char *second)
+{
+    sim_dynstr_t ds;
+
+    if ((first == NULL) || (second == NULL))
+        return NULL;
+
+    sim_dynstr_init(&ds);
+    if (!sim_dynstr_append(&ds, first) || !sim_dynstr_append(&ds, second)) {
+        sim_dynstr_free(&ds);
+        return NULL;
+    }
+
+    return sim_dynstr_take(&ds);
 }
 
 /* Install a test allocator hook for deterministic failure coverage. */

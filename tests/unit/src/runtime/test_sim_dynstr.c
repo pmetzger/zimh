@@ -6,6 +6,7 @@
 #include "test_cmocka.h"
 
 #include "sim_dynstr.h"
+#include "sim_dynstr_internal.h"
 
 static int simh_test_dynstr_realloc_calls = 0;
 static int simh_test_dynstr_fail_after = -1;
@@ -338,6 +339,58 @@ static void test_sim_dynstr_reset_restores_default_allocator(void **state)
     sim_dynstr_free(&ds);
 }
 
+/* Verify concat returns a newly allocated C string with both inputs. */
+static void test_sim_dynstr_concat_cstrs_joins_two_strings(void **state)
+{
+    char *joined;
+
+    (void)state;
+
+    joined = sim_dynstr_concat_cstrs("alpha/", "beta");
+    assert_non_null(joined);
+    assert_string_equal(joined, "alpha/beta");
+    free(joined);
+}
+
+/* Verify concat allocates enough room for paths larger than PATH_MAX. */
+static void test_sim_dynstr_concat_cstrs_keeps_long_strings(void **state)
+{
+    enum {
+        EXTRA = 32
+    };
+    char directory[PATH_MAX + EXTRA];
+    char filename[64];
+    char *joined = NULL;
+    size_t directory_len = sizeof(directory) - 1;
+    size_t filename_len = sizeof(filename) - 1;
+
+    (void)state;
+
+    memset(directory, 'd', directory_len);
+    directory[directory_len] = '\0';
+    memset(filename, 'f', filename_len);
+    filename[filename_len] = '\0';
+
+    joined = sim_dynstr_concat_cstrs(directory, filename);
+    assert_non_null(joined);
+    assert_int_equal(strlen(joined), directory_len + filename_len);
+    assert_memory_equal(joined, directory, directory_len);
+    assert_memory_equal(joined + directory_len, filename, filename_len);
+    free(joined);
+}
+
+/* Verify concat reports allocation failure without returning partial text. */
+static void test_sim_dynstr_concat_cstrs_reports_alloc_failure(void **state)
+{
+    (void)state;
+
+    simh_test_dynstr_fail_after = 0;
+    sim_dynstr_set_test_realloc_hook(simh_test_dynstr_realloc_fail);
+
+    assert_null(sim_dynstr_concat_cstrs("alpha/", "beta"));
+    assert_int_equal(simh_test_dynstr_realloc_calls, 1);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -388,6 +441,15 @@ int main(void)
                                         teardown_sim_dynstr_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_dynstr_reset_restores_default_allocator,
+            setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_dynstr_concat_cstrs_joins_two_strings,
+            setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_dynstr_concat_cstrs_keeps_long_strings,
+            setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_dynstr_concat_cstrs_reports_alloc_failure,
             setup_sim_dynstr_fixture, teardown_sim_dynstr_fixture),
     };
 
