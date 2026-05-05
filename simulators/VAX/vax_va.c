@@ -38,6 +38,7 @@
 #include "vax_gpx.h"
 #include "vax_2681.h"
 #include "vax_lk.h"
+#include "vax_va_internal.h"
 #include "vax_vs.h"
 #include "vax_vcb02_bin.h"
 
@@ -381,7 +382,9 @@ va_dga_fifo_sz++;
 
 static uint32 va_dga_fifo_rd (void)
 {
-uint32 val, wc, bc, r;
+uint32 val, bc;
+int32 r;
+VA_DGA_MAP_STATUS dma;
 
 if (va_dga_fifo_sz == 0) {                              /* reading empty fifo */
     if (va_dga_count > 0) {                             /* DMA in progress? */
@@ -392,13 +395,17 @@ if (va_dga_fifo_sz == 0) {                              /* reading empty fifo */
                 bc = va_dga_count;                      /* get remaining DMA size */
                 if (bc > (VA_DGA_FIFOSIZE << 1))        /* limit to size of FIFO */
                     bc = (VA_DGA_FIFOSIZE << 1);
-                wc = bc >> 1;                           /* bytes -> words */
                 r = Map_ReadW (va_dga_addr, bc, &va_ram[VA_FFO_OF]);
+                dma = va_dga_map_status (bc, r);
                                                         /* do the DMA */
-                va_dga_fifo_sz = wc;
-                va_dga_fifo_wp = wc;
-                va_dga_count -= bc;                     /* decrement DMA size */
-                va_dga_addr += bc;                      /* increment DMA addr */
+                va_dga_fifo_sz = dma.words;
+                va_dga_fifo_wp = dma.words;
+                va_dga_count -= dma.bytes;              /* decrement DMA size */
+                va_dga_addr += dma.bytes;               /* increment DMA addr */
+                if (dma.bus_timeout) {
+                    va_dga_csr = va_dga_csr_set_bus_timeout (va_dga_csr);
+                    va_setint (INT_DGA);
+                    }
                 break;
                 }
         }
@@ -493,19 +500,21 @@ static void va_dga_wr (int32 pa, int32 val, int32 lnt)
 (void) lnt;
 
 int32 rg = (pa >> 1) & 0xFF;
+uint32 error_bits;
 
 if (rg <= DGA_MAXREG)
     sim_debug (DBG_DGA, &va_dev, "dga_wr: %s, %X from PC %08X\n", va_dga_rgd[rg], val, fault_PC);
 
 switch (rg) {
     case DGA_CSR:                                       /* CSR */
+        error_bits = va_dga_csr & VA_DGA_CSR_ERROR_BITS;
         if (val & DGACSR_DE)
-            va_dga_csr = va_dga_csr & ~0x00E0;
+            error_bits = va_dga_csr_clear_dma_errors (error_bits);
         if ((val & 0x2) && ((va_dga_csr & 0x2) == 0)) {
             if (GET_MODE (val) != MODE_HALT)
                 sim_activate (&va_unit[1], 30);
             }
-        va_dga_csr = val & DGACSR_WR;
+        va_dga_csr = (val & DGACSR_WR) | error_bits;
         va_checkint ();
         break;
 
@@ -1019,7 +1028,9 @@ t_stat va_dmasvc (UNIT *uptr)
    This implementation does not use every parameter. */
 (void) uptr;
 
-uint32 wc, bc, i, r;
+uint32 wc, bc, i;
+int32 r;
+VA_DGA_MAP_STATUS dma;
 
 if (GET_MODE (va_dga_csr) == MODE_HALT)
     return SCPE_OK;
@@ -1034,8 +1045,10 @@ while (va_dga_count > 0) {
 
         case MODE_PTB:
             r = Map_ReadW (va_dga_addr, bc, &va_ram[VA_FFO_OF]);
-            va_dga_count -= bc;
-            va_dga_addr += bc;
+            dma = va_dga_map_status (bc, r);
+            wc = dma.words;
+            va_dga_count -= dma.bytes;
+            va_dga_addr += dma.bytes;
             for (i = 0; i < wc; i++) {
                 if (va_dga_csr & DGACSR_PACK) {
                     if ((va_adp[ADP_STAT] & ADPSTAT_ITR) == 0)
@@ -1052,6 +1065,11 @@ while (va_dga_count > 0) {
                     }
                 }
             va_ptb (&va_unit[1], (va_unit[1].CMD == CMD_PTBZ));
+            if (dma.bus_timeout) {
+                va_dga_csr = va_dga_csr_set_bus_timeout (va_dga_csr);
+                va_setint (INT_DGA);
+                return SCPE_OK;
+                }
             break;
 
         case MODE_BTP:
@@ -1072,17 +1090,31 @@ while (va_dga_count > 0) {
                     }
                 }
             r = Map_WriteW (va_dga_addr, bc, &va_ram[VA_FFO_OF]);
-            va_dga_count -= bc;
-            va_dga_addr += bc;
+            dma = va_dga_map_status (bc, r);
+            va_dga_count -= dma.bytes;
+            va_dga_addr += dma.bytes;
+            if (dma.bus_timeout) {
+                va_dga_csr = va_dga_csr_set_bus_timeout (va_dga_csr);
+                va_setint (INT_DGA);
+                return SCPE_OK;
+                }
             break;
 
         case MODE_DL:
             r = Map_ReadW (va_dga_addr, bc, &va_ram[VA_FFO_OF]);
-            va_dga_count -= bc;
-            va_dga_addr += bc;
+            dma = va_dga_map_status (bc, r);
+            wc = dma.words;
+            va_dga_count -= dma.bytes;
+            va_dga_addr += dma.bytes;
             for (i = 0; i < wc; i++)
                 va_dga_fifo_wr (va_ram[VA_FFO_OF + i]);
-            va_dlist ();
+            if (wc != 0)
+                va_dlist ();
+            if (dma.bus_timeout) {
+                va_dga_csr = va_dga_csr_set_bus_timeout (va_dga_csr);
+                va_setint (INT_DGA);
+                return SCPE_OK;
+                }
             break;
 
         default:
