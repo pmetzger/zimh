@@ -33,22 +33,36 @@ struct stdout_capture_context {
     char **filelist;
 };
 
+static char *copy_env_value(const char *name)
+{
+    const char *value = getenv(name);
+    char *copy = value ? strdup(value) : NULL;
+
+    if (value != NULL)
+        assert_non_null(copy);
+    return copy;
+}
+
+static void restore_env_value(const char *name, char *value)
+{
+    if (value != NULL) {
+        assert_int_equal(setenv(name, value, 1), 0);
+        free(value);
+    } else {
+        assert_int_equal(unsetenv(name), 0);
+    }
+}
+
 /* Run one callback with TZ set to a known value, then restore it. */
 static void with_timezone(const char *timezone, void (*fn)(void *ctx),
                           void *ctx)
 {
-    const char *saved_tz = getenv("TZ");
-    char *saved_copy = saved_tz ? strdup(saved_tz) : NULL;
+    char *saved_tz = copy_env_value("TZ");
 
     assert_int_equal(setenv("TZ", timezone, 1), 0);
     tzset();
     fn(ctx);
-    if (saved_copy != NULL) {
-        assert_int_equal(setenv("TZ", saved_copy, 1), 0);
-        free(saved_copy);
-    } else {
-        assert_int_equal(unsetenv("TZ"), 0);
-    }
+    restore_env_value("TZ", saved_tz);
     tzset();
 }
 
@@ -288,7 +302,7 @@ test_sim_filepath_parts_handles_home_expansion_and_time_fields(void **state)
     char *stripped_path;
     char *time_text;
 
-    saved_home = getenv("HOME");
+    saved_home = copy_env_value("HOME");
     assert_int_equal(setenv("HOME", fixture->temp_dir, 1), 0);
 
     stripped_path = sim_filepath_parts(quoted_home_file, "");
@@ -302,11 +316,7 @@ test_sim_filepath_parts_handles_home_expansion_and_time_fields(void **state)
     free(time_text);
     free(stripped_path);
 
-    if (saved_home != NULL) {
-        assert_int_equal(setenv("HOME", saved_home, 1), 0);
-    } else {
-        assert_int_equal(unsetenv("HOME"), 0);
-    }
+    restore_env_value("HOME", saved_home);
 }
 
 static void expect_fixed_timestamp_text(void *ctx)
@@ -588,7 +598,7 @@ static void test_sim_fopen_and_sim_set_fsize_handle_home_expansion(void **state)
     FILE *file;
     struct stat statb;
 
-    saved_home = getenv("HOME");
+    saved_home = copy_env_value("HOME");
     assert_int_equal(setenv("HOME", fixture->temp_dir, 1), 0);
 
     file = sim_fopen(relative_file, "wb+");
@@ -601,11 +611,7 @@ static void test_sim_fopen_and_sim_set_fsize_handle_home_expansion(void **state)
     assert_int_equal(sim_stat(quoted_file, &statb), 0);
     assert_int_equal((int)statb.st_size, 3);
 
-    if (saved_home != NULL) {
-        assert_int_equal(setenv("HOME", saved_home, 1), 0);
-    } else {
-        assert_int_equal(unsetenv("HOME"), 0);
-    }
+    restore_env_value("HOME", saved_home);
 }
 
 /* Verify sim_set_file_times updates the file timestamps to caller-
@@ -855,7 +861,7 @@ static void test_sim_directory_wrappers_handle_home_expansion(void **state)
     struct stat statb;
     struct stat cwd_statb;
 
-    saved_home = getenv("HOME");
+    saved_home = copy_env_value("HOME");
     assert_int_equal(setenv("HOME", fixture->temp_dir, 1), 0);
     assert_int_equal(snprintf(expanded_home_dir, sizeof(expanded_home_dir),
                               "%s/simh-fio-home", fixture->temp_dir) <
@@ -877,11 +883,7 @@ static void test_sim_directory_wrappers_handle_home_expansion(void **state)
     assert_int_equal(sim_rmdir(relative_home_dir), 0);
     assert_int_not_equal(sim_stat(relative_home_dir, &statb), 0);
 
-    if (saved_home != NULL) {
-        assert_int_equal(setenv("HOME", saved_home, 1), 0);
-    } else {
-        assert_int_equal(unsetenv("HOME"), 0);
-    }
+    restore_env_value("HOME", saved_home);
 }
 
 /* Verify the ASCII-safe character wrappers clamp non-ASCII input and
