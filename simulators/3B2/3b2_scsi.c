@@ -29,6 +29,7 @@
 */
 
 #include "3b2_scsi.h"
+#include "3b2_scsi_internal.h"
 
 #include "sim_scsi.h"
 #include "sim_tape.h"
@@ -810,12 +811,25 @@ static inline void ha_cmd_prep(uint8 tc, uint8 op, uint8 subdev, t_bool express)
     }
 }
 
+/*
+ * Finish a command that refers to a SCSI host-adapter subdevice with no
+ * attached target. Since there is no device target state slot to update, use
+ * the host adapter's own target slot to report the timeout completion.
+ */
+static void ha_invalid_subdev(uint8 op, uint8 subdev, t_bool express)
+{
+    ha_cmd_prep(HA_SCSI_ID, op, subdev, express);
+    ha_state.ts[HA_SCSI_ID].rep.status = CIO_TIMEOUT;
+    sim_activate_abs(cio_unit, 1000);
+}
+
 static void ha_cmd(uint8 op, uint8 subdev, uint32 addr, int32 len, t_bool express)
 {
     int32 i, block;
     UNIT *uptr;
     SCSI_DEV *dev;
-    uint8 dsd_tc, tc;
+    int8 dsd_tc;
+    uint8 tc;
 
     sim_debug(HA_TRACE, &ha_dev,
               "[ha_cmd] --------------------------[START]---------------------------------\n");
@@ -920,19 +934,18 @@ static void ha_cmd(uint8 op, uint8 subdev, uint32 addr, int32 len, t_bool expres
 
         break;
     case HA_BOOT:
-        tc = ha_subdev_tab[subdev & 7];
+        if (!ha_subdev_command_target(ha_subdev_tab, op, subdev, &tc)) {
+            sim_debug(HA_TRACE, &ha_dev,
+                      "[ha_cmd] SUBDEV %d HAS NO SCSI TARGET.\n",
+                      subdev);
+            ha_invalid_subdev(op, subdev, express);
+            return;
+        }
         ha_cmd_prep(tc, op, subdev, express);
-
 
         sim_debug(HA_TRACE, &ha_dev,
                   "[ha_cmd] TARGET %d BOOTING.\n",
                   tc);
-
-        if (tc < 0) {
-            ha_state.ts[tc].rep.status = CIO_TIMEOUT;
-            sim_activate_abs(cio_unit, 1000);
-            return;
-        }
 
         uptr = &ha_unit[tc];
 
@@ -965,7 +978,13 @@ static void ha_cmd(uint8 op, uint8 subdev, uint32 addr, int32 len, t_bool expres
         sim_activate_abs(cio_unit, 1000);
         break;
     case HA_READ_BLK:
-        tc = ha_subdev_tab[subdev & 7];
+        if (!ha_subdev_command_target(ha_subdev_tab, op, subdev, &tc)) {
+            sim_debug(HA_TRACE, &ha_dev,
+                      "[ha_cmd] SUBDEV %d HAS NO SCSI TARGET.\n",
+                      subdev);
+            ha_invalid_subdev(op, subdev, express);
+            return;
+        }
         ha_cmd_prep(tc, op, subdev, express);
 
         sim_debug(HA_TRACE, &ha_dev,
@@ -991,12 +1010,6 @@ static void ha_cmd(uint8 op, uint8 subdev, uint32 addr, int32 len, t_bool expres
                   "[ha_read_blik]    %08x = %08x\n",
                   addr + 16, pread_w(addr + 16, BUS_PER));
 
-
-        if (tc < 0) {
-            ha_state.ts[tc].rep.status = CIO_TIMEOUT;
-            sim_activate_abs(cio_unit, 1000);
-            return;
-        }
 
         uptr = &ha_unit[tc];
 
@@ -1029,7 +1042,13 @@ static void ha_cmd(uint8 op, uint8 subdev, uint32 addr, int32 len, t_bool expres
 
         break;
     case HA_WRITE_BLK:
-        tc = ha_subdev_tab[subdev & 7];
+        if (!ha_subdev_command_target(ha_subdev_tab, op, subdev, &tc)) {
+            sim_debug(HA_TRACE, &ha_dev,
+                      "[ha_cmd] SUBDEV %d HAS NO SCSI TARGET.\n",
+                      subdev);
+            ha_invalid_subdev(op, subdev, express);
+            return;
+        }
         ha_cmd_prep(tc, op, subdev, express);
 
         sim_debug(HA_TRACE, &ha_dev,
@@ -1045,12 +1064,6 @@ static void ha_cmd(uint8 op, uint8 subdev, uint32 addr, int32 len, t_bool expres
         sim_debug(HA_TRACE, &ha_dev,
                   "[ha_write_blk]    %08x = %08x\n",
                   addr + 4, pread_w(addr + 4, BUS_PER));
-
-        if (tc < 0) {
-            ha_state.ts[tc].rep.status = CIO_TIMEOUT;
-            sim_activate_abs(cio_unit, 1000);
-            return;
-        }
 
         uptr = &ha_unit[tc];
 
