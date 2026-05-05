@@ -916,6 +916,33 @@ static void test_sim_tape_dos11_fallback_name_uses_six_digits(void **state)
     assert_memory_equal(name, "000000   ", sizeof(name));
 }
 
+/* Verify ANSI decimal labels reject values that do not fit their fields. */
+static void test_sim_tape_ansi_decimal_fields_validate_width(void **state)
+{
+    char field[6];
+
+    (void)state;
+
+    memcpy(field, "xxxxxx", sizeof(field));
+    assert_true(sim_tape_format_ansi_decimal(field, 4, 0));
+    assert_memory_equal(field, "0000", 4);
+    assert_true(sim_tape_format_ansi_decimal(field, 4, 1));
+    assert_memory_equal(field, "0001", 4);
+    assert_true(sim_tape_format_ansi_decimal(field, 4, 9999));
+    assert_memory_equal(field, "9999", 4);
+    memcpy(field, "xxxxxx", sizeof(field));
+    assert_false(sim_tape_format_ansi_decimal(field, 4, 10000));
+    assert_memory_equal(field, "xxxxxx", sizeof(field));
+
+    assert_true(sim_tape_format_ansi_decimal(field, 6, 999999));
+    assert_memory_equal(field, "999999", 6);
+    memcpy(field, "yyyyyy", sizeof(field));
+    assert_false(sim_tape_format_ansi_decimal(field, 6, 1000000));
+    assert_memory_equal(field, "yyyyyy", sizeof(field));
+    assert_false(sim_tape_format_ansi_decimal(NULL, 4, 1));
+    assert_false(sim_tape_format_ansi_decimal(field, 0, 1));
+}
+
 /* Verify generic positioning can count objects and position by
    file/record tuples after an optional rewind. */
 static void test_sim_tape_position_tracks_objects_and_files(void **state)
@@ -1230,6 +1257,8 @@ int main(void)
             setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test(
             test_sim_tape_dos11_fallback_name_uses_six_digits),
+        cmocka_unit_test(
+            test_sim_tape_ansi_decimal_fields_validate_width),
         cmocka_unit_test(
             test_sim_tape_error_text_covers_named_and_generic_errors),
     };

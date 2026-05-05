@@ -4743,6 +4743,22 @@ void sim_tape_dos11_fallback_name(char name[9], uint32 file_count)
     memcpy(name, temp, 9);
 }
 
+/* Format a value that must fit exactly in a fixed-width ANSI label field. */
+t_bool
+sim_tape_format_ansi_decimal(char *field, size_t field_size, uint32 value)
+{
+    char text[16];
+    int written;
+
+    if ((field == NULL) || (field_size == 0) || (field_size >= sizeof (text)))
+        return FALSE;
+    written = snprintf (text, sizeof (text), "%0*u", (int)field_size, value);
+    if ((written < 0) || ((size_t)written != field_size))
+        return FALSE;
+    memcpy (field, text, field_size);
+    return TRUE;
+}
+
 /*
  * Sanitize a filename to generate a DOS-11 compatible version. Ignore
  * non-alphanumerics, upper case lower case characters and terminate on '.'
@@ -5013,10 +5029,9 @@ struct ansi_tape_parameters *ansi = &ansi_args[tape->ansi_type];
 uint8 *block = NULL;
 size_t rms_record_size, max_record_size;
 t_bool lf_line_endings, crlf_line_endings;
-char file_sequence[5];
 int block_count = 0;
-char block_count_string[17];
 int error = FALSE;
+uint32 file_sequence;
 ANSI_HDR1 hdr1;
 ANSI_HDR2 hdr2;
 ANSI_HDR3 hdr3;
@@ -5068,10 +5083,23 @@ if (max_record_size > tape->block_size) {
     return TRUE;
     }
 ansi_make_HDR1 (&hdr1, &tape->vol1, &hdr4, filename, tape->ansi_type);
-/* TODO: Validate that file_count is representable in file_sequence. */
-(void)snprintf (file_sequence, sizeof (file_sequence), "%04u",
-                1 + tape->file_count);
-memcpy (hdr1.file_sequence, file_sequence, sizeof (hdr1.file_sequence));
+if (tape->file_count >= 9999) {
+    sim_messagef (SCPE_ARG,
+                  "%s file count %u exceeds the ANSI label sequence limit\n",
+                  ansi->name, tape->file_count);
+    fclose (f);
+    return TRUE;
+    }
+file_sequence = tape->file_count + 1;
+if (!sim_tape_format_ansi_decimal (hdr1.file_sequence,
+                                   sizeof (hdr1.file_sequence),
+                                   file_sequence)) {
+    sim_messagef (SCPE_ARG,
+                  "%s file sequence %u does not fit the ANSI label field\n",
+                  ansi->name, file_sequence);
+    fclose (f);
+    return TRUE;
+    }
 ansi_make_HDR2 (&hdr2, !lf_line_endings && !crlf_line_endings, tape->block_size, max_record_size, tape->ansi_type);
 
 if (!(ansi->nohdr3)) {               /* Need HDR3? */
@@ -5132,10 +5160,14 @@ memcpy (hdr1.type, "EOF", sizeof (hdr1.type));
 memcpy (hdr2.type, "EOF", sizeof (hdr2.type));
 memcpy (hdr3.type, "EOF", sizeof (hdr3.type));
 memcpy (hdr4.type, "EOF", sizeof (hdr4.type));
-/* TODO: Validate that block_count is representable in block_count. */
-(void)snprintf (block_count_string, sizeof (block_count_string), "%06d",
-                block_count);
-memcpy (hdr1.block_count, block_count_string, sizeof (hdr1.block_count));
+if (!sim_tape_format_ansi_decimal (hdr1.block_count,
+                                   sizeof (hdr1.block_count),
+                                   (uint32)block_count)) {
+    sim_messagef (SCPE_ARG,
+                  "%s block count %d does not fit the ANSI label field\n",
+                  ansi->name, block_count);
+    return TRUE;
+    }
 memory_tape_add_block (tape, (uint8 *)&hdr1, sizeof (hdr1));
 if (!(ansi->nohdr2))
     memory_tape_add_block (tape, (uint8 *)&hdr2, sizeof (hdr2));
