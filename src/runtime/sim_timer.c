@@ -3304,15 +3304,17 @@ return result;                                          /* Not found. */
    can be set with sim_set_rom_delay_factor().
 */
 
-SIM_NOINLINE static int32 _rom_swapb(int32 val)
+SIM_NOINLINE static uint32 _rom_swapb(uint32 val)
 {
-return ((val << 24) & 0xff000000) | (( val << 8) & 0xff0000) |
-    ((val >> 8) & 0xff00) | ((val >> 24) & 0xff);
+return ((val << 24) & 0xff000000u) |
+       ((val << 8) & 0xff0000u) |
+       ((val >> 8) & 0xff00u) |
+       ((val >> 24) & 0xffu);
 }
 
-static volatile int32 rom_loopval = 0;
+static volatile uint32 rom_loopval = 0;
 
-SIM_NOINLINE int32 sim_rom_read_with_delay (int32 val)
+SIM_NOINLINE uint32 sim_rom_read_with_delay (uint32 val)
 {
 uint32 i, l = sim_rom_delay;
 

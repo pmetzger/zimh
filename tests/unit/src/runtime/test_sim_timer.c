@@ -233,6 +233,24 @@ static void test_sim_timenow_double_uses_shared_clock_wrapper (void **state)
     assert_float_equal (now, 42.125, 0.000001);
 }
 
+/* Verify ROM delay reads tolerate high-bit input words without changing the
+   caller-visible value. */
+static void test_sim_rom_read_with_delay_accepts_high_bit_words (void **state)
+{
+    const uint32 values[] = {
+        0x80000000u,
+        0x89abcdefu,
+        0xffffffffu,
+    };
+    size_t i;
+
+    (void)state;
+
+    sim_set_rom_delay_factor (1);
+    for (i = 0; i < sizeof (values) / sizeof (values[0]); ++i)
+        assert_int_equal (sim_rom_read_with_delay (values[i]), values[i]);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -265,6 +283,9 @@ int main(void)
             setup_sim_timer_fixture, teardown_sim_timer_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_timenow_double_uses_shared_clock_wrapper,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_rom_read_with_delay_accepts_high_bit_words,
             setup_sim_timer_fixture, teardown_sim_timer_fixture),
     };
 

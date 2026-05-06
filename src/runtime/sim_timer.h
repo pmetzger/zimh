@@ -110,7 +110,7 @@ t_bool sim_timer_idle_capable (uint32 *host_ms_sleep_1, uint32 *host_tick_ms);
 t_stat sim_os_set_thread_priority (int below_normal_above);
 uint32 sim_get_rom_delay_factor (void);
 void sim_set_rom_delay_factor (uint32 delay);
-int32 sim_rom_read_with_delay (int32 val);
+uint32 sim_rom_read_with_delay (uint32 val);
 double sim_host_speed_factor (void);
 
 extern t_bool sim_idle_enab;                        /* idle enabled flag */
