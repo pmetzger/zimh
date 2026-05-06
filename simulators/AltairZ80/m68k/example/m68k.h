@@ -34,9 +34,9 @@
 #define ARRAY_LENGTH(x)         (sizeof(x) / sizeof(x[0]))
 #endif
 
-#ifndef FALSE
-#define FALSE 0
-#define TRUE 1
+#ifndef NMI_FALSE
+#define NMI_FALSE 0
+#define NMI_TRUE 1
 #endif
 
 /* ======================================================================== */
