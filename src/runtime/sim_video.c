@@ -27,6 +27,7 @@ static int vid_gamepad_inited = 0;
 
 #if defined(USE_SIM_VIDEO) && defined(HAVE_LIBSDL)
 static void vid_controllers_setup(DEVICE *dptr);
+static void vid_controllers_cleanup(void);
 
 /* Return TRUE when a simulator has asked for optional gamepad input. */
 static t_bool vid_gamepad_callbacks_registered(void)
@@ -90,6 +91,25 @@ static t_stat register_callback (VID_GAMEPAD_CALLBACK *array, int n,
     return SCPE_NXM;
 }
 
+static t_stat unregister_callback (VID_GAMEPAD_CALLBACK *array, int n,
+                                   VID_GAMEPAD_CALLBACK callback)
+{
+    int i;
+
+    for (i = 0; i < n; i++) {
+        if (array[i] == callback) {
+            array[i] = NULL;
+#if defined(USE_SIM_VIDEO) && defined(HAVE_LIBSDL)
+            if (!vid_gamepad_callbacks_registered ())
+                vid_controllers_cleanup ();
+#endif
+            return SCPE_OK;
+            }
+        }
+
+    return SCPE_NOATT;
+}
+
 t_stat vid_register_gamepad_motion_callback (VID_GAMEPAD_CALLBACK callback)
 {
     int n = sizeof (motion_callback) / sizeof (callback);
@@ -100,6 +120,18 @@ t_stat vid_register_gamepad_button_callback (VID_GAMEPAD_CALLBACK callback)
 {
     int n = sizeof (button_callback) / sizeof (callback);
     return register_callback (button_callback, n, callback);
+}
+
+t_stat vid_unregister_gamepad_motion_callback (VID_GAMEPAD_CALLBACK callback)
+{
+    int n = sizeof (motion_callback) / sizeof (callback);
+    return unregister_callback (motion_callback, n, callback);
+}
+
+t_stat vid_unregister_gamepad_button_callback (VID_GAMEPAD_CALLBACK callback)
+{
+    int n = sizeof (button_callback) / sizeof (callback);
+    return unregister_callback (button_callback, n, callback);
 }
 
 t_stat vid_show (FILE* st, DEVICE *dptr,  UNIT* uptr, int32 val, const char* desc)
@@ -124,6 +156,74 @@ char vid_release_key[64] = "Ctrl-Right-Shift";
 
 #include <SDL.h>
 #include <SDL_thread.h>
+
+typedef enum {
+    vid_gamepad_handle_none,
+    vid_gamepad_handle_controller,
+    vid_gamepad_handle_joystick
+} vid_gamepad_handle_type;
+
+typedef struct {
+    vid_gamepad_handle_type type;
+    union {
+        SDL_GameController *controller;
+        SDL_Joystick *joystick;
+    } handle;
+} vid_gamepad_handle;
+
+static const sim_video_sdl_hooks vid_default_sdl_hooks = {
+    SDL_GetVersion,
+    SDL_InitSubSystem,
+    SDL_QuitSubSystem,
+    SDL_JoystickEventState,
+    SDL_GameControllerEventState,
+    SDL_NumJoysticks,
+    SDL_IsGameController,
+    SDL_GameControllerOpen,
+    SDL_GameControllerClose,
+    SDL_GameControllerNameForIndex,
+    SDL_JoystickOpen,
+    SDL_JoystickClose,
+    SDL_JoystickNameForIndex,
+    SDL_JoystickNumAxes,
+    SDL_JoystickNumButtons,
+#if (SDL_MAJOR_VERSION > 2) || (SDL_MAJOR_VERSION == 2 && \
+    (SDL_MINOR_VERSION > 0) || (SDL_PATCHLEVEL >= 4))
+    SDL_GameControllerFromInstanceID,
+    SDL_GameControllerGetBindForButton
+#else
+    NULL,
+    NULL
+#endif
+};
+static sim_video_sdl_hooks vid_test_sdl_hooks;
+static const sim_video_sdl_hooks *vid_sdl = &vid_default_sdl_hooks;
+static vid_gamepad_handle *vid_gamepad_handles = NULL;
+static int vid_gamepad_handle_count = 0;
+
+void sim_video_set_test_sdl_hooks(const sim_video_sdl_hooks *hooks)
+{
+    vid_test_sdl_hooks = *hooks;
+    vid_sdl = &vid_test_sdl_hooks;
+}
+
+void sim_video_reset_test_hooks(void)
+{
+    vid_controllers_cleanup();
+    sim_video_reset_test_gamepad_callbacks();
+    vid_sdl = &vid_default_sdl_hooks;
+    vid_gamepad_ok = 0;
+}
+
+void sim_video_test_setup_gamepad_controllers(DEVICE *dev)
+{
+    vid_controllers_setup(dev);
+}
+
+void sim_video_test_cleanup_gamepad_controllers(void)
+{
+    vid_controllers_cleanup();
+}
 
 static const char *key_names[] =
     {"F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12",
@@ -652,9 +752,20 @@ return SCPE_OK;
 }
 #endif
 
+/* Return the SDL subsystem selected for the current gamepad mode. */
+static Uint32 vid_gamepad_subsystem(void)
+{
+    return vid_gamepad_ok ? SDL_INIT_GAMECONTROLLER : SDL_INIT_JOYSTICK;
+}
+
+/* Shut down the SDL subsystem selected for the current gamepad mode. */
+static void vid_gamepad_quit_subsystem(void)
+{
+    vid_sdl->quit_subsystem(vid_gamepad_subsystem());
+}
+
 static void vid_controllers_setup (DEVICE *dev)
 {
-SDL_Joystick *y;
 SDL_version ver;
 int i, n;
 
@@ -666,59 +777,101 @@ if (vid_gamepad_inited++)
 
 /* Check that the SDL_GameControllerFromInstanceID function is
    available at run time. */
-SDL_GetVersion(&ver);
+vid_sdl->get_version(&ver);
 vid_gamepad_ok = (ver.major > 2 ||
                   (ver.major == 2 && (ver.minor > 0 || ver.patch >= 4)));
 
 sim_debug (SIM_VID_DBG_VIDEO|SIM_VID_DBG_JOYSTICK, dev, "SDL %d.%d.%d %s support game controllers.\n", ver.major, ver.minor, ver.patch, vid_gamepad_ok ? "DOES" : "DOES NOT");
 
-if (vid_gamepad_ok)
-    SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER);
-else
-    SDL_InitSubSystem(SDL_INIT_JOYSTICK);
+if (vid_sdl->init_subsystem(vid_gamepad_subsystem()) < 0) {
+    vid_gamepad_inited--;
+    sim_printf ("%s: vid_controllers_setup(): SDL_InitSubSystem error: %s\n", vid_dname(dev), SDL_GetError());
+    return;
+    }
 
-if (SDL_JoystickEventState (SDL_ENABLE) < 0) {
-    if (vid_gamepad_ok)
-        SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
-    else
-        SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+if (vid_sdl->joystick_event_state (SDL_ENABLE) < 0) {
+    vid_gamepad_quit_subsystem ();
+    vid_gamepad_inited--;
     sim_printf ("%s: vid_controllers_setup(): SDL_JoystickEventState error: %s\n", vid_dname(dev), SDL_GetError());
     return;
     }
 
-if (vid_gamepad_ok && SDL_GameControllerEventState (SDL_ENABLE) < 0) {
-    if (vid_gamepad_ok)
-        SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
-    else
-        SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+if (vid_gamepad_ok && vid_sdl->game_controller_event_state (SDL_ENABLE) < 0) {
+    vid_gamepad_quit_subsystem ();
+    vid_gamepad_inited--;
     sim_printf ("%s: vid_controllers_setup(): SDL_GameControllerEventState error: %s\n", vid_dname(dev), SDL_GetError());
     return;
     }
 
-n = SDL_NumJoysticks();
+n = vid_sdl->num_joysticks();
 
 sim_debug (SIM_VID_DBG_VIDEO|SIM_VID_DBG_JOYSTICK, dev, "Game controllers found: %d\n", n);
 
+if (n > 0) {
+    vid_gamepad_handles = (vid_gamepad_handle *)calloc (
+        n, sizeof (*vid_gamepad_handles));
+    if (vid_gamepad_handles == NULL) {
+        sim_printf (
+            "%s: vid_controllers_setup(): memory allocation error\n",
+            vid_dname(dev));
+        vid_gamepad_quit_subsystem ();
+        vid_gamepad_inited--;
+        return;
+        }
+    vid_gamepad_handle_count = n;
+    }
+
 for (i = 0; i < n; i++) {
-    if (vid_gamepad_ok && SDL_IsGameController (i)) {
-        SDL_GameController *x = SDL_GameControllerOpen (i);
+    if (vid_gamepad_ok && vid_sdl->is_game_controller (i)) {
+        SDL_GameController *x = vid_sdl->game_controller_open (i);
         if (x != NULL) {
+            vid_gamepad_handles[i].type = vid_gamepad_handle_controller;
+            vid_gamepad_handles[i].handle.controller = x;
             sim_debug (SIM_VID_DBG_VIDEO|SIM_VID_DBG_JOYSTICK, dev,
-            "Game controller: %s\n", SDL_GameControllerNameForIndex(i));
+            "Game controller: %s\n",
+            vid_sdl->game_controller_name_for_index(i));
             }
         }
     else {
-        y = SDL_JoystickOpen (i);
+        SDL_Joystick *y = vid_sdl->joystick_open (i);
         if (y != NULL) {
+            vid_gamepad_handles[i].type = vid_gamepad_handle_joystick;
+            vid_gamepad_handles[i].handle.joystick = y;
             sim_debug (SIM_VID_DBG_VIDEO|SIM_VID_DBG_JOYSTICK, dev,
-            "%s\n", SDL_JoystickNameForIndex(i));
+            "%s\n", vid_sdl->joystick_name_for_index(i));
             sim_debug (SIM_VID_DBG_VIDEO|SIM_VID_DBG_JOYSTICK, dev,
             "Number of axes: %d, buttons: %d\n",
-            SDL_JoystickNumAxes(y),
-            SDL_JoystickNumButtons(y));
+            vid_sdl->joystick_num_axes(y),
+            vid_sdl->joystick_num_buttons(y));
             }
         }
     }
+}
+
+/* Close every SDL controller or joystick handle opened during setup. */
+static void vid_gamepad_close_handles(void)
+{
+    int i;
+
+    for (i = 0; i < vid_gamepad_handle_count; i++) {
+        switch (vid_gamepad_handles[i].type) {
+            case vid_gamepad_handle_controller:
+                vid_sdl->game_controller_close (
+                    vid_gamepad_handles[i].handle.controller);
+                break;
+
+            case vid_gamepad_handle_joystick:
+                vid_sdl->joystick_close (
+                    vid_gamepad_handles[i].handle.joystick);
+                break;
+
+            case vid_gamepad_handle_none:
+                break;
+            }
+        }
+    free (vid_gamepad_handles);
+    vid_gamepad_handles = NULL;
+    vid_gamepad_handle_count = 0;
 }
 
 static void vid_controllers_cleanup (void)
@@ -727,12 +880,10 @@ if (!vid_gamepad_inited)
     return;
 
 if (0 == (--vid_gamepad_inited)) {
+    vid_gamepad_close_handles ();
     memset (motion_callback, 0, sizeof motion_callback);
     memset (button_callback, 0, sizeof button_callback);
-    if (vid_gamepad_ok)
-        SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
-    else
-        SDL_QuitSubSystem(SDL_INIT_JOYSTICK);
+    vid_gamepad_quit_subsystem ();
     }
 }
 
@@ -1459,8 +1610,8 @@ void vid_controller_button (SDL_ControllerButtonEvent *event)
     SDL_GameController *c;
     SDL_GameControllerButton button = (SDL_GameControllerButton)event->button;
 
-    c = SDL_GameControllerFromInstanceID (event->which);
-    b = SDL_GameControllerGetBindForButton (c, button);
+    c = vid_sdl->game_controller_from_instance_id (event->which);
+    b = vid_sdl->game_controller_get_bind_for_button (c, button);
     e.which = event->which;
     e.button = b.value.button;
     e.state = event->state;

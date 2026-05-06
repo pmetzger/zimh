@@ -178,11 +178,14 @@ t_stat vid_register_quit_callback (VID_QUIT_CALLBACK callback);
  * When SDL video support is enabled, callbacks may be registered before
  * opening video.  Motion callbacks receive the SDL device instance id, axis,
  * and axis value.  Button callbacks receive the SDL device instance id,
- * button, and button state.
+ * button, and button state.  Unregistering the last gamepad callback shuts
+ * down any controller resources opened for callback delivery.
  */
 typedef void (*VID_GAMEPAD_CALLBACK)(int, int, int);
 t_stat vid_register_gamepad_motion_callback (VID_GAMEPAD_CALLBACK);
 t_stat vid_register_gamepad_button_callback (VID_GAMEPAD_CALLBACK);
+t_stat vid_unregister_gamepad_motion_callback (VID_GAMEPAD_CALLBACK);
+t_stat vid_unregister_gamepad_button_callback (VID_GAMEPAD_CALLBACK);
 
 t_stat vid_close (void);
 t_stat vid_poll_kb (SIM_KEY_EVENT *ev);
