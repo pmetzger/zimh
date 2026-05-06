@@ -10264,6 +10264,8 @@ return _sim_activate_after_abs (uptr, usec_delay);
 t_stat _sim_activate_after_abs (UNIT *uptr, double usec_delay)
 {
 AIO_VALIDATE(uptr);             /* Can't call asynchronously */
+if (usec_delay < 0.0)
+    return sim_timer_activate_after (uptr, usec_delay);
 sim_cancel (uptr);
 return _sim_activate_after (uptr, usec_delay);
 }

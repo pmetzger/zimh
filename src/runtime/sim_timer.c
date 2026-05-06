@@ -2745,6 +2745,14 @@ t_stat stat;
 RTC *crtc;
 
 AIO_VALIDATE(uptr);
+if (usec_delay < 0.0) {
+    sim_debug (DBG_QUE, &sim_timer_dev,
+               "sim_timer_activate_after(%s, %.0f usecs) - negative delay\n",
+               sim_uname(uptr), usec_delay);
+    return sim_messagef (
+        SCPE_IERR, "Negative timer activation delay for %s: %.0f usecs\n",
+        sim_uname(uptr), usec_delay);
+    }
 /* If this is a clock unit, we need to schedule the related timer unit instead */
 for (tmr=0; tmr<=SIM_NTIMERS; tmr++) {
     RTC *rtc = &rtcs[tmr];
@@ -2756,10 +2764,6 @@ for (tmr=0; tmr<=SIM_NTIMERS; tmr++) {
     }
 if (sim_is_active (uptr))                               /* already active? */
     return SCPE_OK;
-if (usec_delay < 0.0) {
-    sim_debug (DBG_QUE, &sim_timer_dev, "sim_timer_activate_after(%s, %.0f usecs) - surprising usec value\n",
-               sim_uname(uptr), usec_delay);
-    }
 if ((sim_is_running) || (tmr <= SIM_NTIMERS))
     uptr->usecs_remaining = 0.0;
 else {                                      /* defer non timer wallclock activations until a calibrated timer is in effect */

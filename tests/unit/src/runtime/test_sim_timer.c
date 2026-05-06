@@ -36,6 +36,11 @@ struct sim_timer_activation_fixture {
     t_bool saved_sim_is_running;
 };
 
+struct sim_timer_negative_delay_context {
+    struct sim_timer_activation_fixture *fixture;
+    t_stat status;
+};
+
 struct sim_timer_dynamic_throttle_case {
     const char *spec;
     uint32 type;
@@ -239,6 +244,33 @@ static void sim_timer_queue_calibrated_tick (
                                                 usec_delay),
                       SCPE_OK);
     assert_true (sim_is_active (&sim_timer_units[0]));
+}
+
+/* Try a negative wall-clock activation through the timer API. */
+static void sim_timer_try_negative_activation (void *context)
+{
+    struct sim_timer_negative_delay_context *negative_context = context;
+
+    negative_context->status = sim_timer_activate_after (
+        &negative_context->fixture->target_unit, -100.0);
+}
+
+/* Try a negative wall-clock activation through the public double API. */
+static void sim_timer_try_negative_public_activation (void *context)
+{
+    struct sim_timer_negative_delay_context *negative_context = context;
+
+    negative_context->status =
+        sim_activate_after_d (&negative_context->fixture->target_unit, -100.0);
+}
+
+/* Try a negative absolute wall-clock activation through the public double API. */
+static void sim_timer_try_negative_abs_public_activation (void *context)
+{
+    struct sim_timer_negative_delay_context *negative_context = context;
+
+    negative_context->status = sim_activate_after_abs_d (
+        &negative_context->fixture->target_unit, -100.0);
 }
 
 /* Build a calibrated-timer fixture for wall-clock activation tests. */
@@ -791,19 +823,101 @@ static void test_sim_timer_activate_after_preserves_active_unit (void **state)
     assert_float_equal (fixture->target_unit.usecs_remaining, 0.0, 0.000001);
 }
 
-/* Verify negative activation delays preserve the current behavior of queuing a
-   past-due event rather than rejecting or clamping the request. */
-static void test_sim_timer_activate_after_accepts_negative_delay (void **state)
+/* Verify negative wall-clock delays are loud internal errors, not overdue
+   queue entries. */
+static void test_sim_timer_activate_after_rejects_negative_delay (void **state)
 {
     struct sim_timer_activation_fixture *fixture = *state;
+    struct sim_timer_negative_delay_context context = {fixture, SCPE_OK};
+    FILE *debug_stream;
+    FILE *saved_deb = sim_deb;
+    int32 saved_deb_switches = sim_deb_switches;
+    uint32 saved_dctrl = sim_timer_dev.dctrl;
+    char *debug_text;
+    char *text = NULL;
+    size_t text_size = 0;
 
     sim_is_running = TRUE;
-    assert_int_equal (sim_timer_activate_after (&fixture->target_unit, -100.0),
+    sim_interval = 1234;
+    debug_stream = tmpfile ();
+    assert_non_null (debug_stream);
+    sim_deb = debug_stream;
+    sim_deb_switches |= SWMASK ('F');
+    sim_timer_dev.dctrl |= TIMER_DBG_QUEUE;
+
+    assert_int_equal (simh_test_capture_stdout (sim_timer_try_negative_activation,
+                                                &context, &text, &text_size),
+                      0);
+    debug_text = sim_timer_read_stream_text (debug_stream);
+    sim_deb = saved_deb;
+    sim_deb_switches = saved_deb_switches;
+    sim_timer_dev.dctrl = saved_dctrl;
+
+    assert_int_equal (SCPE_BARE_STATUS (context.status), SCPE_IERR);
+    assert_non_null (strstr (text, "Negative timer activation delay"));
+    assert_non_null (strstr (text, "TMR0"));
+    assert_non_null (strstr (debug_text, "negative delay"));
+    assert_false (sim_is_active (&fixture->target_unit));
+    assert_ptr_equal (sim_clock_queue, QUEUE_LIST_END);
+    assert_int_equal (sim_interval, 1234);
+
+    fclose (debug_stream);
+    free (debug_text);
+    free (text);
+}
+
+/* Verify the public double activation wrapper propagates negative-delay
+   contract violations from the timer implementation. */
+static void test_sim_activate_after_d_rejects_negative_delay (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+    struct sim_timer_negative_delay_context context = {fixture, SCPE_OK};
+    char *text = NULL;
+    size_t text_size = 0;
+
+    sim_is_running = TRUE;
+    sim_interval = 4321;
+
+    assert_int_equal (
+        simh_test_capture_stdout (sim_timer_try_negative_public_activation,
+                                  &context, &text, &text_size),
+        0);
+
+    assert_int_equal (SCPE_BARE_STATUS (context.status), SCPE_IERR);
+    assert_non_null (strstr (text, "Negative timer activation delay"));
+    assert_false (sim_is_active (&fixture->target_unit));
+    assert_ptr_equal (sim_clock_queue, QUEUE_LIST_END);
+    assert_int_equal (sim_interval, 4321);
+
+    free (text);
+}
+
+/* Verify the absolute public double wrapper rejects negative delays before
+   canceling an existing activation. */
+static void test_sim_activate_after_abs_d_rejects_negative_delay_before_cancel (
+    void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+    struct sim_timer_negative_delay_context context = {fixture, SCPE_OK};
+    char *text = NULL;
+    size_t text_size = 0;
+
+    sim_is_running = TRUE;
+    assert_int_equal (sim_timer_activate_after (&fixture->target_unit, 1000.0),
                       SCPE_OK);
 
+    assert_int_equal (
+        simh_test_capture_stdout (sim_timer_try_negative_abs_public_activation,
+                                  &context, &text, &text_size),
+        0);
+
+    assert_int_equal (SCPE_BARE_STATUS (context.status), SCPE_IERR);
+    assert_non_null (strstr (text, "Negative timer activation delay"));
     assert_true (sim_is_active (&fixture->target_unit));
-    assert_int_equal (fixture->target_unit.time, -1);
-    assert_int_equal (sim_interval, -1);
+    assert_int_equal (fixture->target_unit.time, 10);
+    assert_int_equal (sim_interval, 10);
+
+    free (text);
 }
 
 /* Verify delays beyond the next calibration are coscheduled for the
@@ -1910,7 +2024,15 @@ int main(void)
             setup_sim_timer_activation_fixture,
             teardown_sim_timer_activation_fixture),
         cmocka_unit_test_setup_teardown(
-            test_sim_timer_activate_after_accepts_negative_delay,
+            test_sim_timer_activate_after_rejects_negative_delay,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_activate_after_d_rejects_negative_delay,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_activate_after_abs_d_rejects_negative_delay_before_cancel,
             setup_sim_timer_activation_fixture,
             teardown_sim_timer_activation_fixture),
         cmocka_unit_test_setup_teardown(
