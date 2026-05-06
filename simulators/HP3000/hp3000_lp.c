@@ -414,7 +414,9 @@
 
 
 
-#include "hp3000_defs.h"
+#include <stdbool.h>
+
+#include "hp3000_lp_internal.h"
 #include "hp3000_io.h"
 
 
@@ -1047,7 +1049,7 @@ static FLIP_FLOP device_flag    = CLEAR;        /* device flag flip-flop */
 static FLIP_FLOP device_end     = CLEAR;        /* device end flip-flop */
 
 static HP_WORD data_out           = 0;          /* external DATA OUT signal bus */
-static t_bool  device_command_out = FALSE;      /* external DEV CMD signal state */
+static bool    device_command_out = false;      /* external DEV CMD signal state */
 
 static HP_WORD data_in            = 0;          /* external DATA IN signal bus */
 static t_bool  device_flag_in     = FALSE;      /* external DEV FLAG signal state */
@@ -1721,7 +1723,8 @@ static t_bool device_flag_last = FALSE;
 t_stat        result;
 OUTBOUND_SET  signals;
 
-device_command_out = device_command ^ J2W10_INSTALLED;  /* set device command out; invert if W10 is installed */
+device_command_out =
+    hp3000_lp_device_command_out(device_command, J2W10_INSTALLED);
 
 if (lp_dev.flags & DEV_DIAG)                            /* if the DHA is connected */
     result = diag_service (uptr);                       /*   then service the diagnostic hardware */
