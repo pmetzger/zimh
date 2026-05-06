@@ -1,3 +1,38 @@
+# This target links the real i8080 sim_load(), so it cannot use
+# add_unit_test(), which supplies generic simulator personality stubs.
+simh_executable_template(zimh-unit-intel-systems-i8080-load
+    SOURCES
+        ${PROJECT_SOURCE_DIR}/simulators/Intel-Systems/common/i8080_load.c
+        ${PROJECT_SOURCE_DIR}/tests/unit/support/test_support.c
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_i8080_load.c
+    INCLUDES
+        ${PROJECT_SOURCE_DIR}/simulators/Intel-Systems/common
+        ${PROJECT_SOURCE_DIR}/simulators/Intel-Systems/Intel-MDS
+        ${PROJECT_SOURCE_DIR}/src/runtime
+        ${PROJECT_SOURCE_DIR}/tests/unit/support
+)
+
+target_compile_definitions(zimh-unit-intel-systems-i8080-load PRIVATE
+    SIMH_TEST_SOURCE_ROOT="${CMAKE_SOURCE_DIR}"
+    SIMH_TEST_BINARY_ROOT="${CMAKE_BINARY_DIR}"
+)
+
+if (TARGET cmocka::cmocka)
+    target_link_libraries(zimh-unit-intel-systems-i8080-load
+        PUBLIC cmocka::cmocka)
+elseif (TARGET PkgConfig::CMOCKA)
+    target_link_libraries(zimh-unit-intel-systems-i8080-load
+        PUBLIC PkgConfig::CMOCKA)
+else ()
+    message(FATAL_ERROR "cmocka target not available")
+endif ()
+add_test(NAME zimh-unit-intel-systems-i8080-load
+    COMMAND zimh-unit-intel-systems-i8080-load)
+set_tests_properties(zimh-unit-intel-systems-i8080-load PROPERTIES
+    LABELS "zimh;unit;zimh-intel-systems")
+set_property(GLOBAL APPEND PROPERTY SIMH_UNIT_TEST_TARGETS
+    zimh-unit-intel-systems-i8080-load)
+
 add_unit_test(unit-intel-systems-iram8
     SOURCES
         ${PROJECT_SOURCE_DIR}/simulators/Intel-Systems/common/iram8.c

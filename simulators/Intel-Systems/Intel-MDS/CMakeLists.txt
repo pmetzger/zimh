@@ -9,6 +9,7 @@
 add_simulator(intel-mds
     SOURCES
         ${INTELSYSC}/i8080.c
+        ${INTELSYSC}/i8080_load.c
         imds_sys.c
         ${INTELSYSC}/i3214.c
         ${INTELSYSC}/i8251.c
