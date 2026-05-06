@@ -437,7 +437,12 @@ t_stat eth_mac_scan_ex (ETH_MAC mac, const char* strmac, UNIT *uptr)
           shift = 0;
       else
           shift = ((i + 1) << 3) - state.bits;
-      mask = 0xFF << shift;
+      /* Preserve requested prefix bits from this byte, and take the rest
+         from the generated suffix. */
+      if (shift >= 8)
+          mask = 0;
+      else
+          mask = (0xFFu << shift) & 0xFFu;
       newmac[i] = (unsigned char)((a[i] & mask) | (g[i] & ~mask));
       }
 

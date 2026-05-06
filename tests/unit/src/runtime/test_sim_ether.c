@@ -1,11 +1,51 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "test_cmocka.h"
 
 #include "sim_defs.h"
+#include "sim_ether.h"
 
 t_stat eth_test_dev_command_format(void);
+
+/* Assert that a generated MAC address preserved the requested prefix bits. */
+static void assert_eth_mac_prefix(const ETH_MAC actual,
+                                  const ETH_MAC expected,
+                                  uint32 prefix_bits)
+{
+    const uint32 full_bytes = prefix_bits / 8;
+    const uint32 partial_bits = prefix_bits % 8;
+    uint32 i;
+
+    for (i = 0; i < full_bytes; ++i)
+        assert_int_equal(actual[i], expected[i]);
+    if (partial_bits != 0) {
+        const uint8 mask = (uint8)(0xffu << (8 - partial_bits));
+
+        assert_int_equal(actual[full_bytes] & mask,
+                         expected[full_bytes] & mask);
+    }
+}
+
+/* Verify generated MAC addresses preserve the requested fixed prefix bits. */
+static void test_eth_mac_scan_generated_prefix_lengths(void **state)
+{
+    static const ETH_MAC base_mac = {0x02, 0x84, 0x86, 0x08, 0x0a, 0x0c};
+    char input[sizeof("02:84:86:08:0A:0C/48")];
+    ETH_MAC mac;
+    uint32 prefix_bits;
+
+    (void)state;
+
+    for (prefix_bits = 16; prefix_bits <= 48; ++prefix_bits) {
+        assert_true(snprintf(input, sizeof(input),
+                             "02:84:86:08:0A:0C/%u",
+                             prefix_bits) < (int)sizeof(input));
+        assert_int_equal(eth_mac_scan(mac, input), SCPE_OK);
+        assert_eth_mac_prefix(mac, base_mac, prefix_bits);
+    }
+}
 
 static void test_eth_dev_command_formatting(void **state)
 {
@@ -17,6 +57,7 @@ static void test_eth_dev_command_formatting(void **state)
 int main(void)
 {
     const struct CMUnitTest tests[] = {
+        cmocka_unit_test(test_eth_mac_scan_generated_prefix_lengths),
         cmocka_unit_test(test_eth_dev_command_formatting),
     };
 
