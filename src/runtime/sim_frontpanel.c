@@ -2619,7 +2619,18 @@ if (completion_status || completion_string) {
                 *completion_status = -1;
                 status = strstr (tresponse, command_status);
                 if (status) {
-                    *(status - strlen (sim_prompt)) = '\0';
+                    /* Normal transcripts include the prompt before the
+                       echoed status command.  Tolerate promptless transcripts
+                       without trimming real command output or underflowing. */
+                    char *response_end = status;
+                    size_t prompt_len = strlen (sim_prompt);
+
+                    if (((size_t)(status - tresponse) >= prompt_len) &&
+                        (memcmp (status - prompt_len, sim_prompt,
+                                 prompt_len) == 0))
+                        response_end -= prompt_len;
+                    *response_end = '\0';
+
                     status += strlen (command_status) + 2;
                     eol = strchr (status, '\r');
                     if (eol)

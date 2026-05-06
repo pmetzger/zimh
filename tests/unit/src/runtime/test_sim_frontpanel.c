@@ -20,6 +20,8 @@ static int simh_test_frontpanel_last_clock_id = -1;
 static struct timespec simh_test_frontpanel_last_sleep_req = {0};
 static PANEL *simh_test_frontpanel_active_panel = NULL;
 static PANEL *simh_test_frontpanel_sleep_panel = NULL;
+static const char *simh_test_frontpanel_command_output = "";
+static int simh_test_frontpanel_prompt_status_echo = 1;
 static int simh_test_frontpanel_write_count = 0;
 static char simh_test_frontpanel_writes[4][4096];
 
@@ -27,6 +29,8 @@ static char simh_test_frontpanel_writes[4][4096];
 static void simh_test_frontpanel_reset_writes(void)
 {
     simh_test_frontpanel_active_panel = NULL;
+    simh_test_frontpanel_command_output = "";
+    simh_test_frontpanel_prompt_status_echo = 1;
     simh_test_frontpanel_write_count = 0;
     memset(simh_test_frontpanel_writes, 0,
            sizeof(simh_test_frontpanel_writes));
@@ -64,11 +68,14 @@ static void simh_test_frontpanel_complete_command(PANEL *panel,
                                                  const char *msg)
 {
     const char *status = strstr(msg, command_status);
+    const char *status_prompt = simh_test_frontpanel_prompt_status_echo ?
+                                sim_prompt : "";
     size_t command_len = status ? (size_t)(status - msg) : strlen(msg);
     int response_len;
 
-    response_len = snprintf(NULL, 0, "%s%.*s\n%s\r\nStatus:00000000-\r\n",
+    response_len = snprintf(NULL, 0, "%s%.*s\n%s%s%s\r\nStatus:00000000-\r\n",
                             sim_prompt, (int)command_len, msg,
+                            simh_test_frontpanel_command_output, status_prompt,
                             command_status);
     assert_true(response_len >= 0);
     if ((size_t)response_len + 1 > panel->io_response_size) {
@@ -79,8 +86,10 @@ static void simh_test_frontpanel_complete_command(PANEL *panel,
         panel->io_response_size = (size_t)response_len + 1;
     }
     snprintf(panel->io_response, panel->io_response_size,
-             "%s%.*s\n%s\r\nStatus:00000000-\r\n",
-             sim_prompt, (int)command_len, msg, command_status);
+             "%s%.*s\n%s%s%s\r\nStatus:00000000-\r\n",
+             sim_prompt, (int)command_len, msg,
+             simh_test_frontpanel_command_output, status_prompt,
+             command_status);
     panel->io_response_data = (size_t)response_len;
     panel->io_waiting = 0;
     pthread_cond_signal(&panel->io_done);
@@ -112,6 +121,65 @@ static int simh_test_frontpanel_write_sock(SOCKET sock, const char *msg,
             simh_test_frontpanel_active_panel, msg);
 
     return nbytes;
+}
+
+/* Verify _panel_sendf() returns only command output, not protocol echoes. */
+static void test_frontpanel_sendf_returns_command_output_only(void **state)
+{
+    PANEL panel;
+    char *response = NULL;
+    int cmd_stat = -1;
+
+    (void)state;
+
+    simh_test_frontpanel_init_panel(&panel);
+    simh_test_frontpanel_active_panel = &panel;
+
+    assert_int_equal(_panel_sendf(&panel, &cmd_stat, &response, "SHOW FOO"),
+                     0);
+
+    assert_int_equal(cmd_stat, 0);
+    assert_non_null(response);
+    assert_string_equal(response, "");
+    assert_int_equal(simh_test_frontpanel_write_count, 1);
+    assert_string_equal(simh_test_frontpanel_writes[0],
+                        "SHOW FOO\r"
+                        "ECHO Status:%STATUS%-%TSTATUS%\r# COMMAND-DONE\r");
+
+    free(response);
+    response = NULL;
+    simh_test_frontpanel_command_output = "first output line\r\n";
+
+    assert_int_equal(_panel_sendf(&panel, &cmd_stat, &response, "SHOW BAR"),
+                     0);
+
+    assert_int_equal(cmd_stat, 0);
+    assert_non_null(response);
+    assert_string_equal(response, "first output line\r\n");
+    assert_int_equal(simh_test_frontpanel_write_count, 2);
+    assert_string_equal(simh_test_frontpanel_writes[1],
+                        "SHOW BAR\r"
+                        "ECHO Status:%STATUS%-%TSTATUS%\r# COMMAND-DONE\r");
+
+    free(response);
+    response = NULL;
+    simh_test_frontpanel_command_output = "promptless output line\r\n";
+    simh_test_frontpanel_prompt_status_echo = 0;
+
+    assert_int_equal(_panel_sendf(&panel, &cmd_stat, &response, "SHOW BAZ"),
+                     0);
+
+    assert_int_equal(cmd_stat, 0);
+    assert_non_null(response);
+    assert_string_equal(response, "promptless output line\r\n");
+    assert_int_equal(simh_test_frontpanel_write_count, 3);
+    assert_string_equal(simh_test_frontpanel_writes[2],
+                        "SHOW BAZ\r"
+                        "ECHO Status:%STATUS%-%TSTATUS%\r# COMMAND-DONE\r");
+
+    free(response);
+    simh_test_frontpanel_active_panel = NULL;
+    simh_test_frontpanel_destroy_panel(&panel);
 }
 
 /* Return a deterministic timestamp through the shared time wrapper. */
@@ -310,6 +378,9 @@ int main(void)
             setup_sim_frontpanel_fixture, teardown_sim_frontpanel_fixture),
         cmocka_unit_test_setup_teardown(
             test_frontpanel_debug_flusher_uses_shared_sleep,
+            setup_sim_frontpanel_fixture, teardown_sim_frontpanel_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_frontpanel_sendf_returns_command_output_only,
             setup_sim_frontpanel_fixture, teardown_sim_frontpanel_fixture),
         cmocka_unit_test_setup_teardown(
             test_frontpanel_establishes_register_bit_collection,
