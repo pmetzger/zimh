@@ -231,6 +231,16 @@ static void sim_timer_start_calibrated_dynamic_throttle (
     sim_timer_process_due_throttle_event (0);
 }
 
+/* Queue the calibrated clock assist unit at a known point in the tick. */
+static void sim_timer_queue_calibrated_tick (
+    struct sim_timer_activation_fixture *fixture, double usec_delay)
+{
+    assert_int_equal (sim_timer_activate_after (&fixture->clock_unit,
+                                                usec_delay),
+                      SCPE_OK);
+    assert_true (sim_is_active (&sim_timer_units[0]));
+}
+
 /* Build a calibrated-timer fixture for wall-clock activation tests. */
 static int setup_sim_timer_activation_fixture (void **state)
 {
@@ -764,6 +774,78 @@ static void test_sim_timer_activate_after_preserves_minimum_delay (
     assert_int_equal (sim_interval, 1);
 }
 
+/* Verify activation requests for already queued units leave the existing queue
+   entry unchanged. */
+static void test_sim_timer_activate_after_preserves_active_unit (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    sim_is_running = TRUE;
+    assert_int_equal (sim_timer_activate_after (&fixture->target_unit, 1000.0),
+                      SCPE_OK);
+    assert_int_equal (sim_timer_activate_after (&fixture->target_unit, 5000.0),
+                      SCPE_OK);
+
+    assert_true (sim_is_active (&fixture->target_unit));
+    assert_int_equal (fixture->target_unit.time, 10);
+    assert_float_equal (fixture->target_unit.usecs_remaining, 0.0, 0.000001);
+}
+
+/* Verify negative activation delays preserve the current behavior of queuing a
+   past-due event rather than rejecting or clamping the request. */
+static void test_sim_timer_activate_after_accepts_negative_delay (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    sim_is_running = TRUE;
+    assert_int_equal (sim_timer_activate_after (&fixture->target_unit, -100.0),
+                      SCPE_OK);
+
+    assert_true (sim_is_active (&fixture->target_unit));
+    assert_int_equal (fixture->target_unit.time, -1);
+    assert_int_equal (sim_interval, -1);
+}
+
+/* Verify delays beyond the next calibration are coscheduled for the
+   calibration tick and retain only the remaining wall-clock time. */
+static void test_sim_timer_activate_after_coschedules_until_calibration (
+    void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    sim_is_running = TRUE;
+    sim_timer_queue_calibrated_tick (fixture, 1000.0);
+
+    assert_int_equal (
+        sim_timer_activate_after (&fixture->target_unit, 1000000.0), SCPE_OK);
+
+    assert_ptr_equal (rtcs[0].clock_cosched_queue, &fixture->target_unit);
+    assert_int_equal (rtcs[0].cosched_interval, 99);
+    assert_int_equal (fixture->target_unit.time, 99);
+    assert_float_equal (fixture->target_unit.usecs_remaining, 9000.0,
+                        0.000001);
+}
+
+/* Verify delays that fit before calibration but span more than one tick are
+   coscheduled at the next clock tick with the remnant preserved. */
+static void test_sim_timer_activate_after_coschedules_until_next_tick (
+    void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    sim_is_running = TRUE;
+    sim_timer_queue_calibrated_tick (fixture, 1000.0);
+
+    assert_int_equal (
+        sim_timer_activate_after (&fixture->target_unit, 50000.0), SCPE_OK);
+
+    assert_ptr_equal (rtcs[0].clock_cosched_queue, &fixture->target_unit);
+    assert_int_equal (rtcs[0].cosched_interval, 0);
+    assert_int_equal (fixture->target_unit.time, 0);
+    assert_float_equal (fixture->target_unit.usecs_remaining, 49000.0,
+                        0.000001);
+}
+
 /* Verify a clock unit activation schedules the timer assist unit and can be
    queried and canceled through the clock-unit wrapper API. */
 static void test_sim_timer_clock_unit_activation_uses_assist_unit (
@@ -1035,6 +1117,139 @@ static void test_sim_idle_sleeps_for_idle_capable_event (void **state)
     assert_int_equal (simh_test_last_sleep_req.tv_nsec, 100000000L);
     assert_int_equal (rtcs[0].clock_time_idled, 100);
     assert_true (sim_interval < 1000);
+}
+
+/* Verify an uncalibrated requested timer falls back to the calibrated timer
+   for idle accounting. */
+static void test_sim_idle_falls_back_to_calibrated_timer (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    rtcs[0].elapsed = SIM_IDLE_STDFLT;
+    sim_idle_enab = TRUE;
+    fixture->target_unit.flags = UNIT_IDLE;
+    assert_int_equal (sim_activate (&fixture->target_unit, 1000), SCPE_OK);
+    simh_test_clock_values[0] = (struct timespec){.tv_sec = 10,
+                                                  .tv_nsec = 0};
+    simh_test_clock_values[1] = (struct timespec){.tv_sec = 10,
+                                                  .tv_nsec = 100000000L};
+    simh_test_clock_value_count = 2;
+    sim_time_set_test_hooks (simh_test_clock_gettime_stub,
+                             simh_test_nanosleep_stub);
+
+    assert_true (sim_idle (1, 0));
+
+    assert_int_equal (simh_test_sleep_calls, 1);
+    assert_int_equal (rtcs[0].clock_time_idled, 100);
+    assert_int_equal (rtcs[1].clock_time_idled, 0);
+}
+
+/* Verify a pending catch-up tick prevents idling and queues the clock assist
+   unit to run immediately. */
+static void test_sim_idle_accelerates_pending_catchup_tick (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    sim_interval = 100;
+    sim_idle_enab = TRUE;
+    rtcs[0].elapsed = SIM_IDLE_STDFLT;
+    rtcs[0].clock_catchup_pending = TRUE;
+    fixture->target_unit.flags = UNIT_IDLE;
+    assert_int_equal (sim_activate (&fixture->target_unit, 100), SCPE_OK);
+
+    assert_false (sim_idle (0, 7));
+
+    assert_true (sim_is_active (&sim_timer_units[0]));
+    assert_int_equal (sim_activate_time (&sim_timer_units[0]), 1);
+    assert_int_equal (sim_interval, -7);
+}
+
+/* Verify catch-up detection prevents idling and schedules an overdue clock
+   assist tick. */
+static void test_sim_idle_schedules_overdue_catchup_tick (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    sim_interval = 100;
+    sim_idle_enab = TRUE;
+    rtcs[0].elapsed = SIM_IDLE_STDFLT;
+    rtcs[0].clock_catchup_eligible = TRUE;
+    rtcs[0].clock_catchup_base_time = 10.0;
+    rtcs[0].clock_tick_size = 0.01;
+    simh_test_clock_values[0] = (struct timespec){.tv_sec = 10,
+                                                  .tv_nsec = 20000000L};
+    simh_test_clock_value_count = 1;
+    sim_time_set_test_hooks (simh_test_clock_gettime_stub, NULL);
+    fixture->target_unit.flags = UNIT_IDLE;
+    assert_int_equal (sim_activate (&fixture->target_unit, 100), SCPE_OK);
+
+    assert_false (sim_idle (0, 7));
+
+    assert_true (rtcs[0].clock_catchup_pending);
+    assert_true (sim_is_active (&sim_timer_units[0]));
+    assert_int_equal (sim_activate_time (&sim_timer_units[0]), 1);
+    assert_int_equal (sim_interval, -7);
+}
+
+/* Verify idling refuses waits shorter than the useful minimum without calling
+   the host sleep hook. */
+static void test_sim_idle_rejects_too_short_wait (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    sim_interval = 1;
+    sim_idle_enab = TRUE;
+    rtcs[0].elapsed = SIM_IDLE_STDFLT;
+    fixture->target_unit.flags = UNIT_IDLE;
+    assert_int_equal (sim_activate (&fixture->target_unit, 1), SCPE_OK);
+
+    assert_false (sim_idle (0, 1));
+
+    assert_int_equal (simh_test_sleep_calls, 0);
+    assert_int_equal (sim_interval, 0);
+}
+
+/* Verify idling fails after setup if the calibrated timer cannot produce a
+   cycles-per-millisecond value. */
+static void test_sim_idle_rejects_timer_without_cycle_rate (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    sim_interval = 1000;
+    sim_idle_enab = TRUE;
+    rtcs[0].currd = 1;
+    rtcs[0].elapsed = SIM_IDLE_STDFLT;
+    fixture->target_unit.flags = UNIT_IDLE;
+    assert_int_equal (sim_activate (&fixture->target_unit, 1000), SCPE_OK);
+
+    assert_false (sim_idle (0, 7));
+
+    assert_int_equal (simh_test_sleep_calls, 0);
+    assert_int_equal (sim_interval, 993);
+}
+
+/* Verify catch-up eligible idling uses the pending fraction of a clock tick
+   when deciding whether to sleep. */
+static void test_sim_idle_uses_catchup_tick_fraction_for_wait (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    sim_idle_enab = TRUE;
+    rtcs[0].elapsed = SIM_IDLE_STDFLT;
+    rtcs[0].clock_catchup_eligible = TRUE;
+    rtcs[0].clock_catchup_base_time = 1000.0;
+    rtcs[0].clock_tick_size = 0.01;
+    fixture->target_unit.flags = UNIT_IDLE;
+    assert_int_equal (sim_activate (&fixture->target_unit, 100), SCPE_OK);
+    simh_test_clock_auto_step_msec = 100;
+    sim_time_set_test_hooks (simh_test_clock_gettime_stub,
+                             simh_test_nanosleep_stub);
+
+    assert_true (sim_idle (0, 0));
+
+    assert_int_equal (simh_test_sleep_calls, 1);
+    assert_int_equal (simh_test_last_sleep_req.tv_sec, 0);
+    assert_int_equal (simh_test_last_sleep_req.tv_nsec, 10000000L);
 }
 
 /* Verify the user-facing idle setters accept the documented range and reject
@@ -1691,6 +1906,22 @@ int main(void)
             setup_sim_timer_activation_fixture,
             teardown_sim_timer_activation_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_timer_activate_after_preserves_active_unit,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_timer_activate_after_accepts_negative_delay,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_timer_activate_after_coschedules_until_calibration,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_timer_activate_after_coschedules_until_next_tick,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_timer_clock_unit_activation_uses_assist_unit,
             setup_sim_timer_activation_fixture,
             teardown_sim_timer_activation_fixture),
@@ -1738,6 +1969,30 @@ int main(void)
             setup_sim_timer_fixture, teardown_sim_timer_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_idle_sleeps_for_idle_capable_event,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_idle_falls_back_to_calibrated_timer,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_idle_accelerates_pending_catchup_tick,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_idle_schedules_overdue_catchup_tick,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_idle_rejects_too_short_wait,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_idle_rejects_timer_without_cycle_rate,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_idle_uses_catchup_tick_fraction_for_wait,
             setup_sim_timer_activation_fixture,
             teardown_sim_timer_activation_fixture),
         cmocka_unit_test_setup_teardown(
