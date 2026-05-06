@@ -138,11 +138,13 @@
 */
 
 #include "system_defs.h"                /* system header in system dir */
+#include "zx200a_internal.h"
+#include "scp.h"
 
 #define UNIT_V_WPMODE   (UNIT_V_UF)     /* Write protect */
 #define UNIT_WPMODE     (1 << UNIT_V_WPMODE)
 
-#define FDD_NUM         6
+#define FDD_NUM         ZX200A_FDD_NUM
 #define SECSIZ          128
 
 //disk controoler operations
@@ -190,6 +192,10 @@
 #define MAXSECDD        52              //double density last sector
 #define MAXTRK          76              //last track
 
+#define CW_INT_CTL      0x30            //channel word interrupt control
+#define CW_INT_DIS      0x10            //I/O complete interrupts disabled
+#define ZX200A_MAX_CFG_BYTE 0xff
+
 #define zx200a_NAME    "Zendex ZX-200A Floppy Disk Controller Board"
 
 /* external globals */
@@ -234,28 +240,44 @@ static const char* zx200a_desc(DEVICE *dptr) {
     return zx200a_NAME;
 }
 
-typedef    struct    {                  //FDD definition
-    uint8   sec;
-    uint8   cyl;
-    uint8   dd;
-    }    FDDDEF;
-
-typedef    struct    {                  //FDC definition
-    uint8   baseport;                   //FDC base port
-    uint8   intnum;                     //interrupt number
-    uint8   verb;                       //verbose flag
-    uint16  iopb;                       //FDC IOPB
-    uint8   DDstat;                     //FDC DD status
-    uint8   SDstat;                     //FDC SD status
-    uint8   rdychg;                     //FDC ready change
-    uint8   rtype;                      //FDC result type
-    uint8   rbyte0;                     //FDC result byte for type 00
-    uint8   rbyte1;                     //FDC result byte for type 10
-    uint8   intff;                      //fdc interrupt FF
-    FDDDEF  fdd[FDD_NUM];               //indexed by the FDD number
-    }    FDCDEF;
-
 FDCDEF    zx200a;
+
+/*
+ * Return whether the IOPB channel word requests an I/O complete interrupt.
+ * The documented value 01 disables completion interrupts; illegal values are
+ * left on the historical interrupting path until their behavior is specified.
+ *
+ * TODO: Share this helper logic with the other Intel diskette controllers
+ * after the warning-driven fixes are settled.
+ */
+static t_bool zx200a_completion_interrupt_enabled(uint8 cw)
+{
+    return (cw & CW_INT_CTL) != CW_INT_DIS;
+}
+
+/*
+ * Parse a byte-wide hexadecimal value from a SET modifier argument. The SIMH
+ * command numeric parser rejects missing values, trailing junk, and values
+ * that would otherwise truncate when stored in the controller state.
+ *
+ * TODO: Share this helper logic with the other Intel diskette controllers
+ * after the warning-driven fixes are settled.
+ */
+static t_stat zx200a_parse_config_byte(const char *cptr, uint8 *value)
+{
+    t_stat status;
+    t_value parsed;
+
+    if (cptr == NULL)
+        return SCPE_ARG;
+
+    parsed = get_uint(cptr, 16, ZX200A_MAX_CFG_BYTE, &status);
+    if (status != SCPE_OK)
+        return status;
+
+    *value = (uint8) parsed;
+    return SCPE_OK;
+}
 
 /* ZX-200A Standard I/O Data Structures */
 
@@ -370,11 +392,15 @@ t_stat zx200a_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
     (void) val;
     (void) desc;
 
-    uint32 size, result;
+    uint8 size;
+    t_stat status;
 
     if (uptr == NULL)
         return SCPE_ARG;
-    result = sscanf(cptr, "%02x", &size);
+    status = zx200a_parse_config_byte(cptr, &size);
+    if (status != SCPE_OK)
+        return status;
+
     zx200a.baseport = size;
 //    if (zx200a.verb)
         sim_printf("ZX200A: Installed at base port=%04X\n", zx200a.baseport);
@@ -383,11 +409,11 @@ t_stat zx200a_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
     reg_dev(zx200ar2DD, zx200a.baseport + 2, 0, 0); //write IOPB addr-h and start
     reg_dev(zx200ar3, zx200a.baseport + 3, 0, 0); //read rstl byte
     reg_dev(zx200ar7, zx200a.baseport + 7, 0, 0); //write reset fdc202
-    reg_dev(zx200ar0SD, zx200a.baseport, 0, 0); //read status
-    reg_dev(zx200ar1SD, zx200a.baseport + 1, 0, 0); //read rslt type/write IOPB addr-l
-    reg_dev(zx200ar2SD, zx200a.baseport + 2, 0, 0); //write IOPB addr-h and start
-    reg_dev(zx200ar3, zx200a.baseport + 3, 0, 0); //read rstl byte
-    reg_dev(zx200ar7, zx200a.baseport + 7, 0, 0); //write reset fdc202
+    reg_dev(zx200ar0SD, zx200a.baseport + 16, 0, 0); //read status
+    reg_dev(zx200ar1SD, zx200a.baseport + 17, 0, 0); //read rslt type/write IOPB addr-l
+    reg_dev(zx200ar2SD, zx200a.baseport + 18, 0, 0); //write IOPB addr-h and start
+    reg_dev(zx200ar3, zx200a.baseport + 19, 0, 0); //read rstl byte
+    reg_dev(zx200ar7, zx200a.baseport + 23, 0, 0); //write reset fdc202
 //    if (zx200a.verb)
         sim_printf("    ZX200A: Enabled base port at 0%02XH  Interrupt #=%02X  %s\n",
         zx200a.baseport, zx200a.intnum, zx200a.verb ? "Verbose" : "Quiet" );
@@ -403,11 +429,15 @@ t_stat zx200a_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
     (void) val;
     (void) desc;
 
-    uint32 size, result;
+    uint8 size;
+    t_stat status;
 
     if (uptr == NULL)
         return SCPE_ARG;
-    result = sscanf(cptr, "%02x", &size);
+    status = zx200a_parse_config_byte(cptr, &size);
+    if (status != SCPE_OK)
+        return status;
+
     zx200a.intnum = size;
 //    if (zx200a.verb)
         sim_printf("ZX200A: Interrupt number=%04X\n", zx200a.intnum);
@@ -482,8 +512,8 @@ t_stat zx200a_reset(DEVICE *dptr)
     }
     if ((dptr->flags & DEV_DIS) == 0) { // enabled
         reg_dev(zx200ar0DD, zx200a.baseport, 0, 0); //read status
-        reg_dev(zx200ar0DD, zx200a.baseport + 1, 0, 0); //read rslt type/write IOPB addr-l
-        reg_dev(zx200ar0DD, zx200a.baseport + 2, 0, 0); //write IOPB addr-h and start
+        reg_dev(zx200ar1DD, zx200a.baseport + 1, 0, 0); //read rslt type/write IOPB addr-l
+        reg_dev(zx200ar2DD, zx200a.baseport + 2, 0, 0); //write IOPB addr-h and start
         reg_dev(zx200ar3, zx200a.baseport + 3, 0, 0); //read rstl byte
         reg_dev(zx200ar7, zx200a.baseport + 7, 0, 0); //write reset zx200a
         reg_dev(zx200ar0SD, zx200a.baseport + 16, 0, 0);  //read status
@@ -758,9 +788,11 @@ void zx200a_diskio(void)
     uint32 i;
     UNIT *uptr;
     uint8 *fbuf;
+    t_bool completion_interrupt;
 
     //parse the IOPB
     cw = get_mbyte(zx200a.iopb);
+    completion_interrupt = zx200a_completion_interrupt_enabled(cw);
     di = get_mbyte(zx200a.iopb + 1);
     nr = get_mbyte(zx200a.iopb + 2);
     ta = get_mbyte(zx200a.iopb + 3);
@@ -779,7 +811,7 @@ void zx200a_diskio(void)
             if ((zx200a.DDstat & RDY0) == 0) {
                 zx200a.rtype = ROK;
                 zx200a.rbyte0 = RB0NR;
-                zx200a.intff = 1;       //set interrupt FF
+                zx200a.intff = completion_interrupt;
                 sim_printf("\n   zx200a: Ready error on drive %d", fddnum);
                 return;
             }
@@ -788,7 +820,7 @@ void zx200a_diskio(void)
             if ((zx200a.DDstat & RDY1) == 0) {
                 zx200a.rtype = ROK;
                 zx200a.rbyte0 = RB0NR;
-                zx200a.intff = 1;       //set interrupt FF
+                zx200a.intff = completion_interrupt;
                 sim_printf("\n   zx200a: Ready error on drive %d", fddnum);
                 return;
             }
@@ -797,7 +829,7 @@ void zx200a_diskio(void)
             if ((zx200a.DDstat & RDY2) == 0) {
                 zx200a.rtype = ROK;
                 zx200a.rbyte0 = RB0NR;
-                zx200a.intff = 1;       //set interrupt FF
+                zx200a.intff = completion_interrupt;
                 sim_printf("\n   zx200a: Ready error on drive %d", fddnum);
                 return;
             }
@@ -806,7 +838,7 @@ void zx200a_diskio(void)
             if ((zx200a.DDstat & RDY3) == 0) {
                 zx200a.rtype = ROK;
                 zx200a.rbyte0 = RB0NR;
-                zx200a.intff = 1;       //set interrupt FF
+                zx200a.intff = completion_interrupt;
                 sim_printf("\n   zx200a: Ready error on drive %d", fddnum);
                 return;
             }
@@ -815,7 +847,7 @@ void zx200a_diskio(void)
             if ((zx200a.SDstat & RDY0) == 0) {
                 zx200a.rtype = ROK;
                 zx200a.rbyte0 = RB0NR;
-                zx200a.intff = 1;       //set interrupt FF
+                zx200a.intff = completion_interrupt;
                 sim_printf("\n   zx200a: Ready error on drive %d", fddnum);
                 return;
             }
@@ -824,7 +856,7 @@ void zx200a_diskio(void)
             if ((zx200a.SDstat & RDY1) == 0) {
                 zx200a.rtype = ROK;
                 zx200a.rbyte0 = RB0NR;
-                zx200a.intff = 1;       //set interrupt FF
+                zx200a.intff = completion_interrupt;
                 sim_printf("\n   zx200a: Ready error on drive %d", fddnum);
                 return;
             }
@@ -841,7 +873,7 @@ void zx200a_diskio(void)
             )) {
             zx200a.rtype = ROK;
             zx200a.rbyte0 = RB0ADR;
-            zx200a.intff = 1;           //set interrupt FF
+            zx200a.intff = completion_interrupt;
             sim_printf("\n   ZX200A: FDD %d - Address error sa=%02X nr=%02X ta=%02X PCX=%04X",
                 fddnum, sa, nr, ta, PCX);
             return;
@@ -856,7 +888,7 @@ void zx200a_diskio(void)
             )) {
             zx200a.rtype = ROK;
             zx200a.rbyte0 = RB0ADR;
-            zx200a.intff = 1;           //set interrupt FF
+            zx200a.intff = completion_interrupt;
             sim_printf("\n   ZX200A: FDD %d - Address error sa=%02X nr=%02X ta=%02X PCX=%04X",
                 fddnum, sa, nr, ta, PCX);
             return;
@@ -866,33 +898,33 @@ void zx200a_diskio(void)
         case DNOP:
             zx200a.rtype = ROK;
             zx200a.rbyte0 = 0;          //set no error
-            zx200a.intff = 1;           //set interrupt FF
+            zx200a.intff = completion_interrupt;
             break;
         case DSEEK:
             zx200a.fdd[fddnum].sec = sa;
             zx200a.fdd[fddnum].cyl = ta;
             zx200a.rtype = ROK;
             zx200a.rbyte0 = 0;          //set no error
-            zx200a.intff = 1;           //set interrupt FF
+            zx200a.intff = completion_interrupt;
             break;
         case DHOME:
             zx200a.fdd[fddnum].sec = sa;
             zx200a.fdd[fddnum].cyl = 0;
             zx200a.rtype = ROK;
             zx200a.rbyte0 = 0;          //set no error
-            zx200a.intff = 1;           //set interrupt FF
+            zx200a.intff = completion_interrupt;
             break;
         case DVCRC:
             zx200a.rtype = ROK;
             zx200a.rbyte0 = 0;          //set no error
-            zx200a.intff = 1;           //set interrupt FF
+            zx200a.intff = completion_interrupt;
             break;
         case DFMT:
             //check for WP
             if(uptr->flags & UNIT_WPMODE) {
                 zx200a.rtype = ROK;
                 zx200a.rbyte0 = RB0WP;
-                zx200a.intff = 1;       //set interrupt FF
+                zx200a.intff = completion_interrupt;
                 sim_printf("\n   zx200a: Write protect error 1 on drive %d", fddnum);
                 return;
             }
@@ -912,7 +944,7 @@ void zx200a_diskio(void)
             }
             zx200a.rtype = ROK;
             zx200a.rbyte0 = 0;          //set no error
-            zx200a.intff = 1;           //set interrupt FF
+            zx200a.intff = completion_interrupt;
             break;
         case DREAD:
             nrptr = 0;
@@ -934,14 +966,14 @@ void zx200a_diskio(void)
             }
             zx200a.rtype = ROK;
             zx200a.rbyte0 = 0;          //set no error
-            zx200a.intff = 1;           //set interrupt FF
+            zx200a.intff = completion_interrupt;
             break;
         case DWRITE:
             //check for WP
             if(uptr->flags & UNIT_WPMODE) {
                 zx200a.rtype = ROK;
                 zx200a.rbyte0 = RB0WP;
-                zx200a.intff = 1;       //set interrupt FF
+                zx200a.intff = completion_interrupt;
                 sim_printf("\n   zx200a: Write protect error 2 on drive %d", fddnum);
                 return;
             }
@@ -963,7 +995,7 @@ void zx200a_diskio(void)
             }
             zx200a.rtype = ROK;
             zx200a.rbyte0 = 0;          //set no error
-            zx200a.intff = 1;           //set interrupt FF
+            zx200a.intff = completion_interrupt;
             break;
         default:
             sim_printf("\n   zx200a: zx200a_diskio bad di=%02X", di & 0x07);
