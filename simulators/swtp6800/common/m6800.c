@@ -336,7 +336,7 @@ DEVICE m6800_dev = {
 
 t_stat sim_instr (void)
 {
-    int32 IR, EA, hi, lo, op1, i, sw = 0;
+    int32 IR, EA, hi, lo, op1, i;
     InstHistory *hst_ent = NULL;
 
     PC = saved_PC & ADDRMASK;           /* load local PC */
