@@ -127,13 +127,15 @@
 */
 
 #include "system_defs.h"                /* system header in system dir */
+#include "isbc206_internal.h"
+#include "scp.h"
 
 //#if defined (SBC206_NUM) && (SBC206_NUM > 0)
 
 #define UNIT_V_WPMODE   (UNIT_V_UF)     /* Write protect */
 #define UNIT_WPMODE     (1 << UNIT_V_WPMODE)
 
-#define HDD_NUM          2               //one fixed and one removable
+#define HDD_NUM          ISBC206_HDD_NUM //one fixed and one removable
 
 //disk controller operations
 #define DNOP            0x00            //HDC no operation
@@ -173,6 +175,10 @@
 #define MDSHD           3796992         //hard disk size MB
 #define MAXSECHD        144             //hard disk last sector (2 heads/2 tracks)
 #define MAXTRKHD        206             //hard disk last track
+
+#define CW_INT_CTL      0x30            //channel word interrupt control
+#define CW_INT_DIS      0x10            //I/O complete interrupts disabled
+#define SBC206_MAX_CFG_BYTE 0xff
 
 #define isbc206_NAME    "Intel iSBC 206 Hard Disk Controller Board"
 
@@ -217,29 +223,44 @@ static const char* isbc206_desc(DEVICE *dptr) {
     return isbc206_NAME;
 }
 
-typedef    struct    {                  //HDD definition
-    int     t0;
-    int     rdy;
-    uint8   sec;
-    uint8   cyl;
-    }    HDDDEF;
-
-typedef    struct    {                  //HDC definition
-    uint8   baseport;                   //HDC base port
-    uint8   intnum;                     //interrupt number
-    uint8   verb;                       //verbose flag
-    uint16  iopb;                       //HDC IOPB
-    uint8   stat;                       //HDC status
-    uint8   rdychg;                     //HDC ready change
-    uint8   rtype;                      //HDC result type
-    uint8   rbyte0;                     //HDC result byte for type 00
-    uint8   rbyte1;                     //HDC result byte for type 10
-    uint8   intff;                      //HDC interrupt FF
-    HDDDEF  hd[HDD_NUM];                //indexed by the HDD number
-    }    HDCDEF;
-
 HDCDEF    hdc206;                       //indexed by the isbc-206 instance number
 
+/*
+ * Return whether the IOPB channel word requests an I/O complete interrupt.
+ * The documented value 01 disables completion interrupts; illegal values are
+ * left on the historical interrupting path until their behavior is specified.
+ *
+ * TODO: Share this helper logic with the other Intel diskette controllers
+ * after the warning-driven fixes are settled.
+ */
+static t_bool isbc206_completion_interrupt_enabled(uint8 cw)
+{
+    return (cw & CW_INT_CTL) != CW_INT_DIS;
+}
+
+/*
+ * Parse a byte-wide hexadecimal value from a SET modifier argument. The SIMH
+ * command numeric parser rejects missing values, trailing junk, and values
+ * that would otherwise truncate when stored in the controller state.
+ *
+ * TODO: Share this helper logic with the other Intel diskette controllers
+ * after the warning-driven fixes are settled.
+ */
+static t_stat isbc206_parse_config_byte(const char *cptr, uint8 *value)
+{
+    t_stat status;
+    t_value parsed;
+
+    if (cptr == NULL)
+        return SCPE_ARG;
+
+    parsed = get_uint(cptr, 16, SBC206_MAX_CFG_BYTE, &status);
+    if (status != SCPE_OK)
+        return status;
+
+    *value = (uint8)parsed;
+    return SCPE_OK;
+}
 
 UNIT isbc206_unit[] = {                 // 2 HDDs
     { UDATA (0, UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE+UNIT_RO+UNIT_BUFABLE+UNIT_MUSTBUF+UNIT_FIX, MDSHD) },
@@ -391,11 +412,16 @@ t_stat isbc206_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
     (void) val;
     (void) desc;
 
-    uint32 size, result;
+    uint8 size;
+    t_stat status;
 
     if (uptr == NULL)
         return SCPE_ARG;
-    result = sscanf(cptr, "%02x", &size);
+
+    status = isbc206_parse_config_byte(cptr, &size);
+    if (status != SCPE_OK)
+        return status;
+
     hdc206.baseport = size;
 //    if (hdc206.verb)
         sim_printf("SBC206: Base port=%04X\n", hdc206.baseport);
@@ -416,11 +442,16 @@ t_stat isbc206_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
     (void) val;
     (void) desc;
 
-    uint32 size, result;
+    uint8 size;
+    t_stat status;
 
     if (uptr == NULL)
         return SCPE_ARG;
-    result = sscanf(cptr, "%02x", &size);
+
+    status = isbc206_parse_config_byte(cptr, &size);
+    if (status != SCPE_OK)
+        return status;
+
     hdc206.intnum = size;
 //    if (hdc206.verb)
         sim_printf("SBC206: Interrupt number=%04X\n", hdc206.intnum);
@@ -634,9 +665,11 @@ void isbc206_diskio(void)
     uint32 i;
     UNIT *uptr;
     uint8 *fbuf;
+    t_bool completion_interrupt;
 
     //parse the IOPB
     cw = get_mbyte(hdc206.iopb);
+    completion_interrupt = isbc206_completion_interrupt_enabled(cw);
     di = get_mbyte(hdc206.iopb + 1);
     nr = get_mbyte(hdc206.iopb + 2);
     ta = get_mbyte(hdc206.iopb + 3);
@@ -651,7 +684,7 @@ void isbc206_diskio(void)
             if ((hdc206.stat & RDY0) == 0) {
                 hdc206.rtype = ROK;
                 hdc206.rbyte0 = RB0NR;
-                hdc206.intff = 1;  //set interrupt FF
+                hdc206.intff = completion_interrupt;
                 sim_printf("\n   SBC206: HDD %d - Ready error", hddnum);
                 return;
             }
@@ -660,7 +693,7 @@ void isbc206_diskio(void)
             if ((hdc206.stat & RDY1) == 0) {
                 hdc206.rtype = ROK;
                 hdc206.rbyte0 = RB0NR;
-                hdc206.intff = 1;  //set interrupt FF
+                hdc206.intff = completion_interrupt;
                 sim_printf("\n   SBC206: HDD %d - Ready error", hddnum);
                 return;
             }
@@ -676,7 +709,7 @@ void isbc206_diskio(void)
         )) {
         hdc206.rtype = ROK;
         hdc206.rbyte0 = RB0ADR;
-        hdc206.intff = 1;           //set interrupt FF
+        hdc206.intff = completion_interrupt;
         sim_printf("\n   SBC206: HDD %d - Address error sa=%02X nr=%02X ta=%02X PCX=%04X",
             hddnum, sa, nr, ta, PCX);
         return;
@@ -685,33 +718,33 @@ void isbc206_diskio(void)
         case DNOP:
             hdc206.rtype = ROK;
             hdc206.rbyte0 = 0;          //set no error
-            hdc206.intff = 1;           //set interrupt FF
+            hdc206.intff = completion_interrupt;
             break;
         case DSEEK:
             hdc206.hd[hddnum].sec = sa;
             hdc206.hd[hddnum].cyl = ta;
             hdc206.rtype = ROK;
             hdc206.rbyte0 = 0;          //set no error
-            hdc206.intff = 1;           //set interrupt FF
+            hdc206.intff = completion_interrupt;
             break;
         case DHOME:
             hdc206.hd[hddnum].sec = sa;
             hdc206.hd[hddnum].cyl = 0;
             hdc206.rtype = ROK;
             hdc206.rbyte0 = 0;          //set no error
-            hdc206.intff = 1;           //set interrupt FF
+            hdc206.intff = completion_interrupt;
             break;
         case DVCRC:
             hdc206.rtype = ROK;
             hdc206.rbyte0 = 0;          //set no error
-            hdc206.intff = 1;           //set interrupt FF
+            hdc206.intff = completion_interrupt;
             break;
         case DFMT:
            //check for WP
             if(uptr->flags & UNIT_WPMODE) {
                 hdc206.rtype = ROK;
                 hdc206.rbyte0 = RB0WP;
-                hdc206.intff = 1;       //set interrupt FF
+                hdc206.intff = completion_interrupt;
                 sim_printf("\n   SBC206: HDD %d - Write protect error DFMT", hddnum);
                 return;
             }
@@ -723,7 +756,7 @@ void isbc206_diskio(void)
             }
             hdc206.rtype = ROK;
             hdc206.rbyte0 = 0;              //set no error
-            hdc206.intff = 1;      //set interrupt FF
+            hdc206.intff = completion_interrupt;
             break;
         case DREAD:
             nrptr = 0;
@@ -741,14 +774,14 @@ void isbc206_diskio(void)
             }
             hdc206.rtype = ROK;
             hdc206.rbyte0 = 0;          //set no error
-            hdc206.intff = 1;           //set interrupt FF
+            hdc206.intff = completion_interrupt;
             break;
         case DWRITE:
             //check for WP
             if(uptr->flags & UNIT_WPMODE) {
                 hdc206.rtype = ROK;
                 hdc206.rbyte0 = RB0WP;
-                hdc206.intff = 1;       //set interrupt FF
+                hdc206.intff = completion_interrupt;
                 sim_printf("\n   SBC206: HDD %d - Write protect error DWRITE", hddnum);
                 return;
             }
@@ -767,7 +800,7 @@ void isbc206_diskio(void)
             }
             hdc206.rtype = ROK;
             hdc206.rbyte0 = 0;          //set no error
-            hdc206.intff = 1;           //set interrupt FF
+            hdc206.intff = completion_interrupt;
             break;
         default:
             sim_printf("\n   SBC206: HDD %d - isbc206_diskio bad di=%02X", hddnum, di & 0x07);
