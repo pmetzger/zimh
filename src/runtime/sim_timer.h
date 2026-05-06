@@ -92,7 +92,7 @@ t_stat sim_timer_activate_after (UNIT *uptr, double usec_delay);
 int32 _sim_timer_activate_time (UNIT *uptr);
 double sim_timer_activate_time_usecs (UNIT *uptr);
 t_bool sim_timer_is_active (UNIT *uptr);
-t_bool sim_timer_cancel (UNIT *uptr);
+t_stat sim_timer_cancel (UNIT *uptr);
 t_stat sim_register_clock_unit (UNIT *uptr);
 t_stat sim_register_clock_unit_tmr (UNIT *uptr, int32 tmr);
 t_stat sim_clock_coschedule (UNIT *uptr, int32 interval);

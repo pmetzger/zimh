@@ -72,8 +72,10 @@
 
 #include "sim_defs.h"
 #include "sim_time.h"
+#include "sim_timer_internal.h"
 #include <ctype.h>
 #include <math.h>
+#include <string.h>
 #ifdef HAVE_WINMM
 #include <windows.h>
 #endif
@@ -187,47 +189,6 @@ static uint32 sim_throt_delay = 3;
 #define CLK_TPS 100
 #define CLK_INIT (sim_precalibrate_ips/CLK_TPS)
 static int32 sim_int_clk_tps;
-
-typedef struct RTC {
-    UNIT *clock_unit;               /* registered ticking clock unit */
-    UNIT *timer_unit;               /* points to related clock assist unit (sim_timer_units) */
-    UNIT *clock_cosched_queue;
-    int32 cosched_interval;
-    uint32 ticks;                   /* ticks */
-    uint32 hz;                      /* tick rate */
-    uint32 last_hz;                 /* prior tick rate */
-    uint32 rtime;                   /* real time (usecs) */
-    uint32 vtime;                   /* virtual time (usecs) */
-    double gtime;                   /* instruction time */
-    uint32 nxintv;                  /* next interval */
-    int32 based;                    /* base delay */
-    int32 currd;                    /* current delay */
-    int32 initd;                    /* initial delay */
-    uint32 elapsed;                 /* seconds since init */
-    uint32 calibrations;            /* calibration count */
-    double clock_skew_max;          /* asynchronous max skew */
-    double clock_tick_size;         /* 1/hz */
-    uint32 calib_initializations;   /* Initialization Count */
-    double calib_tick_time;         /* ticks time */
-    double calib_tick_time_tot;     /* ticks time - total*/
-    uint32 calib_ticks_acked;       /* ticks Acked */
-    uint32 calib_ticks_acked_tot;   /* ticks Acked - total */
-    uint32 clock_ticks;             /* ticks delivered since catchup base */
-    uint32 clock_ticks_tot;         /* ticks delivered since catchup base - total */
-    double clock_init_base_time;    /* reference time for clock initialization */
-    double clock_tick_start_time;   /* reference time when ticking started */
-    double clock_catchup_base_time; /* reference time for catchup ticks */
-    uint32 clock_catchup_ticks;     /* Record of catchups */
-    uint32 clock_catchup_ticks_tot; /* Record of catchups - total */
-    uint32 clock_catchup_ticks_curr;/* Record of catchups in this second */
-    t_bool clock_catchup_pending;   /* clock tick catchup pending */
-    t_bool clock_catchup_eligible;  /* clock tick catchup eligible */
-    uint32 clock_time_idled;        /* total time idled */
-    uint32 clock_time_idled_last;   /* total time idled as of the previous second */
-    uint32 clock_calib_skip_idle;   /* Calibrations skipped due to idling */
-    uint32 clock_calib_gap2big;     /* Calibrations skipped Gap Too Big */
-    uint32 clock_calib_backwards;   /* Calibrations skipped Clock Running Backwards */
-    } RTC;
 
 RTC rtcs[SIM_NTIMERS+1];
 UNIT sim_timer_units[SIM_NTIMERS+1];/* Clock assist units                         */
@@ -579,6 +540,62 @@ UNIT sim_stop_unit;                                     /* Stop unit            
 UNIT sim_internal_timer_unit;                           /* Internal calibration timer */
 int32 sim_internal_timer_time;                          /* Pending internal timer delay */
 UNIT sim_throttle_unit;                                 /* one for throttle */
+
+/* Restore timer subsystem globals to startup-like defaults for unit tests.
+   This is a test-only seam for isolating timer cases; production code should
+   use the normal timer initialization and shutdown paths. */
+void sim_timer_reset_test_state(void)
+{
+    while (sim_clock_queue != QUEUE_LIST_END)
+        sim_cancel(sim_clock_queue);
+    memset(rtcs, 0, sizeof(rtcs));
+    memset(sim_timer_units, 0, sizeof(sim_timer_units));
+    memset(&sim_stop_unit, 0, sizeof(sim_stop_unit));
+    memset(&sim_internal_timer_unit, 0, sizeof(sim_internal_timer_unit));
+    memset(&sim_throttle_unit, 0, sizeof(sim_throttle_unit));
+    sim_interval = 0;
+#if defined(SIM_ASYNCH_CLOCKS)
+    sim_wallclock_queue = QUEUE_LIST_END;
+    sim_wallclock_entry = NULL;
+#endif
+    sim_idle_enab = FALSE;
+    sim_idle_wait = FALSE;
+    sim_vm_initial_ips = SIM_INITIAL_IPS;
+    sim_precalibrate_ips = SIM_INITIAL_IPS;
+    sim_calb_tmr = -1;
+    sim_calb_tmr_last = -1;
+    sim_inst_per_sec_last = 0;
+    sim_stop_time = 0;
+    sim_time_at_sim_prompt = 0;
+    sim_idle_rate_ms = 0;
+    sim_os_sleep_min_ms = 0;
+    sim_os_sleep_inc_ms = 0;
+    sim_os_clock_resoluton_ms = 0;
+    sim_os_tick_hz = 0;
+    sim_idle_stable = SIM_IDLE_STDFLT;
+    sim_idle_calib_pct = 100;
+    sim_timer_stop_time = 0;
+    sim_rom_delay = 0;
+    sim_throt_ms_start = 0;
+    sim_throt_ms_stop = 0;
+    sim_throt_type = 0;
+    sim_throt_val = 0;
+    sim_throt_drift_pct = SIM_THROT_DRIFT_PCT_DFLT;
+    sim_throt_state = SIM_THROT_STATE_INIT;
+    sim_throt_cps = 0;
+    sim_throt_peak_cps = 0;
+    sim_throt_inst_start = 0;
+    sim_throt_sleep_time = 0;
+    sim_throt_wait = 0;
+    sim_throt_delay = 3;
+    sim_int_clk_tps = 0;
+    sim_catchup_ticks = TRUE;
+    sim_asynch_timer = FALSE;
+    sim_idle_cyc_ms = 0;
+    sim_idle_cyc_sleep = 0;
+    sim_idle_end_time = 0.0;
+    sim_internal_timer_time = 0;
+}
 
 t_stat sim_throt_svc (UNIT *uptr);
 t_stat sim_timer_tick_svc (UNIT *uptr);
@@ -1494,10 +1511,20 @@ uint32 w_ms, w_idle, act_ms;
 int32 act_cyc;
 static t_bool in_nowait = FALSE;
 double cyc_since_idle;
-RTC *rtc = &rtcs[tmr];
+RTC *rtc;
 
-if (rtc->hz == 0)                                       /* specified timer is not running? */
-    tmr = sim_calb_tmr;                                 /* use calibrated timer instead */
+if (tmr > SIM_NTIMERS) {                                /* invalid timer? */
+    sim_interval -= sin_cyc;
+    return FALSE;
+    }
+rtc = &rtcs[tmr];
+if (rtc->hz == 0) {                                     /* specified timer is not running? */
+    if ((sim_calb_tmr < 0) || (sim_calb_tmr > SIM_NTIMERS)) {
+        sim_interval -= sin_cyc;
+        return FALSE;
+        }
+    tmr = (uint32)sim_calb_tmr;                         /* use calibrated timer instead */
+    }
 rtc = &rtcs[tmr];
 if (rtc->clock_catchup_pending) {                       /* Catchup clock tick pending due to ack? */
     sim_debug (DBG_TIK, &sim_timer_dev, "sim_idle(tmr=%d, sin_cyc=%d) - accelerating pending catch-up tick before idling %s\n", tmr, sin_cyc, sim_uname (rtc->clock_unit));
@@ -3042,7 +3069,7 @@ for (tmr=0; tmr<=SIM_NTIMERS; tmr++) {
 return FALSE;
 }
 
-t_bool sim_timer_cancel (UNIT *uptr)
+t_stat sim_timer_cancel (UNIT *uptr)
 {
 int32 tmr;
 
