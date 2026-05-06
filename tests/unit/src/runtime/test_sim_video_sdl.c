@@ -3,7 +3,7 @@
 
 #include "test_cmocka.h"
 
-#include "sim_video.h"
+#include "sim_video_internal.h"
 
 static void use_dummy_sdl_drivers(void)
 {
@@ -36,10 +36,43 @@ static void test_screenshot_reports_surface_allocation_failure(void **state)
     assert_int_equal(vid_close_all(), SCPE_OK);
 }
 
+static void dummy_gamepad_callback(int control, int value, int state)
+{
+    (void)control;
+    (void)value;
+    (void)state;
+}
+
+static int teardown_gamepad_callbacks(void **state)
+{
+    (void)state;
+
+    sim_video_reset_test_gamepad_callbacks();
+    return 0;
+}
+
+/* Gamepad callbacks are optional and may be registered before video opens. */
+static void test_gamepad_callbacks_register_before_open(void **state)
+{
+    (void)state;
+
+    assert_int_equal(
+        vid_register_gamepad_motion_callback(dummy_gamepad_callback),
+        SCPE_OK);
+    assert_int_equal(
+        vid_register_gamepad_motion_callback(dummy_gamepad_callback),
+        SCPE_ALATT);
+    assert_int_equal(
+        vid_register_gamepad_button_callback(dummy_gamepad_callback),
+        SCPE_OK);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_screenshot_reports_surface_allocation_failure),
+        cmocka_unit_test_teardown(test_gamepad_callbacks_register_before_open,
+                                  teardown_gamepad_callbacks),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

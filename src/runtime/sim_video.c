@@ -11,6 +11,7 @@
 #include <png.h>
 #endif
 #include "sim_video.h"
+#include "sim_video_internal.h"
 #include "scp.h"
 
 int vid_active = 0;
@@ -24,19 +25,51 @@ static VID_GAMEPAD_CALLBACK motion_callback[10];
 static VID_GAMEPAD_CALLBACK button_callback[10];
 static int vid_gamepad_inited = 0;
 
+#if defined(USE_SIM_VIDEO) && defined(HAVE_LIBSDL)
+static void vid_controllers_setup(DEVICE *dptr);
+
+/* Return TRUE when a simulator has asked for optional gamepad input. */
+static t_bool vid_gamepad_callbacks_registered(void)
+{
+    int i;
+
+    for (i = 0; i < (int)(sizeof motion_callback / sizeof motion_callback[0]);
+         i++) {
+        if (motion_callback[i] != NULL)
+            return TRUE;
+        }
+
+    for (i = 0; i < (int)(sizeof button_callback / sizeof button_callback[0]);
+         i++) {
+        if (button_callback[i] != NULL)
+            return TRUE;
+        }
+
+    return FALSE;
+}
+#endif
+
+void sim_video_reset_test_gamepad_callbacks(void)
+{
+    memset (motion_callback, 0, sizeof motion_callback);
+    memset (button_callback, 0, sizeof button_callback);
+}
+
 t_stat vid_register_quit_callback (VID_QUIT_CALLBACK callback)
 {
 vid_quit_callback = callback;
 return SCPE_OK;
 }
 
-static t_stat register_callback (void **array, int n, void *callback)
+static t_stat register_callback (VID_GAMEPAD_CALLBACK *array, int n,
+                                 VID_GAMEPAD_CALLBACK callback)
 {
     int i, j = -1;
 
-    if (!vid_gamepad_inited) {
+#if !(defined(USE_SIM_VIDEO) && defined(HAVE_LIBSDL))
+    if (!vid_gamepad_inited)
         return SCPE_NOATT;
-        }
+#endif
 
     for (i = 0; i < n; i++) {
         if (array[i] == callback)
@@ -47,6 +80,10 @@ static t_stat register_callback (void **array, int n, void *callback)
 
     if (j != -1) {
         array[j] = callback;
+#if defined(USE_SIM_VIDEO) && defined(HAVE_LIBSDL)
+        if (vid_active && !vid_gamepad_inited)
+            vid_controllers_setup (NULL);
+#endif
         return SCPE_OK;
         }
 
@@ -56,13 +93,13 @@ static t_stat register_callback (void **array, int n, void *callback)
 t_stat vid_register_gamepad_motion_callback (VID_GAMEPAD_CALLBACK callback)
 {
     int n = sizeof (motion_callback) / sizeof (callback);
-    return register_callback ((void **)motion_callback, n, (void *)callback);
+    return register_callback (motion_callback, n, callback);
 }
 
 t_stat vid_register_gamepad_button_callback (VID_GAMEPAD_CALLBACK callback)
 {
     int n = sizeof (button_callback) / sizeof (callback);
-    return register_callback ((void **)button_callback, n, (void *)callback);
+    return register_callback (button_callback, n, callback);
 }
 
 t_stat vid_show (FILE* st, DEVICE *dptr,  UNIT* uptr, int32 val, const char* desc)
@@ -337,7 +374,6 @@ void vid_screenshot_event (void);
 void vid_beep_event (void);
 static void vid_beep_setup (int duration_ms, int tone_frequency);
 static void vid_beep_cleanup (void);
-static void vid_controllers_setup (DEVICE *dptr);
 static void vid_controllers_cleanup (void);
 
 struct VID_DISPLAY {
@@ -622,6 +658,9 @@ SDL_Joystick *y;
 SDL_version ver;
 int i, n;
 
+if (!vid_gamepad_callbacks_registered ())
+    return;
+
 if (vid_gamepad_inited++)
     return;
 
@@ -684,6 +723,9 @@ for (i = 0; i < n; i++) {
 
 static void vid_controllers_cleanup (void)
 {
+if (!vid_gamepad_inited)
+    return;
+
 if (0 == (--vid_gamepad_inited)) {
     memset (motion_callback, 0, sizeof motion_callback);
     memset (button_callback, 0, sizeof button_callback);

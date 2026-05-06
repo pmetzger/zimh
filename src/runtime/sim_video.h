@@ -169,9 +169,21 @@ t_stat vid_open (DEVICE *dptr, const char *title, uint32 width, uint32 height, i
 #define SIM_VID_RESIZABLE           4                       /* video screen is resizable */
 typedef void (*VID_QUIT_CALLBACK)(void);
 t_stat vid_register_quit_callback (VID_QUIT_CALLBACK callback);
+
+/*
+ * Gamepad callbacks are optional.  Registering a callback opts the SDL video
+ * backend into joystick or GameController initialization; ordinary video
+ * windows do not initialize that subsystem when no callbacks are registered.
+ *
+ * When SDL video support is enabled, callbacks may be registered before
+ * opening video.  Motion callbacks receive the SDL device instance id, axis,
+ * and axis value.  Button callbacks receive the SDL device instance id,
+ * button, and button state.
+ */
 typedef void (*VID_GAMEPAD_CALLBACK)(int, int, int);
 t_stat vid_register_gamepad_motion_callback (VID_GAMEPAD_CALLBACK);
 t_stat vid_register_gamepad_button_callback (VID_GAMEPAD_CALLBACK);
+
 t_stat vid_close (void);
 t_stat vid_poll_kb (SIM_KEY_EVENT *ev);
 t_stat vid_poll_mouse (SIM_MOUSE_EVENT *ev);
