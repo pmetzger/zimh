@@ -603,6 +603,7 @@ static int teardown_sim_tmxr_fixture(void **state)
         free(fixture->lines[i].txb);
         free(fixture->lines[i].rxpb);
         free(fixture->lines[i].txpb);
+        free(fixture->lines[i].telnet_sent_opts);
         free(fixture->lines[i].serconfig);
         free(fixture->lines[i].destination);
         free(fixture->lines[i].lpb);
@@ -1339,6 +1340,26 @@ static void test_tmxr_open_master_loopback_sets_line_state(void **state)
     assert_int_equal(line->txdeltausecs, TMLN_SPD_2400_BPS);
 
     assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+}
+
+/* Verify closing a loopback mux tears down the private loopback buffers. */
+static void test_tmxr_close_master_clears_loopback_buffers(void **state)
+{
+    struct sim_tmxr_fixture *fixture = *state;
+    TMLN *line = &fixture->lines[0];
+
+    fixture->mux.lines = 1;
+
+    assert_int_equal(tmxr_open_master(&fixture->mux, "Loopback"), SCPE_OK);
+    assert_true(line->loopback);
+    assert_non_null(line->lpb);
+    assert_true(line->lpbsz > 0);
+
+    assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
+
+    assert_false(line->loopback);
+    assert_null(line->lpb);
+    assert_int_equal(line->lpbsz, 0);
 }
 
 /* Verify invalid BUFFERED sizes are rejected. */
@@ -2908,6 +2929,7 @@ static void test_tmxr_send_expect_line_name_formats_registered_lines(
     fixture->mux.lines = 1;
     assert_string_equal(tmxr_send_line_name(&fixture->lines[0].send),
                         "TMXR");
+    fixture->mux.lines = 4;
 
     assert_int_equal(tmxr_close_master(&fixture->mux), SCPE_OK);
 }
@@ -3332,6 +3354,9 @@ int main(void)
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
             test_tmxr_open_master_loopback_sets_line_state,
+            setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_tmxr_close_master_clears_loopback_buffers,
             setup_sim_tmxr_fixture, teardown_sim_tmxr_fixture),
         cmocka_unit_test_setup_teardown(
             test_tmxr_open_master_rejects_invalid_buffered_size,

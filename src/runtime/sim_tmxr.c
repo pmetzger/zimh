@@ -4806,6 +4806,7 @@ for (i = 0; i < mp->lines; i++) {  /* loop thru conn */
         free (lp->port);
         lp->port = NULL;
         }
+    tmxr_set_line_loopback (lp, FALSE);
     lp->txbfd = 0;
     free (lp->txb);
     lp->txb = NULL;
