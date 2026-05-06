@@ -422,7 +422,6 @@ t_stat dsk_attach (UNIT *uptr, const char *cptr)
 int32 fdcdrv(int32 io, int32 data)
 {
     static long pos;
-    static int32 err;
     uint8  *SIR;
     int32  disk_image_size;
 
@@ -484,7 +483,7 @@ int32 fdcdrv(int32 io, int32 data)
 
 int32 fdccmd(int32 io, int32 data)
 {
-    static int32 val = 0, val1 = NOTRDY;
+    static int32 val = 0;
     static long pos;
     static int32 err;
 
