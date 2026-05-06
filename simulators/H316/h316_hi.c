@@ -84,6 +84,8 @@
 #define PFLG_READY 00002
 
 
+#include <stdbool.h>
+
 #ifdef VM_IMPTIP
 #include "h316_defs.h"          // H316 emulator definitions
 #include "h316_imp.h"           // ARPAnet IMP/TIP definitions
@@ -788,7 +790,7 @@ t_stat hi_attach (UNIT *uptr, const char *cptr)
   //    ATTACH HIn llll:w.x.y.z:rrrr - connect via UDP to a remote simh host
   //
   t_stat ret;  char *pfn;  uint16 host = uptr->hline;
-  t_bool fport = sim_switches & SWMASK('P');
+  bool fport = h316_physical_port_switch_requested(sim_switches);
 
   // If we're already attached, then detach ...
   if ((uptr->flags & UNIT_ATT) != 0) detach_unit(uptr);

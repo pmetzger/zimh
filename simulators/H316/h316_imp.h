@@ -25,6 +25,8 @@
 
    21-May-13    RLA     New file.
 */
+#include <stdbool.h>
+
 #ifdef VM_IMPTIP
 #ifndef H316_IMP_H_
 #define H316_IMP_H_   0
@@ -130,6 +132,11 @@
 #define MI_DBG_MSG      0x8000  // modem: decode and print all messages
 #define HI_DBG_MSG      0x8000  // host interface: decode and print all messages
 #define WDT_DBG_LIGHTS  0x8000  // wdt: show status light changes
+
+static inline bool h316_physical_port_switch_requested(int32 switches)
+{
+  return (switches & SWMASK('P')) != 0;
+}
 
 // Synonyms for DIB and UNIT fields ...
 #define rxdmc   chan            // dib->rxdmc
