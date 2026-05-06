@@ -1262,7 +1262,3 @@ static t_stat ibm650_deck_cmd(int32 arg, const char *buf)
     }
     return sim_messagef (SCPE_ARG, "Unknown deck command operation\n");
 }
-
-
-
-

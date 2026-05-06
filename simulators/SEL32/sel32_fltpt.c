@@ -1634,4 +1634,3 @@ t_uint64 s_dvfd(t_uint64 reg, t_uint64 mem, uint32 *cc) {
     *cc = CC;                           /* save CC's */
     return res;                         /* return results */
 }
-

@@ -653,4 +653,3 @@ const char *clk_description (DEVICE *dptr)
 
 return "KW11-L line frequency clock";
 }
-

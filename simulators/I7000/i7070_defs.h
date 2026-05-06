@@ -235,7 +235,3 @@ int                 scan_irq(void);
 #define OP_CHN2         0x194
 #define OP_CHN3         0x196
 #define OP_CHN4         0x197
-
-
-
-

@@ -1002,4 +1002,3 @@ if (dibp->ack[0])                                       /* set abort dispatch */
 mba_dev[idx].flags &= ~DEV_DIS;                         /* mark MBA enabled */
 return SCPE_OK;
 }
-

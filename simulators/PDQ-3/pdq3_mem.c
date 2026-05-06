@@ -383,4 +383,3 @@ t_stat rom_write(t_addr ea, uint16 data) {
   M[ea] = data;
   return SCPE_OK;
 }
-

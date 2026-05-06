@@ -435,4 +435,3 @@ extern uint16    dev_pulse[NUM_CHAN];                   /* Device pulse */
 #define OP_EFT  000044
 #define OP_ESM  000140
 #define OP_TSM  000141
-

@@ -342,4 +342,3 @@ cr_description(DEVICE *dptr)
 }
 
 #endif
-

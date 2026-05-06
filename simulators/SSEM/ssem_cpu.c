@@ -269,4 +269,3 @@ void Write (uint32 ea, uint32 dat)
 S[ea] = dat & MMASK;
 return;
 }
-

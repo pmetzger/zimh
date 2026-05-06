@@ -283,4 +283,3 @@ int32 sio1d(int32 io, int32 data)
     }
     return 0;
 }
-

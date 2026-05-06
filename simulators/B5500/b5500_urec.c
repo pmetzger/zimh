@@ -1194,4 +1194,3 @@ con_description(DEVICE *dptr)
 }
 
 #endif
-

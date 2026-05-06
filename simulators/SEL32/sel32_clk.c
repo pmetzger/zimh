@@ -755,4 +755,3 @@ const char *itm_desc(DEVICE *dptr)
 }
 
 #endif
-

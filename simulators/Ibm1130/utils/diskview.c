@@ -609,4 +609,3 @@ char *lowcase (char *str)
 
     return str;
 }
-

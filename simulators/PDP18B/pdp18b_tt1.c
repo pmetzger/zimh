@@ -470,4 +470,3 @@ else {
 ttx_lines = newln;
 return SCPE_OK;
 }
-

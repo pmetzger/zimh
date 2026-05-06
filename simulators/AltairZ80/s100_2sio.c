@@ -874,4 +874,3 @@ static void m2sio_int(UNIT *uptr)
         sim_debug(IRQ_MSG, uptr->dptr, "%s: IRQ Vector=%d Status=%02X\n", sim_uname(uptr), xptr->intvector, xptr->stb);
     }
 }
-

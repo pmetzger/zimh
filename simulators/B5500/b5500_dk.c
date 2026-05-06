@@ -618,5 +618,3 @@ esu_description (DEVICE *dptr)
     return  "B471 electrontics unit and 5 B457 storage units.";
 }
 #endif
-
-

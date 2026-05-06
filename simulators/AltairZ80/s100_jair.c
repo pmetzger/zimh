@@ -1980,4 +1980,3 @@ static t_stat jair_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const c
 
     return SCPE_OK;
 }
-

@@ -4045,4 +4045,3 @@ static void MMD_Dump_Sector(void) {
     }
     sim_printf("\n\r");
 }
-

@@ -1365,4 +1365,3 @@ cdr_description(DEVICE *dptr)
 
    return "533 Card Read-Punch unit";
 }
-

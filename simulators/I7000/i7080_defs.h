@@ -100,4 +100,3 @@ void store_addr(uint32 addr, uint32 *loc);
 #define CHAN_AFULL      01000           /* A buffer has data */
 #define CHAN_BFULL      02000           /* B buffer has data */
 #define CHAN_BFLAG      04000           /* Write/read B buffer */
-

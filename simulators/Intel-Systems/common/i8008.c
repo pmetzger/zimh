@@ -1257,4 +1257,3 @@ val[1] = r & 0xFF;
 val[2] = (r >> 8) & 0xFF;
 return (-2);
 }
-

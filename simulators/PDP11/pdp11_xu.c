@@ -2201,5 +2201,3 @@ const char *xu_description (DEVICE *dptr)
 
 return "DEUNA/DELUA Ethernet controller";
 }
-
-

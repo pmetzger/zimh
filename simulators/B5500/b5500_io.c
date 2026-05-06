@@ -782,4 +782,3 @@ int chan_read_drum(int chan, uint8 *ch, int flags) {
         }
         return 0;
 }
-

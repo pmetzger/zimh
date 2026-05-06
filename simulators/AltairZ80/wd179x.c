@@ -1560,4 +1560,3 @@ static t_stat wd179x_trackWrite(WD179X_DRIVE_INFO* pDrive,
 
     return(status);
 }
-

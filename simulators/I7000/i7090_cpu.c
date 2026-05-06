@@ -4497,4 +4497,3 @@ fprintf (st, "   sim> SHOW CPU HISTORY                print CPU history\n");
 
 return SCPE_OK;
 }
-

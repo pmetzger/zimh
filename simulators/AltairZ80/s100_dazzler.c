@@ -845,4 +845,3 @@ static void js1_joy_button (int device, int button, int state)
         sim_debug(SIM_VID_DBG_JOYSTICK, &daz_dev, "Button device=%d, button=%d, state=%d\n", device, button, state);
     }
 }
-

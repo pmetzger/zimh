@@ -1262,4 +1262,3 @@ static int32 jademem(int32 Addr, int32 rw, int32 Data)
 
     return(jade_mem[offset]);
 }
-

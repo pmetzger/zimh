@@ -425,4 +425,3 @@ TLBENT *dtlb_load (uint32 vpn, t_uint64 pte);
 t_uint64 dtlb_read (void);
 
 #endif
-

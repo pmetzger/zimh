@@ -329,4 +329,3 @@ t_stat slave_devio(uint32 dev, uint64 *data)
 }
 
 #endif
-

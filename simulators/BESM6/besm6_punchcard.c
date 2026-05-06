@@ -495,4 +495,3 @@ int pi_read (int num)
         return PI[unit].image[card][line][pos] ^ 0xFFFFF;
     }
 }
-

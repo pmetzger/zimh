@@ -94,4 +94,3 @@ const char *sim_stop_messages[SCPE_BASE] = {
     "Invalid Memory",
     "XACK Error"
 };
-

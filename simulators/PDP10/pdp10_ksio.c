@@ -2368,4 +2368,3 @@ if (dptr == NULL)
     return SCPE_IERR;
 return auto_config (NULL, 0);                           /* autoconfigure */
 }
-

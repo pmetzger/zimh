@@ -190,4 +190,3 @@ t_stat pata_reset (DEVICE *dptr, int32 base)
     sim_printf("   PATA: Reset\n");
     return SCPE_OK;
 }
-

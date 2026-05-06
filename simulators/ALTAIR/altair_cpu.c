@@ -1208,4 +1208,3 @@ int32 nulldev(int32 flag, int32 data)
         return (0377);
     return 0;
 }
-

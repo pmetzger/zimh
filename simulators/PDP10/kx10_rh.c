@@ -1233,4 +1233,3 @@ int rh_write(struct rh_if *rhc) {
 #endif
      return 1;
 }
-

@@ -2694,4 +2694,3 @@ static t_stat sol20_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const 
 
     return SCPE_OK;
 }
-

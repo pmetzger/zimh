@@ -748,4 +748,3 @@ static void tuart_int(UNIT *uptr)
 
     sim_debug(IRQ_MSG, uptr->dptr, "Vector=%d Data bus=%02X\n", xptr->intvector, dataBus[xptr->intvector]);
 }
-

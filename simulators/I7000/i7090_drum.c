@@ -308,4 +308,3 @@ drm_description (DEVICE *dptr)
 }
 
 #endif
-

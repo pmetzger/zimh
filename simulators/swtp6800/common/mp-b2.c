@@ -317,4 +317,3 @@ void MB_put_mword(int32 addr, int32 val)
 }
 
 /* end of mp-b2.c */
-

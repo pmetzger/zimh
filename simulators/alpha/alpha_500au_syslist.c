@@ -46,4 +46,3 @@ DEVICE *sim_devices[] = {
     &rom_dev,
     NULL
     };
-

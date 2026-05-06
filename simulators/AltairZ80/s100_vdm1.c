@@ -755,4 +755,3 @@ static t_stat vdm1_show_display(FILE *st, UNIT *uptr, int32 val, const void *des
 
     return SCPE_OK;
 }
-

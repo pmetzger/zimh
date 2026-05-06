@@ -1544,4 +1544,3 @@ char * file_progtype (LETENTRY *entry)                  // description of module
 
     return buf;
 }
-

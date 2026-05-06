@@ -443,4 +443,3 @@ t_stat dbg_init(void) {
 
   return SCPE_OK;
 }
-

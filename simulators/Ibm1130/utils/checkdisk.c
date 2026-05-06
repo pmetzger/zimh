@@ -259,4 +259,3 @@ long filelength (int fno)
     return (long) sb.st_size;
 }
 #endif
-

@@ -506,5 +506,3 @@ dsk_description(DEVICE *dptr)
 
    return "IBM 355 RAMAC Disk Storage Unit";
 }
-
-

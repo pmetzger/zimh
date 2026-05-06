@@ -414,4 +414,3 @@ static t_stat auxcpu_show_base (FILE *st, UNIT *uptr, int32 val, const void *des
     return SCPE_OK;
 }
 #endif
-

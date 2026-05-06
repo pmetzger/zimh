@@ -240,4 +240,3 @@ void bail (char *msg)
     fprintf(stderr, "%s\n", msg);
     exit(1);
 }
-

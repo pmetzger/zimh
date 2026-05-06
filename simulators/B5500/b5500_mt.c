@@ -645,5 +645,3 @@ mt_description(DEVICE *dptr)
    return "B422/B423 Magnetic tape unit";
 }
 #endif
-
-

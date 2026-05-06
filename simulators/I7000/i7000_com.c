@@ -1348,5 +1348,3 @@ return SCPE_OK;
 }
 
 #endif
-
-

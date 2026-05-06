@@ -1688,4 +1688,3 @@ const char *nia_description (DEVICE *dptr)
     return "KL NIA interface";
 }
 #endif
-

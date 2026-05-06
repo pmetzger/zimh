@@ -136,4 +136,3 @@ void m6810_put_mbyte(int32 offset, int32 val)
 }
 
 /* end of m6810.c */
-

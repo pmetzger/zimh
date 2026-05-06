@@ -718,4 +718,3 @@ static t_stat ss1_svc (UNIT *uptr)
 
     return SCPE_OK;
 }
-

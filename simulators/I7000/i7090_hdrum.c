@@ -278,4 +278,3 @@ hsdrm_description (DEVICE *dptr)
 }
 
 #endif
-

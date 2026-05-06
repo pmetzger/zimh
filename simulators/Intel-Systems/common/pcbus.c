@@ -467,4 +467,3 @@ void xtbus_put_mbyte(uint32 addr, uint8 val)
 }
 
 /* end of pcbus.c */
-

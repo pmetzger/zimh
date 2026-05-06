@@ -3069,4 +3069,3 @@ t_stat show_dev_addr(FILE *st, UNIT *uptr, int32 v, const void *desc) {
     fprintf(st, "CHAN/SA %04x", chsa);          /* display channel/subaddress */
     return SCPE_OK;                             /* we done */
 }
-

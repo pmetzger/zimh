@@ -378,4 +378,3 @@ sim_cancel (&drp_unit);
 drp_unit.FUNC = 0;
 return SCPE_OK;
 }
-

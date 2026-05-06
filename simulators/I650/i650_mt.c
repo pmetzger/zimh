@@ -698,5 +698,3 @@ mt_description(DEVICE *dptr)
 
    return "IBM 727 Magnetic tape unit";
 }
-
-

@@ -153,4 +153,3 @@ while ((i = Fgetc (fileref)) != EOF) {                   /* read byte stream */
     }
 return SCPE_OK;
 }
-

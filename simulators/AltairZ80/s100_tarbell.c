@@ -1481,4 +1481,3 @@ static int32 tarbelldma(int32 Addr, int32 rw, int32 data)
 
     return 0x00;    /* DMA is not implemented */
 }
-

@@ -619,5 +619,3 @@ uba_show_ctl (FILE *st, UNIT *uptr, int32 val, const void *desc)
     fprintf(st, "uba%o", dibp->uba_ctl);
     return SCPE_OK;
 }
-
-

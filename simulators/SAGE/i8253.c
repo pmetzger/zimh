@@ -144,4 +144,3 @@ t_stat i8253_io(IOHANDLER* ioh,uint32* value,uint32 rw,uint32 mask)
     I8253* chip = (I8253*)ioh->ctxt;
     return rw==MEM_WRITE ? i8253_write(chip,port,*value) : i8253_read(chip,port,value);
 }
-

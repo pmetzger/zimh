@@ -433,4 +433,3 @@ const char          *chan_description (DEVICE *dptr) {
 
    return "IBM 701 Psuedo Channel";
 }
-

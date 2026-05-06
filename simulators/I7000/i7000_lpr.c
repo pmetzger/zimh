@@ -582,5 +582,3 @@ lpr_description(DEVICE *dptr)
 }
 
 #endif
-
-

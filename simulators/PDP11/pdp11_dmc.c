@@ -4152,4 +4152,3 @@ const char *dmp_description (DEVICE *dptr)
 return (UNIBUS) ? "DMP11 Synchronous network controller"
                 : "DMV11 Synchronous network controller";
 }
-

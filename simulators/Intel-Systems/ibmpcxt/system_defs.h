@@ -107,4 +107,3 @@
 #define STOP_OPCODE     4                           /* Invalid Opcode */
 #define STOP_IO         5                           /* I/O error */
 #define STOP_MEM        6                           /* Memory error */
-

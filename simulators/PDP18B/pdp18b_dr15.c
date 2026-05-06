@@ -364,4 +364,3 @@ sim_shmem_close (uc15_shmem);                           /* release shared state 
 sim_shmem_close (pdp15_shmem);                          /* release shared mem */
 return SCPE_OK;
 }
-

@@ -380,4 +380,3 @@ const char *mfp_desc(DEVICE *dptr)
 }
 
 #endif
-

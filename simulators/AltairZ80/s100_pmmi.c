@@ -716,4 +716,3 @@ static int32 pmmi_reg3(int32 io, int32 data)
     }
     return 0x00;
 }
-

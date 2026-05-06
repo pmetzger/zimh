@@ -975,4 +975,3 @@ switch (I_GETOP (val)) {
 if (*cptr != 0) return SCPE_ARG;
 return -3;
 }
-

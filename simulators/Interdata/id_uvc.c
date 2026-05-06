@@ -422,4 +422,3 @@ t_stat lfc_show_freq (FILE *st, UNIT *uptr, int32 val, const void *desc)
 fprintf (st, (lfc_tps == 100)? "50Hz": "60Hz");
 return SCPE_OK;
 }
-

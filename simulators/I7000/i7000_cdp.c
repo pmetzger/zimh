@@ -572,4 +572,3 @@ cdp_description(DEVICE *dptr)
 }
 
 #endif
-

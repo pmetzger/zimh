@@ -730,4 +730,3 @@ if ((uptr->flags & UNIT_ATT) == 0)
     uptr->flags = uptr->flags & ~(UNIT_ATTABLE | UNIT_BUFABLE);
 return r;
 }
-

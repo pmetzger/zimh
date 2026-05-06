@@ -509,4 +509,3 @@ const char *clk_description (DEVICE *dptr)
 
 return "100hz clock tick";
 }
-

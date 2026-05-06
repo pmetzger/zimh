@@ -180,5 +180,3 @@ df10_init(struct df10 *df, uint32 dev_num, uint8 nxmerr)
     df->cshift = 18;
 #endif
 }
-
-

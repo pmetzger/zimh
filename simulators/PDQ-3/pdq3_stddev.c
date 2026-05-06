@@ -581,4 +581,3 @@ static t_stat tim2_svc(UNIT* uptr)
   sim_debug(DBG_TIM_SVC, &tim_dev, DBG_PCFORMAT2 "Timer2: SVC call - should not occur\n", DBG_PC);
   return SCPE_OK;
 }
-

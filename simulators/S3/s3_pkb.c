@@ -318,4 +318,3 @@ t_stat pkb_setmod (UNIT *uptr, int32 value)
 {
 return SCPE_OK;
 }
-

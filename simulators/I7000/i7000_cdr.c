@@ -449,4 +449,3 @@ cdr_description(DEVICE *dptr)
 }
 
 #endif
-

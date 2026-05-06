@@ -418,4 +418,3 @@ if (src->h || src->l) {                                 /* if non-zero */
     }
 return nsh;
 }
-

@@ -772,4 +772,3 @@ chan_description(DEVICE *dptr)
 
     return "IBM 7010 channel controller";
 }
-

@@ -43,4 +43,3 @@ int osd_get_char() {
     changemode(0);
     return ch;
 }
-

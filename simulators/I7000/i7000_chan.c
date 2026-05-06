@@ -547,4 +547,3 @@ chan9_set_attn(int chan, int sel)
 
     chan9_set_error(chan, mask);
 }
-

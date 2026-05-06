@@ -567,4 +567,3 @@ do {
 
 return SCPE_OK;
 }
-

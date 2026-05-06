@@ -278,4 +278,3 @@ cp_description(DEVICE *dptr)
 }
 
 #endif
-

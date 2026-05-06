@@ -133,4 +133,3 @@ switch (op) {
 
 return SCPE_OK;
 }
-

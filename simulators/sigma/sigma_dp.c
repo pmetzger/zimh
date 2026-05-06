@@ -1418,4 +1418,3 @@ if (dp_ctx[cidx].dp_ctype >= DP_CTYPE)
 fprintf (st, "%s controller", dp_cname[dp_ctx[cidx].dp_ctype]);
 return SCPE_OK;
 }
-

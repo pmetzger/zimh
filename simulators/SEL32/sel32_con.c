@@ -704,4 +704,3 @@ t_stat  con_haltio(UNIT *uptr) {
     return CC1BIT | SCPE_OK;                /* not busy */
 }
 #endif /* #if NUM_DEVS_CON > 0 */
-

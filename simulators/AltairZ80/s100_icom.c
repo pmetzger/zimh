@@ -1537,4 +1537,3 @@ static int32 icommem(int32 Addr, int32 rw, int32 Data)
 
     return(icom_mem[Addr & ICOM_MEM_MASK]);
 }
-

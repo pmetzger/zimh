@@ -324,4 +324,3 @@ const char *iop_desc(DEVICE *dptr)
 }
 
 #endif
-

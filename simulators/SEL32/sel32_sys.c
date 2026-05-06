@@ -1896,4 +1896,3 @@ t_stat parse_sym (const char *cptr, t_addr addr, UNIT *uptr, t_value *val, int32
         val[i] = (num >> ((l - (1 + i)) * 8)) & 0xff; /* get 1-4 bytes of data */
     return -(l-1);
 }
-

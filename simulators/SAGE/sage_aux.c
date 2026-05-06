@@ -59,4 +59,3 @@ static t_stat sageaux_reset(DEVICE* dptr)
     printf("sageaux_reset\n");
     return SCPE_OK;
 }
-

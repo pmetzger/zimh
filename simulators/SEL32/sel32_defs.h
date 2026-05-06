@@ -662,5 +662,3 @@ extern  char *dump_buf(uint8 *mp, int32 off, int cnt);
 #define RMR(a) ((a)&2?(MAPC[(a)>>2]&RMASK):(MAPC[(a)>>2]>>16)&RMASK)
 /* write halfword map register to MAP cache address */
 #define WMR(a,d) ((a)&2?(MAPC[(a)>>2]=(MAPC[(a)>>2]&LMASK)|((d)&RMASK)):(MAPC[(a)>>2]=(MAPC[(a)>>2]&RMASK)|((d)<<16)))
-
-

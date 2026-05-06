@@ -817,4 +817,3 @@ reg = (int32) get_uint (cptr, 10, 31, &r);
 if (r != SCPE_OK) return -1;
 return reg;
 }
-
