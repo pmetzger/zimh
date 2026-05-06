@@ -107,10 +107,10 @@
 
 #include <ctype.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
-#include "hp2100_defs.h"
-#include "hp2100_cpu.h"
+#include "hp2100_sys_internal.h"
 #include "hp2100_cpu_dmm.h"
 
 
@@ -4016,7 +4016,7 @@ uint32     op_index, op_size, op_count, op_radix, op_address_set;
 t_value    instruction, op_value;
 t_stat     status;
 const char *prefix   = NULL;                            /* label to print before the operand */
-t_bool     clear     = FALSE;                           /* TRUE if the instruction contains a CLF micro-op */
+bool       clear     = false;                           /* set if the instruction contains a CLF micro-op */
 t_bool     separator = FALSE;                           /* TRUE if a separator between multiple ops is needed */
 uint32     op_start  = 1;                               /* the "val" array index of the first operand */
 
@@ -4149,7 +4149,7 @@ switch (op_type) {                                      /* dispatch by the opera
 
     case opSCHC:
     case opSCOHC:
-        clear = (instruction & IR_HCF);                 /* set TRUE if the clear-flag bit is set */
+        clear = hp2100_instruction_has_clear_flag(instruction);
 
     /* fall through into the opSC case */
 
