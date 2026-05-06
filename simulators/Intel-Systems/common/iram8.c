@@ -68,6 +68,18 @@ static const char* iRAM_desc(DEVICE *dptr) {
 
 UNIT RAM_unit = { UDATA (NULL, UNIT_BINK, 0) };
 
+/*
+ * Return whether an address maps to currently allocated RAM storage.
+ */
+static t_bool RAM_addr_is_configured(uint16 addr)
+{
+    if ((RAM_unit.filebuf == NULL) || (RAM_unit.capac == 0))
+        return FALSE;
+    if (addr < RAM_unit.u3)
+        return FALSE;
+    return ((uint32)addr - (uint32)RAM_unit.u3) < (uint32)RAM_unit.capac;
+}
+
 MTAB RAM_mod[] = {
     { MTAB_XTD | MTAB_VDV, 0, NULL, "BASE", &RAM_set_base,
         NULL, NULL, "Sets the base address for RAM"},
@@ -143,6 +155,7 @@ t_stat RAM_clr(void)
     RAM_unit.capac = 0;
     RAM_unit.u3 = 0;
     free(RAM_unit.filebuf);
+    RAM_unit.filebuf = NULL;
     return SCPE_OK;
 }
 
@@ -238,6 +251,9 @@ uint8 RAM_get_mbyte(uint16 addr)
 {
     uint8 val;
 
+    if (!RAM_addr_is_configured(addr))
+        return 0xFF;                    /* absent memory reads high */
+
     val = *((uint8 *)RAM_unit.filebuf + (addr - RAM_unit.u3));
     return (val & BYTEMASK);
 }
@@ -246,6 +262,9 @@ uint8 RAM_get_mbyte(uint16 addr)
 
 void RAM_put_mbyte(uint16 addr, uint8 val)
 {
+    if (!RAM_addr_is_configured(addr))
+        return;
+
     *((uint8 *)RAM_unit.filebuf + (addr - RAM_unit.u3)) = val & BYTEMASK;
     return;
 }
