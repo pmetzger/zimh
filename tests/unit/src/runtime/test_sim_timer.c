@@ -3,8 +3,12 @@
 
 #include "test_cmocka.h"
 
+#include "scp.h"
 #include "sim_defs.h"
 #include "sim_timer.h"
+#include "test_scp_fixture.h"
+#include "test_simh_personality.h"
+#include "test_support.h"
 
 static int simh_test_clock_calls = 0;
 static int simh_test_sleep_calls = 0;
@@ -14,6 +18,15 @@ static struct timespec simh_test_last_sleep_req = {0};
 static struct timespec simh_test_clock_values[4] = {{0}};
 static size_t simh_test_clock_value_count = 0;
 static size_t simh_test_clock_value_index = 0;
+
+struct sim_timer_activation_fixture {
+    DEVICE clock_device;
+    DEVICE target_device;
+    DEVICE *devices[3];
+    UNIT clock_unit;
+    UNIT target_unit;
+    t_bool saved_sim_is_running;
+};
 
 /* Return scripted timespec values through the shared time wrapper hook. */
 static int simh_test_clock_gettime_stub (int clock_id, struct timespec *tp)
@@ -64,6 +77,56 @@ static int teardown_sim_timer_fixture (void **state)
     (void)state;
 
     sim_time_reset_test_hooks ();
+    return 0;
+}
+
+static t_stat sim_timer_test_unit_svc (UNIT *uptr)
+{
+    (void)uptr;
+
+    return SCPE_OK;
+}
+
+/* Build a calibrated-timer fixture for wall-clock activation tests. */
+static int setup_sim_timer_activation_fixture (void **state)
+{
+    struct sim_timer_activation_fixture *fixture;
+
+    fixture = calloc (1, sizeof (*fixture));
+    assert_non_null (fixture);
+
+    simh_test_init_device_unit (&fixture->clock_device, &fixture->clock_unit,
+                                "CLK", "CLK0", 0, 0, 8, 1);
+    simh_test_init_device_unit (&fixture->target_device, &fixture->target_unit,
+                                "TMR", "TMR0", 0, 0, 8, 1);
+    fixture->clock_unit.action = sim_timer_test_unit_svc;
+    fixture->target_unit.action = sim_timer_test_unit_svc;
+    fixture->devices[0] = &fixture->clock_device;
+    fixture->devices[1] = &fixture->target_device;
+    fixture->devices[2] = NULL;
+
+    assert_int_equal (
+        simh_test_install_devices ("zimh-unit-sim-timer", fixture->devices), 0);
+    assert_false (sim_timer_init ());
+    assert_int_equal (
+        sim_rtcn_init_unit_ticks (&fixture->clock_unit, 100, 0, 1), 100);
+    fixture->saved_sim_is_running = sim_is_running;
+
+    *state = fixture;
+    return 0;
+}
+
+/* Tear down timer fixture state that may be queued by activation tests. */
+static int teardown_sim_timer_activation_fixture (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    sim_cancel (&fixture->target_unit);
+    sim_register_clock_unit_tmr (NULL, 0);
+    sim_is_running = fixture->saved_sim_is_running;
+    simh_test_reset_simulator_state ();
+    free (fixture);
+    *state = NULL;
     return 0;
 }
 
@@ -251,6 +314,41 @@ static void test_sim_rom_read_with_delay_accepts_high_bit_words (void **state)
         assert_int_equal (sim_rom_read_with_delay (values[i]), values[i]);
 }
 
+/* Verify a deferred wall-clock activation tolerates a calibrated timer whose
+   assist unit is not currently queued. */
+static void test_sim_timer_activate_after_handles_inactive_calibrated_tick (
+    void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    assert_false (sim_is_active (&fixture->clock_unit));
+
+    assert_int_equal (
+        sim_timer_activate_after (&fixture->target_unit, 1000.0), SCPE_OK);
+
+    assert_true (sim_is_active (&fixture->target_unit));
+    assert_float_equal (fixture->target_unit.usecs_remaining, 1000.0,
+                        0.000001);
+}
+
+/* Verify long wall-clock activations are bounded before converting the
+   instruction delay to the event queue's int32 representation. */
+static void test_sim_timer_activate_after_bounds_long_running_delay (
+    void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    sim_is_running = TRUE;
+
+    assert_int_equal (
+        sim_timer_activate_after (&fixture->target_unit, 30000000000000.0),
+        SCPE_OK);
+
+    assert_true (sim_is_active (&fixture->target_unit));
+    assert_int_equal (fixture->target_unit.time, 0x7fffffff);
+    assert_int_equal (sim_interval, 0x7fffffff);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
@@ -287,6 +385,14 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_sim_rom_read_with_delay_accepts_high_bit_words,
             setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_timer_activate_after_handles_inactive_calibrated_tick,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_timer_activate_after_bounds_long_running_delay,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

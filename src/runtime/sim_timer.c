@@ -2733,11 +2733,10 @@ else {                                      /* defer non timer wallclock activat
  */
 inst_per_usec = sim_timer_inst_per_sec () / 1000000.0;
 inst_delay_d = floor(inst_per_usec * usec_delay);
-inst_delay = (int32)inst_delay_d;
-if ((inst_delay == 0) && (usec_delay != 0))
-    inst_delay_d = inst_delay = 1;  /* Minimum non-zero delay is 1 instruction */
+if ((inst_delay_d == 0.0) && (usec_delay != 0))
+    inst_delay_d = 1;  /* Minimum non-zero delay is 1 instruction */
 if (uptr->usecs_remaining != 0.0)   /* No calibrated timer yet, wait one cycle */
-    inst_delay_d = inst_delay = 1;  /* Minimum non-zero delay is 1 instruction */
+    inst_delay_d = 1;  /* Minimum non-zero delay is 1 instruction */
 if (sim_calb_tmr != -1) {
     crtc = &rtcs[sim_calb_tmr];
     if (crtc->hz) {                 /* Calibrated Timer available? */
@@ -2745,10 +2744,11 @@ if (sim_calb_tmr != -1) {
         int32 ticks_til_calib = crtc->hz - crtc->ticks;
         double usecs_per_tick = floor (1000000.0 / crtc->hz);
         int32 inst_til_calib = inst_til_tick + ((ticks_til_calib - 1) * crtc->currd);
-        uint32 usecs_til_calib = (uint32)ceil(inst_til_calib / inst_per_usec);
 
         if ((uptr != crtc->timer_unit) &&                   /* Not scheduling calibrated timer */
             (inst_til_tick > 0)) {                          /* and tick not pending? */
+            uint32 usecs_til_calib = (uint32)ceil(inst_til_calib / inst_per_usec);
+
             if (inst_delay_d > (double)inst_til_calib) {    /* long wait? */
                 stat = sim_clock_coschedule_tmr (uptr, sim_calb_tmr, ticks_til_calib - 1);
                 uptr->usecs_remaining = (stat == SCPE_OK) ? usec_delay - usecs_til_calib : 0.0;
