@@ -107,8 +107,10 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "altair_defs.h"
+#include "altair_dsk_internal.h"
 
 #define UNIT_V_ENABLE   (UNIT_V_UF + 0)                 /* Write Enable */
 #define UNIT_ENABLE (1 << UNIT_V_ENABLE)
@@ -121,8 +123,6 @@
 #define DSK_SIZE (DSK_SECT * DSK_SURF * DSK_CYL * DSK_SECTSIZE)
 
 t_stat dsk_svc (UNIT *uptr);
-t_stat dsk_reset (DEVICE *dptr);
-void writebuf(void);
 
 extern int32 PCX;
 
@@ -140,6 +140,28 @@ UNIT *dptr;                                             /* fileref to write dirt
 
 int32 dsk_rwait = 100;                                  /* rotate latency */
 
+static altair_dsk_seek_fn altair_dsk_seek_hook = fseek;
+static altair_dsk_read_fn altair_dsk_read_hook = fread;
+static altair_dsk_write_fn altair_dsk_write_hook = fwrite;
+
+void altair_dsk_reset_io_hooks(void)
+{
+    altair_dsk_seek_hook = fseek;
+    altair_dsk_read_hook = fread;
+    altair_dsk_write_hook = fwrite;
+}
+
+void altair_dsk_set_io_hooks(const ALTAIR_DSK_IO_HOOKS *hooks)
+{
+    if (hooks == NULL) {
+        altair_dsk_reset_io_hooks();
+        return;
+    }
+
+    altair_dsk_seek_hook = hooks->seek ? hooks->seek : fseek;
+    altair_dsk_read_hook = hooks->read ? hooks->read : fread;
+    altair_dsk_write_hook = hooks->write ? hooks->write : fwrite;
+}
 
 /* 88DSK Standard I/O Data Structures */
 
@@ -219,8 +241,10 @@ int32 dsk10(int32 io, int32 data)
 
     /* OUT: Controller set/reset/enable/disable */
 
-    if (dirty == 1)
-        writebuf();
+    if (dirty == 1) {
+        if (!writebuf())
+            return 0;
+    }
 
     /*printf("\n[%o] OUT 10: %x", PCX, data);*/
     cur_disk = data & 0x0F;
@@ -246,8 +270,10 @@ int32 dsk11(int32 io, int32 data)
 
     if (io == 0) {                                      /* Read sector position */
         /*printf("\n[%o] IN 11", PCX);*/
-        if (dirty == 1)
-            writebuf();
+        if (dirty == 1) {
+            if (!writebuf())
+                return 0;
+        }
         if (cur_flags[cur_disk] & 0x04) {               /* head loaded? */
             cur_sect[cur_disk]++;
             if (cur_sect[cur_disk] > 31)
@@ -269,29 +295,35 @@ int32 dsk11(int32 io, int32 data)
 
     /*printf("\n[%o] OUT 11: %x", PCX, data);*/
     if (data & 0x01) {                                  /* Step head in */
+        if (dirty == 1) {
+            if (!writebuf())
+                return 0;
+        }
         cur_track[cur_disk]++;
         if (cur_track[cur_disk] > 76 )
             cur_track[cur_disk] = 76;
-        if (dirty == 1)
-            writebuf();
         cur_sect[cur_disk] = 0377;
         cur_byte[cur_disk] = 0377;
     }
 
     if (data & 0x02) {                                  /* Step head out */
+        if (dirty == 1) {
+            if (!writebuf())
+                return 0;
+        }
         cur_track[cur_disk]--;
         if (cur_track[cur_disk] < 0) {
             cur_track[cur_disk] = 0;
             cur_flags[cur_disk] |= 0x40;                /* track 0 if there */
         }
-        if (dirty == 1)
-            writebuf();
         cur_sect[cur_disk] = 0377;
         cur_byte[cur_disk] = 0377;
     }
 
-    if (dirty == 1)
-        writebuf();
+    if (dirty == 1) {
+        if (!writebuf())
+            return 0;
+    }
 
     if (data & 0x04) {                                  /* Head load */
         cur_flags[cur_disk] |= 0x04;                    /* turn on head loaded bit */
@@ -318,7 +350,7 @@ int32 dsk11(int32 io, int32 data)
 
 int32 dsk12(int32 io, int32 data)
 {
-    static int32 rtn, i;
+    static int32 i;
     static long pos;
     UNIT *uptr;
 
@@ -335,8 +367,14 @@ int32 dsk12(int32 io, int32 data)
         pos += DSK_SECTSIZE * cur_sect[cur_disk];
         if ((uptr == NULL) || (uptr->fileref == NULL))
             return 0;
-        rtn = fseek(uptr -> fileref, pos, 0);
-        rtn = fread(dskbuf, 137, 1, uptr -> fileref);
+        if (altair_dsk_seek_hook(uptr -> fileref, pos, 0) != 0) {
+            memset(dskbuf, 0, sizeof(dskbuf));
+            return 0;
+        }
+        if (altair_dsk_read_hook(dskbuf, 137, 1, uptr -> fileref) != 1) {
+            memset(dskbuf, 0, sizeof(dskbuf));
+            return 0;
+        }
         cur_byte[cur_disk] = 1;
         return (dskbuf[0] & 0xFF);
     } else {
@@ -355,10 +393,10 @@ int32 dsk12(int32 io, int32 data)
     }
 }
 
-void writebuf(void)
+t_bool writebuf(void)
 {
     long pos;
-    int32 rtn, i;
+    int32 i;
 
     i = cur_byte[cur_disk];                             /* null-fill rest of sector if any */
     while (i < 138) {
@@ -369,10 +407,14 @@ void writebuf(void)
                         cur_sect[cur_disk]); i = getch(); */
     pos = DSK_TRACSIZE * cur_track[cur_disk];           /* calc file pos */
     pos += DSK_SECTSIZE * cur_sect[cur_disk];
-    rtn = fseek(dptr -> fileref, pos, 0);
-    rtn = fwrite(dskbuf, 137, 1, dptr -> fileref);
+    if ((dptr == NULL) || (dptr->fileref == NULL))
+        return FALSE;
+    if (altair_dsk_seek_hook(dptr -> fileref, pos, 0) != 0)
+        return FALSE;
+    if (altair_dsk_write_hook(dskbuf, 137, 1, dptr -> fileref) != 1)
+        return FALSE;
     cur_flags[cur_disk] &= 0xFE;                        /* ENWD off */
     cur_byte[cur_disk] = 0377;
     dirty = 0;
-    return;
+    return TRUE;
 }
