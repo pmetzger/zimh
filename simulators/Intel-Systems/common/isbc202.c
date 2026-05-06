@@ -144,11 +144,13 @@
 */
 
 #include "system_defs.h"                /* system header in system dir */
+#include "isbc202_internal.h"
+#include "scp.h"
 
 #define UNIT_V_WPMODE   (UNIT_V_UF)     /* Write protect */
 #define UNIT_WPMODE     (1 << UNIT_V_WPMODE)
 
-#define FDD_NUM         4
+#define FDD_NUM         ISBC202_FDD_NUM
 #define SECSIZ          128
 
 //disk controller operations
@@ -194,6 +196,10 @@
 #define MAXSECDD        52              //double density last sector
 #define MAXTRK          76              //last track
 
+#define CW_INT_CTL      0x30            //channel word interrupt control
+#define CW_INT_DIS      0x10            //I/O complete interrupts disabled
+#define SBC202_MAX_CFG_BYTE 0xff
+
 #define isbc202_NAME    "Intel iSBC 202 Floppy Disk Controller Board"
 
 /* external globals */
@@ -237,27 +243,38 @@ static const char* isbc202_desc(DEVICE *dptr) {
     return isbc202_NAME;
 }
 
-typedef    struct    {                  //FDD definition
-    uint8   sec;
-    uint8   cyl;
-    uint8   att;
-    }    FDDDEF;
-
-typedef    struct    {                  //FDC definition
-    uint8   baseport;                   //FDC base port
-    uint8   intnum;                     //interrupt number
-    uint8   verb;                       //verbose flag
-    uint16  iopb;                       //FDC IOPB
-    uint8   stat;                       //FDC status
-    uint8   rdychg;                     //FDC ready change
-    uint8   rtype;                      //FDC result type
-    uint8   rbyte0;                     //FDC result byte for type 00
-    uint8   rbyte1;                     //FDC result byte for type 10
-    uint8   intff;                      //fdc interrupt FF
-    FDDDEF  fdd[FDD_NUM];               //indexed by the FDD number
-    }    FDCDEF;
-
 FDCDEF    fdc202;                       //indexed by the isbc-202 instance number
+
+/*
+ * Return whether the IOPB channel word requests an I/O complete interrupt.
+ * The documented value 01 disables completion interrupts; illegal values are
+ * left on the historical interrupting path until their behavior is specified.
+ */
+static t_bool isbc202_completion_interrupt_enabled(uint8 cw)
+{
+    return (cw & CW_INT_CTL) != CW_INT_DIS;
+}
+
+/*
+ * Parse a byte-wide hexadecimal value from a SET modifier argument. The SIMH
+ * command numeric parser rejects missing values, trailing junk, and values
+ * that would otherwise truncate when stored in the controller state.
+ */
+static t_stat isbc202_parse_config_byte(const char *cptr, uint8 *value)
+{
+    t_stat status;
+    t_value parsed;
+
+    if (cptr == NULL)
+        return SCPE_ARG;
+
+    parsed = get_uint(cptr, 16, SBC202_MAX_CFG_BYTE, &status);
+    if (status != SCPE_OK)
+        return status;
+
+    *value = (uint8)parsed;
+    return SCPE_OK;
+}
 
 /* isbc202 Standard I/O Data Structures */
 
@@ -413,11 +430,16 @@ t_stat isbc202_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
     (void) val;
     (void) desc;
 
-    uint32 size, result;
+    uint8 size;
+    t_stat status;
 
     if (uptr == NULL)
         return SCPE_ARG;
-    result = sscanf(cptr, "%02x", &size);
+
+    status = isbc202_parse_config_byte(cptr, &size);
+    if (status != SCPE_OK)
+        return status;
+
     fdc202.baseport = size;
 //    if (fdc202.verb)
         sim_printf("SBC202: Installed at base port=%04X\n", fdc202.baseport);
@@ -438,11 +460,16 @@ t_stat isbc202_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
     (void) val;
     (void) desc;
 
-    uint32 size, result;
+    uint8 size;
+    t_stat status;
 
     if (uptr == NULL)
         return SCPE_ARG;
-    result = sscanf(cptr, "%02x", &size);
+
+    status = isbc202_parse_config_byte(cptr, &size);
+    if (status != SCPE_OK)
+        return status;
+
     fdc202.intnum = size;
 //    if (fdc202.verb)
         sim_printf("SBC202: Interrupt number=%04X\n", fdc202.intnum);
@@ -480,8 +507,6 @@ t_stat isbc202_show_param (FILE *st, UNIT *uptr, int32 val, const void *desc)
        This implementation does not use every parameter. */
     (void) val;
     (void) desc;
-
-    int i = 0;
 
     if (uptr == NULL)
         return SCPE_ARG;
@@ -673,9 +698,11 @@ void isbc202_diskio(void)
     uint32 i;
     UNIT *uptr;
     uint8 *fbuf;
+    t_bool completion_interrupt;
 
     //parse the IOPB
     cw = get_mbyte(fdc202.iopb);
+    completion_interrupt = isbc202_completion_interrupt_enabled(cw);
     di = get_mbyte(fdc202.iopb + 1);
     nr = get_mbyte(fdc202.iopb + 2);
     ta = get_mbyte(fdc202.iopb + 3);
@@ -693,7 +720,7 @@ void isbc202_diskio(void)
             if ((fdc202.stat & RDY0) == 0) {
                 fdc202.rtype = ROK;
                 fdc202.rbyte0 = RB0NR;
-                fdc202.intff = 1;       //set interrupt FF
+                fdc202.intff = completion_interrupt;
                 sim_printf("\n   SBC202: FDD %d - Ready error", fddnum);
                 return;
             }
@@ -702,7 +729,7 @@ void isbc202_diskio(void)
             if ((fdc202.stat & RDY1) == 0) {
                 fdc202.rtype = ROK;
                 fdc202.rbyte0 = RB0NR;
-                fdc202.intff = 1;       //set interrupt FF
+                fdc202.intff = completion_interrupt;
                 sim_printf("\n   SBC202: FDD %d - Ready error", fddnum);
                 return;
             }
@@ -711,7 +738,7 @@ void isbc202_diskio(void)
             if ((fdc202.stat & RDY2) == 0) {
                 fdc202.rtype = ROK;
                 fdc202.rbyte0 = RB0NR;
-                fdc202.intff = 1;       //set interrupt FF
+                fdc202.intff = completion_interrupt;
                 sim_printf("\n   SBC202: FDD %d - Ready error", fddnum);
                 return;
             }
@@ -720,7 +747,7 @@ void isbc202_diskio(void)
             if ((fdc202.stat & RDY3) == 0) {
                 fdc202.rtype = ROK;
                 fdc202.rbyte0 = RB0NR;
-                fdc202.intff = 1;        //set interrupt FF
+                fdc202.intff = completion_interrupt;
                 sim_printf("\n   SBC202: FDD %d - Ready error", fddnum);
                 return;
             }
@@ -736,7 +763,7 @@ void isbc202_diskio(void)
         )) {
         fdc202.rtype = ROK;
         fdc202.rbyte0 = RB0ADR;
-        fdc202.intff = 1;               //set interrupt FF
+        fdc202.intff = completion_interrupt;
         sim_printf("\n   SBC202: FDD %d - Address error nr=%02XH ta=%02XH sa=%02XH IOPB=%04XH PCX=%04XH",
             fddnum, nr, ta, sa, fdc202.iopb, PCX);
         return;
@@ -745,33 +772,33 @@ void isbc202_diskio(void)
         case DNOP:
             fdc202.rtype = ROK;
             fdc202.rbyte0 = 0;          //set no error
-            fdc202.intff = 1;           //set interrupt FF
+            fdc202.intff = completion_interrupt;
             break;
         case DSEEK:
             fdc202.fdd[fddnum].sec = sa;
             fdc202.fdd[fddnum].cyl = ta;
             fdc202.rtype = ROK;
             fdc202.rbyte0 = 0;          //set no error
-            fdc202.intff = 1;           //set interrupt FF
+            fdc202.intff = completion_interrupt;
             break;
         case DHOME:
             fdc202.fdd[fddnum].sec = sa;
             fdc202.fdd[fddnum].cyl = 0;
             fdc202.rtype = ROK;
             fdc202.rbyte0 = 0;          //set no error
-            fdc202.intff = 1;           //set interrupt FF
+            fdc202.intff = completion_interrupt;
             break;
         case DVCRC:
             fdc202.rtype = ROK;
             fdc202.rbyte0 = 0;          //set no error
-            fdc202.intff = 1;           //set interrupt FF
+            fdc202.intff = completion_interrupt;
             break;
         case DFMT:
             //check for WP
             if(uptr->flags & UNIT_WPMODE) {
                 fdc202.rtype = ROK;
                 fdc202.rbyte0 = RB0WP;
-                fdc202.intff = 1;       //set interrupt FF
+                fdc202.intff = completion_interrupt;
                 sim_printf("\n   SBC202: FDD %d - Write protect error DFMT", fddnum);
                 return;
             }
@@ -783,7 +810,7 @@ void isbc202_diskio(void)
             }
             fdc202.rtype = ROK;
             fdc202.rbyte0 = 0;          //set no error
-            fdc202.intff = 1;           //set interrupt FF
+            fdc202.intff = completion_interrupt;
             break;
         case DREAD:
             nrptr = 0;
@@ -801,14 +828,14 @@ void isbc202_diskio(void)
             }
             fdc202.rtype = ROK;
             fdc202.rbyte0 = 0;          //set no error
-            fdc202.intff = 1;           //set interrupt FF
+            fdc202.intff = completion_interrupt;
             break;
         case DWRITE:
             //check for WP
             if(uptr->flags & UNIT_WPMODE) {
                 fdc202.rtype = ROK;
                 fdc202.rbyte0 = RB0WP;
-                fdc202.intff = 1;       //set interrupt FF
+                fdc202.intff = completion_interrupt;
                 sim_printf("\n   SBC202: FDD %d - Write protect error DWRITE", fddnum);
                 return;
             }
@@ -827,7 +854,7 @@ void isbc202_diskio(void)
             }
             fdc202.rtype = ROK;
             fdc202.rbyte0 = 0;          //set no error
-            fdc202.intff = 1;           //set interrupt FF
+            fdc202.intff = completion_interrupt;
             break;
         default:
             sim_printf("\n   SBC202: FDD %d - isbc202_diskio bad command di=%02X",

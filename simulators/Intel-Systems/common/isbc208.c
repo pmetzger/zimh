@@ -797,7 +797,6 @@ void isbc208_reset1 (void)
 t_stat isbc208_attach (UNIT *uptr, const char *cptr)
 {
     t_stat r;
-    int32 c = 0;
     long len;
     uint8 fddnum;
 
