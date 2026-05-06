@@ -59,6 +59,19 @@ int iic, iie, iid;      /* IIC/IIE/IID register */
 int pid, pie;           /* PID/PIE register */
 int ald, eccr, pvl, lmp, opr;
 
+/*
+ * Return the A:D register pair as a 32-bit word.
+ *
+ * ND100 instructions commonly treat A and D as a combined 32-bit
+ * quantity.  Cast A before shifting so the high bit is handled as part of
+ * the simulated word rather than as a signed host integer promotion.
+ */
+static inline uint32
+nd100_ad_u32(void)
+{
+    return ((uint32)regA << 16) | (uint32)regD;
+}
+
 #define SETC()          (regSTL |= STS_C)
 #define CLRC()          (regSTL &= ~STS_C)
 #define SETQ()          (regSTL |= STS_Q)
@@ -607,7 +620,7 @@ ins_skip_ext(int IR)
                 regA = shc >> 16;
         } else if ((IR & 0177700) == ND_SKP_RDIV) {
                 ss = R[(IR & 070) >> 3];
-                shc = (regA << 16) | regD;
+                shc = (int32)nd100_ad_u32();
                 regA = shc / ss;
                 regD = shc % ss;
         } else if (IR == 0142700 || IR == 0143700) {
@@ -706,11 +719,11 @@ nd_mis_opc(int IR)
                 break;
 
         case ND_MIS_EXAM:
-                regT = prdmem((regA << 16) | regD, M_FETCH);
+                regT = prdmem((int)nd100_ad_u32(), M_FETCH);
                 break;
 
         case ND_MIS_DEPO:
-                pwrmem((regA << 16) | regD, regT, M_FETCH);
+                pwrmem((int)nd100_ad_u32(), regT, M_FETCH);
                 break;
 
         default:
@@ -803,7 +816,7 @@ ins_sht(int IR, int off)
         n = BIT5(IR) ? (32 - (IR & 037)) : (IR & 037);
         m = BIT7(regSTL);
 
-        ushc = rs ? R[rs] : (regA << 16) | regD;
+        ushc = rs ? R[rs] : nd100_ad_u32();
         if (BIT5(IR)) { /* right */
                 int mm = BIT0(ushc);
                 for (i = 0; i < n; i++) {
