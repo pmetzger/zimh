@@ -1,0 +1,114 @@
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+
+#include "test_cmocka.h"
+
+#include "altairz80_defs.h"
+#include "sim_video.h"
+
+ChipType chiptype;
+
+uint32 sim_map_resource(uint32 baseaddr, uint32 size, uint32 resource_type,
+                        int32 (*routine)(const int32, const int32,
+                                         const int32),
+                        const char *name, uint8 unmap)
+{
+    (void)baseaddr;
+    (void)size;
+    (void)resource_type;
+    (void)routine;
+    (void)name;
+    (void)unmap;
+
+    return SCPE_OK;
+}
+
+t_stat set_iobase(UNIT *uptr, int32 val, const char *cptr, void *desc)
+{
+    (void)uptr;
+    (void)val;
+    (void)cptr;
+    (void)desc;
+
+    return SCPE_OK;
+}
+
+t_stat show_iobase(FILE *st, UNIT *uptr, int32 val, const void *desc)
+{
+    (void)st;
+    (void)uptr;
+    (void)val;
+    (void)desc;
+
+    return SCPE_OK;
+}
+
+uint8 GetBYTEWrapper(const uint32 Addr)
+{
+    (void)Addr;
+
+    return 0;
+}
+
+#include "s100_dazzler.c"
+
+static void reset_dazzler_register_state(void)
+{
+    daz_vptr = NULL;
+    daz_0e = 0x00;
+    daz_0f = 0x80;
+    daz_addr = 0x0000;
+    daz_frame = 0x3f;
+    daz_res = 32;
+    daz_pages = 1;
+    daz_screen_width = 32;
+    daz_screen_height = 32;
+    daz_screen_pixels = 32 * 32;
+    daz_color = 0;
+}
+
+static void test_dazzler_control_ports_preserve_byte_registers(void **state)
+{
+    (void)state;
+
+    reset_dazzler_register_state();
+
+    assert_int_equal(daz_io(DAZ_IO_BASE, 1, 0xff), 0xff);
+    assert_int_equal(daz_0e, 0xff);
+    assert_int_equal(daz_addr, 0xfe00);
+
+    assert_int_equal(daz_io(DAZ_IO_BASE + 1, 1, 0xf3), 0xff);
+    assert_int_equal(daz_0f, 0xf3);
+    assert_int_equal(daz_color, 0x03);
+    assert_int_equal(daz_pages, 4);
+    assert_int_equal(daz_res, 128);
+    assert_int_equal(daz_screen_width, 128);
+    assert_int_equal(daz_screen_height, 128);
+    assert_int_equal(daz_screen_pixels, 128 * 128);
+}
+
+static void test_dazzler_frame_status_is_byte_value(void **state)
+{
+    int32 frame_status;
+
+    (void)state;
+
+    reset_dazzler_register_state();
+
+    frame_status = daz_io(DAZ_IO_BASE, 0, 0);
+
+    assert_true(frame_status == 0x3f || frame_status == 0x7f ||
+                frame_status == 0xff);
+    assert_int_equal(daz_frame, frame_status);
+}
+
+int main(void)
+{
+    const struct CMUnitTest tests[] = {
+        cmocka_unit_test(test_dazzler_control_ports_preserve_byte_registers),
+        cmocka_unit_test(test_dazzler_frame_status_is_byte_value),
+    };
+
+    return cmocka_run_group_tests(tests, NULL, NULL);
+}

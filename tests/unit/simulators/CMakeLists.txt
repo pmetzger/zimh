@@ -3,6 +3,7 @@
 add_subdirectory(S3)
 add_subdirectory(3B2)
 add_subdirectory(ALTAIR)
+add_subdirectory(AltairZ80)
 add_subdirectory(BESM6)
 add_subdirectory(PDP8)
 add_subdirectory(PDP11)
