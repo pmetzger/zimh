@@ -93,6 +93,22 @@ static int teardown_sim_tape_fixture(void **state)
     return 0;
 }
 
+/* Reset dynstr test hooks before tests that inject allocation failures. */
+static int setup_sim_tape_dynstr_fixture(void **state)
+{
+    (void)state;
+    sim_dynstr_reset_test_hooks();
+    return 0;
+}
+
+/* Clear dynstr test hooks so failure injection cannot leak between tests. */
+static int teardown_sim_tape_dynstr_fixture(void **state)
+{
+    (void)state;
+    sim_dynstr_reset_test_hooks();
+    return 0;
+}
+
 static void *sim_tape_dynstr_realloc_fail(void *ptr, size_t size)
 {
     ++sim_tape_dynstr_realloc_failures;
@@ -1078,6 +1094,225 @@ static void test_sim_tape_ansi_decimal_fields_validate_width(void **state)
     assert_false(sim_tape_format_ansi_decimal(field, 0, 1));
 }
 
+/* Verify TESTLIB tape processing attach commands are built without
+   truncating long filenames. */
+static void test_sim_tape_test_process_args_builds_attach_commands(void **state)
+{
+    enum {
+        FILENAME_LEN = 300
+    };
+    char filename[FILENAME_LEN + 1];
+    const struct {
+        const char *filename;
+        const char *format;
+        t_awslnt recsize;
+        const char *expected;
+    } cases[] = {
+        {"TapeTestFile1.bin", "fixed", 2048,
+         "fixed 2048 TapeTestFile1.bin.fixed"},
+        {"TapeTestFile1.*", "dos11", 0, "dos11 TapeTestFile1.*"},
+        {filename, "ansi-vms", 0, NULL},
+    };
+    size_t i;
+
+    (void)state;
+    memset(filename, 'x', FILENAME_LEN);
+    filename[FILENAME_LEN] = '\0';
+
+    for (i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+        char *args;
+
+        args = sim_tape_test_process_args(cases[i].filename, cases[i].format,
+                                          cases[i].recsize);
+        assert_non_null(args);
+        if (cases[i].expected != NULL)
+            assert_string_equal(args, cases[i].expected);
+        else {
+            size_t prefix_len = strlen("ansi-vms ");
+
+            assert_memory_equal(args, "ansi-vms ", prefix_len);
+            assert_memory_equal(args + prefix_len, filename, FILENAME_LEN);
+            assert_string_equal(args + prefix_len + FILENAME_LEN, ".ansi-vms");
+        }
+        free(args);
+    }
+}
+
+/* Verify TESTLIB tape processing attach command allocation failures are
+   reported without returning partial command text. */
+static void test_sim_tape_test_process_args_reports_alloc_failure(void **state)
+{
+    (void)state;
+
+    sim_tape_dynstr_realloc_failures = 0;
+    sim_dynstr_set_test_realloc_hook(sim_tape_dynstr_realloc_fail);
+
+    assert_null(sim_tape_test_process_args("TapeTestFile1.bin", "fixed",
+                                           2048));
+    assert_int_equal(sim_tape_dynstr_realloc_failures, 1);
+}
+
+/* Verify TESTLIB Architecture Workstation tape attach commands are built
+   without truncating long filenames. */
+static void test_sim_tape_test_aws_attach_args_builds_command(void **state)
+{
+    enum {
+        FILENAME_LEN = 300
+    };
+    char filename[FILENAME_LEN + 1];
+    const struct {
+        const char *filename;
+        const char *expected;
+    } cases[] = {
+        {"TapeTestFile1", "aws TapeTestFile1.aws.tape"},
+        {filename, NULL},
+    };
+    size_t i;
+
+    (void)state;
+    memset(filename, 'x', FILENAME_LEN);
+    filename[FILENAME_LEN] = '\0';
+
+    for (i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+        char *args;
+
+        args = sim_tape_test_aws_attach_args(cases[i].filename);
+        assert_non_null(args);
+        if (cases[i].expected != NULL)
+            assert_string_equal(args, cases[i].expected);
+        else {
+            size_t prefix_len = strlen("aws ");
+
+            assert_memory_equal(args, "aws ", prefix_len);
+            assert_memory_equal(args + prefix_len, filename, FILENAME_LEN);
+            assert_string_equal(args + prefix_len + FILENAME_LEN, ".aws.tape");
+        }
+        free(args);
+    }
+}
+
+/* Verify TESTLIB Architecture Workstation attach command allocation failures
+   are reported without returning partial command text. */
+static void test_sim_tape_test_aws_attach_args_reports_alloc_failure(
+    void **state)
+{
+    (void)state;
+
+    sim_tape_dynstr_realloc_failures = 0;
+    sim_dynstr_set_test_realloc_hook(sim_tape_dynstr_realloc_fail);
+
+    assert_null(sim_tape_test_aws_attach_args("TapeTestFile1"));
+    assert_int_equal(sim_tape_dynstr_realloc_failures, 1);
+}
+
+/* Verify TESTLIB classification attach commands are built without
+   truncating long test file names. */
+static void test_sim_tape_test_classify_args_builds_command(void **state)
+{
+    enum {
+        TEST_NAME_LEN = 300
+    };
+    char test_name[TEST_NAME_LEN + 1];
+    const struct {
+        const char *unit_name;
+        const char *attach_args;
+        const char *test_name;
+        const char *expected;
+    } cases[] = {
+        {"TAPE0", "-F FIXED", "sample.txt",
+         "TAPE0 -v -F FIXED sample.txt"},
+        {"TAPE0", "-F FIXED", test_name, NULL},
+    };
+    size_t i;
+
+    (void)state;
+    memset(test_name, 'x', TEST_NAME_LEN);
+    test_name[TEST_NAME_LEN] = '\0';
+
+    for (i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
+        char *args;
+
+        args = sim_tape_test_classify_args(cases[i].unit_name,
+                                           cases[i].attach_args,
+                                           cases[i].test_name);
+        assert_non_null(args);
+        if (cases[i].expected != NULL)
+            assert_string_equal(args, cases[i].expected);
+        else {
+            size_t prefix_len = strlen("TAPE0 -v -F FIXED ");
+
+            assert_memory_equal(args, "TAPE0 -v -F FIXED ", prefix_len);
+            assert_string_equal(args + prefix_len, test_name);
+        }
+        free(args);
+    }
+}
+
+/* Verify TESTLIB classification attach command allocation failures are
+   reported without returning partial command text. */
+static void test_sim_tape_test_classify_args_reports_alloc_failure(
+    void **state)
+{
+    (void)state;
+
+    sim_tape_dynstr_realloc_failures = 0;
+    sim_dynstr_set_test_realloc_hook(sim_tape_dynstr_realloc_fail);
+
+    assert_null(sim_tape_test_classify_args("TAPE0", "-F FIXED",
+                                            "sample.txt"));
+    assert_int_equal(sim_tape_dynstr_realloc_failures, 1);
+}
+
+/* Verify TESTLIB file table helpers open every suffixed file and close all
+   recorded streams. */
+static void test_sim_tape_test_file_table_opens_and_closes(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+    FILE *first = NULL;
+    FILE *second = NULL;
+    SIM_TAPE_TEST_FILE files[] = {
+        {&first, ".one"},
+        {&second, ".two"},
+    };
+    char path[1024];
+
+    assert_int_equal(sim_tape_test_open_files(files, 2, fixture->tape_path),
+                     SCPE_OK);
+    assert_non_null(first);
+    assert_non_null(second);
+
+    assert_int_equal(simh_test_join_path(path, sizeof(path), fixture->temp_dir,
+                                         "sample.tap.one"),
+                     0);
+    assert_int_equal(access(path, F_OK), 0);
+    assert_int_equal(simh_test_join_path(path, sizeof(path), fixture->temp_dir,
+                                         "sample.tap.two"),
+                     0);
+    assert_int_equal(access(path, F_OK), 0);
+
+    sim_tape_test_close_files(files, 2);
+    assert_null(first);
+    assert_null(second);
+}
+
+/* Verify TESTLIB file table open failures close any streams opened earlier in
+   the table. */
+static void test_sim_tape_test_file_table_closes_partial_failure(void **state)
+{
+    struct sim_tape_fixture *fixture = *state;
+    FILE *first = NULL;
+    FILE *second = NULL;
+    SIM_TAPE_TEST_FILE files[] = {
+        {&first, ".one"},
+        {&second, "/missing-parent/file"},
+    };
+
+    assert_int_equal(sim_tape_test_open_files(files, 2, fixture->tape_path),
+                     SCPE_OPENERR);
+    assert_null(first);
+    assert_null(second);
+}
+
 /* Verify memory tape attach reports path allocation failures cleanly. */
 static void assert_memory_tape_attach_reports_path_alloc_failure(
     struct sim_tape_fixture *fixture, const char *fmt)
@@ -1445,6 +1680,30 @@ int main(void)
             test_sim_tape_dos11_fallback_name_uses_six_digits),
         cmocka_unit_test(
             test_sim_tape_ansi_decimal_fields_validate_width),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_test_process_args_builds_attach_commands,
+            setup_sim_tape_dynstr_fixture, teardown_sim_tape_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_test_process_args_reports_alloc_failure,
+            setup_sim_tape_dynstr_fixture, teardown_sim_tape_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_test_aws_attach_args_builds_command,
+            setup_sim_tape_dynstr_fixture, teardown_sim_tape_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_test_aws_attach_args_reports_alloc_failure,
+            setup_sim_tape_dynstr_fixture, teardown_sim_tape_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_test_classify_args_builds_command,
+            setup_sim_tape_dynstr_fixture, teardown_sim_tape_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_test_classify_args_reports_alloc_failure,
+            setup_sim_tape_dynstr_fixture, teardown_sim_tape_dynstr_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_test_file_table_opens_and_closes,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_tape_test_file_table_closes_partial_failure,
+            setup_sim_tape_fixture, teardown_sim_tape_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_tape_ansi_attach_reports_path_alloc_failure,
             setup_sim_tape_fixture, teardown_sim_tape_fixture),

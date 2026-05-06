@@ -52,11 +52,10 @@ Priority areas:
 - command parsing paths that pass `CBUFSIZE` or `4 * CBUFSIZE` buffers
 - environment, path, and wildcard/argument expansion code that can
   produce results larger than the original command text
-- `src/runtime/sim_tape.c` self-test command construction, which still
-  builds paths and attach arguments in fixed buffers even after the
-  immediate `snprintf` hardening
 
 Completed:
 
 - `src/runtime/sim_tape.c` ANSI and DOS11 directory-entry path
   construction now uses dynamic strings instead of `PATH_MAX` buffers.
+- `src/runtime/sim_tape.c` self-test file names and attach arguments now
+  use dynamic strings instead of fixed local buffers.

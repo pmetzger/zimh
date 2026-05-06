@@ -5,6 +5,9 @@
 #ifndef SIM_TAPE_INTERNAL_H_
 #define SIM_TAPE_INTERNAL_H_ 0
 
+#include <stddef.h>
+#include <stdio.h>
+
 #include "sim_defs.h"
 
 typedef struct ANSI_VOL1 {
@@ -65,11 +68,37 @@ typedef struct ANSI_HDR4 {   /* Also EOF4, EOV4 */
     char unused[11];
 } ANSI_HDR4;
 
+/* Describe one TESTLIB scratch tape file and the stream opened for it. */
+typedef struct SIM_TAPE_TEST_FILE {
+    FILE **stream;
+    const char *suffix;
+} SIM_TAPE_TEST_FILE;
+
 /* Fill a DOS11 fallback filename field using the six-digit file count. */
 void sim_tape_dos11_fallback_name(char name[9], uint32 file_count);
 
 /* Format a zero-padded decimal value into a fixed-width ANSI label field. */
 t_bool sim_tape_format_ansi_decimal(char *field, size_t field_size,
                                     t_uint64 value);
+
+/* Build TESTLIB tape attach arguments for one processing step; caller frees. */
+char *sim_tape_test_process_args(const char *filename, const char *format,
+                                 t_awslnt recsize);
+
+/* Build TESTLIB Architecture Workstation tape attach args; caller frees. */
+char *sim_tape_test_aws_attach_args(const char *filename);
+
+/* Build TESTLIB tape classification attach args; caller frees result. */
+char *sim_tape_test_classify_args(const char *unit_name,
+                                  const char *attach_args,
+                                  const char *test_name);
+
+/* Open a table of TESTLIB tape files using suffixes appended to filename. */
+t_stat sim_tape_test_open_files(const SIM_TAPE_TEST_FILE *files,
+                                size_t file_count, const char *filename);
+
+/* Close TESTLIB tape files and clear their stream pointers. */
+void sim_tape_test_close_files(const SIM_TAPE_TEST_FILE *files,
+                               size_t file_count);
 
 #endif

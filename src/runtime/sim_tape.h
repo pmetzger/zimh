@@ -51,7 +51,7 @@ typedef uint16          t_tpclnt;                       /* magtape rec lnt */
 #define P7B_DPAR        (P7B_PAR|P7B_DATA)              /* data and parity */
 #define P7B_EOF         0x0F                            /* eof character */
 
-/* AWS tape format */
+/* AWS (Architecture Workstation) tape format */
 
 typedef uint16          t_awslnt;                       /* magtape rec lnt */
 typedef struct {

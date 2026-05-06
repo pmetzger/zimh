@@ -3945,6 +3945,131 @@ static t_bool p7b_parity_inited = FALSE;
 static uint8 p7b_odd_parity[64];
 static uint8 p7b_even_parity[64];
 
+/* Build one allocated TESTLIB tape file name; caller frees result. */
+static char *
+sim_tape_test_file_name(const char *filename, const char *suffix)
+{
+    return sim_dynstr_concat_cstrs(filename, suffix);
+}
+
+/* Open one sim_tape self-test file using an allocated suffix path. */
+static t_stat
+sim_tape_test_open_file(FILE **stream, const char *filename,
+                        const char *suffix)
+{
+    char *name;
+
+    name = sim_tape_test_file_name(filename, suffix);
+    if (name == NULL)
+        return SCPE_MEM;
+    *stream = fopen(name, "wb");
+    free(name);
+    if (*stream == NULL)
+        return SCPE_OPENERR;
+    return SCPE_OK;
+}
+
+/* Open each TESTLIB tape file entry using its filename suffix. */
+t_stat
+sim_tape_test_open_files(const SIM_TAPE_TEST_FILE *files, size_t file_count,
+                         const char *filename)
+{
+    size_t i;
+
+    for (i = 0; i < file_count; i++) {
+        t_stat stat;
+
+        stat = sim_tape_test_open_file(files[i].stream, filename,
+                                       files[i].suffix);
+        if (stat != SCPE_OK) {
+            sim_tape_test_close_files(files, i);
+            return stat;
+        }
+    }
+    return SCPE_OK;
+}
+
+/* Close each open TESTLIB tape file entry and clear its stream pointer. */
+void
+sim_tape_test_close_files(const SIM_TAPE_TEST_FILE *files, size_t file_count)
+{
+    size_t i;
+
+    for (i = 0; i < file_count; i++) {
+        if (*files[i].stream != NULL) {
+            fclose(*files[i].stream);
+            *files[i].stream = NULL;
+        }
+    }
+}
+
+/* Remove one sim_tape self-test file using an allocated suffix path. */
+static t_stat
+sim_tape_test_remove_file(const char *filename, const char *suffix)
+{
+    char *name;
+
+    name = sim_tape_test_file_name(filename, suffix);
+    if (name == NULL)
+        return SCPE_MEM;
+    (void)remove(name);
+    free(name);
+    return SCPE_OK;
+}
+
+/* Build TESTLIB Architecture Workstation tape attach args; caller frees. */
+char *
+sim_tape_test_aws_attach_args(const char *filename)
+{
+    sim_dynstr_t args;
+
+    if (filename == NULL)
+        return NULL;
+
+    sim_dynstr_init(&args);
+    if (!sim_dynstr_appendf(&args, "aws %s.aws.tape", filename)) {
+        sim_dynstr_free(&args);
+        return NULL;
+    }
+    return sim_dynstr_take(&args);
+}
+
+/* Build one quoted TESTLIB tape file name; caller frees result. */
+static char *
+sim_tape_test_quoted_file_name(const char *filename, const char *suffix)
+{
+    sim_dynstr_t name;
+
+    if ((filename == NULL) || (suffix == NULL))
+        return NULL;
+
+    sim_dynstr_init(&name);
+    if (!sim_dynstr_appendf(&name, "\"%s%s\"", filename, suffix)) {
+        sim_dynstr_free(&name);
+        return NULL;
+    }
+    return sim_dynstr_take(&name);
+}
+
+/* Build TESTLIB tape classification attach args; caller frees result. */
+char *
+sim_tape_test_classify_args(const char *unit_name, const char *attach_args,
+                            const char *test_name)
+{
+    sim_dynstr_t args;
+
+    if ((unit_name == NULL) || (attach_args == NULL) || (test_name == NULL))
+        return NULL;
+
+    sim_dynstr_init(&args);
+    if (!sim_dynstr_appendf(&args, "%s -v %s %s", unit_name, attach_args,
+                            test_name)) {
+        sim_dynstr_free(&args);
+        return NULL;
+    }
+    return sim_dynstr_take(&args);
+}
+
 static t_stat sim_tape_test_create_tape_files (UNIT *uptr, const char *filename, int files, int records, int max_size)
 {
 FILE *fSIMH = NULL;
@@ -3959,6 +4084,20 @@ FILE *fTAR2 = NULL;
 FILE *fBIN = NULL;
 FILE *fTXT = NULL;
 FILE *fVAR = NULL;
+const SIM_TAPE_TEST_FILE tape_files[] = {
+    {&fSIMH, ".simh"},
+    {&fE11, ".e11"},
+    {&fTPC, ".tpc"},
+    {&fP7B, ".p7b"},
+    {&fTAR, ".tar"},
+    {&fTAR2, ".2.tar"},
+    {&fAWS, ".aws"},
+    {&fAWS2, ".2.aws"},
+    {&fAWS3, ".3.aws"},
+    {&fBIN, ".bin.fixed"},
+    {&fTXT, ".txt.fixed"},
+    {&fVAR, ".txt.ansi-var"},
+};
 int i;
 size_t j, k;
 t_tpclnt tpclnt;
@@ -3966,10 +4105,10 @@ t_mtrlnt mtrlnt;
 t_awslnt awslnt;
 t_awslnt awslnt_last = 0;
 t_awslnt awsrec_typ = AWS_REC;
-char name[256];
 t_stat stat = SCPE_OPENERR;
 uint8 *buf = NULL, zpad = 0;
 t_stat aws_stat = MTSE_UNATT;
+char *aws_args = NULL;
 int32 saved_switches = sim_switches;
 
 const char hello_world[] =      /* FORTRAN IV text data file */
@@ -3997,59 +4136,22 @@ if (!p7b_parity_inited) {
 buf = (uint8 *)malloc (65536);
 if (buf == NULL)
     return SCPE_MEM;
-(void)snprintf (name, sizeof (name), "%s.simh", filename);
-fSIMH = fopen (name, "wb");
-if (fSIMH  == NULL)
+stat = sim_tape_test_open_files(tape_files,
+                                sizeof(tape_files) / sizeof(tape_files[0]),
+                                filename);
+if (stat != SCPE_OK)
     goto Done_Files;
-(void)snprintf (name, sizeof (name), "%s.e11", filename);
-fE11 = fopen (name, "wb");
-if (fE11  == NULL)
+aws_args = sim_tape_test_aws_attach_args(filename);
+if (aws_args == NULL) {
+    stat = SCPE_MEM;
     goto Done_Files;
-(void)snprintf (name, sizeof (name), "%s.tpc", filename);
-fTPC = fopen (name, "wb");
-if (fTPC  == NULL)
-    goto Done_Files;
-(void)snprintf (name, sizeof (name), "%s.p7b", filename);
-fP7B = fopen (name, "wb");
-if (fP7B  == NULL)
-    goto Done_Files;
-(void)snprintf (name, sizeof (name), "%s.tar", filename);
-fTAR = fopen (name, "wb");
-if (fTAR  == NULL)
-    goto Done_Files;
-(void)snprintf (name, sizeof (name), "%s.2.tar", filename);
-fTAR2 = fopen (name, "wb");
-if (fTAR2  == NULL)
-    goto Done_Files;
-(void)snprintf (name, sizeof (name), "%s.aws", filename);
-fAWS = fopen (name, "wb");
-if (fAWS  == NULL)
-    goto Done_Files;
-(void)snprintf (name, sizeof (name), "%s.2.aws", filename);
-fAWS2 = fopen (name, "wb");
-if (fAWS2  == NULL)
-    goto Done_Files;
-(void)snprintf (name, sizeof (name), "%s.3.aws", filename);
-fAWS3 = fopen (name, "wb");
-if (fAWS3  == NULL)
-    goto Done_Files;
-(void)snprintf (name, sizeof (name), "%s.bin.fixed", filename);
-fBIN = fopen (name, "wb");
-if (fBIN  == NULL)
-    goto Done_Files;
-(void)snprintf (name, sizeof (name), "%s.txt.fixed", filename);
-fTXT = fopen (name, "wb");
-if (fTXT  == NULL)
-    goto Done_Files;
-(void)snprintf (name, sizeof (name), "%s.txt.ansi-var", filename);
-fVAR = fopen (name, "wb");
-if (fVAR  == NULL)
-    goto Done_Files;
-(void)snprintf (name, sizeof (name), "aws %s.aws.tape", filename);
+    }
 sim_switches = SWMASK ('F') | (sim_switches & SWMASK ('D')) | SWMASK ('N');
 if (sim_switches & SWMASK ('D'))
     uptr->dctrl = MTSE_DBG_STR | MTSE_DBG_DAT;
-aws_stat = sim_tape_attach_ex (uptr, name, (saved_switches & SWMASK ('D')) ? MTSE_DBG_STR | MTSE_DBG_DAT: 0, 0);
+aws_stat = sim_tape_attach_ex (
+    uptr, aws_args,
+    (saved_switches & SWMASK ('D')) ? MTSE_DBG_STR | MTSE_DBG_DAT : 0, 0);
 if (aws_stat != MTSE_OK) {
     stat = aws_stat;
     goto Done_Files;
@@ -4172,112 +4274,110 @@ for (j=0; j<3; j++) {
 (void)sim_fwrite (hello_world, 1, strlen(hello_world), fTXT);
 (void)sim_fwrite (hello_world, 1, strlen(hello_world), fVAR);
 Done_Files:
-if (fSIMH)
-    fclose (fSIMH);
-if (fE11)
-    fclose (fE11);
-if (fTPC)
-    fclose (fTPC);
-if (fP7B)
-    fclose (fP7B);
-if (fAWS)
-    fclose (fAWS);
-if (fAWS2)
-    fclose (fAWS2);
-if (fAWS3)
-    fclose (fAWS3);
-if (fTAR)
-    fclose (fTAR);
-if (fTAR2)
-    fclose (fTAR2);
-if (fBIN)
-    fclose (fBIN);
-if (fTXT)
-    fclose (fTXT);
-if (fVAR)
-    fclose (fVAR);
+sim_tape_test_close_files(tape_files,
+                          sizeof(tape_files) / sizeof(tape_files[0]));
+free (aws_args);
 free (buf);
 if (aws_stat == MTSE_OK)
     sim_tape_detach (uptr);
 if (stat == SCPE_OK) {
-    char name1[CBUFSIZE], name2[CBUFSIZE];
+    char *name1;
+    char *name2;
 
-    (void)snprintf (name1, sizeof (name1), "\"%s.aws\"", filename);
-    (void)snprintf (name2, sizeof (name2), "\"%s.aws.tape\"", filename);
-    sim_switches = SWMASK ('F');
-    if (sim_cmp_string (name1, name2))
-        stat = 1;
+    name1 = sim_tape_test_quoted_file_name(filename, ".aws");
+    name2 = sim_tape_test_quoted_file_name(filename, ".aws.tape");
+    if ((name1 == NULL) || (name2 == NULL))
+        stat = SCPE_MEM;
+    else {
+        sim_switches = SWMASK ('F');
+        if (sim_cmp_string (name1, name2))
+            stat = 1;
+        }
+    free (name1);
+    free (name2);
     }
 sim_switches = saved_switches;
 return stat;
 }
 
-static t_stat sim_tape_test_process_tape_file (UNIT *uptr, const char *filename, const char *format, t_awslnt recsize)
+/* Build TESTLIB tape attach arguments for one processing step; caller frees. */
+char *
+sim_tape_test_process_args(const char *filename, const char *format,
+                           t_awslnt recsize)
 {
-char args[256];
-char str_recsize[16] = "";
-t_stat stat;
+    sim_dynstr_t args;
 
-if (recsize) {
-    sim_switches |= SWMASK ('B');
-    (void)snprintf (str_recsize, sizeof (str_recsize), " %d",
-                    (int)recsize);
+    if ((filename == NULL) || (format == NULL))
+        return NULL;
+
+    sim_dynstr_init(&args);
+    if (!sim_dynstr_append(&args, format))
+        goto fail;
+    if (recsize != 0) {
+        if (!sim_dynstr_appendf(&args, " %d", (int)recsize))
+            goto fail;
     }
-if (NULL == strchr (filename, '*'))
-    (void)snprintf (args, sizeof (args), "%s%s %s.%s", format,
-                    str_recsize, filename, format);
-else
-    (void)snprintf (args, sizeof (args), "%s%s %s", format,
-                    str_recsize, filename);
-sim_tape_detach (uptr);
-sim_switches |= SWMASK ('F') | SWMASK ('L');    /* specific-format and detailed record report */
-stat = sim_tape_attach_ex (uptr, args, 0, 0);
-if (stat != SCPE_OK)
-    return stat;
-sim_tape_detach (uptr);
-sim_switches = 0;
-return SCPE_OK;
+    if (strchr(filename, '*') == NULL) {
+        if (!sim_dynstr_appendf(&args, " %s.%s", filename, format))
+            goto fail;
+    } else {
+        if (!sim_dynstr_appendf(&args, " %s", filename))
+            goto fail;
+    }
+
+    return sim_dynstr_take(&args);
+
+fail:
+    sim_dynstr_free(&args);
+    return NULL;
 }
 
-static t_stat sim_tape_test_remove_tape_files (const char *filename)
+static t_stat
+sim_tape_test_process_tape_file(UNIT *uptr, const char *filename,
+                                const char *format, t_awslnt recsize)
 {
-char name[256];
+    char *args;
+    int32 saved_switches = sim_switches;
+    t_stat stat;
 
-(void)snprintf (name, sizeof (name), "%s.simh", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.2.simh", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.e11", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.2.e11", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.tpc", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.2.tpc", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.p7b", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.2.p7b", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.aws", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.2.aws", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.3.aws", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.tar", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.2.tar", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.bin.fixed", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.txt.fixed", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.txt.ansi-var", filename);
-(void)remove (name);
-(void)snprintf (name, sizeof (name), "%s.aws.tape", filename);
-(void)remove (name);
-return SCPE_OK;
+    if (recsize != 0)
+        sim_switches |= SWMASK('B');
+    args = sim_tape_test_process_args(filename, format, recsize);
+    if (args == NULL) {
+        sim_switches = saved_switches;
+        return SCPE_MEM;
+    }
+    sim_tape_detach(uptr);
+    sim_switches |= SWMASK('F') | SWMASK('L');
+    stat = sim_tape_attach_ex(uptr, args, 0, 0);
+    free(args);
+    if (stat != SCPE_OK) {
+        sim_switches = saved_switches;
+        return stat;
+    }
+    sim_tape_detach(uptr);
+    sim_switches = 0;
+    return SCPE_OK;
+}
+
+static t_stat
+sim_tape_test_remove_tape_files(const char *filename)
+{
+    static const char *const suffixes[] = {
+        ".simh",      ".2.simh",       ".e11",  ".2.e11", ".tpc",
+        ".2.tpc",     ".p7b",          ".2.p7b", ".aws",   ".2.aws",
+        ".3.aws",     ".tar",          ".2.tar", ".bin.fixed",
+        ".txt.fixed", ".txt.ansi-var", ".aws.tape",
+    };
+    size_t i;
+
+    for (i = 0; i < sizeof(suffixes) / sizeof(suffixes[0]); i++) {
+        t_stat stat = sim_tape_test_remove_file(filename, suffixes[i]);
+
+        if (stat != SCPE_OK)
+            return stat;
+    }
+    return SCPE_OK;
 }
 
 static t_stat sim_tape_test_density_string (void)
@@ -4372,25 +4472,45 @@ for (t = classify_tests; t->testname != NULL; t++) {
         return sim_messagef (SCPE_ARG, "%s was unexpectedly reported to having MRS=%d, lf_lines=%s, crlf_lines=%s\n",
                                        t->testname, (int)mrs, lf_lines ? "true" : "false", crlf_lines ? "true" : "false");
     if (t->success_attach_args) {
-        char args[CBUFSIZE*2];
+        char *args;
         t_stat r;
 
-        snprintf (args, sizeof (args), "%s -v %s %s", sim_uname (uptr), t->success_attach_args, t->testname);
+        args = sim_tape_test_classify_args(sim_uname(uptr),
+                                           t->success_attach_args,
+                                           t->testname);
+        if (args == NULL)
+            return SCPE_MEM;
         r = attach_cmd (0, args);
-        if (r != SCPE_OK)
-            return sim_messagef (r, "ATTACH %s failed\n", args);
+        if (r != SCPE_OK) {
+            t_stat stat;
+
+            stat = sim_messagef (r, "ATTACH %s failed\n", args);
+            free(args);
+            return stat;
+            }
         detach_cmd (0, sim_uname (uptr));
+        free(args);
         }
     if (t->fail_attach_args) {
-        char args[CBUFSIZE*2];
+        char *args;
         t_stat r;
 
-        snprintf (args, sizeof (args), "%s -v %s %s", sim_uname (uptr), t->fail_attach_args, t->testname);
+        args = sim_tape_test_classify_args(sim_uname(uptr),
+                                           t->fail_attach_args,
+                                           t->testname);
+        if (args == NULL)
+            return SCPE_MEM;
         r = attach_cmd (0, args);
         if (r == SCPE_OK) {
+            t_stat stat;
+
             detach_cmd (0, sim_uname (uptr));
-            return sim_messagef (r, "** UNEXPECTED ATTACH SUCCESS ** %s\n", args);
+            stat = sim_messagef (r, "** UNEXPECTED ATTACH SUCCESS ** %s\n",
+                                 args);
+            free(args);
+            return stat;
             }
+        free(args);
         }
     (void)remove (t->testname);
     }
