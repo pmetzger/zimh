@@ -159,11 +159,13 @@
 */
 
 #include "system_defs.h"                /* system header in system dir */
+#include "isbc201_internal.h"
+#include "scp.h"
 
 #define UNIT_V_WPMODE   (UNIT_V_UF)     /* Write protect */
 #define UNIT_WPMODE     (1 << UNIT_V_WPMODE)
 
-#define FDD_NUM         2
+#define FDD_NUM         ISBC201_FDD_NUM
 #define SECSIZ          128
 
 //disk controoler operations
@@ -203,6 +205,10 @@
 #define MDSSD           256256          //single density FDD size
 #define MAXSECSD        26              //single density last sector
 #define MAXTRK          76              //last track
+
+#define CW_INT_CTL      0x30            //channel word interrupt control
+#define CW_INT_DIS      0x10            //I/O complete interrupts disabled
+#define SBC201_MAX_CFG_BYTE 0xff
 
 #define isbc201_NAME    "Intel iSBC 201 Floppy Disk Controller Board"
 
@@ -247,26 +253,44 @@ static const char* isbc201_desc(DEVICE *dptr) {
     return isbc201_NAME;
 }
 
-typedef    struct    {                  //FDD definition
-    uint8   sec;
-    uint8   cyl;
-    }    FDDDEF;
-
-typedef    struct    {                  //FDC board definition
-    uint8   baseport;                   //FDC base port
-    uint8   intnum;                     //interrupt number
-    uint8   verb;                       //verbose flag
-    uint16  iopb;                       //FDC IOPB
-    uint8   stat;                       //FDC status
-    uint8   rdychg;                     //FDC ready changed
-    uint8   rtype;                      //FDC result type
-    uint8   rbyte0;                     //FDC result byte for type 00
-    uint8   rbyte1;                     //FDC result byte for type 10
-    uint8   intff;                      //FDC interrupt FF
-    FDDDEF  fdd[FDD_NUM];               //indexed by the FDD number
-    }    FDCDEF;
-
 FDCDEF    fdc201;                       //indexed by the isbc-201 instance number
+
+/*
+ * Return whether the IOPB channel word requests an I/O complete interrupt.
+ * The documented value 01 disables completion interrupts; illegal values are
+ * left on the historical interrupting path until their behavior is specified.
+ *
+ * TODO: Share this helper logic with the other Intel diskette controllers
+ * after the warning-driven fixes are settled.
+ */
+static t_bool isbc201_completion_interrupt_enabled(uint8 cw)
+{
+    return (cw & CW_INT_CTL) != CW_INT_DIS;
+}
+
+/*
+ * Parse a byte-wide hexadecimal value from a SET modifier argument. The SIMH
+ * command numeric parser rejects missing values, trailing junk, and values
+ * that would otherwise truncate when stored in the controller state.
+ *
+ * TODO: Share this helper logic with the other Intel diskette controllers
+ * after the warning-driven fixes are settled.
+ */
+static t_stat isbc201_parse_config_byte(const char *cptr, uint8 *value)
+{
+    t_stat status;
+    t_value parsed;
+
+    if (cptr == NULL)
+        return SCPE_ARG;
+
+    parsed = get_uint(cptr, 16, SBC201_MAX_CFG_BYTE, &status);
+    if (status != SCPE_OK)
+        return status;
+
+    *value = (uint8)parsed;
+    return SCPE_OK;
+}
 
 /* isbc201 Standard I/O Data Structures */
 
@@ -421,11 +445,16 @@ t_stat isbc201_set_port(UNIT *uptr, int32 val, const char *cptr, void *desc)
     (void) val;
     (void) desc;
 
-    uint32 size, result;
+    uint8 size;
+    t_stat status;
 
     if (uptr == NULL)
         return SCPE_ARG;
-    result = sscanf(cptr, "%02x", &size);
+
+    status = isbc201_parse_config_byte(cptr, &size);
+    if (status != SCPE_OK)
+        return status;
+
     fdc201.baseport = size;
 //    if (fdc201.verb)
         sim_printf("SBC201: Installed at base port=%04X\n", fdc201.baseport);
@@ -446,11 +475,16 @@ t_stat isbc201_set_int(UNIT *uptr, int32 val, const char *cptr, void *desc)
     (void) val;
     (void) desc;
 
-    uint32 size, result;
+    uint8 size;
+    t_stat status;
 
     if (uptr == NULL)
         return SCPE_ARG;
-    result = sscanf(cptr, "%02x", &size);
+
+    status = isbc201_parse_config_byte(cptr, &size);
+    if (status != SCPE_OK)
+        return status;
+
     fdc201.intnum = size;
 //    if (fdc201.verb)
         sim_printf("SBC201: Interrupt number=%04X\n", fdc201.intnum);
@@ -659,25 +693,32 @@ uint8 isbc201r7(t_bool io, uint8 data, uint8 devnum)
 
 void isbc201_diskio(void)
 {
-    uint8 cw, di, nr, ta, sa, bn, data, nrptr;
-    uint16 ba, ni;
+    uint8 cw, di, nr, ta, sa, data, nrptr;
+    uint16 ba;
     uint32 dskoff;
     uint8 fddnum, fmtb;
     uint32 i;
     UNIT *uptr;
     uint8 *fbuf;
+    t_bool completion_interrupt;
 
     //parse the IOPB
     cw = get_mbyte(fdc201.iopb);        //Channel Word
+    completion_interrupt = isbc201_completion_interrupt_enabled(cw);
     di = get_mbyte(fdc201.iopb + 1);    //Diskette Instruction
     nr = get_mbyte(fdc201.iopb + 2);    //Number of Records
     ta = get_mbyte(fdc201.iopb + 3);    //Track Address
     sa = get_mbyte(fdc201.iopb + 4) & 0x1f; //Sector Address - without bank/fddnum
     ba = get_mbyte(fdc201.iopb + 5);
     ba |= (get_mbyte(fdc201.iopb + 6) << 8); //Buffer Address
-    bn = get_mbyte(fdc201.iopb + 7);    //Block Number
-    ni = get_mbyte(fdc201.iopb + 8);
-    ni |= (get_mbyte(fdc201.iopb + 9) << 8); //Next IOPB Address
+    /*
+     * TODO: The iSBC 201 hardware supports linked IOPBs using the channel
+     * word successor, wait, and branch-on-wait bits plus the block-number
+     * and next-IOPB address fields. This emulator currently executes only
+     * the initial IOPB. Correct linked support needs manual-backed tests for
+     * chaining, intermediate interrupts, result type 01, and block-number
+     * reporting before these fields are consumed.
+     */
     fddnum = (di & 0x10) >> 4;          //Floppy Disk Number
     uptr = isbc201_dev.units + fddnum;  //Unit Pointer
     fbuf = (uint8 *) uptr->filebuf;     //File Buffer
@@ -690,7 +731,7 @@ void isbc201_diskio(void)
             if ((fdc201.stat & RDY0) == 0) {
                 fdc201.rtype = ROK;
                 fdc201.rbyte0 = RB0NR;
-                fdc201.intff = 1;       //set interrupt FF
+                fdc201.intff = completion_interrupt;
                 sim_printf("\n   SBC201: FDD %d - Ready error", fddnum);
                 return;
             }
@@ -699,7 +740,7 @@ void isbc201_diskio(void)
             if ((fdc201.stat & RDY1) == 0) {
                 fdc201.rtype = ROK;
                 fdc201.rbyte0 = RB0NR;
-                fdc201.intff = 1;       //set interrupt FF
+                fdc201.intff = completion_interrupt;
                 sim_printf("\n   SBC201: FDD %d - Ready error", fddnum);
                 return;
             }
@@ -715,7 +756,7 @@ void isbc201_diskio(void)
         )) {
         fdc201.rtype = ROK;
         fdc201.rbyte0 = RB0ADR;
-        fdc201.intff = 1;               //set interrupt FF
+        fdc201.intff = completion_interrupt;
         sim_printf("\n   SBC201: FDD %d - Address error nr=%02XH ta=%02XH sa=%02XH IOPB=%04XH PCX=%04XH",
             fddnum, nr, ta, sa, fdc201.iopb, PCX);
         return;
@@ -724,33 +765,33 @@ void isbc201_diskio(void)
         case DNOP:
             fdc201.rtype = ROK;
             fdc201.rbyte0 = 0;          //set no error
-            fdc201.intff = 1;           //set interrupt FF
+            fdc201.intff = completion_interrupt;
             break;
         case DSEEK:
             fdc201.fdd[fddnum].sec = sa;
             fdc201.fdd[fddnum].cyl = ta;
             fdc201.rtype = ROK;
             fdc201.rbyte0 = 0;          //set no error
-            fdc201.intff = 1;           //set interrupt FF
+            fdc201.intff = completion_interrupt;
             break;
         case DHOME:
             fdc201.fdd[fddnum].sec = sa;
             fdc201.fdd[fddnum].cyl = 0;
             fdc201.rtype = ROK;
             fdc201.rbyte0 = 0;          //set no error
-            fdc201.intff = 1;           //set interrupt FF
+            fdc201.intff = completion_interrupt;
             break;
         case DVCRC:
             fdc201.rtype = ROK;
             fdc201.rbyte0 = 0;
-            fdc201.intff = 1;           //set interrupt FF
+            fdc201.intff = completion_interrupt;
             break;
         case DFMT:
             //check for WP
             if(uptr->flags & UNIT_WPMODE) {
                 fdc201.rtype = ROK;
                 fdc201.rbyte0 = RB0WP;
-                fdc201.intff = 1;       //set interrupt FF
+                fdc201.intff = completion_interrupt;
                 sim_printf("\n   SBC201: FDD %d - Write protect error DFMT", fddnum);
                 return;
             }
@@ -762,7 +803,7 @@ void isbc201_diskio(void)
             }
             fdc201.rtype = ROK;
             fdc201.rbyte0 = 0;          //set no error
-            fdc201.intff = 1;           //set interrupt FF
+            fdc201.intff = completion_interrupt;
             break;
         case DREAD:
             nrptr = 0;
@@ -780,14 +821,14 @@ void isbc201_diskio(void)
             }
             fdc201.rtype = ROK;
             fdc201.rbyte0 = 0;          //set no error
-            fdc201.intff = 1;           //set interrupt FF
+            fdc201.intff = completion_interrupt;
             break;
         case DWRITE:
             //check for WP
             if(uptr->flags & UNIT_WPMODE) {
                 fdc201.rtype = ROK;
                 fdc201.rbyte0 = RB0WP;
-                fdc201.intff = 1;       //set interrupt FF
+                fdc201.intff = completion_interrupt;
                 sim_printf("\n   SBC201: FDD %d - Write protect error DWRITE", fddnum);
                 return;
             }
@@ -806,7 +847,7 @@ void isbc201_diskio(void)
             }
             fdc201.rtype = ROK;
             fdc201.rbyte0 = 0;          //set no error
-            fdc201.intff = 1;           //set interrupt FF
+            fdc201.intff = completion_interrupt;
             break;
         default:
             sim_printf("\n   SBC201: FDD %d - isbc201_diskio bad di=%02X",

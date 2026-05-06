@@ -249,6 +249,9 @@ FDCDEF    fdc202;                       //indexed by the isbc-202 instance numbe
  * Return whether the IOPB channel word requests an I/O complete interrupt.
  * The documented value 01 disables completion interrupts; illegal values are
  * left on the historical interrupting path until their behavior is specified.
+ *
+ * TODO: Share this helper logic with the other Intel diskette controllers
+ * after the warning-driven fixes are settled.
  */
 static t_bool isbc202_completion_interrupt_enabled(uint8 cw)
 {
@@ -259,6 +262,9 @@ static t_bool isbc202_completion_interrupt_enabled(uint8 cw)
  * Parse a byte-wide hexadecimal value from a SET modifier argument. The SIMH
  * command numeric parser rejects missing values, trailing junk, and values
  * that would otherwise truncate when stored in the controller state.
+ *
+ * TODO: Share this helper logic with the other Intel diskette controllers
+ * after the warning-driven fixes are settled.
  */
 static t_stat isbc202_parse_config_byte(const char *cptr, uint8 *value)
 {
