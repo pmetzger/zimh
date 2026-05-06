@@ -914,8 +914,6 @@ uptr->WRITTEN = FALSE;                                  /* no longer dirty */
 
 t_stat td_detach (UNIT* uptr)
 {
-int u = (int)(uptr - td_dev.units);
-
 if (!(uptr->flags & UNIT_ATT))
     return SCPE_OK;
 if (uptr->hwmark && ((uptr->flags & UNIT_RO)== 0))      /* any data? */
