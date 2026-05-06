@@ -37,7 +37,7 @@
  * other dealings in this Software without prior written authorization
  * from the authors.
  */
-
+
 /*
  *      The VT11 is a calligraphic display-file device used in the GT4x series
  *      of workstations (PDP-11/04,34,40 based).
@@ -105,7 +105,7 @@
  *      right, since they're reported as errors and cause display restart.
  *      (XXX  Need to obtain source listing to check this.)
  */
-
+
 #ifdef DEBUG_VT11
 #include <stdio.h>
 #endif
@@ -152,7 +152,7 @@ extern void _sim_debug_device (unsigned int dbits, DEVICE* dptr, const char* fmt
 #define DEBUGF(...)
 
 #endif
-
+
 /*
  * Note about coordinate signedness and wrapping:
  *
@@ -215,7 +215,7 @@ int vt11_scale = PIX_SCALE;     /* RES_{FULL,HALF,QUARTER,EIGHTH} */
 unsigned char vt11_init = 0;    /* set after display_init() called */
 #define INIT { if (!vt11_init) { display_init(vt11_display, vt11_scale, vt11_dptr); \
                     vt11_init = 1; vt11_reset(vt11_dptr, vt11_dbit); } }
-
+
 /* state visible to host */
 
 /* The register and field names are those used in the VS60 manual (minus the
@@ -274,7 +274,7 @@ static int32         xpos = 0;          /* X position register * PSCALEF */
                                         /* note: offset has been applied! */
 static int           lp_xpos;           /* (normalized) */
 static int           edge_xpos;         /* (normalized) */
-
+
 /*
  * Character Code and Y Position Register
  * Read Only
@@ -330,7 +330,7 @@ static unsigned char ext_stop = 0;      /* 1 bit: stop display */
  */
 static unsigned char    s_xoff = 0;     /* sign bit for xoff (needed for -0) */
 static int32            xoff = 0;       /* X offset register * PSCALEF */
-
+
 /*
  * Y Offset Register (VS60 only)
  * Read/Write
@@ -391,7 +391,7 @@ static unsigned char    lp1_up = 0;     /* 1 bit: LP #1 switch was released */
 
 enum scolor { GREEN=0, YELLOW, ORANGE, RED };
 #define color           stack[8]._color /* 2 bits: VS60 color option */
-
+
 /*
  * Name Register (VS60 only)
  * Read Only
@@ -419,7 +419,7 @@ static unsigned char name_irq = 0;      /* 1 bit: name matches associative nm */
    There are thus 9 stack elements, 8 stack entries [0..7] and the current state
    [8].  Mimicking the actual hardware, the stack level *decreases* upon JSR.
  */
-
+
 static struct frame
         {
         vt11word      _dpc;             /* Display Program Counter (even) */
@@ -479,7 +479,7 @@ static const unsigned char csi2csf[4] = { 2, 4, 6, 8 }; /* maps cs_index to " */
 #define stop_intr_ena   stack[8]._stopintr /* generate intr. on internal stop */
 #define file_z_data     stack[8]._zdata /* flag: display file has Z coords */
 #define depth_cue_proc  stack[8]._depth /* flag: display Z using depth cue */
-
+
 /*
  * Character String Terminate Register (VS60 only)
  * Read/Write
@@ -539,7 +539,7 @@ static int32 edge_zpos;                 /* (scaled) */
  */
 static unsigned char    s_zoff = 0;     /* sign bit for zoff (needed for -0) */
 static int32            zoff = 0;       /* Z offset register * PSCALEF */
-
+
 /*
  * Invisible state:
  */
@@ -629,7 +629,7 @@ static int32 clip_x1, clip_y1, clip_z1; /* CRT coords for exit point */
 
 static void lineTwoStep(int32, int32, int32, int32, int32, int32);
                                         /* forward reference */
-
+
 /*
  * calls to read/write VT11/VS60 CSRs
  *
@@ -652,7 +652,7 @@ vt11_get_dpc(void)
      */
     return ((maint1 ? bdb : DPC) + reloc) & 0177777;
 }
-
+
 void
 vt11_set_dpc(uint16 d)
 {   INIT
@@ -709,7 +709,7 @@ vt11_set_dpc(uint16 d)
     char_irq = lphit_irq = lpsw_irq = edge_irq = name_irq = 0;
     /* next vt11_cycle() will perform a fetch */
 }
-
+
 int32
 vt11_get_mpr(void)
 {
@@ -764,7 +764,7 @@ vt11_set_ypr(uint16 d)
 {   INIT
     DEBUGF("set YPR: no effect\r\n");
 }
-
+
 /* All the remaining registers pertain to the VS60 only. */
 
 int32
@@ -797,7 +797,7 @@ vt11_set_spr(uint16 d)
         vt_stop_intr();                 /* post stop interrupt to host */
     }
 }
-
+
 int32
 vt11_get_xor(void)
 {
@@ -851,7 +851,7 @@ vt11_set_anr(uint16 d)
     if (TESTBIT(d,11))
         assoc_name = GETFIELD(d,10,0);
 }
-
+
 int32
 vt11_get_scr(void)
 {   INIT
@@ -905,7 +905,7 @@ vt11_set_scr(uint16 d)
             vt_lpen_intr();
     }
 }
-
+
 int32
 vt11_get_nr(void)
 {   INIT
@@ -966,7 +966,7 @@ vt11_set_str(uint16 d)
     if (TESTBIT(d,7))
         char_term = GETFIELD(d,6,0);
 }
-
+
 int32
 vt11_get_sar(void)
 {
@@ -1007,7 +1007,7 @@ vt11_set_sar(uint16 d)
         sp = &stack[GETFIELD(stack_sel,4,2)];   /* [0..7] */
     }
 }
-
+
 /* registers used with the VS60 depth cueing option */
 
 /*
@@ -1056,7 +1056,7 @@ vt11_set_zor(uint16 d)
     if (s_zoff)
         zoff = -zoff;
 }
-
+
 void
 vt11_reset(void *dev, int debug)
 {
@@ -1115,7 +1115,7 @@ vt11_reset(void *dev, int debug)
             memset(&stack[i], 0, sizeof(struct frame));
     }
 }
-
+
 /* VS60 display subroutine support (see stack layout for SDR, above) */
 
 static void
@@ -1144,7 +1144,7 @@ pop(int restore)
     }
     /* else will generate interrupt soon after return */
 }
-
+
 /* compute depth-cued display intensity from current display-file intensity */
 
 int
@@ -1171,7 +1171,7 @@ dintens(int32 z)
  * pixel, this computation doesn't seem too expensive, so optimization isn't
  * necessary.
  */
-
+
 /* illuminate pixel in raster image */
 
 static void
@@ -1224,7 +1224,7 @@ illum3(int32 x, int32 y, int32 z)
 
 #define illum2(x,y)     illum3(x, y, PNORM(zpos))       /* may be depth cued */
                         /* the extra overhead if not depth cueing is not much */
-
+
 static void
 point3(int i, int32 x1, int32 y1, int32 z1, int detect_edge)
                                 /* VSCALEd, offset coordinates (z1 * 4) */
@@ -1271,7 +1271,7 @@ point3(int i, int32 x1, int32 y1, int32 z1, int detect_edge)
 
 #define point2(i,x,y,e) point3(i, x, y, zpos, e)
                         /* the extra overhead if not depth cueing is not much */
-
+
 /* 4 bit counter, fed from div 2 clock (to compensate for raster algorithm) */
 /* XXX  check display against example photos to see if div 2 is right */
 static unsigned char line_counter;
@@ -1318,7 +1318,7 @@ lpoint(int32 x, int32 y, int32 z)
         /* note: Z coordinate is already in virtual CRT units */
         illum3(x * reduce, y * reduce, z);
 }
-
+
 /*
  * 2-step algorithm, developed by Xiaolin Wu
  * from http://graphics.lcs.mit.edu/~mcmillan/comp136/Lecture6/Lines.html
@@ -1391,7 +1391,7 @@ lineTwoStep(int32 x0, int32 y0, int32 z0, int32 x1, int32 y1, int32 z1)
     if (dx == 0 && dy == 0)             /* following algorithm won't work */
         return;                         /* just the one dot */
         /* XXX  not accurate for vector in Z direction */
-
+
     if (dx > dy) {
         int32 length = (dx - 1) / 2;
         int extras = (dx - 1) & 1;
@@ -1430,7 +1430,7 @@ lineTwoStep(int32 x0, int32 y0, int32 z0, int32 x1, int32 y1, int32 z1)
                     y0 += stepy;
                 TPOINT;
             }
-
+
         } else {
             int32 c = (dy - dx) * 2;    /* negative */
             int32 incr1 = c * 2;        /* negative */
@@ -1465,7 +1465,7 @@ lineTwoStep(int32 x0, int32 y0, int32 z0, int32 x1, int32 y1, int32 z1)
                 TPOINT;
             }
         }
-
+
     } else {                            /* dy >= dx */
         int32 length = (dy - 1) / 2;
         int extras = (dy - 1) & 1;
@@ -1505,7 +1505,7 @@ lineTwoStep(int32 x0, int32 y0, int32 z0, int32 x1, int32 y1, int32 z1)
                     x0 += stepx;
                 TPOINT;
             }
-
+
         } else {
             int32 c = (dx - dy) * 2;    /* nonpositive */
             int32 incr1 = c * 2;        /* nonpositive */
@@ -1557,7 +1557,7 @@ lineTwoStep(int32 x0, int32 y0, int32 z0, int32 x1, int32 y1, int32 z1)
     save_z1 = z1;
     /* line_counter is static and thus will be intact upon resume */
 } /* lineTwoStep */
-
+
 /*
  * Clip segment to only that portion, if any, visible within the window.
  * Returns:     -1      visible and not clipped
@@ -2007,7 +2007,7 @@ clip3(int32 x0, int32 y0, int32 z0, int32 x1, int32 y1, int32 z1)
     clip_z1 = z1;
     return clipped;
 }
-
+
 /* draw a relative vector, depth-cued when appropriate */
 
 static void
@@ -2067,7 +2067,7 @@ vector3(int i, int32 dx, int32 dy, int32 dz)   /* unscaled display-file units */
             xpos = PSCALE(xpos);        /* compensates for eventual PNORM */
             ypos = PSCALE(ypos);        /* compensates for eventual PNORM */
         }
-
+
         /* clip to viewport ("working surface") if necessary */
 
         /*
@@ -2176,7 +2176,7 @@ vector3(int i, int32 dx, int32 dy, int32 dz)   /* unscaled display-file units */
 
 #define vector2(i,dx,dy) vector3(i,dx,dy,0)
                         /* the extra overhead for Z computation is not much */
-
+
 /* basic vector (multiple of 45 degrees; directions numbered CCW, #0 => +X) */
 static void
 basic_vector(int i, int dir, int len)   /* unscaled display-file units */
@@ -2227,7 +2227,7 @@ basic_vector(int i, int dir, int len)   /* unscaled display-file units */
     DEBUGF("basic ");
     vector2(i, dx, dy);
 }
-
+
 /*
  * support for VS60 circle/arc option
  *
@@ -2295,7 +2295,7 @@ conic3(int i, int32 dcx, int32 dcy, int32 dcz, int32 dex, int32 dey, int32 dez)
            (long)xe,(long)ye,(long)ze);
 
     /* XXX  not known whether Maintenance Switch 3 has any effect for arcs */
-
+
     /* clip to viewport ("working surface") if necessary */
 
     /* XXX  not implemented yet [could check each chord individually] */
@@ -2349,7 +2349,7 @@ conic3(int i, int32 dcx, int32 dcy, int32 dcz, int32 dex, int32 dey, int32 dez)
     dr = (re - rs) / nseg;
     da /= nseg;
     dz = (double)(ze - zs) / nseg;
-
+
     if (menu) {
         xs += MENU_OFFSET;
         xc += MENU_OFFSET;
@@ -2395,7 +2395,7 @@ conic3(int i, int32 dcx, int32 dcy, int32 dcz, int32 dex, int32 dey, int32 dez)
 
 #define conic2(i,dcx,dcy,dex,dey) conic3(i,dcx,dcy,0,dex,dey,0)
                         /* the extra overhead for Z computation is not much */
-
+
 /*
  * VT11 character font;
  * 6x8 matrix, not serpentine encoded, decenders supported as in real VT11
@@ -2532,7 +2532,7 @@ static const unsigned char dots[0200][6] = {
     { 0x00, 0x0c, 0x10, 0x08, 0x04, 0x18 },     /* 176 ~ */
     { 0x00, 0xff, 0xff, 0xff, 0xff, 0xff }      /* 177 rubout */
 };
-
+
 /*
  * VS60 character stroke table
  *
@@ -2734,7 +2734,7 @@ static const unsigned char stroke[] = {
 
 /* pointers to start of stroke data for each character */
 static const unsigned char *sstroke[128] = { NULL };    /* init. at run time */
-
+
 /* character generator; supports control chars, POPR on term character (VS60) */
 
 static int      /* returns nonzero iff VS60 char terminate feature triggered */
@@ -2798,7 +2798,7 @@ character(int c)
             case 016:                   /* SHIFT OUT */
                 shift_out = 1;
                 break;
-
+
             case 021:                   /* SUPERSCRIPT */
                 if (VT11)
                     break;
@@ -2859,7 +2859,7 @@ character(int c)
             goto copy;
         }
     }
-
+
     /* VT11/VS60 doesn't draw any part of a character if its *baseline* is
         (partly) offscreen; thus the top of a character might be clipped */
     /* (no allowance for descender, italic, or interchar. spacing) */
@@ -2889,7 +2889,7 @@ character(int c)
         goto space;
 
     /* plot a (nominally on-screen) graphic symbol */
-
+
     if (VT11) {
         unsigned char col, prvcol;
 
@@ -2949,7 +2949,7 @@ character(int c)
             col = nxtcol;
         }
         lp_suppress = 0;
-
+
     } else {                            /* VS60 */
         const unsigned char *p;         /* -> stroke data */
         unsigned char s;                /* encoded stroke */
@@ -3010,7 +3010,7 @@ character(int c)
         xpos = xp;                      /* restore for use in spacing (below) */
         ypos = yp;
     }   /* end of graphic character drawing */
-
+
   space:
     if (char_rotate)
         ypos += CSCALE(vt11_csp_w);
@@ -3030,7 +3030,7 @@ character(int c)
     } else
         return 0;
 }
-
+
 /*
  * Perform one display processor "cycle":
  * If display processor is halted or awaiting sync, just performs "background"
@@ -3149,7 +3149,7 @@ vt11_cycle(int us, int slowdown)
             goto jsra;
     }
     /* else have processed only half the CHAR or BSVECT data word so far */
-
+
   fetched:
 
     if (TESTBIT(inst,15)) {             /* control */
@@ -3198,7 +3198,7 @@ vt11_cycle(int us, int slowdown)
             }
             DEBUGF("\r\n");
             break;
-
+
         case 012:                       /* 1010: Load Name Register */
             if (VT11)
                 goto bad_ins;
@@ -3230,7 +3230,7 @@ vt11_cycle(int us, int slowdown)
             }
             DEBUGF("\r\n");
             break;
-
+
         case 014:                       /* 1100__ */
             if (VT11)                   /* other bits are "spare" */
                 op = 0;                 /* always Display Jump Absolute */
@@ -3306,7 +3306,7 @@ vt11_cycle(int us, int slowdown)
                 break;                  /* jsr = 0 ?? */
             }
             break;
-
+
         case 015:                       /* 1101__ */
             if (VT11)
                 DEBUGF("Display NOP\r\n");
@@ -3361,7 +3361,7 @@ vt11_cycle(int us, int slowdown)
                 }
             }
             break;
-
+
         case 016:                       /* 1110: Load Status A */
             DEBUGF("Load Status A");
             internal_stop = TESTBIT(inst,10);   /* 11101 Display Stop */
@@ -3408,7 +3408,7 @@ vt11_cycle(int us, int slowdown)
             }
             DEBUGF("\r\n");
             break;
-
+
         case 017:                       /* 1111_ */
             if (VS60 && TESTBIT(inst,10)) {     /* 11111: Load Status BB */
                 DEBUGF("Load Status BB");
@@ -3441,7 +3441,7 @@ vt11_cycle(int us, int slowdown)
             }
             DEBUGF("\r\n");
             break;
-
+
         default:
   bad_ins:  DEBUGF("SPARE COMMAND 0%o\r\n", mode_field);
             /* "display processor hangs" */
@@ -3483,7 +3483,7 @@ vt11_cycle(int us, int slowdown)
                     DEBUGF(")\r\n");
             (void)character(c);
             break;
-
+
         case SVECTOR:
             if (word_number > 1 || (!file_z_data && word_number > 0))
                 word_number = 0;
@@ -3548,7 +3548,7 @@ vt11_cycle(int us, int slowdown)
                 }
             }
             break;
-
+
         case POINT:                     /* (or OFFSET, if VS60) */
             /* [VT48 manual incorrectly says point data doesn't use sign bit] */
             if (word_number > 2 || (!file_z_data && word_number > 1))
@@ -3608,7 +3608,7 @@ vt11_cycle(int us, int slowdown)
                 }
             }
             break;
-
+
         case GRAPHX:                    /* (or BLVECT if VS60) */
             word_number = 0;
             i = TESTBIT(inst,14);
@@ -3671,7 +3671,7 @@ vt11_cycle(int us, int slowdown)
                 point2(i, xpos + VSCALE(ex), ypos + VSCALE(ey), 1);
             }
             break;
-
+
         /* the remaining graphic data types are supported by the VS60 only */
 
         case BSVECT:                    /* (VS60) */
@@ -3733,7 +3733,7 @@ vt11_cycle(int us, int slowdown)
             xpos = ex;                  /* more precise, if PSCALEF > 1 */
             ypos = ey;
             break;
-
+
         case CIRCLE:                    /* (VS60) */
             if (word_number > 5 || (!file_z_data && word_number > 3))
                 word_number = 0;
@@ -3784,7 +3784,7 @@ vt11_cycle(int us, int slowdown)
                 conic2(i, x, y, ex, ey);
             }
             break;
-
+
         default:                        /* "can't happen" */
             DPC -= 2;                   /* hang around scene of crime */
             break;

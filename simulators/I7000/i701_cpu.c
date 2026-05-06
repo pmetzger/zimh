@@ -78,7 +78,7 @@
         i7090_chan.c    add channel subsystem
         i701_sys.c      add sim_devices table entry
 */
-
+
 #include "i7090_defs.h"
 
 #define HIST_XCT        1       /* instruction */
@@ -142,7 +142,7 @@ extern UNIT         chan_unit[];
 
 #undef  AMASK           /* Change definition of AMASK here */
 #define AMASK           00000000007777L
-
+
 /* CPU data structures
 
    cpu_dev      CPU device descriptor
@@ -758,7 +758,7 @@ store:
 
     return reason;
 }
-
+
 
 /* Reset routine */
 
@@ -835,7 +835,7 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
         M[a] = val & 0777777777777L;
     return SCPE_OK;
 }
-
+
 /* Handle execute history */
 
 /* Set history */

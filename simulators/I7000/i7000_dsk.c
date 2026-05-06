@@ -43,7 +43,7 @@
    be more then 16 bytes.
 
 */
-
+
 #include "i7000_defs.h"
 
 #ifdef NUM_DEVS_DSK
@@ -51,7 +51,7 @@
 #define FORMAT_OK       (1 << (UNIT_V_LOCAL+0))
 #define HA2_OK          (1 << (UNIT_V_LOCAL+1))
 #define CTSS_BOOT       (1 << (UNIT_V_MODE))
-
+
 /* Device status information stored in u5 */
 #define DSKSTA_CMD      0x0000100       /* Unit has recieved a cmd */
 #define DSKSTA_DATA     0x0000200       /* Unit has finished cmd */
@@ -294,7 +294,7 @@ DEVICE              dsk_dev = {
     &dsk_dib, DEV_DISABLE | DEV_DEBUG, 0, dev_debug,
     NULL, NULL, &dsk_help, NULL, NULL, &dsk_description
 };
-
+
 uint32 dsk_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
 #ifndef I7010
@@ -1762,7 +1762,7 @@ dsk_reset(DEVICE * dptr)
     }
     return SCPE_OK;
 }
-
+
 /* Disk option setting commands */
 
 t_stat

@@ -56,7 +56,7 @@
    Last record has cyl and head = 0xffffffff
 
 */
-
+
 #include "kx10_defs.h"
 
 #ifndef NUM_DEVS_PMP
@@ -80,7 +80,7 @@
 #define NUM_UNITS_PMP     8
 
 #define PMP_DEV 0500
-
+
 
 #define CMD     u3
 
@@ -413,7 +413,7 @@ DEVICE              pmp_dev = {
     NULL, NULL, &pmp_help, NULL, NULL, &pmp_description
 };
 
-
+
 /* IOT routines */
 t_stat
 pmp_devio(uint32 dev, uint64 *data) {
@@ -2311,7 +2311,7 @@ pmp_detach(UNIT * uptr)
     return detach_unit(uptr);
 }
 
-
+
 /* Disk option setting commands */
 
 t_stat

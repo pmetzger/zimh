@@ -26,7 +26,7 @@
    output.  This file presents the two as a single GE device to SIMH
    users.
 */
-
+
 #include "kx10_defs.h"
 #include "sim_tmxr.h"
 

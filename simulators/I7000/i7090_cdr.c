@@ -22,7 +22,7 @@
    This is the standard card reader.
 
 */
-
+
 #include "i7090_defs.h"
 #include "sim_card.h"
 
@@ -30,7 +30,7 @@
 
 #define UNIT_CDR        UNIT_ATTABLE | UNIT_RO | UNIT_DISABLE | MODE_026
 
-
+
 /* std devices. data structures
 
    chan_dev     Channel device descriptor
@@ -84,7 +84,7 @@ DEVICE              cdr_dev = {
     &cdr_dib, DEV_DISABLE | DEV_DEBUG | DEV_CARD, 0, crd_debug,
     NULL, NULL, &cdr_help, NULL, NULL, &cdr_description
 };
-
+
 
 uint32 cdr_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {

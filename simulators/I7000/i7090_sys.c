@@ -183,7 +183,7 @@ DEBTAB              crd_debug[] = {
     {0, 0}
 };
 
-
+
 /* Character conversion tables */
 const char          mem_to_ascii[64] = {
     '0', '1', '2', '3', '4', '5', '6', '7',
@@ -216,7 +216,7 @@ const char          ascii_to_mem[128] = {
     067, 070, 071,  -1,  -1,  -1,  -1,  -1
 };
 
-
+
 /* Load a card image file into memory.  */
 
 t_stat
@@ -357,7 +357,7 @@ sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
         return SCPE_ARG;
     return SCPE_OK;
 }
-
+
 /* Symbol tables */
 typedef struct _opcode
 {
@@ -725,7 +725,7 @@ t_opcode            neg_760[] = {
 const char *chname[11] = {
     "*", "A", "B", "C", "D", "E", "F", "G", "H"
 };
-
+
 static void
 lookup_sopcode(FILE * of, t_value val, t_opcode * tab)
 {
@@ -925,7 +925,7 @@ fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
     }
     return SCPE_OK;
 }
-
+
 static t_opcode           *
 find_opcode(char *op, t_opcode * tab)
 {
@@ -1066,5 +1066,5 @@ parse_sym(const char *cptr, t_addr addr, UNIT * uptr, t_value * val, int32 sw)
     }
     *val = d;
     return SCPE_OK;
-
+
 }

@@ -20,7 +20,7 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
+
 #include "b5500_defs.h"
 
 #if (NUM_DEVS_DR > 0)
@@ -28,7 +28,7 @@
 #define UNIT_DR         UNIT_ATTABLE | UNIT_DISABLE | UNIT_FIX | \
                         UNIT_BUFABLE | UNIT_MUSTBUF
 
-
+
 /* in u4 is current address */
 /* in u5       Bits 30-16 of W */
 #define ADDR     u4
@@ -75,7 +75,7 @@ DEVICE              drm_dev = {
 };
 
 
-
+
 
 /* Start off a disk command */
 t_stat drm_cmd(uint16 cmd, uint16 dev, uint8 chan, uint16 *wc, uint8 rd_flg)

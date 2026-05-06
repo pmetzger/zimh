@@ -23,7 +23,7 @@
    This is a device which interfaces with a master processor through
    shared memory and inter-processor interrupts.
 */
-
+
 #include "kx10_defs.h"
 #include "sim_tmxr.h"
 

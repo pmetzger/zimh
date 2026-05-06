@@ -20,7 +20,7 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
+
 #include "kx10_defs.h"
 
 #ifndef NUM_DEVS_RC
@@ -462,7 +462,7 @@ t_stat rc_svc (UNIT *uptr)
     return SCPE_OK;
 }
 
-
+
 t_stat
 rc_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
@@ -483,7 +483,7 @@ rc_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
     return SCPE_IERR;
 }
 
-
+
 t_stat
 rc_reset(DEVICE * dptr)
 {

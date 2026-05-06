@@ -28,7 +28,7 @@
    transmitted as BCD characters.
 
 */
-
+
 #include "i7000_defs.h"
 #include "sim_card.h"
 #include "sim_defs.h"
@@ -40,7 +40,7 @@
 #define ATTENA          (1 << (UNIT_V_UF+7))
 #define ATTENB          (1 << (UNIT_V_UF+14))
 
-
+
 /* std devices. data structures
 
    cdr_dev      Card Reader device descriptor
@@ -94,7 +94,7 @@ DEVICE              cdr_dev = {
     &cdr_dib, DEV_DISABLE | DEV_DEBUG | DEV_CARD, 0, crd_debug,
     NULL, NULL, &cdr_help, NULL, NULL, &cdr_description
 };
-
+
 
 /*
  * Device entry points for card reader.

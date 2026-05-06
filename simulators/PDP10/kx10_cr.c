@@ -28,7 +28,7 @@
    transmitted as BCD characters.
 
 */
-
+
 #include "kx10_defs.h"
 #include "sim_card.h"
 #include "sim_defs.h"
@@ -46,7 +46,7 @@
 #define CR_DIS 0
 #endif
 
-
+
 /* std devices. data structures
 
    cr_dev      Card Reader device descriptor
@@ -130,7 +130,7 @@ DEVICE              cr_dev = {
     &cr_dib, DEV_DISABLE | DEV_DEBUG | DEV_CARD | CR_DIS, 0, crd_debug,
     NULL, NULL, &cr_help, NULL, NULL, &cr_description
 };
-
+
 
 /*
  * Device entry points for card reader.

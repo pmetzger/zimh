@@ -20,7 +20,7 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
+
 #include "b5500_defs.h"
 #include "sim_timer.h"
 #include "sim_sock.h"
@@ -219,7 +219,7 @@ DEVICE              dtc_dev = {
 };
 
 
-
+
 
 /* Start off a terminal controller command */
 t_stat dtc_cmd(uint16 cmd, uint16 dev, uint8 chan, uint16 *wc)
@@ -814,7 +814,7 @@ dtc_detach(UNIT * uptr)
     iostatus &= ~DTC_FLAG;
     return r;
 }
-
+
 /* SET LINES processor */
 
 t_stat dtc_setnl (UNIT *uptr, int32 val, const char *cptr, void *desc)

@@ -57,7 +57,7 @@
         i705_defs.h    add device definitions
         i705_sys.c     add sim_devices table entry
 */
-
+
 #include "i7080_defs.h"
 #include "sim_card.h"
 #include <math.h>
@@ -236,7 +236,7 @@ struct InstHistory *hst = NULL;                 /* History stack */
 extern uint32       drum_addr;
 extern UNIT         chan_unit[];
 
-
+
 /* CPU data structures
 
    cpu_dev      CPU device descriptor
@@ -2295,7 +2295,7 @@ stop_cpu:
 /* Simulation halted */
     return reason;
 }
-
+
 
 /* Read and convert address of instruction */
 uint32 read_addr(uint8 *reg, uint8 *zone) {
@@ -3287,7 +3287,7 @@ do_compare(int reg, int tluop) {
     return SCPE_OK;
 }
 
-
+
 /* Initialize memory to all blank */
 void
 mem_init(void) {
@@ -3299,7 +3299,7 @@ mem_init(void) {
     EMEMSIZE = MEMSIZE;
 }
 
-
+
 /* Reset routine */
 t_stat
 cpu_reset(DEVICE * dptr)
@@ -3428,7 +3428,7 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
     M[addr] = val & 077;
     return SCPE_OK;
 }
-
+
 t_stat
 cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
@@ -3462,7 +3462,7 @@ cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
         M[i] = CHR_BLANK;
     return SCPE_OK;
 }
-
+
 /* Handle execute history */
 
 /* Set history */

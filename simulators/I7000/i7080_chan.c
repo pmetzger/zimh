@@ -50,7 +50,7 @@
       Word 0 digits 3-0: Program location.
 
 */
-
+
 #include "i7080_defs.h"
 
 extern uint16       iotraps;
@@ -79,7 +79,7 @@ t_stat          chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                         const char *cptr);
 const char      *chan_description (DEVICE *dptr);
 
-
+
 /* Channel data structures
 
    chan_dev     Channel device descriptor
@@ -173,7 +173,7 @@ DEVICE              chan_dev = {
     NULL, NULL, &chan_help, NULL, NULL, &chan_description
 };
 
-
+
 t_stat
 set_chan_type(UNIT *uptr, int32 val, const char *cptr, void *desc) {
     /* Generic callback signature.

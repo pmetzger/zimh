@@ -163,7 +163,7 @@ DEBTAB              crd_debug[] = {
     {0, 0}
 };
 
-
+
 /* Character conversion tables */
 const char          ascii_to_six[128] = {
    /* Control                              */
@@ -213,7 +213,7 @@ const char          mem_to_ascii[64] = {
                       /*Sq*/          /*RM*/
 };
 
-
+
 /* Load a card image file into memory.  */
 
 t_stat
@@ -228,7 +228,7 @@ sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
 
     return SCPE_NOFNC;
 }
-
+
 /* Symbol tables */
 typedef struct _opcode
 {
@@ -535,7 +535,7 @@ t_opcode            base_ops[] = {
 const char *chname[] = {
     "*", "1", "2", "3", "4"
 };
-
+
 
 /* Print out a address plus index */
 static t_stat fprint_addr (FILE *of, uint32 addr) {
@@ -925,7 +925,7 @@ t = val[0];
 fprintf (of, (t & WM)? "~%02o ": " %02o ", t & 077);
 return 0;
 }
-
+
 static t_opcode           *
 find_opcode(char *op, t_opcode * tab)
 {

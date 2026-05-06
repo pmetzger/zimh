@@ -25,7 +25,7 @@
    This is the standard operators console.      30
 
 */
-
+
 #include "b5500_defs.h"
 #include "sim_card.h"
 #include "sim_defs.h"
@@ -42,7 +42,7 @@
 #define CMD        u5
 #define LPP        u6
 
-
+
 /* std devices. data structures
 
    cdr_dev      Card Reader device descriptor
@@ -243,7 +243,7 @@ DEVICE              con_dev = {
 };
 #endif
 
-
+
 
 #if ((NUM_DEVS_CDR > 0) | (NUM_DEVS_CDP > 0))
 t_stat
@@ -536,7 +536,7 @@ cdr_description(DEVICE *dptr)
 
 #endif
 
-
+
 
 #if NUM_DEVS_CDR > 0 | NUM_DEVS_CDP > 0
 
@@ -681,7 +681,7 @@ cdp_description(DEVICE *dptr)
 
 #endif
 
-
+
 /* Line printer routines
 */
 t_stat
@@ -870,7 +870,7 @@ print_line(UNIT * uptr, int unit)
     }
 
 }
-
+
 
 
 t_stat lpr_cmd(uint16 cmd, uint16 dev, uint8 chan, uint16 *wc)
@@ -1015,7 +1015,7 @@ lpr_description(DEVICE *dptr)
 
 #endif
 
-
+
 
 
 #if NUM_DEVS_CON > 0

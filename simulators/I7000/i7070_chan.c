@@ -39,7 +39,7 @@
    STATUS<0:16>         Simulated register for basic channel status.
    SENSE<0:16>          Additional flags for 7907 channels.
 */
-
+
 #include "i7070_defs.h"
 
 extern UNIT         cpu_unit;
@@ -52,7 +52,7 @@ t_stat              chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                         const char *cptr);
 const char          *chan_description (DEVICE *dptr);
 
-
+
 /* Channel data structures
 
    chan_dev     Channel device descriptor
@@ -217,7 +217,7 @@ uint8   mem_bcd[256] = {
 /* 98 */  010, 011, 000, 000, 000, 000, 000, 000
 };
 
-
+
 t_stat
 chan_reset(DEVICE * dptr)
 {

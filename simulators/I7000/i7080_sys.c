@@ -194,7 +194,7 @@ const char          mem_to_ascii[64] = {
 
 t_stat parse_sym(const char *, t_addr, UNIT *, t_value *, int32);
 
-
+
 
 /* Load BCD card image into memory, following 705 standard load format */
 static int
@@ -298,7 +298,7 @@ sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
 
     return SCPE_ARG;
 }
-
+
 /* Symbol tables */
 typedef struct _opcode
 {
@@ -439,7 +439,7 @@ t_opcode optbl[] = {
         {0,             NULL,   0},
 };
 
-
+
 /* Print out a address plus index */
 t_stat fprint_addr (FILE *of, uint32 addr) {
     fprintf(of, "%d", addr);
@@ -466,7 +466,7 @@ fprint_reg (FILE *of, uint32 rdx, t_value *val, UNIT *uptr, int32 sw)
 }
 
 
-
+
 /* Symbolic decode
 
    Inputs:
@@ -578,7 +578,7 @@ if (sw & SWMASK ('M')) {                                /* machine code? */
 fprintf (of, " %02o ", val[0] & 077);
 return SCPE_OK;
 }
-
+
 static t_opcode           *
 find_opcode(char *op, t_opcode * tab)
 {

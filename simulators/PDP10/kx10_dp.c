@@ -20,7 +20,7 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
+
 #include "kx10_defs.h"
 #include "kx10_disk.h"
 
@@ -867,7 +867,7 @@ t_stat dp_svc (UNIT *uptr)
     return SCPE_OK;
 }
 
-
+
 t_stat
 dp_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
@@ -927,7 +927,7 @@ t_stat dp_show_hdr (FILE *st, UNIT *uptr, int32 val, const void *desc)
    return SCPE_OK;
 }
 
-
+
 t_stat
 dp_reset(DEVICE * dptr)
 {

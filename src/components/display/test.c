@@ -53,7 +53,7 @@
 #endif
 
 #include "display.h"
-
+
 static unsigned long test_switches = 0;
 
 /* called from display code: */
@@ -69,7 +69,7 @@ cpu_set_switches(unsigned long w1, unsigned long w2) {
     test_switches = w1 ^ w2;
     printf("switches: %06lo\n", test_switches);
 }
-
+
 void
 munch(void) {
     static long us = 0;
@@ -122,7 +122,7 @@ munch(void) {
     }
     display_sync();                     /* XXX push down */
 }
-
+
 #ifdef T2
 /* display all window system level intensities;
  * must be compiled with -DINTENSITIES=<n> -DT2
@@ -171,7 +171,7 @@ t3(void) {
         /* wait */ ;
 }
 #endif
-
+
 int
 main(void) {
     if (!display_init(TEST_DIS, TEST_RES, NULL))

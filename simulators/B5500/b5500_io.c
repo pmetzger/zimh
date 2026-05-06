@@ -20,14 +20,14 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
+
 #include "b5500_defs.h"
 
 #define EOR             1
 #define USEGM           2
 
 t_stat              chan_reset(DEVICE * dptr);
-
+
 /* Channel data structures
 
    chan_dev     Channel device descriptor
@@ -84,7 +84,7 @@ DEVICE              chan_dev = {
 };
 
 
-
+
 t_stat
 chan_reset(DEVICE * dptr)
 {

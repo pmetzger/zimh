@@ -22,13 +22,13 @@
    This is the standard card punch.
 
 */
-
+
 #include "i7090_defs.h"
 #include "sim_card.h"
 #ifdef NUM_DEVS_CDP
 #define UNIT_CDP        UNIT_ATTABLE | UNIT_DISABLE | UNIT_SEQ
 
-
+
 /* std devices. data structures
 
    chan_dev     Channel device descriptor
@@ -80,14 +80,14 @@ DEVICE              cdp_dev = {
     &cdp_dib, DEV_DISABLE | DEV_DEBUG | DEV_CARD, 0, crd_debug,
     NULL, NULL, &cdp_help, NULL, NULL, &cdp_description
 };
-
+
 /* Card punch routine
 
    Modifiers have been checked by the caller
    C modifier is recognized (column binary is implemented)
 */
 
-
+
 uint32 cdp_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
     /* Generic callback signature.

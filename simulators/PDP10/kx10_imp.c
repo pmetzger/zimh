@@ -23,7 +23,7 @@
    This emulates the MIT-AI/ML/MC Host/IMP interface.
 */
 
-
+
 #include "kx10_defs.h"
 #include "sim_ether.h"
 
@@ -1336,7 +1336,7 @@ t_stat imp_eth_srv(UNIT * uptr)
     }
     return SCPE_OK;
 }
-
+
 void
 imp_timer_task(struct imp_device *imp)
 {
@@ -1383,7 +1383,7 @@ t_stat imp_tim_srv(UNIT * uptr)
 #endif
     return SCPE_OK;
 }
-
+
 void
 imp_packet_in(struct imp_device *imp)
 {
@@ -2409,7 +2409,7 @@ t_stat imp_show_arp (FILE *st, UNIT *uptr, int32 val, const void *desc)
         }
     return SCPE_OK;
 }
-
+
 
 static int sent_flag = 0;
 void sent(int status) {
@@ -2879,7 +2879,7 @@ imp_dhcp_release(struct imp_device *imp)
 }
 
 
-
+
 static char *
 ipv4_inet_ntoa(struct in_addr ip)
 {

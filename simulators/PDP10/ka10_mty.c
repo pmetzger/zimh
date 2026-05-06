@@ -22,7 +22,7 @@
    This is a device with 32 high-speed terminal lines.  It's specific
    to the MIT Mathlab and Dynamic Modeling PDP-10s.
 */
-
+
 #include "sim_defs.h"
 #include "sim_tmxr.h"
 #include "kx10_defs.h"

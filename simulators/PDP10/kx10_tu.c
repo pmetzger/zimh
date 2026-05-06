@@ -20,7 +20,7 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
+
 #include "kx10_defs.h"
 #include "sim_tape.h"
 
@@ -842,7 +842,7 @@ t_stat tu_srv(UNIT * uptr)
 
 
 
-
+
 t_stat
 tu_reset(DEVICE * dptr)
 {

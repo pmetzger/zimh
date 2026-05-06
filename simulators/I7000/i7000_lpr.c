@@ -28,7 +28,7 @@
    transmitted as BCD characters.
 
 */
-
+
 #include "i7000_defs.h"
 #include "sim_card.h"
 #include "sim_defs.h"
@@ -48,7 +48,7 @@
 #define PROGRAM         (1 << (UNIT_V_UF+2))
 #endif
 
-
+
 /* std devices. data structures
 
    lpr_dev      Line Printer device descriptor
@@ -111,9 +111,9 @@ DEVICE              lpr_dev = {
     &lpr_dib, DEV_DISABLE | DEV_DEBUG, 0, dev_debug,
     NULL, NULL, &lpr_help, NULL, NULL, &lpr_description
 };
-
 
-
+
+
 /*
  * Line printer routines
  */
@@ -289,7 +289,7 @@ print_line(UNIT * uptr, int chan, int unit)
 
     return SCPE_OK;
 }
-
+
 
 uint32 lpr_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {

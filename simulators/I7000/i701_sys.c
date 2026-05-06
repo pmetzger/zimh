@@ -119,7 +119,7 @@ DEBTAB              crd_debug[] = {
     {"CARD", DEBUG_CARD},
     {0, 0}
 };
-
+
 /* Load a card image file into memory.  */
 
 t_stat
@@ -210,7 +210,7 @@ sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
         return SCPE_ARG;
     return SCPE_OK;
 }
-
+
 /* Symbol tables */
 typedef struct _opcode
 {
@@ -259,7 +259,7 @@ t_opcode            base_ops[] = {
 
 const char *chname[] = { "*" };
 
-
+
 
 /* Parse address
 
@@ -380,7 +380,7 @@ fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
     }
     return SCPE_OK;
 }
-
+
 static t_opcode    *
 find_opcode(char *op, t_opcode * tab)
 {

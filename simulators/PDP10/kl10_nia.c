@@ -22,7 +22,7 @@
    This emulates the MIT-AI/ML/MC Host/IMP interface.
 */
 
-
+
 #include "kx10_defs.h"
 #include "sim_ether.h"
 
@@ -1542,7 +1542,7 @@ t_stat nia_rec_srv(UNIT * uptr)
     return nia_eth_srv(nia_recv_uptr);
 }
 
-
+
 
 t_stat nia_show_mac (FILE* st, UNIT* uptr, int32 val, const void* desc)
 {

@@ -88,7 +88,7 @@ DEBTAB              dev_debug[] = {
     {"EXP", DEBUG_EXP, "Show exception information"},
     {0, 0}
 };
-
+
 
 uint8                parity_table[64] = {
     /* 0    1    2    3    4    5    6    7 */
@@ -161,7 +161,7 @@ const char          ascii_to_con[128] = {
     027, 030, 031, 057, 052, 017,  -1,  -1
 };
 
-
+
 /* Load a card image file into memory.  */
 
 t_stat
@@ -177,7 +177,7 @@ sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
    /* Currently not implimented until I know format of load files */
     return SCPE_NOFNC;
 }
-
+
 #define TYPE_A  1       /* Full 12 bit opcode */
 #define TYPE_B  2       /* 6 Bit Opcode with 6 bit field */
 #define TYPE_C  3       /* 8 Bit opcode with 4 bit field */
@@ -345,7 +345,7 @@ t_opcode  char_ops[] = {
        { 0,              0,      NULL,  }
 };
 
-
+
 /* Print out an instruction */
 void
 print_opcode(FILE * of, uint16 val, int chr_mode)
@@ -447,7 +447,7 @@ fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
     }
     return SCPE_OK;
 }
-
+
 static t_opcode    *
 find_opcode(char *op, t_opcode * tab)
 {

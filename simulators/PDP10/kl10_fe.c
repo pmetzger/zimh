@@ -2017,7 +2017,7 @@ const char *dte_description (DEVICE *dptr)
     return "Console TTY Line";
 }
 
-
+
 #if (NUM_DEVS_LP20 > 0)
 
 static void

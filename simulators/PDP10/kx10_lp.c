@@ -179,7 +179,7 @@ t_stat lpt_devio(uint32 dev, uint64 *data) {
     return SCPE_OK;
 }
 
-
+
 static void
 lpt_printline(UNIT *uptr, int nl) {
     int   trim = 0;

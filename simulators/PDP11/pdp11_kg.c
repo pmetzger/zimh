@@ -328,7 +328,7 @@ DEVICE kg_dev = {
     NULL,                                               /* help context */
     &kg_description,                                    /* description */
 };
-                                                       /* KG I/O address routines */
+                                                       /* KG I/O address routines */
 
 static t_stat kg_rd (int32 *data, int32 PA, int32 access)
 {

@@ -33,7 +33,7 @@
    If the byte count is odd, the record is padded with an extra byte
    of junk.  File marks are represented by a byte count of 0.
 */
-
+
 #include "i7000_defs.h"
 #include "sim_tape.h"
 
@@ -49,7 +49,7 @@
 #define MTUF_LDN        (1 << MTUF_V_UF)
 #define MTUF_ONLINE     (1 << UNIT_V_UF_31)
 
-
+
 /* in u3 is current frame of tape */
 /* in u5 holds the commands */
 #define MT_RDS          1
@@ -340,7 +340,7 @@ DEVICE              mtf_dev = {
 #endif
 #endif
 
-
+
 uint8               parity_table[64] = {
     /* 0    1    2    3    4    5    6    7 */
     0000, 0100, 0100, 0000, 0100, 0000, 0000, 0100,

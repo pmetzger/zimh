@@ -34,7 +34,7 @@
    STATUS<0:16>         Simulated register for basic channel status.
    SENSE<0:16>          Additional flags for 7907 channels.
 */
-
+
 #include "i7010_defs.h"
 
 extern UNIT         cpu_unit;
@@ -49,7 +49,7 @@ t_stat              chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
                         const char *cptr);
 const char          *chan_description (DEVICE *dptr);
 
-
+
 /* Channel data structures
 
    chan_dev     Channel device descriptor
@@ -146,7 +146,7 @@ struct urec_t {
         {0000,  NULL}
 };
 
-
+
 /* Sets the device that will interrupt on the channel. */
 t_stat
 set_urec(UNIT * uptr, int32 val, const char *cptr, void *desc)
@@ -202,7 +202,7 @@ get_urec(FILE * st, UNIT * uptr, int32 v, const void *desc)
     fprintf(st, "UREC=%o", irqdev[chan]);
     return SCPE_OK;
 }
-
+
 t_stat
 chan_reset(DEVICE * dptr)
 {

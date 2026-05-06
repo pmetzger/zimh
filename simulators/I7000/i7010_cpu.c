@@ -43,7 +43,7 @@
         i7010_defs.h    add device definitions
         i7010_sys.c     add sim_devices table entry
 */
-
+
 #include "i7010_defs.h"
 #include "sim_card.h"
 
@@ -169,7 +169,7 @@ DEBTAB              cpu_debug[] = {
 };
 
 
-
+
 /* CPU data structures
 
    cpu_dev      CPU device descriptor
@@ -242,7 +242,7 @@ DEVICE              cpu_dev = {
     NULL, NULL, &cpu_help, NULL, NULL, &cpu_description
 };
 
-
+
                       /*0, 1, 2, 3, 4, 5, 6, 7, 8, 9, A, B, C, D, E, F */
 uint8   bcd_bin[16] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 3, 4, 5, 6, 7};
 uint8   bin_bcd[20] = { 10, 1, 2, 3, 4, 5, 6, 7, 8, 9,
@@ -3824,7 +3824,7 @@ do_divide(void)
     }
     return SCPE_OK;
 }
-
+
 
 /* Interval timer routines */
 t_stat
@@ -3895,7 +3895,7 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
     M[addr] = val & (077 | WM);
     return SCPE_OK;
 }
-
+
 t_stat
 cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
@@ -3925,7 +3925,7 @@ cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
         M[i] = 0;
     return SCPE_OK;
 }
-
+
 /* Handle execute history */
 
 /* Set history */

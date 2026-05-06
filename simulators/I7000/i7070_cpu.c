@@ -59,7 +59,7 @@
 
    Options supported are Timer, Extended addressing and Floating point.
 */
-
+
 #include "i7070_defs.h"
 #include "sim_timer.h"
 
@@ -133,7 +133,7 @@ int32               hst_p = 0;                  /* History pointer */
 int32               hst_lnt = 0;                /* History length */
 struct InstHistory *hst = NULL;                 /* History stack */
 
-
+
 /* CPU data structures
 
    cpu_dev      CPU device descriptor
@@ -2434,7 +2434,7 @@ sim_instr(void)
 
     return reason;
 }
-
+
 /* Decimal arithmetic routines */
 /* Add a to b result in a */
 int dec_add(t_uint64 *a, t_uint64 b) {
@@ -2764,7 +2764,7 @@ int scan_irq(void) {
     return irq;
 }
 
-
+
 /* Initialize memory to all plus zero */
 void
 mem_init(void) {
@@ -2774,7 +2774,7 @@ mem_init(void) {
         M[i] = PSIGN;
 }
 
-
+
 /* Reset routine */
 t_stat
 cpu_reset(DEVICE * dptr)
@@ -2866,7 +2866,7 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
     M[addr] = val;
     return SCPE_OK;
 }
-
+
 t_stat
 cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
@@ -2899,7 +2899,7 @@ cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
         M[i] = PSIGN;
     return SCPE_OK;
 }
-
+
 /* Handle execute history */
 
 /* Set history */

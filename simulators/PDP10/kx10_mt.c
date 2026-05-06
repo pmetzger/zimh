@@ -33,7 +33,7 @@
    If the byte count is odd, the record is padded with an extra byte
    of junk.  File marks are represented by a byte count of 0.
 */
-
+
 #include "kx10_defs.h"
 #include "sim_tape.h"
 
@@ -61,7 +61,7 @@
 #define UNIT_MT         UNIT_FIX+UNIT_ATTABLE+UNIT_DISABLE+UNIT_ROABLE
 #define LT              66      /* Time per char low density */
 #define HT              16      /* Time per char high density */
-
+
 #define NOP_CLR         000     /* Nop clear, interrupt */
 #define NOP_IDLE        010     /* Nop interrupt when idle */
 #define REWIND          001     /* Rewind */

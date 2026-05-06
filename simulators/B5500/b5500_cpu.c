@@ -91,7 +91,7 @@
   +-+-+-+---+------------+---------------+---------------+
 
 */
-
+
 #include "b5500_defs.h"
 #include "sim_timer.h"
 #include <math.h>
@@ -188,7 +188,7 @@ uint8 rank[64] = {
         51, 52, 14, 15, 44, 16, 17, 18,  /* 70 */
 };
 
-
+
 int                 cpu_index;                  /* Current running cpu */
 t_uint64            M[MAXMEMSIZE] = { 0 };      /* memory */
 t_uint64            a_reg[2];                   /* A register */
@@ -226,7 +226,7 @@ uint8               P1_run;                     /* Run flag for P1 */
 uint8               P2_run;                     /* Run flag for P2 */
 uint16              idle_addr = 0;              /* Address of idle loop */
 
-
+
 struct InstHistory
 {
         uint16          c;
@@ -278,7 +278,7 @@ t_stat              rtc_srv(UNIT * uptr);
 
 int32               rtc_tps = 60 ;
 
-
+
 /* CPU data structures
 
    cpu_dev      CPU device descriptor
@@ -352,7 +352,7 @@ DEVICE              cpu_dev = {
 };
 
 
-
+
 /* Define registers */
 #define A       a_reg[cpu_index]
 #define B       b_reg[cpu_index]
@@ -737,7 +737,7 @@ static int indexWord(void) {
     return 0;
 }
 
-
+
 /* Character mode helper routines */
 
 /* Adjust source bit pointers to point to char */
@@ -872,7 +872,7 @@ static void fill_src(void) {
     }
 }
 
-
+
 /* Helper routines for managing processor */
 
 /* Fetch next program sylable */
@@ -1061,7 +1061,7 @@ static int check_idle(void) {
     return 1;
 }
 
-
+
 /* Math helper routines. */
 
 /* Compare A and B,
@@ -3812,7 +3812,7 @@ control:
 
     return reason;
 }
-
+
 /* Interval timer routines */
 t_stat
 rtc_srv(UNIT * uptr)
@@ -3904,7 +3904,7 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
     M[addr] = val & (FLAG|FWORD);
     return SCPE_OK;
 }
-
+
 t_stat
 cpu_msize(UNIT *uptr, int32 v, const char *cptr, void *dptr)
 {
@@ -3956,7 +3956,7 @@ cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
         M[i] = 0;
     return SCPE_OK;
 }
-
+
 /* Handle execute history */
 
 /* Set history */
@@ -4071,7 +4071,7 @@ cpu_show_hist(FILE * st, UNIT * uptr, int32 val, const void *desc)
     return SCPE_OK;
 }
 
-
+
 t_stat              cpu_help(FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {
     /* Generic help signature.

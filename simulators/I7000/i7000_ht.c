@@ -45,7 +45,7 @@
    CTL           06uoo01    Where u is unit number, and oo is order code
                                 3x or 42
 */
-
+
 #include "i7000_defs.h"
 #include "sim_tape.h"
 
@@ -59,7 +59,7 @@
 #undef HTSIZE
 #endif
 #define HTSIZE          31731000
-
+
 /* in u3 is device address */
 /* in u4 is current buffer position */
 /* in u5 */
@@ -139,7 +139,7 @@ t_stat              ht_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
 const char          *ht_description (DEVICE *dptr);
 void                ht_tape_posterr(UNIT * uptr, uint32 error);
 
-
+
 
 /* One buffer per channel */
 uint8               ht_unit[NUM_CHAN * 2];      /* Currently selected unit */
@@ -216,7 +216,7 @@ DEVICE              htb_dev = {
 };
 #endif
 
-
+
 uint32 ht_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
     /* Generic callback signature.
@@ -968,7 +968,7 @@ ht_reset(DEVICE * dptr)
     }
     return SCPE_OK;
 }
-
+
 
 t_stat
 ht_attach(UNIT * uptr, const char *file)

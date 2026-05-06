@@ -20,7 +20,7 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
+
 #include "kx10_defs.h"
 #include "kx10_disk.h"
 
@@ -1045,7 +1045,7 @@ wr_end:
     return SCPE_OK;
 }
 
-
+
 t_stat
 rp_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
@@ -1064,7 +1064,7 @@ rp_set_type(UNIT *uptr, int32 val, const char *cptr, void *desc)
     return SCPE_OK;
 }
 
-
+
 t_stat
 rp_reset(DEVICE * rptr)
 {

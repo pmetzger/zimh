@@ -20,7 +20,7 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
+
 #include "kx10_defs.h"
 
 #ifndef NUM_DEVS_DSK
@@ -414,7 +414,7 @@ dsk_svc (UNIT *uptr)
         set_interrupt(DSK_DEVNUM, dsk_cmd);
     return SCPE_OK;
 }
-
+
 /* set DCT channel and unit. */
 t_stat
 dsk_set_dct (UNIT *uptr, int32 val, const char *cptr, void *desc)
@@ -453,7 +453,7 @@ dsk_show_dct (FILE *st, UNIT *uptr, int32 val, const void *desc)
 }
 
 
-
+
 t_stat
 dsk_reset(DEVICE * dptr)
 {

@@ -154,7 +154,7 @@
         i7094_chan.c    add channel subsystem
         i7094_sys.c     add sim_devices table entry
 */
-
+
 #include "i7090_defs.h"
 #include "sim_timer.h"
 #include <math.h>
@@ -288,7 +288,7 @@ extern uint32       drum_addr;
 #define INDICATORS      16
 #define PROTECT         32
 #define DUALCORE        64
-
+
 /* CPU data structures
 
    cpu_dev      CPU device descriptor
@@ -4164,7 +4164,7 @@ prottrap:
 
     return reason;
 }
-
+
 /* Nothing special to do, just return true if cmd is write and we got here */
 uint32 cpu_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
@@ -4263,7 +4263,7 @@ cpu_dep(t_value val, t_addr addr, UNIT * uptr, int32 sw)
     M[addr] = val & 0777777777777LL;
     return SCPE_OK;
 }
-
+
 t_stat
 cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
 {
@@ -4295,7 +4295,7 @@ cpu_set_size(UNIT * uptr, int32 val, const char *cptr, void *desc)
         M[i] = 0;
     return SCPE_OK;
 }
-
+
 /* Handle execute history */
 
 /* Set history */

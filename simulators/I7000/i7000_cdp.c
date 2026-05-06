@@ -28,7 +28,7 @@
    transmitted as BCD characters.
 
 */
-
+
 #include "i7000_defs.h"
 #include "sim_card.h"
 #include "sim_defs.h"
@@ -47,7 +47,7 @@
 #define INPUT_BLANK     (4 << INPUT_V)
 #define INPUT_MASK      (7 << INPUT_V)
 
-
+
 /* std devices. data structures
 
    cdp_dev      Card Punch device descriptor
@@ -152,14 +152,14 @@ DEVICE stack_dev = {
 #endif
 
 
-
+
 /* Card punch routine
 
    Modifiers have been checked by the caller
    C modifier is recognized (column binary is implemented)
 */
 
-
+
 uint32 cdp_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
     int                 chan = UNIT_G_CHAN(uptr->flags);

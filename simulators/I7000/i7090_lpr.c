@@ -33,7 +33,7 @@
           Echo 8, 7, 6, 5, 4, 3, 2, 1
 
 */
-
+
 #include "i7090_defs.h"
 #include "sim_console.h"
 #include "sim_card.h"
@@ -43,7 +43,7 @@
 #define UNIT_LPR        UNIT_ATTABLE | UNIT_DISABLE | UNIT_SEQ
 #define ECHO            (1 << UNIT_V_LOCAL)
 
-
+
 /* std devices. data structures
 
    chan_dev     Channel device descriptor
@@ -119,7 +119,7 @@ DEVICE              lpr_dev = {
     &lpr_dib, DEV_DISABLE | DEV_DEBUG, 0, dev_debug,
     NULL, NULL, &lpr_help, NULL, NULL, &lpr_description
 };
-
+
 /* Line printer routines
 */
 
@@ -331,7 +331,7 @@ print_line(UNIT * uptr, int chan, int unit)
 
     return SCPE_OK;
 }
-
+
 uint32 lpr_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
     int                 chan = UNIT_G_CHAN(uptr->flags);

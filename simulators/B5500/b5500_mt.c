@@ -33,7 +33,7 @@
    If the byte count is odd, the record is padded with an extra byte
    of junk.  File marks are represented by a byte count of 0.
 */
-
+
 #include "b5500_defs.h"
 #include "sim_tape.h"
 
@@ -43,7 +43,7 @@
 #define UNIT_MT         UNIT_ATTABLE | UNIT_DISABLE | UNIT_ROABLE
 #define HT              500     /* Time per char high density */
 
-
+
 /* in u4 is current buffer position */
 /* in u5       Bits 30-16 of W */
 #define CMD      u5
@@ -152,7 +152,7 @@ DEVICE              mt_dev = {
 };
 
 
-
+
 
 /* Start off a mag tape command */
 t_stat

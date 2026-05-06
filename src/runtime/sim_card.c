@@ -63,7 +63,7 @@
     The card module uses up7 to hold a buffer for the card being translated
     and the backward translation table. Which is generated from the table.
 */
-
+
 
 #include <ctype.h>
 #include "sim_defs.h"
@@ -417,7 +417,7 @@ static struct card_formats fmts[] = {
     {0, 0},
 };
 
-
+
 /* Conversion routines */
 
 /* Convert BCD character into Hollerith code */
@@ -530,7 +530,7 @@ sim_hol_to_ebcdic(uint16 hol) {
 }
 
 
-
+
 t_addr
 sim_hopper_size(UNIT * uptr) {
     struct card_context  *data = (struct card_context *)uptr->card_ctx;
@@ -648,7 +648,7 @@ sim_card_eof(UNIT *uptr)
     return 0;
 }
 
-
+
 
 struct _card_buffer {
    uint8                 buffer[8192+500];    /* Buffer data */
@@ -1032,7 +1032,7 @@ _sim_read_deck(UNIT * uptr, int eof)
     return r;
 }
 
-
+
 /* Card punch routine
 
    Modifiers have been checked by the caller

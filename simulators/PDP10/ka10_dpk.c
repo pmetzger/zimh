@@ -23,7 +23,7 @@
    a device with 16 terminal ports.  It's specific to the MIT AI lab
    PDP-10.
 */
-
+
 #include "sim_defs.h"
 #include "sim_tmxr.h"
 #include "kx10_defs.h"

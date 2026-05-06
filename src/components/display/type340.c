@@ -224,7 +224,7 @@ ty340_reset(void *dptr)
     ty340_rfd();                /* ready for data */
     return u->status;
 }
-
+
 static int
 point(int x, int y, int seq)
 {
@@ -272,7 +272,7 @@ lpoint(int x, int y)
 #endif
     point(x, y, 0);
 }
-
+
 /*
  * two-step algorithm, developed by Xiaolin Wu
  * from http://graphics.lcs.mit.edu/~mcmillan/comp136/Lecture6/Lines.html
@@ -613,7 +613,7 @@ ipoint(int i, int n, unsigned char byte)
 
     return 0;                           /* no escape */
 }
-
+
 #if TYPE342
 /*
  * 342 character generator - first 64 characters
@@ -846,7 +846,7 @@ character(int n, unsigned char c)
     return 0;
 }
 #endif
-
+
 /*
  * execute one type340 instruction
  * returns status word

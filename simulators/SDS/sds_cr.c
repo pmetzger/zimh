@@ -113,7 +113,7 @@ DEVICE  cr_dev = {
     &cr_dib, DEV_DISABLE | DEV_CARD, 0, NULL,
     NULL, NULL, NULL, NULL, NULL, NULL
 };
-
+
 /* Returns the SDS Internal style BCD of the
  hollerith code or 0x7f if error
  */

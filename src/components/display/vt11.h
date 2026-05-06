@@ -58,7 +58,7 @@ extern int32 vt11_csp_h;                /* vertical character spacing */
 #else   /* VT11 normal;                    W5 or W6 installed */
 #define VT11_CSP_H      24
 #endif
-
+
 /*
  * The DISPLAY_TYPE #define establishes the initial default display
  * type; to change from the default display type, set vt11_display
@@ -89,7 +89,7 @@ extern unsigned char vt11_init;         /* set after display_init() called */
 
 /* The display file is an array of 16-bit words. */
 typedef uint16 vt11word;
-
+
 extern int32 vt11_get_dpc(void);        /* read Display PC */
 extern int32 vt11_get_mpr(void);        /* read mode parameter register */
 extern int32 vt11_get_xpr(void);        /* read graphplot incr/X pos register */

@@ -182,7 +182,7 @@ struct i386_segment_regs
 #define INTR_SYNCH          0x1
 #define INTR_HALTED         0x4
 #define INTR_ILLEGAL_OPCODE 0x8
-
+
 /* INSTRUCTION DECODING STUFF */
 #define FETCH_DECODE_MODRM(m,mod,rh,rl) fetch_decode_modrm(m,&mod,&rh,&rl)
 #define DECODE_RM_BYTE_REGISTER(m,r)    decode_rm_byte_register(m,r)

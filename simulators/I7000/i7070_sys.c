@@ -213,7 +213,7 @@ char    mem_ascii[256] = {
 /* 98 */  '8', '9', '~', '~', '~', '~', '~', '~'
 };
 
-
+
 /* Load a card image file into memory.  */
 
 t_stat
@@ -229,7 +229,7 @@ sim_load(FILE * fileref, const char *cptr, const char *fnam, int flag)
    /* Currently not implimented until I know format of load files */
     return SCPE_NOFNC;
 }
-
+
 /* Symbol tables */
 typedef struct _opcode
 {
@@ -496,7 +496,7 @@ t_opcode  sub_ops[] = {
 const char *chname[11] = {
     "*", "1", "2", "3", "4", "A", "B", "C", "D"
 };
-
+
 /* Print out an instruction */
 static void
 print_opcode(FILE * of, t_value val, t_opcode * tab)
@@ -831,7 +831,7 @@ fprint_sym(FILE * of, t_addr addr, t_value * val, UNIT * uptr, int32 sw)
     }
     return SCPE_OK;
 }
-
+
 static t_opcode           *
 find_opcode(char *op, t_opcode * tab)
 {

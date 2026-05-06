@@ -28,7 +28,7 @@
    transmitted as BCD characters.
 
 */
-
+
 #include "kx10_defs.h"
 #include "sim_card.h"
 #include "sim_defs.h"
@@ -46,7 +46,7 @@
 #define CP_DIS  0
 #endif
 
-
+
 /* std devices. data structures
 
    cp_dev      Card Punch device descriptor
@@ -129,7 +129,7 @@ DEVICE              cp_dev = {
 
 
 
-
+
 /* Card punch routine
 */
 

@@ -216,7 +216,7 @@ const char *vt_regnam[] = {
     "ZPR",
     "ZOR",
     };
-
+
 /* VT11/VS60 routines
 
    vt_rd        I/O page read
@@ -309,7 +309,7 @@ vt_wr(int32 data, int32 PA, int32 access)
     }
     return SCPE_NXM;
 }
-
+
 /*
  * here to run a display processor cycle, called as a SIMH
  * "device service routine".
@@ -763,7 +763,7 @@ vt_boot(int32 unit, DEVICE *dptr)
     sim_clr_idle (NULL, 0, stability, NULL);
     return r;
 }
-
+
 /* SET/SHOW VT options: */
 
 t_stat
@@ -822,7 +822,7 @@ vt_show_scale(FILE *st, UNIT *uptr, int32 val, const void *desc)
     fprintf(st, "scale=%d", (int)vt11_scale);
     return SCPE_OK;
 }
-
+
 t_stat
 vt_set_hspace(UNIT *uptr, int32 val, const char *cptr, void *desc)
 {
@@ -872,7 +872,7 @@ vt_show_vspace(FILE *st, UNIT *uptr, int32 val, const void *desc)
     fprintf(st, "vspace=%s", vt11_csp_h==26 ? "tall" : "normal");
     return SCPE_OK;
 }
-
+
 /* interface routines (called from display simulator) */
 
 void

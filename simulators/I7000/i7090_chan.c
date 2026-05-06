@@ -45,7 +45,7 @@
    STATUS<0:16>         Simulated register for basic channel status.
    SENSE<0:16>          Additional flags for 7909 channels.
 */
-
+
 #include "i7090_defs.h"
 
 extern uint16       iotraps;
@@ -64,7 +64,7 @@ t_stat              chan_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag,
 const char          *chan_description (DEVICE *dptr);
 void                chan9_seqcheck(int chan);
 uint32              dly_cmd(UNIT *, uint16, uint16);
-
+
 /* Channel data structures
 
    chan_dev     Channel device descriptor
@@ -219,7 +219,7 @@ DEVICE              chan_dev = {
     NULL, NULL, &chan_help, NULL, NULL, &chan_description
 };
 
-
+
 /* Nothing special to do, just return true if cmd is write and we got here */
 uint32 dly_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
@@ -234,7 +234,7 @@ uint32 dly_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 }
 
 
-
+
 t_stat
 chan_reset(DEVICE * dptr)
 {

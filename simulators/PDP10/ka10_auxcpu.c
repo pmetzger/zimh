@@ -22,7 +22,7 @@
    This is a device which interfaces with an auxiliary processor
    through shared memory and inter-processor interrupts.
 */
-
+
 #include "kx10_defs.h"
 #include "sim_tmxr.h"
 

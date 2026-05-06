@@ -20,7 +20,7 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
+
 #include "kx10_defs.h"
 
 #ifndef NUM_DEVS_DDC
@@ -339,9 +339,9 @@ done:
    return SCPE_OK;
 }
 
-
 
-
+
+
 t_stat
 ddc_reset(DEVICE * dptr)
 {

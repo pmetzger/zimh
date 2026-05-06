@@ -21,7 +21,7 @@
 
 
 */
-
+
 #include "i7000_defs.h"
 
 #ifdef NUM_DEVS_CHRON
@@ -29,7 +29,7 @@
 
 #define UNIT_MT(x)      UNIT_DISABLE | UNIT_ROABLE | \
                         UNIT_S_CHAN(x)
-
+
 /* in u3 is device address */
 /* in u4 is current buffer position */
 /* in u5 */
@@ -76,7 +76,7 @@ DEVICE              chron_dev = {
     &chron_dib, DEV_DISABLE, 0, NULL,
     NULL, NULL, &chron_help, NULL, NULL, &chron_description
 };
-
+
 uint32 chron_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
     int                 chan = UNIT_G_CHAN(uptr->flags);

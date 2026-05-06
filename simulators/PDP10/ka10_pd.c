@@ -29,7 +29,7 @@
    This is not needed on a KA10, so it's not implemented here.
 
 */
-
+
 #include "kx10_defs.h"
 
 #ifndef NUM_DEVS_PD

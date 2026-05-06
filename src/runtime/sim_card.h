@@ -62,7 +62,7 @@
     Auto output format is ASCII if card has only printable characters
     or card format binary.
 */
-
+
 #ifndef SIM_CARD_H_
 #define SIM_CARD_H_     0
 
@@ -86,7 +86,7 @@
 #define MODE_029        (0x20 << UNIT_V_CARD_MODE)
 #define MODE_DEC29      (0x30 << UNIT_V_CARD_MODE)
 #define MODE_CHAR       (0x70 << UNIT_V_CARD_MODE)
-
+
 
 /* Card Reader Return Status code */
 typedef int t_cdstat;

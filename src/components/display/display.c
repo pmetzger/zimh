@@ -44,7 +44,7 @@
 #include <limits.h>         /* for USHRT_MAX */
 #include "ws.h"
 #include "display.h"
-
+
 /*
  * The user may select (at compile time) how big a window is used to
  * emulate the display.  Using smaller windows saves memory and screen space.
@@ -75,7 +75,7 @@
 #ifndef PEN_RADIUS
 #define PEN_RADIUS 4
 #endif /* PEN_RADIUS not defined */
-
+
 /*
  * note: displays can have up to two different colors (eg VR20)
  * each color can be made up of any number of phosphors
@@ -145,7 +145,7 @@ static struct color color_p40 = { p40, ELEMENTS(p40), 20000 };
 /* "red" -- until real VR20 phosphor type/number/constants known */
 static struct phosphor pred[] = { {1.0, 0.37, 0.37, 0.5, 0.10} };
 static struct color color_red = { pred, ELEMENTS(pred), 100000 };
-
+
 static struct display displays[] = {
    /*
      * TX-0
@@ -282,7 +282,7 @@ static struct display displays[] = {
      */
     { DIS_TT2500, "TT2500 Display", &color_p31, NULL, 512, 512 }
 };
-
+
 /*
  * Unit time (in microseconds) used to store display point time to
  * live at current aging level.  If this is too small, delay values
@@ -337,7 +337,7 @@ static struct display displays[] = {
 #define NLEVELS (DISPLAY_INT_MAX-DISPLAY_INT_MIN+1)
 
 #define MAXLEVEL (NLEVELS-1)
-
+
 /*
  * Display Device Implementation
  */
@@ -438,7 +438,7 @@ static float level_scale[NLEVELS];
  * for painting each age level, intensity level and beam color
  */
 void *colors[2][NLEVELS][NTTL];
-
+
 void
 display_lp_radius(int r)
 {
@@ -478,7 +478,7 @@ queue_point(struct point *p)
 
     p->delay = d;
 }
-
+
 /*
  * Return true if the display is blank, i.e. no active points in list.
  */
@@ -487,7 +487,7 @@ display_is_blank(void)
 {
     return head->next == head;
 }
-
+
 /*
  * here to to dynamically adjust interval for examination
  * of elapsed vs. simulated time, and fritter away
@@ -638,7 +638,7 @@ display_delay(int t, int slowdown)
      * (clock not reset after a delay)
      */
 } /* display_delay */
-
+
 /*
  * here periodically from simulator to age pixels.
  *
@@ -713,7 +713,7 @@ display_age(int t,          /* simulated us since last call */
         }
     return changed;
 } /* display_age */
-
+
 /* here from window system */
 void
 display_repaint(void) {
@@ -728,7 +728,7 @@ display_repaint(void) {
                 ws_display_point(x, y, colors[p->color][p->level][p->ttl-1]);
     ws_sync();
 }
-
+
 /* (0,0) is lower left */
 static int
 intensify(int x,            /* 0..xpixels */
@@ -783,7 +783,7 @@ intensify(int x,            /* 0..xpixels */
     queue_point(p);         /* put at end of list */
     return bleed;
 }
-
+
 int
 display_point(int x,        /* 0..xpixels (unscaled) */
           int y,            /* 0..ypixels (unscaled) */
@@ -821,7 +821,7 @@ display_point(int x,        /* 0..xpixels (unscaled) */
     ly = y - ws_lp_y;
     return lx*lx + ly*ly <= scaled_pen_radius_squared;
 } /* display_point */
-
+
 #define ABS(_X) ((_X) >= 0 ? (_X) : -(_X))
 #define SIGN(_X) ((_X) >= 0 ? 1 : -1)
 
@@ -887,7 +887,7 @@ display_line(int x1,        /* 0..xpixels (unscaled) */
     else
         yline (x1, y1, y2, dx, dy, level);
 } /* display_line */
-
+
 /*
  * calculate decay color table for a phosphor mixture
  * must be called AFTER refresh_rate initialized!
@@ -955,7 +955,7 @@ phosphor_init(struct phosphor *phosphors, int nphosphors, int color)
         } /* for each intensity level */
     } /* for each TTL */
 } /* phosphor_init */
-
+
 static struct display *
 find_type(enum display_type type)
 {
@@ -1098,7 +1098,7 @@ display_close(void *dptr)
     initialized = 0;
     device = NULL;
 }
-
+
 void
 display_reset(void)
 {
@@ -1135,7 +1135,7 @@ display_scale(void)
 {
     return scale;
 }
-
+
 /*
  * handle keyboard events
  *

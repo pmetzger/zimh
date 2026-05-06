@@ -24,16 +24,16 @@
    Common routines for handling channel functions.
 
 */
-
+
 #include "i7000_defs.h"
 
 extern DEVICE      *sim_devices[];
 
-
+
 
 int     num_devs[NUM_CHAN];
 
-
+
 t_stat
 chan_set_devs(DEVICE * dptr)
 {

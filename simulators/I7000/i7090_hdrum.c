@@ -22,13 +22,13 @@
    High speed drum for CTSS
 
 */
-
+
 #include "i7090_defs.h"
 
 #ifdef NUM_DEVS_HD
 #define UNIT_DRM        UNIT_ATTABLE | UNIT_DISABLE | UNIT_FIX | \
                         UNIT_BUFABLE | UNIT_MUSTBUF
-
+
 /* Device status information stored in u5 */
 #define DRMSTA_READ     000001  /* Unit is in read */
 #define DRMSTA_WRITE    000002  /* Unit is in write */
@@ -71,7 +71,7 @@ DEVICE              hsdrm_dev = {
     &hsdrm_dib, DEV_DISABLE | DEV_DEBUG, 0, dev_debug,
     NULL, NULL, &hsdrm_help, NULL, NULL, &hsdrm_description
 };
-
+
 uint32 hsdrm_cmd(UNIT * uptr, uint16 cmd, uint16 dev)
 {
     int                 chan = UNIT_G_CHAN(uptr->flags);

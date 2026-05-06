@@ -22,7 +22,7 @@
    This is a device which has 128 A/D channels.  It's specific to the MIT
    AI lab PDP-10.
 */
-
+
 #include "kx10_defs.h"
 #include "sim_video.h"
 

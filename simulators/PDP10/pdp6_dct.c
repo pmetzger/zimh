@@ -20,7 +20,7 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
+
 #include "kx10_defs.h"
 
 #ifndef NUM_DEVS_DCT
@@ -170,7 +170,7 @@ dct_svc (UNIT *uptr)
     return SCPE_OK;
 }
 
-
+
 
 /* Check if the dct is still connected to this device. */
 int
@@ -263,7 +263,7 @@ dct_write (int dev, uint64 *data, int cnt)
     return 0;
 }
 
-
+
 t_stat
 dct_help (FILE *st, DEVICE *dptr, UNIT *uptr, int32 flag, const char *cptr)
 {

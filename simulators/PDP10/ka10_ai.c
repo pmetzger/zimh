@@ -23,7 +23,7 @@
    Lab PDP-10.  Since the device name DC is alreay claimed, we call
    this AI.
 */
-
+
 #include "kx10_defs.h"
 
 #ifndef NUM_DEVS_AI

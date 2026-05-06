@@ -83,7 +83,7 @@ DEVICE dpy_dev = {
         NULL, NULL, NULL,
         NULL, DEV_DIS | DEV_DISABLE | DEV_DEBUG,
         0, dpy_deb};
-
+
 /* Display IOT routine */
 
 int32 dpy (int32 inst, int32 dev, int32 io, int32 ac)
@@ -133,7 +133,7 @@ sim_activate (&dpy_unit, dpy_unit.wait);        /* activate */
 
 return io;
 }
-
+
 /*
  * Unit service routine
  *

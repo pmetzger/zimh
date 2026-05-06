@@ -22,7 +22,7 @@
    This is a device which interfaces with a Stanford keyboard.  It's
    specific to the MIT AI lab PDP-10.
 */
-
+
 #include "kx10_defs.h"
 
 #ifdef USE_DISPLAY

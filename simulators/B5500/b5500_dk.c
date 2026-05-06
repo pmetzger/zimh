@@ -20,12 +20,12 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
-
+
 #include "b5500_defs.h"
 
 #if (NUM_DEVS_DSK > 0)
 
-
+
 /* in u3 is device address */
 /* in u4 is current buffer position */
 /* in u5       Bits 30-16 of W */
@@ -147,7 +147,7 @@ DEVICE              dsk_dev = {
     NULL, NULL, &dsk_help, NULL, NULL, &dsk_description
 };
 
-
+
 
 /* Start off a disk command */
 t_stat dsk_cmd(uint16 cmd, uint16 dev, uint8 chan, uint16 *wc)
@@ -461,7 +461,7 @@ set_mod(UNIT *uptr, int32 val, const char *cptr, void *desc) {
     return SCPE_OK;
 }
 
-
+
 /* Boot from given device */
 t_stat
 dsk_boot(int32 unit_num, DEVICE * dptr)

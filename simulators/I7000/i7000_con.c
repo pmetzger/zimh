@@ -28,14 +28,14 @@
    transmitted as BCD characters.
 
 */
-
+
 #include "i7000_defs.h"
 #include "sim_card.h"
 #include "sim_defs.h"
 
 #ifdef NUM_DEVS_CON
 
-
+
 /* std devices. data structures
 
    cdr_dev      Card Reader device descriptor
@@ -73,7 +73,7 @@ DEVICE              con_dev = {
     NULL, NULL, &con_help, NULL, NULL, &con_description
 };
 
-
+
 
 /*
  *Console printer routines.
