@@ -597,6 +597,22 @@ void sim_timer_reset_test_state(void)
     sim_internal_timer_time = 0;
 }
 
+/* Snapshot throttle internals for deterministic state-machine tests. */
+void sim_timer_get_throttle_test_state(
+    struct sim_timer_throttle_test_state *state)
+{
+    state->ms_start = sim_throt_ms_start;
+    state->ms_stop = sim_throt_ms_stop;
+    state->type = sim_throt_type;
+    state->val = sim_throt_val;
+    state->state = sim_throt_state;
+    state->cps = sim_throt_cps;
+    state->peak_cps = sim_throt_peak_cps;
+    state->inst_start = sim_throt_inst_start;
+    state->sleep_time = sim_throt_sleep_time;
+    state->wait = sim_throt_wait;
+}
+
 t_stat sim_throt_svc (UNIT *uptr);
 t_stat sim_timer_tick_svc (UNIT *uptr);
 t_stat sim_timer_stop_svc (UNIT *uptr);

@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -23,6 +24,8 @@ static size_t simh_test_clock_value_count = 0;
 static size_t simh_test_clock_value_index = 0;
 static uint64_t simh_test_clock_auto_msec = 0;
 static uint32 simh_test_clock_auto_step_msec = 0;
+static int simh_test_clock_service_calls = 0;
+static int simh_test_target_service_calls = 0;
 
 struct sim_timer_activation_fixture {
     DEVICE clock_device;
@@ -32,6 +35,31 @@ struct sim_timer_activation_fixture {
     UNIT target_unit;
     t_bool saved_sim_is_running;
 };
+
+struct sim_timer_dynamic_throttle_case {
+    const char *spec;
+    uint32 type;
+    uint32 val;
+    int32 wait;
+};
+
+/* Count clock service dispatches without otherwise changing timer state. */
+static t_stat sim_timer_counting_clock_svc (UNIT *uptr)
+{
+    (void)uptr;
+
+    ++simh_test_clock_service_calls;
+    return SCPE_OK;
+}
+
+/* Count target service dispatches without otherwise changing timer state. */
+static t_stat sim_timer_counting_target_svc (UNIT *uptr)
+{
+    (void)uptr;
+
+    ++simh_test_target_service_calls;
+    return SCPE_OK;
+}
 
 /* Return scripted timespec values through the shared time wrapper hook. */
 static int simh_test_clock_gettime_stub (int clock_id, struct timespec *tp)
@@ -79,12 +107,37 @@ static int setup_sim_timer_fixture (void **state)
     simh_test_clock_value_index = 0;
     simh_test_clock_auto_msec = 0;
     simh_test_clock_auto_step_msec = 0;
+    simh_test_clock_service_calls = 0;
+    simh_test_target_service_calls = 0;
     sim_time_reset_test_hooks ();
     sim_timer_reset_test_state ();
     sim_is_running = FALSE;
     sim_set_rom_delay_factor (1);
     errno = 0;
     return 0;
+}
+
+/* Return the current private throttle state through the internal test seam. */
+static struct sim_timer_throttle_test_state sim_timer_throttle_state (void)
+{
+    struct sim_timer_throttle_test_state throttle;
+
+    sim_timer_get_throttle_test_state (&throttle);
+    return throttle;
+}
+
+/* Reset the scripted host clock and fake sleep call records. */
+static void sim_timer_reset_scripted_host_time (void)
+{
+    simh_test_clock_calls = 0;
+    simh_test_sleep_calls = 0;
+    simh_test_last_clock_id = -1;
+    simh_test_clock_status = 0;
+    simh_test_last_sleep_req = (struct timespec){0};
+    simh_test_clock_value_count = 0;
+    simh_test_clock_value_index = 0;
+    simh_test_clock_auto_msec = 0;
+    simh_test_clock_auto_step_msec = 0;
 }
 
 /* Restore the default shared time hooks after a test case completes. */
@@ -98,13 +151,6 @@ static int teardown_sim_timer_fixture (void **state)
     return 0;
 }
 
-static t_stat sim_timer_test_unit_svc (UNIT *uptr)
-{
-    (void)uptr;
-
-    return SCPE_OK;
-}
-
 /* Read and return the complete text written to a temporary stream. */
 static char *sim_timer_read_stream_text (FILE *stream)
 {
@@ -116,6 +162,73 @@ static char *sim_timer_read_stream_text (FILE *stream)
     assert_int_equal (simh_test_read_stream (stream, &text, &size), 0);
     assert_non_null (text);
     return text;
+}
+
+/* Verify SHOW THROTTLE output includes a user-facing status fragment. */
+static void sim_timer_assert_show_throt_contains (const char *expected)
+{
+    char *text;
+    FILE *stream;
+
+    stream = tmpfile ();
+    assert_non_null (stream);
+    assert_int_equal (sim_show_throt (stream, NULL, NULL, 0, NULL), SCPE_OK);
+    text = sim_timer_read_stream_text (stream);
+    assert_non_null (strstr (text, expected));
+    free (text);
+    fclose (stream);
+}
+
+/* Initialize timer host timing through deterministic clock and sleep hooks. */
+static void sim_timer_init_with_deterministic_host_timing (void)
+{
+    simh_test_clock_auto_step_msec = 1;
+    sim_time_set_test_hooks (simh_test_clock_gettime_stub,
+                             simh_test_nanosleep_stub);
+
+    assert_false (sim_timer_init ());
+}
+
+/* Reset and initialize the timer subsystem with deterministic host timing. */
+static void sim_timer_reset_initialized_host_timing (void)
+{
+    sim_timer_reset_test_state ();
+    sim_set_rom_delay_factor (1);
+    sim_timer_reset_scripted_host_time ();
+    sim_time_reset_test_hooks ();
+    sim_timer_init_with_deterministic_host_timing ();
+    simh_test_clock_calls = 0;
+    simh_test_sleep_calls = 0;
+    simh_test_clock_auto_step_msec = 0;
+}
+
+/* Run the currently queued throttle event as if its delay had expired. */
+static void sim_timer_process_due_throttle_event (int32 catchup)
+{
+    assert_true (sim_is_active (&sim_throttle_unit));
+    sim_interval = -catchup;
+    assert_int_equal (sim_process_event (), SCPE_OK);
+}
+
+/* Drive calibrated dynamic throttling through deferred startup into the
+   throttling state using a deterministic final timing sample. */
+static void sim_timer_start_calibrated_dynamic_throttle (
+    const char *spec, uint32 final_clock_step_msec)
+{
+    struct sim_timer_throttle_test_state throttle;
+
+    assert_int_equal (sim_set_throt (1, spec), SCPE_OK);
+    simh_test_clock_auto_step_msec = 1;
+    assert_int_equal (sim_throt_svc (&sim_throttle_unit), SCPE_OK);
+
+    throttle = sim_timer_throttle_state ();
+    assert_int_equal (throttle.state, SIM_THROT_STATE_INIT);
+    assert_true (sim_is_active (&sim_throttle_unit));
+    assert_int_equal (sim_activate_time (&sim_throttle_unit), 10001);
+
+    rtcs[0].calibrations = 3;
+    simh_test_clock_auto_step_msec = final_clock_step_msec;
+    sim_timer_process_due_throttle_event (0);
 }
 
 /* Build a calibrated-timer fixture for wall-clock activation tests. */
@@ -132,15 +245,18 @@ static int setup_sim_timer_activation_fixture (void **state)
                                 "CLK", "CLK0", 0, 0, 8, 1);
     simh_test_init_device_unit (&fixture->target_device, &fixture->target_unit,
                                 "TMR", "TMR0", 0, 0, 8, 1);
-    fixture->clock_unit.action = sim_timer_test_unit_svc;
-    fixture->target_unit.action = sim_timer_test_unit_svc;
+    fixture->clock_unit.action = sim_timer_counting_clock_svc;
+    fixture->target_unit.action = sim_timer_counting_target_svc;
     fixture->devices[0] = &fixture->clock_device;
     fixture->devices[1] = &fixture->target_device;
     fixture->devices[2] = NULL;
 
     assert_int_equal (
         simh_test_install_devices ("zimh-unit-sim-timer", fixture->devices), 0);
-    assert_false (sim_timer_init ());
+    sim_timer_init_with_deterministic_host_timing ();
+    simh_test_clock_calls = 0;
+    simh_test_sleep_calls = 0;
+    simh_test_clock_auto_step_msec = 0;
     assert_int_equal (
         sim_rtcn_init_unit_ticks (&fixture->clock_unit, 100, 0, 100), 100);
     fixture->saved_sim_is_running = sim_is_running;
@@ -452,6 +568,69 @@ static void test_sim_rtcn_calb_ignores_large_host_time_gap (void **state)
     assert_int_equal (rtc->nxintv, 1000);
 }
 
+/* Verify init-all revisits only timers with saved initial delays and preserves
+   their remembered clock units. */
+static void test_sim_rtcn_init_all_reinitializes_saved_timers (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    rtcs[0].ticks = 25;
+    rtcs[0].elapsed = 9;
+    rtcs[0].calibrations = 4;
+    rtcs[1].initd = 77;
+    rtcs[1].currd = 0;
+
+    sim_rtcn_init_all ();
+
+    assert_ptr_equal (rtcs[0].clock_unit, &fixture->clock_unit);
+    assert_int_equal (rtcs[0].ticks, 0);
+    assert_int_equal (rtcs[0].elapsed, 0);
+    assert_int_equal (rtcs[0].calibrations, 0);
+    assert_int_equal (rtcs[1].currd, 77);
+    assert_int_equal (rtcs[1].based, 77);
+}
+
+/* Verify timer service startup chooses the internal calibrated timer when no
+   simulator clock is available. */
+static void test_sim_start_timer_services_uses_internal_timer_without_clock (
+    void **state)
+{
+    (void)state;
+
+    sim_timer_init_with_deterministic_host_timing ();
+    simh_test_clock_auto_step_msec = 0;
+    sim_register_clock_unit_tmr (NULL, SIM_NTIMERS);
+
+    sim_start_timer_services ();
+
+    assert_int_equal (sim_rtcn_calibrated_tmr (), SIM_NTIMERS);
+    assert_ptr_equal (rtcs[SIM_NTIMERS].clock_unit, &sim_internal_timer_unit);
+    assert_true (sim_is_active (&sim_internal_timer_unit));
+}
+
+/* Verify stopping timer services migrates clock and coscheduled entries back
+   to the standard event queue without leaving negative event catch-up. */
+static void test_sim_stop_timer_services_migrates_clock_queues (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    assert_int_equal (sim_timer_activate_after (&fixture->clock_unit, 1000.0),
+                      SCPE_OK);
+    assert_int_equal (sim_clock_coschedule_tmr (&fixture->target_unit, 0, 3),
+                      SCPE_OK);
+    sim_interval = -5;
+
+    sim_stop_timer_services ();
+
+    assert_true (sim_interval >= 0);
+    assert_false (sim_is_active (&sim_timer_units[0]));
+    assert_true (sim_is_active (&fixture->clock_unit));
+    assert_true (sim_is_active (&fixture->target_unit));
+    assert_ptr_equal (rtcs[0].clock_cosched_queue, QUEUE_LIST_END);
+    assert_null (fixture->target_unit.cancel);
+    assert_true (fixture->target_unit.usecs_remaining >= 0.0);
+}
+
 /* Verify sim_os_ms_sleep uses the shared clock and nanosleep wrappers. */
 static void test_sim_os_ms_sleep_uses_shared_time_wrappers (void **state)
 {
@@ -695,6 +874,82 @@ static void test_sim_clock_coschedule_wrappers_round_to_ticks (void **state)
     assert_int_equal (sim_cancel (&fixture->target_unit), SCPE_OK);
 }
 
+/* Verify clock tick acknowledgements enable catch-up tracking and reject
+   invalid timer numbers without touching timer state. */
+static void test_sim_rtcn_tick_ack_enables_catchup_tracking (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+    RTC *rtc = &rtcs[0];
+
+    assert_int_equal (sim_rtcn_tick_ack (5, -1), SCPE_TIMER);
+    assert_false (rtc->clock_catchup_eligible);
+
+    rtc->clock_tick_size = 0.01;
+    simh_test_clock_values[0] = (struct timespec){.tv_sec = 10,
+                                                  .tv_nsec = 0};
+    simh_test_clock_values[1] = (struct timespec){.tv_sec = 10,
+                                                  .tv_nsec = 20000000L};
+    simh_test_clock_value_count = 2;
+    sim_time_set_test_hooks (simh_test_clock_gettime_stub, NULL);
+
+    assert_int_equal (sim_rtcn_tick_ack (5, 0), SCPE_OK);
+    assert_true (rtc->clock_catchup_eligible);
+    assert_true (rtc->clock_catchup_pending);
+    assert_int_equal (rtc->calib_ticks_acked, 1);
+    assert_true (sim_is_active (&sim_timer_units[0]));
+    assert_int_equal (sim_activate_time (&sim_timer_units[0]), 6);
+    assert_ptr_equal (rtc->clock_unit, &fixture->clock_unit);
+}
+
+/* Verify a catch-up calibration tick is counted and clears the pending
+   catch-up marker before the next tick is considered. */
+static void test_sim_rtcn_calb_counts_pending_catchup_tick (void **state)
+{
+    RTC *rtc = &rtcs[0];
+
+    (void)state;
+
+    rtc->clock_catchup_pending = TRUE;
+    rtc->clock_tick_size = 0.01;
+
+    assert_int_equal (sim_rtcn_calb (100, 0), 100);
+    assert_false (rtc->clock_catchup_pending);
+    assert_int_equal (rtc->clock_catchup_ticks, 1);
+    assert_int_equal (rtc->clock_catchup_ticks_curr, 1);
+}
+
+/* Verify the timer assist service dispatches the registered clock and queues
+   coscheduled work whose tick has arrived. */
+static void test_sim_timer_tick_svc_dispatches_coscheduled_work (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    assert_int_equal (sim_clock_coschedule_tmr (&fixture->target_unit, 0, 0),
+                      SCPE_OK);
+
+    assert_int_equal (sim_timer_units[0].action (&sim_timer_units[0]),
+                      SCPE_OK);
+
+    assert_int_equal (simh_test_clock_service_calls, 1);
+    assert_true (sim_is_active (&fixture->target_unit));
+    assert_null (fixture->target_unit.cancel);
+
+    assert_int_equal (sim_process_event (), SCPE_OK);
+    assert_int_equal (simh_test_target_service_calls, 1);
+}
+
+/* Verify the timer assist service reports an internal error for a registered
+   clock unit without a service routine. */
+static void test_sim_timer_tick_svc_rejects_missing_clock_action (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    fixture->clock_unit.action = NULL;
+
+    assert_int_equal (sim_timer_units[0].action (&sim_timer_units[0]),
+                      SCPE_IERR);
+}
+
 /* Verify the clock queue show helper reports coscheduled entries. */
 static void test_sim_show_clock_queues_reports_coscheduled_entries (
     void **state)
@@ -795,6 +1050,499 @@ static void test_sim_set_idle_validates_stability_range (void **state)
     assert_true (sim_idle_enab);
     assert_int_equal (sim_clr_idle (NULL, 0, NULL, NULL), SCPE_OK);
     assert_false (sim_idle_enab);
+}
+
+/* Verify throttle setup validates availability and arguments before accepting
+   the documented modes. */
+static void test_sim_set_throt_validates_and_reports_modes (void **state)
+{
+    (void)state;
+
+    assert_int_equal (SCPE_BARE_STATUS (sim_set_throt (1, "1M")),
+                      SCPE_NOFNC);
+
+    sim_timer_init_with_deterministic_host_timing ();
+    simh_test_clock_auto_step_msec = 0;
+
+    assert_int_equal (SCPE_BARE_STATUS (sim_set_throt (1, "")), SCPE_ARG);
+    assert_int_equal (SCPE_BARE_STATUS (sim_set_throt (1, "BOGUS")),
+                      SCPE_ARG);
+
+    assert_int_equal (sim_set_throt (1, "2M"), SCPE_OK);
+    sim_timer_assert_show_throt_contains ("Throttle:                      2 mega");
+
+    assert_int_equal (sim_set_throt (1, "3K"), SCPE_OK);
+    sim_timer_assert_show_throt_contains ("Throttle:                      3 kilo");
+
+    assert_int_equal (sim_set_throt (1, "25%"), SCPE_OK);
+    sim_timer_assert_show_throt_contains ("Throttle:                      25%");
+
+    assert_int_equal (sim_set_throt (1, "5/2"), SCPE_OK);
+    sim_timer_assert_show_throt_contains ("Throttle:                      5/2");
+    sim_timer_assert_show_throt_contains (
+        "Throttling by sleeping for:    2 ms every 5");
+
+    assert_int_equal (SCPE_BARE_STATUS (sim_set_throt (0, "extra")),
+                      SCPE_ARG);
+    assert_int_equal (sim_set_throt (0, NULL), SCPE_OK);
+}
+
+/* Verify throttle scheduling and cancellation use the internal throttle unit
+   without requiring simulator-specific device state. */
+static void test_sim_throt_sched_and_cancel_manage_internal_unit (void **state)
+{
+    (void)state;
+
+    sim_timer_init_with_deterministic_host_timing ();
+    simh_test_clock_auto_step_msec = 0;
+    assert_int_equal (sim_set_throt (1, "5/2"), SCPE_OK);
+
+    sim_throt_sched ();
+
+    assert_true (sim_is_active (&sim_throttle_unit));
+    assert_int_equal (sim_activate_time (&sim_throttle_unit), 6);
+
+    sim_throt_cancel ();
+
+    assert_false (sim_is_active (&sim_throttle_unit));
+}
+
+/* Verify the periodic throttle service sleeps for the configured interval and
+   reschedules itself after the configured instruction wait. */
+static void test_sim_throt_svc_specific_mode_sleeps_and_reschedules (
+    void **state)
+{
+    (void)state;
+
+    sim_timer_init_with_deterministic_host_timing ();
+    assert_int_equal (sim_set_throt (1, "5/2"), SCPE_OK);
+    simh_test_clock_calls = 0;
+    simh_test_sleep_calls = 0;
+    simh_test_clock_auto_step_msec = 1;
+
+    assert_int_equal (sim_throt_svc (&sim_throttle_unit), SCPE_OK);
+
+    assert_int_equal (simh_test_sleep_calls, 1);
+    assert_true (sim_is_active (&sim_throttle_unit));
+    assert_int_equal (sim_activate_time (&sim_throttle_unit), 6);
+}
+
+/* Verify dynamic throttle modes take their first measurement and schedule
+   their timing pass using the requested instruction rate. */
+static void test_sim_throt_svc_dynamic_modes_enter_timing_state (void **state)
+{
+    static const struct sim_timer_dynamic_throttle_case cases[] = {
+        {"2M", SIM_THROT_MCYC, 2, 2000000},
+        {"3K", SIM_THROT_KCYC, 3, 3000},
+    };
+    size_t i;
+
+    (void)state;
+
+    for (i = 0; i < sizeof (cases) / sizeof (cases[0]); ++i) {
+        struct sim_timer_throttle_test_state throttle;
+
+        sim_timer_reset_initialized_host_timing ();
+        assert_int_equal (sim_set_throt (1, cases[i].spec), SCPE_OK);
+
+        throttle = sim_timer_throttle_state ();
+        assert_int_equal (throttle.type, cases[i].type);
+        assert_int_equal (throttle.val, cases[i].val);
+        assert_int_equal (throttle.state, SIM_THROT_STATE_INIT);
+        assert_int_equal (throttle.sleep_time, 1);
+
+        assert_int_equal (sim_throt_svc (&sim_throttle_unit), SCPE_OK);
+
+        throttle = sim_timer_throttle_state ();
+        assert_int_equal (throttle.state, SIM_THROT_STATE_TIME);
+        assert_int_equal (throttle.wait, cases[i].wait);
+        assert_int_equal (simh_test_sleep_calls, 1);
+        assert_true (sim_is_active (&sim_throttle_unit));
+        assert_int_equal (sim_activate_time (&sim_throttle_unit),
+                          cases[i].wait + 1);
+    }
+}
+
+/* Verify dynamic throttle calibration computes a stable sleep interval when
+   enough host time and simulated instructions have elapsed. */
+static void test_sim_throt_svc_dynamic_time_state_calibrates_wait (
+    void **state)
+{
+    struct sim_timer_throttle_test_state throttle;
+
+    (void)state;
+
+    sim_timer_reset_initialized_host_timing ();
+    assert_int_equal (sim_set_throt (1, "1M"), SCPE_OK);
+    simh_test_clock_auto_step_msec = 1;
+    assert_int_equal (sim_throt_svc (&sim_throttle_unit), SCPE_OK);
+    simh_test_clock_auto_step_msec = 100;
+
+    sim_timer_process_due_throttle_event (0);
+
+    throttle = sim_timer_throttle_state ();
+    assert_int_equal (throttle.type, SIM_THROT_MCYC);
+    assert_int_equal (throttle.state, SIM_THROT_STATE_THROTTLE);
+    assert_int_equal (throttle.sleep_time, 1);
+    assert_int_equal (throttle.wait, 1111);
+    assert_float_equal (throttle.cps, 1000000.0, 0.000001);
+    assert_true (sim_is_active (&sim_throttle_unit));
+    assert_int_equal (sim_activate_time (&sim_throttle_unit), 1112);
+}
+
+/* Verify a dynamic throttle timing sample that is too short extends the
+   measurement interval instead of declaring a calibrated throttle. */
+static void test_sim_throt_svc_dynamic_time_state_retries_short_sample (
+    void **state)
+{
+    struct sim_timer_throttle_test_state throttle;
+
+    (void)state;
+
+    sim_timer_reset_initialized_host_timing ();
+    assert_int_equal (sim_set_throt (1, "1M"), SCPE_OK);
+    simh_test_clock_auto_step_msec = 1;
+    assert_int_equal (sim_throt_svc (&sim_throttle_unit), SCPE_OK);
+    simh_test_sleep_calls = 0;
+    simh_test_clock_auto_step_msec = 1;
+
+    sim_timer_process_due_throttle_event (0);
+
+    throttle = sim_timer_throttle_state ();
+    assert_int_equal (throttle.state, SIM_THROT_STATE_TIME);
+    assert_int_equal (throttle.wait, 4000000);
+    assert_int_equal (simh_test_sleep_calls, 1);
+    assert_true (sim_is_active (&sim_throttle_unit));
+    assert_int_equal (sim_activate_time (&sim_throttle_unit), 4000001);
+}
+
+/* Verify an impossibly short but very large instruction sample disables
+   dynamic throttling as the current user-visible behavior specifies. */
+static void test_sim_throt_svc_dynamic_time_state_disables_too_fast_cpu (
+    void **state)
+{
+    struct sim_timer_throttle_test_state throttle;
+
+    (void)state;
+
+    sim_timer_reset_initialized_host_timing ();
+    assert_int_equal (sim_set_throt (1, "200M"), SCPE_OK);
+    simh_test_clock_auto_step_msec = 1;
+    assert_int_equal (sim_throt_svc (&sim_throttle_unit), SCPE_OK);
+    simh_test_clock_auto_step_msec = 1;
+
+    sim_timer_process_due_throttle_event (0);
+
+    throttle = sim_timer_throttle_state ();
+    assert_int_equal (throttle.type, SIM_THROT_NONE);
+    assert_int_equal (throttle.state, SIM_THROT_STATE_INIT);
+    assert_false (sim_is_active (&sim_throttle_unit));
+}
+
+/* Verify dynamic throttling disables itself when the measured host rate is
+   below the requested simulated rate and no higher peak rate is known. */
+static void test_sim_throt_svc_dynamic_time_state_disables_slow_cpu (
+    void **state)
+{
+    struct sim_timer_throttle_test_state throttle;
+
+    (void)state;
+
+    sim_timer_reset_initialized_host_timing ();
+    assert_int_equal (sim_set_throt (1, "2M"), SCPE_OK);
+    simh_test_clock_auto_step_msec = 1;
+    assert_int_equal (sim_throt_svc (&sim_throttle_unit), SCPE_OK);
+    simh_test_clock_auto_step_msec = 2000;
+
+    sim_timer_process_due_throttle_event (0);
+
+    throttle = sim_timer_throttle_state ();
+    assert_int_equal (throttle.type, SIM_THROT_NONE);
+    assert_int_equal (throttle.state, SIM_THROT_STATE_INIT);
+    assert_false (sim_is_active (&sim_throttle_unit));
+}
+
+/* Verify calibrated startup defers dynamic throttling until the simulator
+   clock is stable, then uses the clock peak rate to recover from a slow
+   measurement sample. */
+static void test_sim_throt_svc_calibrated_startup_uses_peak_rate (
+    void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+    struct sim_timer_throttle_test_state throttle;
+
+    sim_timer_start_calibrated_dynamic_throttle ("48%", 5000);
+
+    throttle = sim_timer_throttle_state ();
+    assert_ptr_equal (rtcs[0].clock_unit, &fixture->clock_unit);
+    assert_int_equal (throttle.state, SIM_THROT_STATE_THROTTLE);
+    assert_float_equal (throttle.peak_cps, 10000.0, 0.000001);
+    assert_float_equal (throttle.cps, 4800.0, 0.000001);
+    assert_int_equal (throttle.sleep_time, 1);
+    assert_int_equal (throttle.wait, 119);
+    assert_int_equal (rtcs[0].currd, 48);
+    assert_int_equal (rtcs[0].based, 48);
+    assert_int_equal (rtcs[0].ticks, 99);
+}
+
+/* Verify dynamic throttling lengthens its wait when periodic recalibration
+   observes execution slower than the desired rate. */
+static void test_sim_throt_svc_dynamic_throttle_adjusts_slow_drift (
+    void **state)
+{
+    struct sim_timer_throttle_test_state before;
+    struct sim_timer_throttle_test_state after;
+
+    (void)state;
+
+    sim_timer_reset_initialized_host_timing ();
+    assert_int_equal (sim_set_throt (1, "1M"), SCPE_OK);
+    simh_test_clock_auto_step_msec = 1;
+    assert_int_equal (sim_throt_svc (&sim_throttle_unit), SCPE_OK);
+    simh_test_clock_auto_step_msec = 100;
+    sim_timer_process_due_throttle_event (0);
+    before = sim_timer_throttle_state ();
+    assert_int_equal (before.state, SIM_THROT_STATE_THROTTLE);
+
+    simh_test_clock_auto_step_msec = 10000;
+    sim_timer_process_due_throttle_event (0);
+
+    after = sim_timer_throttle_state ();
+    assert_int_equal (after.state, SIM_THROT_STATE_THROTTLE);
+    assert_int_equal (after.sleep_time, before.sleep_time);
+    assert_true (after.wait > before.wait);
+    assert_float_equal (after.cps, 1000000.0, 0.000001);
+}
+
+/* Verify dynamic throttling recomputes its wait from the known peak rate when
+   periodic recalibration observes execution far above the desired rate. */
+static void test_sim_throt_svc_dynamic_throttle_recovers_fast_drift (
+    void **state)
+{
+    struct sim_timer_throttle_test_state before;
+    struct sim_timer_throttle_test_state after;
+
+    (void)state;
+
+    sim_timer_start_calibrated_dynamic_throttle ("9K", 1000);
+    before = sim_timer_throttle_state ();
+    assert_int_equal (before.wait, 90);
+
+    simh_test_clock_auto_step_msec = 10000;
+    sim_timer_process_due_throttle_event (1000000);
+
+    after = sim_timer_throttle_state ();
+    assert_int_equal (after.state, SIM_THROT_STATE_THROTTLE);
+    assert_float_equal (after.peak_cps, before.peak_cps, 0.000001);
+    assert_float_equal (after.cps, 9000.0, 0.000001);
+    assert_int_equal (after.sleep_time, before.sleep_time);
+    assert_true (after.ms_start > before.ms_start);
+    assert_true (after.wait >= SIM_THROT_WMIN);
+}
+
+/* Verify fixed-period throttling records the observed instruction rate during
+   its periodic ten-second refresh without changing throttle mode. */
+static void test_sim_throt_svc_specific_mode_records_periodic_rate (
+    void **state)
+{
+    struct sim_timer_throttle_test_state throttle;
+
+    (void)state;
+
+    sim_timer_reset_initialized_host_timing ();
+    assert_int_equal (sim_set_throt (1, "50000/2"), SCPE_OK);
+    simh_test_clock_auto_step_msec = 1;
+    sim_throt_sched ();
+    simh_test_clock_auto_step_msec = 10000;
+
+    sim_timer_process_due_throttle_event (0);
+
+    throttle = sim_timer_throttle_state ();
+    assert_int_equal (throttle.type, SIM_THROT_SPC);
+    assert_int_equal (throttle.state, SIM_THROT_STATE_THROTTLE);
+    assert_int_equal (throttle.sleep_time, 2);
+    assert_int_equal (throttle.wait, 50000);
+    assert_true (throttle.cps > 0.0);
+}
+
+/* Verify the detailed timer report includes calibrated clock, skip counters,
+   catch-up timing, and throttling sections. */
+static void test_sim_show_timers_reports_detailed_timer_state (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+    RTC *rtc = &rtcs[0];
+    char *text;
+    FILE *stream;
+
+    rtc->elapsed = 3;
+    rtc->calibrations = 2;
+    rtc->clock_calib_skip_idle = 1;
+    rtc->clock_calib_backwards = 1;
+    rtc->clock_calib_gap2big = 1;
+    rtc->gtime = 1234.0;
+    rtc->clock_ticks = 4;
+    rtc->clock_ticks_tot = 5;
+    rtc->clock_skew_max = -0.25;
+    rtc->calib_ticks_acked = 6;
+    rtc->calib_ticks_acked_tot = 7;
+    rtc->calib_tick_time = 0.5;
+    rtc->calib_tick_time_tot = 1.0;
+    rtc->clock_catchup_eligible = TRUE;
+    rtc->clock_catchup_base_time = 100.0;
+    rtc->clock_catchup_ticks = 8;
+    rtc->clock_catchup_ticks_curr = 1;
+    rtc->clock_catchup_ticks_tot = 9;
+    rtc->clock_time_idled = 250;
+    assert_int_equal (sim_set_timers (0, "CALIB=50"), SCPE_OK);
+    assert_int_equal (sim_set_idle (NULL, 0, "2", NULL), SCPE_OK);
+    assert_true (sim_idle_enab);
+    assert_int_equal (sim_set_throt (1, "5/2"), SCPE_OK);
+    assert_false (sim_idle_enab);
+    simh_test_clock_values[0] = (struct timespec){.tv_sec = 200,
+                                                  .tv_nsec = 125000000L};
+    simh_test_clock_value_count = 1;
+    sim_time_set_test_hooks (simh_test_clock_gettime_stub, NULL);
+
+    stream = tmpfile ();
+    assert_non_null (stream);
+    assert_int_equal (sim_show_timers (stream, NULL, &fixture->clock_unit, 0,
+                                       NULL),
+                      SCPE_OK);
+    text = sim_timer_read_stream_text (stream);
+
+    assert_non_null (strstr (text, "Throttle:                      5/2"));
+    assert_non_null (strstr (text, "Calibrated Timer:               CLK0"));
+    assert_non_null (
+        strstr (text, "Calibration:                    Skipped when Idle"));
+    assert_non_null (strstr (text, "zimh-unit-sim-timer clock device is CLK0"));
+    assert_non_null (strstr (text, "Calibrated Timer 0:"));
+    assert_non_null (strstr (text, "Calibs Skip While Idle"));
+    assert_non_null (strstr (text, "Calibs Skip Backwards"));
+    assert_non_null (strstr (text, "Calibs Skip Gap Too Big"));
+    assert_non_null (strstr (text, "Peak Clock Skew"));
+    assert_non_null (strstr (text, "Ticks Acked"));
+    assert_non_null (strstr (text, "Catchup Tick Time"));
+    assert_non_null (strstr (text, "Total Time Idled"));
+
+    free (text);
+    fclose (stream);
+}
+
+/* Verify the timer report names the internal calibrated timer fallback. */
+static void test_sim_show_timers_reports_internal_timer_fallback (void **state)
+{
+    char *text;
+    FILE *stream;
+
+    (void)state;
+
+    sim_timer_init_with_deterministic_host_timing ();
+    simh_test_clock_auto_step_msec = 0;
+    sim_register_clock_unit_tmr (NULL, SIM_NTIMERS);
+    sim_start_timer_services ();
+
+    stream = tmpfile ();
+    assert_non_null (stream);
+    assert_int_equal (sim_show_timers (stream, NULL, NULL, 0, NULL), SCPE_OK);
+    text = sim_timer_read_stream_text (stream);
+
+    assert_non_null (
+        strstr (text, "Calibrated Timer:               Internal Timer"));
+    assert_non_null (strstr (text, "Catchup Ticks:"));
+
+    free (text);
+    fclose (stream);
+}
+
+/* Verify the timer report describes enabled idling and always-on
+   calibration. */
+static void test_sim_show_timers_reports_idle_status (void **state)
+{
+    char *text;
+    FILE *stream;
+
+    (void)state;
+
+    sim_timer_init_with_deterministic_host_timing ();
+    simh_test_clock_auto_step_msec = 0;
+    assert_int_equal (sim_set_timers (0, "CATCHUP,CALIB=ALWAYS"), SCPE_OK);
+    assert_int_equal (sim_set_idle (NULL, 0, "3", NULL), SCPE_OK);
+
+    stream = tmpfile ();
+    assert_non_null (stream);
+    assert_int_equal (sim_show_timers (stream, NULL, NULL, 0, NULL), SCPE_OK);
+    text = sim_timer_read_stream_text (stream);
+
+    assert_non_null (strstr (text, "Idling:                         Enabled"));
+    assert_non_null (
+        strstr (text, "Time before Idling starts:      3 seconds"));
+    assert_non_null (strstr (text, "Calibration:                    Always"));
+
+    free (text);
+    fclose (stream);
+}
+
+/* Verify SET CLOCK STOP schedules the internal stop unit and rejects times
+   that are not in the future. */
+static void test_sim_set_timers_stop_schedules_stop_unit (void **state)
+{
+    int stop_time;
+    int expected_delay;
+    char stop_spec[32];
+
+    (void)state;
+
+    sim_timer_init_with_deterministic_host_timing ();
+    simh_test_clock_auto_step_msec = 0;
+    stop_time = (int)sim_gtime () + 100;
+    expected_delay = stop_time - (int)sim_gtime ();
+
+    assert_int_equal (SCPE_BARE_STATUS (sim_set_timers (0, "STOP=0")),
+                      SCPE_ARG);
+    assert_true (snprintf (stop_spec, sizeof (stop_spec), "STOP=%d",
+                           stop_time) < (int)sizeof (stop_spec));
+    assert_int_equal (sim_set_timers (0, stop_spec), SCPE_OK);
+    assert_true (sim_is_active (&sim_stop_unit));
+    assert_int_equal (sim_activate_time (&sim_stop_unit), expected_delay + 1);
+    assert_int_equal (sim_stop_unit.action (&sim_stop_unit), SCPE_STOP);
+}
+
+/* Verify public clock registration handles invalid timer numbers and migrates
+   coscheduled entries when a clock unit is deregistered. */
+static void test_sim_register_clock_unit_migrates_coscheduled_work (
+    void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    assert_int_equal (
+        sim_register_clock_unit_tmr (&fixture->target_unit, -1), SCPE_IERR);
+    assert_int_equal (sim_clock_coschedule_tmr (&fixture->target_unit, 0, 3),
+                      SCPE_OK);
+
+    assert_int_equal (sim_register_clock_unit_tmr (NULL, 0), SCPE_OK);
+
+    assert_null (rtcs[0].clock_unit);
+    assert_ptr_equal (rtcs[0].clock_cosched_queue, QUEUE_LIST_END);
+    assert_false (fixture->clock_unit.dynflags & UNIT_TMR_UNIT);
+    assert_true (sim_is_active (&fixture->target_unit));
+    assert_null (fixture->target_unit.cancel);
+    assert_true (fixture->target_unit.usecs_remaining > 0.0);
+}
+
+/* Verify the public timer activation wrapper converts instruction delay
+   through the calibrated execution rate before queuing. */
+static void test_sim_timer_activate_wrapper_converts_interval_to_usecs (
+    void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    sim_is_running = TRUE;
+    assert_int_equal (sim_timer_activate (&fixture->target_unit, 50), SCPE_OK);
+
+    assert_true (sim_is_active (&fixture->target_unit));
+    assert_int_equal (fixture->target_unit.time, 50);
+    assert_float_equal (sim_timer_activate_time_usecs (&fixture->target_unit),
+                        5000.0, 0.000001);
 }
 
 /* Verify idle and catchup show/set helpers emit their current user-facing
@@ -917,6 +1665,17 @@ int main(void)
             setup_sim_timer_activation_fixture,
             teardown_sim_timer_activation_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_rtcn_init_all_reinitializes_saved_timers,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_start_timer_services_uses_internal_timer_without_clock,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_stop_timer_services_migrates_clock_queues,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_rom_read_with_delay_accepts_high_bit_words,
             setup_sim_timer_fixture, teardown_sim_timer_fixture),
         cmocka_unit_test_setup_teardown(
@@ -952,6 +1711,22 @@ int main(void)
             setup_sim_timer_activation_fixture,
             teardown_sim_timer_activation_fixture),
         cmocka_unit_test_setup_teardown(
+            test_sim_rtcn_tick_ack_enables_catchup_tracking,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_rtcn_calb_counts_pending_catchup_tick,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_timer_tick_svc_dispatches_coscheduled_work,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_timer_tick_svc_rejects_missing_clock_action,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
             test_sim_show_clock_queues_reports_coscheduled_entries,
             setup_sim_timer_activation_fixture,
             teardown_sim_timer_activation_fixture),
@@ -968,6 +1743,65 @@ int main(void)
         cmocka_unit_test_setup_teardown(
             test_sim_set_idle_validates_stability_range,
             setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_set_throt_validates_and_reports_modes,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_throt_sched_and_cancel_manage_internal_unit,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_throt_svc_specific_mode_sleeps_and_reschedules,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_throt_svc_dynamic_modes_enter_timing_state,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_throt_svc_dynamic_time_state_calibrates_wait,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_throt_svc_dynamic_time_state_retries_short_sample,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_throt_svc_dynamic_time_state_disables_too_fast_cpu,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_throt_svc_dynamic_time_state_disables_slow_cpu,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_throt_svc_calibrated_startup_uses_peak_rate,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_throt_svc_dynamic_throttle_adjusts_slow_drift,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_throt_svc_dynamic_throttle_recovers_fast_drift,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_throt_svc_specific_mode_records_periodic_rate,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_show_timers_reports_detailed_timer_state,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_show_timers_reports_internal_timer_fallback,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_show_timers_reports_idle_status,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_set_timers_stop_schedules_stop_unit,
+            setup_sim_timer_fixture, teardown_sim_timer_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_register_clock_unit_migrates_coscheduled_work,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_timer_activate_wrapper_converts_interval_to_usecs,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_timer_set_and_show_helpers,
             setup_sim_timer_fixture, teardown_sim_timer_fixture),

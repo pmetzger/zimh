@@ -50,13 +50,36 @@ typedef struct RTC {
     uint32 clock_calib_backwards;    /* calibrations skipped: clock backwards */
 } RTC;
 
+/* Test-only snapshot of private throttle state-machine internals. */
+struct sim_timer_throttle_test_state {
+    uint32 ms_start;
+    uint32 ms_stop;
+    uint32 type;
+    uint32 val;
+    uint32 state;
+    double cps;
+    double peak_cps;
+    double inst_start;
+    uint32 sleep_time;
+    int32 wait;
+};
+
 extern RTC rtcs[SIM_NTIMERS + 1];
 extern UNIT sim_timer_units[SIM_NTIMERS + 1];
+extern UNIT sim_stop_unit;
+extern UNIT sim_internal_timer_unit;
+extern UNIT sim_throttle_unit;
+extern int32 sim_internal_timer_time;
 
 /* Restore timer globals to startup-like defaults for isolated unit tests.
    Production code should use the normal timer lifecycle APIs instead. */
 void sim_timer_reset_test_state(void);
 
+/* Snapshot throttle internals for deterministic state-machine tests. */
+void sim_timer_get_throttle_test_state(
+    struct sim_timer_throttle_test_state *state);
+
+t_stat sim_throt_svc(UNIT *uptr);
 t_stat sim_timer_show_catchup(FILE *st, UNIT *uptr, int32 val,
                               const void *desc);
 
