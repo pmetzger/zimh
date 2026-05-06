@@ -25,6 +25,7 @@ set(SIM_SOURCES
     ${SIMH_RUNTIME_ROOT}/sim_serial.c
     ${SIMH_RUNTIME_ROOT}/sim_sock.c
     ${SIMH_RUNTIME_ROOT}/sim_tape.c
+    ${SIMH_RUNTIME_ROOT}/sim_tape_testlib.c
     ${SIMH_RUNTIME_ROOT}/sim_tempfile.c
     ${SIMH_RUNTIME_ROOT}/sim_time.c
     ${SIMH_RUNTIME_ROOT}/sim_timer.c
