@@ -41,8 +41,10 @@
    28-May-08    RMS     Inlined physical memory routines
 */
 
-#include "vax_defs.h"
 #include <ctype.h>
+#include <stdbool.h>
+
+#include "vax_defs.h"
 
 #define BLK_SIZE        256                             /* RT11 block size */
 
@@ -82,7 +84,7 @@ extern UNIT fl_unit;
 t_bool rtfile_parse (char *pntr, uint16 *file_name);
 uint32 rtfile_lookup (uint16 *file_name, uint32 *start);
 uint32 rtfile_ator50 (uint32 ascii);
-t_bool rtfile_read (uint32 block, uint32 count, uint16 *buffer);
+bool rtfile_read (uint32 block, uint32 count, uint16 *buffer);
 uint32 rtfile_find (uint32 block, uint32 sector);
 
 /* FLOAD file_name {file_origin} */
@@ -211,7 +213,7 @@ return 0;
 
 /* Read blocks */
 
-t_stat rtfile_read (uint32 block, uint32 count, uint16 *buffer)
+bool rtfile_read (uint32 block, uint32 count, uint16 *buffer)
 {
 uint32 i, j;
 uint32 pos;
@@ -221,13 +223,13 @@ for (; count > 0; count--, block++) {
     for (i = 0; i < 4; i++) {                           /* 4 sectors/block */
         pos = rtfile_find (block, i);                   /* position */
         if ((pos + 128) >= (uint32) fl_unit.capac)      /* off end of disk? */
-            return FALSE;
+            return false;
         for (j = 0; j < 128; j = j + 2)                 /* copy 128 bytes */
             *buffer++ = (((uint16) fbuf[pos + j + 1]) << 8) |
                 ((uint16) fbuf[pos + j]);
         }
     }
-return TRUE;
+return true;
 }
 
 /* Map an RT-11 block number to a physical byte number */

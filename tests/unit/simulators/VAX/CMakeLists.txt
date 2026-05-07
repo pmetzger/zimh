@@ -51,3 +51,17 @@ add_unit_test(unit-vax-va-dma-behavior
         VAX_630
     FEATURE_FULL64
 )
+
+add_unit_test(unit-vax780-fload
+    LABEL unit
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_vax780_fload.c
+        ${PROJECT_SOURCE_DIR}/simulators/VAX/vax780_fload.c
+    INCLUDES
+        ${PROJECT_SOURCE_DIR}/simulators/VAX
+        ${PROJECT_SOURCE_DIR}/simulators/PDP11
+    DEFINES
+        VM_VAX
+        VAX_780
+    FEATURE_FULL64
+)
