@@ -136,7 +136,10 @@
         i1401_sys.c     add sim_devices table entry
 */
 
+#include <stdbool.h>
+
 #include "i1401_defs.h"
+#include "i1401_bool_internal.h"
 #include "i1401_dat.h"
 
 #define PCQ_SIZE        64                              /* must be 2**n */
@@ -206,7 +209,7 @@ int32 iochk = 0;                                        /* I/O check stop */
 int32 hst_p = 0;                                        /* history pointer */
 int32 hst_lnt = 0;                                      /* history length */
 InstHistory *hst = NULL;                                /* instruction history */
-t_bool conv_old = 0;                                    /* old conversions */
+bool conv_old = false;                                  /* old conversions */
 
 extern int32 sim_emax;
 
@@ -1987,7 +1990,7 @@ t_stat cpu_set_conv (UNIT *uptr, int32 val, const char *cptr, void *desc)
 (void) cptr;
 (void) desc;
 
-conv_old = val;
+conv_old = i1401_set_modifier_enabled(val);
 return SCPE_OK;
 }
 

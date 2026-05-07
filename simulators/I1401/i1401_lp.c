@@ -39,7 +39,6 @@
 
 extern uint8 M[];
 extern int32 iochk, ind[64];
-extern t_bool conv_old;
 
 int32 cct[CCT_LNT] = { 03 };
 int32 cctlnt = 66, cctptr = 0, lines = 0, lflag = 0;

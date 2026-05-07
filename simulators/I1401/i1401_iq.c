@@ -32,8 +32,11 @@
    14-Apr-99    RMS     Changed t_addr to unsigned
 */
 
-#include "i1401_defs.h"
 #include <ctype.h>
+#include <stdbool.h>
+
+#include "i1401_defs.h"
+#include "i1401_bool_internal.h"
 
 #define UNIT_V_PCH      (UNIT_V_UF + 0)                 /* output conv */
 #define UNIT_PCH        (1 << UNIT_V_PCH)
@@ -41,7 +44,6 @@
 extern uint8 M[];
 extern int32 BS, iochk, ind[64];
 extern UNIT cpu_unit;
-extern t_bool conv_old;
 
 int32 inq_char = 033;                                   /* request inq */
 t_stat inq_svc (UNIT *uptr);
@@ -87,7 +89,7 @@ DEVICE inq_dev = {
 t_stat inq_io (int32 flag, int32 mod)
 {
 int32 i, t, wm_seen = 0;
-t_bool use_h = inq_unit.flags & UNIT_PCH;
+bool use_h = i1401_mask_is_set(inq_unit.flags, UNIT_PCH);
 
 ind[IN_INC] = 0;                                        /* clear inq clear */
 switch (mod) {                                          /* case on mod */

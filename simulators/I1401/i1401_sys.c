@@ -41,8 +41,11 @@
    27-Oct-98    RMS     V2.4 load interface
 */
 
-#include "i1401_defs.h"
 #include <ctype.h>
+#include <stdbool.h>
+
+#include "i1401_defs.h"
+#include "i1401_bool_internal.h"
 
 #define LINE_LNT        80
 extern DEVICE cpu_dev, inq_dev, lpt_dev;
@@ -54,7 +57,6 @@ extern uint8 M[];
 extern int32 store_addr_h (int32 addr);
 extern int32 store_addr_t (int32 addr);
 extern int32 store_addr_u (int32 addr);
-extern t_bool conv_old;
 
 /* SCP data structures and interface routines
 
@@ -204,7 +206,7 @@ return;
 static t_stat dcw (FILE *of, int32 op, t_value *val, int32 sw)
 {
 int32 i;
-t_bool use_h = sw & SWMASK ('F');
+bool use_h = i1401_fortran_conversion_switch_requested(sw);
 
 fprintf (of, "DCW @%c", bcd2ascii (op, use_h));         /* assume it's data */
 for (i = 1; i < sim_emax; i++) {
@@ -240,7 +242,7 @@ t_stat fprint_sym (FILE *of, t_addr addr, t_value *val,
 
 int32 op, flags, ilnt, i, t;
 int32 wmch = conv_old? '~': '`';
-t_bool use_h = sw & SWMASK ('F');
+bool use_h = i1401_fortran_conversion_switch_requested(sw);
 
 if (sw & SWMASK ('C')) {                                /* character? */
     t = val[0];
@@ -302,7 +304,7 @@ fprintf (of, "%s",opcode[op]);                          /* print opcode */
 if (ilnt > 2) {                                         /* A address? */
     if (((flags & IO) || (op == OP_NOP)) && (val[1] == BCD_PERCNT))
         fprintf (of, " %%%c%c", bcd2ascii (val[2], use_h),
-            bcd2ascii (val[3], sw));
+            bcd2ascii (val[3], use_h));
     else fprint_addr (of, &val[1]);
     }
 if (ilnt > 5)                                           /* B address? */
@@ -437,7 +439,7 @@ return -(ilnt - 1);
 
 /* Convert BCD to ASCII */
 
-int32 bcd2ascii (int32 c, t_bool use_h)
+int32 bcd2ascii (int32 c, bool use_h)
 {
 if (conv_old)
     return bcd_to_ascii_old[c];

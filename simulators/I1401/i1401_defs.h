@@ -43,6 +43,8 @@
 #ifndef I1401_DEFS_H_
 #define I1401_DEFS_H_  0
 
+#include <stdbool.h>
+
 #include "sim_defs.h"
 
 #if defined(USE_INT64) || defined(USE_ADDR64)
@@ -299,7 +301,9 @@
 
 /* Function prototypes */
 
-int32 bcd2ascii (int32 c, t_bool use_h);
+extern bool conv_old;
+
+int32 bcd2ascii (int32 c, bool use_h);
 int32 ascii2bcd (int32 c);
 t_stat read_card (int32 ilnt, int32 mod);
 t_stat punch_card (int32 ilnt, int32 mod);

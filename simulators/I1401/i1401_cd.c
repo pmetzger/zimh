@@ -88,8 +88,11 @@
                             if DFLT, clear ATTABLE
 */
 
-#include "i1401_defs.h"
 #include <ctype.h>
+#include <stdbool.h>
+
+#include "i1401_defs.h"
+#include "i1401_bool_internal.h"
 
 #define UNIT_V_PCH      (UNIT_V_UF + 0)                 /* output conv */
 #define UNIT_PCH        (1 << UNIT_V_PCH)
@@ -98,7 +101,6 @@
 
 extern uint8 M[];
 extern int32 ind[64], ssa, iochk;
-extern int32 conv_old;
 
 int32 s1sel, s2sel, s4sel, s8sel;
 char cdr_buf[(2 * CBUFSIZE) + 1];                       /* > CDR_WIDTH */
@@ -319,13 +321,13 @@ return SCPE_OK;
 t_stat punch_card (int32 ilnt, int32 mod)
 {
 int32 i, cbn, c1, c2;
-t_bool use_h;
+bool use_h;
 t_stat r;
 
 r = cdp_npr (NULL, 0, NULL, NULL);                      /* write card */
 if (r != SCPE_OK)
     return r;
-use_h = cdp_unit.flags & UNIT_PCH;
+use_h = i1401_mask_is_set(cdp_unit.flags, UNIT_PCH);
 ind[IN_PNCH] = s4sel = s8sel = 0;                       /* clear flags */
 cbn = ((ilnt == 2) || (ilnt == 5)) && (mod == BCD_C);   /* col binary? */
 
