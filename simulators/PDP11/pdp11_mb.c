@@ -31,8 +31,6 @@ t_stat mb_wr(int32 data, int32 PA, int32 access);
 t_stat mb_reset(DEVICE *dptr);
 const char *mb_description (DEVICE *dptr);
 
-#define HSIZE 64
-
 static uint16 MBCSR;
 static uint16 MBXHGH;
 static uint16 MBXLOW;
@@ -41,7 +39,20 @@ static uint16 MBYLOW;
 static uint16 MBHHGH;
 static uint16 MBHLOW;
 static uint16 MBHCNT;
+
+/*
+ * TODO: Implement MB11 MAR history memory.  The MB11 includes a 64-entry
+ * MAR history memory, but this simulator currently only exposes the MB11
+ * registers and I/O entry points.  Correct history support requires hooks in
+ * the PDP-11 memory access path so that reads and writes are recorded with
+ * the same ordering as MMU relocation, traps, breakpoints, and I/O page
+ * accesses.  Leave the storage disabled until that device behavior is
+ * implemented and tested from documentation.
+ */
+#if 0
+#define HSIZE 64
 static uint32 history[HSIZE];
+#endif
 
 /* BITS IN MBCSR */
 #define MBINTE 0100
