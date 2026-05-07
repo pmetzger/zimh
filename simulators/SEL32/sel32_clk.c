@@ -30,6 +30,7 @@
    38.4 microseconds per count.
 */
 
+#include "sel32_clk_internal.h"
 #include "sel32_defs.h"
 
 #if NUM_DEVS_RTOM > 0
@@ -406,7 +407,8 @@ int32 itm_rdwr(uint32 cmd, int32 cnt, uint32 level)
             cmd, cnt, cnt, temp);
         if (itm_run) {                      /* if we were running save curr cnt */
             /* read timer value */
-            temp = (uint32)(100.0*sim_activate_time_usecs(&itm_unit)/itm_tick_size_x_100);
+            temp = sel32_itm_remaining_counts(
+                sim_activate_time_usecs(&itm_unit), itm_tick_size_x_100);
             sim_debug(DEBUG_CMD, &itm_dev,
                 "Intv 0x%2x temp value %08x (%d)\n", cmd, temp, temp);
             if (itm_strt) {                 /* see if running neg */
@@ -471,7 +473,8 @@ int32 itm_rdwr(uint32 cmd, int32 cnt, uint32 level)
         temp = itm_load;                    /* get last loaded value */
         if (itm_run) {                      /* if we were running save curr cnt */
             /* read timer value */
-            temp = (uint32)(100.0*sim_activate_time_usecs(&itm_unit)/itm_tick_size_x_100);
+            temp = sel32_itm_remaining_counts(
+                sim_activate_time_usecs(&itm_unit), itm_tick_size_x_100);
             sim_debug(DEBUG_CMD, &itm_dev,
                 "Intv 0x%2x temp value %08x (%d)\n", cmd, temp, temp);
             if (itm_strt) {                 /* see if running neg */
@@ -532,7 +535,8 @@ int32 itm_rdwr(uint32 cmd, int32 cnt, uint32 level)
         temp = itm_load;                    /* get last loaded value */
         if (itm_run) {                      /* if we were running save curr cnt */
             /* read timer value */
-            temp = (uint32)(100.0*sim_activate_time_usecs(&itm_unit)/itm_tick_size_x_100);
+            temp = sel32_itm_remaining_counts(
+                sim_activate_time_usecs(&itm_unit), itm_tick_size_x_100);
             sim_debug(DEBUG_CMD, &itm_dev,
                 "Intv 0x%2x read value %08x (%d)\n", cmd, temp, temp);
             if (itm_strt) {                 /* see if running neg */
@@ -551,7 +555,8 @@ int32 itm_rdwr(uint32 cmd, int32 cnt, uint32 level)
         temp = itm_load;                    /* get last loaded value */
         if (itm_run) {                      /* if we were running save curr cnt */
             /* read timer value */
-            temp = (uint32)(100.0*sim_activate_time_usecs(&itm_unit)/itm_tick_size_x_100);
+            temp = sel32_itm_remaining_counts(
+                sim_activate_time_usecs(&itm_unit), itm_tick_size_x_100);
             sim_debug(DEBUG_CMD, &itm_dev,
                 "Intv 0x%2x read value %08x (%d)\n", cmd, temp, temp);
             if (itm_strt) {                 /* see if running neg */
@@ -577,7 +582,8 @@ int32 itm_rdwr(uint32 cmd, int32 cnt, uint32 level)
         temp = itm_load;                    /* get last loaded value */
         if (itm_run) {                      /* if we were running save curr cnt */
             /* read timer value */
-            temp = (uint32)(100.0*sim_activate_time_usecs(&itm_unit)/itm_tick_size_x_100);
+            temp = sel32_itm_remaining_counts(
+                sim_activate_time_usecs(&itm_unit), itm_tick_size_x_100);
             sim_debug(DEBUG_CMD, &itm_dev,
                 "Intv 0x%2x read value %08x (%d)\n", cmd, temp, temp);
             if (itm_strt) {                 /* see if running neg */
@@ -611,7 +617,8 @@ int32 itm_rdwr(uint32 cmd, int32 cnt, uint32 level)
         temp = itm_load;                    /* get last loaded value */
         if (itm_run) {                      /* if we were running save curr cnt */
             /* read timer value */
-            temp = (uint32)(100.0*sim_activate_time_usecs(&itm_unit)/itm_tick_size_x_100);
+            temp = sel32_itm_remaining_counts(
+                sim_activate_time_usecs(&itm_unit), itm_tick_size_x_100);
             sim_debug(DEBUG_CMD, &itm_dev,
                 "Intv 0x%2x read value %08x (%d)\n", cmd, temp, temp);
             if (itm_strt) {                 /* see if running neg */
