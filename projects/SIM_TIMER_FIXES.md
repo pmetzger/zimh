@@ -22,6 +22,20 @@ What is already done:
   clock directly at each call site
 - the stale Windows-side `NEED_CLOCK_GETTIME` shim is gone; Windows
   realtime clock handling now lives in `sim_time.c`
+- `sim_timer.c` has substantial deterministic unit coverage for the
+  non-async timer paths, including:
+  - host time wrapper seams and deadline construction
+  - timer initialization and calibration
+  - catch-up tick bookkeeping
+  - activation and long-delay coscheduling
+  - negative wall-clock activation delay rejection
+  - idle behavior and throttle state-machine behavior
+  - ROM delay word handling
+- the `sim_timer_cancel()` return type now matches its status-style
+  return values
+- `sim_cancel()` now propagates `sim_timer_cancel()` failures for
+  `UNIT_TMR_UNIT` clock units instead of silently treating stale timer
+  markers as normal inactive units
 
 What remains:
 
@@ -49,32 +63,27 @@ Coverage status:
 
 - there is a dedicated unit-test target:
   - `zimh-unit-sim-timer`
-- but it is still only a foothold suite
-- current coverage from that test alone is extremely low:
-  - functions: `6.33%`
-  - lines: `1.68%`
-  - branches: `0.66%`
-- the current tests mostly cover:
-  - `sim_timespec_diff()`
-  - a few default-state helper/query behaviors
-  - the new absolute-deadline helper
-  - `sim_os_msec()` and `sim_os_ms_sleep()` through the shared
-    `sim_time` seam
-- they do not yet cover the real scheduling, calibration, async-clock,
-  or reporting logic
+- the suite is now meaningful for the synchronous timer code rather
+  than just a foothold
+- a recent focused coverage run after the non-async expansion was about:
+  - functions: 88%
+  - lines: 81%
+  - branches: 51%
+- this is enough to support focused changes in the covered paths, but
+  it should not be treated as full coverage of the module
+- the largest remaining coverage gap is the async-clock/timer-thread
+  side, where practical tests probably require additional seams or
+  helper extraction
 
 Testing work that remains:
 
 - deepen unit coverage into meaningful timer behavior, especially:
-  - `sim_os_msec()` / `sim_os_ms_sleep()` behavior through the shared
-    `sim_time` seam
   - the status/reporting paths recently converted away from `ctime()`
-  - calibration and catch-up logic where deterministic coverage is
-    feasible
+  - additional calibration and catch-up edge cases where deterministic
+    coverage is feasible
   - async-clock and timer-thread logic where narrow seams or helper
     extraction can make tests practical
-- do not rely on the current foothold tests as evidence that
-  `sim_timer.c` is well covered; it is not
+- keep adding direct coverage before changing uncovered timer behavior
 
 Structural cleanup ideas:
 
