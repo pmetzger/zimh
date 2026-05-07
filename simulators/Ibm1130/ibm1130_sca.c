@@ -83,8 +83,10 @@
  ******************************************************************************************************************/
 
 #include "ibm1130_defs.h"
+#include "ibm1130_bool_internal.h"
 #include "sim_sock.h"                                       /* include path must include main simh directory */
 #include <ctype.h>
+#include <stdbool.h>
 
 #define DEBUG_SCA_FLUSH         0x0001                      /* debugging options */
 #define DEBUG_SCA_TRANSMIT      0x0002
@@ -168,7 +170,7 @@ static int32  sca_keepalive = 0;                            /* keepalive SYN pac
 static SCA_TIMER_STATE sca_timer_state[3];                  /* current timer state */
 static int    sca_timer_endtime[3];                         /* clocktime when timeout is to occur if state is RUNNING */
 static int    sca_timer_timeleft[3];                        /* time left in msec if state is INHIBITED */
-static t_bool any_timer_running = FALSE;                    /* TRUE if at least one timer is running */
+static bool   any_timer_running = false;                    /* TRUE if at least one timer is running */
 static int    sca_timer_msec[3] = {3000, 1250, 350};        /* timebase in msec for the three timers: 3 sec, 1.25 sec, 0.35 sec */
 static t_bool sca_timer_trigger;                            /* if TRUE, the "timer trigger" is set, the 0.35s timer is running and the 3 sec and 1.25 sec timers are inhibited */
 static int    sca_nsyns  = 0;                               /* number of consecutively sent SYN's */
@@ -445,7 +447,7 @@ static t_stat sca_reset (DEVICE *dptr)
     sca_state = SCA_STATE_IDLE;
     CLRBIT(sca_dsw, SCA_DSW_BUSY | SCA_DSW_AUTOANSWER_ENABLED | SCA_DSW_RECEIVE_RUN | SCA_DSW_READ_RESPONSE | SCA_DSW_WRITE_RESPONSE | SCA_DSW_CHECK | SCA_DSW_TIMEOUT | SCA_DSW_AUTOANSWER_REQUEST);
     sca_timer_state[0] = sca_timer_state[1] = sca_timer_state[2] = SCA_TIMER_INACTIVE;
-    any_timer_running = FALSE;
+    any_timer_running = false;
     sca_timer_trigger = FALSE;
 
     if (sca_unit.flags & UNIT_ATT)                  /* if unit is attached (or listening) */
@@ -697,7 +699,9 @@ static t_stat sca_svc (UNIT *uptr)
         if (timeout)
             sca_interrupt(SCA_DSW_TIMEOUT);
 
-        any_timer_running = (sca_timer_state[0]| sca_timer_state[1] | sca_timer_state[2]) & SCA_TIMER_RUNNING;
+        any_timer_running = ibm1130_any_state_mask_is_set(
+            (uint32)sca_timer_state[0], (uint32)sca_timer_state[1],
+            (uint32)sca_timer_state[2], SCA_TIMER_RUNNING);
     }
 
     if (sca_dsw & SCA_DSW_READY) {              /* if connected */
@@ -838,7 +842,7 @@ static void sca_start_timer (int n, int msec_now)
 {
     sca_timer_state[n]   = SCA_TIMER_RUNNING;
     sca_timer_endtime[n] = sca_timer_msec[n] + msec_now;
-    any_timer_running    = TRUE;
+    any_timer_running    = true;
 #if (DEBUG_SCA & DEBUG_SCA_TIMERS)
     printf("+ SCA_TIMER %d started\n", n);
 #endif
@@ -1025,7 +1029,9 @@ void xio_sca (int32 iocc_addr, int32 func, int32 modify)
                 sca_toggle_timer(TIMER_3S, msec_now);           /* toggle the 3 sec and 1.35 sec timers accordingly */
                 sca_toggle_timer(TIMER_125S, msec_now);
 
-                any_timer_running = (sca_timer_state[0]| sca_timer_state[1] | sca_timer_state[2]) & SCA_TIMER_RUNNING;
+                any_timer_running = ibm1130_any_state_mask_is_set(
+                    (uint32)sca_timer_state[0], (uint32)sca_timer_state[1],
+                    (uint32)sca_timer_state[2], SCA_TIMER_RUNNING);
             }
 
             if (modify & 0x10) {                    /* bit 11 */
@@ -1063,7 +1069,7 @@ void xio_sca (int32 iocc_addr, int32 func, int32 modify)
 #endif
                 sca_state = SCA_STATE_IDLE;
                 sca_timer_state[0] = sca_timer_state[1] = sca_timer_state[2] = SCA_TIMER_INACTIVE;
-                any_timer_running = FALSE;
+                any_timer_running = false;
                 sca_timer_trigger = FALSE;
                 sca_nsyns = 0;                      /* reset SYN suppression */
                 CLRBIT(sca_dsw, SCA_DSW_BUSY);

@@ -2,6 +2,7 @@
 
 #include <ctype.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -22,8 +23,8 @@
 #include "ibm1130_fmt.h"
 
 UNIT cpu_unit = {0};
-int cgi = 0;
-int cgiwritable = 0;
+bool cgi = false;
+bool cgiwritable = false;
 t_bool sim_gui = FALSE;
 uint16 M[MAXMEMSIZE] = {0};
 uint16 ILSW[6] = {0};

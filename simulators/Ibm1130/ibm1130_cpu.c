@@ -148,6 +148,7 @@
  * ------------------------------------------------------------------------ */
 
 #include <stdarg.h>
+#include <stdbool.h>
 
 #include "ibm1130_defs.h"
 
@@ -205,8 +206,8 @@ int32 ibkpt_addr = -1;              /* breakpoint addr */
 t_bool sim_gui = TRUE;              /* enable gui */
 t_bool running = FALSE;             /* TRUE if CPU is running */
 t_bool power   = TRUE;              /* TRUE if CPU power is on */
-t_bool cgi     = FALSE;             /* TRUE if we are running as a CGI program */
-t_bool cgiwritable = FALSE;         /* TRUE if we can write the disk images back to the image file in CGI mode */
+bool cgi     = false;               /* TRUE if we are running as a CGI program */
+bool cgiwritable = false;           /* TRUE if we can write the disk images back to the image file in CGI mode */
 t_bool is_1800 = FALSE;             /* TRUE if we are simulating an IBM 1800 processor */
 t_stat reason;                      /* CPU execution loop control */
 

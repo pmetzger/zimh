@@ -27,9 +27,9 @@
  * Definitions
  * ------------------------------------------------------------------------ */
 
-#include <stdarg.h>
 #include <ctype.h>
 #include <math.h>
+#include <stdarg.h>
 
 #include "ibm1130_defs.h"
 #include "ibm1130res.h"
@@ -104,7 +104,7 @@ extern t_bool program_is_loaded;
 #ifndef GUI_SUPPORT
     /* Non-GUI stubs keep the GUI-facing API available to the simulator.
        These implementations do not use every parameter. */
-    void update_gui (int force)
+    void update_gui (t_bool force)
     {
         (void) force;
     }
@@ -454,7 +454,7 @@ static void RepaintRegion (HWND hWnd, int left, int top, int right, int bottom)
  * reflected instantly.
  * ------------------------------------------------------------------------ */
 
-void update_gui (BOOL force)
+void update_gui (t_bool force)
 {
     int i;
     BOOL state;

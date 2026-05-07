@@ -34,7 +34,9 @@ commands may NOT be accurate. This should probably be fixed.
  */
 
 #include "ibm1130_defs.h"
+#include "ibm1130_bool_internal.h"
 #include <memory.h>
+#include <stdbool.h>
 
 #define TRACE_DMS_IO                /* define to enable debug of DMS phase IO */
 
@@ -83,7 +85,7 @@ static int16 dsk_sec[DSK_NUMDR] = {0};  /* next-sector-up */
 static char dsk_lastio[DSK_NUMDR];      /* last stdio operation: IO_READ or IO_WRITE */
 int32 dsk_swait = 50;                   /* seek time  -- see how short a delay we can get away with */
 int32 dsk_rwait = 50;                   /* rotate time */
-static t_bool raw_disk_debug = FALSE;
+static bool raw_disk_debug = false;
 
 static t_stat dsk_svc    (UNIT *uptr);
 static t_stat dsk_reset  (DEVICE *dptr);
@@ -542,7 +544,7 @@ static t_stat dsk_attach (UNIT *uptr, const char *cptr)
     }
 
     enable_dms_tracing(sim_switches & SWMASK('D'));
-    raw_disk_debug = sim_switches & SWMASK('G');
+    raw_disk_debug = ibm1130_switch_requested(sim_switches, SWMASK('G'));
 
     return SCPE_OK;
 }

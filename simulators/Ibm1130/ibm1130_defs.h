@@ -16,6 +16,7 @@
 #include "sim_console.h"                    /* more SIMH defns (include path should include .., or make a copy) */
 
 #include <setjmp.h>
+#include <stdbool.h>
 #include <stdlib.h>
 
 #ifndef _WIN32
@@ -37,8 +38,6 @@
 /* ------------------------------------------------------------------------ */
 /* Global state */
 
-extern int cgi;                             /* TRUE if we are running as a CGI program */
-extern int cgiwritable;                     /* TRUE if we can write the disk images back to the image file in CGI mode */
 extern t_bool sim_gui;
 
 extern uint16 M[];                          /* core memory, up to 32Kwords (note: don't even think about trying 64K) */
@@ -65,8 +64,8 @@ extern int32  cpu_dsw;                      /* CPU device status word */
 extern int32  con_dsw;                      /* has program stop and int run bits */
 extern t_bool running;
 extern t_bool power;
-extern t_bool cgi;                          /* TRUE if we are running as a CGI program */
-extern t_bool cgiwritable;                  /* TRUE if we can write to the disk image file in CGI mode */
+extern bool cgi;                            /* TRUE if we are running as a CGI program */
+extern bool cgiwritable;                    /* TRUE if we can write to the disk image file in CGI mode */
 extern t_stat reason;                       /* CPU execution loop control */
 
 #define WAIT_OP          1      /* wait state causes: wait instruction, invalid instruction*/
