@@ -222,6 +222,7 @@
 #include <setjmp.h>
 #include <signal.h>
 #include <stdarg.h>
+#include <stdbool.h>
 #include <time.h>
 #if defined(_WIN32)
 #include <fcntl.h>
@@ -584,7 +585,7 @@ static int32 sim_goto_line[MAX_DO_NEST_LVL+1];          /* the current line numb
 static int32 sim_do_echo = 0;                           /* the echo status of the currently open do file */
 static int32 sim_on_inherit = 0;                        /* the inherit status of on state and conditions when executing do files */
 static int32 sim_do_depth = 0;
-static t_bool sim_cmd_echoed = FALSE;                   /* Command was emitted already prior to message output */
+static bool sim_cmd_echoed = false;                     /* Command was emitted already prior to message output */
 static int32 sim_on_check[MAX_DO_NEST_LVL+1];
 static char *sim_on_actions[MAX_DO_NEST_LVL+1][SCPE_MAX_ERR+2];
 #define ON_SIGINT_ACTION (SCPE_MAX_ERR+1)
@@ -2887,7 +2888,7 @@ while (stat != SCPE_EXIT) {                             /* in case exit */
         }
     if (*cptr == 0)                                     /* ignore blank */
         continue;
-    sim_cmd_echoed = TRUE;
+    sim_cmd_echoed = true;
     sim_sub_args (cbuf, sizeof(cbuf), argv);
     if (sim_log)                                        /* log cmd */
         fprintf (sim_log, "%s%s\n", sim_prompt, cptr);
@@ -3449,7 +3450,7 @@ do {
         continue;
     if (echo)                                           /* echo if -v */
         sim_printf("%s> %s\n", do_position(), cptr);
-    sim_cmd_echoed = echo;
+    sim_cmd_echoed = (echo != 0);
     if (*cptr == ':')                                   /* ignore label */
         continue;
     cptr = get_glyph_cmd (cptr, gbuf);                  /* get command glyph */
@@ -3831,7 +3832,9 @@ const char *ap;
 const char *tptr, *gptr;
 REG *rptr;
 
-tptr = (const char *)get_glyph_gen (iptr, optr, mchar, (sim_switches & SWMASK ('I')), TRUE, '\\');
+tptr = (const char *)get_glyph_gen (iptr, optr, mchar,
+                                    ((sim_switches & SWMASK ('I')) != 0),
+                                    TRUE, '\\');
 if ((*optr != '"') && (*optr != '\'')) {
     ap = getenv (optr);
     if (!ap)
@@ -4336,12 +4339,13 @@ t_stat sim_set_asynch (int32 flag, const char *cptr)
 {
 /* Shared command signature.
    This build variant does not use every parameter. */
-(void) flag;
 
 if (cptr && (*cptr != 0))                               /* now eol? */
     return SCPE_2MARG;
 #ifdef SIM_ASYNCH_IO
-if (flag == sim_asynch_enabled)                         /* already set correctly? */
+const bool flag_bool = (flag != 0);
+
+if (flag_bool == sim_asynch_enabled)                    /* already set correctly? */
     return SCPE_OK;
 if (1) {
     uint32 i;
@@ -4353,7 +4357,7 @@ if (1) {
             return sim_messagef (SCPE_ALATT, "Can't change asynch mode with %s device attached\n", dptr->name);
         }
     }
-sim_asynch_enabled = flag;
+sim_asynch_enabled = flag_bool;
 tmxr_change_async ();
 sim_timer_change_asynch ();
 if (1) {
@@ -4377,6 +4381,7 @@ if ((!sim_oline) && sim_log)
     fprintf (sim_log, "Asynchronous I/O %sabled\n", sim_asynch_enabled ? "en" : "dis");
 return SCPE_OK;
 #else
+(void) flag;
 if (!sim_quiet)
     fprintf (stdout, "Asynchronous I/O is not available in this simulator\n");
 if ((!sim_oline) && sim_log)
@@ -5423,7 +5428,7 @@ t_stat show_config (FILE *st, DEVICE *dnotused, UNIT *unotused, int32 flag, cons
 
 size_t i;
 DEVICE *dptr;
-t_bool only_enabled = (sim_switches & SWMASK ('E'));
+bool only_enabled = ((sim_switches & SWMASK ('E')) != 0);
 
 if (NULL != cptr && (*cptr != 0))
     return SCPE_2MARG;
@@ -10045,7 +10050,7 @@ t_stat reason, bare_reason;
 int32 sim_interval_catchup;
 
 if (stop_cpu) {                                         /* stop CPU? */
-    stop_cpu = 0;
+    stop_cpu = false;
     return SCPE_STOP;
     }
 AIO_UPDATE_QUEUE;
@@ -10946,10 +10951,10 @@ char *buf = stackbuf;
 int formatted_len;
 size_t len;
 va_list arglist;
-t_bool inhibit_message = (!sim_show_message || (stat & SCPE_NOMESSAGE));
+const bool inhibit_message = (!sim_show_message || ((stat & SCPE_NOMESSAGE) != 0));
 char msg_prefix[32] = "";
 size_t prefix_len;
-t_bool newline_prefix = (*fmt == '\n');
+const bool newline_prefix = (*fmt == '\n');
 
 if ((stat == SCPE_OK) && (sim_quiet || (sim_switches & SWMASK ('Q'))))
     return stat;
@@ -10991,7 +10996,7 @@ while (1) {                                         /* format passed string, arg
 if (sim_do_ocptr[sim_do_depth]) {
     if (!sim_do_echo && !inhibit_message && !sim_cmd_echoed) {
         sim_printf("%s> %s\n", do_position(), sim_do_ocptr[sim_do_depth]);
-        sim_cmd_echoed = TRUE;
+        sim_cmd_echoed = true;
         }
     else {
         if (sim_deb) {                      /* Always put context in debug output */

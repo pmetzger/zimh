@@ -399,7 +399,7 @@ static const char *get_glyph_exp(const char *cptr, char *buf, Operator **oper,
     } else {
         if ((*cptr == '"') || (*cptr == '\'')) {
             cptr = (const char *)get_glyph_gen(
-                cptr, buf, 0, (sim_switches & SWMASK('I')), TRUE, '\\');
+                cptr, buf, 0, ((sim_switches & SWMASK('I')) != 0), TRUE, '\\');
         } else {
             Operator *op;
 

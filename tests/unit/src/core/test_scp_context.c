@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -8,6 +9,9 @@
 #include "test_scp_fixture.h"
 #include "test_simh_personality.h"
 #include "test_support.h"
+
+extern t_stat show_config(FILE *st, DEVICE *dnotused, UNIT *unotused,
+                          int32 flag, const char *cptr);
 
 struct scp_context_fixture {
     DEVICE disk;
@@ -190,6 +194,35 @@ static void test_find_unit_rejects_disabled_devices(void **state)
     assert_false(qdisable(&fixture->disk));
 }
 
+/* Verify SHOW CONFIGURATION -E filters disabled devices. */
+static void test_show_config_enabled_filter_hides_disabled_devices(void **state)
+{
+    FILE *stream;
+    char *text;
+    size_t text_size;
+    int32 saved_switches;
+
+    (void)state;
+
+    stream = tmpfile();
+    assert_non_null(stream);
+
+    saved_switches = sim_switches;
+    sim_switches = SWMASK('E');
+    assert_int_equal(show_config(stream, NULL, NULL, 0, NULL), SCPE_OK);
+    sim_switches = saved_switches;
+
+    assert_int_equal(simh_test_read_stream(stream, &text, &text_size), 0);
+    fclose(stream);
+
+    assert_non_null(strstr(text, "enabled devices"));
+    assert_non_null(strstr(text, "SYSDISK"));
+    assert_non_null(strstr(text, "READER"));
+    assert_null(strstr(text, "TTY"));
+
+    free(text);
+}
+
 /* Verify internal devices remain available by name but not unit lookup. */
 static void test_internal_devices_do_not_participate_in_find_unit(void **state)
 {
@@ -248,6 +281,9 @@ int main(void)
         cmocka_unit_test_setup_teardown(test_find_unit_rejects_disabled_devices,
                                         setup_scp_context_fixture,
                                         teardown_scp_context_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_show_config_enabled_filter_hides_disabled_devices,
+            setup_scp_context_fixture, teardown_scp_context_fixture),
         cmocka_unit_test_setup_teardown(
             test_internal_devices_do_not_participate_in_find_unit,
             setup_scp_context_fixture, teardown_scp_context_fixture),
