@@ -284,7 +284,7 @@ error:
     return SCPE_FMT;
 }
 
-t_stat sim_load(FILE* fptr, const char* cptr, const char* fnam, t_bool flag)
+t_stat sim_load(FILE* fptr, const char* cptr, const char* fnam, int flag)
 {
     /* Generic loader signature.
        This implementation does not use every parameter. */
