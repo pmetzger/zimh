@@ -667,7 +667,7 @@ return SCPE_OK;
 
 /* Write data sector */
 
-t_bool idc_wds (UNIT *uptr)
+t_stat idc_wds (UNIT *uptr)
 {
 for ( ; idc_bptr < IDC_NUMBY; idc_bptr++)
     idcxb[idc_bptr] = idc_db;                           /* fill with last */
@@ -678,7 +678,7 @@ if (ferror (uptr->fileref)) {                           /* error? */
     idc_done (STC_DTE);
     return SCPE_IOERR;
     }
-return FALSE;
+return SCPE_OK;
 }
 
 /* Data transfer error test routine */
