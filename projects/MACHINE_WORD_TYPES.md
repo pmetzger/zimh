@@ -46,6 +46,14 @@ The ECLIPSE floating-point accumulator notes describe the same class of
 problem for guest register images that are manipulated as encoded bits
 but stored in signed host types.
 
+The SEL32 CAMx compare path exposed the opposite side of the same rule:
+the raw operands are machine words or doublewords, but the instruction
+needs a signed comparison.  The right shape is to keep the register
+images in unsigned word containers and make the signed interpretation
+explicit at the comparison point.  Same-width signed subtraction is not
+a safe substitute for signed ordering because the difference can
+overflow even when the ordering result is well-defined.
+
 ## Process
 
 Work one subsystem at a time, following `projects/UB_PROCESS.md`:
