@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 
 #include "test_cmocka.h"
@@ -54,11 +55,25 @@ static void test_eth_dev_command_formatting(void **state)
     assert_int_equal(eth_test_dev_command_format(), SCPE_OK);
 }
 
+static void test_eth_reader_thread_async_flag_is_bool(void **state)
+{
+    ETH_DEV dev = {0};
+
+    (void)state;
+
+    assert_false(dev.asynch_io);
+    dev.asynch_io = true;
+    assert_true(dev.asynch_io);
+    dev.asynch_io = false;
+    assert_false(dev.asynch_io);
+}
+
 int main(void)
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_eth_mac_scan_generated_prefix_lengths),
         cmocka_unit_test(test_eth_dev_command_formatting),
+        cmocka_unit_test(test_eth_reader_thread_async_flag_is_bool),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

@@ -45,6 +45,8 @@
 #ifndef SIM_ETHER_H
 #define SIM_ETHER_H
 
+#include <stdbool.h>
+
 #include "sim_defs.h"
 #include "sim_sock.h"
 
@@ -277,7 +279,7 @@ struct eth_device {
   uint32        throttle_packet_time;                   /* time last packet was transmitted */
   uint32        throttle_count;                         /* Total Throttle Delays */
 #if defined (USE_READER_THREAD)
-  int           asynch_io;                              /* Asynchronous Interrupt scheduling enabled */
+  bool          asynch_io;                              /* Asynchronous Interrupt scheduling enabled */
   int           asynch_io_latency;                      /* instructions to delay pending interrupt */
   ETH_QUE       read_queue;
   pthread_mutex_t     lock;

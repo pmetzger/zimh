@@ -342,6 +342,7 @@
 */
 
 #include <ctype.h>
+#include <stdbool.h>
 #include "sim_ether.h"
 #include "sim_sock.h"
 #include "sim_time.h"
@@ -2103,7 +2104,7 @@ return sim_messagef (SCPE_NOFNC, "%s", msg);
 
 int wakeup_needed;
 
-dev->asynch_io = sim_asynch_enabled;
+dev->asynch_io = (sim_asynch_enabled != 0);
 dev->asynch_io_latency = latency;
 pthread_mutex_lock (&dev->lock);
 wakeup_needed = (dev->read_queue.count != 0);
@@ -2133,7 +2134,7 @@ return SCPE_NOFNC;
 /* make sure device exists */
 if (!dev) return SCPE_UNATT;
 
-dev->asynch_io = 0;
+dev->asynch_io = false;
 return SCPE_OK;
 #endif
 }
