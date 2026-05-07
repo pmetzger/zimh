@@ -199,6 +199,9 @@ load_ptr (FILE *fileref)
     if (addr == 0177777)
       return SCPE_OK;
 
+    if (verbose)
+      sim_messagef (SCPE_OK, "Address %06o: %d words.\n", addr, count);
+
     csum = 0;
     for (i = 0; i < count; i++) {
       if (get_word (fileref, &x) != SCPE_OK)
