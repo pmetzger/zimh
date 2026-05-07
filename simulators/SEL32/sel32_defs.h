@@ -21,6 +21,10 @@
    CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 */
+
+#ifndef SEL32_DEFS_H_
+#define SEL32_DEFS_H_ 0
+
 /********************Attention************************/
 /* define the environment wanted for sel32 execution */
 /*                                                   */
@@ -715,3 +719,5 @@ extern  char *dump_buf(uint8 *mp, int32 off, int cnt);
 #define RMR(a) sel32_read_halfword_from(MAPC, (a))
 /* write halfword map register to MAP cache address */
 #define WMR(a,d) sel32_write_halfword_to(MAPC, (a), (d))
+
+#endif
