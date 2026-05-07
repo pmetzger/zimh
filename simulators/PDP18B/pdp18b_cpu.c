@@ -280,7 +280,7 @@
         pdp18b_sys.c    add sim_devices table entry
 */
 
-#include "pdp18b_defs.h"
+#include "pdp18b_cpu_internal.h"
 
 #define SEXT(x)         ((int32) (((x) & SIGN)? (x) | ~DMASK: (x) & DMASK))
 
@@ -1139,10 +1139,10 @@ while (reason == 0) {                                   /* loop until halted */
 
         switch (((IR >> 8) & 04) | ((IR >> 3) & 03)) {  /* decode IR<7,13:14> */
         case 1:                                         /* RAL */
-            LAC = ((LAC << 1) | (LAC >> 18)) & LACMASK;
+            LAC = pdp18b_lac_rotate_left((uint32)LAC, 1);
             break;
         case 2:                                         /* RAR */
-            LAC = ((LAC >> 1) | (LAC << 18)) & LACMASK;
+            LAC = pdp18b_lac_rotate_right((uint32)LAC, 1);
             break;
         case 3:                                         /* RAL RAR */
 #if defined (PDP15)                                     /* PDP-15 */
@@ -1152,10 +1152,10 @@ while (reason == 0) {                                   /* loop until halted */
 #endif
             break;
         case 5:                                         /* RTL */
-            LAC = ((LAC << 2) | (LAC >> 17)) & LACMASK;
+            LAC = pdp18b_lac_rotate_left((uint32)LAC, 2);
             break;
         case 6:                                         /* RTR */
-            LAC = ((LAC >> 2) | (LAC << 17)) & LACMASK;
+            LAC = pdp18b_lac_rotate_right((uint32)LAC, 2);
             break;
         case 7:                                         /* RTL RTR */
 #if defined (PDP15)                                     /* PDP-15 */
