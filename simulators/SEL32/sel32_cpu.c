@@ -7314,8 +7314,7 @@ mcheck:
             case 5:
             case 6:
             case 7:         /* byte store operation */
-                temp &= ~(0xFF << (8 * (7 - FC)));  /* clear the byte to store */
-                temp |= (uint32)(dest & 0xFF) << (8 * (7 - FC));    /* insert new byte */
+                temp = sel32_replace_word_byte(temp, (uint32)(FC - 4), dest);
                 break;
             }
             /* store back the modified memory location */

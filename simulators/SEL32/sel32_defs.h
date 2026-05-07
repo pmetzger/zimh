@@ -616,6 +616,61 @@ extern  uint32  SPAD[];                 /* cpu SPAD memory */
 extern  uint32  attention_trap;
 extern  int     irq_pend;               /* pending interrupt flag */
 
+/* Return the bit offset for a byte within a big-endian SEL-32 word. */
+static inline uint32
+sel32_byte_shift(uint32 addr)
+{
+    return 8u * (3u - (addr & 3u));
+}
+
+/* Read a byte from a SEL-32 word-addressed memory array. */
+static inline uint32
+sel32_read_byte_from(const uint32 *memory, uint32 addr)
+{
+    return (memory[addr >> 2] >> sel32_byte_shift(addr)) & 0xffu;
+}
+
+/* Replace one byte in a big-endian SEL-32 word. */
+static inline uint32
+sel32_replace_word_byte(uint32 word, uint32 byte_index, uint32 data)
+{
+    uint32 shift = sel32_byte_shift(byte_index);
+    uint32 mask = 0xffu << shift;
+
+    return (word & ~mask) | ((data & 0xffu) << shift);
+}
+
+/* Write a byte into a SEL-32 word-addressed memory array. */
+static inline void
+sel32_write_byte_to(uint32 *memory, uint32 addr, uint32 data)
+{
+    uint32 index = addr >> 2;
+
+    memory[index] = sel32_replace_word_byte(memory[index], addr & 3u, data);
+}
+
+/* Read a halfword from a SEL-32 word-addressed memory array. */
+static inline uint32
+sel32_read_halfword_from(const uint32 *memory, uint32 addr)
+{
+    if (addr & 2u)
+        return memory[addr >> 2] & RMASK;
+    return (memory[addr >> 2] >> 16) & RMASK;
+}
+
+/* Write a halfword into a SEL-32 word-addressed memory array. */
+static inline void
+sel32_write_halfword_to(uint32 *memory, uint32 addr, uint32 data)
+{
+    uint32 index = addr >> 2;
+    uint32 halfword = data & RMASK;
+
+    if (addr & 2u)
+        memory[index] = (memory[index] & LMASK) | halfword;
+    else
+        memory[index] = (memory[index] & RMASK) | (halfword << 16);
+}
+
 #ifdef NOT_USED
 extern  uint32  RDYQ[];                 /* ready queue */
 extern  uint32  RDYQIN;                 /* input index */
@@ -646,19 +701,17 @@ extern  char *dump_buf(uint8 *mp, int32 off, int cnt);
 /* The RMW and WMW macros are used to read/write memory words */
 /* RMW(addr) or WMW(addr, data) where addr is a byte alligned word address */
 
-#define RMB(a) ((M[(a)>>2]>>(8*(3-(a&3))))&0xff)    /* read memory addressed byte */
-#define RMH(a) ((a)&2?(M[(a)>>2]&RMASK):(M[(a)>>2]>>16)&RMASK)    /* read memory addressed halfword */
+#define RMB(a) sel32_read_byte_from(M, (a))  /* read memory addressed byte */
+#define RMH(a) sel32_read_halfword_from(M, (a))  /* read memory halfword */
 #define RMW(a) (M[((a)&MASK24)>>2])     /* read memory addressed word */
 #define WMW(a,d) (M[((a)&MASK24)>>2]=d) /* write memory addressed word */
-/* write halfword to memory address */
-#define WMH(a,d) ((a)&2?(M[(a)>>2]=(M[(a)>>2]&LMASK)|((d)&RMASK)):(M[(a)>>2]=(M[(a)>>2]&RMASK)|((d)<<16)))
-/* write byte to memory */
-#define WMB(a,d) (M[(a)>>2]=(((M[(a)>>2])&(~(0xff<<(8*(3-(a&3))))))|((d&0xff)<<(8*(3-(a&3))))))
+#define WMH(a,d) sel32_write_halfword_to(M, (a), (d))  /* write halfword */
+#define WMB(a,d) sel32_write_byte_to(M, (a), (d))  /* write memory byte */
 
 /* map register access macros */
 /* The RMR and WMR macros are used to read/write the MAPC cache registers */
 /* RMR(addr) or WMR(addr, data) where addr is a half word alligned address */
 /* read map register halfword from cache address */
-#define RMR(a) ((a)&2?(MAPC[(a)>>2]&RMASK):(MAPC[(a)>>2]>>16)&RMASK)
+#define RMR(a) sel32_read_halfword_from(MAPC, (a))
 /* write halfword map register to MAP cache address */
-#define WMR(a,d) ((a)&2?(MAPC[(a)>>2]=(MAPC[(a)>>2]&LMASK)|((d)&RMASK)):(MAPC[(a)>>2]=(MAPC[(a)>>2]&RMASK)|((d)<<16)))
+#define WMR(a,d) sel32_write_halfword_to(MAPC, (a), (d))
