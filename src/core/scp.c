@@ -10300,12 +10300,16 @@ return sim_timer_activate_after (uptr, usec_delay);
 t_stat sim_cancel (UNIT *uptr)
 {
 UNIT *cptr, *nptr;
+t_stat cancel_status;
 
 AIO_VALIDATE(uptr);
 if ((uptr->cancel) && uptr->cancel (uptr))
     return SCPE_OK;
-if (uptr->dynflags & UNIT_TMR_UNIT)
-    sim_timer_cancel (uptr);
+if (uptr->dynflags & UNIT_TMR_UNIT) {
+    cancel_status = sim_timer_cancel (uptr);
+    if (cancel_status != SCPE_OK)
+        return cancel_status;
+    }
 AIO_CANCEL(uptr);
 AIO_UPDATE_QUEUE;
 if (sim_clock_queue == QUEUE_LIST_END)

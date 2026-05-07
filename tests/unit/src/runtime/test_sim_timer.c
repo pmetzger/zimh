@@ -979,6 +979,42 @@ static void test_sim_timer_clock_unit_activation_uses_assist_unit (
     assert_false (sim_timer_is_active (&fixture->clock_unit));
 }
 
+/* Verify sim_cancel delegates registered clock-unit cancellation to the timer
+   assist unit and reports success. */
+static void test_sim_cancel_delegates_registered_clock_unit (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+
+    assert_int_equal (sim_timer_activate_after (&fixture->clock_unit, 1000.0),
+                      SCPE_OK);
+    assert_true (sim_is_active (&fixture->clock_unit));
+    assert_true (sim_is_active (&sim_timer_units[0]));
+
+    assert_int_equal (sim_cancel (&fixture->clock_unit), SCPE_OK);
+
+    assert_false (sim_timer_is_active (&fixture->clock_unit));
+    assert_false (sim_is_active (&sim_timer_units[0]));
+    assert_ptr_equal (sim_clock_queue, QUEUE_LIST_END);
+}
+
+/* Verify a stale timer-unit marker is reported instead of being silently
+   treated as a normal inactive unit. */
+static void test_sim_cancel_reports_stale_timer_unit_marker (void **state)
+{
+    struct sim_timer_activation_fixture *fixture = *state;
+    UNIT stale_timer_unit = {0};
+
+    stale_timer_unit.dptr = &fixture->target_device;
+    stale_timer_unit.dynflags = UNIT_TMR_UNIT;
+    assert_int_equal (sim_activate (&fixture->target_unit, 100), SCPE_OK);
+
+    assert_int_equal (sim_cancel (&stale_timer_unit), SCPE_IERR);
+
+    assert_true (sim_is_active (&fixture->target_unit));
+    assert_int_equal (sim_activate_time (&fixture->target_unit), 101);
+    assert_int_equal (sim_interval, 100);
+}
+
 /* Verify direct activation time helpers report inactive units and active
    standard queue units consistently. */
 static void test_sim_timer_activation_time_queries_standard_queue (
@@ -2045,6 +2081,14 @@ int main(void)
             teardown_sim_timer_activation_fixture),
         cmocka_unit_test_setup_teardown(
             test_sim_timer_clock_unit_activation_uses_assist_unit,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_cancel_delegates_registered_clock_unit,
+            setup_sim_timer_activation_fixture,
+            teardown_sim_timer_activation_fixture),
+        cmocka_unit_test_setup_teardown(
+            test_sim_cancel_reports_stale_timer_unit_marker,
             setup_sim_timer_activation_fixture,
             teardown_sim_timer_activation_fixture),
         cmocka_unit_test_setup_teardown(
