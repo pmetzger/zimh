@@ -54,6 +54,14 @@ explicit at the comparison point.  Same-width signed subtraction is not
 a safe substitute for signed ordering because the difference can
 overflow even when the ordering result is well-defined.
 
+The SEL32 interval timer path exposed a related device-register case.
+The timer is documented as a 32-bit downcounter that can continue
+counting after zero, but some of the surrounding state is still stored in
+`int32`.  The immediate UB fix explicitly wraps the guest-visible count
+before converting it to `uint32`; the broader audit should decide which
+ITM count, reload, and saved-register values are 32-bit device register
+images and should therefore use unsigned storage and helper interfaces.
+
 ## Process
 
 Work one subsystem at a time, following `projects/UB_PROCESS.md`:
