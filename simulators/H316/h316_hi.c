@@ -164,10 +164,11 @@ REG hi1_reg[] = HI_REG(1), hi2_reg[] = HI_REG(2);
 REG hi3_reg[] = HI_REG(3), hi4_reg[] = HI_REG(4);
 
 // Host Device Modifiers ...
-//  These are the modifiers simh uses for the "SET MIxn" and "SHOW MIx" commands.
+//  These modifiers support the "SET HIn" and "SHOW HIn" commands.
 #define HI_MOD(N) {                                                     \
   { MTAB_XTD|MTAB_VDV, 0, NULL, "CONVERT", &hi_set_convert, &hi_show_convert, NULL },   \
   { MTAB_XTD|MTAB_VDV, 1, NULL, "NOCONVERT", &hi_set_convert, &hi_show_convert, NULL }, \
+  { 0 }                                                                 \
 }
 MTAB hi1_mod[] = HI_MOD(1), hi2_mod[] = HI_MOD(2);
 MTAB hi3_mod[] = HI_MOD(3), hi4_mod[] = HI_MOD(4);
