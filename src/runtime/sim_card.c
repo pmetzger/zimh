@@ -66,6 +66,7 @@
 
 
 #include <ctype.h>
+#include <stdbool.h>
 #include "sim_defs.h"
 #include "sim_card.h"
 
@@ -1248,7 +1249,7 @@ sim_card_attach(UNIT * uptr, const char *cptr)
     char                 gbuf[30];
     unsigned int         i;
     char                *saved_filename;
-    t_bool               was_attached = (uptr->flags & UNIT_ATT);
+    bool                 was_attached = ((uptr->flags & UNIT_ATT) != 0);
     t_addr               saved_pos;
     static int           ebcdic_init = 0;
 
