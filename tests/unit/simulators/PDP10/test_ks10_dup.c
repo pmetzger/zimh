@@ -38,8 +38,11 @@ static void ks10_dup_record_debug_bits(uint32 dbits, DEVICE *dptr,
  * Capture ordinary debug calls so tests can verify that the source uses the
  * flags exposed by the DUP debug table, independently of formatted output.
  */
-static void ks10_dup_record_debug(uint32 dbits, DEVICE *dptr)
+static void ks10_dup_record_debug(uint32 dbits, DEVICE *dptr, const char *fmt,
+                                  ...)
 {
+    (void)fmt;
+
     ++ks10_dup_debug_calls;
     ks10_dup_debug_reason = dbits;
     ks10_dup_debug_device = dptr;
@@ -47,7 +50,7 @@ static void ks10_dup_record_debug(uint32 dbits, DEVICE *dptr)
 
 #undef sim_debug
 #define sim_debug(dbits, dptr, ...)                                            \
-    ks10_dup_record_debug((dbits), (dptr))
+    ks10_dup_record_debug((dbits), (dptr), __VA_ARGS__)
 #define sim_debug_bits ks10_dup_record_debug_bits
 #include "ks10_dup.c"
 #undef sim_debug_bits
