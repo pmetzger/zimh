@@ -23,7 +23,7 @@
 */
 
 /* Handle Class E and F channel I/O operations */
-#include "sel32_defs.h"
+#include "sel32_chan_internal.h"
 
 /* Class E I/O device instruction format */
 /* |-----------+-----------+-----------+-----------+-----------+-----------+-----------+-----------| */
@@ -1038,7 +1038,7 @@ void chan_end(uint16 chsa, uint16 flags) {
             uint16      chsa = GET_UADDR(uptr->u3);
             int         unit = (uptr-dptr->units);  /* get the UNIT number */
             DIB*        dibp = (DIB *)dptr->ctxt;   /* get the DIB pointer */
-            IOCLQ       *qp = &dibp->ioclq_ptr[unit];   /* IOCLQ pointer */
+            IOCLQ       *qp = sel32_ioclq_for_unit(dibp, unit);
             uint32      iocla;
 
             /* we have channel end and no CC flag, end this iocl command */
@@ -1067,9 +1067,8 @@ void chan_end(uint16 chsa, uint16 flags) {
             chp->ccw_cmd = 0;                   /* no command anymore */
 
             if (chp->chan_status & STATUS_ERROR) {  /* check channel error status */
-                qp = &dibp->ioclq_ptr[unit];    /* IOCLQ pointer */
                 /* we have an error, so delete all other IOCLQ entries */
-                while ((dibp->ioclq_ptr != NULL) && (qp != NULL) && IOCLQ_Get(qp, &iocla) == SCPE_OK) {
+                while ((qp != NULL) && IOCLQ_Get(qp, &iocla) == SCPE_OK) {
                     sim_debug(DEBUG_EXP, &cpu_dev,
                         "$$ CHEND removed IOCL from IOCLQ processing chsa %04x iocla %06x\n",
                         chsa, iocla);
@@ -1081,7 +1080,7 @@ void chan_end(uint16 chsa, uint16 flags) {
             /* but the status has not been posted yet nor the interrupt */
             /* starting another I/O confuses the scan_chan code and ends up */
             /* doing an extra interrupt for UTX 05/21/2021 */
-            if ((dibp->ioclq_ptr != NULL) && (qp != NULL) && IOCLQ_Get(qp, &iocla) == SCPE_OK) {
+            if ((qp != NULL) && IOCLQ_Get(qp, &iocla) == SCPE_OK) {
                 /* channel not busy and ready to go, so start a new command */
                 chp->chan_status = 0;           /* no channel status yet */
                 chp->chan_caw = iocla;          /* get iocla address in memory */
@@ -1531,7 +1530,9 @@ missing:
             return SCPE_OK;                     /* just busy or something, CC3|CC4 */
         }
         if (tempa == SNS_SMS) {                 /* see if sub channel status is ready */
-            if (dibp->ioclq_ptr == NULL) {      /* see if device has IOCL queue */
+            IOCLQ *qp = sel32_ioclq_for_unit(dibp, unit);
+
+            if (qp == NULL) {                   /* see if device has IOCL queue */
                 /* The device must be busy or something, but it is not ready.  Return busy */
                 /* This should not happen for SNS_SMS status */
                 sim_debug(DEBUG_XIO, &cpu_dev,
@@ -1540,7 +1541,7 @@ missing:
                 return SCPE_OK;                 /* just busy or something, CC3|CC4 */
             }
             /* device has IOCLQ, queue up the iocla */
-            if (IOCLQ_Put(&dibp->ioclq_ptr[unit], iocla) == -1) {
+            if (IOCLQ_Put(qp, iocla) == -1) {
                 sim_debug(DEBUG_XIO, &cpu_dev,
                     "startxio IOCLQ_Put error return chsa %04x unit %02x\n", chsa, unit);
                 *status = CC3BIT|CC4BIT;        /* sub channel busy, so CC3|CC4 */
@@ -1548,7 +1549,7 @@ missing:
             }
             sim_debug(DEBUG_XIO, &cpu_dev,
                 "startxio IOCLQ_Put call sucessful count %02x chan %04x unit %02x\n",
-                IOCLQ_Num(&dibp->ioclq_ptr[unit]), chan, unit);
+                IOCLQ_Num(qp), chan, unit);
             *status = CC1BIT;                   /* CCs = 1, SIO accepted & queued, no echo status */
             return SCPE_OK;                     /* CC1 all OK  */
         }
@@ -2484,12 +2485,10 @@ t_stat rsctlxio(uint16 lchsa, uint32 *status) { /* reset controller XIO */
 
         uptr = chp->unitptr;                    /* get the unit ptr */
         unit = uptr - dptr->units;              /* get the UNIT number */
-        if (dibp->ioclq_ptr != NULL) {
-            qp = &dibp->ioclq_ptr[unit];        /* IOCLQ pointer */
-            if (qp != NULL) {
-                qp->ioclq_in = 0;               /* clear any entries */
-                qp->ioclq_out = 0;              /* clear any entries */
-            }
+        qp = sel32_ioclq_for_unit(dibp, unit);  /* IOCLQ pointer */
+        if (qp != NULL) {
+            qp->ioclq_in = 0;                   /* clear any entries */
+            qp->ioclq_out = 0;                  /* clear any entries */
         }
 
         /* see if we have a rsctl device entry */

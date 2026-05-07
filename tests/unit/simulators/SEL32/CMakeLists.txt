@@ -6,3 +6,12 @@ add_unit_test(unit-sel32-memory
         ${PROJECT_SOURCE_DIR}/simulators/SEL32
         ${PROJECT_SOURCE_DIR}/tests/unit/support
 )
+
+add_unit_test(unit-sel32-channel
+    LABEL SEL32
+    SOURCES
+        ${CMAKE_CURRENT_SOURCE_DIR}/test_sel32_channel.c
+    INCLUDES
+        ${PROJECT_SOURCE_DIR}/simulators/SEL32
+        ${PROJECT_SOURCE_DIR}/tests/unit/support
+)
