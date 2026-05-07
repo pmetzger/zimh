@@ -1154,6 +1154,10 @@ return SCPE_OK;
 
 t_stat dup_setup_dup (int32 dup, t_bool enable, t_bool protocol_DDCMP, t_bool crc_inhibit, t_bool halfduplex, uint8 station)
 {
+/* Shared helper signature.
+   This implementation does not use every parameter. */
+(void) station;
+
 if ((dup < 0) || (dup >= dup_desc.lines) || (DUPDPTR->flags & DEV_DIS))
     return SCPE_IERR;
 if (!enable) {
