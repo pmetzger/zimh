@@ -203,6 +203,8 @@
  */
 
 
+#include <stdbool.h>
+
 #if defined (VM_PDP10)                                  /* PDP10 version */
 #include "pdp10_defs.h"
 #define IPL_CD          (IPL_CR)                        /* use same for CD */
@@ -432,7 +434,7 @@ static int32    blowerState = BLOW_OFF;                 /* reader vacuum/blower 
 static int32    spinUp = 3000000;                       /* blower spin-up time: 3 seconds (usec) */
 static int32    spinDown = 2000000;                     /* blower spin-down time: 2 seconds (usec) */
 static int      EOFcard = 0;                            /* played special card yet? */
-static t_bool   eofPending = FALSE;                     /* Manual EOF switch pressed */
+static bool     eofPending = false;                     /* Manual EOF switch pressed */
 static int32    cpm = DFLT_CPM;                         /* reader rate: cards per minute */
 static int      schedule_svc=0;                         /* Re-schedule service if true */
 /* card image in various formats */
@@ -667,7 +669,7 @@ static t_bool fileEOF ( UNIT  *uptr,
 
     if (((uptr->flags & UNIT_AUTOEOF) || eofPending) && !ferror(uptr->fileref)) {
         cdst |= CDCSR_EOF;
-        eofPending = FALSE;
+        eofPending = false;
     }
     return (FALSE);
 }
@@ -1328,7 +1330,7 @@ readFault:
             cdst |= (CDCSR_RDRCHK | CSR_ERR | CDCSR_OFFLINE | CDCSR_HOPPER);
             if (eofPending) {
                 cdst |= CDCSR_EOF;
-                eofPending = FALSE;
+                eofPending = false;
             }
         }
 
@@ -1805,7 +1807,7 @@ t_stat cr_set_eof (    UNIT    *uptr,
 
     if (DEBUG_PRS (cr_dev))
         fprintf (sim_deb, "set_eof\n");
-    eofPending = 1;
+    eofPending = true;
 
     return (SCPE_OK);
 }
