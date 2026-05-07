@@ -98,6 +98,8 @@
    17-Dec-01    RMS     Added queue process
 */
 
+#include <stdbool.h>
+
 #if defined (VM_PDP10)                                  /* PDP10 version */
 #error "RQDX3 not supported on PDP-10!"
 
@@ -3313,11 +3315,11 @@ t_stat rq_attach (UNIT *uptr, const char *cptr)
 {
 MSC *cp = rq_ctxmap[uptr->cnum];
 t_stat r;
-t_bool dontchangecapac = (uptr->flags & UNIT_NOAUTO);
+bool dontchangecapac = ((uptr->flags & UNIT_NOAUTO) != 0);
 
 if (drv_tab[GET_DTYPE (uptr->flags)].flgs & RQDF_RO) {
     sim_switches |= SWMASK ('R');
-    dontchangecapac = FALSE;
+    dontchangecapac = false;
     }
 r = sim_disk_attach_ex (uptr, cptr, RQ_NUMBY, sizeof (uint16), dontchangecapac, DBG_DSK,
                         drv_tab[GET_DTYPE (uptr->flags)].name, 0, 0, (uptr->flags & UNIT_NOAUTO) ? NULL : drv_types);
