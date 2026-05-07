@@ -94,7 +94,7 @@ gw(FILE *f)
  */
 
 t_stat
-sim_load(FILE *f, const char *buf, const char *fnam, t_bool flag)
+sim_load(FILE *f, const char *buf, const char *fnam, int flag)
 {
         /* Generic loader signature.
            This implementation does not use every parameter. */
