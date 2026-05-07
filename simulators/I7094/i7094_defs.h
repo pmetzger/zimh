@@ -493,7 +493,7 @@ t_stat ch6_end_nds (uint32 ch);
 uint32 ch6_set_flags (uint32 ch, uint32 unit, uint32 flags);
 t_stat ch6_err_disc (uint32 ch, uint32 unit, uint32 flags);
 t_stat ch6_req_rd (uint32 ch, uint32 unit, t_uint64 val, uint32 flags);
-t_stat ch6_req_wr (uint32 ch, uint32 unit);
+void ch6_req_wr (uint32 ch, uint32 unit);
 t_bool ch6_qconn (uint32 ch, uint32 unit);
 t_stat ch_op_ds (uint32 ch, uint32 ds, uint32 unit);
 t_stat ch_op_nds (uint32 ch, uint32 nds, uint32 unit);

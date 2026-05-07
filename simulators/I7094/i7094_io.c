@@ -1410,13 +1410,13 @@ return SCPE_OK;
 
 /* Output - request channel output service */
 
-t_bool ch6_req_wr (uint32 ch, uint32 unit)
+void ch6_req_wr (uint32 ch, uint32 unit)
 {
 if (ch6_qconn (ch, unit)) {                             /* ch conn to caller? */
     ch_req |= REQ_CH (ch);
     ch_flags[ch] &= ~CHF_RDS;
     }
-return SCPE_OK;
+return;
 }
 
 /* Set/read channel flags */
