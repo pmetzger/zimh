@@ -26,6 +26,8 @@
    vc          Monochrome video
 */
 
+#include <stdbool.h>
+
 #include "vax_defs.h"
 #include "sim_video.h"
 #include "vax_lk.h"
@@ -89,7 +91,7 @@ uint16 vc_cur[32];                                      /* cursor image data */
 uint32 vc_cur_p = 0;                                    /* cursor image pointer */
 t_bool vc_updated[VC_YSIZE];
 t_bool vc_cur_new_data = FALSE;                         /* New Cursor image data */
-t_bool vc_input_captured = FALSE;                       /* Mouse and Keyboard input captured in video window */
+bool vc_input_captured = false;                         /* Mouse and Keyboard input captured in video window */
 uint32 vc_cur_x = 0;                                    /* Last cursor X-position */
 uint32 vc_cur_y = 0;                                    /* Last cursor Y-position */
 uint32 vc_cur_f = 0;                                    /* Last cursor function */
@@ -564,7 +566,7 @@ t_stat vc_set_capture (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 if (vid_active)
     return sim_messagef (SCPE_ALATT, "Capture Mode Can't be changed with device enabled\n");
-vc_input_captured = val;
+vc_input_captured = (val != 0);
 return SCPE_OK;
 }
 

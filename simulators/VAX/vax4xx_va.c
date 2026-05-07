@@ -26,6 +26,8 @@
    va           GPX colour video
 */
 
+#include <stdbool.h>
+
 #include "vax_defs.h"
 #include "sim_video.h"
 #include "vax_gpx.h"
@@ -162,7 +164,7 @@ t_bool va_cur_v = FALSE;                                /* Last cursor visible *
 
 t_bool va_active = FALSE;
 t_bool va_updated[2048];
-t_bool va_input_captured = FALSE;                       /* Mouse and Keyboard input captured in video window */
+bool va_input_captured = false;                         /* Mouse and Keyboard input captured in video window */
 uint32 *va_buf = NULL;                                  /* Video memory */
 uint32 *va_lines = NULL;                                /* Video Display Lines */
 #if defined(BT458)
@@ -1440,7 +1442,7 @@ t_stat va_set_capture (UNIT *uptr, int32 val, const char *cptr, void *desc)
 
 if (vid_active)
     return sim_messagef (SCPE_ALATT, "Capture Mode Can't be changed with device enabled\n");
-va_input_captured = val;
+va_input_captured = (val != 0);
 return SCPE_OK;
 }
 
