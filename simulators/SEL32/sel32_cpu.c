@@ -22,7 +22,7 @@
 
 */
 
-#include "sel32_defs.h"
+#include "sel32_arith_internal.h"
 
 #ifndef CPUONLY
 #ifndef USE_IPU_THREAD
@@ -1813,8 +1813,6 @@ t_stat sim_instr(void) {
     t_uint64            source = 0;                 /* Holds source or memory data */
     t_uint64            td;                         /* Temporary */
     t_int64             int64a;                     /* temp int */
-    t_int64             int64b;                     /* temp int */
-    t_int64             int64c;                     /* temp int */
     uint32              addr;                       /* Holds address of last access */
     uint32              temp;                       /* General holding place for stuff */
 //  uint32              IR;                         /* Instruction register */
@@ -1840,9 +1838,6 @@ t_stat sim_instr(void) {
 //FORSTEP    uint32              stopnext = 0;      /* Stop on next instruction */
 //  uint32              int_icb;                    /* interrupt context block address */
     uint32              rstatus;                    /* temp return status */
-    int32               int32a;                     /* temp int */
-    int32               int32b;                     /* temp int */
-    int32               int32c;                     /* temp int */
 
     reason = SCPE_OK;
 
@@ -5237,23 +5232,10 @@ meoa:       /* merge point for eor, and, or */
 
         case 0x90>>2:       /* 0x90 SCC|RR|RM|ADR - RM|ADR */   /* CAMx */
             if (dbl == 0) {
-                int32a = dest & D32RMASK;           /* mask out right most 32 bits */
-                int32b = source & D32RMASK;         /* mask out right most 32 bits */
-                int32c = int32a - int32b;           /* signed diff */
-                td = int32c;
-                if (int32a > int32b) dest = 1;
-                else
-                if (int32a == int32b) dest = 0;
-                else dest = -1;
+                dest = sel32_cam_word_result((uint32)(dest & D32RMASK),
+                    (uint32)(source & D32RMASK));
             } else {
-                int64a = dest;                      /* mask out right most 32 bits */
-                int64b = source;                    /* mask out right most 32 bits */
-                int64c = int64a - int64b;           /* signed diff */
-                td = int64c;
-                if (int64a > int64b) dest = 1;
-                else
-                if (int64a == int64b) dest = 0;
-                else dest = -1;
+                dest = sel32_cam_double_result(dest, source);
             }
             break;
 
@@ -5787,9 +5769,7 @@ doovr2:
 /* */
             case 0x6:       /* SVC  none - none */  /* Supervisor Call Trap */
             {
-                int32c = CPUSTATUS;                 /* keep for retain blocking state */
                 addr = SPAD[0xf0];                  /* get trap table memory addr from SPAD (def 80, 20) */
-                int32a = addr;
                 if (addr == 0 || ((addr&MASK24) == MASK24)) {  /* see if secondary vector table set up */
                     TRAPME = ADDRSPEC_TRAP;         /* Not setup, error */
                     sim_debug(DEBUG_TRAP, my_dev,
