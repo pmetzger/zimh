@@ -130,6 +130,7 @@
 #include "sim_timer.h"
 #include <ctype.h>
 #include <math.h>
+#include <stdbool.h>
 
 /* Forward declarations of platform specific routines */
 
@@ -142,7 +143,7 @@ static t_stat sim_os_ttinit (void);
 static t_stat sim_os_ttrun (void);
 static t_stat sim_os_ttcmd (void);
 static t_stat sim_os_ttclose (void);
-static t_bool sim_os_fd_isatty (int fd);
+static bool sim_os_fd_isatty (int fd);
 
 static t_stat sim_set_rem_telnet (int32 flag, const char *cptr);
 static t_stat sim_set_rem_bufsize (int32 flag, const char *cptr);
@@ -332,7 +333,7 @@ return sim_set_notelnet (0, NULL);
 
 /* Forward declarations */
 
-static t_stat sim_os_fd_isatty (int fd);
+static bool sim_os_fd_isatty (int fd);
 
 /* Set/show data structures */
 
@@ -3517,11 +3518,14 @@ return r2;
 
 t_bool sim_ttisatty (void)
 {
-static int answer = -1;
+static bool initialized = false;
+static bool is_a_tty = false;
 
-if (answer == -1)
-    answer = sim_os_fd_isatty (0);
-return (t_bool)answer;
+if (!initialized) {
+    is_a_tty = sim_os_fd_isatty (0);
+    initialized = true;
+    }
+return is_a_tty;
 }
 
 t_bool sim_fd_isatty (int fd)
@@ -3657,7 +3661,7 @@ static t_stat sim_os_ttclose (void)
 return SCPE_OK;
 }
 
-static t_bool sim_os_fd_isatty (int fd)
+static bool sim_os_fd_isatty (int fd)
 {
 DWORD Mode;
 HANDLE handle;
@@ -3676,7 +3680,8 @@ switch (fd) {
         handle = NULL;
     }
 
-return (handle) && (handle != INVALID_HANDLE_VALUE) && GetConsoleMode (handle, &Mode);
+return (handle != NULL) && (handle != INVALID_HANDLE_VALUE) &&
+       (GetConsoleMode (handle, &Mode) != 0);
 }
 
 static t_stat sim_os_poll_kbd (void)
@@ -3916,9 +3921,9 @@ static t_stat sim_os_ttclose (void)
 return sim_ttcmd ();
 }
 
-static t_bool sim_os_fd_isatty (int fd)
+static bool sim_os_fd_isatty (int fd)
 {
-return isatty (fd);
+return isatty (fd) != 0;
 }
 
 static t_stat sim_os_poll_kbd (void)
@@ -4088,9 +4093,9 @@ static t_stat sim_os_ttclose (void)
 return sim_ttcmd ();
 }
 
-static t_bool sim_os_fd_isatty (int fd)
+static bool sim_os_fd_isatty (int fd)
 {
-return isatty (fd);
+return isatty (fd) != 0;
 }
 
 static t_stat sim_os_poll_kbd (void)
