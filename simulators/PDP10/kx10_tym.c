@@ -755,7 +755,6 @@ static void tym_output(void)
     }
 }
 
-static uint64 lock = ~0ULL;
 static uint64 dump = ~0ULL;
 static uint64 irng = ~0ULL;
 static uint64 isiz = ~0ULL;
