@@ -401,6 +401,16 @@ install(
                 -P ${CMAKE_SOURCE_DIR}/cmake/file-link-copy.cmake)"
     COMPONENT vax_family)
 
+add_test(
+    NAME zimh-vax-sysdev-bool
+    COMMAND
+        $<TARGET_FILE:vax>
+        "${CMAKE_CURRENT_SOURCE_DIR}/tests/vax-sysdev-bool_test.ini")
+set_tests_properties(
+    zimh-vax-sysdev-bool
+    PROPERTIES
+        LABELS "zimh;integration;zimh-VAX"
+        ENVIRONMENT "SDL_VIDEODRIVER=dummy;SDL_AUDIODRIVER=dummy")
 
 add_simulator(vax730
     SOURCES

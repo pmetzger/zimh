@@ -55,9 +55,10 @@
    28-Feb-02    RMS     Fixed bug, missing end of table (Lars Brinkhoff)
 */
 
-#include "vax_defs.h"
-
 #include <math.h>
+#include <stdbool.h>
+
+#include "vax_defs.h"
 
 #ifdef DONT_USE_INTERNAL_ROM
 #define BOOT_CODE_FILENAME "ka655x.bin"
@@ -240,7 +241,7 @@ int32 cso_csr = 0;                                      /* control/status */
 int32 cmctl_reg[CMCTLSIZE >> 2] = { 0 };                /* CMCTL reg */
 int32 ka_cacr = 0;                                      /* KA655 cache ctl */
 int32 ka_bdr = BDR_BRKENB;                              /* KA655 boot diag */
-t_bool ka_hltenab = 1;                                  /* Halt Enable / Autoboot flag */
+bool ka_hltenab = true;                                 /* Halt Enable / Autoboot flag */
 int32 ssc_base = SSCBASE;                               /* SSC base */
 int32 ssc_cnf = 0;                                      /* SSC conf */
 int32 ssc_bto = 0;                                      /* SSC timeout */
@@ -249,7 +250,7 @@ int32 tmr_csr[2] = { 0 };                               /* SSC timers */
 uint32 tmr_tir[2] = { 0 };                              /* curr interval */
 uint32 tmr_tnir[2] = { 0 };                             /* next interval */
 int32 tmr_tivr[2] = { 0 };                              /* vector */
-t_bool tmr_inst[2] = { 0 };                             /* wait instructions vs usecs */
+bool tmr_inst[2] = { false, false };                    /* wait instructions vs usecs */
 int32 ssc_adsm[2] = { 0 };                              /* addr strobes */
 int32 ssc_adsk[2] = { 0 };
 int32 cdg_dat[CDASIZE >> 2];                            /* cache data */
@@ -1700,12 +1701,12 @@ double usecs_sched_d = tmr_tir[tmr] ? (double)(~tmr_tir[tmr] + 1) : (1.0 + (doub
 sim_cancel (&sysd_unit[tmr]);                       /* Make sure not active */
 if ((ADDR_IS_ROM(fault_PC)) &&                      /* running from ROM and */
     (usecs_sched < TMR_INC)) {                      /* short delay? */
-    tmr_inst[tmr] = TRUE;                           /* wait for instructions */
+    tmr_inst[tmr] = true;                           /* wait for instructions */
     sim_activate (&sysd_unit[tmr], usecs_sched);
     sim_debug (DBG_SCHD, &sysd_dev, "tmr_sched(tmr=%d) - after %u instructions - activate after: %.0f usecs\n", tmr, usecs_sched, sim_activate_time_usecs (&sysd_unit[tmr]));
     }
 else {
-    tmr_inst[tmr] = FALSE;
+    tmr_inst[tmr] = false;
     sim_activate_after_d (&sysd_unit[tmr], usecs_sched_d);
     sim_debug (DBG_SCHD, &sysd_dev, "tmr_sched(tmr=%d) - after %.0f usecs - activate after: %.0f usecs\n", tmr, usecs_sched_d, sim_activate_time_usecs (&sysd_unit[tmr]));
     }
@@ -1818,7 +1819,7 @@ conpsl = PSL_IS | PSL_IPL1F | CON_PWRUP;
 if (rom == NULL)
     return SCPE_IERR;
 if (*rom == 0) {                                        /* no boot? */
-    r = cpu_load_bootcode (BOOT_CODE_FILENAME, BOOT_CODE_ARRAY, BOOT_CODE_SIZE, TRUE, 0);
+    r = cpu_load_bootcode (BOOT_CODE_FILENAME, BOOT_CODE_ARRAY, BOOT_CODE_SIZE, true, 0);
     if (r != SCPE_OK)
         return r;
     }
@@ -1835,7 +1836,7 @@ t_stat sysd_set_halt (UNIT *uptr, int32 val, const char *cptr, void *desc)
 (void) cptr;
 (void) desc;
 
-ka_hltenab = val;
+ka_hltenab = (val != 0);
 if (ka_hltenab)
     ka_bdr |= BDR_BRKENB;
 else
@@ -1868,7 +1869,7 @@ int32 i;
 if (sim_switches & SWMASK ('P')) sysd_powerup ();       /* powerup? */
 for (i = 0; i < 2; i++) {
     tmr_csr[i] = tmr_tnir[i] = tmr_tir[i] = 0;
-    tmr_inst[i] = FALSE;
+    tmr_inst[i] = false;
     sim_cancel (&sysd_unit[i]);
     }
 csi_csr = 0;
