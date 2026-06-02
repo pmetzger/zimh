@@ -194,6 +194,11 @@ int main(int argc, char **argv)
         cmocka_unit_test(test_xalloc_contract_violations_abort),
     };
 
+#if defined(_WIN32)
+    // Suppress the "Debug Error!" dialog and Watson crash dumps
+    _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+#endif
+
     test_program_path = argv[0];
     if ((argc == 3) && (strcmp(argv[1], "--expect-abort") == 0))
         return run_abort_case(argv[2]);

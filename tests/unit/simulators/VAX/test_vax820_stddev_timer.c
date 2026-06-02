@@ -119,5 +119,10 @@ int main(void)
         cmocka_unit_test(test_done_clear_with_pending_tick_acknowledges_tick),
     };
 
+#if defined(_WIN32)
+    // Suppress the "Debug Error!" dialog and Watson crash dumps
+    _set_abort_behavior(0, _WRITE_ABORT_MSG | _CALL_REPORTFAULT);
+#endif
+
     return cmocka_run_group_tests(tests, NULL, NULL);
 }
