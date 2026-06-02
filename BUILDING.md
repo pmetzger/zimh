@@ -180,6 +180,12 @@ cmake --build --preset ninja-release
   compilation (Default: `Off`).
 - `-DC_DIALIECT={11|17|23|26}` - Set the C compiler's dialect to C11,
   C17, C23 or C26.
+- `-DSTD_EXTENSIONS={On|Off}` - Enable C dialect-specific extensions.
+  
+  Note: The ZIMH code does not rely on or use dialect-specific
+  extensions, as might be avaiable via `gnu11` in the GNU C
+  compiler. Consequently, this configuration variable has very little
+  effect. It exists for completeness.
 
 ---
 
