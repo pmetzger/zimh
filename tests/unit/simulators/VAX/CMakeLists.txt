@@ -174,6 +174,7 @@ add_unit_test(unit-vax820-stddev-timer
         VM_VAX
         VAX_820
     FEATURE_FULL64
+    USES_AIO
 )
 
 add_unit_test(unit-vax-kdb50

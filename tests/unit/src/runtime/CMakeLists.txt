@@ -110,6 +110,7 @@ add_unit_test(unit-sim-frontpanel
         ${CMAKE_CURRENT_SOURCE_DIR}/test_sim_frontpanel.c
     INCLUDES
         ${PROJECT_SOURCE_DIR}/tests/unit/support
+    USES_AIO
 )
 
 add_unit_test(unit-sim-sock

@@ -31,6 +31,7 @@ add_simulator(sel32
     DEFINES
         USE_INT32
         SEL32
+    USES_AIO
     LABEL SEL32
     PKG_FAMILY gould_family
     TEST sel32)

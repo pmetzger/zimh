@@ -3920,6 +3920,12 @@ do {
         }
       break;
 #endif /* HAVE_TAP_NETWORK */
+#ifdef HAVE_SLIRP_NETWORK
+    case ETH_API_NAT:
+      status = -1;
+      sim_messagef(SCPE_IERR, "USE_READER_THREAD must be defined to use the SLIRP network API");
+      break;
+#endif /* HAVE_SLIRP_NETWORK */
 #ifdef HAVE_VDE_NETWORK
     case ETH_API_VDE:
       {

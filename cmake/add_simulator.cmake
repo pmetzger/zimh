@@ -90,9 +90,6 @@ function(build_simcore _targ)
     # don't export out to the dependencies (hence PRIVATE.)
     foreach (lib IN ITEMS "${_targ}" "${sim_aio_lib}")
         set_target_properties(${lib} PROPERTIES
-            C_STANDARD ${CMAKE_C_STANDARD}
-            C_STANDARD_REQUIRED ON
-            C_EXTENSIONS OFF
             EXCLUDE_FROM_ALL True
         )
         target_compile_definitions(${lib} PRIVATE USE_SIM_CARD USE_SIM_IMD)
@@ -142,12 +139,12 @@ function(build_simcore _targ)
             simh_network
             simh_regexp
             os_features
-            thread_lib
         )
-
     endforeach ()
 
+    ## Add extras to the AIO variant:
     target_compile_definitions(${sim_aio_lib} PUBLIC ${AIO_FLAGS})
+    target_link_libraries(${sim_aio_lib} PUBLIC thread_lib)
 
     # Create target cppcheck rule, if detected.
     if (ENABLE_CPPCHECK AND cppcheck_cmd)

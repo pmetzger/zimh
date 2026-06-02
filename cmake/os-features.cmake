@@ -23,21 +23,23 @@ if(NOT TARGET PTW::PTW AND WIN32)
     find_package(PTW)
 endif()
 
+# AIO_FLAGS: Used in add_simulator.cmake to enable asynchronous I/O support primarily
+# in Ethernet devices. It's only useful if the platform threading libraries are
+# detected and building the AIO version of the core libraries.
+set(AIO_FLAGS)
+
 if(TARGET PTW::PTW)
     # Forward all header paths, multi-config libs, and definitions to thread_lib
     target_link_libraries(thread_lib INTERFACE PTW::PTW)
-    target_compile_definitions(thread_lib INTERFACE SIM_ASYNCH_IO HAVE_PTHREAD)
-    
+    list(APPEND AIO_FLAGS "SIM_ASYNCH_IO" "HAVE_PTHREAD" "USE_READER_THREAD")
     message(STATUS "pthreads-dep: Using modern PTW::PTW interface target")
-
-# 2. POSIX Path: Fallback to native system threads (Linux, FreeBSD, macOS)
 else()
+    # POSIX Path: Fallback to native system threads (Linux, FreeBSD, macOS)
     # FindThreads looks for -pthread, -lpthread, etc. based on platform/compiler
     find_package(Threads REQUIRED)
     
     target_link_libraries(thread_lib INTERFACE Threads::Threads)
-    target_compile_definitions(thread_lib INTERFACE SIM_ASYNCH_IO HAVE_PTHREAD)
-    
+    list(APPEND AIO_FLAGS "SIM_ASYNCH_IO" "HAVE_PTHREAD" "USE_READER_THREAD")
     message(STATUS "pthreads-dep: Using system native Threads::Threads")
 endif()
 
