@@ -474,8 +474,8 @@ t_stat eth_mac_scan_ex (ETH_MAC mac, const char* strmac, UNIT *uptr)
     fprintf (f, "file:      %s\n", state.file);
     eth_mac_fmt (state.base_mac, filebuf, sizeof(filebuf));
     fprintf (f, "base-mac:  %s\n", filebuf);
-    fprintf (f, "specified: %d bits\n", state.bits);
-    fprintf (f, "generated: %d bits\n", 48-state.bits);
+    fprintf (f, "specified: %u bits\n", state.bits);
+    fprintf (f, "generated: %u bits\n", 48-state.bits);
     fclose (f);
     }
   /* copy into passed mac */
@@ -902,10 +902,12 @@ t_stat eth_show (FILE* st, UNIT* uptr, int32_t val, const void* desc)
     if (number == 0)
       fprintf(st, "  no network devices are available\n");
     else {
-      size_t min, len;
+      size_t min;
       int i;
-      for (i=0, min=0; i<number; i++)
-        if ((len = strlen(list[i].name)) > min) min = len;
+      for (i=0, min=0; i<number; i++) {
+        size_t len = strlen(list[i].name);
+        if (len > min) min = len;
+      }
       for (i=0; i<number; i++)
         fprintf(st," eth%d\t%-*s (%s)\n", i, (int)min, list[i].name, list[i].desc);
     }
@@ -1820,7 +1822,7 @@ _eth_callback((u_char *)opaque, &header, buf);
 static void *
 _eth_reader(void *arg)
 {
-ETH_DEV* volatile dev = (ETH_DEV*)arg;
+ETH_DEV* volatile dev = (ETH_DEV *) arg;
 int status = 0;
 int sel_ret = 0;
 int do_select = 0;
@@ -1853,6 +1855,11 @@ sim_debug(dev->dbit, dev->dptr, "Reader Thread Starting\n");
    thread which, in general, won't be readily yielding the processor
    when this thread needs to run */
 sim_os_set_thread_priority (PRIORITY_ABOVE_NORMAL);
+
+/* Signal that we've started... */
+pthread_mutex_lock(&dev->startup_mtx);
+pthread_cond_signal(&dev->startup_cond);
+pthread_mutex_unlock(&dev->startup_mtx);
 
 while (dev->handle) {
 #if defined (_WIN32)
@@ -2007,7 +2014,7 @@ return NULL;
 static void *
 _eth_writer(void *arg)
 {
-ETH_DEV* volatile dev = (ETH_DEV*)arg;
+ETH_DEV* volatile dev = (ETH_DEV *) arg;
 ETH_WRITE_REQUEST *request = NULL;
 
 /* Boost Priority for this I/O thread vs the CPU instruction execution
@@ -2016,6 +2023,11 @@ ETH_WRITE_REQUEST *request = NULL;
 sim_os_set_thread_priority (PRIORITY_ABOVE_NORMAL);
 
 sim_debug(dev->dbit, dev->dptr, "Writer Thread Starting\n");
+
+/* Signal that we've started... */
+pthread_mutex_lock(&dev->startup_mtx);
+pthread_cond_signal(&dev->startup_cond);
+pthread_mutex_unlock(&dev->startup_mtx);
 
 pthread_mutex_lock (&dev->writer_lock);
 while (dev->handle) {
@@ -2068,6 +2080,8 @@ static void
 eth_stop_threads(ETH_DEV *dev)
 {
     if (dev->reader_thread_started) {
+        /* Shut down the threads before closing the device. */
+        dev->reader_status = ETH_THREAD_SHUTDOWN;
         pthread_join(dev->reader_thread, NULL);
         dev->reader_thread_started = false;
     }
@@ -2095,6 +2109,9 @@ eth_destroy_thread_state(ETH_DEV *dev)
     pthread_mutex_destroy(&dev->self_lock);
     pthread_mutex_destroy(&dev->writer_lock);
     pthread_cond_destroy(&dev->writer_cond);
+    pthread_mutex_destroy(&dev->startup_mtx);
+    pthread_cond_destroy(&dev->startup_cond);
+
     while (NULL != (buffer = dev->write_buffers)) {
         dev->write_buffers = buffer->next;
         free(buffer);
@@ -2178,7 +2195,9 @@ dev->throttle_mask = (1 << dev->throttle_burst) - 1;
 return SCPE_OK;
 }
 
-static t_stat _eth_open_port(char *savname, size_t savname_size, int *eth_api, void **handle, SOCKET *fd_handle, char errbuf[PCAP_ERRBUF_SIZE], char *bpf_filter, void *opaque, DEVICE *dptr, uint32_t dbit)
+static t_stat _eth_open_port(char *savname, size_t savname_size, eth_api_t *eth_api, void **handle, 
+                             SOCKET *fd_handle, char errbuf[PCAP_ERRBUF_SIZE], char *bpf_filter, 
+                             void *opaque, DEVICE *dptr, uint32_t dbit)
 {
   (void)savname_size;
 
@@ -2505,7 +2524,7 @@ t_stat r;
 int bufsz = (BUFSIZ < ETH_MAX_PACKET) ? ETH_MAX_PACKET : BUFSIZ;
 char errbuf[PCAP_ERRBUF_SIZE];
 char temp[1024], desc[1024] = "";
-const char* savname = name;
+const char* savname;
 char namebuf[4*CBUFSIZE];
 int   num;
 
@@ -2576,14 +2595,15 @@ dev->dbit = dbit;
 if (dev->eth_api == ETH_API_TEST)
   dev->reflections = 0;
 
-#if defined (USE_READER_THREAD)
+#if defined(USE_READER_THREAD)
 if (dev->eth_api != ETH_API_TEST)
 {
   pthread_attr_t attr;
   int create_status;
   pcap_t *opened_handle;
   SOCKET opened_fd;
-  const char *thread_name = "reader";
+  char thr_name[16];
+  const size_t n_thr_name = sizeof(thr_name) / sizeof(char);
 
   r = ethq_init (&dev->read_queue, 200);     /* initialize FIFO queue */
   if (r != SCPE_OK) {
@@ -2596,35 +2616,55 @@ if (dev->eth_api != ETH_API_TEST)
   pthread_mutex_init (&dev->writer_lock, NULL);
   pthread_mutex_init (&dev->self_lock, NULL);
   pthread_cond_init (&dev->writer_cond, NULL);
-  dev->threading_initialized = true;
+  pthread_cond_init (&dev->startup_cond, NULL);
+  pthread_mutex_init (&dev->startup_mtx, NULL);
+
   pthread_attr_init(&attr);
   pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
+  
+  snprintf(thr_name, n_thr_name - 1, "r: %s", dev->name); 
+  thr_name[n_thr_name - 1] = '\0'; 
   create_status = pthread_create (&dev->reader_thread, &attr, _eth_reader,
                                   (void *)dev);
   if (create_status == 0) {
     dev->reader_thread_started = true;
-    thread_name = "writer";
+    pthread_mutex_lock (&dev->startup_mtx);
+    pthread_cond_wait(&dev->startup_cond, &dev->startup_mtx);
+    pthread_setname_np(dev->reader_thread, thr_name);
+
+    snprintf(thr_name, n_thr_name - 1, "w: %s", dev->name); 
+    thr_name[n_thr_name - 1] = '\0'; 
     create_status = pthread_create (&dev->writer_thread, &attr, _eth_writer,
                                     (void *)dev);
-    if (create_status == 0)
+    if (create_status == 0) {
+      /* pthread_cond_wait() returns with startup_mtx locked. */
+      pthread_setname_np(dev->writer_thread, thr_name);
+      pthread_cond_wait(&dev->startup_cond, &dev->startup_mtx);
+      pthread_mutex_unlock (&dev->startup_mtx);
+
+      dev->threading_initialized = true;
       dev->writer_thread_started = true;
     }
-  pthread_attr_destroy(&attr);
-  if (create_status != 0) {
-    opened_handle = (pcap_t *)dev->handle;
-    opened_fd = dev->fd_handle;
-    dev->handle = NULL;
-    dev->fd_handle = 0;
-    eth_stop_threads(dev);
-    eth_destroy_thread_state(dev);
-    _eth_close_port (dev->eth_api, opened_handle, opened_fd);
-    free(dev->name);
-    eth_zero(dev);
-    return sim_messagef (SCPE_OPENERR, "Eth: can't start %s thread: %s\n",
-                         thread_name, strerror(create_status));
+
+    pthread_attr_destroy(&attr);
+
+    if (create_status != 0) {
+      opened_handle = (pcap_t *)dev->handle;
+      opened_fd = dev->fd_handle;
+      dev->handle = NULL;
+      dev->fd_handle = 0;
+      eth_stop_threads(dev);
+      eth_destroy_thread_state(dev);
+      _eth_close_port (dev->eth_api, opened_handle, opened_fd);
+      free(dev->name);
+      eth_zero(dev);
+      return sim_messagef (SCPE_OPENERR, "Eth: can't start %s thread: %s\n",
+                           thr_name, strerror(create_status));
+      }
     }
   }
 #endif /* defined (USE_READER_THREAD */
+
 _eth_add_to_open_list (dev);
 /*
  * install a total filter on a newly opened interface and let the device
@@ -3170,14 +3210,17 @@ memcpy(request->packet.msg, packet->msg, packet->len);
   *last_request = request;
   if (write_queue_size > dev->write_queue_peak)
     dev->write_queue_peak = write_queue_size;
+
+  /* Awaken writer thread to perform actual write if first packet. */
+  if (write_queue_size > 1)
+    pthread_cond_signal (&dev->writer_cond);
   }
 
-/* Awaken writer thread to perform actual write */
-pthread_cond_signal (&dev->writer_cond);
+/* Done mutating. */
 pthread_mutex_unlock (&dev->writer_lock);
 
 /* Return with a status from some prior write */
-if (routine)
+if (routine != NULL)
   (routine)(dev->write_status);
 return dev->write_status;
 #else
@@ -4278,29 +4321,29 @@ if (dev->have_host_nic_phy_addr) {
   fprintf(st, "  Host NIC Address:        %s\n", hw_mac);
   }
 if (dev->jumbo_dropped)
-  fprintf(st, "  Jumbo Dropped:           %d\n", dev->jumbo_dropped);
+  fprintf(st, "  Jumbo Dropped:           %u\n", dev->jumbo_dropped);
 if (dev->jumbo_fragmented)
-  fprintf(st, "  Jumbo Fragmented:        %d\n", dev->jumbo_fragmented);
+  fprintf(st, "  Jumbo Fragmented:        %u\n", dev->jumbo_fragmented);
 if (dev->jumbo_truncated)
-  fprintf(st, "  Jumbo Truncated:         %d\n", dev->jumbo_truncated);
+  fprintf(st, "  Jumbo Truncated:         %u\n", dev->jumbo_truncated);
 if (dev->packets_sent)
-  fprintf(st, "  Packets Sent:            %d\n", dev->packets_sent);
+  fprintf(st, "  Packets Sent:            %u\n", dev->packets_sent);
 if (dev->transmit_packet_errors)
-  fprintf(st, "  Send Packet Errors:      %d\n", dev->transmit_packet_errors);
+  fprintf(st, "  Send Packet Errors:      %u\n", dev->transmit_packet_errors);
 if (dev->packets_received)
-  fprintf(st, "  Packets Received:        %d\n", dev->packets_received);
+  fprintf(st, "  Packets Received:        %u\n", dev->packets_received);
 if (dev->receive_packet_errors)
-  fprintf(st, "  Read Packet Errors:      %d\n", dev->receive_packet_errors);
+  fprintf(st, "  Read Packet Errors:      %u\n", dev->receive_packet_errors);
 if (dev->error_reopen_count)
-  fprintf(st, "  Error ReOpen Count:      %d\n", dev->error_reopen_count);
+  fprintf(st, "  Error ReOpen Count:      %u\n", dev->error_reopen_count);
 if (dev->loopback_packets_processed)
-  fprintf(st, "  Loopback Packets:        %d\n", dev->loopback_packets_processed);
+  fprintf(st, "  Loopback Packets:        %u\n", dev->loopback_packets_processed);
 #if defined(USE_READER_THREAD)
 fprintf(st, "  Asynch Interrupts:       %s\n", dev->asynch_io?"Enabled":"Disabled");
 if (dev->asynch_io)
   fprintf(st, "  Interrupt Latency:       %d uSec\n", dev->asynch_io_latency);
 if (dev->throttle_count)
-  fprintf(st, "  Throttle Delays:         %d\n", dev->throttle_count);
+  fprintf(st, "  Throttle Delays:         %u\n", dev->throttle_count);
 fprintf(st, "  Read Queue: Count:       %d\n", dev->read_queue.count);
 fprintf(st, "  Read Queue: High:        %d\n", dev->read_queue.high);
 fprintf(st, "  Read Queue: Loss:        %d\n", dev->read_queue.loss);
@@ -4309,7 +4352,7 @@ fprintf(st, "  Peak Write Queue Size:   %d\n", dev->write_queue_peak);
 if (dev->error_needs_reset)
   fprintf(st, "  In Error Needs Reset:    True\n");
 if (dev->error_reopen_count)
-  fprintf(st, "  Error Reopen Count:      %d\n", (int)dev->error_reopen_count);
+  fprintf(st, "  Error Reopen Count:      %u\n", dev->error_reopen_count);
 {
   int i, count = 0;
   char  buffer[ETH_MAC_STRING_SIZE];
@@ -4342,7 +4385,7 @@ t_stat eth_test_crc32 (DEVICE *dptr)
 int errors = 0;
 int val;
 uint8_t data[12];
-static uint32_t valcrc32[] = {
+static const uint32_t valcrc32[] = {
   0x7BD5C66F, 0x92C4D707, 0x7286E2FE, 0x9B97F396, 0x69738F4D, 0x80629E25, 0x6020ABDC, 0x8931BAB4,
   0x5E99542B, 0xB7884543, 0x57CA70BA, 0xBEDB61D2, 0x4C3F1D09, 0xA52E0C61, 0x456C3998, 0xAC7D28F0,
   0x314CE2E7, 0xD85DF38F, 0x381FC676, 0xD10ED71E, 0x23EAABC5, 0xCAFBBAAD, 0x2AB98F54, 0xC3A89E3C,
@@ -4521,7 +4564,6 @@ for (eth_num=0; eth_num<eth_device_count; eth_num++) {
           for (hash_listindex=0; hash_listindex<=1; hash_listindex++) {
             for (host_phy_addr_listindex=0; host_phy_addr_listindex<=1; host_phy_addr_listindex++) {
               int i;
-              char errbuf[PCAP_ERRBUF_SIZE];
 
               ++bpf_count;
               r = eth_bpf_filter (&dev, addr_count, &filter_address[0],
@@ -4542,6 +4584,7 @@ for (eth_num=0; eth_num<eth_device_count; eth_num++) {
                   }
                 if (dev.eth_api == ETH_API_PCAP) {
                   struct bpf_program bpf;
+                  char errbuf[PCAP_ERRBUF_SIZE];
 
                   if (pcap_compile ((pcap_t*)dev.handle, &bpf, buf, 1, (bpf_u_int32)0) < 0) {
                     ++bpf_compile_error_count;
